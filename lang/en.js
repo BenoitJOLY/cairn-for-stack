@@ -478,6 +478,7 @@ I18N.add("en", {
   "msg.err_topo_eq_vide":  "Chem Topo Q{n}: equation is empty.",
   "msg.err_chem_vide":     "Chemical equation Q{n}: field is empty.",
   "msg.err_chem_enonce_vide": "Chemical equation Q{n}: the statement is required (the student will see no other instructions).",
+  "msg.err_nuc_enonce_vide": "Nuclear reaction Q{n}: the statement is required (the student will see no other instructions).",
   "msg.err_nuc_vide":      "Nuclear Q{n}: please enter a nuclear reaction.",
   "msg.err_nuc_fleche":    "Nuclear Q{n}: the reaction must contain an arrow (→ or ->).",
   "msg.err_nuc_parse":     "Nuclear Q{n}: unable to parse the reaction. Check the syntax.",
@@ -927,6 +928,7 @@ I18N.add("en", {
   "type.thermo":         "Thermodynamics",
   "type.diffraction":    "Interference-Diffraction",
   "type.image-mesure":   "Image measurement",
+  "type.apn":            "Camera (exposure)",
   "type.expert":         "Expert STACK Question",
   "palette.cat.expert":  "Expert STACK Mode"
 }, { name: "English", dir: "ltr" });

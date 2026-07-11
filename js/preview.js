@@ -3498,15 +3498,40 @@ function renderPreviewHTML_topo(state) {
 window.topoRefreshPreview = _hsWireSimplePreview('chemical_topo', 'topo', 'topo-preview-container', 'fp-chemical_topo', renderPreviewHTML_topo);
 
 function renderPreviewHTML_nuclear(state) {
-  var np = document.getElementById('nuc-preview');
+  var realParts = {};
+  try { realParts = (typeof genNuclear === 'function') ? genNuclear(1) : {}; } catch (e) { realParts = {}; }
+  var prtBoxes = _hsPrtBoxes(realParts);
+  var diagNodes = (realParts.diagNodes || []).map(function(n) { return { desc: n.desc, fb: n.fb }; });
+  // genNuclear() embarque désormais lui-même l'encart "réponse attendue" dans
+  // generalFeedback (voir js/gen-nuclear.js, fin de genNuclear) — c'est ce même champ
+  // qui part dans le XML exporté via js/app.js. On l'affiche tel quel ici, sans le
+  // reconstruire séparément, pour ne jamais diverger de l'export réel.
+  var fbGenAutoHTML = realParts.generalFeedback ? _hsRenderMath(realParts.generalFeedback) : '';
+  // L'élève ne voit PAS le rendu KaTeX de la réaction modèle (ça, c'est réservé au
+  // panneau Config enseignant) : le [[jsxgraph]] exporté (buildNuclearJSXCode) lui
+  // affiche une zone d'édition VIDE avec la même barre d'outils de particules —
+  // donc l'aperçu doit mimer cette interface vide, pas la réponse (même logique que
+  // renderPreviewHTML_chemical, cf. exampleHTML).
+  var nucIsotopeChip = '<span style="background:#2980b9;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;display:inline-flex;align-items:center;gap:1px;">'
+    + '<span style="display:inline-flex;flex-direction:column;line-height:.75;font-size:.7em;text-align:left;"><span>A</span><span>Z</span></span>X</span>';
+  var nucChips = nucIsotopeChip + [
+    ['+', '#7f8c8d'], ['→', '#7f8c8d'], ['*', '#8e44ad'],
+    ['α', '#c0392b'], ['γ', '#27ae60'], ['β⁻', '#e67e22'], ['β⁺', '#e67e22'],
+    ['e⁺', '#d35400'], ['e⁻', '#8e44ad'], ['n', '#f39c12'], ['p', '#e74c3c'], ['ν', '#7f8c8d']
+  ].map(function(c) { return '<span style="background:' + c[1] + ';color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">' + c[0] + '</span>'; }).join('');
   return _hsSimplePreviewHTML({
     badge: 'Réaction Nucléaire', badgeColor: '#5b21b6', noteBg: '#f5f3ff', noteColor: '#5b21b6',
     prefix: 'nuc', bareme: state.bareme || 2,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : compléter la réaction nucléaire.</em></p>'),
-    exampleHTML: (np && np.innerHTML.trim())
-      ? '<div style="text-align:center;font-size:1.1rem;">' + np.innerHTML + '</div>'
-      : '<p style="color:#94a3b8;font-style:italic;">Actualisez l\'aperçu dans l\'onglet Config pour afficher la réaction.</p>',
-    fbOk: '', fbWrong: '', fbGen: state.fbGen
+    text: _hsRenderMath(state.text || '<p style="color:#b91c1c;"><em>⚠️ Aucun énoncé saisi — l\'élève ne verra aucune consigne au-dessus de l\'éditeur de réaction. Rédigez l\'énoncé (ex. "Compléter la réaction de fission de l\'uranium 235").</em></p>'),
+    exampleLabel: 'Ce que voit l\'élève (zone de saisie vide, il compose sa propre réaction) :',
+    exampleHTML: '<div style="text-align:left;">'
+      + '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">' + nucChips + '</div>'
+      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#94a3b8;font-style:italic;">(l\'élève écrit ici sa réaction — aucune réaction n\'est pré-remplie)</div>'
+      + '</div>',
+    fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
+    fbOk: prtBoxes.okFb, fbWrong: prtBoxes.wrongFb,
+    fbGenAuto: fbGenAutoHTML,
+    extraFeedbackNodes: diagNodes
   });
 }
 window.nucRefreshPreview = _hsWireSimplePreview('nuclear', 'nuc', 'nuc-preview-container', 'fp-nuclear', renderPreviewHTML_nuclear);
@@ -3635,3 +3660,29 @@ function renderPreviewHTML_doi(state) {
   });
 }
 window.doiRefreshPreview = _hsWireSimplePreview('doi', 'doi', 'doi-preview-container', 'fp-doi', renderPreviewHTML_doi);
+
+function renderPreviewHTML_apn(state) {
+  var realParts = {};
+  try { realParts = (typeof genApn === 'function') ? genApn(1) : {}; } catch (e) { realParts = {}; }
+  var realGeneralFeedback = realParts.generalFeedback || '';
+  var knownVars = _calcExtractKnownVars(realParts.vars || '');
+  var prtBoxes = _hsPrtBoxes(realParts);
+  var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:170px;';
+  var bodyFrag = (realParts.textFrag || '')
+    .replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
+    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled placeholder="Choix (bouton radio)" style="' + fakeInputStyle + '">')
+    .replace(/\[\[validation:[^\]]+\]\]/g, '');
+  var scenarioHTML = bodyFrag ? _calcTokenizeForPreview(bodyFrag, knownVars)
+    : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
+  var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
+  return _hsSimplePreviewHTML({
+    badge: 'Appareil photo', badgeColor: '#1e3a8a', noteBg: '#eff6ff', noteColor: '#1e3a8a',
+    prefix: 'apn', bareme: state.bareme || 1,
+    text: _hsRenderMath(scenarioHTML),
+    hideExampleBox: true,
+    fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
+    fbGenAuto: _hsRenderMath(_calcTokenizeForPreview(realGeneralFeedback, knownVars) + note),
+    fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen
+  });
+}
+window.apnRefreshPreview = _hsWireSimplePreview('apn', 'apn', 'apn-preview-container', 'fp-apn', renderPreviewHTML_apn);

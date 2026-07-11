@@ -4,6 +4,28 @@
 //  HÉSTACK FORM PANEL — INTERACTIONS ÉDITEUR
 // ══════════════════════════════════════════════════════
 
+// Verrouille la zone de saisie de la réaction (éditeur + barre d'outils) tant que
+// l'énoncé (nuc-text) est vide — l'énoncé est obligatoire (voir validation dans
+// genNuclear) donc il n'y a aucune raison de laisser l'enseignant saisir la réaction
+// avant de l'avoir rédigé. Même convention que chemUpdateLock (gen-topo.js).
+function nucUpdateLock() {
+  const editor = document.getElementById('nuc-editor');
+  const toolbar = document.querySelector('#fp-nuclear .nuc-toolbar');
+  const hint = document.getElementById('nuc-lock-hint');
+  const hasText = !!(typeof richVal === 'function' && richVal('nuc-text').trim());
+  if (editor) {
+    editor.setAttribute('contenteditable', hasText ? 'true' : 'false');
+    editor.style.opacity = hasText ? '1' : '.5';
+    editor.style.pointerEvents = hasText ? '' : 'none';
+    editor.title = hasText ? '' : 'Rédigez d\'abord l\'énoncé ci-dessus.';
+  }
+  if (toolbar) toolbar.querySelectorAll('button').forEach(b => { b.disabled = !hasText; });
+  if (hint) hint.style.display = hasText ? 'none' : 'block';
+}
+document.addEventListener('DOMContentLoaded', function () {
+  if (typeof nucUpdateLock === 'function') nucUpdateLock();
+});
+
 function nucInsert(text) {
   const editor = document.getElementById('nuc-editor');
   if (!editor) return;
@@ -176,6 +198,23 @@ function nucEquationToLatex(reactants, products) {
 // ══════════════════════════════════════════════════════
 //  JSXGRAPH CODE (interface élève dans Moodle)
 // ══════════════════════════════════════════════════════
+// Ouverture du bloc [[jsxgraph]] — reste dans textFrag (pas de ">" litigieux ici,
+// seuls des attributs), suivie du marqueur <!--HS-KBD:X--> puis [[/jsxgraph]].
+function buildNuclearJSXOpen(X) {
+  const refAns  = `refA${X}`;
+  const refSent = `refS${X}`;
+  const refRea  = `refR${X}`;
+  const refPro  = `refP${X}`;
+  return `[[jsxgraph width="100%" height="600px" input-ref-ans${X}="${refAns}" input-ref-ans${X}s="${refSent}" input-ref-ans${X}r="${refRea}" input-ref-ans${X}p="${refPro}"]]`;
+}
+
+// Corps du script (kbdRaw) — NE DOIT JAMAIS être inliné dans textFrag : ce JS brut
+// contient de vrais ">" (comparateurs, chaîne " -> " du bouton Flèche, etc.) que
+// stripMathDivs/moodleLatex (js/app.js) échapperait en "&gt;" lors de l'aller-retour
+// DOM (div.innerHTML=html puis relecture) — même bug historique corrigé pour
+// l'équation chimique (voir gen-topo.js/genChemical, feedback_jsxgraph_export_bug).
+// Fix : ce script est restitué APRÈS coup via q.kbdRaw + marqueur <!--HS-KBD:X-->
+// (js/app.js ~L300, jamais touché par stripMathDivs).
 function buildNuclearJSXCode(X) {
   // Noms des refs STACK — correspondent aux input-ref-* du [[jsxgraph]]
   const refAns  = `refA${X}`;   // raw LaTeX
@@ -183,8 +222,7 @@ function buildNuclearJSXCode(X) {
   const refRea  = `refR${X}`;   // réactifs parsés [[coeff,A,Z,"X"],...]
   const refPro  = `refP${X}`;   // produits parsés
 
-  return `[[jsxgraph width="100%" height="600px" input-ref-ans${X}="${refAns}" input-ref-ans${X}s="${refSent}" input-ref-ans${X}r="${refRea}" input-ref-ans${X}p="${refPro}"]]
-
+  return `
 // --- 1. UTILITAIRE ---
 function setRef(ref, value) {
   var el = document.getElementById(ref);
@@ -331,9 +369,7 @@ editor.addEventListener('keyup', function(){ updateLivePreview(); saveAnswer(); 
 var savedVal = document.getElementById(${refAns});
 if(savedVal && savedVal.value && savedVal.value.trim()!==''){
     editor.innerHTML = savedVal.value; updateLivePreview(); saveAnswer();
-}
-
-[[/jsxgraph]]`;
+}`;
 }
 
 // ══════════════════════════════════════════════════════
@@ -342,6 +378,7 @@ if(savedVal && savedVal.value && savedVal.value.trim()!==''){
 function genNuclear(X) {
   const bareme = parseFloat(v('nuc-bareme')) || 1;
   const text   = richVal('nuc-text');
+  if (!text || !text.trim()) throw new Error(I18N.t('msg.err_nuc_enonce_vide', {n: X}));
   const editor = document.getElementById('nuc-editor');
   const rawEq  = editor ? editor.innerText.trim() : '';
 
@@ -379,8 +416,13 @@ nuc${X}_rea: ${ta3Str};
 nuc${X}_pro: ${ta4Str};
 nuc${X}_latex: "${latexForMaxima}"`;
 
-  // ── JSXGraph code ─────────────────────────────────
-  const jsxCode = buildNuclearJSXCode(X);
+  // ── JSXGraph code ──────────────────────────────────
+  // Le JS brut (kbdRaw) n'est PAS inliné dans textFrag (voir commentaire au-dessus de
+  // buildNuclearJSXCode) : seuls les tags [[jsxgraph]]/[[/jsxgraph]] et le marqueur
+  // <!--HS-KBD:X--> restent dans textFrag ; le vrai JS est restitué après coup via
+  // q.kbdRaw (js/app.js ~L300).
+  const jsxOpen = buildNuclearJSXOpen(X);
+  const kbdRaw  = buildNuclearJSXCode(X);
 
   const textFrag =
 `<div style="background:#EAB308;border-left:5px solid #676863;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -388,7 +430,9 @@ nuc${X}_latex: "${latexForMaxima}"`;
   <span style="background:#676863;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div style="margin-bottom:14px;">${text || ''}</div><!-- ENONCE-END -->
-${jsxCode}
+${jsxOpen}
+<!--HS-KBD:${X}-->
+[[/jsxgraph]]
 <div style="display:none;">
     [[input:ans${X}]] [[validation:ans${X}]]
     [[input:ans${X}s]] [[validation:ans${X}s]]
@@ -638,17 +682,52 @@ fb_asterisk${X}: sconcat(
   const prtMeta = { name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables: fbVars };
   const prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
+  // Feedbacks de tous les nœuds intermédiaires (hors "Ok" du nœud 0 et "Faux" du
+  // dernier nœud, déjà repris par _hsPrtBoxes) — sans cette liste, la moitié des
+  // feedbacks restait invisible dans l'aperçu de l'onglet Config (même fix que
+  // genChemical, voir gen-topo.js diagNodes).
+  // Contrairement à la chimie, les feedbacks nucléaires sont des jetons Maxima
+  // opaques ({@fb_error_reactants1@}) calculés à partir de la réponse de l'élève
+  // (inexistante en aperçu) : on affiche donc ici un aperçu statique et lisible du
+  // message réel (voir fbVars ci-dessus), uniquement pour l'onglet Config — l'export
+  // XML utilise toujours le vrai jeton via canonicalNodes/prtXML, inchangé.
+  const diagPreviewText = {
+    '0f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>❌ Les réactifs sont incorrects</strong><br><span style="font-size:.85rem;color:#64748b;">(liste les réactifs saisis par l'élève vs ceux attendus)</span></div>`,
+    '1f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>❌ Les produits sont incorrects</strong><br><span style="font-size:.85rem;color:#64748b;">(liste les produits saisis par l'élève vs ceux attendus)</span></div>`,
+    '3f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>⚠️ Attention aux coefficients (Réactifs)</strong><br><span style="font-size:.85rem;color:#64748b;">(détail des coefficients erronés)</span></div>`,
+    '4f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>⚠️ Attention aux coefficients (Produits)</strong><br><span style="font-size:.85rem;color:#64748b;">(détail des coefficients erronés)</span></div>`,
+    '5f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>⚠️ Attention aux états excités</strong><br><span style="font-size:.85rem;color:#64748b;">(structure correcte mais * manquant/en trop)</span></div>`,
+    '6t': `<div style="padding:10px 14px;background:#f0fff4;border-radius:8px;border-left:4px solid #27ae60;color:#166534;"><strong>✅ Excellent ! La réaction est correctement équilibrée.</strong></div>`
+  };
+  const diagNodes = [];
+  canonicalNodes.forEach((n, i) => {
+    const isFirst = i === 0, isLast = i === canonicalNodes.length - 1;
+    if (!isFirst && n.truefeedback) diagNodes.push({ desc: n.description + ' (succès)', fb: diagPreviewText[i + 't'] || n.truefeedback });
+    if (!isLast && n.falsefeedback) diagNodes.push({ desc: n.description + ' (échec)', fb: diagPreviewText[i + 'f'] || n.falsefeedback });
+  });
+
+  // Encart "réponse attendue" injecté directement dans generalFeedback — sans lui,
+  // une question nucléaire sans commentaire manuel exportait un <generalfeedback>
+  // totalement vide (même fix que genChemical/chemAnswerBox, voir gen-topo.js).
+  const nucAnswerBox = `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
+    <span style="font-weight:bold;color:#1e293b;">Réaction nucléaire</span>
+    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">La réponse attendue était</span>
+    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\displaystyle%20${encodeURIComponent(latexEq)}" alt="réaction nucléaire" style="max-height:60px;max-width:100%;"></div>
+  </div>`;
+
   return {
     bareme,
     vars,
     qnote: `Nucléaire Q${X}: {@nuc${X}_rea@} -> {@nuc${X}_pro@}`,
     textFrag,
     previewFrag,
+    kbdRaw,
     nucKatexFrag: `<div style="text-align:center;padding:16px;background:#f0f0ee;border:1.5px dashed #676863;border-radius:8px;"><img src="https://latex.codecogs.com/svg.image?\\displaystyle%20${encodeURIComponent(latexEq)}" style="max-width:100%;max-height:80px;" alt="${latexEq}"></div>`,
     inputXML,
     prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
-    generalFeedback: _mkFbGen('', v('nuc-fbgen')),
+    diagNodes,
+    generalFeedback: _mkFbGen(nucAnswerBox, v('nuc-fbgen')),
     feedbackRef: `[[feedback:prt${X}]]`
   };
 }

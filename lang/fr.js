@@ -480,6 +480,7 @@ I18N.add("fr", {
   "msg.err_topo_eq_vide":  "Chimie Topo Q{n} : équation vide.",
   "msg.err_chem_vide":     "Équation chimique Q{n} : champ vide.",
   "msg.err_chem_enonce_vide": "Équation chimique Q{n} : l'énoncé est obligatoire (l'élève ne verra aucune autre consigne).",
+  "msg.err_nuc_enonce_vide": "Réaction nucléaire Q{n} : l'énoncé est obligatoire (l'élève ne verra aucune autre consigne).",
   "msg.err_nuc_vide":      "Nucléaire Q{n} : saisissez une réaction nucléaire.",
   "msg.err_nuc_fleche":    "Nucléaire Q{n} : la réaction doit contenir une flèche (→ ou ->).",
   "msg.err_nuc_parse":     "Nucléaire Q{n} : impossible de parser la réaction. Vérifiez la syntaxe.",
@@ -929,6 +930,7 @@ I18N.add("fr", {
   "type.thermo":         "Thermodynamique",
   "type.diffraction":    "Interférences-Diffraction",
   "type.image-mesure":   "Mesure sur image",
+  "type.apn":            "Appareil photo (exposition)",
   "type.expert":         "Question Expert STACK",
   "palette.cat.expert":  "Mode Expert STACK"
 }, { name: "Français", dir: "ltr" });

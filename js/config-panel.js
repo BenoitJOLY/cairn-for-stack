@@ -89,7 +89,7 @@ async function _generateAndStoreQuestion(qid, type) {
     string: W.genString, match: W.genMatch, crossword: W.genCrossword, doi: W.genDOI,
     chemical: W.genChemical, chemical_topo: W.genChemicalTopo, nuclear: W.genNuclear,
     composition: W.genComposition, jxgdrop: W.genJxgDrop, vf: W.genVF, ord: W.genOrd,
-    imgclick: W.genImgClick, glr: W.genGLR, rvbcmj: W.genRvbCmj, optique: W.genOptique, 'acide-base': W.genAcideBase, 'redox': W.genRedox, 'basen': W.genBasen, 'circuit': W.genCircuit, 'logique': W.genLogique, 'complexe': W.genComplexe, 'calcul': W.genCalcul, 'statistiques': W.genStatistiques, 'matrices': W.genMatrices, 'geometrie': W.genGeometrie, 'suites': W.genSuites, 'probabilites': W.genProbabilites, 'trigonometrie': W.genTrigonometrie, 'polynomes': W.genPolynomes, 'limites': W.genLimites, 'physique': W.genPhysique, 'oscilloscope': W.genOscilloscope, 'inequation': W.genInequation, 'thermo': W.genThermo, 'diffraction': W.genDiffraction, 'image-mesure': W.genImageMesure,
+    imgclick: W.genImgClick, glr: W.genGLR, rvbcmj: W.genRvbCmj, optique: W.genOptique, 'acide-base': W.genAcideBase, 'redox': W.genRedox, 'basen': W.genBasen, 'circuit': W.genCircuit, 'logique': W.genLogique, 'complexe': W.genComplexe, 'calcul': W.genCalcul, 'statistiques': W.genStatistiques, 'matrices': W.genMatrices, 'geometrie': W.genGeometrie, 'suites': W.genSuites, 'probabilites': W.genProbabilites, 'trigonometrie': W.genTrigonometrie, 'polynomes': W.genPolynomes, 'limites': W.genLimites, 'physique': W.genPhysique, 'oscilloscope': W.genOscilloscope, 'inequation': W.genInequation, 'thermo': W.genThermo, 'diffraction': W.genDiffraction, 'image-mesure': W.genImageMesure, 'apn': W.genApn,
     'stack-raw': W.genStackRaw,
     'expert': W.genExpert
   };
@@ -551,6 +551,14 @@ function captureState() {
       s.w=v('opt-w');s.h=v('opt-h');
       s.fbOk=v('opt-fb-ok');s.fbWrong=v('opt-fb-wrong');s.fbGen=v('opt-fbgen');
       break;
+    case 'apn':
+      s.bareme=v('apn-bareme');s.text=richVal('apn-text');
+      s.unknown=v('apn-unknown')||'V';
+      s.changedD=document.getElementById('apn-changed-D').checked;
+      s.changedV=document.getElementById('apn-changed-V').checked;
+      s.changedI=document.getElementById('apn-changed-I').checked;
+      s.fbOk=v('apn-fb-ok');s.fbWrong=v('apn-fb-wrong');s.fbGen=v('apn-fbgen');
+      break;
     case 'diffraction':
       s.bareme=v('diff-bareme');s.text=richVal('diff-text');
       s.difftype=v('diff-type')||'fente_simple';s.diffmode=v('diff-mode')||'ecran';
@@ -719,6 +727,7 @@ function restoreState(s) {
     case 'nuclear':
       document.getElementById('nuc-bareme').value=s.bareme||1;setRichVal('nuc-text',s.text||'');
       if(document.getElementById('nuc-editor'))document.getElementById('nuc-editor').innerText=s.equation||'';
+      if(typeof nucUpdateLock==='function')nucUpdateLock();
       if(typeof nucRenderPreview==='function')nucRenderPreview();
       var _nucFbGen=document.getElementById('nuc-fbgen');if(_nucFbGen)_nucFbGen.value=s.fbGen||'';
       break;
@@ -1159,6 +1168,18 @@ function restoreState(s) {
       var _optFbGen=document.getElementById('opt-fbgen');if(_optFbGen)_optFbGen.value=s.fbGen||'';
       if(typeof optScenarioChange==='function')optScenarioChange();
       break;
+    case 'apn':
+      document.getElementById('apn-bareme').value=s.bareme||1;
+      setRichVal('apn-text',s.text||'');
+      document.getElementById('apn-unknown').value=s.unknown||'V';
+      document.getElementById('apn-changed-D').checked=!!s.changedD;
+      document.getElementById('apn-changed-V').checked=!!s.changedV;
+      document.getElementById('apn-changed-I').checked=!!s.changedI;
+      document.getElementById('apn-fb-ok').value=s.fbOk||'';
+      document.getElementById('apn-fb-wrong').value=s.fbWrong||'';
+      var _apnFbGen=document.getElementById('apn-fbgen');if(_apnFbGen)_apnFbGen.value=s.fbGen||'';
+      if(typeof apnUnknownChange==='function')apnUnknownChange();
+      break;
     case 'diffraction':
       document.getElementById('diff-bareme').value=s.bareme||1;
       setRichVal('diff-text',s.text||'');
@@ -1321,6 +1342,7 @@ function resetFormForType(type) {
       setRichVal('nuc-text','');
       if(document.getElementById('nuc-editor'))document.getElementById('nuc-editor').innerText='';
       document.getElementById('nuc-bareme').value=1;
+      if(typeof nucUpdateLock==='function')nucUpdateLock();
       if(typeof nucRenderPreview==='function')nucRenderPreview();
       var _nucfbGen=document.getElementById('nuc-fbgen');if(_nucfbGen)_nucfbGen.value='';
       break;
@@ -1732,6 +1754,18 @@ function resetFormForType(type) {
       document.getElementById('opt-fb-wrong').value='';
       var _optfbGen=document.getElementById('opt-fbgen');if(_optfbGen)_optfbGen.value='';
       if(typeof optScenarioChange==='function')optScenarioChange();
+      break;
+    case 'apn':
+      setRichVal('apn-text','');
+      document.getElementById('apn-bareme').value=1;
+      document.getElementById('apn-unknown').value='V';
+      document.getElementById('apn-changed-D').checked=true;
+      document.getElementById('apn-changed-V').checked=false;
+      document.getElementById('apn-changed-I').checked=false;
+      document.getElementById('apn-fb-ok').value='';
+      document.getElementById('apn-fb-wrong').value='';
+      var _apnfbGen=document.getElementById('apn-fbgen');if(_apnfbGen)_apnfbGen.value='';
+      if(typeof apnUnknownChange==='function')apnUnknownChange();
       break;
     case 'diffraction':
       setRichVal('diff-text','');

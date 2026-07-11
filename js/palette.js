@@ -43,13 +43,14 @@ var PALETTE_TYPES = [
   {type:'thermo',       label:'Thermodynamique (gaz parfaits PV=nRT, chaleur, enthalpie)'},
   {type:'diffraction',  label:'Interférences-Diffraction (fente, Young, λ)'},
   {type:'image-mesure', label:'Mesure sur image (spectre, microscope, règle…)'},
+  {type:'apn',          label:"Appareil photo (triangle d'exposition)"},
   {type:'expert',       label:'Question Expert STACK'}
 ];
 
 var PALETTE_CATEGORIES = [
   {id:'choix',       label:'Choix multiples',       types:['checkbox','radio','dropdown','vf']},
   {id:'numerique',   label:'Mathématiques',   types:['numerical','algebraic','complexe','calcul','statistiques','matrices','geometrie','suites','probabilites','trigonometrie','polynomes','limites','inequation']},
-  {id:'physchim',    label:'Physique-Chimie',        types:['units','doi','chemical','chemical_topo','nuclear','optique','acide-base','redox','circuit','physique','oscilloscope','thermo','diffraction','rvbcmj']},
+  {id:'physchim',    label:'Physique-Chimie',        types:['units','doi','chemical','chemical_topo','nuclear','optique','acide-base','redox','circuit','physique','oscilloscope','thermo','diffraction','rvbcmj','apn']},
   {id:'info',        label:'Informatique',           types:['basen','logique']},
   {id:'textuelle',   label:'Réponse textuelle',      types:['string','composition']},
   {id:'organisation',label:'Organisation',           types:['match','crossword','ord']},

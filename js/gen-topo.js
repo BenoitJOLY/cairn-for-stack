@@ -924,6 +924,7 @@ function _chemEditor() { return document.getElementById('chem-editor-text'); }
 function chemUpdateLock() {
   const editor = _chemEditor();
   const toolbar = document.querySelector('#fp-chemical .chem-toolbar');
+  const hint = document.getElementById('chem-lock-hint');
   const hasText = !!(typeof richVal === 'function' && richVal('chem-text').trim());
   if (editor) {
     editor.setAttribute('contenteditable', hasText ? 'true' : 'false');
@@ -932,6 +933,7 @@ function chemUpdateLock() {
     editor.title = hasText ? '' : 'Rédigez d\'abord l\'énoncé ci-dessus.';
   }
   if (toolbar) toolbar.querySelectorAll('button').forEach(b => { b.disabled = !hasText; });
+  if (hint) hint.style.display = hasText ? 'none' : 'block';
 }
 document.addEventListener('DOMContentLoaded', function () {
   if (typeof chemUpdateLock === 'function') chemUpdateLock();

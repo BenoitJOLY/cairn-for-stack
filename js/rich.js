@@ -23,6 +23,7 @@ function openRich(fieldId){
 function closeRich(){document.getElementById('richModal').style.display='none';FocusTrap.release();}
 function confirmRich(){setRichVal(currentRichField,spansToLatex(richEditor()));
   if(currentRichField==='chem-text' && typeof chemUpdateLock==='function') chemUpdateLock();
+  if(currentRichField==='nuc-text' && typeof nucUpdateLock==='function') nucUpdateLock();
   if(currentRichField && currentRichField.indexOf('calc-')===0) {
     if(typeof calcUpdatePreview==='function') calcUpdatePreview();
     if(typeof calcRefreshPreview==='function') calcRefreshPreview();
