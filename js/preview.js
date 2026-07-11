@@ -3682,7 +3682,10 @@ function renderPreviewHTML_apn(state) {
     hideExampleBox: true,
     fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
     fbGenAuto: _hsRenderMath(_calcTokenizeForPreview(realGeneralFeedback, knownVars) + note),
-    fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen
+    fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen,
+    extraFeedbackNodes: (realParts.diagNodes || []).map(function(n) {
+      return { desc: n.desc, fb: _calcTokenizeForPreview(n.fb, knownVars) };
+    })
   });
 }
 window.apnRefreshPreview = _hsWireSimplePreview('apn', 'apn', 'apn-preview-container', 'fp-apn', renderPreviewHTML_apn);

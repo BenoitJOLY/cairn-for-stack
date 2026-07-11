@@ -12,8 +12,14 @@ function apnUnknownChange() {
     ['D', 'V', 'I'].forEach(function(k) {
         var cb = document.getElementById('apn-changed-' + k);
         if (!cb) return;
-        if (k === unk) { cb.checked = false; cb.disabled = true; }
-        else { cb.disabled = false; }
+        var label = cb.closest('label');
+        if (k === unk) {
+            cb.checked = false; cb.disabled = true;
+            if (label) label.style.display = 'none';
+        } else {
+            cb.disabled = false;
+            if (label) label.style.display = '';
+        }
     });
     if (typeof apnRefreshPreview === 'function') apnRefreshPreview();
 }
@@ -139,6 +145,42 @@ function genApn(X) {
         + P + 'nvR_exact: if ' + P + 'V2>' + P + 'V1 then ' + P + 'V2/' + P + 'V1 else ' + P + 'V1/' + P + 'V2;\n'
         + P + 'nvR: 2^round(log(' + P + 'nvR_exact)/log(2));\n';
 
+    // ── Valeurs "pièges" pour le PRT pédagogique multi-nœuds : recherche de la
+    // valeur standard la plus proche (même technique que pour la vraie cible),
+    // pour 2 erreurs classiques (sens de compensation inversé, paramètre changé
+    // ignoré), afin de donner un feedback ciblé plutôt qu'un simple "faux". ──
+    var snapList = function(listVar, exprStr, outName) {
+        return P + 'diffs_' + outName + ': map(lambda([x], abs(float(x)-float(' + exprStr + '))), ' + listVar + '),\n'
+            + P + 'md_' + outName + ': lmin(' + P + 'diffs_' + outName + '),\n'
+            + P + outName + ': first(sublist(' + listVar + ', lambda([x], abs(float(x)-float(' + exprStr + '))=' + P + 'md_' + outName + ')));\n';
+    };
+    var snapAperture = function(exprStr, outName) {
+        return P + 'diffs_' + outName + ': map(lambda([x], abs(float(x)-float(' + exprStr + '))), ' + P + 'ldr),\n'
+            + P + 'md_' + outName + ': lmin(' + P + 'diffs_' + outName + '),\n'
+            + P + 'idx_' + outName + ': first(sublist(makelist(i,i,1,length(' + P + 'ldr)), lambda([i], abs(float(' + P + 'ldr[i])-float(' + exprStr + '))=' + P + 'md_' + outName + '))),\n'
+            + P + outName + ': ' + P + 'lda[' + P + 'idx_' + outName + '];\n';
+    };
+
+    if (unknown === 'V') {
+        qvars += snapList(P + 'lv', P + 'V1*(' + P + 'I2/' + P + 'I1)*(' + P + 'D1r/' + P + 'D2r)^2', 'winv');
+        if (nChanged === 2) {
+            qvars += snapList(P + 'lv', P + 'V1*(' + P + 'I2/' + P + 'I1)', 'wig1'); // diaphragme ignoré
+            qvars += snapList(P + 'lv', P + 'V1*(' + P + 'D2r/' + P + 'D1r)^2', 'wig2'); // ISO ignoré
+        }
+    } else if (unknown === 'D') {
+        qvars += snapAperture(P + 'D1r*sqrt(float((' + P + 'V1/' + P + 'V2)*(' + P + 'I1/' + P + 'I2)))', 'winv');
+        if (nChanged === 2) {
+            qvars += snapAperture(P + 'D1r*sqrt(float(' + P + 'I2/' + P + 'I1))', 'wig1'); // vitesse ignorée
+            qvars += snapAperture(P + 'D1r*sqrt(float(' + P + 'V2/' + P + 'V1))', 'wig2'); // ISO ignoré
+        }
+    } else { // I
+        qvars += snapList(P + 'li', P + 'I1*(' + P + 'D1r/' + P + 'D2r)^2*(' + P + 'V2/' + P + 'V1)', 'winv');
+        if (nChanged === 2) {
+            qvars += snapList(P + 'li', P + 'I1*(' + P + 'V1/' + P + 'V2)', 'wig1'); // diaphragme ignoré
+            qvars += snapList(P + 'li', P + 'I1*(' + P + 'D2r/' + P + 'D1r)^2', 'wig2'); // vitesse ignorée
+        }
+    }
+
     // ── Énoncé (bandeau + texte enseignant ou paragraphe par défaut) ──
     var HDR = '<div style="background:#1e3a8a;border-left:5px solid #1d4ed8;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Photographie — Triangle d\'exposition</strong>'
@@ -180,38 +222,88 @@ function genApn(X) {
         + '<checkanswertype>0</checkanswertype><mustverify>0</mustverify>'
         + '<showvalidation>0</showvalidation><options></options></input>';
 
-    // ── PRT : un seul nœud AlgEquiv (comme les 7 références) ──
+    // ── PRT : plusieurs nœuds de diagnostic (valeur non recalculée, sens de
+    // compensation inversé, paramètre changé ignoré), puis nœud générique final ──
     var fbOkFinal = fbOk || '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Correct !</strong> Cette valeur permet de conserver la même exposition.</div>';
     var fbWrongFinal = fbWrong || ('<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> La valeur correcte était <code>' + cibleDisplay + '</code>.</div>');
 
     // Comparaison sur chaîne de caractères pour l'inconnue "diaphragme" (les valeurs
     // d'affichage comme 1.4/2.8 doivent matcher exactement la chaîne soumise par le
-    // bouton radio, cf. pattern des references : d_cible: string(D2_affichage)).
-    var prtFeedbackVars = (unknown === 'D') ? (P + 'cible: string(' + P + 'D2a);') : '';
+    // bouton radio).
+    var tansOf = function(expr) { return (unknown === 'D') ? ('string(' + expr + ')') : expr; };
 
-    var canonicalNodes = [{
-        name: '0',
-        description: '',
-        answertest: 'AlgEquiv',
-        sans: 'ans' + X,
-        tans: P + 'cible',
-        testoptions: '',
-        quiet: '0',
-        truescoremode: '=',
-        truescore: String(bareme),
-        truepenalty: '',
-        truenextnode: '-1',
-        trueanswernote: 'prt' + X + '-1-T',
-        truefeedback: fbOkFinal,
-        falsescoremode: '=',
-        falsescore: '0',
-        falsepenalty: '',
-        falsenextnode: '-1',
-        falseanswernote: 'prt' + X + '-1-F',
-        falsefeedback: fbWrongFinal
-    }];
-    var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: prtFeedbackVars };
+    var oldValueVar = unknown === 'V' ? (P + 'V1') : unknown === 'D' ? (P + 'D1a') : (P + 'I1');
+    var ignoredLabels = unknown === 'V'
+        ? { wig1: "l'ouverture (diaphragme)", wig2: 'la sensibilité ISO' }
+        : unknown === 'D'
+        ? { wig1: "la vitesse d'obturation", wig2: 'la sensibilité ISO' }
+        : { wig1: "l'ouverture (diaphragme)", wig2: "la vitesse d'obturation" };
+
+    var fbBox = function(msg) {
+        return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> ' + msg + ' La valeur correcte était <code>' + cibleDisplay + '</code>.</div>';
+    };
+
+    var nodes = [];
+    nodes.push({
+        desc: 'Réponse correcte', test: 'AlgEquiv', tans: tansOf(P + 'cible'),
+        fb: fbOkFinal, isCorrect: true
+    });
+    nodes.push({
+        desc: 'Valeur non recalculée', test: 'AlgEquiv', tans: tansOf(oldValueVar),
+        fb: fbBox('Vous avez conservé la valeur initiale de ' + unknownLabel + ' sans la recalculer pour la nouvelle configuration.')
+    });
+    nodes.push({
+        desc: 'Sens de compensation inversé', test: 'AlgEquiv', tans: tansOf(P + 'winv'),
+        fb: fbBox('Vous avez inversé le sens de la compensation : réfléchissez à si vous devez augmenter ou diminuer ' + unknownLabel + ' pour compenser le changement des autres réglages.')
+    });
+    if (nChanged === 2) {
+        nodes.push({
+            desc: 'Paramètre 1 ignoré', test: 'AlgEquiv', tans: tansOf(P + 'wig1'),
+            fb: fbBox('Il semble que vous n\'ayez compensé que pour un seul des deux réglages modifiés : ' + ignoredLabels.wig1 + ' a changé aussi et doit être pris en compte.')
+        });
+        nodes.push({
+            desc: 'Paramètre 2 ignoré', test: 'AlgEquiv', tans: tansOf(P + 'wig2'),
+            fb: fbBox('Il semble que vous n\'ayez compensé que pour un seul des deux réglages modifiés : ' + ignoredLabels.wig2 + ' a changé aussi et doit être pris en compte.')
+        });
+    }
+    nodes.push({
+        desc: 'Erreur générique', test: 'EqualComAss', sans: '1', tans: '1',
+        fb: fbWrongFinal, isFinal: true
+    });
+
+    var canonicalNodes = nodes.map(function(nd, i) {
+        var isLast = (i === nodes.length - 1);
+        return {
+            name: String(i),
+            description: nd.desc,
+            answertest: nd.test,
+            sans: nd.sans || ('ans' + X),
+            tans: nd.tans,
+            testoptions: '',
+            quiet: '0',
+            truescoremode: '=',
+            truescore: nd.isCorrect ? String(bareme) : '0',
+            truepenalty: '',
+            truenextnode: '-1',
+            trueanswernote: 'prt' + X + '-' + i + '-T',
+            truefeedback: nd.fb,
+            falsescoremode: '=',
+            falsescore: '0',
+            falsepenalty: '',
+            falsenextnode: isLast ? '-1' : String(i + 1),
+            falseanswernote: 'prt' + X + '-' + i + '-F',
+            falsefeedback: ''
+        };
+    });
+    var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: '' };
     var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+
+    var diagNodes = [];
+    for (var di = 1; di < nodes.length; di++) {
+        var dn = nodes[di];
+        var isLastDiag = (di === nodes.length - 1);
+        if (dn.fb && !(isLastDiag && dn.fb === fbWrongFinal)) diagNodes.push({ desc: dn.desc, fb: dn.fb });
+    }
 
     return {
         type:            'apn',
@@ -224,6 +316,6 @@ function genApn(X) {
         prt:             { meta: prtMeta, nodes: canonicalNodes },
         generalFeedback: _mkFbGen(autoFb, gv('apn-fbgen')),
         feedbackRef:     '[[feedback:prt' + X + ']]',
-        diagNodes:       []
+        diagNodes:       diagNodes
     };
 }
