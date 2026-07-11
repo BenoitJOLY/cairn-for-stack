@@ -1,0 +1,858 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TriangleForm" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+option Explicit
+
+Public oTriangleForm as object
+Public x0, y0, x1, y1, x2, y2, xi, yi, xj, yj, xk, yk As single
+
+Sub Main
+	AfficheTriangleForm
+End Sub
+
+Sub ExtraitCoordonnees(p, xx, yy)
+    Select Case p
+    Case oTriangleForm.Model.Sommet1.Text
+        xx = x1
+        yy = y1
+    Case oTriangleForm.Model.Sommet2.Text
+        xx = x0
+        yy = y0
+    Case oTriangleForm.Model.Sommet3.Text
+        xx = x2
+        yy = y2
+    Case oTriangleForm.Model.TextBox4.Text
+        xx = xi
+        yy = yi
+    Case oTriangleForm.Model.TextBox6.Text
+        xx = xj
+        yy = yj
+    Case oTriangleForm.Model.TextBox8.Text
+        xx = xk
+        yy = yk
+    End Select
+End Sub
+
+Sub val1_Change()
+    ActiveCheckbox
+End Sub
+
+Sub val2_Change()
+    ActiveCheckbox
+End Sub
+
+Sub val3_Change()
+    ActiveCheckbox
+End Sub
+
+Sub AfficheTriangleForm()
+&apos;on error resume next
+	oTriangleForm = LoadDialog(&quot;OOoGdmath&quot;,&quot;TriangleForm&quot;)
+	ChangeTitreDialog(oTriangleForm)
+	TriangleForm_Activate
+&apos;	RestaureForm(oTriangleForm)
+	MAJ_label
+	MAJ_Checkbox
+
+	oTriangleForm.Model.Step=1
+
+    oTriangleForm.Model.ImageControl1.ImageURL=fCheminImages &amp; &quot;tri1.gif&quot;
+    oTriangleForm.Model.ImageControl2.ImageURL=fCheminImages &amp; &quot;tri2.gif&quot;
+    oTriangleForm.Model.ImageControl3.ImageURL=fCheminImages &amp; &quot;tri3.gif&quot;
+    oTriangleForm.Model.ImageControl4.ImageURL=fCheminImages &amp; &quot;tri4.gif&quot;
+    oTriangleForm.Model.ImageControl5.ImageURL=fCheminImages &amp; &quot;tri.gif&quot;
+
+	oTriangleForm.Execute()
+	
+End Sub
+
+Sub TriangleForm_Image6()
+	ChangeCouleur oTriangleForm.Model.ImageControl6
+End Sub
+
+Sub TriangleForm_Image7()
+	ChangeCouleur oTriangleForm.Model.ImageControl7
+End Sub
+
+Sub TriangleForm_Image8()
+	ChangeCouleur oTriangleForm.Model.ImageControl8
+End Sub
+
+Sub TriangleForm_Image9()
+	ChangeCouleur oTriangleForm.Model.ImageControl9
+End Sub
+
+Sub TriangleForm_Image10()
+	ChangeCouleur oTriangleForm.Model.ImageControl10
+End Sub
+
+Sub TriangleForm_Image11()
+	ChangeCouleur oTriangleForm.Model.ImageControl11
+End Sub
+
+Sub CouleurCommandButtonBis(i as integer)
+	oTriangleForm.Model.CommandButton8.State = (i=1)
+	oTriangleForm.Model.CommandButton8.Toggle = (i&lt;&gt;1)
+	oTriangleForm.Model.CommandButton9.State = (i=2)
+	oTriangleForm.Model.CommandButton9.Toggle = (i&lt;&gt;2)
+	oTriangleForm.Model.CommandButton10.State = (i=3)
+	oTriangleForm.Model.CommandButton10.Toggle = (i&lt;&gt;3)
+	oTriangleForm.Model.CommandButton11.State = (i=4)
+	oTriangleForm.Model.CommandButton11.Toggle = (i&lt;&gt;4)
+	oTriangleForm.Model.CommandButton12.State = (i=5)
+	oTriangleForm.Model.CommandButton12.Toggle = (i&lt;&gt;5)
+	oTriangleForm.Model.CommandButton13.State = (i=6)
+	oTriangleForm.Model.CommandButton13.Toggle = (i&lt;&gt;6)
+End Sub
+
+Sub CouleurCommandButton(i as integer)
+	oTriangleForm.Model.CommandButton1.State = (i=1)
+	oTriangleForm.Model.CommandButton1.Toggle = (i&lt;&gt;1)
+	oTriangleForm.Model.CommandButton2.State = (i=2)
+	oTriangleForm.Model.CommandButton2.Toggle = (i&lt;&gt;2)
+	oTriangleForm.Model.CommandButton4.State = (i=4)
+	oTriangleForm.Model.CommandButton4.Toggle = (i&lt;&gt;4)
+	oTriangleForm.Model.CommandButton5.State = (i=5)
+	oTriangleForm.Model.CommandButton5.Toggle = (i&lt;&gt;5)
+End Sub
+
+Sub TriangleForm_CommandButton1()
+	ChangePageBouton(2)
+	oTriangleForm.Model.Step = 1
+	CouleurCommandButton 1
+End Sub
+
+Sub TriangleForm_CommandButton2()
+	ChangePageBouton(2)
+	oTriangleForm.Model.Step = 2
+	CouleurCommandButton 2
+	TriangleForm_CommandButton8
+End sub
+
+Sub TriangleForm_CommandButton4()
+	ChangePageBouton(2)
+	oTriangleForm.Model.Step = 4
+	CouleurCommandButton 4
+End sub
+
+Sub TriangleForm_CommandButton5()
+	ChangePageBouton(2)
+	oTriangleForm.Model.Step = 5
+	CouleurCommandButton 5
+End sub
+
+Sub ChangePageBouton(i as integer)
+	oTriangleForm.Model.CommandButton8.Step=i
+	oTriangleForm.Model.CommandButton9.Step=i
+	oTriangleForm.Model.CommandButton10.Step=i
+	oTriangleForm.Model.CommandButton11.Step=i
+	oTriangleForm.Model.CommandButton12.Step=i
+	oTriangleForm.Model.CommandButton13.Step=i
+end sub
+
+Sub TriangleForm_CommandButton8()
+	ChangePageBouton(6)
+	oTriangleForm.Model.Step = 6
+	CouleurCommandButtonBis 1
+End sub
+
+Sub TriangleForm_CommandButton9()
+	ChangePageBouton(7)
+	oTriangleForm.Model.Step = 7
+	CouleurCommandButtonBis 2
+End sub
+
+Sub TriangleForm_CommandButton10()
+	ChangePageBouton(8)
+	oTriangleForm.Model.Step = 8
+	CouleurCommandButtonBis 3
+End sub
+
+Sub TriangleForm_CommandButton11()
+	ChangePageBouton(9)
+	oTriangleForm.Model.Step = 9
+	CouleurCommandButtonBis 4
+End sub
+
+Sub TriangleForm_CommandButton12()
+	ChangePageBouton(10)
+	oTriangleForm.Model.Step = 10
+	CouleurCommandButtonBis 5
+End sub
+
+Sub TriangleForm_CommandButton13()
+	ChangePageBouton(11)
+	oTriangleForm.Model.Step = 11
+	CouleurCommandButtonBis 6
+End sub
+
+
+Sub TriangleForm_CommandButton6()
+dim Shapes as object
+dim a,b,c,ga,gb
+dim ang1
+dim ang2
+Dim angle3
+Dim t1,t2,t3
+Dim rayon
+Dim LeCercle as Object
+Dim xn, yn
+Dim sTexte as String
+Dim aTexte() as string
+Dim c1 as String
+
+	oTriangleForm.EndExecute()
+	SauveForm(oTriangleForm)
+
+	&apos; on groupe les ojets dessinés  
+	InitialiseDessin(False)
+	Shapes = InitialiseGroupe()
+	a=val(oTriangleForm.Model.val1.Text)
+	b=val(oTriangleForm.Model.val2.Text)
+	c=val(oTriangleForm.Model.val3.Text)
+    x0 = 0
+    y0 = 0
+    ga = 20
+    gb = ga - 2
+    If oTriangleForm.Model.OptionButton1.State Then
+&apos;     Premiere forme 3 cotes
+        a = a*1000
+        b = b*1000
+        c = c*1000
+        x1 = a
+        y1 = 0
+        x2 = (a * a + c * c - b * b) / (2 * a)
+        y2 = Sqr(c * c - x2 * x2)
+        ang1 = CalculeAngle(x0, y0, x2, y2)
+        ang2 = -(Int(ang1 * 180 / Pi) + 10)
+		InsereTriangle x0,y0,x1,y1,x2,y2,Shapes,oTriangleForm.Model.ImageControl6
+        If oTriangleForm.Model.CheckBox15.State Then
+            If oTriangleForm.Model.val1.Text = oTriangleForm.Model.val2.Text Or oTriangleForm.Model.val1.Text = oTriangleForm.Model.val3.text Then CodeLongueur(x0, y0, x1, y1, 2,Shapes)
+            If oTriangleForm.Model.val2.Text = oTriangleForm.Model.val1.Text Or oTriangleForm.Model.val2.Text = oTriangleForm.Model.val3.Text Then CodeLongueur(x1, y1, x2, y2, 2,Shapes)
+            If oTriangleForm.Model.val3.Text = oTriangleForm.Model.val2.Text Or oTriangleForm.Model.val3.Text = oTriangleForm.Model.val1.Text Then CodeLongueur(x0, y0, x2, y2, 2,Shapes)
+        End If
+		if oTriangleForm.Model.CheckBox13.State then
+			t1=oTriangleForm.Model.val1.Text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot; &quot; &amp; oTriangleForm.Model.Label4.Label)
+			t2=oTriangleForm.Model.val2.Text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot; &quot; &amp; oTriangleForm.Model.Label5.Label)
+			t3=oTriangleForm.Model.val3.Text &amp;MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;,  &quot; &quot; &amp; oTriangleForm.Model.Label6.Label)
+			InsereTexte( t1, (x0 + x1) / 2, (y0 + y1) / 2, Shapes, -CalculeAngle(x0, y0, x1, y1) * 18000 / Pi)
+			InsereTexte( t2, (x1 + x2) / 2, (y1 + y2) / 2, Shapes, -CalculeAngle(x1, y1, x2, y2) * 18000 / Pi)
+			InsereTexte( t3, (x0 + x2) / 2, (y0 + y2) / 2, Shapes, -CalculeAngle(x2, y2, x0, y0) * 18000 / Pi)
+		end if
+        If oTriangleForm.Model.CheckBox17.State Then
+	    	NormaliseCoordonnees xn, yn, x1, y1, x0, y0, x2, y2
+            InsereTexte(oTriangleForm.Model.Sommet2.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+	    	NormaliseCoordonnees xn, yn, x2, y2, x1, y1, x0, y0
+            InsereTexte(oTriangleForm.Model.Sommet1.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+	    	NormaliseCoordonnees xn, yn, x0, y0, x2, y2, x1, y1
+            InsereTexte(oTriangleForm.Model.Sommet3.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+        End If
+    End If
+    
+    If oTriangleForm.Model.OptionButton2.State Then
+&apos;    Deuxieme forme 2 cotes 1 angle
+        a = a * Pi / 180
+        b = b*1000
+        c = c*1000
+        x1 = b
+        y1 = 0
+        x2 = c * Cos(a)
+        y2 = c * Sin(a)
+		InsereTriangle x0, y0, x1, y1, x2, y2,Shapes,oTriangleForm.Model.ImageControl6
+        If oTriangleForm.model.val1.Text = &quot;90&quot; And oTriangleForm.Model.CheckBox14.State Then
+            MarqueAngleDroit(x0, y0, x1, y1, Shapes)
+        Else
+            If oTriangleForm.Model.Checkbox13.State Then MarqueAngle(x1, y1, x0, y0, x2, y2, False, 1, 0, Shapes)
+        End If
+        If  oTriangleForm.Model.CheckBox15.State And  oTriangleForm.Model.val2.Text =  oTriangleForm.Model.val3.Text Then
+            CodeLongueur(x0, y0, x1, y1, 2, Shapes)
+            CodeLongueur(x0, y0, x2, y2, 2, Shapes)
+        End If
+        ang1 = a
+        ang2 = -(Int(ang1 * 180 / Pi) + 10)
+        If oTriangleForm.Model.Checkbox13.State Then
+            If  oTriangleForm.Model.val1.Text &lt;&gt; &quot;90&quot; Or Not  oTriangleForm.Model.CheckBox14.State Then InsereTexte( oTriangleForm.Model.val1.Text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot;°&quot;), (6 * x0 + x1 + x2) / 8, (6 * y0 + y1 + y2) / 8, Shapes,ang2*100
+            InsereTexte( oTriangleForm.Model.val2.Text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot; cm&quot;), (x1 + x0) / 2, (y1 + y0) / 2, Shapes,-CalculeAngle(x0,y0,x1,y1)*18000/Pi)
+            InsereTexte( oTriangleForm.Model.val3.Text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot; cm&quot;), (x0 + x2) / 2, (y0 + y2) / 2, Shapes,-CalculeAngle(x0,y0,x2,y2)*18000/Pi)
+        End If
+        If  oTriangleForm.Model.CheckBox17.State Then
+	    	NormaliseCoordonnees xn, yn, x1, y1, x0, y0, x2, y2
+            InsereTexte(oTriangleForm.Model.Sommet2.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+	    	NormaliseCoordonnees xn, yn, x2, y2, x1, y1, x0, y0
+            InsereTexte(oTriangleForm.Model.Sommet1.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+	    	NormaliseCoordonnees xn, yn, x0, y0, x2, y2, x1, y1
+            InsereTexte(oTriangleForm.Model.Sommet3.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+        End If
+    End If
+
+    If oTriangleForm.Model.OptionButton3.State Then
+&apos;    Troisieme forme 1 cote 2 angles
+        angle3 = 180 - (a + b)
+        a = a * Pi / 180
+        b = b * Pi / 180
+        c = c*1000
+        x1 = c
+        y1 = 0
+        x2 = c * Tan(b) / (Tan(a) + Tan(b))
+        y2 = -x2 * Tan(a)
+        x0=x0+3000
+        y0=y0+3000
+        x1=x1+3000
+        y1=y1+3000
+        x2=x2+3000
+        y2=y2+3000
+        InsereTriangle x0, y0, x1, y1, x2, y2,Shapes,oTriangleForm.Model.ImageControl6
+        If oTriangleForm.Model.val1.Text = &quot;90&quot; And oTriangleForm.model.CheckBox14.State Then
+            MarqueAngleDroit(x0, y0, x1, y1, Shapes)
+        Else
+            If oTriangleForm.Model.CheckBox16.State And (oTriangleForm.Model.val1.text = oTriangleForm.Model.val2.Text Or Val(oTriangleForm.Model.val1.text) = angle3) Then
+                MarqueAngle(x1, y1, x0, y0, x2, y2, (Val(oTriangleForm.Model.val1.Text) &gt; 180), 2, 0, Shapes)
+            Else
+                If oTriangleForm.Model.Checkbox13.State Then MarqueAngle(x1, y1, x0, y0, x2, y2, (Val(oTriangleForm.Model.val1.Text) &gt; 180), 1, 0, Shapes)
+            End If
+        End If
+        If oTriangleForm.Model.val2.Text = &quot;90&quot; And oTriangleForm.Model.CheckBox14.State Then
+            MarqueAngleDroit(x1, y1, x2, y2, Shapes)
+        Else
+            If oTriangleForm.Model.CheckBox16.State And (oTriangleForm.Model.val1.Text = oTriangleForm.Model.val2.Text Or Val(oTriangleForm.Model.val1.Text) = angle3) Then
+                MarqueAngle(x2, y2, x1, y1, x0, y0, (Val(oTriangleForm.Model.val2.Text) &gt; 180), 2, 0, Shapes)
+            Else
+                If oTriangleForm.Model.Checkbox13.State Then MarqueAngle(x2, y2, x1, y1, x0, y0, (Val(oTriangleForm.Model.val2.Text) &gt; 180), 1, 0, Shapes)
+            End If
+        End If
+        If angle3 = 90 And oTriangleForm.Model.CheckBox14.State Then
+            MarqueAngleDroit(x2, y2, x0, y0, Shapes)
+        Else
+            If oTriangleForm.Model.CheckBox16.State And (angle3 = Val(oTriangleForm.Model.val1.Text) Or Val(oTriangleForm.Model.val2.Text) = angle3) Then
+                MarqueAngle(x0, y0, x2, y2, x1, y1, (angle3 &gt; 180), 2, 0, Shapes)
+            Else
+                If oTriangleForm.Model.Checkbox13.State Then MarqueAngle(x0, y0, x2, y2, x1, y1, (angle3 &gt; 180), 1, 0, Shapes)
+            End If
+        End If
+        If oTriangleForm.Model.CheckBox15.State And (oTriangleForm.Model.val1.Text = oTriangleForm.Model.val2.Text Or Val(oTriangleForm.Model.val2.Text) = angle3 Or angle3 = Val(oTriangleForm.Model.val1.Text)) Then
+            If (oTriangleForm.Model.val1.text = oTriangleForm.Model.val2.text Or Val(oTriangleForm.Model.val1.text) = angle3) Then CodeLongueur(x1, y1, x2, y2, 2, Shapes)
+            If (oTriangleForm.Model.val2.text = oTriangleForm.Model.val1.text Or Val(oTriangleForm.Model.val2.text) = angle3) Then CodeLongueur(x0, y0, x2, y2, 2, Shapes)
+            If (angle3 = Val(oTriangleForm.Model.val1.text) Or angle3 = Val(oTriangleForm.Model.val2.text)) Then CodeLongueur(x0, y0, x1, y1, 2, Shapes)
+        End If
+        ang1 = 0
+        ang2 = -10
+        If oTriangleForm.Model.Checkbox13.State Then
+            If oTriangleForm.Model.val1.text &lt;&gt; &quot;90&quot; Or Not oTriangleForm.Model.CheckBox14.State Then InsereTexte(oTriangleForm.Model.val1.Text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot; °&quot;), (6 * x0 + x1 + x2) / 8, (6 * y0 + y1 + y2) / 8, Shapes,ang2*100)
+            If oTriangleForm.Model.val2.text &lt;&gt; &quot;90&quot; Or Not oTriangleForm.Model.CheckBox14.State Then InsereTexte(oTriangleForm.Model.val2.text &amp;MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;,  &quot; °&quot;), (6 * x1 + x0 + x2) / 8, (6 * y1 + y0 + y2) / 8, Shapes,ang2*100)
+            InsereTexte(oTriangleForm.Model.val3.text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot; cm&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes,ang2*100
+        End If
+        If oTriangleForm.Model.CheckBox17.State Then
+	    	NormaliseCoordonnees xn, yn, x1, y1, x0, y0, x2, y2
+            InsereTexte(oTriangleForm.Model.Sommet2.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+	    	NormaliseCoordonnees xn, yn, x2, y2, x1, y1, x0, y0
+            InsereTexte(oTriangleForm.Model.Sommet3.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+	    	NormaliseCoordonnees xn, yn, x0, y0, x2, y2, x1, y1
+            InsereTexte(oTriangleForm.Model.Sommet1.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+        End If
+        Echange x1, x2
+        Echange y1, y2
+    End If
+
+    If oTriangleForm.Model.OptionButton4.State Then
+&apos;             Quatrieme forme 2 cotes 1 angle
+        a = a * Pi / 180
+        b = b*1000
+        c = c*1000
+        x1 = c
+        y1 = 0
+        x2 = Cos(a) * (c * Cos(a) + Sqr(b * b - c * c * Sin(a) * Sin(a)))
+        y2 = -x2 * Tan(a)
+        x0=x0+3000
+        y0=y0+3000
+        x1=x1+3000
+        y1=y1+3000
+        x2=x2+3000
+        y2=y2+3000
+        InsereTriangle x0, y0, x1, y1, x2, y2, Shapes,oTriangleForm.Model.ImageControl6
+        If oTriangleForm.Model.val1.Text = &quot;90&quot; And oTriangleForm.Model.CheckBox14.State Then
+            MarqueAngleDroit(x0, y0, x1, y1, Shapes)
+        Else
+            If oTriangleForm.Model.Checkbox13.State Then MarqueAngle(x1, y1, x0, y0, x2, y2, (Val(oTriangleForm.Model.val1.Text) &gt; 180), 1, 0, Shapes)
+        End If
+        If oTriangleForm.Model.CheckBox15.State And oTriangleForm.Model.val2.Text = oTriangleForm.Model.val3.Text Then
+            CodeLongueur(x0, y0, x1, y1, 2, Shapes)
+            CodeLongueur(x1, y1, x2, y2, 2, Shapes)
+        End If
+        ang1 = 0
+        ang2 = -(Int(ang1 * 180 / Pi) + 10)
+        If oTriangleForm.Model.Checkbox13.State Then
+            If oTriangleForm.Model.val1.text &lt;&gt; &quot;90&quot; Or Not oTriangleForm.Model.CheckBox14.State Then InsereTexte(oTriangleForm.Model.val1.text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot;°&quot;), (6 * x0 + x1 + x2) / 8, (6 * y0 + y1 + y2) / 8, Shapes,ang2*100)
+            InsereTexte(oTriangleForm.Model.val2.Text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot; cm&quot;), (x1 + x2) / 2, (y1 + y2) / 2, Shapes, ang2*100)
+            InsereTexte(oTriangleForm.Model.val3.Text &amp; MIif(oTriangleForm.Model.CheckBox1.State = 1, &quot;&quot;, &quot; cm&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, ang2*100)
+        End If
+        If oTriangleForm.Model.CheckBox17.State Then
+	    	NormaliseCoordonnees xn, yn, x1, y1, x0, y0, x2, y2
+            InsereTexte(oTriangleForm.Model.Sommet2.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+	    	NormaliseCoordonnees xn, yn, x2, y2, x1, y1, x0, y0
+            InsereTexte(oTriangleForm.Model.Sommet3.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+	    	NormaliseCoordonnees xn, yn, x0, y0, x2, y2, x1, y1
+            InsereTexte(oTriangleForm.Model.Sommet1.Text, xn, yn, Shapes, ang2 * 100, 0, 0)
+        End If
+        Echange x1, x2
+        Echange y1, y2
+    End If
+&apos;
+&apos; On trace les médianes si il faut
+&apos;
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox4&quot;),1) Then TraceMediane(x0, y0, x1, y1, x2, y2, oTriangleForm.Model.CheckBox31.State, oTriangleForm.Model.CheckBox32.State,Shapes)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox4&quot;),2) Then TraceMediane(x1, y1, x0, y0, x2, y2, oTriangleForm.Model.CheckBox31.State, oTriangleForm.Model.CheckBox32.State,Shapes)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox4&quot;),0) Then TraceMediane(x2, y2, x0, y0, x1, y1, oTriangleForm.Model.CheckBox31.State, oTriangleForm.Model.CheckBox32.State,Shapes)
+&apos;
+&apos; on trace les hauteurs si il faut
+&apos;
+	Dim xh as single, yh as single
+	Dim xh1 as single, yh1 as single
+	Dim xh2 as single, yh2 as single
+    CalculeOrthocentre(x0, y0, x1, y1, x2, y2, xh, yh)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox5&quot;),1) Then TraceHauteur(x0, y0, x1, y1, x2, y2, Shapes, xh1, yh1, xh2, yh2, oTriangleForm.Model.CheckBox29.State, oTriangleForm.Model.CheckBox30.State, oTriangleForm.Model.CheckBox28.State, oTriangleForm.Model.CheckBox35.State, xh, yh)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox5&quot;),2) Then TraceHauteur(x1, y1, x2, y2, x0, y0, Shapes, xh1, yh1, xh2, yh2, oTriangleForm.Model.CheckBox29.State, oTriangleForm.Model.CheckBox30.State, oTriangleForm.Model.CheckBox28.State, oTriangleForm.Model.CheckBox35.State, xh, yh)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox5&quot;),0) Then TraceHauteur(x2, y2, x0, y0, x1, y1, Shapes, xh1, yh1, xh2, yh2, oTriangleForm.Model.CheckBox29.State, oTriangleForm.Model.CheckBox30.State, oTriangleForm.Model.CheckBox28.State, oTriangleForm.Model.CheckBox35.State, xh, yh)
+&apos;
+&apos; on trace les bissectrices si il faut
+&apos;
+	dim xci as single,yci as single
+	
+    CalculeCentreInscrit(x0, y0, x1, y1, x2, y2, xci, yci)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox6&quot;),1) Then TraceBissectrice(x2, y2, x0, y0, x1, y1, Shapes, oTriangleForm.Model.CheckBox33.State, oTriangleForm.Model.CheckBox34.State, xci, yci)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox6&quot;),2) Then TraceBissectrice(x0, y0, x1, y1, x2, y2, Shapes, oTriangleForm.Model.CheckBox33.State, oTriangleForm.Model.CheckBox34.State, xci, yci)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox6&quot;),0) Then TraceBissectrice(x1, y1, x2, y2, x0, y0, Shapes, oTriangleForm.Model.CheckBox33.State, oTriangleForm.Model.CheckBox34.State, xci, yci)
+
+&apos;
+&apos; on trace les médiatrices si il faut
+&apos;
+	dim xcc as single,ycc as single
+	
+    CalculeCentreCirconscrit(x0, y0, x1, y1, x2, y2, xcc, ycc)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox7&quot;),0) Then TraceMediatrice(x0, y0, x1, y1, x2, y2, Shapes, oTriangleForm.Model.CheckBox36.State, xcc, ycc)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox7&quot;),2) Then TraceMediatrice(x0, y0, x2, y2, x1, y1, Shapes, oTriangleForm.Model.CheckBox36.State, xcc, ycc)
+    If ListBoxSelected(oTriangleForm.GetControl(&quot;ListBox7&quot;),1) Then TraceMediatrice(x1, y1, x2, y2, x0, y0, Shapes, oTriangleForm.Model.CheckBox36.State, xcc, ycc)
+
+&apos; Cercle Circonscrit
+    If oTriangleForm.Model.CheckBox18.State Then
+	    CalculeCentreCirconscrit(x0, y0, x1, y1, x2, y2, xcc, ycc)
+        rayon = Sqr((xcc - x0) ^ 2 + (ycc - y0) ^ 2)
+        If oTriangleForm.Model.CheckBox20.State Then
+        	Croix(xcc, ycc, Shapes)
+            InsereTexte(oTriangleForm.Model.TextBox1.Text, xcc-200, ycc-200, Shapes,ang2*100)
+        End If
+        LeCercle=InsereCercle(xcc, ycc, rayon, Shapes, oTriangleForm.Model.ImageControl7)
+        LeCercle.FillStyle = com.sun.star.drawing.FillStyle.NONE
+    End If
+&apos; Cercle inscrit
+    If oTriangleForm.Model.CheckBox19.State Then
+        CalculeCentreInscrit(x0, y0, x1, y1, x2, y2, xcc, ycc)
+        
+        Dim xxp as single, yyp as single
+        TrouvePiedHauteur(x0, y0, x1, y1, xcc, ycc, xxp, yyp)
+        rayon = Sqr((xcc - xxp) ^ 2 + (ycc - yyp) ^ 2)
+        If oTriangleForm.Model.CheckBox21.State Then
+			Croix(xcc, ycc, Shapes)
+        	InsereTexte(oTriangleForm.Model.TextBox2.Text, xcc-200, ycc-200, Shapes,ang2*100)
+        End If
+        LeCercle=InsereCercle(xcc, ycc, rayon, Shapes, oTriangleForm.Model.ImageControl8)
+        LeCercle.FillStyle = com.sun.star.drawing.FillStyle.NONE
+    End If
+&apos; points sur les cotes
+    If oTriangleForm.Model.CheckBox22.State Then
+        c1 = oTriangleForm.Model.TextBox3.Text
+        RemplaceVirgulePoint(c1)
+        xi = Val(c1) * (x0 - x2) + x2
+        yi = Val(c1) * (y0 - y2) + y2
+        If Not oTriangleForm.Model.ComboBox1.Enabled And Not oTriangleForm.Model.ComboBox2.Enabled Then MarquePointSegment(xi, yi, x0, y0, x2, y2)
+        InsereTexte(oTriangleForm.Model.TextBox4.Text, xi, yi, Shapes,ang2*100)
+    End If
+    If oTriangleForm.Model.CheckBox23.State Then
+        c1 = oTriangleForm.Model.TextBox5.Text
+        RemplaceVirgulePoint(c1)
+        xj = Val(c1) * (x1 - x2) + x2
+        yj = Val(c1) * (y1 - y2) + y2
+        If Not oTriangleForm.Model.ComboBox3.Enabled And Not oTriangleForm.Model.ComboBox1.Enabled Then MarquePointSegment(xj, yj, x1, y1, x2, y2)
+        InsereTexte(oTriangleForm.Model.TextBox6.Text, xj, yj, Shapes,ang2*100)
+    End If
+    If oTriangleForm.Model.CheckBox24.State Then
+        c1 = oTriangleForm.Model.TextBox7.Text
+        RemplaceVirgulePoint(c1)
+        xk = Val(c1) * (x1 - x0) + x0
+        yk = Val(c1) * (y1 - y0) + y0
+        If Not oTriangleForm.Model.ComboBox2.Enabled And Not oTriangleForm.Model.ComboBox3.Enabled Then MarquePointSegment(xk, yk, x0, y0, x1, y1)
+        InsereTexte(oTriangleForm.Model.TextBox8.Text, xk, yk, Shapes,ang2*100)
+    End If
+    
+&apos; Droites et autres segments
+    If oTriangleForm.Model.ComboBox1.Enabled Then
+        If oTriangleForm.Model.ComboBox1.Text = Chaine(&quot;droite&quot;) Then
+            InsereLigneLongue(4000, xi, yi, xj, yj, Shapes, oTriangleForm.Model.ImageControl9)
+        Else
+            InsereLigne(xi, yi, xj, yj, Shapes)
+        End If
+    End If
+    If oTriangleForm.Model.ComboBox2.Enabled Then
+        If oTriangleForm.Model.ComboBox2.Text = Chaine(&quot;droite&quot;) Then
+            InsereLigneLongue(4000, xi, yi, xk, yk, Shapes)
+        Else
+            InsereLigne(xi, yi, xk, yk, Shapes)
+        End If
+    End If
+    If oTriangleForm.Model.ComboBox3.Enabled Then
+        If oTriangleForm.Model.ComboBox3.Text = Chaine(&quot;droite&quot;) Then
+            InsereLigneLongue(4000, xj, yj, xk, yk, Shapes)
+        Else
+            InsereLigne(xk, yk, xj, yj, Shapes)
+        End If
+   End If
+
+&apos; Droites // et perp...
+	dim j,i
+	dim Laliste as Object
+		
+    For j = 1 To 2
+    	if j=1 then
+       		LaListe = oTriangleForm.GetControl(&quot;ListBox1&quot;)
+       	else
+       		LaListe= oTriangleForm.GetControl(&quot;ListBox3&quot;)
+       	end if
+        For i = 0 To LaListe.GetItemCount() - 1
+            If ListBoxSelected(LaListe,i) Then
+                &apos; on analyse le texte
+                t$ = LaListe.GetItem(i)
+                p1 = Mid$(t$, InStr(1, t$, &quot;[&quot;) + 1, 1)
+                p2 = Mid$(t$, InStr(1, t$, &quot;[&quot;) + 2, 1)
+                p3 = Right$(t$, 1)
+                ExtraitCoordonnees(p1, xx1, yy1)
+                ExtraitCoordonnees(p2, xx2, yy2)
+                ExtraitCoordonnees(p3, xx3, yy3)
+                Select Case j
+                Case 2
+                    &apos; Perpendiculaire
+                    TracePerpendiculaire(xx1, yy1, xx2, yy2, xx3, yy3, Shapes)
+                Case 1
+                    &apos; Parallele
+                    TraceParallele(xx1, yy1, xx2, yy2, xx3, yy3, Shapes)
+                End Select
+            End If
+        Next i
+    Next j
+
+	Dim aPoint As New com.sun.star.awt.Point
+    Dim TheSize as new com.sun.star.awt.Size
+    Dim Group as Object
+    Dim Coeff
+    
+	aPoint.x=3000
+	aPoint.y=3000
+	Group = GroupeObjet(Shapes)
+	Group.Position=aPoint
+	Group.rotateangle=(Int(ang1 * 180 / Pi) + 10)*100
+	TheSize=Group.Size
+	coeff=oTriangleForm.Model.Echelle.Text
+	RemplaceVirgulePoint(coeff)
+	TheSize.width = TheSize.Width*val(coeff)/100
+	TheSize.height= TheSize.Height*val(coeff)/100
+	Group.Size=TheSize
+	TermineDessin()
+End sub
+
+Sub TriangleForm_CommandButton7()
+	oTriangleForm.EndExecute()
+	SauveForm(oTriangleForm)
+End sub
+
+Sub CheckBox18_Click()
+    oTriangleForm.Model.CheckBox20.Enabled = oTriangleForm.Model.CheckBox18.State
+    oTriangleForm.Model.TextBox1.Enabled = oTriangleForm.Model.CheckBox18.State
+End Sub
+
+Sub CheckBox19_Click()
+    oTriangleForm.Model.CheckBox21.Enabled = oTriangleForm.Model.CheckBox19.State
+    oTriangleForm.Model.TextBox2.Enabled = oTriangleForm.Model.CheckBox19.State
+End Sub
+
+Sub MAJ_Checkbox()
+dim c1 as boolean
+dim c2 as boolean
+dim c3 as boolean
+
+    c1 = (oTriangleForm.Model.CheckBox22.State And oTriangleForm.Model.CheckBox23.State)
+    c2 = (oTriangleForm.Model.CheckBox22.State And oTriangleForm.Model.CheckBox24.State)
+    c3 = (oTriangleForm.Model.CheckBox23.State And oTriangleForm.Model.CheckBox24.State)
+    oTriangleForm.Model.CheckBox25.Enabled = c1
+    oTriangleForm.Model.ComboBox1.Enabled = (c1 And oTriangleForm.Model.CheckBox25.State)
+    oTriangleForm.Model.Label38.Enabled = (c1 And oTriangleForm.Model.CheckBox25.State)
+    oTriangleForm.Model.CheckBox26.Enabled = c2
+    oTriangleForm.Model.ComboBox2.Enabled = (c2 And oTriangleForm.Model.CheckBox26.State)
+    oTriangleForm.Model.Label39.Enabled = (c2 And oTriangleForm.Model.CheckBox26.State)
+    oTriangleForm.Model.CheckBox27.Enabled = c3
+    oTriangleForm.Model.ComboBox3.Enabled = (c3 And oTriangleForm.Model.CheckBox27.State)
+    oTriangleForm.Model.Label40.Enabled = (c3 And oTriangleForm.Model.CheckBox27.State)
+End Sub
+
+Sub CheckBox22_Click()
+    MAJ_Checkbox
+    MAJ_Label
+End Sub
+
+Sub CheckBox23_Click()
+    MAJ_Checkbox
+    MAJ_Label
+end Sub
+
+Sub CheckBox24_Click()
+    MAJ_Checkbox
+    MAJ_Label
+End Sub
+
+Sub CheckBox25_Click()
+    MAJ_Checkbox
+End Sub
+
+Sub CheckBox26_Click()
+    MAJ_Checkbox
+End Sub
+
+Sub CheckBox27_Click()
+    MAJ_Checkbox
+End Sub
+
+Sub ComboBox1_Change()
+    MAJ_Label
+End Sub
+
+Sub ComboBox2_Change()
+    MAJ_Label
+End Sub
+
+Sub ComboBox3_Change()
+    MAJ_Label
+End Sub
+
+Sub Image1_Click()
+    TriangleForm.OptionButton1.Value = True
+    ActiveLabel 1, 1, 1
+End Sub
+
+Sub ActiveCheckbox()
+dim angle3 as double
+Dim EstIsocele as Boolean
+    angle3 = 180 - Val(oTriangleForm.GetControl(&quot;val1&quot;).gettext()) - Val(oTriangleForm.GetControl(&quot;val2&quot;).gettext())
+    oTriangleForm.Model.CheckBox14.Enabled=((angle3 = 90 And EstUnAngle(&quot;Label4&quot;) And EstUnAngle(&quot;Label5&quot;)) Or (oTriangleForm.GetControl(&quot;val1&quot;).gettext() = &quot;90&quot; And EstUnAngle(&quot;Label4&quot;)) Or (oTriangleForm.GetControl(&quot;val2&quot;).gettext() = &quot;90&quot; And EstUnAngle(&quot;Label5&quot;)))
+    EstIsocele = (Val(oTriangleForm.GetControl(&quot;val1&quot;).gettext()) = angle3 And EstUnAngle(&quot;Label4&quot;) And EstUnAngle(&quot;Label5&quot;)) Or (Val(oTriangleForm.GetControl(&quot;val2&quot;).gettext()) = angle3 And EstUnAngle(&quot;Label4&quot;) And EstUnAngle(&quot;Label5&quot;)) Or (oTriangleForm.GetControl(&quot;val1&quot;).gettext() = oTriangleForm.GetControl(&quot;val2&quot;).gettext() And EstUnAngle(&quot;Label4&quot;) And EstUnAngle(&quot;Label5&quot;)) Or (oTriangleForm.GetControl(&quot;val1&quot;).gettext() = oTriangleForm.GetControl(&quot;val2&quot;).gettext() And Not EstUnAngle(&quot;Label4&quot;) And Not EstUnAngle(&quot;Label5&quot;)) Or (oTriangleForm.GetControl(&quot;val2&quot;).gettext() = oTriangleForm.GetControl(&quot;val3&quot;).gettext() And Not EstUnAngle(&quot;Label5&quot;) And Not EstUnAngle(&quot;Label6&quot;)) Or (oTriangleForm.GetControl(&quot;val1&quot;).gettext() = oTriangleForm.GetControl(&quot;val3&quot;).gettext() And Not EstUnAngle(&quot;Label4&quot;) And Not EstUnAngle(&quot;Label6&quot;))
+    oTriangleForm.Model.CheckBox15.Enabled=EstIsocele
+    oTriangleForm.Model.CheckBox16.Enabled=EstIsocele
+End Sub
+
+Function EstUnAngle(unLabel as String) as Boolean
+	EstUnAngle=(oTriangleForm.GetControl(unLabel).gettext() = &quot;°&quot;)
+End Function
+
+Sub ActiveLabel(et1, et2, et3)
+    If (et1) Then oTriangleForm.GetControl(&quot;Label4&quot;).settext(&quot;cm&quot;) Else oTriangleForm.GetControl(&quot;Label4&quot;).settext(&quot;°&quot;)
+    If (et2) Then oTriangleForm.GetControl(&quot;Label5&quot;).settext(&quot;cm&quot;) Else oTriangleForm.GetControl(&quot;Label5&quot;).settext(&quot;°&quot;)
+    If (et3) Then oTriangleForm.GetControl(&quot;Label6&quot;).settext(&quot;cm&quot;) Else oTriangleForm.GetControl(&quot;Label6&quot;).settext(&quot;°&quot;)
+    ActiveCheckbox
+End Sub
+
+Sub OptionButton1_Click()
+    ActiveLabel 1, 1, 1
+End Sub
+
+Sub OptionButton2_Click()
+    ActiveLabel 0, 1, 1
+End Sub
+
+Sub OptionButton3_Click()
+    ActiveLabel 0, 0, 1
+End Sub
+
+Sub OptionButton4_Click()
+    ActiveLabel 0, 1, 1
+End Sub
+
+Sub MAJ_Label()
+dim i,j,k
+dim t1 as string
+dim t2 as string
+dim t as string
+dim test as boolean
+
+    oTriangleForm.Model.Label24.Label = Chaine(&quot;sur&quot;) &amp;  &quot;[&quot; &amp; oTriangleForm.Model.Sommet3.Text &amp; oTriangleForm.Model.Sommet2.Text &amp; &quot;]&quot;
+    oTriangleForm.Model.Label23.Label = oTriangleForm.Model.Sommet3.Text &amp; oTriangleForm.Model.TextBox4.Text
+    oTriangleForm.Model.Label25.label = oTriangleForm.Model.Sommet3.Text &amp; oTriangleForm.Model.Sommet2.Text
+    oTriangleForm.Model.Label31.label = Chaine(&quot;sur&quot;) &amp;  &quot;[&quot; &amp; oTriangleForm.Model.Sommet3.Text &amp; oTriangleForm.Model.Sommet1.Text &amp; &quot;]&quot;
+    oTriangleForm.Model.Label29.label = oTriangleForm.Model.Sommet3.Text &amp; oTriangleForm.Model.TextBox6.Text
+    oTriangleForm.Model.Label30.label = oTriangleForm.Model.Sommet3.Text &amp; oTriangleForm.Model.Sommet1.Text
+    oTriangleForm.Model.Label37.label = Chaine(&quot;sur&quot;) &amp;  &quot;[&quot; &amp; oTriangleForm.Model.Sommet2.Text &amp; oTriangleForm.Model.Sommet1.Text &amp; &quot;]&quot;
+    oTriangleForm.Model.Label35.label = oTriangleForm.Model.Sommet2.Text &amp; oTriangleForm.Model.TextBox8.Text
+    oTriangleForm.Model.Label36.label = oTriangleForm.Model.Sommet2.Text &amp; oTriangleForm.Model.Sommet1.Text
+    oTriangleForm.Model.Label38.Label = MIif(oTriangleForm.GetControl(&quot;ComboBox1&quot;).getText() = Chaine(&quot;segment&quot;), &quot;[&quot;,&quot;(&quot;) &amp; oTriangleForm.Model.TextBox4.Text &amp; oTriangleForm.Model.TextBox6.Text &amp;   MIif(oTriangleForm.GetControl(&quot;ComboBox1&quot;).getText() = Chaine(&quot;segment&quot;), &quot;]&quot;,&quot;)&quot;)
+    oTriangleForm.Model.Label39.Label = MIif(oTriangleForm.GetControl(&quot;ComboBox2&quot;).getText() = Chaine(&quot;segment&quot;), &quot;[&quot;,&quot;(&quot;) &amp; oTriangleForm.Model.TextBox4.Text &amp; oTriangleForm.Model.TextBox8.Text &amp;   MIif(oTriangleForm.GetControl(&quot;ComboBox2&quot;).getText() = Chaine(&quot;segment&quot;), &quot;]&quot;,&quot;)&quot;)
+    oTriangleForm.Model.Label40.label = MIif(oTriangleForm.GetControl(&quot;ComboBox3&quot;).getText() = Chaine(&quot;segment&quot;), &quot;[&quot;,&quot;(&quot;) &amp; oTriangleForm.Model.TextBox6.Text &amp; oTriangleForm.Model.TextBox8.Text &amp;   MIif(oTriangleForm.GetControl(&quot;ComboBox3&quot;).getText() = Chaine(&quot;segment&quot;), &quot;]&quot;,&quot;)&quot;)
+
+	oTriangleForm.GetControl(&quot;ListBox1&quot;).removeitems(0,oTriangleForm.GetControl(&quot;ListBox1&quot;).Getitemcount())
+	oTriangleForm.GetControl(&quot;ListBox2&quot;).removeitems(0,oTriangleForm.GetControl(&quot;ListBox2&quot;).Getitemcount())
+	oTriangleForm.GetControl(&quot;ListBox3&quot;).removeitems(0,oTriangleForm.GetControl(&quot;ListBox3&quot;).Getitemcount())
+	oTriangleForm.GetControl(&quot;ListBox4&quot;).removeitems(0,oTriangleForm.GetControl(&quot;ListBox4&quot;).Getitemcount())
+	oTriangleForm.GetControl(&quot;ListBox5&quot;).removeitems(0,oTriangleForm.GetControl(&quot;ListBox5&quot;).Getitemcount())
+	oTriangleForm.GetControl(&quot;ListBox6&quot;).removeitems(0,oTriangleForm.GetControl(&quot;ListBox6&quot;).Getitemcount())
+	oTriangleForm.GetControl(&quot;ListBox7&quot;).removeitems(0,oTriangleForm.GetControl(&quot;ListBox7&quot;).Getitemcount())
+
+	oTriangleForm.GetControl(&quot;ListBox2&quot;).additem(oTriangleForm.Model.Sommet1.Text,	oTriangleForm.GetControl(&quot;ListBox2&quot;).Getitemcount())
+	oTriangleForm.GetControl(&quot;ListBox2&quot;).additem(oTriangleForm.Model.Sommet2.Text,	oTriangleForm.GetControl(&quot;ListBox2&quot;).Getitemcount())
+	oTriangleForm.GetControl(&quot;ListBox2&quot;).additem(oTriangleForm.Model.Sommet3.Text,	oTriangleForm.GetControl(&quot;ListBox2&quot;).Getitemcount())
+	
+    If oTriangleForm.Model.CheckBox22.State Then oTriangleForm.GetControl(&quot;ListBox2&quot;).additem(oTriangleForm.Model.Textbox4.Text,oTriangleForm.GetControl(&quot;ListBox2&quot;).getitemcount())
+    If oTriangleForm.Model.CheckBox23.State Then oTriangleForm.GetControl(&quot;ListBox2&quot;).additem(oTriangleForm.Model.Textbox6.Text,oTriangleForm.GetControl(&quot;ListBox2&quot;).getitemcount())
+    If oTriangleForm.Model.CheckBox24.State Then oTriangleForm.GetControl(&quot;ListBox2&quot;).additem(oTriangleForm.Model.Textbox8.Text,oTriangleForm.GetControl(&quot;ListBox2&quot;).getitemcount())
+
+	Dim LaListe as object
+    For j = 1 To 2
+    	
+    	if j=1 then
+        	LaListe = oTriangleForm.GetControl(&quot;ListBox1&quot;)
+        else
+        	LaListe= oTriangleForm.GetControl(&quot;ListBox3&quot;)
+        end if
+        For k = 1 To 3
+        	if k=3 then
+        		t1=oTriangleForm.GetControl(&quot;Sommet2&quot;).getText()
+        	else
+        		t1=oTriangleForm.GetControl(&quot;Sommet3&quot;).getText()
+        	end if
+        	if k=1 then
+        		t2=oTriangleForm.GetControl(&quot;Sommet2&quot;).getText()
+        	else
+        		t2=oTriangleForm.GetControl(&quot;Sommet1&quot;).getText()
+        	end if
+            t = Chaine(&quot;a&quot;) &amp; &quot; [&quot; &amp; t1 &amp; t2 &amp;  &quot;] &quot;
+            For i = 0 To oTriangleForm.GetControl(&quot;ListBox2&quot;).getitemCount() - 1
+                test = (oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i) = oTriangleForm.Model.TextBox4.Text And InStr(1, t, &quot;[&quot; &amp; oTriangleForm.Model.Sommet3.Text &amp; oTriangleForm.Model.Sommet2.Text &amp; &quot;]&quot;) &lt;&gt; 0) Or (oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i) = oTriangleForm.Model.TextBox6.Text And InStr(1, t, &quot;[&quot; &amp; oTriangleForm.Model.Sommet3.Text &amp; oTriangleForm.Model.Sommet1.Text &amp; &quot;]&quot;) &lt;&gt; 0) Or (oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i) = oTriangleForm.Model.TextBox8.Text And InStr(1, t, &quot;[&quot; &amp; oTriangleForm.Model.Sommet2.Text &amp; oTriangleForm.Model.Sommet1.Text &amp; &quot;]&quot;) &lt;&gt; 0)
+                If j = 2 Or (Not (test) And Not (oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i) = t1) Or oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i) = t2) Then LaListe.AddItem(t &amp; Chaine(&quot;passantpar&quot;) &amp; &quot; &quot; &amp; oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i),Laliste.getitemcount())
+            Next i
+        Next k
+    Next j
+    For i = 0 To 2
+        oTriangleForm.GetControl(&quot;ListBox4&quot;).AddItem(Chaine(&quot;issuede&quot;) &amp; &quot; &quot; &amp; oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i),0)
+        oTriangleForm.GetControl(&quot;ListBox5&quot;).AddItem(Chaine(&quot;issuede&quot;) &amp; &quot; &quot; &amp; oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i),0)
+        oTriangleForm.GetControl(&quot;ListBox6&quot;).AddItem (Chaine(&quot;delangle&quot;) &amp; &quot; &quot; &amp; oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i),0)
+        oTriangleForm.GetControl(&quot;ListBox7&quot;).AddItem (Chaine(&quot;ducote&quot;) &amp; &quot; &quot; &amp; MIif(oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i) = oTriangleForm.GetControl(&quot;Sommet1&quot;).getText(), &quot;[&quot; &amp; oTriangleForm.GetControl(&quot;Sommet3&quot;).getText() &amp; oTriangleForm.GetControl(&quot;Sommet2&quot;).getText() &amp; &quot;]&quot;, MIif(oTriangleForm.GetControl(&quot;ListBox2&quot;).getitem(i) = oTriangleForm.GetControl(&quot;Sommet2&quot;).getText(), &quot;[&quot; &amp; oTriangleForm.GetControl(&quot;Sommet3&quot;).getText() &amp; oTriangleForm.GetControl(&quot;Sommet1&quot;).getText() &amp; &quot;]&quot;, &quot;[&quot; &amp; oTriangleForm.GetControl(&quot;Sommet2&quot;).getText() &amp; oTriangleForm.GetControl(&quot;Sommet1&quot;).getText() &amp; &quot;]&quot;)),0)
+    Next i
+End Sub
+
+Sub CheckBox13_Click()
+	oTriangleForm.Model.CheckBox1.Enabled = oTriangleForm.Model.CheckBox13.State
+End Sub
+
+Sub Sommet1_Change()
+    MAJ_Label
+End Sub
+
+Sub Sommet2_Change()
+    MAJ_Label
+End Sub
+
+Sub Sommet3_Change()
+    MAJ_Label
+End Sub
+
+Sub Polices_Change()
+    If Polices.ListIndex &gt;= 0 Then Exemple.Font.Name = Polices.List(Polices.ListIndex)
+End Sub
+
+Sub Souligne_Click()
+    Exemple.Font.Underline = Souligne.Value
+End Sub
+
+Sub SpinTaille_Change()
+    If SpinTaille.Value &lt; 0 Then
+        SpinTaille.Value = 0
+    Else
+        Taille = SpinTaille.Value
+    End If
+End Sub
+
+Sub Taille_Change()
+    Exemple.Font.Size = Val(Taille)
+    If Val(Taille) &lt;&gt; SpinTaille.Value Then SpinTaille.Value = Val(Taille)
+End Sub
+
+Sub TextBox1_Change()
+    If Len(TextBox1) &gt; 1 Then TextBox1 = Left$(TextBox1, 1)
+End Sub
+
+Sub TextBox2_Change()
+    If Len(TextBox2) &gt; 1 Then TextBox2 = Left$(TextBox2, 1)
+End Sub
+
+Sub TextBox4_Change()
+    MAJ_Label
+End Sub
+
+Sub TextBox6_Change()
+    MAJ_Label
+End Sub
+
+Sub TextBox8_Change()
+    MAJ_Label
+End Sub
+
+Sub TriangleForm_Activate()
+Dim ListBox(1) as string
+
+	ListBox(0)=Chaine(&quot;segment&quot;)
+	ListBox(1)=Chaine(&quot;droite&quot;)
+	oTriangleForm.Model.combobox1.StringItemList()=ListBox()
+	oTriangleForm.Model.combobox2.StringItemList()=ListBox()
+	oTriangleForm.Model.combobox3.StringItemList()=ListBox()
+    oTriangleForm.Model.ComboBox1.Text=Chaine(&quot;segment&quot;)
+    oTriangleForm.Model.ComboBox2.Text=Chaine(&quot;segment&quot;)
+    oTriangleForm.Model.ComboBox3.Text=Chaine(&quot;segment&quot;)
+
+&apos;    ActivePolice TriangleForm
+&apos;    DoEvents
+End Sub
+
+Sub Gras_Click()
+    Exemple.Font.Bold = Gras.Value
+End Sub
+
+Sub Italique_Click()
+    Exemple.Font.Italic = Italique.Value
+End Sub
+
+Sub UserForm_Initialize()
+    StartUpPosition = 0
+    x = Left
+    y = Top
+    ChangeSPForm x, y, Width, Height
+    Left = x
+    Top = y
+    If Polices.ListCount = 0 Then AjoutePoliceDispo Polices
+End Sub
+
+Sub Renomme(evt as Object)
+	GRenomme evt, oTriangleForm, Array(&quot;Sommet1&quot;, &quot;Sommet2&quot;, &quot;Sommet3&quot;)
+End Sub
+
+
+</script:module>

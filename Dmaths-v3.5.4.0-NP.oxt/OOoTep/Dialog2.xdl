@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog2" dlg:left="211" dlg:top="172" dlg:width="200" dlg:height="169" dlg:closeable="true" dlg:moveable="true" dlg:title="Script Tracenpoche - OOoTep  v">
+ <dlg:bulletinboard>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="1" dlg:left="74" dlg:top="145" dlg:width="49" dlg:height="21" dlg:default="true" dlg:value="Ok">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Module4.CommandButton1_Click?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:textfield dlg:id="TextBox1" dlg:tab-index="0" dlg:left="8" dlg:top="17" dlg:width="182" dlg:height="121" dlg:multiline="true" dlg:readonly="true"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="2" dlg:left="9" dlg:top="5" dlg:width="99" dlg:height="9" dlg:value="Voici le script de la figure sélectionnée :"/>
+ </dlg:bulletinboard>
+</dlg:window>

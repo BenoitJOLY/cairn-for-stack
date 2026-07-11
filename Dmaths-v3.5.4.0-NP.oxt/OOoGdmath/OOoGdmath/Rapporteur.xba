@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Rapporteur" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Dim oRapporteurForm as Object
+
+Sub Main
+	oRapporteurForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;RapporteurForm&quot;)
+	ChangeTitreDialog(oRapporteurForm)
+	oRapporteurForm.Model.Step=1
+&apos;	RestaureForm(oRapporteurForm)
+	oRapporteurForm.Execute()
+End Sub
+
+Private Sub RapporteurForm_CheckBox1_Click()
+    oRapporteurForm.Model.CheckBox4.Enabled = oRapporteurForm.Model.CheckBox1.State
+End Sub
+
+Private Sub RapporteurForm_CheckBox2_Click()
+    oRapporteurForm.Model.CheckBox5.Enabled = oRapporteurForm.Model.CheckBox2.State
+End Sub
+
+Private Sub RapporteurForm_CheckBox3_Click()
+    oRapporteurForm.Model.CheckBox6.Enabled = oRapporteurForm.Model.CheckBox3.State
+End Sub
+
+Private Sub RapporteurForm_CheckBox7_Click()
+    oRapporteurForm.Model.CheckBox8.Enabled = oRapporteurForm.Model.CheckBox7.State
+    oRapporteurForm.Model.TextBox1.Enabled = oRapporteurForm.Model.CheckBox7.State
+    oRapporteurForm.Model.Label1.Enabled = oRapporteurForm.Model.CheckBox7.State
+End Sub
+
+Private Sub RapporteurForm_CheckBox9_Click()
+    oRapporteurForm.Model.CheckBox10.Enabled = oRapporteurForm.Model.CheckBox9.State
+End Sub
+
+Private Sub RapporteurForm_CommandButton1_Click()
+Dim unnom As String
+Dim posx, posy,  a, i, can, san, an
+Dim unArc as Object
+Dim Shapes as Object
+Dim rayon,pg,ng,gg,tg,pt
+Dim t1 as String
+
+	oRapporteurForm.Model.Step = 2
+	oRapporteurForm.Model.Label4.Label = Chaine(&quot;tracrapp&quot;) &apos;&quot;Tracé du rapporteur&quot;
+	InitialiseDessin(False)
+    Shapes=InitialiseGroupe
+    PointInsertion posx, posy
+    t1 = oRapporteurForm.Model.TextField1.Text
+    RemplaceVirgulePoint t1
+    rayon = val(t1)*1000
+    pg = 200
+    ng = 300
+    gg = 500
+	tg = 700
+	pt = 800
+	
+	if oRapporteurForm.Model.OptionButton2.State then 
+		unArc=InsereCercle(posx,posy,rayon,Shapes)
+	else
+	    unArc=InsereArcDeCercle(posx,posy,0,18000,rayon,Shapes)
+	   end if
+    InsereLigne posx - MIif(oRapporteurForm.Model.OptionButton2.State,400,rayon), posy, posx + rayon, posy,Shapes
+    InsereLigne posx, posy - 400, posx, posy + 400, Shapes
+    InsereLigne posx, posy - rayon/2+tg, posx, posy - rayon/2-tg, Shapes
+    If oRapporteurForm.Model.OptionButton2.State Then
+        InsereLigne posx, posy + rayon/2+tg, posx, posy + rayon/2-tg, Shapes
+        InsereLigne posx - rayon/2+tg, posy, posx - rayon/2-tg, posy, Shapes
+    End If
+    If oRapporteurForm.Model.CheckBox1.State Then
+		oRapporteurForm.Model.Label4.Label = Chaine(&quot;tracgrad10&quot;) &apos;&quot;Tracé des graduations 10°..&quot;
+        a = (rayon - gg) * (1 - oRapporteurForm.Model.CheckBox4.State)
+        For i = 10 To MIif(oRapporteurForm.Model.OptionButton2.State,350,170) Step 10
+            can = Cos(i * Pi / 180)
+            san = Sin(i * Pi / 180)
+            InsereLigne posx + a * can, posy - a * san, posx + rayon * can, posy - rayon * san, Shapes
+            If oRapporteurForm.Model.CheckBox9.State Then
+                InsereTexte(Trim(Str(i)), posx + (rayon-1.1*pt) * can, posy - (rayon-1.1*pt) * san, Shapes,(i - 90)*100,0,0).Text.CharHeight=Int(10*rayon/5000+.5)
+                If oRapporteurForm.Model.CheckBox10.State Then InsereTexte(Trim(Str(180 - 180 * oRapporteurForm.Model.OptionButton2.State - i)), posx + (rayon-1.5*pt) * can, posy - (rayon-1.5*pt) * san, Shapes,(i - 90 - 180 * oRapporteurForm.Model.OptionButton2.State)*100,0,0).Text.CharHeight=int(10*rayon/5000+.5)
+            End If
+        Next i
+    End If
+    If oRapporteurForm.Model.CheckBox2.State Then
+		oRapporteurForm.Model.Label4.Label =Chaine(&quot;tracgrad5&quot;)  &apos;&quot;Tracé des graduations 5°..&quot;
+        a = (rayon - ng) * (1 - oRapporteurForm.Model.CheckBox5.State)
+        For i = 5 To MIif(oRapporteurForm.Model.OptionButton2.State,355,175) Step MIif(oRapporteurForm.Model.CheckBox1.State,10,5)
+            can = Cos(i * Pi / 180)
+            san = Sin(i * Pi / 180)
+            InsereLigne posx + a * Can, posy - a * San, posx + rayon * Can, posy - rayon * San, Shapes
+        Next i
+    End If
+    If oRapporteurForm.Model.CheckBox3.State Then
+		oRapporteurForm.Model.Label4.Label = Chaine(&quot;tracgrad1&quot;) &apos;&quot;Tracé des graduations 1°..&quot;
+        a = (rayon - pg) * (1 - oRapporteurForm.Model.CheckBox6.State)
+        For i = 1 To MIif(oRapporteurForm.Model.OptionButton2.State,359,179)
+            can = Cos(i * Pi / 180)
+            san = Sin(i * Pi / 180)
+            If Not (Int(i / 10) * 10 = i And oRapporteurForm.Model.CheckBox1.State) And Not (Not (Int(i / 10) * 10 = i) And Int(i / 5) * 5 = i And oRapporteurForm.Model.CheckBox2.State) Then
+                InsereLigne posx + a * can, posy - a * san, posx + rayon * can, posy - rayon * san, Shapes
+            End If
+        Next i
+    End If
+    If oRapporteurForm.Model.CheckBox7.State Then
+		oRapporteurForm.Model.Label4.Label = Chaine(&quot;tracgrad&quot;) &apos;&quot;Tracé des graduations autres..&quot;
+        a = (rayon - tg) * (1 - oRapporteurForm.Model.CheckBox8.State)
+        For i = 1 To Int(Val(oRapporteurForm.Model.TextBox1.Text)) - 1
+            an = i * ((180 - 180 * oRapporteurForm.Model.OptionButton2.State) / Val(oRapporteurForm.Model.TextBox1.Text)) * Pi / 180
+            can = Cos(i * Pi / 180)
+            san = Sin(i * Pi / 180)
+            InsereLigne posx + a * can, posy - a * san, posx + rayon * can, posy - rayon * san, Shapes
+        Next i
+    End If
+	oRapporteurForm.Model.Label4.Label = Chaine(&quot;tracfin&quot;) &apos;&quot;Finalisation du tracé..&quot;
+	GroupeObjet(Shapes)
+    oRapporteurForm.EndExecute()
+	sauveForm(oRapporteurForm)
+	TermineDessin()
+End Sub
+
+Private Sub RapporteurForm_CommandButton2_Click()
+    oRapporteurForm.EndExecute()
+End Sub
+
+
+</script:module>

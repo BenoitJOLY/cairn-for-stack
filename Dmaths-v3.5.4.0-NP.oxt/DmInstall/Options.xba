@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Options" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) 2006-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye 
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.com
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+Public oLanguesSelect as Object
+Public oDmOptions as Object
+Private oAddonBarre, oAddon, oConfigAccess, oConfigAccessToolBarre,oDmBarre  as Object
+Public oCopyDmaths as Object
+Public sNomFichierInstall as String
+Public bIconesChangees, bAfficherMasquerIcones as Boolean
+Public sSource as String
+
+
+Sub ChoixOptionsDmaths	
+	BasicLibraries.loadLibrary(&quot;Dmaths&quot;)
+	Call Dmaths.Tools.VerifOperationnel
+	bIconesChangees = False
+	bAfficherMasquerIcones = False
+	If bFigure=True Then oFigure.Visible=False
+	If bGrille=True or bDiagBox=True or bRepreGra=True Then oPoints.Visible=False
+
+	
+	oDmOptions = Dmaths.Module5.LoadDialog(&quot;DmInstall&quot;,&quot;DmOptions&quot;)
+ 
+&apos;	If GetguiType &lt;&gt; 4 or Not FileExists(&quot;/Users&quot;) Then
+		DmInstall.Install_Addon.LoadAppsPref(oDmOptions,False,True,sThemeIcons) rem bPremInstall=False bRegleOptions = True
+&apos;	Endif
+	If bPremInstall Then Call ReinitialiseOptions
+	exitOK = com.sun.star.ui.dialogs.ExecutableDialogResults.OK
+	exitCANCEL = com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL
+	If oDmOptions.Execute = exitOK Then ValidOptionsDmaths
+&apos;	elseif  oDmOptions.Execute = exitCANCEL Then
+&apos;		AfficherMasquerIcones
+&apos;	Endif
+End Sub
+
+Sub ReinitialiseOptions
+	oDmOptions.Model.CheckBox1.State=1
+	oDmOptions.Model.CheckBox2.State=0	
+	oDmOptions.Model.CheckBox5.State=1
+	oDmOptions.Model.CheckBox16.State=1	
+	oDmOptions.Model.CheckBox7.State=1
+	oDmOptions.Model.CheckBox7.State=1
+	oDmOptions.Model.CheckBox8.State=0 
+	oDmOptions.Model.CheckBox9.State=0
+	oDmOptions.Model.CheckBox10.State=0 
+	oDmOptions.Model.CheckBox11.State=0
+	oDmOptions.Model.CheckBox12.State=1
+	oDmOptions.GetControl(&quot;TextField1&quot;).Enable = False
+	oDmOptions.Model.CheckBox13.State=0
+	oDmOptions.Model.CheckBox14.State=0
+	oDmOptions.Model.CheckBox15.State=1
+	oDmOptions.Model.CheckBox17.State=0	
+	oDmOptions.Model.CheckBox19.State=1
+	If OOoNumVersion &lt; 300 Then   rem modifie le 15-11-08
+		oDmOptions.Model.CheckBox20.State = 1
+	Else
+		oDmOptions.Model.CheckBox20.State = 0
+	Endif
+	oDmOptions.Model.CheckBox21.State=1
+	oDmOptions.Model.CheckBox22.State=1
+	If iLang = 0 Then 
+		oDmOptions.Model.CheckBox23.State=0
+	Else
+		oDmOptions.Model.CheckBox23.State=1
+	Endif
+	oDmOptions.Model.OptionButton1.State=1
+	oDmOptions.Model.TextField6.Text=&quot;0&quot;
+	oDmOptions.Model.TextField4.Text=&quot;0&quot;
+	oDmOptions.Model.TextField2.Text=&quot;40&quot;
+	oDmOptions.Model.TextField3.Text=&quot;0&quot;
+	oDmOptions.Model.TextField1.Text=&quot;12&quot;
+	If (GetguiType = 4 and FileExists(&quot;/Users&quot;)) Then 
+		oDmOptions.Model.TextField5.Text = &quot;Apple Chancery&quot;
+	Else
+		oDmOptions.Model.TextField5.Text = &quot;Atalante&quot;
+	Endif
+	oDmOptions.GetControl(&quot;TextField7&quot;).Enable = True
+	oDmOptions.Model.TextField7.Text = &quot;abcdexyzt&quot;
+End Sub
+
+Sub ReinitialiseCheminsApps
+	rem recherche des logiciels installes
+	BasicLibraries.loadLibrary(&quot;DmInstall&quot;)
+	sThemeIconesChoisi = DmInstall.Install_Addon.DeterminesThemeIcons(oDmOptions)
+	bIconesChangees = True
+	DmInstall.Install_Addon.LoadAppsPref(oDmOptions,True,True,sThemeIconesChoisi)	
+End Sub
+
+
+
+Sub FinChoixOptionsDmaths
+	oDmOptions.EndExecute()
+	If bFigure=True Then oFigure.Visible=True
+	If bGrille=True or bDiagBox=True or bRepreGra=True Then oPoints.Visible=True
+End Sub
+
+Sub ValidOptionsDmaths
+&apos;	Print &quot;change les options&quot;
+	Dim sMatricesRondes as String
+	Dim sWidevec,sItalic,sTailleFormules,sMarqHorPoints,sMarqVerPoints,sFormulesGras,sMessage as String
+	Dim sLettresAreScalaires, sLettresScalaires as String
+	Dim sPoliceFormCarac, sMargesFormules, sConcateneFormules, sThemeIconesChoisi as String
+	Dim sIdroit, sEdroit, sFractions, sbXpointaulieux, sDelaiEntreSauvegardes as String
+	Dim sTextMode, sBorneInfIntegrales, sBorneSupIntegrales,sFormulesEspacees, sTailleFormCarac, sNomPoliceCursive as String
+	Dim sFormulesEncadrees, sGrandesParentheses, sUsingDispatcher as String 
+	Dim sCheminSoftware1,sCheminSoftware2,sCheminSoftware3 as String
+	Dim iLangChoisie as Integer
+	If oDmOptions.Model.CheckBox1.State=1 Then sItalic = &quot;TRUE&quot; Else sItalic = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox2.State=1 Then sWidevec = &quot;TRUE&quot; Else sWidevec = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox5.State=1 Then sEdroit = &quot;TRUE&quot; Else sEdroit = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox16.State=1 Then sIdroit = &quot;TRUE&quot; Else sIdroit = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox7.State=1 Then sBorneInfIntegrales = &quot;from&quot; Else sBorneInfIntegrales = &quot;_&quot;
+	If oDmOptions.Model.CheckBox7.State=1 Then sBorneSupIntegrales = &quot;to&quot; Else sBorneSupIntegrales = &quot;^&quot;
+	If oDmOptions.Model.CheckBox8.State=1 Then sTextMode = &quot;TRUE&quot; Else sTextMode = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox9.State=1 Then sCoordColonne = &quot;TRUE&quot; Else sCoordColonne = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox10.State=1 Then sFormulesGras = &quot;TRUE&quot; Else sFormulesGras = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox11.State=1 Then sSystemesAlignes = &quot;TRUE&quot; Else sSystemesAlignes = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox12.State=1 Then sTailleFormCarac = &quot;TRUE&quot; Else sTailleFormCarac = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox13.State=1 Then sFormulesEspacees = &quot;TRUE&quot; Else sFormulesEspacees = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox14.State=1 Then sFormulesEncadrees = &quot;TRUE&quot; Else sFormulesEncadrees = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox15.State=1 Then sGrandesParentheses = &quot;TRUE&quot; Else sGrandesParentheses = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox17.State=1 Then sFractions = &quot;TRUE&quot; Else sFractions = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox19.State=1 Then sPoliceFormCarac = &quot;TRUE&quot; Else sPoliceFormCarac = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox20.State=1 Then sUsingDispatcher = &quot;TRUE&quot; Else sUsingDispatcher = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox21.State=1 Then sConcateneFormules = &quot;TRUE&quot; Else sConcateneFormules = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox22.State=1 Then sLettresAreScalaires = &quot;TRUE&quot; Else sLettresAreScalaires = &quot;FALSE&quot;
+	If oDmOptions.Model.CheckBox23.State=1 Then sbXpointaulieux = &quot;TRUE&quot; Else sbXpointaulieux = &quot;FALSE&quot;
+	If oDmOptions.Model.MatriceButton1.State=1 Then sMatricesRondes = &quot;TRUE&quot; Else sMatricesRondes = &quot;FALSE&quot;
+	sThemeIconesChoisi = DmInstall.Install_Addon.DeterminesThemeIcons(oDmOptions) 
+
+
+	rem choix du theme des icones si modification demandée
+	If sThemeIconesChoisi &lt;&gt; sThemeIcons Then bIconesChangees = True
+	&apos;-------------------------------------------------------------------------------------
+	
+	sTailleFormules=oDmOptions.Model.TextField1.Text
+	sMarqHorPoints=oDmOptions.Model.TextField2.Text
+	sMarqVerPoints=oDmOptions.Model.TextField3.Text
+	sDelaiEntreSauvegardes = oDmOptions.Model.TextField4.Text
+	sNomPoliceCursive = oDmOptions.Model.TextField5.Text
+	sMargesFormules = oDmOptions.Model.TextField6.Text
+	sLettresScalaires = oDmOptions.Model.TextField7.Text
+	sCheminSoftware1 = oDmOptions.Model.FileControl2.Text
+	sCheminSoftware2 = oDmOptions.Model.FileControl3.Text
+	sCheminSoftware3 = oDmOptions.Model.FileControl4.Text
+
+	If GetguiType = 4 Then 
+	sCheminSoftware1 = RegleAppsSousLinux(sCheminSoftware1)
+	sCheminSoftware2 = RegleAppsSousLinux(sCheminSoftware2)
+	sCheminSoftware3 = RegleAppsSousLinux(sCheminSoftware3)
+	Endif
+	
+	rem valeur langue choisie
+	iLangChoisie = oDmOptions.GetControl(&quot;ListBox1&quot;).SelectedItemPos
+	
+	rem regle le chemin pour les autotextes
+	If iLangChoisie &lt;&gt; iLang Then
+		RegleCheminAutotextLangue(iLangChoisie)
+	Endif
+
+&apos;	Print iLangChoisie
+
+	sSource=&quot;Rem (C) Didier Dorange-Pattoret www.dmaths.org&quot;+Chr(13)
+	
+	sSource=sSource+&quot;Global const iLang = &quot;+iLangChoisie+Chr(13)
+	
+	sSource=sSource+&quot;Public const iNumVersionDmathsCourante = &quot;+ iNumVersionDmaths + &quot;&quot; + Chr(13)
+	
+	sSource=sSource+&quot;Public const bItalic = &quot;+sItalic+Chr(13)
+	sSource=sSource+&quot;Public const bEdroit = &quot;+sEdroit+Chr(13)
+	sSource=sSource+&quot;Public const bIdroit = &quot;+sIdroit+Chr(13)
+	sSource=sSource+&quot;Public const bOptionMajusculesItalic = &quot;+sWidevec+Chr(13)
+	sSource=sSource+&quot;Public const bLettresAreScalaires = &quot;+sLettresAreScalaires+Chr(13)		
+	sSource=sSource+&quot;Public const sLettresScalaires = &quot;&quot;&quot;+sLettresScalaires+&quot;&quot;&quot;&quot;+Chr(13)	
+	sSource=sSource+&quot;Public const bFormulesGras = &quot;+sFormulesGras+Chr(13)
+	sSource=sSource+&quot;Public const iTailleFormules = &quot;+sTailleFormules+Chr(13)
+	sSource=sSource+&quot;Public const bTailleFormCarac = &quot;+sTailleFormCarac+Chr(13)
+	sSource=sSource+&quot;Public const bPoliceFormCarac = &quot;+sPoliceFormCarac+Chr(13)
+	sSource=sSource+&quot;Public const iMargesFormules = &quot;+sMargesFormules+Chr(13)
+	sSource=sSource+&quot;Public const bConcateneFormules = &quot;+sConcateneFormules+Chr(13)	
+	sSource=sSource+&quot;Public const iMarqHorPoints = &quot;+sMarqHorPoints+Chr(13)
+	sSource=sSource+&quot;Public const iMarqVerPoints = &quot;+sMarqVerPoints+Chr(13)
+	sSource=sSource+&quot;Public const sBorneInfIntegrales = &quot;&quot;&quot;+sBorneInfIntegrales+&quot;&quot;&quot;&quot;+Chr(13)
+	sSource=sSource+&quot;Public const sBorneSupIntegrales = &quot;&quot;&quot;+sBorneSupIntegrales+&quot;&quot;&quot;&quot;+Chr(13)
+	sSource=sSource+&quot;Public const bTextMode = &quot;+sTextMode+Chr(13)
+	sSource=sSource+&quot;Public const bCoordColonne = &quot;+sCoordColonne+Chr(13)
+	sSource=sSource+&quot;Public const bSystemesAlignes = &quot;+sSystemesAlignes+Chr(13)
+	sSource=sSource+&quot;Public const bMatricesRondes = &quot;+sMatricesRondes+Chr(13)
+	sSource=sSource+&quot;Public const bFormulesEspacees = &quot;+sFormulesEspacees+Chr(13)
+	sSource=sSource+&quot;Public const bFormulesEncadrees = &quot;+sFormulesEncadrees+Chr(13)
+	sSource=sSource+&quot;Public const bGrandesParentheses = &quot;+sGrandesParentheses+Chr(13)
+	sSource=sSource+&quot;Public const bFractions = &quot;+sFractions+Chr(13)
+	sSource=sSource+&quot;Public const bXpointaulieux = &quot;+sbXpointaulieux+Chr(13)
+	sSource=sSource+&quot;Public const bUsingDispatcher = &quot;+ sUsingDispatcher +Chr(13)
+	sSource=sSource+&quot;Public const iDelaiEntreSauvegardes = &quot;+sDelaiEntreSauvegardes+Chr(13)
+	sSource=sSource+&quot;Public const sThemeIcons = &quot;&quot;&quot;+sThemeIconesChoisi+&quot;&quot;&quot;&quot;+Chr(13)
+	sSource=sSource+&quot;Public const sCheminSoftware1 = &quot;&quot;&quot;+sCheminSoftware1+&quot;&quot;&quot;&quot;+Chr(13)
+	sSource=sSource+&quot;Public const sCheminSoftware2 = &quot;&quot;&quot;+sCheminSoftware2+&quot;&quot;&quot;&quot;+Chr(13)
+	sSource=sSource+&quot;Public const sCheminSoftware3 = &quot;&quot;&quot;+sCheminSoftware3+&quot;&quot;&quot;&quot;+Chr(13)
+	sSource=sSource+&quot;Public const sNomPoliceCursive = &quot;&quot;&quot;+sNomPoliceCursive+&quot;&quot;&quot;&quot;+Chr(13)
+	sSource=sSource+&quot;Public const sOptionsTraceCourbe = &quot;&quot;&quot;+sOptionsTraceCourbe+&quot;&quot;&quot;&quot;+Chr(13)
+	sSource=sSource+&quot;Sub MyTest2&quot; &amp; Chr(13) &amp; &quot;Print &quot;&quot;Vive Dmaths !&quot;&quot;&quot; &amp; Chr(13) &amp; &quot;End Sub&quot;
+
+
+	If bFigure=True Then oFigure.Visible=True
+	If bGrille=True or bDiagBox=True or bRepreGra=True Then oPoints.Visible=True
+&apos;---------------------------------------------------------------------------------------------------------------------------
+rem inscription de la taille des formules dans le fichier de configuration.
+	If iTailleFormules&lt;&gt;Cint(sTailleFormules) Then
+		oConfigAccess = GetConfigAccess( &quot;/org.openoffice.Office.Math&quot;, True )
+		oTailleDesFormules = oConfigAccess.getByName( &quot;StandardFormat&quot; )
+		oTailleDesFormules.BaseSize = Cint(sTailleFormules)
+		oConfigAccess.commitChanges()
+		bModifieTailleFormule = TRUE
+	End if
+rem installation du process mise à jour automatique
+&apos;	oConfigAccess = GetConfigAccess( &quot;/org.openoffice.Office.Events/ApplicationEvents/Bindings&quot;, True )
+&apos;	If oConfigAccess.hasByName(&quot;OnStartApp&quot;) Then oConfigAccess.removeByName(&quot;OnStartApp&quot;)
+&apos;	If sMiseAJourManuel = &quot;FALSE&quot; Then
+&apos;	oEvene = oConfigAccess.createInstance
+&apos;	oEvene.BindingURL = &quot;vnd.sun.star.script:DmInstall.MajAuto.TestNewVersionDemarrage?language=Basic&amp;location=application&quot;
+&apos;	oConfigAccess.insertByName(&quot;OnStartApp&quot;,oEvene)
+&apos;	End if	
+&apos;	oConfigAccess.CommitChanges
+&apos;----------------------------------------------------------------------------------------------------------------------------
+rem validation des icones
+	&apos;If (GetguiType = 1 or Not FileExists(&quot;/Users&quot;))  Then
+	DmInstall.Install_Addon.RegleIconesAppsPref(oDmOptions,sThemeIconesChoisi)
+	DmInstall.Install_Addon.ChoisirThemeIcone(sThemeIconesChoisi)
+	&apos;Endif
+&apos;----------------------------------------------------------------------------------------------------------------------------
+rem affiche masque les icones
+	If bAfficherMasquerIcones = True Then RegleAffichageIcones
+	
+rem on considère le dictionnaire comme déchargé
+	DictionnaireCharge = False
+	
+rem message de fin
+	
+	Call ChargementDuVocabulaire
+	
+	sMessage = Trad(iLangChoisie,3) &amp; &quot; &quot;
+	
+	If bIconesChangees = True Then
+		If IsMacOS Then
+			sMessage = sMessage &amp; Chr(13) &amp; Chr(13) &amp; Trad(iLangChoisie,5) rem Quittez et relancer OOo/SO/NeO
+		Else
+			sMessage = sMessage &amp; Chr(13) &amp; Chr(13) &amp; Trad(iLangChoisie,0) rem OOo va être redémarré.
+		Endif
+	Endif
+	
+&apos;	Print &quot;1&quot;
+	
+
+	If (bIconesChangees = True and bMiseAJour = False) Then
+		If IsMacOS Then
+			msgbox(sMessage,64,&quot;Dmaths&quot;)
+			ReLanceOOoMac	
+		Else
+			msgbox(sMessage,64,&quot;Dmaths&quot;)
+			ReLanceOOo
+		End if
+	Else rem si icones pas changées
+		EcritFichierDmOptionsTXT(sSource) rem ecrit le fichier dmoptions.txt
+		InsertModuleDmOptions(sSource)    rem ecrit le module DmOptions	
+		Wait 500
+		If bMiseAJour = FALSE Then msgbox(sMessage,64,&quot;Dmaths&quot;)
+	EndIf
+	
+&apos;	Print &quot;2&quot;
+End Sub
+
+rem macro ecrite le 8 decembre 2013
+Sub RegleCheminAutotextLangue(iLangC as Integer)
+	Dim oConfigAccess,Lelement as Object 
+	Dim sLeCheminGaleAuto() as String
+	Dim Lauto, Lauto2 as String
+	Dim N1,N2 as Integer
+
+	oConfigAccess = GetConfigAccess( &quot;/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath[&apos;AutoText&apos;]&quot;, True)
+
+	sLeCheminGaleAuto() = oConfigAccess.getByName(&quot;InternalPaths&quot;).ElementNames()
+	For I = LBound(sLeCheminGaleAuto()) To Ubound(sLeCheminGaleAuto())
+			If Instr(sLeCheminGaleAuto(I),&quot;DmathsAddon&quot;) &gt; 0 Then
+				Lauto = sLeCheminGaleAuto(I)						
+				Rem teste la validité du chemin	
+					N1 = Instr(fCheminDmaths,&quot;DmathsAddon&quot;) - 14
+					N2 = Instr(Lauto,&quot;DmathsAddon&quot;) - 14
+					If Mid(fCheminDmaths,N1,14) &lt;&gt; Mid(Lauto,N2,14) Then
+					Rem retire le chemininvalide
+						oConfigAccess.getByName(&quot;InternalPaths&quot;).removeByName(Lauto)						
+				 	Else	
+				 	rem configure le chemin			
+						Lelement = oConfigAccess.getByName(&quot;InternalPaths&quot;).getByName(Lauto)							
+						If Instr(sLeCheminGaleAuto(I),&quot;$(vlang)&quot;) &gt; 0 Then
+							Lauto2 = Mid(Lauto,1,Len(Lauto)-8) 
+						Else
+							Lauto2 = Mid(Lauto,1,Len(Lauto)-2)
+						Endif			
+				
+						If GetRepertoirePath(&quot;vlang&quot;)&lt;&gt; GetLang(iLangC) Then
+						   		Lauto2 = Lauto2 &amp; GetLang(iLangC)   			   
+						Else
+						   		Lauto2 = Lauto2 &amp; &quot;$(vlang)&quot;  	
+					   	Endif
+						&apos;   	Print Lauto2
+					    Lelement.setName(Lauto2)
+				 Endif		  
+			Endif	
+	Next I
+	oConfigAccess.Commitchanges()
+End Sub
+
+rem macro ecrite le 8 decembre 2013
+Function GetLang  (iLangC as integer)  as String &apos;retourne une chaine correspondant au numéro de la langue de l&apos;utilisateur.
+		Select Case iLangC
+			Case 0
+				GetLang = &quot;fr&quot;
+			rem il n&apos;y a pas d&apos;autotextes en anglais, ni en espagnol, ni en estonien
+			Case 2
+				GetLang = &quot;de&quot;
+			Case 4
+		  		GetLang = &quot;pt&quot;
+		  	Case Else 
+		    	GetLang = &quot;fr&quot;
+		End Select
+End Function
+
+
+
+Sub CreeIconesOptionsSoft1
+	BasicLibraries.loadLibrary(&quot;DmInstall&quot;)
+	DmInstall.ToolsImages.CreeIcones(oDmOptions,1)
+	bIconesChangees = True
+End Sub
+
+Sub CreeIconesOptionsSoft2
+	BasicLibraries.loadLibrary(&quot;DmInstall&quot;)
+	DmInstall.ToolsImages.CreeIcones(oDmOptions,2)
+	bIconesChangees = True
+End Sub
+
+Sub CreeIconesOptionsSoft3
+	BasicLibraries.loadLibrary(&quot;DmInstall&quot;)
+	DmInstall.ToolsImages.CreeIcones(oDmOptions,3)
+	bIconesChangees = True
+End Sub
+
+
+Sub AfficherMasquerIcones rem cette macro permet de masquer ou d&apos;afficher des icones de la barre dmaths
+	rem chargement des boites de dialogues
+	Dim sImage, sRacineImage as String
+	oDmOptions.Visible = False
+	DialogLibraries.loadLibrary( &quot;Dmaths&quot; )
+	oAddonBarre = CreateUnoDialog( DialogLibraries.DmInstall.AddonBarre )
+	oConfigAccessToolBarre = GetConfigAccess( &quot;/org.openoffice.Office.Addons/AddonUI/OfficeToolBar&quot;, True )
+	oDmBarre = oConfigAccessToolBarre.getByName(&quot;org.openoffice.Office.addon.DMathsBarre&quot;)
+	oAddonBarre.GetControl(&quot;CheckBox42&quot;).Visible = 0
+	Dim sElementNames$()
+	Dim oToolBarItems as Object
+	sElementNames = getElementNamesofToolbar(oDmBarre)
+	oToolBarItems = getToolBarItems(oDmBarre)
+	For I = LBound(sElementNames()) To UBound(sElementNames())
+		sImage = NomFichier(oToolBarItems.getByname(sElementNames(I)).ImageIdentifier)
+		oAddonBarre.GetControl(&quot;ImageControl&quot;&amp;cStr(I+1)).Model.Width = 8
+		oAddonBarre.GetControl(&quot;ImageControl&quot;&amp;cStr(I+1)).Model.Height = 8
+		oAddonBarre.GetControl(&quot;ImageControl&quot;&amp;cStr(I+1)).Model.ImageUrl = oToolBarItems.getByname(sElementNames(I)).ImageIdentifier &amp; &quot;_16.bmp&quot; 
+		If Instr(sImage,&quot;choixoptionsdmaths&quot;) &gt; 0 Then oAddonBarre.GetControl(&quot;CheckBox&quot;&amp;cStr(I+1)).Enable = False
+		If oToolBarItems.getByname(sElementNames(I)).Context &lt;&gt; &quot;hidden&quot; Then oAddonBarre.GetControl(&quot;CheckBox&quot;&amp;cStr(I+1)).State = 1
+	Next I
+	exitOK = com.sun.star.ui.dialogs.ExecutableDialogResults.OK
+    if oAddonBarre.Execute = exitOK then RetourChoixOptionsDmaths
+&apos;    oAddonBarre.Execute()
+End Sub
+
+Sub RetourChoixOptionsDmaths
+	bAfficherMasquerIcones = True
+	oDmOptions.Visible = True
+End Sub
+
+	
+Sub RegleAffichageIcones
+	Dim sElementNames$()
+	Dim oToolBarItems as Object
+	sElementNames = getElementNamesofToolbar(oDmBarre)
+	oToolBarItems = getToolBarItems(oDmBarre)
+	For I = LBound(sElementNames()) To UBound(sElementNames())
+		If oAddonBarre.GetControl(&quot;CheckBox&quot;&amp;cStr(I+1)).State = 1 Then
+			oToolBarItems.getByname(sElementNames(I)).Context = &quot;com.sun.star.text.TextDocument&quot;
+		Else 
+			oToolBarItems.getByname(sElementNames(I)).Context = &quot;hidden&quot;
+		End if
+	Next I
+	oAddonBarre.EndExecute()
+	oConfigAccessToolBarre.commitChanges()
+	bIconesChangees = True
+End Sub
+
+
+
+Sub CancelMasquerIcones
+	oAddonBarre.EndExecute()
+	oDmOptions.Visible = True
+End Sub
+
+
+
+Sub About_Dmaths rem enregistré le 7 mai 2004
+	DialogLibraries.loadLibrary(&quot;DmInstall&quot;)
+	BasicLibraries.loadLibrary(&quot;Dmaths&quot;)
+	Call Dmaths.Tools.VerifOperationnel
+	Dim oImage as Object
+	Dim sInfo as String
+	oCopyDmaths = CreateUnoDialog( DialogLibraries.DmInstall.CopyDmaths )
+	oImage = oCopyDmaths.Model.ImageControl1
+	oImage.ImageUrl=fChemindmaths+&quot;Images/logo.png&quot;	
+	sInfo = &quot;Dmaths version &quot;+iVersion+&quot; Licence GPL&quot;+Chr(13)
+	sInfo = sInfo+&quot;Copyright 2001-2014 Didier Dorange-Pattoret&quot;+Chr(13)
+	sInfo = sInfo+ &quot;http://www.dmaths.org&quot;+Chr(13) +Chr(13)
+	sInfo = sInfo+ &quot;Remerciements à: &quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Laurent Godard (lgodard@indesko.com http://www.indesko.com)&quot;+Chr(13)
+	sInfo = sInfo+ &quot;  pour ses conseils, TailleFormule et BatchConv (LGPL),&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Andy Lewis pour GraphPlotter et Box Plot Histogram (LGPL),&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Gilles Daurat pour les macros de Gdmath (GPL),&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Alain Haguet pour les macros de AHmath3D (GPL),&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Christophe Devalland pour les macros SPIP/LateX (GPL),&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Agnès Simonet pour la macro qui permet d&apos;encadrer du texte,&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Jérôme Ortais pour ses macros et les modifications apportées,&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Jean Marc Gervais pour le mémo et le mini mémo,&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Arnaud Kientz et Sébastien Estrade pour le logo et le site,&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Gisbert Friege pour la traduction en allemand&quot;+Chr(13)
+	sInfo = sInfo+ &quot;  et l&apos;introduction de la dérivée seconde dans les tableaux de variations.&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Michael Büssow pour les nombreuses corrections et suggestions.&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Hélio Guilherme pour la traduction en portugais.&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Jean-Luc Guillot pour l&apos;amélioration du traceur de courbes.&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Romain Dorange-Pattoret pour celle du module figures géométriques.&quot;+Chr(13)
+	sInfo = sInfo+ &quot;- Jean Marc Gervais, Gisbert Friege et Jacqueline Gouguenheim-Desloy&quot;+Chr(13)+&quot;   pour leurs suggestions et leur aide précieuse.&quot;+Chr(13)
+	sInfo = sInfo +&quot;Dmaths is a free software under the GPL Licence&quot;+Chr(13)
+	sInfo = sInfo +&quot;of the Free Software Foundation (www.fsf.org)&quot;+Chr(13)
+
+	
+	oCopyDmaths.GetControl(&quot;Label1&quot;).Text = sInfo
+	oCopyDmaths.Execute()
+End Sub
+
+Sub End_About_Dmaths
+	oCopyDmaths.Endexecute()
+End Sub
+
+Sub Display_Licence
+	Dim oLicence as Object
+	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+	Dim sUrl as String
+	mFileProperties(0).Value=True
+	sUrl=fChemindmaths+&quot;licence.odt&quot;
+	oDesktop=createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	oLicence= oDesktop.LoadComponentFromURL(sUrl,&quot;_blank&quot;,0,mFileProperties())
+End Sub
+
+
+
+Sub Join_dmaths
+	On error resume next
+&apos;	If GetGuiType = 1 Then
+	Dim sUrl as String
+	Dim sys As Object
+	Dim iFlags As Integer
+	sUrl=ConvertToURL(&quot;http://www.dmaths.org&quot;)
+	sys = CreateUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+	iFlags = com.sun.star.system.SystemShellExecuteFlags.NO_SYSTEM_ERROR_MESSAGE &apos; = 0
+	sys.execute(sUrl,&quot; &quot;, iFlags)
+End Sub
+
+
+rem cette macro sert a relancer la mise a jour
+Sub Repare_Dmaths
+	oDmOptions.EndExecute()
+	Wait 100
+	Call Install_Addon.LanceFinInstallation(TRUE)
+End Sub
+
+&apos;---------------------------------------------------------------------------------------------------------
+Rem Cette macro transforme les raccourcis F10 en F8 et F9 en F4 ecrite le 17 octobre 2010 par Didier DP
+Sub Config4Mac(bForMac as Boolean)
+	Dim oConfigAccess,MyProp as Object 
+	oConfigAccess = GetConfigAccess( &quot;/org.openoffice.Office.Accelerators/PrimaryKeys/Modules/com.sun.star.text.TextDocument&quot;, True )
+	If oConfigAccess.hasByName(&quot;F4&quot;) Then oConfigAccess.removeByName(&quot;F4&quot;)
+	If oConfigAccess.hasByName(&quot;F8&quot;) Then oConfigAccess.removeByName(&quot;F8&quot;)
+	If oConfigAccess.hasByName(&quot;F9&quot;) Then oConfigAccess.removeByName(&quot;F9&quot;)
+	If oConfigAccess.hasByName(&quot;F10&quot;) Then oConfigAccess.removeByName(&quot;F10&quot;)
+	
+	MyProp = oConfigAccess.CreateInstance
+	If bForMac Then
+		MyProp.Command = &quot;vnd.sun.star.script:Dmaths.Module1.MetentreAccolades?language=Basic&amp;location=application&quot;
+		oConfigAccess.insertByName(&quot;F4&quot;,myProp)
+	Endif
+	
+	
+	MyProp = oConfigAccess.CreateInstance
+	If bForMac Then
+		MyProp.Command = &quot;vnd.sun.star.script:Dmaths.Module1.MetenFormule?language=Basic&amp;location=application&quot;
+	Else
+		MyProp.Command = &quot;.uno:SetExtSelection&quot;
+	Endif
+	oConfigAccess.insertByName(&quot;F8&quot;,myProp)
+	
+	oConfigAccess.CommitChanges()
+End Sub 
+
+rem --------------------------------------------------------------------------------------------------------------------------------
+rem la macro suivante permet dechanger F4-F9 et F8-F10
+Sub SwitchF4F8
+	Dim oConfigAccess,MyProp as Object 
+	Dim bDefaultConfig as Boolean
+	
+	bIconesChangees = True rem commande le redemarrage apres validation des options.
+	
+	bDefaultConfig = False
+	oConfigAccess = GetConfigAccess( &quot;/org.openoffice.Office.Accelerators/PrimaryKeys/Modules/com.sun.star.text.TextDocument&quot;, True )
+	If oConfigAccess.hasByName(&quot;F8&quot;) Then bDefaultConfig = (oConfigAccess.getByName(&quot;F8&quot;).Command = &quot;.uno:SetExtSelection&quot;)
+
+&apos;	MyProp = oConfigAccess.CreateInstance
+	If oConfigAccess.hasByName(&quot;F4&quot;) Then oConfigAccess.removeByName(&quot;F4&quot;)
+	If oConfigAccess.hasByName(&quot;F8&quot;) Then oConfigAccess.removeByName(&quot;F8&quot;)
+	If oConfigAccess.hasByName(&quot;F9&quot;) Then oConfigAccess.removeByName(&quot;F9&quot;)
+	If oConfigAccess.hasByName(&quot;F10&quot;) Then oConfigAccess.removeByName(&quot;F10&quot;)
+	
+&apos;	Print oConfigAccess.getByName(&quot;F8&quot;).Command
+	
+	oConfigAccess.CommitChanges()
+	If bDefaultConfig Then 	
+		MyProp = oConfigAccess.CreateInstance	
+		MyProp.Command = &quot;vnd.sun.star.script:Dmaths.Module1.MetentreAccolades?language=Basic&amp;location=application&quot;
+		oConfigAccess.insertByName(&quot;F4&quot;,myProp)
+		MyProp = oConfigAccess.CreateInstance
+		MyProp.Command = &quot;vnd.sun.star.script:Dmaths.Module1.MetenFormule?language=Basic&amp;location=application&quot;
+		oConfigAccess.insertByName(&quot;F8&quot;,myProp)	
+		Avertir(383)	
+	Else
+		MyProp = oConfigAccess.CreateInstance
+		MyProp.Command = &quot;vnd.sun.star.script:Dmaths.Module1.MetentreAccolades?language=Basic&amp;location=application&quot;
+		oConfigAccess.insertByName(&quot;F9&quot;,myProp)
+		MyProp = oConfigAccess.CreateInstance
+		MyProp.Command = &quot;vnd.sun.star.script:Dmaths.Module1.MetenFormule?language=Basic&amp;location=application&quot;
+		oConfigAccess.insertByName(&quot;F10&quot;,myProp)
+		MyProp = oConfigAccess.CreateInstance		
+		MyProp.Command = &quot;.uno:SetExtSelection&quot;
+		oConfigAccess.insertByName(&quot;F8&quot;,myProp)
+		Avertir(384)	
+	Endif
+	oConfigAccess.CommitChanges()
+End Sub 
+
+
+
+&apos;----------------------------------------------------------------------------------------------------------
+
+
+Sub ModifieCheckBoxTailleFormule
+	If oDmOptions.GetControl(&quot;CheckBox12&quot;).State=1 Then
+	oDmOptions.GetControl(&quot;TextField1&quot;).Enable = False
+	Else
+	oDmOptions.GetControl(&quot;TextField1&quot;).Enable = True
+	End If
+End Sub
+
+
+&apos;---------------------------------------------------------------------------------------------------------
+
+
+
+Sub InsertModuleDmOptions(srce as String)
+	Dim oLib as Object
+    oLib = GlobalScope.BasicLibraries.Standard
+    If oLib.hasByName(&quot;DmOptions&quot;) Then
+       oLib.removeByName(&quot;DmOptions&quot;)
+    EndIf
+     If oLib.hasByName(&quot;Lang&quot;) Then
+       oLib.removeByName(&quot;Lang&quot;)
+    EndIf
+	oLib.InsertByName(&quot;DmOptions&quot;,srce)
+End Sub
+
+Function GetConfigAccess( ByVal cNodePath As String,ByVal bWriteAccess As Boolean,Optional bEnableSync,Optional bLazyWrite) As Object
+	If IsMissing(bEnableSync) Then 	bEnableSync = True 
+	If IsMissing( bLazyWrite ) Then bLazyWrite = False
+	Dim oConfigProvider, oConfigAccess as Object
+	oConfigProvider = GetProcessServiceManager.createInstanceWithArguments(&quot;com.sun.star.configuration.ConfigurationProvider&quot;,Array( MakePropertyValue( &quot;enableasync&quot;, bEnableSync)))
+	If bWriteAccess Then
+		cServiceName = &quot;com.sun.star.configuration.ConfigurationUpdateAccess&quot;
+	Else
+		cServiceName = &quot;com.sun.star.configuration.ConfigurationAccess&quot;
+	EndIf
+	oConfigAccess = oConfigProvider.createInstanceWithArguments( cServiceName, Array( MakePropertyValue( &quot;nodepath&quot;, cNodePath ), MakePropertyValue( &quot;lazywrite&quot;, bLazyWrite )))
+	GetConfigAccess() = oConfigAccess
+End Function
+
+&apos;----------
+&apos;	Create and return a new com.sun.star.beans.PropertyValue.
+&apos;
+Function MakePropertyValue( Optional cName As String, Optional uValue ) As com.sun.star.beans.PropertyValue
+	Dim oPropertyValue As New com.sun.star.beans.PropertyValue
+	If Not IsMissing( cName ) Then
+		oPropertyValue.Name = cName
+	EndIf
+	If Not IsMissing( uValue ) Then
+		oPropertyValue.Value = uValue
+	EndIf
+	MakePropertyValue() = oPropertyValue
+End Function
+
+rem cette fonction retourne True pour les installation multi-utilisateurs.
+Function TestInstallRezo as Boolean
+		Dim LeTest As Boolean
+		Dim oAC As Object
+		LeTest = False 
+ 		oCmdEnv = CreateUnoListener( &quot;CmdEnv_&quot;, _
+    		&quot;com.sun.star.deployment.XCommandEnvironment&quot; )
+ 		GetPMF = GetDefaultContext.getValueByName( _
+    		&quot;/singletons/com.sun.star.deployment.thePackageManagerFactory&quot;)    
+    	oPackages = GetPMF.getPackageManager(&quot;shared&quot;).getDeployedPackages(oAc,oCmdEnv)  
+	   	For I = LBound(oPackages) To UBound(oPackages)
+   			If oPackages(I).Name = &quot;DmathsAddon.oxt&quot; Then 
+   				LeTest = True
+   			Endif
+   		Next I
+   		TestInstallRezo = LeTest	
+End Function
+
+
+rem cette fonction donne le nom d&apos;un fichier connaissant son URL
+Function NomFichier(sURL as String) as String
+	Dim iPos,iLongUrl as integer
+	iLongUrl = Len(sUrl)
+	iPos = iLongUrl
+	Do 
+	iPos = iPos - 1	
+	Loop until (Mid(sUrl,iPos,1) = &quot;/&quot; or iPos = 0)
+	NomFichier = Mid(sUrl,iPos+1,iLongUrl-iPos)
+end function
+
+rem cette macro active ou desactive le champ de texte des scalaires lettres
+Sub ChangeLettresStatuts(oEvt as Object)
+ 	oEvt.Source.Context.GetControl(&quot;TextField7&quot;).Enable = (oEVt.Source.State = 1)
+End Sub
+
+
+</script:module>

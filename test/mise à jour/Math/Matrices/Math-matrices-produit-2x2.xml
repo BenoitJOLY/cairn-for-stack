@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396244  -->
+  <question type="stack">
+    <name>
+      <text>Matrices : Produit de deux matrices (2×2)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Matrices — Produit de matrices</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soient les matrices :</p>
+<div style="display: flex; gap: 40px; justify-content: center; margin: 15px 0; flex-wrap: wrap;">
+<div>\(A = {@A@}\)</div>
+<div>\(B = {@B@}\)</div>
+</div>
+<p><strong>Calculer</strong> le produit \(C = A \times B\).</p>
+<p style="font-size: .85rem; color: #64748b; margin-bottom: 8px;"><em>Saisir sous la forme : <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">matrix([a,b],[c,d])</code></em></p>
+<div>\(C = \) [[input:ans_prod]] [[validation:ans_prod]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour calculer \(C = A \times B\), on effectue le produit ligne par colonne :<br><br>
+\[
+A \times B = {@A@} \times {@B@} = {@C@}
+\]<br>
+<strong>Détail des calculs :</strong><br>
+• \(c_{11} = ({@a11@})({@b11@}) + ({@a12@})({@b21@}) = {@c11@}\)<br>
+• \(c_{12} = ({@a11@})({@b12@}) + ({@a12@})({@b22@}) = {@c12@}\)<br>
+• \(c_{21} = ({@a21@})({@b11@}) + ({@a22@})({@b21@}) = {@c21@}\)<br>
+• \(c_{22} = ({@a21@})({@b12@}) + ({@a22@})({@b22@}) = {@c22@}\)<br><br>
+<em style="color: #64748b;">Rappel : Le produit matriciel n'est <strong>pas commutatif</strong>, en général \(A \times B \neq B \times A\).</em>
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Fonction utilitaire : entier aléatoire entre a et b */
+ri(a,b) := a + rand(b - a + 1)$ 
+
+/* Génération des coefficients */
+a11: ri(-3,3); a12: ri(-3,3); a21: ri(-3,3); a22: ri(-3,3);
+b11: ri(-3,3); b12: ri(-3,3); b21: ri(-3,3); b22: ri(-3,3);
+
+/* Construction des matrices */
+A: matrix([a11, a12], [a21, a22]);
+B: matrix([b11, b12], [b21, b22]);
+
+/* Produit correct */
+C: A.B;
+
+/* Coefficients du résultat (pour le feedback détaillé via extraction) */
+c11: C[1,1]; c12: C[1,2]; c21: C[2,1]; c22: C[2,2];
+
+/* Erreurs classiques */
+err_BA: B.A;
+err_add: A + B;
+err_had: matrix([a11*b11, a12*b12], [a21*b21, a22*b22]);]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>A={@A@}, B={@B@}, A×B={@C@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:matrix-product-2x2</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_prod</name>
+      <type>matrix</type>
+      <tans>C</tans>
+      <boxsize>25</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>matrix([ , ],[ , ])</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>C</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Excellent !</strong> Le produit \(A \times B\) est bien calculé.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : B×A au lieu de A×B</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>err_BA</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-BA</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Inversion des matrices !</strong> Vous avez calculé \(B \times A\) au lieu de \(A \times B\). Le produit matriciel <strong>n'est pas commutatif</strong> : l'ordre compte !</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-BA</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Addition au lieu du produit</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>err_add</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-ADD</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Opération incorrecte !</strong> Vous avez additionné les matrices (\(A + B\)) au lieu de les multiplier. Le produit matriciel se fait <strong>ligne par colonne</strong>.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-ADD</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Produit terme à terme (Hadamard)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>err_had</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-HAD</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise méthode !</strong> Vous avez multiplié les coefficients <strong>deux à deux</strong> (terme à terme). Le produit matriciel utilise des <strong>produits scalaires</strong> ligne × colonne.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-HAD</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur générique (Fallback)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>C</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-GENERIC</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la règle du produit ligne par colonne :<br>\(c_{ij} = \displaystyle\sum_{k} a_{ik} \times b_{kj}\)</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-FALLBACK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Angle" dlg:left="127" dlg:top="84" dlg:width="281" dlg:height="97" dlg:help-text="&amp;0.Angle.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1.Angle.Title">
+ <dlg:bulletinboard>
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="2" dlg:left="114" dlg:top="34" dlg:width="145" dlg:height="18" dlg:help-text="&amp;2.Angle.TextField2.HelpText" dlg:value="&amp;3.Angle.TextField2.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="1" dlg:left="29" dlg:top="34" dlg:width="74" dlg:height="18" dlg:help-text="&amp;4.Angle.TextField1.HelpText" dlg:value="&amp;5.Angle.TextField1.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="35" dlg:top="21" dlg:width="56" dlg:height="12" dlg:help-text="&amp;6.Angle.Label1.HelpText" dlg:value="&amp;7.Angle.Label1.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="12" dlg:left="130" dlg:top="21" dlg:width="114" dlg:height="9" dlg:help-text="&amp;8.Angle.Label2.HelpText" dlg:value="&amp;9.Angle.Label2.Label" dlg:align="center"/>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="13" dlg:left="15" dlg:top="9" dlg:width="255" dlg:height="48" dlg:help-text="&amp;10.Angle.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;11.Angle.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="3" dlg:left="15" dlg:top="72" dlg:width="31" dlg:height="16" dlg:help-text="&amp;12.Angle.CommandButton1.HelpText" dlg:value="&amp;13.Angle.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module2.InsereAngle?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="4" dlg:left="55" dlg:top="72" dlg:width="40" dlg:height="16" dlg:help-text="&amp;14.Angle.CommandButton2.HelpText" dlg:value="&amp;15.Angle.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module2.FinFormuleGraphique" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="5" dlg:left="110" dlg:top="72" dlg:width="16" dlg:height="16" dlg:help-text="&amp;16.Angle.CommandButton3.HelpText" dlg:value="&amp;17.Angle.CommandButton3.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetentreParentheses" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton4" dlg:tab-index="6" dlg:left="131" dlg:top="72" dlg:width="16" dlg:height="16" dlg:help-text="&amp;18.Angle.CommandButton4.HelpText" dlg:value="&amp;19.Angle.CommandButton4.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetentreAccolades2" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="14" dlg:left="103" dlg:top="61" dlg:width="169" dlg:height="32" dlg:help-text="&amp;20.Angle.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;21.Angle.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:button dlg:id="CommandButton6" dlg:tab-index="7" dlg:left="153" dlg:top="72" dlg:width="14" dlg:height="16" dlg:help-text="&amp;22.Angle.CommandButton6.HelpText" dlg:value="&amp;23.Angle.CommandButton6.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetLcdot" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton7" dlg:tab-index="8" dlg:left="175" dlg:top="72" dlg:width="16" dlg:height="16" dlg:help-text="&amp;24.Angle.CommandButton7.HelpText" dlg:value="&amp;25.Angle.CommandButton7.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetenRacineBleue" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton8" dlg:tab-index="9" dlg:left="195" dlg:top="72" dlg:width="16" dlg:height="16" dlg:help-text="&amp;26.Angle.CommandButton8.HelpText" dlg:value="&amp;27.Angle.CommandButton8.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetLPi" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton5" dlg:tab-index="10" dlg:left="219" dlg:top="72" dlg:width="20" dlg:height="16" dlg:help-text="&amp;28.Angle.CommandButton5.HelpText" dlg:value="&amp;29.Angle.CommandButton5.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetentreIndex?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton9" dlg:tab-index="11" dlg:left="242" dlg:top="72" dlg:width="20" dlg:height="16" dlg:help-text="&amp;30.Angle.CommandButton9.HelpText" dlg:value="&amp;31.Angle.CommandButton9.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetentreExp?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

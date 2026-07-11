@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="FiguresGeometriques" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Global Const FG_RIEN = 0
+Global Const FG_CROIX = 1
+global Const FG_TRAIT = 2
+
+Sub DeplaceRayonCercle(x0, y0, rayon, Angle,xx,yy)
+	oDeplaceRayonForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;DeplaceRayonForm&quot;)
+    oDeplaceRayonForm.Model.Label1.Label = x0
+    oDeplaceRayonForm.Model.Label2.Label = y0
+    oDeplaceRayonForm.Model.Label3.Label = rayon
+    oDeplaceRayonForm.Model.Label5.Label = &quot;x&quot;
+    oDeplaceRayonForm.Model.Label6.Label = &quot;x&quot;
+    DeplaceRayonForm.Main
+    xx = CSng(oDeplaceRayonForm.Model.Label5.Label)
+    yy = CSng(oDeplaceRayonForm.Model.Label6.Label)
+End Sub
+
+Sub DeplaceTangenteCercle(x0, y0, rayon, Angle,xx,yy,xx1,yy1)
+	oDeplaceTangenteForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;DeplaceTangenteForm&quot;)
+    oDeplaceTangenteForm.Model.Label1.Label = x0
+    oDeplaceTangenteForm.Model.Label2.Label = y0
+    oDeplaceTangenteForm.Model.Label3.Label = rayon
+    oDeplaceTangenteForm.Model.Label5.Label = &quot;x&quot;
+    oDeplaceTangenteForm.Model.Label6.Label = &quot;x&quot;
+    DeplaceTangenteForm.TraceTangente
+    oDeplaceTangenteForm.Execute()
+    xx = CSng(oDeplaceTangenteForm.Model.Label5.Label)
+    yy = CSng(oDeplaceTangenteForm.Model.Label6.Label)
+    xx1 = CSng(oDeplaceTangenteForm.Model.Label7.Label)
+    yy1 = CSng(oDeplaceTangenteForm.Model.Label8.Label)
+End Sub
+
+Sub DeplaceDiametreCercle(x0, y0, rayon, Angle,xx,yy)
+	oDeplaceDiametreForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;DeplaceDiametreForm&quot;)
+    oDeplaceDiametreForm.Model.Label1.Label = x0
+    oDeplaceDiametreForm.Model.Label2.Label = y0
+    oDeplaceDiametreForm.Model.Label3.Label = rayon
+    oDeplaceDiametreForm.Model.Label5.Label = &quot;x&quot;
+    oDeplaceDiametreForm.Model.Label6.Label = &quot;x&quot;
+    DeplaceDiametreForm.TraceDiametre
+    oDeplaceDiametreForm.Execute()
+    xx = CSng(oDeplaceDiametreForm.Model.Label5.Label)
+    yy = CSng(oDeplaceDiametreForm.Model.Label6.Label)
+End Sub
+
+Sub DeplaceCordeCercle(x0, y0, rayon, Angle,xx,yy,xx1,yy1)
+Dim texte as string
+	oDeplaceCordeForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;DeplaceCordeForm&quot;)
+    oDeplaceCordeForm.Model.Label1.Label = x0
+    oDeplaceCordeForm.Model.Label2.Label = y0
+    oDeplaceCordeForm.Model.Label3.Label = rayon
+    oDeplaceCordeForm.Model.Label5.Label = &quot;x&quot;
+    oDeplaceCordeForm.Model.Label6.Label = &quot;x&quot;
+    DeplaceCordeForm.TraceCorde
+    oDeplaceCordeForm.Execute()
+    xx = CSng(oDeplaceCordeForm.Model.Label5.Label)
+    yy = CSng(oDeplaceCordeForm.Model.Label6.Label)
+    xx1 = CSng(oDeplaceCordeForm.Model.Label7.Label)
+    yy1 = CSng(oDeplaceCordeForm.Model.Label8.Label)
+End Sub
+
+&apos;----------------------------Ajout 07/2014   A. Haguet -----------------------------------------------
+Sub DeplacePointCercle(x0, y0, rayon, Angle,xx,yy)
+Dim texte as string
+	oDeplacePointForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;DeplacePointForm&quot;)
+    oDeplacePointForm.Model.Label1.Label = x0
+    oDeplacePointForm.Model.Label2.Label = y0
+    oDeplacePointForm.Model.Label3.Label = rayon
+    oDeplacePointForm.Model.Label5.Label = &quot;x&quot;
+    oDeplacePointForm.Model.Label6.Label = &quot;x&quot;
+    DeplacePointForm.TracePoint
+    oDeplacePointForm.Execute()
+    xx = CSng(oDeplacePointForm.Model.Label5.Label)
+    yy = CSng(oDeplacePointForm.Model.Label6.Label)
+End Sub
+&apos;--------------------------------------------------------------------------------------------------------
+
+Sub AjoutePoint(x, y, nom, shapenom, typecroix, Optional angletrait As Double, Optional sgroup as object)
+    If CestUneFigureGeometrique Then
+        LesPoints(NbPoint).nom = nom
+        LesPoints(NbPoint).x = x
+        LesPoints(NbPoint).y = y
+        LesPoints(NbPoint).shapenom = shapenom
+        Select Case typecroix
+        Case FG_CROIX, True
+            LesPoints(NbPoint).Shape = croix(x, y, False)
+            shapenom.Visible = (Right(nom, 1) &lt;&gt; &quot;b&quot;)
+        Case FG_TRAIT
+            InsereLigne x + 3 * Cos(angletrait), y + 200 * Sin(angletrait), x - 200 * Cos(angletrait), y - 200 * Sin(angletrait),LesPoints(NbPoint).Shape
+             LesPoints(NbPoint).Shape.Visible = (Right(nom, 1) &lt;&gt; &quot;b&quot;)
+        End Select
+        NbPoint = NbPoint + 1
+    Else
+        Select Case typecroix
+        Case FG_CROIX, true
+            croix(x, y, sgroup)
+        Case FG_TRAIT
+            InsereLigne x + 200 * Cos(angletrait), y + 200 * Sin(angletrait), x - 200 * Cos(angletrait), y - 200 * Sin(angletrait), sgroup
+        End Select
+    End If
+End Sub
+
+</script:module>

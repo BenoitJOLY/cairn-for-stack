@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="GraphDrawing" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) Andy Lewis.  (lewiss@ntlworld.com)
+&apos;téléchargé sur www.ooomacros.org
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU Lesser General Public Licence (LGPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+&apos;Routines to draw graphs.  Requires &quot;AxesSetup&quot;
+
+option explicit
+
+public goShadings as object
+public oCollectionFigures as Object
+&apos;___________________________________________________________________________________________
+
+sub DrawGraph (stFunction as String, xMin as single, xMax as single, inequality as String)
+Dim discon as Boolean, erflag As Boolean
+Dim x1 as Single, x2 as Single, oldx1 as Single, gap as single
+Dim y1 as Single, y2 as Single, oldy1 as Single
+Dim xStart as Single, yStart as Single, xEnd as Single, yEnd as single, yEdge as single
+Dim oCurve as object, oSegment as object, oSegments as object, oRegionEdge as object, oShading as object
+Dim oPoint(200) as object
+Dim pointcount as integer
+Dim MaxSectorLength as integer &apos;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MaxSectorLength=200  &apos;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+oSegments = createUnoService( &quot;com.sun.star.drawing.ShapeCollection&quot; )
+parse (stFunction,erflag)
+gap=(gsScaleRight-gsScaleLeft)/200
+if xMin&lt;gsScaleLeft then xMin=gsScaleLeft
+if xMax&gt;gsScaleRight then xMax=gsScaleRight
+
+x1 = xMin : y1 = f(x1) : oldy1=notdef
+xStart = x1 : yStart = y1
+Do while x1 &lt; xMax
+	Do While (y1 = notdef or y1&gt;gsScaleTop or y1&lt;gsScaleBottom) And x1 &lt; xMax
+	    oldx1=x1 : oldy1=y1 : x1 = x1 + gap : y1 = f(x1)
+	    MaxSectorLength=MaxSectorLength-1  &apos; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	Loop
+	If x1&gt;=xMax then Exit do
+	oRegionEdge = createUnoService( &quot;com.sun.star.drawing.ShapeCollection&quot; )
+	If oldy1 = notdef then
+		xStart=x1:yStart=y1
+		oPoint(0)=ScalePoint(xStart,yStart)
+		pointcount=0	&apos; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	ElseIf oldy1&gt;gsScaleTop then
+		xStart=oldx1+(gsScaleTop-oldy1)/(y1-oldy1)*gap : yStart=gsScaleTop
+		oPoint(0)=ScalePoint(xStart,yStart)
+		pointcount=1 : oPoint(1)=ScalePoint(x1,y1)
+	ElseIf oldy1&lt;gsScaleBottom then
+		xStart=oldx1+(gsScaleBottom-oldy1)/(y1-oldy1)*gap : yStart = gsScaleBottom
+		oPoint(0)=ScalePoint(xStart,yStart)
+		pointcount=1 : oPoint(1)=ScalePoint(x1,y1)
+	End If
+	Discon=False
+	do while x1&lt;=xMax and Discon=False
+		x2 = x1 + gap:y2=f(x2)
+		If y2=notdef or x2&gt;xMax then
+			xEnd=x1 : yEnd=y1 : Discon=True
+		ElseIf y2&gt;gsScaleTop then
+			xEnd=x1+(gsScaleTop-y1)/(y2-y1)*gap : yEnd = gsScaleTop : Discon=True
+			pointcount=pointcount+1
+			oPoint(pointcount)=ScalePoint(xEnd,yEnd)
+		ElseIf y2&lt;gsScaleBottom then
+			xEnd=x1+(gsScaleBottom-y1)/(y2-y1)*gap: yEnd = gsScaleBottom : Discon=True
+			pointcount=pointcount+1
+			oPoint(pointcount)=ScalePoint(xEnd,yEnd)
+		EndIf
+		If discon=True then
+			ReDim preserve oPoint(pointcount) as object
+			oSegment=DrawPolyLine(oPoint(),&quot;Open&quot;,,,,oSegments)
+			if inequality&lt;&gt;&quot;=&quot; then
+				ReDim preserve oPoint(pointcount+3) as object
+				If inequality=&quot;&gt;&quot; then yEdge=gsScaleTop else yEdge=gsScaleBottom
+			 	pointcount=pointcount+1 : oPoint(pointcount)=ScalePoint(xEnd,yEdge)
+			 	pointcount=pointcount+1 : oPoint(pointcount)=ScalePoint(xStart,yEdge)
+			 	pointcount=pointcount+1 : oPoint(pointcount)=ScalePoint(xStart,yStart)
+				oShading=DrawPolyLine(oPoint(),&quot;Closed&quot;,,,0,goShadings)
+			End If
+			x1=x2+gap:y1=f(x1)
+			MaxSectorLength=MaxSectorLength-pointcount    &apos;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			IF x1&lt;=xmax then   &apos;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			   ReDim preserve oPoint(MaxSectorLength) as object &apos;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		    End If  &apos;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		Else
+			pointcount=pointcount+1
+			oPoint(pointcount)=ScalePoint(x2,y2)
+			x1=x2:y1=y2
+		End If
+	Loop
+Loop
+oCurve = goPage.Group( oSegments )
+End Sub
+
+&apos;___________________________________________________________________________________________
+
+Sub StraightLineGraph (m as single, c as single, inequality as String)
+Dim StartFlag as Integer, EndFlag as Integer
+Dim xStart as single, xEnd as single, yStart as Single, yEnd as Single
+Dim oShading as object,oRegionEdge as object
+On error resume next
+
+yStart = m*gsScaleLeft+c
+If yStart &gt; gsScaleTop then
+	StartFlag=1 : xStart = (gsScaleTop - c)/m : yStart = gsScaleTop
+ElseIf yStart &lt; gsScaleBottom then
+	StartFlag=-1: xStart = (gsScaleBottom - c)/m : yStart = gsScaleBottom
+Else
+	StartFlag=0: xStart = gsScaleLeft
+End If
+
+yEnd = m*gsScaleRight+c
+If yEnd &gt; gsScaleTop then
+	EndFlag=1 : xEnd = (gsScaleTop - c)/m : yEnd = gsScaleTop
+ElseIf yEnd &lt; gsScaleBottom then
+	EndFlag=-1: xEnd = (gsScaleBottom - c)/m : yEnd = gsScaleBottom
+Else
+	EndFlag=0: xEnd = gsScaleRight
+End If
+
+DrawScaleLine(xStart,yStart, xEnd,yEnd,1,30,1)
+
+If Inequality = &quot;=&quot; then Exit Sub
+
+oRegionEdge = createUnoService( &quot;com.sun.star.drawing.ShapeCollection&quot; )
+DrawScaleLine(xEnd,yEnd,xStart,yStart,1,0,1,oRegionEdge)
+
+If Inequality = &quot;&gt;&quot; then
+	if StartFlag =-1 then DrawScaleLineTo(gsScaleLeft,gsScaleBottom,1,0,1,oRegionEdge)
+	if StartFlag &lt; 1 then DrawScaleLineTo(gsScaleLeft,gsScaleTop,1,0,1,oRegionEdge)
+	if EndFlag &lt; 1 then DrawScaleLineTo(gsScaleRight,gsScaleTop,1,0,1,oRegionEdge)
+	if EndFlag =-1 then DrawScaleLineTo(gsScaleRight,gsScaleBottom,1,0,1,oRegionEdge)
+EndIf
+
+If Inequality = &quot;&lt;&quot; then
+	if StartFlag = 1 then DrawScaleLineTo(gsScaleLeft,gsScaleTop,1,0,1,oRegionEdge)
+	if StartFlag &gt; -1 then DrawScaleLineTo(gsScaleLeft,gsScaleBottom,1,0,1,oRegionEdge)
+	if EndFlag &gt; -1 then DrawScaleLineTo(gsScaleRight,gsScaleBottom,1,0,1,oRegionEdge)
+	if EndFlag = 1 then DrawScaleLineTo(gsScaleRight,gsScaleTop,1,0,1,oRegionEdge)
+EndIf
+
+DrawScaleLineTo(xEnd,yEnd,1,0,1,oRegionEdge)
+oShading = goPage.Bind(oRegionEdge)
+oShading.LineStyle = com.sun.star.drawing.LineStyle.NONE
+oShading.zOrder=0
+goShadings.Add(oShading)
+
+End Sub
+
+&apos;___________________________________________________________________________________________
+
+Sub VerticalStraightLineGraph (x as single, inequality as String)
+Dim oShading as Object,oRegionEdge as object
+
+DrawScaleLine(x,gsScaleBottom,x,gsScaleTop,1,30,1)
+If inequality = &quot;=&quot; then Exit Sub
+
+oRegionEdge = createUnoService( &quot;com.sun.star.drawing.ShapeCollection&quot; )
+DrawScaleLine(x,gsScaleBottom,x,gsScaleTop,1,0,0,oRegionEdge)
+If inequality=&quot;&gt;&quot; then
+	DrawScaleLineTo(gsScaleRight,gsScaleTop,1,0,0,oRegionEdge)
+	DrawScaleLineTo(gsScaleRight,gsScaleBottom,1,0,0,oRegionEdge)
+End If
+If inequality=&quot;&lt;&quot; then
+	DrawScaleLineTo(gsScaleLeft,gsScaleTop,1,0,0,oRegionEdge)
+	DrawScaleLineTo(gsScaleLeft,gsScaleBottom,1,0,0,oRegionEdge)
+End If
+DrawScaleLineTo(x,gsScaleBottom,1,0,0,oRegionEdge)
+
+oShading = goPage.Bind( oRegionEdge )
+oShading.LineStyle = 0
+oShading.zOrder=0
+goShadings.Add(oShading)
+
+End Sub
+
+
+&apos;**********************************************************************************************
+&apos;Macro ajoutée par Didier Dorange-Pattoret. Elle sert à grouper les objets de la page
+Sub Grouper
+	Dim oDoc,oPage as Object
+	Dim oAjoute as Object
+	Dim I as Integer
+	oCollectionFigures = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;)
+	oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	oDoc= oDocGraphPlotter 
+	oPage = oDoc.drawpages(0)
+	For I=0 To oPage.GetCount()-1
+		oAJoute=oPage.GetByIndex(I)
+		If oAjoute.ShapeType &lt;&gt; &quot;com.sun.star.drawing.ControlShape&quot; Then oCollectionFigures.Add(oAjoute)
+	Next I
+	oPage.Group(oCollectionFigures)
+&apos;	oDoc.CurrentController.Select(oCollectionFigures) &apos;selectionne la figure
+
+End Sub
+
+
+
+
+
+
+
+
+</script:module>

@@ -1,0 +1,301 @@
+<!-- HÉSTACK — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
+<svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" aria-hidden="true"><defs>
+  <symbol id="ico-type-checkbox" viewBox="0 0 24 24" fill="currentColor"><path d="M18.333 6a3.667 3.667 0 0 1 3.667 3.667v8.666a3.667 3.667 0 0 1 -3.667 3.667h-8.666a3.667 3.667 0 0 1 -3.667 -3.667v-8.666a3.667 3.667 0 0 1 3.667 -3.667zm-3.333 -4c1.094 0 1.828 .533 2.374 1.514a1 1 0 1 1 -1.748 .972c-.221 -.398 -.342 -.486 -.626 -.486h-10c-.548 0 -1 .452 -1 1v9.998c0 .32 .154 .618 .407 .805l.1 .065a1 1 0 1 1 -.99 1.738a3 3 0 0 1 -1.517 -2.606v-10c0 -1.652 1.348 -3 3 -3zm1.293 9.293l-3.293 3.292l-1.293 -1.292a1 1 0 0 0 -1.414 1.414l2 2a1 1 0 0 0 1.414 0l4 -4a1 1 0 0 0 -1.414 -1.414" /></symbol>
+  <symbol id="ico-type-radio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></symbol>
+  <symbol id="ico-type-dropdown" viewBox="0 0 401.141 401.141" fill="currentColor"><g><path d="M101.847,160.827v64.423h299.294v-64.423H101.847z M382.435,206.544H120.553v-27.012h261.882V206.544z M101.847,300.074h299.294V235.65H101.847V300.074z M120.553,254.356h261.882v27.012H120.553V254.356z M101.847,374.379h299.294v-64.423H101.847V374.379z M120.553,328.662h261.882v27.012H120.553V328.662z M299.294,138.997h81.059V26.762h-81.059h-18.706H0v112.235h280.588H299.294z M299.294,45.467h62.353v74.824h-62.353V45.467z M18.706,120.291V45.467h261.883v74.824H18.706z M311.235,73.843h40.962l-20.484,26.04L311.235,73.843z"/></g></symbol>
+  <symbol id="ico-type-algebraic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21s-4-3-4-9 4-9 4-9"/><path d="M16 3s4 3 4 9-4 9-4 9"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></symbol>
+  <symbol id="ico-type-numeric" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /><path d="M6 8v3a1 1 0 0 0 1 1h3" /><path d="M10 8v8" /></symbol>
+  <symbol id="ico-type-units" viewBox="0 0 256 245" fill="currentColor"><path d="M125.506,144.481c15.461,24.738-1.633,56.667-30.321,57.987l-0.05,0.047h-1.793H40.56h-0.003c-20.796,0-35.919-15.969-37.789-34.205c-0.809-7.888,0.859-16.201,5.627-23.829l42.748-68.397L19.538,25.515h94.826L82.758,76.084L125.506,144.481 M175.817,30.723c0,2.49,2.019,4.509,4.509,4.509s4.509-2.019,4.509-4.509s-2.019-4.509-4.509-4.509S175.817,28.233,175.817,30.723z M170.056,49.259c2.49,0,4.509,2.019,4.509,4.509c0,2.49-2.019,4.509-4.509,4.509s-4.509-2.019-4.509-4.509C165.547,51.278,167.566,49.259,170.056,49.259z M227.417,26.214c2.49,0,4.509,2.019,4.509,4.509s-2.019,4.509-4.509,4.509s-4.509-2.019-4.509-4.509S224.927,26.214,227.417,26.214z M179.324,71.552c2.49,0,4.509,2.019,4.509,4.509c0,2.49-2.019,4.509-4.509,4.509s-4.509-2.019-4.509-4.509C174.815,73.571,176.834,71.552,179.324,71.552z M228.169,71.051c2.49,0,4.509,2.019,4.509,4.509s-2.019,4.509-4.509,4.509c-2.49,0-4.509-2.019-4.509-4.509S225.679,71.051,228.169,71.051z M203.371,82.073c2.49,0,4.509,2.019,4.509,4.509c0,2.49-2.019,4.509-4.509,4.509s-4.509-2.019-4.509-4.509C198.862,84.091,200.881,82.073,203.371,82.073z M236.184,49.008c2.49,0,4.509,2.019,4.509,4.509s-2.019,4.509-4.509,4.509s-4.509-2.019-4.509-4.509S233.694,49.008,236.184,49.008z M215.645,52.265c0,7.014-5.511,12.524-12.524,12.524s-12.524-5.511-12.524-12.524c0-5.761,3.757-10.52,8.767-12.023V17.948l3.757-5.761l3.757,5.761v22.293C212.138,41.744,215.645,46.504,215.645,52.265z M203.371,2.167c-28.555,0-51.6,23.045-51.6,51.6c0,21.542,13.276,40.078,32.062,47.843v14.779h13.526v87.117c0,11.272-9.017,20.289-20.289,20.289h-45.088v-12.745H2v31.782h129.231v-9.018h45.088c16.783,0,30.309-13.526,30.309-30.309v-87.117h15.28v-14.779c18.786-7.765,32.062-26.301,32.062-47.843C254.971,25.212,231.676,2.167,203.371,2.167z M203.371,97.352c-24.047,0-43.585-19.538-43.585-43.585c0-24.047,19.538-43.585,43.585-43.585c24.047,0,43.585,19.538,43.585,43.585C246.955,77.814,227.417,97.352,203.371,97.352z"/></symbol>
+  <symbol id="ico-type-string" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline>
+      <line x1="9" y1="20" x2="15" y2="20"></line>
+      <line x1="12" y1="4" x2="12" y2="20"></line></symbol>
+  <symbol id="ico-type-match" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></symbol>
+  <symbol id="ico-type-crossword" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="1.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18" stroke="currentColor" stroke-width="1.5"/><rect x="3.5" y="3.5" width="5" height="5" fill="currentColor"/><rect x="15.5" y="15.5" width="5" height="5" fill="currentColor"/></symbol>
+  <symbol id="ico-type-doi" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="6" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="6" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="20" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 10.2 6.6 7.4M14.6 10.2 17.4 7.4M12 15.2 12 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="ico-type-chemistry" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"></path>
+      <path d="M14 9.3V1.99"></path>
+      <path d="M8.5 2h7"></path>
+      <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+      <path d="M5.52 16h12.96"></path></symbol>
+  <symbol id="ico-type-chemical_topo" viewBox="0 0 24 24" fill="none"><polygon points="19,12 15.5,18.06 8.5,18.06 5,12 8.5,5.94 15.5,5.94" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.7 7.2h6.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6.7 13.2l3.3-5.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="ico-type-nuclear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12v.01" /><path d="M9.172 9.172c-3.906 3.905 -5.805 8.337 -4.243 9.9c1.562 1.561 6 -.338 9.9 -4.244m1.884 -2.113c2.587 -3.277 3.642 -6.502 2.358 -7.786c-1.284 -1.284 -4.508 -.23 -7.784 2.357" /><path d="M4.929 4.929c-1.562 1.562 .337 6 4.243 9.9c3.905 3.905 8.337 5.804 9.9 4.242m-.072 -4.071c-.767 -1.794 -2.215 -3.872 -4.172 -5.828c-1.944 -1.945 -4.041 -3.402 -5.828 -4.172" /><path d="M3 3l18 18" /></symbol>
+  <symbol id="ico-type-composition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></symbol>
+  <symbol id="ico-action-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="16"></line>
+      <line x1="8" y1="12" x2="16" y2="12"></line></symbol>
+  <symbol id="ico-action-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+      <polyline points="17 21 17 13 7 13 7 21"></polyline>
+      <polyline points="7 3 7 8 15 8"></polyline></symbol>
+  <symbol id="ico-action-tags" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+      <line x1="7" y1="7" x2="7.01" y2="7"></line></symbol>
+  <symbol id="ico-action-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line></symbol>
+  <symbol id="ico-action-preview" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+      <circle cx="12" cy="12" r="3"></circle></symbol>
+  <symbol id="ico-action-delete" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" /><path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" /></symbol>
+  <symbol id="ico-action-cancel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle>
+      <line x1="15" y1="9" x2="9" y2="15"></line>
+      <line x1="9" y1="9" x2="15" y2="15"></line></symbol>
+  <symbol id="ico-action-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line></symbol>
+  <symbol id="ico-action-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline>
+      <polyline points="1 20 1 14 7 14"></polyline>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></symbol>
+  <symbol id="ico-tool-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  
+  <path
+     d="M7 16h10"
+     />
+  <rect
+     width="20"
+     height="16"
+     x="2"
+     y="4"
+     rx="2"
+     />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3333px;font-family:Symbol;-inkscape-font-specification:Symbol;opacity:0.966019;fill:#000000;stroke:#000000;stroke-width:0.7;stroke-dasharray:8.39998, 8.39998"
+     x="4.0738006"
+     y="7.4095941"
+    ><tspan
+      
+      ></tspan></text>
+  <g
+    
+     transform="matrix(0.16493899,0,0,0.15832072,8.136599,6.1754278)">
+    <rect
+       width="18"
+       height="18"
+       x="3"
+       y="3"
+       rx="2"
+       ry="2"
+       />
+    <path
+       d="m 9,17 c 2,0 2.8,-1 2.8,-2.8 V 10 c 0,-2 1,-3.3 3.2,-3"
+       id="path1-0" />
+    <path
+       d="m 9,11.2 h 5.7"
+       id="path2-3" />
+  </g>
+  <g
+    
+     transform="matrix(1.7669587,0,0,1.7127582,-14.969555,-12.496271)">
+    <rect
+       width="1.6339483"
+       height="1.6339483"
+       x="11.183025"
+       y="11.183025"
+       rx="0.18154982"
+       ry="0.18154982"
+       id="rect1-3"
+       style="stroke-width:0.18155" />
+    <g
+       id="g2-0"
+       transform="matrix(0.06587737,0,0,0.0499894,11.239422,11.415318)">
+      <line
+         x1="9"
+         x2="9"
+         y1="4"
+         y2="20"
+         id="line1" />
+      <path
+         d="M 4,7 C 4,5.3 5.3,4 7,4 h 13"
+         />
+      <path
+         d="m 18,20 c -1.7,0 -3,-1.3 -3,-3 V 4"
+         id="path2-2" />
+    </g>
+  </g>
+  <g
+     id="g3-3"
+     transform="matrix(0.16471446,0,0,0.16150882,12.298775,6.2044011)">
+    <rect
+       width="18"
+       height="18"
+       x="3"
+       y="3"
+       rx="2"
+       id="rect1-7" />
+    <path
+       d="M 15,9 9,15"
+       id="path1-5" />
+    <path
+       d="M 9,9 H 9.01"
+       id="path2-4" />
+    <path
+       d="m 15,15 h 0.01"
+       id="path3-8" />
+  </g>
+  <g
+     id="g2-6"
+     transform="matrix(0.16480875,0,0,0.16146964,16.444652,6.25225)">
+    <path
+       d="m 7,12 h 2 l 2,5 2,-10 h 4"
+       id="path1-6" />
+    <rect
+       x="3"
+       y="3"
+       width="18"
+       height="18"
+       rx="2"
+       id="rect1-74" />
+  </g>
+  <g
+     id="g2-3"
+     transform="matrix(0.1647173,0,0,0.16154149,6.1873896,10.070518)">
+    <rect
+       width="18"
+       height="18"
+       x="3"
+       y="3"
+       rx="2"
+       id="rect1-9" />
+    <path
+       d="m 8,14 4,-4 4,4"
+       id="path1-59" />
+  </g>
+  <g
+     id="g2-1"
+     transform="matrix(0.16810466,0,0,0.1595857,10.218237,10.106442)">
+    <rect
+       width="18"
+       height="18"
+       x="3"
+       y="3"
+       rx="2"
+       ry="2"
+       id="rect1-1" />
+    <path
+       d="M 15,9 9,15"
+       id="path1-4" />
+    <path
+       d="m 9,9 6,6"
+       id="path2-45" />
+  </g>
+  <g
+     id="g2-34"
+     transform="matrix(0.16489673,0,0,0.15835469,14.300224,10.079835)">
+    <rect
+       width="18"
+       height="18"
+       x="3"
+       y="3"
+       rx="2"
+       id="rect1-6" />
+    <path
+       d="M 16,8.9 V 7 H 8 l 4,5 -4,5 h 8 v -1.9"
+       id="path1-54" />
+  </g></symbol>
+  <symbol id="ico-tool-structure" viewBox="0 0 24 24" fill="currentColor"><path d="M18.5 3a2.5 2.5 0 1 1 -.912 4.828l-4.556 4.555a5.475 5.475 0 0 1 .936 3.714l2.624 .787a2.5 2.5 0 1 1 -.575 1.916l-2.623 -.788a5.5 5.5 0 0 1 -10.39 -2.29l-.004 -.222l.004 -.221a5.5 5.5 0 0 1 2.984 -4.673l-.788 -2.624a2.498 2.498 0 0 1 -2.194 -2.304l-.006 -.178l.005 -.164a2.5 2.5 0 1 1 4.111 2.071l.787 2.625a5.475 5.475 0 0 1 3.714 .936l4.555 -4.556a2.487 2.487 0 0 1 -.167 -.748l-.005 -.164l.005 -.164a2.5 2.5 0 0 1 2.495 -2.336z" /></symbol>
+  <symbol id="ico-tool-ai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 
+     On applique une transformation : 
+     translate(0, -1) : on remonte un peu le dessin
+     scale(1.3) : on grossit le dessin de 30%
+  -->
+  <g transform="translate(0, -1) scale(1.3)">
+    <path d="M 12,5 A 3,3 0 1 0 6.003,5.125 4,4 0 0 0 3.477,10.895 4,4 0 0 0 4.033,17.483 4,4 0 1 0 12,18 Z" />
+    <path d="M 9,13 A 4.5,4.5 0 0 0 12,9" />
+    <path d="M 6.003,5.125 A 3,3 0 0 0 6.401,6.5" />
+    <path d="M 3.477,10.896 A 4,4 0 0 1 4.062,10.5" />
+    <path d="M 6,18 A 4,4 0 0 1 4.033,17.484" />
+    <path d="m 12,13 h 4" />
+    <path d="m 12,18 h 6 a 2,2 0 0 1 2,2 v 1" />
+    <path d="m 12,8 h 8" />
+    <path d="M 16,8 V 5 a 2,2 0 0 1 2,-2" />
+    <circle cx="16" cy="13" r="0.5" />
+    <circle cx="18" cy="3" r="0.5" />
+    <circle cx="20" cy="21" r="0.5" />
+    <circle cx="20" cy="8" r="0.5" />
+  </g>
+
+  <!-- Texte "AI" grossi et positionné tout en bas pour équilibrer -->
+  <text x="5.5" y="22" 
+        font-family="Arial, sans-serif" 
+        font-weight="900" 
+        font-size="7" 
+        fill="currentColor" 
+        stroke="none">AI</text>
+</symbol>
+  <symbol id="ico-tool-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></symbol>
+  <symbol id="ico-tool-config" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></symbol>
+  <symbol id="ico-tool-grading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line>
+      <line x1="12" y1="20" x2="12" y2="4"></line>
+      <line x1="6" y1="20" x2="6" y2="14"></line></symbol>
+  <symbol id="ico-tool-statement" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <line x1="16" y1="13" x2="8" y2="13"></line>
+      <line x1="16" y1="17" x2="8" y2="17"></line>
+      <polyline points="10 9 9 9 8 9"></polyline></symbol>
+  <symbol id="ico-tool-help-student" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762"/></symbol>
+  <symbol id="ico-tool-feedback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></symbol>
+  <symbol id="ico-tool-bloom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle>
+      <circle cx="12" cy="12" r="6"></circle>
+      <circle cx="12" cy="12" r="2"></circle></symbol>
+  <symbol id="ico-tool-trap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"></path>
+      <path d="M12 2v16"></path>
+      <path d="M8 8h8"></path>
+      <path d="M6 18h12"></path>
+      <path d="M4 18v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path></symbol>
+  <symbol id="ico-tool-random" viewBox="0 0 256 256" fill="currentColor"><g fill-rule="evenodd"><path d="M47.895 88.097c.001-4.416 3.064-9.837 6.854-12.117l66.257-39.858c3.785-2.277 9.915-2.277 13.707.008l66.28 39.934c3.786 2.28 6.853 7.703 6.852 12.138l-.028 79.603c-.001 4.423-3.069 9.865-6.848 12.154l-66.4 40.205c-3.781 2.29-9.903 2.289-13.69-.01l-66.167-40.185c-3.78-2.295-6.842-7.733-6.84-12.151l.023-79.72zm13.936-6.474l65.834 36.759 62.766-36.278-62.872-36.918L61.83 81.623zM57.585 93.52c0 1.628-1.065 71.86-1.065 71.86-.034 2.206 1.467 4.917 3.367 6.064l61.612 37.182.567-77.413s-64.48-39.322-64.48-37.693zm76.107 114.938l60.912-38.66c2.332-1.48 4.223-4.915 4.223-7.679V93.125l-65.135 37.513v77.82z"/><path d="M77.76 132.287c-4.782 2.762-11.122.735-14.16-4.526-3.037-5.261-1.622-11.765 3.16-14.526 4.783-2.762 11.123-.735 14.16 4.526 3.038 5.261 1.623 11.765-3.16 14.526zm32 21c-4.782 2.762-11.122.735-14.16-4.526-3.037-5.261-1.622-11.765 3.16-14.526 4.783-2.762 11.123-.735 14.16 4.526 3.038 5.261 1.623 11.765-3.16 14.526zm-32 16c-4.782 2.762-11.122.735-14.16-4.526-3.037-5.261-1.622-11.765 3.16-14.526 4.783-2.762 11.123-.735 14.16 4.526 3.038 5.261 1.623 11.765-3.16 14.526zm32 21c-4.782 2.762-11.122.735-14.16-4.526-3.037-5.261-1.622-11.765 3.16-14.526 4.783-2.762 11.123-.735 14.16 4.526 3.038 5.261 1.623 11.765-3.16 14.526zm78.238-78.052c-4.783-2.762-11.122-.735-14.16 4.526-3.037 5.261-1.623 11.765 3.16 14.526 4.783 2.762 11.123.735 14.16-4.526 3.038-5.261 1.623-11.765-3.16-14.526zm-16.238 29c-4.782-2.762-11.122-.735-14.16 4.526-3.037 5.261-1.622 11.765 3.16 14.526 4.783 2.762 11.123.735 14.16-4.526 3.038-5.261 1.623-11.765-3.16-14.526zm-17 28c-4.782-2.762-11.122-.735-14.16 4.526-3.037 5.261-1.622 11.765 3.16 14.526 4.783 2.762 11.123.735 14.16-4.526 3.038-5.261 1.623-11.765-3.16-14.526zM128.5 69c-6.351 0-11.5 4.925-11.5 11s5.149 11 11.5 11S140 86.075 140 80s-5.149-11-11.5-11z"/></g></symbol>
+  <symbol id="ico-tool-measure" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v-3"/><path d="M14 15v-3"/><path d="M18 15v-3"/><path d="M2 8V4"/><path d="M22 6H2"/><path d="M22 8V4"/><path d="M6 15v-3"/><rect x="2" y="12" width="20" height="8" rx="2"/></symbol>
+  <symbol id="ico-tool-required" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line>
+      <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></symbol>
+  <symbol id="ico-tool-context" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></symbol>
+  <symbol id="ico-tool-physics" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"></path>
+      <path d="M14 9.3V1.99"></path>
+      <path d="M8.5 2h7"></path>
+      <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+      <path d="M5.52 16h12.96"></path></symbol>
+  <symbol id="ico-file-import" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" />
+  <path d="M5 13v-8a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5.5m-9.5 -2h7m-3 -3l3 3l-3 3" /></symbol>
+  <symbol id="ico-file-export" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" />
+  <path d="M11.5 21h-4.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v5m-5 6h7m-3 -3l3 3l-3 3" /></symbol>
+  <symbol id="ico-file-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></symbol>
+  <symbol id="ico-file-open" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M1 5C1 3.34315 2.34315 2 4 2H8.55848C9.84977 2 10.9962 2.82629 11.4045 4.05132L11.7208 5H20C21.1046 5 22 5.89543 22 7V9.00961C23.1475 9.12163 23.9808 10.196 23.7695 11.3578L22.1332 20.3578C21.9603 21.3087 21.132 22 20.1654 22H3C1.89543 22 1 21.1046 1 20V5ZM20 9V7H11.7208C10.8599 7 10.0956 6.44914 9.82339 5.63246L9.50716 4.68377C9.37105 4.27543 8.98891 4 8.55848 4H4C3.44772 4 3 4.44772 3 5V12.2709L3.35429 10.588C3.54913 9.66249 4.36562 9 5.31139 9H20ZM3.36634 20C3.41777 19.9109 3.4562 19.8122 3.47855 19.706L5.31139 11L21 11H21.8018L20.1654 20L3.36634 20Z" fill="currentColor"/></symbol>
+  <symbol id="ico-file-document" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <line x1="16" y1="13" x2="8" y2="13"></line>
+      <line x1="16" y1="17" x2="8" y2="17"></line>
+      <polyline points="10 9 9 9 8 9"></polyline></symbol>
+  <symbol id="ico-file-attach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></symbol>
+  <symbol id="ico-file-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+      <polyline points="21 15 16 10 5 21"></polyline></symbol>
+  <symbol id="ico-file-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon>
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></symbol>
+  <symbol id="ico-file-audio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></symbol>
+  <symbol id="ico-content-answer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect>
+      <path d="M6 8h12"></path>
+      <path d="M6 12h12"></path>
+      <path d="M6 16h8"></path></symbol>
+  <symbol id="ico-content-locked" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path></symbol>
+  <symbol id="ico-content-clean" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 22-1-4"/><path d="M19 14a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2h-3a1 1 0 0 1-1-1V4a2 2 0 0 0-4 0v5a1 1 0 0 1-1 1H6a2 2 0 0 0-2 2v1a1 1 0 0 0 1 1"/><path d="M19 14H5l-1.973 6.767A1 1 0 0 0 4 22h16a1 1 0 0 0 .973-1.233z"/><path d="m8 22 1-4"/></symbol>
+  <symbol id="ico-content-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></symbol>
+  <symbol id="ico-footer-assistant" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+      <path d="M6 12v5c3 3 9 3 12 0v-5"></path></symbol>
+  <symbol id="ico-footer-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line></symbol>
+  <symbol id="ico-footer-docs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></symbol>
+  <symbol id="ico-footer-legal" viewBox="0 0 436.405 436.405" fill="currentColor"><g><path d="M424.287,302.931L303.836,182.48c-6.913-6.913-15.838-11.077-25.455-11.957c-0.863-9.287-4.84-18.337-11.935-25.433c-4.611-4.612-10.05-7.902-15.841-9.881c0.626-1.918,1.158-3.868,1.595-5.847c1.936,0.883,4.049,1.367,6.217,1.367c3.979,0,7.793-1.58,10.607-4.394l31.367-31.368c5.858-5.857,5.858-15.355,0-21.213L233.069,6.432c-2.813-2.813-6.628-4.394-10.606-4.394c-3.979,0-7.793,1.58-10.606,4.394L180.488,37.8c-4.551,4.551-5.549,11.292-3.029,16.824c-11.514,2.546-22.092,8.297-30.632,16.837l-12.613,12.613c-8.54,8.539-14.291,19.117-16.837,30.632c-5.531-2.521-12.273-1.521-16.824,3.029l-31.368,31.367c-2.813,2.813-4.394,6.628-4.394,10.606s1.581,7.794,4.394,10.606l67.322,67.322c2.929,2.93,6.767,4.394,10.606,4.394c3.838,0,7.678-1.465,10.606-4.394l31.368-31.367c2.813-2.813,4.394-6.628,4.394-10.606c0-2.168-0.484-4.281-1.367-6.217c1.979-0.438,3.93-0.97,5.848-1.596c1.979,5.791,5.269,11.229,9.88,15.841c7.1,7.101,16.158,11.078,25.453,11.938c0.86,9.294,4.837,18.352,11.938,25.453l120.451,120.451c8.078,8.079,18.69,12.118,29.301,12.118c10.612,0,21.224-4.039,29.302-12.118C440.444,345.377,440.444,319.088,424.287,302.931z M222.462,38.251l46.109,46.109l-10.154,10.155l-46.109-46.109L222.462,38.251z M155.427,105.287l12.614-12.613c6.158-6.158,14.345-9.55,23.054-9.55s16.896,3.392,23.055,9.55s9.55,14.346,9.55,23.055s-3.392,16.896-9.55,23.055l-12.614,12.613c-6.158,6.158-14.345,9.55-23.054,9.55c-8.708,0-16.896-3.392-23.054-9.55c-6.158-6.158-9.55-14.346-9.55-23.055S149.269,111.446,155.427,105.287z M147.114,205.819l-46.109-46.109l10.154-10.154l46.109,46.109L147.114,205.819z M229.056,166.303L229.056,166.303c4.46-4.46,11.717-4.46,16.176,0c4.46,4.46,4.46,11.717,0,16.177c-4.46,4.46-11.717,4.46-16.177,0C224.596,178.02,224.596,170.763,229.056,166.303z M403.074,340.322c-4.46,4.459-11.718,4.459-16.177,0L266.446,219.87c-4.46-4.46-4.46-11.718,0-16.178c2.16-2.16,5.033-3.351,8.088-3.351c3.056,0,5.928,1.19,8.089,3.351l120.451,120.451C407.534,328.604,407.534,335.862,403.074,340.322z"/><path d="M245.936,347.534h-10.062v-23.838c0-5.522-4.477-10-10-10H35.064c-5.523,0-10,4.478-10,10v23.838H15c-8.284,0-15,6.716-15,15v56.833c0,8.284,6.716,15,15,15h230.936c8.284,0,15-6.716,15-15v-56.833C260.936,354.249,254.22,347.534,245.936,347.534z M45.064,333.696h170.81v13.838H45.064V333.696z M230.936,404.367H30v-26.833h200.936V404.367z"/></g></symbol>
+  <symbol id="ico-footer-contact" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+      <polyline points="22,6 12,13 2,6"></polyline></symbol>
+  <symbol id="ico-footer-email" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle>
+      <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"></path></symbol>
+  <symbol id="ico-footer-bug" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4a4 4 0 0 1 3.995 3.8l.005 .2a1 1 0 0 1 .428 .096l3.033 -1.938a1 1 0 1 1 1.078 1.684l-3.015 1.931a7.17 7.17 0 0 1 .476 2.227h3a1 1 0 0 1 0 2h-3v1a6.01 6.01 0 0 1 -.195 1.525l2.708 1.616a1 1 0 1 1 -1.026 1.718l-2.514 -1.501a6.002 6.002 0 0 1 -3.973 2.56v-5.918a1 1 0 0 0 -2 0v5.917a6.002 6.002 0 0 1 -3.973 -2.56l-2.514 1.503a1 1 0 1 1 -1.026 -1.718l2.708 -1.616a6.01 6.01 0 0 1 -.195 -1.526v-1h-3a1 1 0 0 1 0 -2h3.001v-.055a7 7 0 0 1 .474 -2.173l-3.014 -1.93a1 1 0 1 1 1.078 -1.684l3.032 1.939l.024 -.012l.068 -.027l.019 -.005l.016 -.006l.032 -.008l.04 -.013l.034 -.007l.034 -.004l.045 -.008l.015 -.001l.015 -.002l.087 -.004a4 4 0 0 1 4 -4zm0 2a2 2 0 0 0 -2 2h4a2 2 0 0 0 -2 -2z" /></symbol>
+  <symbol id="ico-footer-lang" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle>
+      <line x1="2" y1="12" x2="22" y2="12"></line>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></symbol>
+  <symbol id="ico-footer-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle></symbol>
+</defs></svg>

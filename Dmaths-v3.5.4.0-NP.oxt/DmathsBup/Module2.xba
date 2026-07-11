@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module2" script:language="StarBasic">REM  *****  BASIC  *****
+
+&apos;********************************************************************************
+&apos;This module is Copyright (C) 2004 Laurent Godard and Bernard Marcelly
+
+&apos;This module is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU Lesser General Public
+&apos;License as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This module is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;Lesser General Public License for more details.
+&apos;http://www.opensource.org/licenses/lgpl-license.php
+
+&apos;You should have received a copy of the GNU Lesser General Public
+&apos;License along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;******************************************************************************
+
+Sub ZipTree(URLzip As String, URLtree As String)
+Dim args(0) As Variant, p As Long
+Dim ZipService As Object, ZipPackageFolder As Object, FileService As Object
+
+args(0) = URLzip
+ZipService = createUnoService(&quot;com.sun.star.packages.Package&quot;)
+ZipService.initialize(args()) &apos; initialisation du zip
+FileService = createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+ZipPackageFolder = ZipService.GetByHierarchicalName(&quot;&quot;)
+p = Len(URLtree) +1
+ScanFilesToZip(URLtree, ZipService, FileService, ZipPackageFolder, p)
+ZipService.commitChanges
+End Sub
+
+&apos; attention : appel récursif entre ScanFilesToZip et ScanDirsToZip
+Sub ScanFilesToZip(thisDir As String, zs As Object, fs As Object, zpf As Object, rootP As Long)
+Dim f2 As String, fileInZip As Object, Stream1 As Object
+Dim args(0) As Variant
+
+args(0) = false &apos; pour stocker un fichier dans le zip
+f2 = Dir(thisDir &amp; &quot;*&quot;, 0) &apos; chercher tous les fichiers
+Do While Len(f2) &gt; 0
+  Stream1 = fs.OpenFileRead(thisDir &amp; f2)
+  fileInZip = zs.createInstanceWithArguments(args())
+  fileInZip.SetInputStream(Stream1)
+  if zpf.HasByName(f2)  then
+    zpf.replaceByName(f2, fileInZip)
+  else
+    zpf.insertByName(f2, fileInZip)
+  end if
+  f2 = Dir &apos; fichier suivant
+Loop
+&apos; appel récursif !
+ScanDirsToZip(thisDir, zs, fs, zpf, rootP)
+End Sub
+
+
+Sub ScanDirsToZip(thisDir As String, zs As Object, fs As Object, zpf As Object, rootP As Long)
+Dim args(0) As Variant 
+Dim d2 As String, ZipPackageFolder As Object
+Dim newFolder As Object, newDir As String, listDir As String, x As Long
+
+args(0) = true &apos;pour créer un dossier dans le zip
+d2 = Dir(thisDir, 16) &apos; chercher tous les répertoires
+Do While Len(d2) &gt; 0 &apos; mémoriser les sous-répertoires car Dir n&apos;est pas récursif
+  if (d2 &lt;&gt; &quot;.&quot;) and (d2 &lt;&gt; &quot;..&quot;) then
+    listDir = listDir &amp; d2 &amp; &quot;*&quot;
+  end if
+  d2 = Dir &apos; fichier suivant
+Loop
+x = 1
+d2 = nextDirElmt(listDir, x)
+Do While Len(d2) &gt; 0
+    if not zpf.HasByName(d2)  then &apos; créer le répertoire d2 dans le répertoire courant
+      newFolder = zs.createInstanceWithArguments(args())
+      zpf.insertByName(d2, newFolder)
+    end if
+    &apos; ouvrir le dossier dans le zip
+    newDir = thisDir &amp; d2 &amp; &quot;/&quot;
+    ZipPackageFolder = zs.GetByHierarchicalName(Mid(newDir, rootP))
+    &apos; appel récursif !
+    ScanFilesToZip(newDir, zs, fs, ZipPackageFolder, rootP)
+    d2 = nextDirElmt(listDir, x)
+Loop
+End Sub
+
+
+&apos; renvoie l&apos;élément suivant et modifie startP
+Function nextDirElmt(listElements As String, startP As Long)
+Dim x2 As Long
+
+x2 = InStr(startP, listElements, &quot;*&quot;)
+if x2 = 0 then
+  nextDirElmt = &quot;&quot;
+else
+  nextDirElmt = Mid(listElements, startP, x2 -startP)
+  startP = x2 +1
+end if
+End Function
+
+
+Sub unzipArchive(URLzip As String, URLtree As String)
+Dim args(0) As Variant, ZipService As Object
+Dim ThePackageStream  As Object
+
+ZipService = createUnoService(&quot;com.sun.star.packages.Package&quot;)
+args(0) = URLzip
+ZipService.initialize(args())
+&apos;xray.xray zipservice
+&apos; obtenir le flux empaqueté
+ThePackageStream = ZipService.GetByHierarchicalName(&quot;&quot;)
+exploreZip(ThePackageStream, URLtree, &quot;&quot;)
+End Sub
+
+
+Sub exploreZip(thePack As Object, URLtree As String, ByVal ZipFolder As String)
+Dim listFF As Object, fileOrFolder As Object, Zipff As String
+Dim f1 As Object, MyInputStream As Object
+
+listFF = thePack.createEnumeration
+Do While listFF.hasMoreElements
+  fileOrFolder = listFF.nextElement
+  Zipff = ZipFolder &amp; fileOrFolder.Name
+  if fileOrFolder.SupportsService(&quot;com.sun.star.packages.PackageFolder&quot;) then
+    exploreZip(fileOrFolder, URLtree, Zipff &amp; &quot;/&quot;) &apos; appel récursif
+  else
+    MyInputStream = thePack.GetByName(fileOrFolder.Name).InputStream
+    &apos; écrire un fichier normal à partir du flux dézippé
+    f1 = createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+    f1.WriteFile(URLtree &amp; Zipff, MyInputStream)
+  end if
+Loop
+End Sub
+
+
+</script:module>

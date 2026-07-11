@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396639  -->
+  <question type="stack">
+    <name>
+      <text>Oscilloscope - Retard Ultrasonore (Vrais boutons V/div séparés)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#0f766e;border-left:5px solid #14b8a6;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Oscilloscope — Propagation des Ultrasons</strong>
+        <span style="background:#14b8a6;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 2 pts</span>
+        <span style="background:#ffffff;color:#0f766e;border:1px solid #0f766e;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📡 Ondes mécaniques</span>
+      </div>
+      
+      <p><strong>Consigne :</strong> On visualise le signal de l'émetteur (Voie A, <span style="color:#2563eb;font-weight:bold;">Bleu</span>) et le signal du récepteur (Voie B, <span style="color:#dc2626;font-weight:bold;">Rouge</span>).</p>
+      <p>À l'aide des curseurs temporels (■ X), déterminez :</p>
+      
+      <ol style="margin-left: 20px; line-height: 2;">
+        <li>La fréquence des ultrasons émis \(f\).</li>
+        <li>Le retard temporel \(\Delta t\) entre l'émission et la réception.</li>
+      </ol>
+
+[[jsxgraph width="775px" height="550px"]]
+(function(){
+var lSH=[5e-7,0.000001,0.000002,0.000005,0.00001,0.00002,0.00005,0.0001,0.0002,0.0005,0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5];
+var lSV=[0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10];
+var siA=6, siB=7, ti=2, xp=0, ypA=0, ypB=0;
+
+var fc = parseFloat("{#f_carrier_val#}");
+var dt = parseFloat("{#dt_val#}");
+var a1 = 0.7;
+var a2 = 0.2;
+
+function SV_A(){return lSV[siA];}
+function SV_B(){return lSV[siB];}
+function SH(){return lSH[ti];}
+function fV(v){return v<0.05?(v*1e3).toPrecision(3)+" mV":v+" V";}
+function fT(s){
+  return s<5e-5?(s*1e6).toPrecision(3)+" \u00B5s"
+        :s<0.05?(s*1e3).toPrecision(3)+" ms"
+        :s.toPrecision(3)+" s";
+}
+var bd=JXG.JSXGraph.initBoard(divid,{
+  boundingbox:[-5.4,4.5,5.4,-4.8],
+  axis:false,grid:false,
+  showNavigation:false,showCopyright:false,
+  pan:{enabled:false},zoom:{enabled:false}
+});
+
+/* --- FOND BLANC ET BORDURES --- */
+bd.create("polygon",[[-5,-4],[5,-4],[5,4],[-5,4]],
+  {fillColor:"#ffffff",fillOpacity:1,strokeWidth:0,
+  fixed:true,layer:0,highlight:false, vertices:{visible:false, fixed:true}, borders:{visible:false}});
+bd.create("segment",[[-5,-4],[5,-4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[5,-4],[5,4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[5,4],[-5,4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[-5,4],[-5,-4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+
+/* --- GRILLES --- */
+var gs={strokeColor:"#e5e7eb",strokeWidth:0.8,fixed:true,layer:1,highlight:false};
+var gc={strokeColor:"#d1d5db",strokeWidth:1.2,fixed:true,layer:1,highlight:false};
+var ts={strokeColor:"#9ca3af",strokeWidth:0.55,fixed:true,layer:1,highlight:false};
+for(var xi=-4;xi<=4;xi++) bd.create("segment",[[xi,-4],[xi,4]],xi===0?gc:gs);
+for(var yi=-3;yi<=3;yi++) bd.create("segment",[[-5,yi],[5,yi]],yi===0?gc:gs);
+for(var xt=-5;xt<=5.01;xt+=0.2)
+  if(Math.abs(xt%1)>0.05) bd.create("segment",[[xt,-0.07],[xt,0.07]],ts);
+for(var yt=-4;yt<=4.01;yt+=0.2)
+  if(Math.abs(yt%1)>0.05) bd.create("segment",[[-0.07,yt],[0.07,yt]],ts);
+
+/* --- FONCTIONS PING ULTRASONORE --- */
+var nc = 6; 
+var tBurst = nc / fc; 
+var t0_ch1 = -tBurst * 0.25; 
+
+function burst(t) {
+    var halfT = tBurst * 0.6;
+    if (Math.abs(t) > halfT) return 0;
+    var env = Math.cos(Math.PI * t / halfT);
+    return env * env; 
+}
+
+function ch1Sig(xd){
+  var s=SH(), sv=SV_A();
+  var t = (xd-xp)*s - t0_ch1;
+  var y = a1 * burst(t) * Math.sin(2 * Math.PI * fc * t) / sv + ypA; 
+  return y>4?4:y<-4?-4:y;
+}
+
+function ch2Sig(xd){
+  var s=SH(), sv=SV_B();
+  var t = (xd-xp)*s - t0_ch1 - dt; 
+  var y = a2 * burst(t) * Math.sin(2 * Math.PI * fc * t) / sv + ypB; 
+  return y>4?4:y<-4?-4:y;
+}
+
+/* --- TRACÉ DES COURBES --- */
+bd.create("functiongraph",[ch1Sig,-5,5],
+  {strokeColor:"#2563eb",strokeWidth:2.5,layer:3,highlight:false,fixed:true, numberPoints:8000, doAdvancedPlot:false});
+bd.create("functiongraph",[ch2Sig,-5,5],
+  {strokeColor:"#dc2626",strokeWidth:2.5,layer:3,highlight:false,fixed:true, numberPoints:8000, doAdvancedPlot:false});
+
+var lbSH=bd.create("text",[0,-3.75,function(){return fT(SH())+"/div";}],
+  {fixed:true,color:"#1f2937",fontSize:13,anchorX:"middle",layer:4,highlight:false});
+var lbSV_A=bd.create("text",[-4.7,3.6,function(){return fV(SV_A())+"/div";}],
+  {fixed:true,color:"#2563eb",fontSize:13,layer:4,highlight:false});
+var lbSV_B=bd.create("text",[-4.7,3.2,function(){return fV(SV_B())+"/div";}],
+  {fixed:true,color:"#dc2626",fontSize:13,layer:4,highlight:false});
+
+/* --- CURSEURS VIOLETS (Temps) --- */
+var cA=bd.create("point",[-2,0],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ['x']});
+var cB=bd.create("point",[2,0],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ['x']});
+var segPA=bd.create("segment",[function(){return[cA.X(),-4];},function(){return[cA.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});
+var segPB=bd.create("segment",[function(){return[cB.X(),-4];},function(){return[cB.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});
+var txtP=bd.create("text",[0,3.6,function(){
+  var dx=Math.abs(cB.X()-cA.X()),dts=dx*SH();
+  return "\u0394t="+fT(dts);
+}],{fixed:false,color:"#7c3aed",fontSize:14,anchorX:"middle",layer:6,highlight:false, visible:false});
+
+/* --- CURSEURS ROUGES (Tension) --- */
+var cD=bd.create("point",[0,1],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ['y']});
+var cE=bd.create("point",[0,-1],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ['y']});
+var segRD=bd.create("segment",[function(){return[-5,cD.Y()];},function(){return[5,cD.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});
+var segRE=bd.create("segment",[function(){return[-5,cE.Y()];},function(){return[5,cE.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});
+var txtR=bd.create("text",[4.5,3.2,function(){
+  var dy=Math.abs(cD.Y()-cE.Y()),dv=dy*SV_A();
+  return "\u0394V="+fV(dv);
+}],{fixed:false,color:"#dc2626",fontSize:14,anchorX:"right",layer:6,highlight:false, visible:false});
+
+function toggleGroup(arr) {
+  var isVisible = arr[0].getAttribute('visible');
+  arr.forEach(function(obj) { obj.setAttribute({visible: !isVisible}); });
+}
+var purpleGroup = [cA, cB, segPA, segPB, txtP];
+var redGroup = [cD, cE, segRD, segRE, txtR];
+
+/* ---------------------------------------------------------
+   BARRE DE CONTRÔLE 
+   --------------------------------------------------------- */
+var style = document.createElement('style');
+style.textContent = '.osc-btn{background:#ffffff;color:#374151;border:2px solid #6b7280;padding:5px 12px;cursor:pointer;border-radius:4px;font-size:15px;font-family:monospace;font-weight:bold;margin:0 2px;box-shadow: 0 1px 2px rgba(0,0,0,0.05);}.osc-btn:hover{background:#f3f4f6;border-color:#374151;}';
+document.head.appendChild(style);
+
+var ctrl = document.createElement('div');
+ctrl.style.cssText = 'position:absolute; bottom:0; left:0; width:100%; box-sizing:border-box; display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:8px 12px; background:rgba(255,255,255,0.95); border-top:2px solid #4b5563; z-index:100; user-select:none; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);';
+
+function mkL(t,c,w){ var s=document.createElement('span'); s.textContent=t; s.style.cssText='color:'+(c||'#374151')+';font-size:14px;font-family:monospace;font-weight:bold;display:inline-block;'+(w?'min-width:'+w+'px;text-align:center;':''); return s; }
+function mkS(){ var s=document.createElement('span'); s.style.cssText='border-left:1px solid #d1d5db;height:24px;display:inline-block;margin:0 6px;'; return s; }
+function mkB(t,c,fn){ var b=document.createElement('button'); b.className='osc-btn'; b.textContent=t; if(c){b.style.color=c; b.style.borderColor=c;} if(fn) b.addEventListener('click', fn); return b; }
+
+var lblVA = mkL('', '#2563eb', '65px');
+ctrl.appendChild(mkL('V/div A', '#2563eb', '50px'));
+ctrl.appendChild(mkB('\u25BC', '#2563eb', function(){siA=Math.max(0,siA-1);bd.update();}));
+ctrl.appendChild(lblVA);
+ctrl.appendChild(mkB('\u25B2', '#2563eb', function(){siA=Math.min(lSV.length-1,siA+1);bd.update();}));
+
+var lblVB = mkL('', '#dc2626', '65px');
+ctrl.appendChild(mkL('V/div B', '#dc2626', '50px'));
+ctrl.appendChild(mkB('\u25BC', '#dc2626', function(){siB=Math.max(0,siB-1);bd.update();}));
+ctrl.appendChild(lblVB);
+ctrl.appendChild(mkB('\u25B2', '#dc2626', function(){siB=Math.min(lSV.length-1,siB+1);bd.update();}));
+
+ctrl.appendChild(mkS());
+
+var lblT = mkL('', '#374151', '75px');
+ctrl.appendChild(mkL('t/div', '#2563eb', '45px'));
+ctrl.appendChild(mkB('\u25C4', '#2563eb', function(){ti=Math.max(0,ti-1);bd.update();}));
+ctrl.appendChild(lblT);
+ctrl.appendChild(mkB('\u25BA', '#2563eb', function(){ti=Math.min(lSH.length-1,ti+1);bd.update();}));
+
+ctrl.appendChild(mkL('XPOS', '#7c3aed', '50px')); 
+ctrl.appendChild(mkB('\u25C4', '#7c3aed', function(){xp=Math.max(-5,parseFloat((xp-0.5).toFixed(1)));bd.update();}));
+ctrl.appendChild(mkB('\u25BA', '#7c3aed', function(){xp=Math.min(5,parseFloat((xp+0.5).toFixed(1)));bd.update();}));
+
+ctrl.appendChild(mkS());
+
+ctrl.appendChild(mkL('Y A', '#2563eb', '35px'));
+ctrl.appendChild(mkB('\u25BC', '#2563eb', function(){ypA=Math.max(-4,parseFloat((ypA-0.5).toFixed(1)));bd.update();}));
+ctrl.appendChild(mkB('\u25B2', '#2563eb', function(){ypA=Math.min(4,parseFloat((ypA+0.5).toFixed(1)));bd.update();}));
+
+ctrl.appendChild(mkL('Y B', '#dc2626', '35px'));
+ctrl.appendChild(mkB('\u25BC', '#dc2626', function(){ypB=Math.max(-4,parseFloat((ypB-0.5).toFixed(1)));bd.update();}));
+ctrl.appendChild(mkB('\u25B2', '#dc2626', function(){ypB=Math.min(4,parseFloat((ypB+0.5).toFixed(1)));bd.update();}));
+
+var spacer = document.createElement('div');
+spacer.style.cssText = 'flex-grow:1;';
+ctrl.appendChild(spacer);
+
+ctrl.appendChild(mkB('X', '#a855f7', function(){ toggleGroup(purpleGroup); }));
+ctrl.appendChild(mkB('V', '#ef4444', function(){ toggleGroup(redGroup); }));
+
+var boardContainer = document.getElementById(divid);
+boardContainer.style.position = 'relative';
+boardContainer.appendChild(ctrl);
+
+var _ou = bd.update.bind(bd);
+bd.update = function(){ 
+  _ou(); 
+  lblVA.textContent = fV(SV_A());
+  lblVB.textContent = fV(SV_B());
+  lblT.textContent = fT(SH()); 
+};
+bd.update();
+})();
+[[/jsxgraph]]
+
+      <div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin:15px 0;">
+        <strong>Conseils pour la saisie :</strong>
+        <ul style="margin:8px 0 0 20px;line-height:1.7">
+          <li>La virgule se note avec un point (ex : <code>1.32</code>).</li>
+          <li><strong>Lier nombre et unité</strong> : reliez-les par <code>*</code> (ex : <code>25*us</code> pour µs).</li>
+          <li><strong>Unités usuelles</strong> : <code>s</code>, <code>ms</code>, <code>us</code>, <code>Hz</code>, <code>kHz</code>.</li>
+        </ul>
+      </div>
+      
+      <p>1. Fréquence des ultrasons \(f\) : [[input:ans_fc]] [[validation:ans_fc]]</p>
+      <p>2. Retard temporel \(\Delta t\) : [[input:ans_dt]] [[validation:ans_dt]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:#0f766e; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponses attendues
+        </div>
+        <div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">
+          <span style="font-weight:bold;color:#0f766e;">Q1 Fréquence :</span>
+          <p>En mesurant UNE période du signal haute fréquence (les petites oscillations), on trouve \(f\) = {@ta_fc@}.</p>
+        </div>
+        <div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">
+          <span style="font-weight:bold;color:#0f766e;">Q2 Retard temporel :</span>
+          <p>En plaçant un curseur sur le début de la salve bleue et l'autre sur le début de la salve rouge, on mesure \(\Delta t\) = {@ta_dt@}.</p>
+        </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>2</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>f_carrier_val: 4000000;
+f_mod_val: 2000;
+dt_val: rand_with_step(4, 8, 1) * 0.000001;
+ta_fc: stackunits(f_carrier_val, Hz);
+ta_dt: stackunits(dt_val, s);
+ta_fm: stackunits(f_mod_val, Hz);
+ta_err_periode: stackunits(1/f_carrier_val, s);
+ta_err_demi_periode: stackunits(1/(2*f_carrier_val), s);
+precision_q: 0.1;
+
+/* Extraction de l'unité pure pour éviter le bug 400000*1 */
+fc_unit: stack_units_units(ta_fc);
+dt_unit: stack_units_units(ta_dt);</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>f={@f_carrier_val@} Hz | dt={@ta_dt@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Genere avec HeStack V2</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_dt</name>
+      <type>units</type>
+      <tans>ta_dt</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_fc</name>
+      <type>units</type>
+      <tans>ta_fc</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>2.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>/* --- Traitement Fréquence f --- */
+           stud_si_f : stack_unit_si_to_si_base(ans_fc);
+           teach_si_f : fc_unit;
+           v_pure_e_f : subst(map(lambda([u], u=1), listofvars(stud_si_f)), stud_si_f);
+           v_pure_t_f : subst(map(lambda([u], u=1), listofvars(teach_si_f)), teach_si_f);
+           eleve_unit_f : 2 * stud_si_f / v_pure_e_f;
+           teacher_unit_f : 2 * teach_si_f / v_pure_t_f;
+
+           /* --- Traitement Retard dt --- */
+           stud_si_dt : stack_unit_si_to_si_base(ans_dt);
+           teach_si_dt : dt_unit;
+           v_pure_e_dt : subst(map(lambda([u], u=1), listofvars(stud_si_dt)), stud_si_dt);
+           v_pure_t_dt : subst(map(lambda([u], u=1), listofvars(teach_si_dt)), teach_si_dt);
+           eleve_unit_dt : 2 * stud_si_dt / v_pure_e_dt;
+           teacher_unit_dt : 2 * teach_si_dt / v_pure_t_dt;</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification de l'unité de f</description>
+        <answertest>UnitsAbsolute</answertest>
+        <sans>eleve_unit_f</sans>
+        <tans>teacher_unit_f</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Fréquence :</strong> L'unité est incorrecte (attendue en base SI : {@teacher_unit_f/2@}).</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Vérification de la valeur de f</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_fc</sans>
+        <tans>ta_fc</tans>
+        <testoptions>precision_q</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.75</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>3</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Fréquence :</strong> Correcte.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Piège Mesure de la fréquence de la salve</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_fc</sans>
+        <tans>ta_fm</tans>
+        <testoptions>precision_q</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Fréquence :</strong> Vous avez mesuré la période de la salve (l'enveloppe globale), pas la période du signal ultrasonore haute fréquence (les petites oscillations).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Fréquence :</strong> La valeur numérique ou la précision est incorrecte. Mesurez précisément la distance d'UNE petite oscillation (d'un pic au pic suivant).</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Vérification de l'unité du retard</description>
+        <answertest>UnitsAbsolute</answertest>
+        <sans>eleve_unit_dt</sans>
+        <tans>teacher_unit_dt</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>4</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Retard :</strong> L'unité est incorrecte (attendue en base SI : {@teacher_unit_dt/2@}).</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Vérification de la valeur du retard</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_dt</sans>
+        <tans>ta_dt</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.75</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-4-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;">✅ <strong>Retard :</strong> Correct.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>5</falsenextnode>
+        <falseanswernote>prt1-4-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>5</name>
+        <description>Piège Retard - A-t-il mis la période du signal ?</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_dt</sans>
+        <tans>ta_err_periode</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-5-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Retard :</strong> Vous avez calculé et entré la période du signal ultrasonore (\(T = 1/f\)) au lieu du décalage temporel entre l'émission et la réception.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>6</falsenextnode>
+        <falseanswernote>prt1-5-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>6</name>
+        <description>Piège Retard - A-t-il mis T/2 ?</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_dt</sans>
+        <tans>ta_err_demi_periode</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-6-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Retard :</strong> Vous avez calculé la moitié de la période du signal (\(T/2\)) au lieu du décalage temporel entre les salves.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-6-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Retard :</strong> La valeur numérique ou la précision est incorrecte. Placez un curseur sur le début de la salve bleue (émission) et l'autre sur le début de la salve rouge (réception) pour mesurer l'écart \(\Delta t\).</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396789  -->
+  <question type="stack">
+    <name>
+      <text>F Logique — Table de vérité à 3 variables</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#1e3a5f;border-left:5px solid #2563eb;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Logique — Table à 3 variables</strong>
+        <span style="background:#2563eb;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#1e3a5f;border:1px solid #1e3a5f;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📐 Mathématiques</span>
+      </div>
+
+      <p>Complétez la colonne de résultat pour l'expression logique à 3 variables :</p>
+      <div style="text-align:center;font-size:1.3rem;font-weight:bold;margin:15px 0;padding:15px;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;font-family:serif;">
+        \( {@disp_expr[idx]@} \)
+      </div>
+
+      <div style="overflow-x:auto;margin:20px 0;">
+        <table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+          <thead>
+            <tr style="background:#f1f5f9;">
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">\(P\)</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">\(Q\)</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">\(R\)</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;">\({@disp_expr[idx]@}\)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:ans0]] [[validation:ans0]]</td></tr>
+            <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:ans1]] [[validation:ans1]]</td></tr>
+            <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:ans2]] [[validation:ans2]]</td></tr>
+            <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:ans3]] [[validation:ans3]]</td></tr>
+            <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:ans4]] [[validation:ans4]]</td></tr>
+            <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:ans5]] [[validation:ans5]]</td></tr>
+            <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:ans6]] [[validation:ans6]]</td></tr>
+            <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:ans7]] [[validation:ans7]]</td></tr>
+          </tbody>
+        </table>
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
+        <div style="font-weight:bold;color:#0f766e;margin-bottom:10px;">🔑 Réponse attendue</div>
+        <p>Expression : \( {@disp_expr[idx]@} \)</p>
+        <div style="overflow-x:auto;margin:20px 0;">
+          <table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+            <thead>
+              <tr style="background:#f1f5f9;">
+                <th style="border:1px solid #94a3b8;padding:8px 22px;">\(P\)</th>
+                <th style="border:1px solid #94a3b8;padding:8px 22px;">\(Q\)</th>
+                <th style="border:1px solid #94a3b8;padding:8px 22px;">\(R\)</th>
+                <th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;">\({@disp_expr[idx]@}\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {@table_rows_general@}
+            </tbody>
+          </table>
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[eval_expr: [P and Q and R, (P or Q) implies R, P implies (Q implies R), (P implies R) and (Q implies R), not(P or Q or R), (P and Q) or (not(R) and P), (P implies Q) and (Q implies R) and (R implies P), P or (Q and R)]$ disp_expr: ["P \\land Q \\land R", "(P \\lor Q) \\to R", "P \\to (Q \\to R)", "(P \\to R) \\land (Q \\to R)", "\\neg(P \\lor Q \\lor R)", "(P \\land Q) \\lor (\\neg R \\land P)", "(P \\to Q) \\land (Q \\to R) \\land (R \\to P)", "P \\lor (Q \\land R)"]$ idx: rand(8) + 1$ expr: eval_expr[idx]$ T: truth_table(boolean_form(expr))$ Rows: args(T)$ ta_ans: [if last(Rows[2]) then 1 else 0, if last(Rows[3]) then 1 else 0, if last(Rows[4]) then 1 else 0, if last(Rows[5]) then 1 else 0, if last(Rows[6]) then 1 else 0, if last(Rows[7]) then 1 else 0, if last(Rows[8]) then 1 else 0, if last(Rows[9]) then 1 else 0]$ ta_inverse: [ta_ans[8], ta_ans[7], ta_ans[6], ta_ans[5], ta_ans[4], ta_ans[3], ta_ans[2], ta_ans[1]]$ ta_negation: [1-ta_ans[1], 1-ta_ans[2], 1-ta_ans[3], 1-ta_ans[4], 1-ta_ans[5], 1-ta_ans[6], 1-ta_ans[7], 1-ta_ans[8]]$ table_rows_general: ""$ for i:1 thru 8 do (
+    p_val: if first(Rows[i+1]) then 1 else 0,
+    q_val: if second(Rows[i+1]) then 1 else 0,
+    r_val: if third(Rows[i+1]) then 1 else 0,
+    res_val: if last(Rows[i+1]) then 1 else 0,
+    bg: if oddp(i) then "" else " style=\"background:#f8fafc;\"",
+    table_rows_general: sconcat(table_rows_general, "<tr", bg, "><td style=\"border:1px solid #94a3b8;padding:8px 22px;text-align:center;\">", p_val, "</td><td style=\"border:1px solid #94a3b8;padding:8px 22px;text-align:center;\">", q_val, "</td><td style=\"border:1px solid #94a3b8;padding:8px 22px;text-align:center;\">", r_val, "</td><td style=\"border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#dcfce7;font-weight:bold;\">", res_val, "</td></tr>")
+)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol><li>[[feedback:prt1]]</li></ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@disp_expr[idx]@} | {@ta_ans@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:logique-prop-3var</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>symbol</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans0</name>
+      <type>algebraic</type>
+      <tans>ta_ans[1]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>ta_ans[2]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>algebraic</type>
+      <tans>ta_ans[3]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans3</name>
+      <type>algebraic</type>
+      <tans>ta_ans[4]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans4</name>
+      <type>algebraic</type>
+      <tans>ta_ans[5]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans5</name>
+      <type>algebraic</type>
+      <tans>ta_ans[6]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans6</name>
+      <type>algebraic</type>
+      <tans>ta_ans[7]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans7</name>
+      <type>algebraic</type>
+      <tans>ta_ans[8]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>student_ans : [ans0, ans1, ans2, ans3, ans4, ans5, ans6, ans7]</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Tableau correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>student_ans</sans>
+        <tans>ta_ans</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;"><p>✅ <strong>Parfait !</strong> Votre tableau à 3 variables est correct.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Négation calculée</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>student_ans</sans>
+        <tans>ta_negation</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Presque ça !</strong> Vos résultats correspondent à \(\neg({@disp_expr[idx]@})\). Vous avez calculé l'inverse.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Ordre inversé</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>student_ans</sans>
+        <tans>ta_inverse</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Attention à l'ordre !</strong> Avec 3 variables, l'ordre est P (poids fort) → Q → R (poids faible). Vous semblez avoir inversé l'ordre.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Incorrect</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;margin:4px 0;"><p>❌ <strong>Incorrect.</strong> Avec 3 variables, procédez méthodiquement : évaluez d'abord les sous-expressions les plus internes, colonne par colonne. Vérifiez aussi que vous respectez l'ordre des lignes (P, Q, R variant de 000 à 111).</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

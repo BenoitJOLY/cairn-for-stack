@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Combobox" script:language="StarBasic">&apos;OOoGdmath 
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Sub Main
+End Sub
+
+Sub Add(oDialog as Object, Nom as string, Item as string, Optional pos as integer)
+	if IsMissing(pos) then pos=ListCount(oDialog, Nom)
+    oDialog.GetControl(Nom).AddItem(Item, pos)
+End sub
+
+Sub SetListIndex(oDialog as Object, Nom as string, pos as integer)
+Dim Item as string
+&apos;	xray.xray oDialog.GetControl(Nom)
+	if left(Nom,4)=&quot;Comb&quot; then
+		Item=GetList(oDialog, Nom, pos)
+		oDialog.GetControl(Nom).SetText(Item)
+	else
+	    oDialog.GetControl(Nom).SelectItemPos(pos, True)
+	end if
+End Sub
+
+Function GetListIndex(oDialog as Object, Nom as string) as Integer
+dim i,j
+&apos;	xray.xray oDialog.GetControl(Nom)
+	if left(Nom,4)=&quot;Comb&quot; then
+		for i=0 to ListCount(oDialog, Nom)-1
+			if oDialog.GetControl(Nom).Text = GetList(oDialog, Nom, i) then j=i
+		next i
+	else
+&apos;		xray.xray oDialog.GetControl(Nom)
+		j=oDialog.GetControl(Nom).SelectedItemPos()
+	end if
+	GetListIndex=j
+End Function
+
+Sub SetList(oDialog as Object, Nom as string, Item as string)
+&apos;	xray.xray oDialog.GetControl(Nom)
+	RemplaceItem(oDialog, Nom, GetListIndex(oDialog, Nom), Item)
+End Sub
+
+Function GetList(oDialog as Object, Nom as string, pos as integer) as String
+dim s as string
+&apos;	xray.xray oDialog.GetControl(Nom)
+	s=&quot;&quot;
+	if pos&lt;&gt;-1 then	s=oDialog.GetControl(Nom).GetItem(pos)
+	GetList()=s
+End Function
+
+Sub SelectedItem(oDialog as Object, Nom as string, Item as string)
+    oDialog.GetControl(Nom).SelectedItem(Item, True)
+End Sub
+
+Sub SupprimeItem(oDialog as Object, Nom as String, pos as integer)
+&apos;	xray.xray oDialog.GetControl(Nom)
+	if pos&lt;&gt;-1 then oDialog.GetControl(Nom).RemoveItems(pos,1)
+End Sub
+
+Sub RemplaceItem(oDialog as Object, Nom as string, pos as integer, Item as String)
+	if pos&lt;&gt;-1 then
+		SupprimeItem(oDialog, Nom,pos)
+		Add(oDialog, Nom, Item, pos)
+	end if
+End Sub
+
+Function ListCount(oDialog as Object, Nom as string) as integer
+&apos;	xray.xray oDialog.GetControl(Nom)
+	ListCount()=oDialog.GetControl(Nom).GetItemCount()
+End Function
+
+Sub Clear(oDialog as Object, Nom as string)
+    oDialog.GetControl(Nom).RemoveItems(0,ListCount(oDialog, Nom))
+End Sub
+
+
+</script:module>

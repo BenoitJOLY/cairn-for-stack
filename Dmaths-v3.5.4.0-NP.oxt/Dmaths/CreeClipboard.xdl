@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="CreeClipboard" dlg:left="173" dlg:top="143" dlg:width="156" dlg:height="200" dlg:help-text="&amp;2783.CreeClipboard.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;2784.CreeClipboard.Title">
+ <dlg:bulletinboard>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="0" dlg:left="39" dlg:top="38" dlg:width="70" dlg:height="42" dlg:help-text="&amp;2785.CreeClipboard.CommandButton1.HelpText" dlg:value="&amp;2786.CreeClipboard.CommandButton1.Label" dlg:image-src="file:///home/dmaths/.libreoffice/3/user/uno_packages/cache/uno_packages/lu29ix3v.tmp_/DmathsAddon.oxt/Fichiers/icons/addons/coller.bmp" dlg:image-position="top-center" dlg:multiline="true">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module6.LanceCreationPressePapier?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="1" dlg:left="80" dlg:top="172" dlg:width="70" dlg:height="20" dlg:help-text="&amp;2787.CreeClipboard.CommandButton2.HelpText" dlg:value="&amp;2788.CreeClipboard.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module6.ValideCreationPressePapier?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:scrollbar dlg:id="ScrollBar1" dlg:tab-index="3" dlg:disabled="true" dlg:left="11" dlg:top="24" dlg:width="11" dlg:height="106" dlg:help-text="&amp;2789.CreeClipboard.ScrollBar1.HelpText" dlg:align="vertical" dlg:pageincrement="100" dlg:increment="10" dlg:curpos="3000" dlg:maxpos="29700">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:Dmaths.Module6.reglePosYGdmath?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:scrollbar>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="2" dlg:left="5" dlg:top="172" dlg:width="70" dlg:height="20" dlg:help-text="&amp;2790.CreeClipboard.CommandButton3.HelpText" dlg:value="&amp;2791.CreeClipboard.CommandButton3.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module6.AnnuleCreationPressePapier?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:scrollbar dlg:id="ScrollBar2" dlg:tab-index="4" dlg:disabled="true" dlg:left="24" dlg:top="117" dlg:width="84" dlg:height="12" dlg:help-text="&amp;2792.CreeClipboard.ScrollBar2.HelpText" dlg:pageincrement="100" dlg:increment="10" dlg:curpos="3000" dlg:maxpos="21000" dlg:visible-size="4">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:Dmaths.Module6.reglePosXGdmath?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:scrollbar>
+  <dlg:scrollbar dlg:id="ScrollBar3" dlg:tab-index="5" dlg:left="70" dlg:top="147" dlg:width="80" dlg:height="12" dlg:help-text="&amp;2793.CreeClipboard.ScrollBar3.HelpText" dlg:curpos="50" dlg:maxpos="200" dlg:minpos="20">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:Dmaths.Module6.regleZoom?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:scrollbar>
+  <dlg:textfield dlg:id="TextFieldZoom" dlg:tab-index="6" dlg:left="29" dlg:top="145" dlg:width="16" dlg:height="12" dlg:help-text="&amp;2794.CreeClipboard.TextFieldZoom.HelpText" dlg:align="center" dlg:value="&amp;2795.CreeClipboard.TextFieldZoom.Text"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="7" dlg:left="12" dlg:top="7" dlg:width="10" dlg:height="16" dlg:help-text="&amp;2796.CreeClipboard.Label2.HelpText" dlg:value="&amp;2797.CreeClipboard.Label2.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="8" dlg:left="108" dlg:top="118" dlg:width="14" dlg:height="10" dlg:help-text="&amp;2798.CreeClipboard.Label3.HelpText" dlg:value="&amp;2799.CreeClipboard.Label3.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="9" dlg:left="8" dlg:top="147" dlg:width="19" dlg:height="12" dlg:help-text="&amp;2800.CreeClipboard.Label1.HelpText" dlg:value="&amp;2801.CreeClipboard.Label1.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label4" dlg:tab-index="10" dlg:left="47" dlg:top="147" dlg:width="12" dlg:height="12" dlg:help-text="&amp;2802.CreeClipboard.Label4.HelpText" dlg:value="&amp;2803.CreeClipboard.Label4.Label"/>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="11" dlg:left="7" dlg:top="4" dlg:width="119" dlg:height="131" dlg:help-text="&amp;2804.CreeClipboard.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;2805.CreeClipboard.FrameControl1.Label"/>
+  </dlg:titledbox>
+ </dlg:bulletinboard>
+</dlg:window>

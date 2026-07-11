@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="PatCube" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+REM  *****  BASIC  *****
+
+option explicit
+
+Sub appelerBoiteDialoguePatCube()
+Dim i As Integer
+
+monDlg = CreerDialogue(&quot;OOoAHmath3D&quot;, &quot;PatCubeDlg&quot;)		
+PositionDlg(monDlg,120,150)
+&apos;------------------------initialisation de la boite de dialogue-----------------------
+Initialisation_Unites(1,0)	
+Initialisation(monDlg,CheminDessin(&quot;Dessins/PatCube/PatCube.gif/&quot;),)
+GestionInfoBulle
+&apos;------------------------ récupération des messages d&apos;erreurs et des infobulles ------
+oReponseDlg(15) = monDlg.getControl(&quot;Message1&quot;).Peer.Text
+&apos;--------------------------------------------------------------------------------------	
+
+monDlg.execute
+if monDlg.Model.Tag= &quot;OK&quot; then
+monDlg.dispose
+end if
+End Sub
+
+&apos;---------------------------------------------------------------------------------------
+
+sub PatCubeMacroPrincipale()
+
+appelerBoiteDialoguePatCube()
+
+if oReponseDlg(14) = true then
+	Deselection
+   DRAWversDocActif(&quot;PatCube.ConstructionPatCube()&quot;)
+   oSolide = LastForme
+   TailleObjetFinal(oSolide)
+   PosObjetFinal(oSolide)
+end if
+end sub
+
+
+&apos;---------------------------------------------------------------------------------------
+&apos;Construction du patron suivant les réponses du dialogue
+&apos;Macro qui est lancé dans DRAWversDocActif()
+&apos;----------------------------------------------------------------------------------------
+
+sub ConstructionPatCube()
+Dim arete as Double, i as integer
+
+arete = oReponseDlg(0) * 1000
+
+&apos;-------------gestion des patrons 1 à 6-------------
+&apos;- ligne2 de carrés-------------------
+for i=1 to 6
+if oReponseDlg(i)=true then
+CarreDraw(2000, 2000+ arete, 2000 + arete, 2000+ arete)
+CarreDraw(2000+arete, 2000+ arete, 2000 + arete*2, 2000+ arete)
+CarreDraw(2000+arete*2, 2000+ arete, 2000 + arete*3, 2000+ arete)
+CarreDraw(2000+arete*3, 2000+ arete, 2000 + arete*4, 2000+ arete)
+end if
+next
+
+&apos;- ligne 1 et3 de carrés--------------
+if oReponseDlg(1) = true then
+CarreDraw(2000, 2000, 2000 + arete, 2000)
+CarreDraw(2000, 2000+ arete*2, 2000 + arete, 2000+ arete*2)
+end if
+
+if oReponseDlg(2) = true then
+CarreDraw(2000, 2000, 2000 + arete, 2000)
+CarreDraw(2000+arete, 2000+ arete*2, 2000 + arete*2, 2000+ arete*2)
+end if
+
+if oReponseDlg(3) = true then
+CarreDraw(2000, 2000, 2000 + arete, 2000)
+&apos;-ligne3 de carrés
+CarreDraw(2000+arete*2, 2000+ arete*2, 2000 + arete*3, 2000+ arete*2)
+end if
+
+if oReponseDlg(4) = true then
+CarreDraw(2000, 2000, 2000 + arete, 2000)
+CarreDraw(2000+arete*3, 2000+ arete*2, 2000 + arete*4, 2000+ arete*2)
+end if
+
+if oReponseDlg(5) = true then
+CarreDraw(2000+arete, 2000, 2000 + arete*2, 2000)
+CarreDraw(2000+arete, 2000+ arete*2, 2000 + arete*2, 2000+ arete*2)
+end if
+
+if oReponseDlg(6) = true then
+CarreDraw(2000+arete, 2000, 2000 + arete*2, 2000)
+CarreDraw(2000+arete*2, 2000+ arete*2, 2000 + arete*3, 2000+ arete*2)
+end if
+
+&apos;--------------gestion des patrons 7 à 10----------------------
+
+&apos;---ligne 1 et 2 des carrés------
+for i = 7 to 10
+if oReponseDlg(i)= true then
+CarreDraw(2000+arete, 2000, 2000 + arete*2, 2000)
+CarreDraw(2000+arete*2, 2000, 2000 + arete*3, 2000)
+
+CarreDraw(2000+arete*2, 2000+ arete, 2000 + arete*3, 2000+ arete)
+CarreDraw(2000+arete*3, 2000+ arete, 2000 + arete*4, 2000+ arete)
+CarreDraw(2000+arete*4, 2000+ arete, 2000 + arete*5, 2000+ arete)
+end if
+next
+
+&apos;--- ligne 1 et 2 des carrés
+if oReponseDlg(7) = true then
+CarreDraw(2000+arete*2, 2000+ arete*2, 2000 + arete*3, 2000+ arete*2)
+end if
+
+if oReponseDlg(8) = true then
+CarreDraw(2000+arete*3, 2000+ arete*2, 2000 + arete*4, 2000+ arete*2)
+end if
+
+if oReponseDlg(9) = true then
+CarreDraw(2000+arete*4, 2000+ arete*2, 2000 + arete*5, 2000+ arete*2)
+end if
+
+if oReponseDlg(10) = true then
+CarreDraw(2000, 2000, 2000 + arete, 2000)
+end if
+
+&apos;-- gestion du patron 11
+
+if oReponseDlg(11) = true then
+CarreDraw(2000+arete, 2000, 2000 + arete*2, 2000)
+CarreDraw(2000+arete*2, 2000, 2000 + arete*3, 2000)
+
+CarreDraw(2000+arete*2, 2000+ arete, 2000 + arete*3, 2000+ arete)
+CarreDraw(2000+arete*3, 2000+ arete, 2000 + arete*4, 2000+ arete)
+
+CarreDraw(2000+arete*3, 2000+ arete*2, 2000 + arete*4, 2000+ arete*2)
+CarreDraw(2000+arete*4, 2000+ arete*2, 2000 + arete*5, 2000+ arete*2)
+end if
+
+&apos;------------gestion des bandes de collage ------------------------
+if oReponseDlg(12) = true then
+ for i=1 to 4 
+  if oReponseDlg(i) = true then
+  LanguetteDraw(2000,2000,2000+arete,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000,2000,2000,2000+arete,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete,2000,2000+arete,2000+arete,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*4,2000+arete,2000+arete*4,2000+arete*2,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*(i-1),2000+arete*3,2000+arete*i,2000+arete*3,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*(i-1),2000+arete*2,2000+arete*(i-1),2000+arete*3,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*i,2000+arete*2,2000+arete*i,2000+arete*3,&quot;droite&quot;,30)
+  end if
+  next
+  
+   for i=5 to 6 
+  if oReponseDlg(i) = true then
+  LanguetteDraw(2000+arete,2000,2000+arete*2,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete,2000,2000+arete,2000+arete,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*2,2000,2000+arete*2,2000+arete,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*4,2000+arete,2000+arete*4,2000+arete*2,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*(i-4),2000+arete*3,2000+arete*(i-3),2000+arete*3,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*(i-4),2000+arete*2,2000+arete*(i-4),2000+arete*3,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*(i-3),2000+arete*2,2000+arete*(i-3),2000+arete*3,&quot;droite&quot;,30)
+  end if
+  next
+  
+   for i=7 to 9 
+  if oReponseDlg(i) = true then
+  LanguetteDraw(2000+arete,2000,2000+arete*2,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*2,2000,2000+arete*3,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*3,2000,2000+arete*3,2000+arete,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete,2000+arete,2000+arete*2,2000+arete,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*(i-5),2000+arete*3,2000+arete*(i-4),2000+arete*3,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*(i-4),2000+arete*2,2000+arete*(i-4),2000+arete*3,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*(i-5),2000+arete*2,2000+arete*(i-5),2000+arete*3,&quot;gauche&quot;,30)
+  end if
+  next
+
+
+if oReponseDlg(10) = true then
+  LanguetteDraw(2000,2000,2000+arete,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete,2000,2000+arete*2,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*2,2000,2000+arete*3,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*3,2000,2000+arete*3,2000+arete,&quot;droite&quot;,30)
+  LanguetteDraw(2000,2000,2000,2000+arete,&quot;gauche&quot;,30)
+  LanguetteDraw(2000,2000+arete,2000+arete,2000+arete,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete,2000+arete,2000+arete*2,2000+arete,&quot;gauche&quot;,30)
+end if
+
+ if oReponseDlg(11) = true then
+  LanguetteDraw(2000+arete,2000,2000+arete*2,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*2,2000,2000+arete*3,2000,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*3,2000,2000+arete*3,2000+arete,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete,2000+arete,2000+arete*2,2000+arete,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*3,2000+arete*3,2000+arete*4,2000+arete*3,&quot;gauche&quot;,30)
+  LanguetteDraw(2000+arete*4,2000+arete*2,2000+arete*5,2000+arete*2,&quot;droite&quot;,30)
+  LanguetteDraw(2000+arete*3,2000+arete*2,2000+arete*3,2000+arete*3,&quot;gauche&quot;,30)
+  end if
+end if
+
+end sub
+
+&apos;****************************************************Gestion de la boite de dialogue*****************************************************************
+
+Sub GestionInfoBulle
+TexteAide(monDlg,&quot;arete&quot;, &quot;0 &lt;= ... &lt;= 20&quot;)
+end sub
+
+sub GestionBoutonOK  
+Dim i as integer, test(3) as integer
+
+&apos;-----------------------Gestion des erreurs de saisie
+test(3) = ZT_Nbre(monDlg,  &quot;arete&quot;, 0.001 , 20 , 3 ,  oReponseDlg(15),)  &apos; 0 ou 1
+
+if test(3) = 1 then
+&apos;---------------------- recupere toute les données saisie dans une variable globale
+ 
+    oReponseDlg(0) = CDbl(monDlg.getControl(&quot;arete&quot;).Peer.Text)  
+    for i = 1 to 13
+    oReponseDlg(i) = monDlg.getControl(&quot;OptionButton&quot;&amp;i).state 
+    next
+          
+    oReponseDlg(14) = true  
+    monDlg.Model.Tag= &quot;OK&quot;   &apos;met OK au tag du dialogue quand tout est validé
+
+&apos;---------------------    oReponseDlg(14) = true quand tout est validé
+    monDlg.endExecute
+end if
+
+End Sub
+
+&apos;----------------------------------------------------------------------------
+&apos;gestion des unités Cm/Inch
+&apos;-------------------------------------------------------------------------
+
+sub OptionUnite_click
+OptionUnite(1,0)
+end sub
+
+
+
+</script:module>

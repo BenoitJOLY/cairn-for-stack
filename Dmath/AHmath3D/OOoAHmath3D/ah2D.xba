@@ -1,0 +1,3399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ah2D" script:language="StarBasic">&apos;     Plan
+&apos;*****************
+&apos;Macro Principale
+&apos;CONSTRUCTIONS
+&apos;BOUTON AJOUTER
+&apos;INFOS SUR L&apos;ELEMENT SELECTIONNE
+&apos;GESTION DES BOUTONS DU MENU
+&apos;TEST DE L&apos;OBJET SELECTIONNE
+&apos;OPTIONS 
+&apos;NAVIGATION
+&apos;RELIER 2 POINTS
+&apos;INTERSECTION 
+&apos;AFFICHAGE FENETRE ACTION
+&apos;CODAGE
+&apos;CERCLE TANGENT
+
+Option Explicit
+
+Private sLong as double, sAngle as double, sx0 as double, sy0 as double, sx1 as double, sy1 as double
+Private pxa as double, pya as double, pxb as double, pyb as double
+Private XCadre as double, YCadre as double, XCadreTemp as double, YCadreTemp as double
+Private ah2DStep as integer,  SelectionOK as integer, repDialogue as integer
+Private nElements as integer, oTypeElement as string, nAjout as integer, oElement as object
+Private indexSelection as integer, sCouleur as Long, sEpaisseur as integer,sPointille as integer, eZorder as integer   Rem eZorder = ordre de l&apos;élément sélectionné
+Private PositionSelection As New com.sun.star.awt.Point, numBoutonmenu as integer
+Private nPoints as integer, TabPointX as variant, TabPointY as variant
+Private intersZorder(1) as integer, sAngleInters(1) as double, sLongInters(1) as double, sEpaisseurInters(1) as integer, sCouleurInters(1) as Long, sPointilleInters(1) as integer
+Private point1X(1) as double, Point1Y(1) as double, point2X(1) as double, Point2Y(1) as double, intersName(1) as string, intersType(1) as string
+Private SauvCodageAngle as variant, oListeDroite as variant, indDroite as integer
+
+
+sub MacroPrincipale
+Dim i as integer
+
+oDocActif = ThisComponent
+if oDocActif.ImplementationName = &quot;SwXTextDocument&quot; then oPageActive = oDocActif.DrawPage
+if oDocActif.ImplementationName = &quot;SdXImpressDocument&quot; then oPageActive = oDocActif.DrawPages(0)
+
+ah2D_TestSelection
+if SelectionOK = -1 then 
+  Exit sub
+end if
+
+if SelectionOK = 1 then
+&apos;-------------repositionnement de la forme dégroupée-------------------------------
+indexSelection = ThisComponent.CurrentSelection(0).Zorder
+XCadre = oPageActive.GetByIndex(indexSelection).Position.X      REM position du dessin sur la page active
+YCadre = oPageActive.GetByIndex(indexSelection).Position.Y
+PositionSelection.X = XCadre
+PositionSelection.Y = YCadre
+DispatchSimple(&quot;Copy&quot;, oDocActif.CurrentController.Frame)
+&apos;----------------------------------------------------------------------------------
+end if
+
+   ChargerDoc(true)
+   oDocTemp.Title = &quot;AH2D&quot;
+   oPageTemp.Name = &quot;AH2D_Temp&quot;
+   
+if SelectionOK = 1 then    &apos;la selection est un objet déjà créé
+   DispatchSimple(&quot;Paste&quot;, oDocTemp.CurrentController.Frame)
+   GroupCleaner(4,oDocTemp,false)
+   PremierLancement
+   
+   if oTypeElement = &quot;Aucun&quot; then
+       oDocTemp.close(true)
+       Exit Sub
+   end if
+   if oTypeElement = &quot;Ligne&quot; then InfoSegment(eZorder,oPageTemp)
+   if oTypeElement = &quot;Cercle&quot; then InfoCercle(eZorder,oPageTemp)
+   oPageTemp(eZorder).LineWidth = sEpaisseur + 100
+   oPageTemp(eZorder).LineColor = RGB(0,0,255)
+   oDocTemp.Currentcontroller.Select(Null)
+end if
+
+
+  
+monDlg = CreerDialogue(&quot;OOoAHmath3D&quot;, &quot;ah2dDlg&quot;)
+PositionDlg(monDlg,120,150)
+
+&apos;------------------------ récupération des messages d&apos;erreurs et des infobulles ------
+for i = 1 to 29
+oReponseDlg(i + 70) = monDlg.getControl(&quot;Message&quot;&amp;i).Peer.Text
+Next
+&apos;--------------------------------------------------------------------------------------	
+AffecterImageFixe(monDlg, &quot;CommandButton56&quot; , CheminDessin(&quot;Dessins/ah2D/relier2points25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton50&quot; , CheminDessin(&quot;Dessins/ah2D/point25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton51&quot; , CheminDessin(&quot;Dessins/ah2D/segment25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton52&quot; , CheminDessin(&quot;Dessins/ah2D/triangle25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton53&quot; , CheminDessin(&quot;Dessins/ah2D/rectangle25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton54&quot; , CheminDessin(&quot;Dessins/ah2D/polygone25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton55&quot; , CheminDessin(&quot;Dessins/ah2D/cercle25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton26&quot; , CheminDessin(&quot;Dessins/ah2D/PremierElement40.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton27&quot; , CheminDessin(&quot;Dessins/ah2D/ElementPrecedent40.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton28&quot; , CheminDessin(&quot;Dessins/ah2D/ElementSuivant40.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton29&quot; , CheminDessin(&quot;Dessins/ah2D/DernierElement40.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton58&quot; , CheminDessin(&quot;Dessins/ah2D/gomme25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton59&quot; , CheminDessin(&quot;Dessins/ah2D/options25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton61&quot; , CheminDessin(&quot;Dessins/ah2D/codageS25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton62&quot; , CheminDessin(&quot;Dessins/ah2D/codageAngle25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton63&quot; , CheminDessin(&quot;Dessins/ah2D/mediatrice25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton64&quot; , CheminDessin(&quot;Dessins/ah2D/bissectrice25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton31&quot; , CheminDessin(&quot;Dessins/ah2D/gommeDernier25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton57&quot; , CheminDessin(&quot;Dessins/ah2D/intersection25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton35&quot; , CheminDessin(&quot;Dessins/ah2D/pointB_g.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton36&quot; , CheminDessin(&quot;Dessins/ah2D/pointB_d.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton3&quot; , CheminDessin(&quot;Dessins/ah2D/pointA_g.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton2&quot; , CheminDessin(&quot;Dessins/ah2D/valider40.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton1&quot; , CheminDessin(&quot;Dessins/ah2D/pointB_g.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton4&quot; , CheminDessin(&quot;Dessins/ah2D/pointB_d.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton11&quot; , CheminDessin(&quot;Dessins/ah2D/pointA_d.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton20&quot; , CheminDessin(&quot;Dessins/ah2D/pointB_g.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton21&quot; , CheminDessin(&quot;Dessins/ah2D/pointB_d.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton60&quot; , CheminDessin(&quot;Dessins/ah2D/paraperp25.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton22&quot; , CheminDessin(&quot;Dessins/ah2D/rechercherPoint30.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;CommandButton23&quot; , CheminDessin(&quot;Dessins/ah2D/annulepoint30.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl14&quot; , CheminDessin(&quot;Dessins/ah2D/rectdanscercle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl2&quot; , CheminDessin(&quot;Dessins/ah2D/sens.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl3&quot; , CheminDessin(&quot;Dessins/ah2D/angle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl9&quot; , CheminDessin(&quot;Dessins/ah2D/angle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl10&quot; , CheminDessin(&quot;Dessins/ah2D/angle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl11&quot; , CheminDessin(&quot;Dessins/ah2D/angle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl12&quot; , CheminDessin(&quot;Dessins/ah2D/angle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl13&quot; , CheminDessin(&quot;Dessins/ah2D/choixangle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl17&quot; , CheminDessin(&quot;Dessins/ah2D/choixangle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl4&quot; , CheminDessin(&quot;Dessins/ah2D/senstriangle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl5&quot; , CheminDessin(&quot;Dessins/ah2D/rectangle.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl6&quot; , CheminDessin(&quot;Dessins/ah2D/point.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl8&quot; , CheminDessin(&quot;Dessins/ah2D/polygone.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl7&quot; , CheminDessin(&quot;Dessins/ah2D/codagesegment.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl15&quot; , CheminDessin(&quot;Dessins/ah2D/codagemilieu.png/&quot;) )
+AffecterImageFixe(monDlg, &quot;ImageControl16&quot; , CheminDessin(&quot;Dessins/ah2D/codagemilieu.png/&quot;) )
+Initialisation(monDlg)
+initialiseZoom
+intersZorder(0) = -1   &apos;initialisation    -1 pour aucune selection
+intersZorder(1) = -1
+repererPoint
+
+
+if SelectionOK = 0 then
+monDlg.Model.step = 19
+ah2DStep = 19
+sLong = 0
+sAngle = 0
+InitialiseAucuneSelection(false)
+msgbox(oReponseDlg(93), 0+64,&quot;AHmath3D&quot;)
+end if
+
+if SelectionOK = 1 then
+numBoutonmenu = 50
+AffichageFenetreAction
+AffichageApercu
+end if
+
+
+monDlg.getControl(&quot;info1&quot;).Text = sLong
+monDlg.getControl(&quot;info2&quot;).Text = sAngle
+
+initialisation_Unites(22,11,true)
+
+
+while monDlg.Model.Tag &lt;&gt; &quot;fin&quot; 
+
+monDlg.execute
+
+
+if ah2DStep = 1 or  ah2DStep = 7 then Pointah2D
+if ah2DStep = 2 or ah2DStep = 8 or ah2DStep = 15 then Segmentah2D
+if ah2DStep = 3 then Triangleah2D
+if ah2DStep = 4 or ah2DStep = 10 then Rectangleah2D
+if ah2DStep = 5 or ah2DStep = 11 then Polygoneah2D
+if ah2DStep = 6 or ah2DStep = 12 or ah2DStep = 14  then Cercleah2D
+if ah2DStep = 9 then SupprimerElement_click
+if ah2DStep = 13 then Segmentah2D
+if ah2DStep = 16 then Intersectionah2D
+if ah2DStep = 18 then ParaPerpah2D
+if ah2DStep = 19 then Element0ah2D
+if ah2DStep = 20 then CodageSegmentah2D
+if ah2DStep = 22 then CodageAngleah2D
+if ah2DStep = 23 then Mediatriceah2D
+if ah2DStep = 24 then Bissectriceah2D
+if ah2DStep &lt; 30 then  &apos;fin de la macro &gt; ah2Dstep = 30  annuler &gt; ah2Dstep = 31
+             repererPoint
+             AffichageFenetreAction
+end if
+wend
+
+if ah2DStep = 30 then  &apos;valide les modifs et termine
+
+GestionPointilles
+
+if oPageTemp.count&lt;&gt; 0 then
+   SelectionFormes(0,oDocTemp)
+   DispatchSimple(&quot;Copy&quot;, oDocTemp.CurrentController.Frame)
+   oDocTemp.Close(true)
+   wait(200)
+   DispatchSimple(&quot;Delete&quot;, oDocActif.CurrentController.Frame)
+   wait(200)
+   DispatchSimple(&quot;Paste&quot;, oDocActif.CurrentController.Frame)
+   oDocActif.CurrentSelection(0).Position = PositionSelection         REM: Repositionne le dessin sur la page active
+   else
+   oDocTemp.Close(true)
+end if
+
+end if
+
+if ah2DStep = 31 then oDocTemp.Close(true) &apos;annule les modifs et termine
+
+
+monDlg.dispose
+
+end sub
+
+
+sub PremierLancement
+Dim ElementTrouve as boolean, message as string
+message = &quot;No element found&quot; &amp; chr(13) &amp;_
+          &quot;The first shape must contain a line or a circle&quot; 
+
+nElements = oPageTemp.count
+ElementTrouve = false
+eZorder = 0
+
+While ElementTrouve = false and eZorder &lt; nElements
+oTypeElement = TypeForme(oPageTemp(eZorder))
+if oTypeElement = &quot;Cercle&quot; or oTypeElement = &quot;Ligne&quot; then ElementTrouve = true
+if oTypeElement &lt;&gt; &quot;Cercle&quot; and oTypeElement &lt;&gt; &quot;Ligne&quot; then eZorder = eZorder + 1
+wend
+
+if ElementTrouve = false then
+msgbox(message, 0, &quot;AHmath3D&quot;)
+oTypeElement = &quot;Aucun&quot;
+end if
+
+end sub
+
+
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+&apos;**********************************       CONSTRUCTIONS        *******************************************
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+
+sub Pointah2D
+Dim a as double, b as double, c as double, cosA as double, AngleA as double
+Dim xc as double, yc as double, sxc as double, syc as double
+
+if ah2DStep = 1 then
+
+   if oReponseDlg(4) = 0 then
+   sxc = (sx0 + sx1)/2
+   syc = (sy0 + sy1)/2
+   SegmentDraw(sxc - 100, syc - 100, sxc + 100 , syc + 100 , 30, &quot;plein&quot;)
+   SegmentDraw(sxc - 100, syc + 100, sxc + 100 , syc - 100 , 30, &quot;plein&quot;)
+   nElements = oPageTemp.Count
+   oPageTemp(nElements - 1).RotateAngle = oPageTemp(nElements - 1).RotateAngle + sAngle * 100
+   oPageTemp(nElements - 2).RotateAngle = oPageTemp(nElements - 2).RotateAngle + sAngle * 100
+   oPageTemp(nElements - 1).Name =&quot;ah2D_point&quot;
+   oPageTemp(nElements - 2).Name =&quot;ah2D_point&quot;
+   nAjout = 2
+   codageMilieu(eZorder, oReponseDlg(8))
+   end if
+   
+   
+   if oReponseDlg(4) = 1 then
+   b = oReponseDlg(5)*1000
+   sxc = sx0 + b * cos(sAngle * pi/180)
+   syc = sy0 - b * sin(sAngle * pi/180)
+   SegmentDraw(sxc - 100, syc - 100, sxc + 100 , syc + 100 , 30, &quot;plein&quot;)
+   SegmentDraw(sxc - 100, syc + 100, sxc + 100 , syc - 100 , 30, &quot;plein&quot;)
+   nElements = oPageTemp.Count
+   oPageTemp(nElements - 1).RotateAngle = oPageTemp(nElements - 1).RotateAngle + sAngle * 100
+   oPageTemp(nElements - 2).RotateAngle = oPageTemp(nElements - 2).RotateAngle + sAngle * 100
+   nAjout = 2
+   end if
+   
+   if oReponseDlg(4) = 2 then
+   b = oReponseDlg(5)
+   sxc = sx0 + b * (sx1 - sx0)
+   syc = sy0 + b * (sy1 - sy0)
+   SegmentDraw(sxc - 100, syc - 100, sxc + 100 , syc + 100 , 30, &quot;plein&quot;)
+   SegmentDraw(sxc - 100, syc + 100, sxc + 100 , syc - 100 , 30, &quot;plein&quot;)
+   nElements = oPageTemp.Count
+   oPageTemp(nElements - 1).RotateAngle = oPageTemp(nElements - 1).RotateAngle + sAngle * 100
+   oPageTemp(nElements - 2).RotateAngle = oPageTemp(nElements - 2).RotateAngle + sAngle * 100
+   nAjout = 2
+   end if
+
+   if oReponseDlg(4) = 3 then
+    b = oReponseDlg(5)*1000
+    a = oReponseDlg(6)*1000
+    c = sLong*1000
+   
+   if a + b &gt; c and a + c &gt; b and b + c &gt; a then
+   cosA = (b * b + c * c - a * a) / (2 * b * c)
+   angleA = Atn(-cosA / Sqr(-cosA * cosA + 1)) + Pi / 2
+   end if
+   if a + b = c then angleA = 0 
+   if a + c = b then angleA = 0
+   if b + c = a then angleA = -pi
+   
+   if a + b &gt;= c and a + c &gt;= b and b + c &gt;= a then
+   xc =  b * Cos(angleA)
+   yc =  b * Sin(angleA)
+   if oReponseDlg(7) = true then
+   sxc = sx0 + xc*cos(sAngle*pi/180) - yc*sin(sAngle*pi/180)
+   syc = sy0 - (xc*sin(sAngle*pi/180) + yc*cos(sAngle*pi/180))
+   else
+   sxc = sx0 + xc*cos(-sAngle*pi/180) - yc*sin(-sAngle*pi/180)
+   syc = sy0 + (xc*sin(-sAngle*pi/180) + yc*cos(-sAngle*pi/180))
+   end if
+
+   SegmentDraw(sxc - 100, syc - 100, sxc + 100 , syc + 100 , 30, &quot;plein&quot;)
+   SegmentDraw(sxc - 100, syc + 100, sxc + 100 , syc - 100 , 30, &quot;plein&quot;)
+   nAjout = 2
+   else
+   msgbox(oReponseDlg(83), 0, &quot;AHmath3D&quot;)
+   end if
+   end if
+   
+   
+end if
+
+if ah2DStep = 7 then
+   if oReponseDlg(5) = 0 then
+   SegmentDraw(sx0 - 100, sy0 - 100, sx0 + 100 , sy0 + 100 , 30, &quot;plein&quot;)
+   SegmentDraw(sx0 - 100, sy0 + 100, sx0 + 100 , sy0 - 100 , 30, &quot;plein&quot;)
+   end if
+    if oReponseDlg(5) = 1 then
+    sxc = sx0 + sLong/2 * 1000 * cos(oReponseDlg(6) * pi/180) 
+    syc = sy0 - sLong/2 * 1000 * sin(oReponseDlg(6) * pi/180) 
+   SegmentDraw(sxc - 100, syc - 100, sxc + 100 , syc + 100 , 30, &quot;plein&quot;)
+   SegmentDraw(sxc - 100, syc + 100, sxc + 100 , syc - 100 , 30, &quot;plein&quot;)
+   nElements = oPageTemp.count
+   a = oPageTemp(nElements-2).RotateAngle
+   b = oPageTemp(nElements-1).RotateAngle
+   oPageTemp(nElements-2).RotateAngle = a + oReponseDlg(6) * 100  
+   oPageTemp(nElements-1).RotateAngle = b + oReponseDlg(6) * 100
+   end if
+   nAjout = 2
+end if
+
+ if nAjout = 2 then
+    nElements = oPageTemp.count
+    oPageTemp(nElements-1).Name = &quot;ah2D_point&quot;
+    oPageTemp(nElements-2).Name = &quot;ah2D_point&quot;
+  end if
+
+end sub
+
+sub Triangleah2D
+Dim a as double, b as double, c as double, cosA as double, AngleA as double
+Dim xc as double, yc as double, sxc as double, syc as double
+
+if oReponseDlg(10) = 1 then  &apos;choix1 
+   b = oReponseDlg(7)*1000
+   a = oReponseDlg(8)*1000
+   c = sLong*1000
+   cosA = (b * b + c * c - a * a) / (2 * b * c)
+   angleA = Atn(-cosA / Sqr(-cosA * cosA + 1)) + Pi / 2
+   xc =  b * Cos(angleA)
+   yc =  b * Sin(angleA)
+   
+   if oReponseDlg(9) = true then
+   sxc = sx0 + xc*cos(sAngle*pi/180) - yc*sin(sAngle*pi/180)
+   syc = sy0 - (xc*sin(sAngle*pi/180) + yc*cos(sAngle*pi/180))
+   else
+   sxc = sx0 + xc*cos(-sAngle*pi/180) - yc*sin(-sAngle*pi/180)
+   syc = sy0 + (xc*sin(-sAngle*pi/180) + yc*cos(-sAngle*pi/180))
+   end if
+   SegmentDraw(sx0, sy0, sxc , syc , 30, &quot;plein&quot;)
+   SegmentDraw(sx1, sy1, sxc , syc , 30, &quot;plein&quot;)
+end if
+if oReponseDlg(10) = 2 then  &apos;choix2
+   if oReponseDlg(9) = true then
+   SegmentDraw(sx0, sy0, sx0 +  oReponseDlg(7)*1000*cos((sAngle+  oReponseDlg(8))*pi/180), sy0 -  oReponseDlg(7)*1000*sin((sAngle +  oReponseDlg(8))*pi/180), 30, &quot;plein&quot;)
+   SegmentDraw(sx1, sy1, sx0 +  oReponseDlg(7)*1000*cos((sAngle+  oReponseDlg(8))*pi/180), sy0 -  oReponseDlg(7)*1000*sin((sAngle +  oReponseDlg(8))*pi/180), 30, &quot;plein&quot;)
+   else
+   SegmentDraw(sx0, sy0, sx0 +  oReponseDlg(7)*1000*cos((-sAngle+  oReponseDlg(8))*pi/180), sy0 +  oReponseDlg(7)*1000*sin((-sAngle +  oReponseDlg(8))*pi/180), 30, &quot;plein&quot;)
+   SegmentDraw(sx1, sy1, sx0 +  oReponseDlg(7)*1000*cos((-sAngle+  oReponseDlg(8))*pi/180), sy0 +  oReponseDlg(7)*1000*sin((-sAngle +  oReponseDlg(8))*pi/180), 30, &quot;plein&quot;)
+   end if
+end if
+if oReponseDlg(10) = 3 then  &apos;choix3
+   if oReponseDlg(9) = true then
+   SegmentDraw(sx1, sy1, sx1 -  oReponseDlg(7)*1000*cos((-sAngle+  oReponseDlg(8))*pi/180), sy1 -  oReponseDlg(7)*1000*sin((-sAngle +  oReponseDlg(8))*pi/180), 30, &quot;plein&quot;)
+   SegmentDraw(sx0, sy0, sx1 -  oReponseDlg(7)*1000*cos((-sAngle+  oReponseDlg(8))*pi/180), sy1 -  oReponseDlg(7)*1000*sin((-sAngle +  oReponseDlg(8))*pi/180), 30, &quot;plein&quot;)
+   else
+   SegmentDraw(sx1, sy1, sx1 -  oReponseDlg(7)*1000*cos((sAngle+  oReponseDlg(8))*pi/180), sy1 +  oReponseDlg(7)*1000*sin((sAngle +  oReponseDlg(8))*pi/180), 30, &quot;plein&quot;)
+   SegmentDraw(sx0, sy0, sx1 -  oReponseDlg(7)*1000*cos((sAngle+  oReponseDlg(8))*pi/180), sy1 +  oReponseDlg(7)*1000*sin((sAngle +  oReponseDlg(8))*pi/180), 30, &quot;plein&quot;)
+   end if
+end if
+if oReponseDlg(10) = 4 then &apos;choix4
+   b = sin(oReponseDlg(8)*pi/180)*sLong*1000/sin((oReponseDlg(7) + oReponseDlg(8))*pi/180)
+   a = sin(oReponseDlg(7)*pi/180)*sLong*1000/sin((oReponseDlg(7) + oReponseDlg(8))*pi/180)
+   c = sLong*1000
+   cosA = (b * b + c * c - a * a) / (2 * b * c)
+   angleA = Atn(-cosA / Sqr(-cosA * cosA + 1)) + Pi / 2
+   xc =  b * Cos(angleA)
+   yc =  b * Sin(angleA)
+   
+   if oReponseDlg(9) = true then
+   sxc = sx0 + xc*cos(sAngle*pi/180) - yc*sin(sAngle*pi/180)
+   syc = sy0 - (xc*sin(sAngle*pi/180) + yc*cos(sAngle*pi/180))
+   else
+   sxc = sx0 + xc*cos(-sAngle*pi/180) - yc*sin(-sAngle*pi/180)
+   syc = sy0 + (xc*sin(-sAngle*pi/180) + yc*cos(-sAngle*pi/180))
+   end if
+   SegmentDraw(sx0, sy0, sxc , syc , 30, &quot;plein&quot;)
+   SegmentDraw(sx1, sy1, sxc , syc , 30, &quot;plein&quot;)
+end if
+nAjout = 2
+end sub
+
+
+sub Segmentah2D
+Dim sxc as double, syc as double, sxd as double, syd as double, x0 as double, ang1 as double
+
+if ah2DStep = 2 then
+  if oReponseDlg(2) = true then
+    SegmentDraw(sx0, sy0, sx0 +  oReponseDlg(0)*1000*cos((sAngle+  oReponseDlg(1))*pi/180), sy0 -  oReponseDlg(0)*1000*sin((sAngle +  oReponseDlg(1))*pi/180), 30, &quot;plein&quot;)
+  else
+    SegmentDraw(sx1, sy1, sx1 -  oReponseDlg(0)*1000*cos((sAngle+  oReponseDlg(1))*pi/180), sy1 +  oReponseDlg(0)*1000*sin((sAngle +  oReponseDlg(1))*pi/180), 30, &quot;plein&quot;)
+  end if
+  nAjout = 1
+end if
+
+if ah2DStep = 8 then
+  if oReponseDlg(5) = 1 then 
+    sxc = sx0 + sLong/2 * 1000 * cos(oReponseDlg(6) * pi/180) 
+    syc = sy0 - sLong/2 * 1000 * sin(oReponseDlg(6) * pi/180) 
+    SegmentDraw(sx0, sy0, sxc , syc , 30, &quot;plein&quot;)
+  end if
+   if oReponseDlg(5) = 0 then 
+    sxc = sx0 + sLong/2 * 1000 * cos(oReponseDlg(6) * pi/180) 
+    syc = sy0 - sLong/2 * 1000 * sin(oReponseDlg(6) * pi/180) 
+    sxd = sx0 + sLong/2 * 1000 * cos(oReponseDlg(6) * pi/180 + pi) 
+    syd = sy0 - sLong/2 * 1000 * sin(oReponseDlg(6) * pi/180 + pi) 
+    SegmentDraw(sxc, syc, sxd , syd , 30, &quot;plein&quot;)
+  end if
+  if oReponseDlg(5) = 2 then 
+    x0 = oReponseDlg(8)/sLong
+    if x0 &lt;&gt; 1 then ang1 = 2* Atn(x0 / Sqr(-x0 * x0 + 1)) else ang1 = pi
+    
+    if oReponseDlg(7) = 0 then
+    sxc = sx0 + sLong/2 * 1000 * cos(oReponseDlg(6) *pi/180) 
+    syc = sy0 - sLong/2 * 1000 * sin(oReponseDlg(6) *pi/180) 
+    sxd = sx0 + sLong/2 * 1000 * cos(ang1 + oReponseDlg(6) *pi/180 ) 
+    syd = sy0 - sLong/2 * 1000 * sin(ang1 + oReponseDlg(6) *pi/180) 
+    else
+    sxd = sx0 + sLong/2 * 1000 * cos(oReponseDlg(6) *pi/180) 
+    syd = sy0 - sLong/2 * 1000 * sin(oReponseDlg(6) *pi/180) 
+    sxc = sx0 + sLong/2 * 1000 * cos(oReponseDlg(6) *pi/180 - ang1 ) 
+    syc = sy0 - sLong/2 * 1000 * sin(oReponseDlg(6) *pi/180 - ang1) 
+    end if
+    SegmentDraw(sxc, syc, sxd , syd , 30, &quot;plein&quot;)
+  end if
+  
+    if oReponseDlg(5) = 3 then
+    sxc = sx0 + sLong/2 * 1000 * cos(oReponseDlg(6) * pi/180) 
+    syc = sy0 - sLong/2 * 1000 * sin(oReponseDlg(6) * pi/180) 
+    SegmentDraw(sxc + 2500*sin(oReponseDlg(6) * pi/180), syc + 2500*cos(oReponseDlg(6) * pi/180), sxc - 2500*sin(oReponseDlg(6) * pi/180) , syc - 2500*cos(oReponseDlg(6) * pi/180) , 30, &quot;plein&quot;)
+    end if
+    
+    nAjout = 1
+end if
+
+if ah2DStep = 13 then 
+SegmentDraw(pxa,pya,pxb,pyb,30,&quot;plein&quot;)
+nElements = oPageTemp.count
+oPageTemp(nElements - 1).Zorder = nElements - 3
+nAjout = 1
+end if
+
+if ah2DStep = 15 then 
+SegmentDraw(pxa,pya,pxb,pyb,30,&quot;plein&quot;)
+nElements = oPageTemp.count
+oPageTemp(nElements - 1).Zorder = nElements - 2
+nAjout = 1
+end if
+
+end sub
+
+sub Polygoneah2D
+Dim nCotes as integer, angBase as double,angCentre as double,rPoly as double, i as integer, cst as integer
+Dim a as double, b as double, c as double, cosA as double, AngleA as double
+Dim xc as double, yc as double, sxc as double, syc as double , x1 as double, y1 as double, x2 as double, y2 as double
+
+nCotes = oReponseDlg(13)
+angCentre = 2*pi/nCotes
+angBase = pi*(nCotes - 2)/(2*nCotes)
+
+if ah2DStep = 5 then
+   b = sin(angBase)*sLong*1000/sin(2*angBase)
+   a = sin(angBase)*sLong*1000/sin(2*angBase)
+   c = sLong*1000
+   cosA = (b * b + c * c - a * a) / (2 * b * c)
+   angleA = Atn(-cosA / Sqr(-cosA * cosA + 1)) + Pi / 2
+   xc =  b * Cos(angleA)  
+   yc =  b * Sin(angleA)
+   if oReponseDlg(14) = true then
+      sxc = sx0 + xc*cos(sAngle*pi/180) - yc*sin(sAngle*pi/180)    REM coord du centre du polygone
+      syc = sy0 - (xc*sin(sAngle*pi/180) + yc*cos(sAngle*pi/180))
+      cst = -1
+      else
+      sxc = sx0 + xc*cos(-sAngle*pi/180) - yc*sin(-sAngle*pi/180)
+      syc = sy0 + (xc*sin(-sAngle*pi/180) + yc*cos(-sAngle*pi/180))
+      cst = 1
+   end if
+   x1 = sx1
+   y1 = sy1
+   for i = 1 to nCotes - 1
+   x2 = cos(cst*angCentre) * (x1 - sxc) - sin(cst*angCentre) * (y1 - syc) + sxc
+   y2 = sin(cst*angCentre) * (x1 - sxc) + cos(cst*angCentre) * (y1 - syc) + syc
+   SegmentDraw(x1,y1,x2,y2,30,&quot;plein&quot;)
+   x1 = x2
+   y1 = y2
+   next
+nAjout = nCotes -1
+end if
+
+if ah2DStep = 11 then
+
+if oReponseDlg(12) = 0 then rPoly = sLong * 1000 /2
+if oReponseDlg(12) = 1 then rPoly = sLong * 1000 /(2*cos(angCentre/2))
+
+for i = 0 to nCotes-1
+x1 = sx0 + rPoly*cos(i*angCentre + oReponseDlg(14)*pi/180)
+y1 = sy0 - rPoly*Sin(i*angCentre + oReponseDlg(14)*pi/180)
+x2 = sx0 + rPoly*cos((i+1)*angCentre + oReponseDlg(14)*pi/180)
+y2 = sy0 - rPoly*Sin((i+1)*angCentre + oReponseDlg(14)*pi/180)
+SegmentDraw(x1,y1,x2,y2,30,&quot;plein&quot;)
+next
+nAjout = nCotes
+end if
+
+end sub
+
+
+
+sub Cercleah2D
+
+if  oReponseDlg(4) = 0 then CercleDraw(sx0,sy0,sLong*1000)
+if  oReponseDlg(4) = 1 then CercleDraw(sx1,sy1,sLong*1000)
+if  oReponseDlg(4) = 2 then CercleDraw(sx0,sy0,sLong*1000*oReponseDlg(3))
+if  oReponseDlg(4) = 3 then CercleDraw(sx1,sy1,sLong*1000*oReponseDlg(3))
+if  oReponseDlg(4) = 4 then CercleDraw(sx0,sy0,1000*oReponseDlg(3))
+if  oReponseDlg(4) = 5 then CercleDraw(sx1,sy1,1000*oReponseDlg(3))
+if  oReponseDlg(4) = 6 then CercleDraw((sx0+sx1)/2,(sy0+sy1)/2,sLong*1000/2)
+if  oReponseDlg(4) = 7 then CercleDraw(sx0,sy0,oReponseDlg(15)*1000)
+if  oReponseDlg(4) = 8 then CercleDraw((sx0+sx1)/2,(sy0+sy1)/2,oReponseDlg(15)*1000)
+if  oReponseDlg(4) = 9 then 
+    CercleDraw((sx0+sx1)/2,(sy0+sy1)/2,sqr((pxb-(sx0+sx1)/2)*(pxb - (sx0+sx1)/2) + (pyb - (sy0+sy1)/2)*(pyb - (sy0+sy1)/2)))
+    nElements = oPageTemp.count
+    oPageTemp(nElements - 1).Zorder = nElements - 2    rem place le cercle derrière le point vert
+end if
+if  oReponseDlg(4) = 10 then CercleTangent
+
+nAjout = 1
+end sub
+
+sub Rectangleah2D
+Dim xd as double, yd as double, xc as double, yc as double, x0 as double
+Dim xa as double, ya as double, xb as double, yb as double
+Dim ang1 as double, ang2 as double
+
+if ah2DStep = 4 then
+  if oReponseDlg(12) = true then
+  xd = sx0 - oReponseDlg(11)*1000*sin(sAngle*pi/180)
+  yd = sy0 - oReponseDlg(11)*1000*cos(sAngle*pi/180)
+  xc = sx1 - oReponseDlg(11)*1000*sin(sAngle*pi/180)
+  yc = sy1 - oReponseDlg(11)*1000*cos(sAngle*pi/180)
+  else
+  xd = sx0 + oReponseDlg(11)*1000*sin(sAngle*pi/180)
+  yd = sy0 + oReponseDlg(11)*1000*cos(sAngle*pi/180)
+  xc = sx1 + oReponseDlg(11)*1000*sin(sAngle*pi/180)
+  yc = sy1 + oReponseDlg(11)*1000*cos(sAngle*pi/180)
+  end if
+
+  SegmentDraw(sx1, sy1, xc , yc , 30, &quot;plein&quot;)
+  SegmentDraw(xc, yc, xd , yd , 30, &quot;plein&quot;)
+  SegmentDraw(xd, yd, sx0 , sy0 , 30, &quot;plein&quot;)
+nAjout = 3
+end if
+
+if ah2DStep = 10 then
+x0 = oReponseDlg(5)/sLong
+ang1 = 2* Atn(x0 / Sqr(-x0 * x0 + 1))
+ang2 = (pi - ang1)/2
+
+xa = sx0 + sLong/2 * 1000 * cos(pi + ang2 + oReponseDlg(6)*pi/180) 
+ya = sy0 - sLong/2 * 1000 * sin(pi + ang2 + oReponseDlg(6)*pi/180) 
+xb = sx0 + sLong/2 * 1000 * cos(-ang2 + oReponseDlg(6)*pi/180 ) 
+yb = sy0 - sLong/2 * 1000 * sin(-ang2 + oReponseDlg(6)*pi/180) 
+xc = sx0 + sLong/2 * 1000 * cos(ang2 + oReponseDlg(6)*pi/180) 
+yc = sy0 - sLong/2 * 1000 * sin(ang2 + oReponseDlg(6)*pi/180)
+xd = sx0 + sLong/2 * 1000 * cos(pi -ang2 + oReponseDlg(6)*pi/180 ) 
+yd = sy0 - sLong/2 * 1000 * sin(pi -ang2 + oReponseDlg(6)*pi/180)  
+
+  SegmentDraw(xa, ya, xb , yb , 30, &quot;plein&quot;)
+  SegmentDraw(xb, yb, xc , yc , 30, &quot;plein&quot;)
+  SegmentDraw(xc, yc, xd , yd , 30, &quot;plein&quot;)
+  SegmentDraw(xd, yd, xa , ya , 30, &quot;plein&quot;)
+
+nAjout = 4
+
+end if
+
+end sub
+
+
+sub Intersectionah2D
+Dim a0 as double, b0 as double, c0 as double, a1 as double,b1 as double,c1 as double, d as double
+Dim xH as double, yH as double, distCH as double, L1 as double
+Dim xP1 as double, yP1 as double,xP2 as double, yP2 as double
+Dim iAngle as double, distOO2 as double, cosA as double, angleA as double, i as integer
+
+if ah2DStep = 16 then
+   
+   oPageTemp(intersZorder(0)).LineColor = sCouleurInters(0)
+   oPageTemp(intersZorder(0)).LineWidth = sEpaisseurInters(0)
+   intersZorder(0) = -1
+   oPageTemp(intersZorder(1)).LineColor = sCouleurInters(1)
+   oPageTemp(intersZorder(1)).LineWidth = sEpaisseurInters(1)
+   intersZorder(1) = -1
+   monDlg.GetControl(&quot;Label47&quot;).Model.BackgroundColor = RGB(255,255,255)
+   monDlg.GetControl(&quot;CommandButton33&quot;).Model.State = 0
+   monDlg.GetControl(&quot;Label49&quot;).Model.BackgroundColor = RGB(255,255,255)
+   monDlg.GetControl(&quot;CommandButton34&quot;).Model.State = 0
+
+
+  if intersType(0) = &quot;Ligne&quot; then
+    a0 = Point2Y(0) - Point1Y(0)
+    b0 = -(Point2X(0) - Point1X(0))
+    c0 = Point1X(0)*(-a0) + Point1Y(0)*(-b0)
+  end if
+  
+  if intersType(1) = &quot;Ligne&quot; then
+    a1 = Point2Y(1) - Point1Y(1)
+    b1 = -(Point2X(1) - Point1X(1))
+    c1 = Point1X(1)*(-a1) + Point1Y(1)*(-b1)
+  end if
+  
+ if intersType(0) = &quot;Ligne&quot; then
+    if intersType(1) = &quot;Ligne&quot; then
+  
+        if (a0*b1-a1*b0) = 0 then
+          msgbox(&quot;les droites sont parallèles&quot;, 0, &quot;AHmath3D&quot;)
+          exit sub
+        end if
+    if (a0*b1-a1*b0) &lt;&gt; 0 then
+      xP1 = (b0*c1-b1*c0)/(a0*b1-a1*b0)
+      yP1 = (a0*c1-a1*c0)/(a1*b0-a0*b1)
+      if abs(xP1) &lt; 30000 and abs(yP1) &lt; 45000 then
+        nAjout = 2
+      else
+        msgbox(oReponseDlg(99), 0, &quot;AHmath3D&quot;)
+        exit sub
+      end if
+    end if
+  end if
+  
+    if intersType(1) = &quot;Cercle&quot; then      
+    c1 = b0*Point1X(1) - a0*Point1Y(1)
+    xH = (c1*b0-a0*c0)/(a0*a0+b0*b0)
+    yH = -(c0*b0+a0*c1)/(a0*a0+b0*b0)
+    distCH = abs(a0*Point1X(1) + b0*Point1Y(1) + c0)/sqr(a0*a0+b0*b0)
+    if distCH - sLongInters(1)*1000/2 &gt; 5 then
+     msgbox (oReponseDlg(98), 0, &quot;AHmath3D&quot;) 
+     exit sub
+     end if     
+    if abs(distCH - sLongInters(1)*1000/2) &lt;= 5 then       Rem : on considere que la droite est tangente  si elle passe à 0,005 cm du cercle
+    xP1 = xH
+    yP1 = yH                                          
+    nAjout = 2
+    end if
+    if distCH - sLongInters(1) * 1000/2 &lt; -5 then
+    L1 = sqr(sLongInters(1)* 1000*sLongInters(1)*1000/4 - distCH * distCH)
+    xP1 = xH + L1 * cos(sAngleInters(0) * pi/180)
+    yP1 = yH - L1 * sin(sAngleInters(0) * pi/180)
+    xP2 = xH - L1 * cos(sAngleInters(0) * pi/180)
+    yP2 = yH + L1 * sin(sAngleInters(0) * pi/180)
+    nAjout = 4
+    end if   
+    end if
+    
+  end if  &apos; fin du cas l&apos;élément est une ligne
+  
+  if intersType(0) = &quot;Cercle&quot; then
+   
+  if intersType(1) = &quot;Ligne&quot; then         &apos;la selection secondaire est une droite
+
+    d = b1*Point1X(0) - a1*Point1Y(0)
+    xH = (d*b1-a1*c1)/(a1*a1+b1*b1)
+    yH = -(c1*b1+a1*d)/(a1*a1+b1*b1)
+    distCH = abs(a1*Point1X(0) + b1*Point1Y(0) + c1)/sqr(a1*a1+b1*b1)
+    if distCH - sLongInters(0)*1000/2 &gt; 5 then
+     msgbox (oReponseDlg(98), 0, &quot;AHmath3D&quot;) 
+     exit sub
+     end if     
+    if abs(distCH - sLongInters(0)*1000/2) &lt;= 5 then       Rem : on considere que la droite est tangente  si elle passe à 0,005 cm du cercle
+    xP1 = xH
+    yP1 = yH                                          
+    nAjout = 2
+    end if
+    if distCH - sLongInters(0) * 1000/2 &lt; -5 then
+    L1 = sqr(sLongInters(0)* 1000*sLongInters(0)*1000/4 - distCH * distCH)
+    xP1 = xH + L1 * cos(sAngleInters(1) * pi/180)
+    yP1 = yH - L1 * sin(sAngleInters(1) * pi/180)
+    xP2 = xH - L1 * cos(sAngleInters(1) * pi/180)
+    yP2 = yH + L1 * sin(sAngleInters(1) * pi/180)
+    nAjout = 4
+    end if
+ end if   
+ if intersType(1) = &quot;Cercle&quot; then       &apos;la selection secondaire est un cercle
+ 
+    SegmentDraw(Point1X(0), Point1Y(0), Point1X(1) , Point1Y(1) , 30, &quot;plein&quot;)
+    nElements = oPageTemp.count
+    distOO2 = LgSgtDraw(oPageTemp(nElements - 1)) * 1000
+    iAngle = oPageTemp(nElements - 1).RotateAngle/100
+    oPagetemp.Remove(oPagetemp(nElements - 1)
+    
+    if distOO2 &gt; sLongInters(0) * 1000/2 +  sLongInters(1) * 1000/2 + 5 or sLongInters(0) * 1000/2 &gt; distOO2 + sLongInters(1) * 1000/2 or sLongInters(1) * 1000/2 &gt; distOO2 + sLongInters(0) * 1000/2  then
+     msgbox(oReponseDlg(98), 0, &quot;AHmath3D&quot;)
+     Exit sub
+     end if
+   
+    if abs(distOO2 -sLongInters(1) * 1000/2 - sLongInters(0) * 1000/2) &lt;=5 then      rem 2 cercles sont considérés tangents quand leur distance est &lt;= 0,005 cm
+    xP1 = Point1X(0) + sLongInters(0) * 1000/2*cos(iAngle*pi/180)
+    yP1 = Point1Y(0) - sLongInters(0) * 1000/2*sin(iAngle*pi/180)
+    nAjout = 2
+    end if
+    
+    if distOO2 &lt; sLongInters(1) * 1000/2 + sLongInters(0) * 1000/2 - 5 then
+    cosA = (sLongInters(0) * 1000/2 * sLongInters(0) * 1000/2 + distOO2 * distOO2 - sLongInters(1) * 1000/2 * sLongInters(1) * 1000/2) / (2 * sLongInters(0) * 1000/2 * distOO2)
+    angleA = Atn(-cosA / Sqr(-cosA * cosA + 1)) + Pi / 2
+   
+    a0 =  sLongInters(0) * 1000/2 * Cos(angleA)
+    b0 =  sLongInters(0) * 1000/2 * Sin(angleA)
+     
+   xP1 = Point1X(0) + a0*cos(iAngle*pi/180) - b0*sin(iAngle*pi/180)
+   yP1 = Point1Y(0) - (a0*sin(iAngle*pi/180) + b0*cos(iAngle*pi/180))
+   xP2 = Point1X(0) + a0*cos(-iAngle*pi/180) - b0*sin(-iAngle*pi/180)
+   yP2 = Point1Y(0) + (a0*sin(-iAngle*pi/180) + b0*cos(-iAngle*pi/180))
+   nAjout = 4
+   end if
+ end if
+    
+end if
+    
+   SegmentDraw(xP1 - 100, yP1 - 100, xP1 + 100 , yP1 + 100 , 30, &quot;plein&quot;)
+   SegmentDraw(xP1 - 100, yP1 + 100, xP1 + 100 , yP1 - 100 , 30, &quot;plein&quot;)
+   if nAjout = 4 then
+   SegmentDraw(xP2 - 100, yP2 - 100, xP2 + 100 , yP2 + 100 , 30, &quot;plein&quot;)
+   SegmentDraw(xP2 - 100, yP2 + 100, xP2 + 100 , yP2 - 100 , 30, &quot;plein&quot;) 
+   end if
+
+    nElements = oPageTemp.count
+    for i = 1 to nAjout
+    oPageTemp(nElements-i).Name = &quot;ah2D_point&quot;
+    next
+
+end if
+
+
+end sub
+
+
+
+sub ParaPerpah2D
+
+SupprimePoints_AB
+if oReponseDlg(5) = 0 then SegmentDraw(pxb - 2500 * cos(sAngle * pi/180), pyb + 2500 * sin(sAngle * pi/180), pxb + 2500 * cos(sAngle * pi/180), pyb - 2500 * sin(sAngle * pi/180) , 30, &quot;plein&quot;)
+if oReponseDlg(5) = 1 then SegmentDraw(pxb - 2500 * cos(sAngle * pi/180 + pi/2), pyb + 2500 * sin(sAngle * pi/180 + pi/2), pxb + 2500 * cos(sAngle * pi/180 + pi/2), pyb - 2500 * sin(sAngle * pi/180 + pi/2) , 30, &quot;plein&quot;)
+nAjout = 1
+
+if oReponseDlg(5) = 1 then
+nElements = oPageTemp.Count
+MiniInfoSegment(0,eZorder)
+MiniInfoSegment(1,nElements-1)
+if oReponseDlg(6) = 1 then  codageAngle1(oReponseDlg(7), eZorder, nElements-1, &quot;droit&quot;, true)
+
+intersZorder(0) = -1
+intersZorder(1) = -1
+oPageTemp(eZorder).LineWidth = sEpaisseur + 100
+oPageTemp(eZorder).LineColor = RGB(0,0,255)
+end if
+
+
+end sub
+
+
+Sub Element0ah2D
+ if monDlg.Getcontrol(&quot;OptionButton15&quot;).State = true then
+ sx0 = 5000
+ sy0 = 15000
+ sx1 = sx0 + oReponseDlg(3)*1000*cos(oReponseDlg(4)*pi/180)
+ sy1 = sY0 - oReponseDlg(3)*1000*sin(oReponseDlg(4)*pi/180)
+ SegmentDraw(sx0, sy0, sx1 , sy1 , 30, &quot;plein&quot;)
+ InfoSegment(0, oPageTemp)
+ else
+ sx0 = 10500 - oReponseDlg(3)*500
+ sy0 = 15000
+ CercleDraw(sx0,sy0,oReponseDlg(3)*1000/2)
+ InfoCercle(0, oPageTemp)
+ end if
+ ElementPremier
+ InitialiseAucuneSelection(true)
+ numBoutonmenu = 50
+ AffichageFenetreAction
+end sub
+
+
+sub CodageSegmentah2D
+Dim oAngCod as integer, nbre as integer
+
+
+if oReponseDlg(4) &lt; 4 then
+ oAngCod = 9000
+ nbre = oReponseDlg(4)
+ else
+ oAngCod = 4500
+ nbre = oReponseDlg(4) - 3
+end if
+
+if oReponseDlg(3) = true then coderSegment(true, nbre , oAngCod)
+if oReponseDlg(3) = false then coderSegment(false, nbre , oAngCod)
+  
+
+end sub
+
+
+sub CodageAngleah2D
+nAjout = 0
+CodageAngleX(intersZorder(0),intersZorder(1),oReponseDlg(3),oReponseDlg(4))
+initialisationIntersection
+end sub
+
+
+
+sub Mediatriceah2D
+Dim milAB as variant, vAB as variant, lgAB as double, o1mmAB as variant, o1mmpAB as variant, cod1 as variant, cod2 as variant
+Dim angleX as variant, angleY as variant, traitCodageX as variant, traitCodageY as variant
+
+milAB = MilSgtDraw(oPageTemp(eZorder))
+vAB = CoordVectDraw(oPageTemp(eZorder))
+lgAB = LgSgtDraw(oPageTemp(eZorder))
+SegmentDraw(milAB(0) - 2.5*vAB(1)/lgAB, milAB(1) + 2.5*vAB(0)/lgAB, milAB(0) + 2.5*vAB(1)/lgAB, milAB(1) - 2.5*vAB(0)/lgAB , 30, &quot;plein&quot;)
+nAjout = 1
+if oReponseDlg(3) = 1 then &apos;codage de l&apos;angle droit
+angleX = Array(milAB(0) - oReponseDlg(5)*vAB(1)/lgAB , milAB(0) + oReponseDlg(5)*(vAB(0) - vAB(1))/lgAB ,milAB(0) + oReponseDlg(5)*vAB(0)/lgAB)
+angleY = Array(milAB(1) + oReponseDlg(5)*vAB(0)/lgAB , milAB(1) + oReponseDlg(5)*(vAB(0) + vAB(1))/lgAB , milAB(1) + oReponseDlg(5)*vAB(1)/lgAB)
+LigneBrisee(angleX, angleY)
+nAjout =  nAjout + 1
+end if
+codageMilieu(eZorder, oReponseDlg(6))
+end sub
+
+
+
+sub Bissectriceah2D
+Dim v1 as variant, v2 as variant, vOM as variant,  lg1 as double, lg2 as double, lgOM as variant, zorderBis as integer
+Dim ptI as variant, ptJ as variant, ptM as variant, ptO as variant
+nAjout = 0
+
+codageAngle1(0 , intersZorder(0), intersZorder(1), &quot;aucun&quot; , true )
+if SauvCodageAngle(8) = &quot;parallele&quot; then Exit sub
+v1 = SauvCodageAngle(4)
+v2 = SauvCodageAngle(5)
+ptO = array(SauvCodageAngle(0), SauvCodageAngle(1))
+ptI = array(ptO(0) + 1000*v1(0)/SauvCodageAngle(6) , ptO(1) + 1000*v1(1)/SauvCodageAngle(6))
+ptJ = array(ptO(0) + 1000*v2(0)/SauvCodageAngle(7) , ptO(1) + 1000*v2(1)/SauvCodageAngle(7))
+ptM = array((ptI(0) + ptJ(0))/2 , (ptI(1) + ptJ(1))/2)
+vOM = array(ptM(0) - ptO(0) , ptM(1) - ptO(1))
+lgOM = sqr(vOM(0) * vOM(0) + vOM(1) * vOM(1))
+
+segmentDraw(ptO(0),ptO(1),ptO(0) + 5000*vOM(0)/lgOM,ptO(1) + 5000*vOM(1)/lgOM,30, &quot;plein&quot;)
+nAjout = nAjout + 1
+
+zorderBis = oPageTemp.count - 1
+CodageAngleX(intersZorder(0) , zorderBis, oReponseDlg(5), oReponseDlg(6) )
+CodageAngleX(intersZorder(1) , zorderBis, oReponseDlg(5), oReponseDlg(6) )
+initialisationIntersection
+
+
+end sub
+
+
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+&apos;************************               BOUTON AJOUTER                 ***********************************
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+
+sub GestionBoutonOK  
+Dim i as integer, test(6) as integer
+
+ah2DStep = monDlg.Model.Step
+
+&apos;-----------------------Gestion des erreurs de saisie
+if ah2DStep = 1 then
+oReponseDlg(4) = ReponseListe(monDlg,&quot;ListBox8&quot;)(1)
+  if oReponseDlg(4) = 0 then test(0) = 1
+  if oReponseDlg(4) = 1 or oReponseDlg(4) = 2  then test(0) = ZT_Nbre(monDlg,  &quot;TextField6&quot;, -20 , 20 , 5 , oReponseDlg(87),)
+  if oReponseDlg(4) = 3 then
+  test(1) = ZT_Nbre(monDlg,  &quot;TextField6&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+  test(2) = ZT_Nbre(monDlg,  &quot;TextField7&quot;, 0.001 , 20 , 5 , oReponseDlg(71),) 
+  test(0) = test(1)*test(2)
+  end if
+end if
+
+if ah2DStep = 2 then
+test(1) = ZT_Nbre(monDlg,  &quot;TextField3&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+test(2) = ZT_Nbre(monDlg,  &quot;TextField4&quot;, -180 , 180 , 90 , oReponseDlg(72),) 
+test(0) = test(1)*test(2)
+end if
+
+if ah2DStep = 3 then
+  if monDlg.getControl(&quot;OptionButton5&quot;).State = true then
+  test(1) = ZT_Nbre(monDlg,  &quot;TextField8&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+  test(2) = ZT_Nbre(monDlg,  &quot;TextField9&quot;, 0.001, 20 , 5 , oReponseDlg(71),) 
+   test(0) = test(1)*test(2)
+  if test(0) = 1 then
+  oReponseDlg(7) = CDbl(monDlg.getControl(&quot;TextField8&quot;).Peer.Text)
+  oReponseDlg(8) = CDbl(monDlg.getControl(&quot;TextField9&quot;).Peer.Text)
+  if oReponseDlg(7) + oReponseDlg(8)&lt;= sLong or oReponseDlg(7) + sLong&lt;= oReponseDlg(8) or sLong + oReponseDlg(8)&lt;= oReponseDlg(7) then
+   test(1) = 0
+   msgbox(oReponseDlg(75), 0, &quot;AHmath3D&quot;)
+  end if
+  end if
+  end if
+  if monDlg.getControl(&quot;OptionButton6&quot;).State = true then
+  test(1) = ZT_Nbre(monDlg,  &quot;TextField10&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+  test(2) = ZT_Nbre(monDlg,  &quot;TextField11&quot;, 0, 180 , 60 , oReponseDlg(73),) 
+  end if
+  if monDlg.getControl(&quot;OptionButton7&quot;).State = true then
+  test(1) = ZT_Nbre(monDlg,  &quot;TextField12&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+  test(2) = ZT_Nbre(monDlg,  &quot;TextField13&quot;, 0, 180 , 60 , oReponseDlg(73),) 
+  end if
+  if monDlg.getControl(&quot;OptionButton8&quot;).State = true then  
+  test(1) = ZT_Nbre(monDlg,  &quot;TextField14&quot;, 0 , 180 , 60 , oReponseDlg(73),)
+  test(2) = ZT_Nbre(monDlg,  &quot;TextField15&quot;, 0, 180 , 60 , oReponseDlg(73),) 
+  test(0) = test(1)*test(2)
+  if test(0) = 1 then
+  oReponseDlg(7) = CDbl(monDlg.getControl(&quot;TextField14&quot;).Peer.Text)
+  oReponseDlg(8) = CDbl(monDlg.getControl(&quot;TextField15&quot;).Peer.Text)
+  if oReponseDlg(7) + oReponseDlg(8)&gt;=180 then
+   test(1) = 0
+   msgbox(oReponseDlg(75), 0, &quot;AHmath3D&quot;)
+  end if
+  end if
+  end if
+  
+test(0) = test(1)*test(2)
+end if
+
+if ah2DStep = 4 then test(0) = ZT_Nbre(monDlg,  &quot;TextField16&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+
+if ah2DStep = 5 then test(0) = ZT_Nbre(monDlg,  &quot;TextField17&quot;, 3 , 20 , 5 , oReponseDlg(74),true)
+
+if ah2DStep = 6 then
+if monDlg.getControl(&quot;TextField5&quot;).Model.EnableVisible = true then
+  test(3) = ZT_Nbre(monDlg,  &quot;TextField5&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+  test(0) = test(3)
+  else
+  test(0) = 1
+end if
+end if 
+
+if ah2DStep = 7 then
+  oReponseDlg(5) = ReponseListe(monDlg,&quot;ListBox4&quot;)(1)
+  if oReponseDlg(5) = 1 then  test(0) = ZT_Nbre(monDlg,  &quot;TextField26&quot;, -360 , 360 , 0 , oReponseDlg(72),)
+  if oReponseDlg(5) = 0 then  test(0) = 1
+end if
+
+if ah2DStep = 8 then
+  oReponseDlg(5) = ReponseListe(monDlg,&quot;ListBox5&quot;)(1)
+  test(2) = 1
+  test(1) = ZT_Nbre(monDlg,  &quot;TextField21&quot;, -360 , 360 , 0 , oReponseDlg(76),)
+  if oReponseDlg(5) = 2 then test(2) = ZT_Nbre(monDlg,  &quot;TextField28&quot;, 0.001 , sLong , sLong/2 , oReponseDlg(77),)
+  test(0) = test(1)*test(2)
+end if
+
+if ah2DStep = 9 then test(0) = 1
+
+if ah2DStep = 10 then
+  test(1) = ZT_Nbre(monDlg,  &quot;TextField22&quot;, 0.001 ,20 , 5 , oReponseDlg(71),)
+  test(2) = ZT_Nbre(monDlg,  &quot;TextField27&quot;, -360 , 360 , 0 , oReponseDlg(76),)
+  test(0) = test(1)*test(2)
+end if
+
+if ah2DStep = 11 then
+test(1) = ZT_Nbre(monDlg,  &quot;TextField23&quot;, 3 , 20 , 5 , oReponseDlg(74),true)
+test(2) = ZT_Nbre(monDlg,  &quot;TextField24&quot;, -180, 180 , 5 , oReponseDlg(72),) 
+test(0) = test(1) * test(2)
+end if
+
+if ah2DStep = 12 then  test(0) = ZT_Nbre(monDlg,  &quot;TextField25&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+
+if ah2DStep = 13 then test(0) = 1
+
+if ah2DStep = 14 then
+  oReponseDlg(5) = ReponseListe(monDlg,&quot;ListBox9&quot;)(1)
+  if oReponseDlg(5) = 0 then test(0) = ZT_Nbre(monDlg,  &quot;TextField30&quot;, 0.001 , 20 , 5 , oReponseDlg(71),) else test(0) = 1
+end if 
+
+if ah2DStep = 15 then test(0) = 1
+
+
+if ah2DStep = 16 then
+  if intersZorder(0) &lt;&gt; -1 and intersZorder(1) &lt;&gt; -1 then   test(0) = 1  else test(0) = 0
+end if
+
+if ah2DStep = 18 then
+  if monDlg.Getcontrol(&quot;CheckBox3&quot;).State = 1 then test(0) = ZT_Nbre(monDlg,  &quot;TextField37&quot;, 0.001 , 20 , 5 , oReponseDlg(71),) else test(0) = 1
+end if
+
+if ah2DStep = 19 then
+  if monDlg.Getcontrol(&quot;OptionButton15&quot;).State = true then 
+  test(1) = ZT_Nbre(monDlg,  &quot;TextField31&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+  test(2) = ZT_Nbre(monDlg,  &quot;TextField32&quot;, -180, 180 , 5 , oReponseDlg(72),)
+  test(0) = test(1)*test(2)
+  else
+  test(0) = ZT_Nbre(monDlg,  &quot;TextField33&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)
+  endif
+end if
+
+if ah2DStep = 20 then test(0) = 1
+
+if ah2DStep = 22 then
+  if intersZorder(0) &lt;&gt; -1 and intersZorder(1) &lt;&gt; -1 then   test(1) = 1  else test(1) = 0
+  test(2) = ZT_Nbre(monDlg,  &quot;TextField34&quot;, 0.001 , 5 , 0.5 , oReponseDlg(79),)
+  test(0) = test(1)*test(2)
+end if
+
+if ah2DStep = 23 then 
+if monDlg.GetControl(&quot;CheckBox2&quot;).State = 1 then test(0) = ZT_Nbre(monDlg,  &quot;TextField35&quot;, 0.001 , 5 , 0.5 , oReponseDlg(79),) else test(0) = 1
+end if
+
+if ah2DStep = 24 then  
+  if intersZorder(0) &lt;&gt; -1 and intersZorder(1) &lt;&gt; -1 then   test(0) = ZT_Nbre(monDlg,  &quot;TextField36&quot;, 0.001 , 20 , 5 , oReponseDlg(71),)  else test(0) = 0
+end if
+
+&apos;---------------------- (test(0) contient 1 si tout est ok 0 sinon)
+
+if test(0) = 1 then
+&apos;---------------------- recupere toute les données saisie dans une variable globale
+if ah2DStep = 1 then
+    oReponseDlg(4) = ReponseListe(monDlg,&quot;ListBox8&quot;)(1)
+    if oReponseDlg(4) &gt; 0 then oReponseDlg(5) = CDbl(monDlg.getControl(&quot;TextField6&quot;).Peer.Text)
+    if oReponseDlg(4) = 3 then
+      oReponseDlg(6) = CDbl(monDlg.getControl(&quot;TextField7&quot;).Peer.Text)
+      oReponseDlg(7) = monDlg.getControl(&quot;OptionButton11&quot;).State
+    end if
+    if oReponseDlg(4) = 0 then
+    for i = 0 to 8
+    if monDlg.getControl(&quot;OptionButton&quot; &amp; 40+i).State = true then oReponseDlg(8) = i
+    next
+    end if
+end if
+
+if ah2DStep = 2 then
+    oReponseDlg(0) = CDbl(monDlg.getControl(&quot;TextField3&quot;).Peer.Text)
+    oReponseDlg(1) = CDbl(monDlg.getControl(&quot;TextField4&quot;).Peer.Text)
+    oReponseDlg(2) = monDlg.getControl(&quot;OptionButton1&quot;).State
+end if
+
+if ah2DStep = 3 then
+    if monDlg.getControl(&quot;OptionButton5&quot;).State = true then
+    oReponseDlg(7) = CDbl(monDlg.getControl(&quot;TextField8&quot;).Peer.Text)
+    oReponseDlg(8) = CDbl(monDlg.getControl(&quot;TextField9&quot;).Peer.Text)
+    oReponseDlg(10) = 1
+    end if
+    if monDlg.getControl(&quot;OptionButton6&quot;).State = true then
+    oReponseDlg(7) = CDbl(monDlg.getControl(&quot;TextField10&quot;).Peer.Text)
+    oReponseDlg(8) = CDbl(monDlg.getControl(&quot;TextField11&quot;).Peer.Text)
+    oReponseDlg(10) = 2
+    end if
+    if monDlg.getControl(&quot;OptionButton7&quot;).State = true then
+    oReponseDlg(7) = CDbl(monDlg.getControl(&quot;TextField12&quot;).Peer.Text)
+    oReponseDlg(8) = CDbl(monDlg.getControl(&quot;TextField13&quot;).Peer.Text)
+    oReponseDlg(10) = 3
+    end if
+    if monDlg.getControl(&quot;OptionButton8&quot;).State = true then
+    oReponseDlg(7) = CDbl(monDlg.getControl(&quot;TextField14&quot;).Peer.Text)
+    oReponseDlg(8) = CDbl(monDlg.getControl(&quot;TextField15&quot;).Peer.Text)
+    oReponseDlg(10) = 4
+    end if
+    oReponseDlg(9) = monDlg.getControl(&quot;OptionButton3&quot;).State
+end if
+
+if ah2DStep = 4 then
+    oReponseDlg(11) = CDbl(monDlg.getControl(&quot;TextField16&quot;).Peer.Text)
+    oReponseDlg(12) = monDlg.getControl(&quot;OptionButton9&quot;).State
+end if
+
+if ah2DStep = 5 then
+    oReponseDlg(13) = CDbl(monDlg.getControl(&quot;TextField17&quot;).Peer.Text)
+    oReponseDlg(14) = monDlg.getControl(&quot;OptionButton13&quot;).State
+end if
+
+if ah2DStep = 6 then
+    oReponseDlg(4) = ReponseListe(monDlg,&quot;ListBox1&quot;)(1)
+    if oReponseDlg(4) &gt; 1 and oReponseDlg(4) &lt; 6 then
+    oReponseDlg(3) = CDbl(monDlg.getControl(&quot;TextField5&quot;).Peer.Text)
+    end if
+end if
+
+if ah2DStep = 7 then
+    oReponseDlg(5) = ReponseListe(monDlg,&quot;ListBox4&quot;)(1)
+    if oReponseDlg(5) = 1 then oReponseDlg(6) = CDbl(monDlg.getControl(&quot;TextField26&quot;).Peer.Text)
+end if
+
+if ah2DStep = 8 then
+    oReponseDlg(5) = ReponseListe(monDlg,&quot;ListBox5&quot;)(1)
+    oReponseDlg(6) = CDbl(monDlg.getControl(&quot;TextField21&quot;).Peer.Text)
+    oReponseDlg(7) = ReponseListe(monDlg,&quot;ListBox7&quot;)(1)
+    if oReponseDlg(5) = 2 then oReponseDlg(8) = CDbl(monDlg.getControl(&quot;TextField28&quot;).Peer.Text)
+    
+end if
+
+if ah2DStep = 10 then
+    oReponseDlg(5) = CDbl(monDlg.getControl(&quot;TextField22&quot;).Peer.Text)
+    oReponseDlg(6) = CDbl(monDlg.getControl(&quot;TextField27&quot;).Peer.Text)
+end if
+
+if ah2DStep = 11 then
+    oReponseDlg(12) = ReponseListe(monDlg,&quot;ListBox6&quot;)(1)
+    oReponseDlg(13) = CDbl(monDlg.getControl(&quot;TextField23&quot;).Peer.Text)
+    oReponseDlg(14) = CDbl(monDlg.getControl(&quot;TextField24&quot;).Peer.Text)
+end if
+
+
+if ah2DStep = 12 then
+    oReponseDlg(4) = 7  &apos;cas 7 
+    oReponseDlg(15) = CDbl(monDlg.getControl(&quot;TextField25&quot;).Peer.Text)
+end if
+
+if ah2DStep = 14 then
+    oReponseDlg(5) = ReponseListe(monDlg,&quot;ListBox9&quot;)(1)
+    if oReponseDlg(5) = 0 then
+    oReponseDlg(4) = 8  &apos;cas 8 
+    oReponseDlg(15) = CDbl(monDlg.getControl(&quot;TextField30&quot;).Peer.Text)
+    end if
+    if oReponseDlg(5) = 1 then
+    oReponseDlg(4) = 9  &apos;cas 9
+    end if
+    if oReponseDlg(5) = 2 then
+    oReponseDlg(4) = 10  &apos;cas 10
+    end if
+end if
+
+if ah2DStep = 18 then
+  oReponseDlg(5) = ReponseListe(monDlg,&quot;ListBox10&quot;)(1)
+  oReponseDlg(6) = monDlg.Getcontrol(&quot;CheckBox3&quot;).State
+  if oReponseDlg(6) = 1 then oReponseDlg(7) = CDbl(monDlg.getControl(&quot;TextField37&quot;).Peer.Text)
+end if
+
+if ah2DStep = 19 then
+  if monDlg.Getcontrol(&quot;OptionButton15&quot;).State = true then 
+  oReponseDlg(3) = CDbl(monDlg.getControl(&quot;TextField31&quot;).Peer.Text)
+  oReponseDlg(4) = CDbl(monDlg.getControl(&quot;TextField32&quot;).Peer.Text)
+  else
+  oReponseDlg(3) = CDbl(monDlg.getControl(&quot;TextField33&quot;).Peer.Text)
+  end if
+end if
+
+if ah2DStep = 20 then
+  oReponseDlg(3) = monDlg.getControl(&quot;OptionButton17&quot;).State
+  for i = 1 to 6
+  if monDlg.getControl(&quot;OptionButton&quot; &amp; 18+i).State = true then oReponseDlg(4) = i
+  next
+end if
+
+
+if ah2DStep = 22 then
+  oReponseDlg(3) = CDbl(monDlg.getControl(&quot;TextField34&quot;).Peer.Text)
+   monDlg.GetControl(&quot;Label58&quot;).Model.BackgroundColor = RGB(255,255,255)
+   monDlg.GetControl(&quot;CommandButton25&quot;).Model.State = 0
+   monDlg.GetControl(&quot;Label59&quot;).Model.BackgroundColor = RGB(255,255,255)
+   monDlg.GetControl(&quot;CommandButton30&quot;).Model.State = 0
+  for i = 1 to 7
+  if monDlg.getControl(&quot;OptionButton&quot; &amp; 220+i).State = true then oReponseDlg(4) = i
+  next
+end if
+
+if ah2DStep = 23 then
+  oReponseDlg(3) = monDlg.getControl(&quot;CheckBox2&quot;).state
+  if oReponseDlg(3) = 1 then oReponseDlg(5) = CDbl(monDlg.getControl(&quot;TextField35&quot;).Peer.Text)
+  for i = 1 to 9
+  if monDlg.getControl(&quot;OptionButton&quot; &amp; 30+i).State = true then oReponseDlg(6) = i
+  next
+end if
+
+if ah2DStep = 24 then
+   InitialiseBissectrice
+   for i = 0 to 7
+  if monDlg.getControl(&quot;OptionButton&quot; &amp; 49+i).State = true then oReponseDlg(6) = i
+  next
+    oReponseDlg(5) = CDbl(monDlg.getControl(&quot;TextField36&quot;).Peer.Text)
+end if
+
+
+    oReponseDlg(21) = true  
+    monDlg.Model.Tag= &quot;OK&quot;   &apos;met OK au tag du dialogue quand tout est validé
+
+&apos;---------------------    oReponseDlg(21) = true quand tout est validé
+    monDlg.endExecute
+end if
+
+End Sub
+
+
+
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+&apos;************************       INFOS SUR L&apos;ELEMENT SELECTIONNE        ***********************************
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+sub AffichageApercu
+Dim ChoixApercu as integer, i as integer
+
+if oTypeElement = &quot;Ligne&quot; and oPageTemp(eZorder).Name &lt;&gt; &quot;ah2D_point&quot; then
+for i = -12 to 12
+if abs(15*i - sAngle)&lt;= 7.5 then ChoixApercu = 15*i
+next
+AffecterImageFixe(monDlg, &quot;ImageControl1&quot; , CheminDessin(&quot;Dessins/ah2D/apercu_&quot; &amp; ChoixApercu &amp; &quot;.png/&quot;) )
+end if
+
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then AffecterImageFixe(monDlg, &quot;ImageControl1&quot; , CheminDessin(&quot;Dessins/ah2D/apercu_point.png/&quot;) )
+
+if oTypeElement = &quot;Cercle&quot; then AffecterImageFixe(monDlg, &quot;ImageControl1&quot; , CheminDessin(&quot;Dessins/ah2D/apercu_cercle.png/&quot;) )
+
+if oTypeElement &lt;&gt; &quot;Cercle&quot; and  oTypeElement &lt;&gt; &quot;Ligne&quot; then AffecterImageFixe(monDlg, &quot;ImageControl1&quot; , CheminDessin(&quot;Dessins/ah2D/nonreconnu.png/&quot;) )
+
+
+end sub
+
+
+sub InfoSegment(ordreElement as integer, oPage as object)              REM collecte les informations du segment
+   sx0 = oPage(ordreElement).Polygon(0).X    &apos; abscisse point A
+   sy0 = oPage(ordreElement).Polygon(0).Y    &apos; ordonnée point A
+   sx1 = oPage(ordreElement).Polygon(1).X    &apos; abscisse point B
+   sy1 = oPage(ordreElement).Polygon(1).Y    &apos; ordonnée point B
+   sLong = CInt(sqr((sx1-sx0)*(sx1 - sx0) + (sy1-sy0)*(sy1-sy0))/10)/100   &apos;longueur du segment
+   sAngle = oPage(ordreElement).RotateAngle /100     &apos;Angle du segment avec l&apos;horizontal
+   if sAngle &gt; 180 then sAngle = sAngle - 360
+   sPointille = oPage(ordreElement).LineStyle
+   sEpaisseur = oPageTemp(ordreElement).LineWidth
+   sCouleur = oPageTemp(ordreElement).LineColor
+   
+   
+end sub
+
+
+sub InfoCercle(ordreElement as integer, oPage as object)           REM collecte les informations du cercle
+Dim  x0 as integer, y0 as integer
+    
+    sAngle = 0
+    oPage(ordreElement).RotateAngle = sAngle   
+    x0 = oPage(ordreElement).Position.X    &apos; abscisse coin haut droit du cadre
+    y0 = oPage(ordreElement).Position.Y    &apos; ordonnée coin haut droit du cadre
+    sLong = CInt((oPage(ordreElement).Size.Height)/10)/100   &apos;Diamètre
+    sx0 = x0 + sLong*1000/2      &apos; abscisse du centre du cercle
+    sy0 = y0 + sLong*1000/2      &apos; ordonnée du centre du cercle
+    sPointille = oPage(ordreElement).LineStyle
+    sEpaisseur = oPageTemp(ordreElement).LineWidth
+    sCouleur = oPageTemp(ordreElement).LineColor
+end sub
+
+
+sub InfoInters(k as integer)
+intersType(k) = TypeForme(oPageTemp(eZorder))
+intersZorder(k) = eZorder
+sAngleInters(k) = sAngle
+sLongInters(k) = sLong
+intersName(k) = oPageTemp(eZorder).Name
+point1X(k) = sx0
+Point1Y(k) = sy0
+point2X(k) = sx1
+Point2Y(k) = sy1
+sEpaisseurInters(k) = sEpaisseur
+sCouleurInters(k) = sCouleur
+sPointilleInters(k) = sPointille
+
+end sub
+
+sub MiniInfoSegment(k as integer, oZorder as integer)
+point1X(k) = oPageTemp(oZorder).Polygon(0).X
+Point1Y(k) = oPageTemp(oZorder).Polygon(0).Y
+point2X(k) = oPageTemp(oZorder).Polygon(1).X
+Point2Y(k) = oPageTemp(oZorder).Polygon(1).Y
+intersZorder(k) = oZorder
+sAngleInters(k) = oPageTemp(oZorder).RotateAngle /100
+   if sAngleInters(k) &gt; 180 then sAngleInters(k) = sAngleInters(k) - 360
+end sub
+
+
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+&apos;**************************       GESTION DES BOUTONS DU MENU       **************************************
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+&apos;*********************************************************************************************************
+sub Segment_click
+if monDlg.getControl(&quot;OptionButton1&quot;).Model.State = 1 then monDlg.getControl(&quot;Label5&quot;).Text = oReponseDlg(96)
+if monDlg.getControl(&quot;OptionButton2&quot;).Model.State = 1 then monDlg.getControl(&quot;Label5&quot;).Text = oReponseDlg(97)
+end sub
+
+sub Cercle_click
+Dim oSelectionListe as integer
+oSelectionListe = ReponseListe(monDlg,&quot;ListBox1&quot;)(1)
+
+if oSelectionListe &lt; 2 or oSelectionListe = 6 then
+monDlg.getControl(&quot;TextField5&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;Label6&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UL3&quot;).Model.EnableVisible = false
+end if
+if oSelectionListe = 2 or oSelectionListe = 3 then
+monDlg.getControl(&quot;TextField5&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label6&quot;).text = &quot;K =&quot;
+monDlg.getControl(&quot;Label6&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;UL3&quot;).Model.EnableVisible = false
+end if
+if oSelectionListe = 4 or oSelectionListe = 5 then
+monDlg.getControl(&quot;TextField5&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label6&quot;).text = &quot;R =&quot;
+monDlg.getControl(&quot;Label6&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;UL3&quot;).Model.EnableVisible = true
+end if
+
+end sub
+
+
+sub Point_click
+Dim oSelectionListe as integer, i as integer
+oSelectionListe = ReponseListe(monDlg,&quot;ListBox8&quot;)(1)
+if oSelectionListe = 0 then
+monDlg.getControl(&quot;Label8&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;Label9&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UL4&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UL5&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;TextField6&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;TextField7&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;OptionButton11&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;OptionButton12&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;ImageControl6&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;ImageControl16&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label63&quot;).Model.EnableVisible = true
+for i = 0 to 8
+monDlg.getControl(&quot;OptionButton&quot;&amp; 40+i).Model.EnableVisible = true
+next
+
+end if
+if oSelectionListe = 1 then
+monDlg.getControl(&quot;Label8&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label9&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UL4&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;UL5&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;TextField6&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;TextField7&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;OptionButton11&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;OptionButton12&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;ImageControl6&quot;).Model.EnableVisible = false
+end if
+if oSelectionListe = 2 then
+monDlg.getControl(&quot;Label8&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label9&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UL4&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UL5&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;TextField6&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;TextField7&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;OptionButton11&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;OptionButton12&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;ImageControl6&quot;).Model.EnableVisible = false
+end if
+if oSelectionListe = 3 then
+monDlg.getControl(&quot;Label8&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label9&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;UL4&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;UL5&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;TextField6&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;TextField7&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;OptionButton11&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;OptionButton12&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;ImageControl6&quot;).Model.EnableVisible = true
+end if
+if oSelectionListe = 2 then monDlg.getControl(&quot;Label8&quot;).Text = &quot;k =&quot; else monDlg.getControl(&quot;Label8&quot;).Text = &quot;AP =&quot;
+
+if oSelectionListe = 1 or  oSelectionListe = 2 or  oSelectionListe = 3 then
+monDlg.getControl(&quot;ImageControl16&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;Label63&quot;).Model.EnableVisible = false
+for i = 0 to 8
+monDlg.getControl(&quot;OptionButton&quot;&amp; 40+i).Model.EnableVisible = false
+next
+end if
+end sub
+
+sub SegmentdansCercle_click
+Dim oSelectionListe as integer
+oSelectionListe = ReponseListe(monDlg,&quot;ListBox5&quot;)(1)
+if oSelectionListe = 2 then 
+monDlg.getControl(&quot;ListBox7&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;UL13&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;TextField28&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label35&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label22&quot;).Model.EnableVisible = false
+else
+monDlg.getControl(&quot;ListBox7&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UL13&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;TextField28&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;Label35&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;Label22&quot;).Model.EnableVisible = true
+if oSelectionListe = 3 then monDlg.getControl(&quot;Label22&quot;).Text = oReponseDlg(81) else monDlg.getControl(&quot;Label22&quot;).Text = oReponseDlg(82)
+end if
+end sub
+
+
+sub PointsurCercle_click
+Dim oSelectionListe as integer
+oSelectionListe = ReponseListe(monDlg,&quot;ListBox4&quot;)(1)
+
+if oSelectionListe = 1 then 
+monDlg.getControl(&quot;TextField26&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label33&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;UA9&quot;).Model.EnableVisible = true
+end if
+if oSelectionListe = 0 then 
+monDlg.getControl(&quot;TextField26&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;Label33&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UA9&quot;).Model.EnableVisible = false
+end if
+
+end sub
+
+
+sub ChoixTriangle_click
+Dim i as integer
+   for i = 11 to 18 
+   monDlg.getControl(&quot;Label&quot;&amp;i).Model.Enabled = false 
+   next
+   for i = 6 to 9 
+   monDlg.getControl(&quot;UL&quot;&amp;i).Model.Enabled = false 
+   next
+   for i = 3 to 6 
+   monDlg.getControl(&quot;UA&quot;&amp;i).Model.Enabled = false 
+   next
+   for i = 8 to 15 
+   monDlg.getControl(&quot;TextField&quot;&amp;i).Model.Enabled = false 
+   next
+   for i = 9 to 12 
+   monDlg.getControl(&quot;ImageControl&quot;&amp;i).Model.Enabled = false 
+   next
+   if monDlg.getControl(&quot;OptionButton5&quot;).State = true then
+     monDlg.getControl(&quot;Label11&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;Label12&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;TextField8&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;TextField9&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;UL6&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;UL7&quot;).Model.Enabled = true  
+   end if
+   if monDlg.getControl(&quot;OptionButton6&quot;).State = true then
+     monDlg.getControl(&quot;Label13&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;Label14&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;TextField10&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;TextField11&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;UL8&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;UA3&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;ImageControl9&quot;).Model.Enabled = true  
+   end if
+  if monDlg.getControl(&quot;OptionButton7&quot;).State = true then
+     monDlg.getControl(&quot;Label15&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;Label16&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;TextField12&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;TextField13&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;UL9&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;UA4&quot;).Model.Enabled = true 
+     monDlg.getControl(&quot;ImageControl10&quot;).Model.Enabled = true 
+   end if   
+  if monDlg.getControl(&quot;OptionButton8&quot;).State = true then
+     monDlg.getControl(&quot;Label17&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;Label18&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;TextField14&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;TextField15&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;UA5&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;UA6&quot;).Model.Enabled = true  
+     monDlg.getControl(&quot;ImageControl11&quot;).Model.Enabled = true
+     monDlg.getControl(&quot;ImageControl12&quot;).Model.Enabled = true 
+   end if
+         
+end sub
+
+sub CercledeCentre_Click
+Dim oSelectionListe as integer
+oSelectionListe = ReponseListe(monDlg,&quot;ListBox9&quot;)(1)
+SupprimePoints_AB
+
+if oSelectionListe = 0 then 
+monDlg.getControl(&quot;TextField30&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;Label43&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;UL15&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;CommandButton35&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;CommandButton36&quot;).Model.EnableVisible = false
+end if
+if oSelectionListe &gt; 0 then 
+monDlg.getControl(&quot;TextField30&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;Label43&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;UL15&quot;).Model.EnableVisible = false
+monDlg.getControl(&quot;CommandButton35&quot;).Model.EnableVisible = true
+monDlg.getControl(&quot;CommandButton36&quot;).Model.EnableVisible = true
+end if
+if oSelectionListe = 1 then
+SupprimeDroiteVerte
+if nPoints &gt; 1 then
+ AfficherPointB
+ else
+ msgbox(oReponseDlg(92), 0, &quot;AHmath3D&quot;)
+ monDlg.getControl(&quot;ListBox9&quot;).SelectItemPos(0,true)
+ end if
+end if
+
+if oSelectionListe = 2 then 
+
+if oListeDroite(0)(0) = &quot;aucune&quot; then 
+      msgbox(oReponseDlg(94),0+64,&quot;AHmath3D&quot;) 
+      else
+     indDroite = 0
+     TraceLigne(0)
+     end if
+end if
+end sub
+
+sub CommandButton35_click
+Dim oSelectionListe as integer
+oSelectionListe = ReponseListe(monDlg,&quot;ListBox9&quot;)(1)
+if oSelectionListe = 1 then PointB_gauche
+if oSelectionListe = 2 then LigneSuivante_G
+end sub
+
+sub CommandButton36_click
+Dim oSelectionListe as integer
+oSelectionListe = ReponseListe(monDlg,&quot;ListBox9&quot;)(1)
+if oSelectionListe = 1 then PointB_droite
+if oSelectionListe = 2 then LigneSuivante_D
+end sub
+
+
+
+sub perpendiculaire_click
+Dim oSelectionListe as integer
+oSelectionListe = ReponseListe(monDlg,&quot;ListBox10&quot;)(1)
+if oSelectionListe = 1 then
+    monDlg.getControl(&quot;CheckBox3&quot;).Model.EnableVisible = true
+    monDlg.getControl(&quot;TextField37&quot;).Model.EnableVisible = true
+    monDlg.getControl(&quot;UL22&quot;).Model.EnableVisible = true
+    else
+    monDlg.getControl(&quot;CheckBox3&quot;).Model.EnableVisible = false
+    monDlg.getControl(&quot;TextField37&quot;).Model.EnableVisible = false
+    monDlg.getControl(&quot;UL22&quot;).Model.EnableVisible = false    
+end if
+end sub
+
+sub initialisationIntersection
+   if intersZorder(0) &lt;&gt; -1 then
+   oPageTemp(intersZorder(0)).LineWidth = sEpaisseurInters(0)
+   oPageTemp(intersZorder(0)).LineColor = sCouleurInters(0)
+   oPageTemp(intersZorder(0)).LineStyle = sPointilleInters(0)
+   end if
+   if intersZorder(1) &lt;&gt; -1 then
+   oPageTemp(intersZorder(1)).LineWidth = sEpaisseurInters(1)
+   oPageTemp(intersZorder(1)).LineColor = sCouleurInters(1)
+   oPageTemp(intersZorder(1)).LineStyle = sPointilleInters(1)
+   end if
+   intersZorder(0) = -1
+   intersZorder(1) = -1
+   monDlg.GetControl(&quot;Label47&quot;).Model.BackgroundColor = RGB(255,255,255)
+   monDlg.GetControl(&quot;CommandButton33&quot;).Model.State = 0
+   monDlg.GetControl(&quot;Label49&quot;).Model.BackgroundColor = RGB(255,255,255)
+   monDlg.GetControl(&quot;CommandButton34&quot;).Model.State = 0
+end sub
+
+
+sub CommandButton50_click
+BasculeBouton(50)
+numBoutonmenu = 50
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton51_click
+BasculeBouton(51)
+numBoutonmenu = 51
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton52_click
+BasculeBouton(52)
+numBoutonmenu = 52
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton53_click
+BasculeBouton(53)
+numBoutonmenu = 53
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton54_click
+BasculeBouton(54)
+numBoutonmenu = 54
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton55_click
+BasculeBouton(55)
+numBoutonmenu = 55
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton56_click
+BasculeBouton(56)
+numBoutonmenu = 56
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton57_click
+BasculeBouton(57)
+numBoutonmenu = 57
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton58_click
+BasculeBouton(58)
+numBoutonmenu = 58
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton59_click
+BasculeBouton(59)
+numBoutonmenu = 59
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton60_click
+BasculeBouton(60)
+numBoutonmenu = 60
+GestionOption
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton61_click
+BasculeBouton(61)
+numBoutonmenu = 61
+GestionOption
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton62_click
+BasculeBouton(62)
+numBoutonmenu = 62
+GestionOption
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton63_click
+BasculeBouton(63)
+numBoutonmenu = 63
+GestionOption
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+sub CommandButton64_click
+BasculeBouton(64)
+numBoutonmenu = 64
+GestionOption
+SupprimeDroiteVerte
+AffichageFenetreAction
+initialisationIntersection
+InitialiseBissectrice
+end sub
+
+
+sub BasculeBouton(numBouton as integer) &apos;+ affichage bouton ajouter
+Dim i as integer
+
+for i = 50 to 64
+monDlg.GetControl(&quot;CommandButton&quot; &amp; i).Model.State = 0
+next
+monDlg.GetControl(&quot;CommandButton&quot; &amp; numBouton).Model.State = 1
+if numBouton = 59 then monDlg.getControl(&quot;CommandButton2&quot;).Model.EnableVisible = false else monDlg.getControl(&quot;CommandButton2&quot;).Model.EnableVisible = true
+end sub
+
+sub InitialiseAucuneSelection(Etat as boolean)
+Dim i as integer
+for i = 50 to 64
+monDlg.GetControl(&quot;CommandButton&quot; &amp; i).Enable = Etat
+next
+monDlg.GetControl(&quot;CommandButton31&quot;).Enable = Etat
+monDlg.GetControl(&quot;CommandButton22&quot;).Enable = Etat
+monDlg.GetControl(&quot;CommandButton23&quot;).Enable = Etat
+end sub
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;*****************************  TEST DE L&apos;OBJET SELECTIONNE *****************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+
+Sub ah2D_TestSelection
+Dim oSelection as object, oTypeForme as string
+Dim message1 as string, message2 as string
+message1 = &quot;The selected shape is not recognized&quot; &amp; chr(13) &amp;_
+           &quot;or this shape don&apos;t contain a line or a circle&quot;
+           
+message2 = &quot;Only one shape must be selected&quot;           
+           
+oSelection = oDocActif.CurrentSelection
+oTypeForme = TypeForme(oSelection(0))
+
+SelectionOK = 1  &apos;initialisation : forme reconnue
+
+if oTypeForme = &quot;Aucune forme sélectionnée ou forme non reconnue&quot; then SelectionOK = AucuneSelection
+if SelectionOK = -1 then
+  msgbox(Message1,0,&quot;AHmath3D&quot;)
+  Exit sub
+end if
+
+if IsNull(oSelection) = false then
+  if oSelection.Count&gt;1 then
+  msgbox(Message2,0,&quot;AHmath3D&quot;)
+  SelectionOK = -1
+  Exit Sub
+end if
+end if
+
+    &apos;Si la selection a passé les différents tests alors  SelectionOK = 0 ou 1
+
+end sub
+
+
+
+
+
+
+function AucuneSelection as Integer   &apos;teste si la selection est vide
+Dim oSelection as object, oTypeForme as string, curseurVisible as object, otext as string
+
+oDocActif = ThisComponent
+if oDocActif.ImplementationName = &quot;SwXTextDocument&quot; then oPageActive = oDocActif.DrawPage
+if oDocActif.ImplementationName = &quot;SdXImpressDocument&quot; then oPageActive = oDocActif.DrawPages(0)
+
+ AucuneSelection = -1  &apos;initialisation selection non reconnue
+
+if oDocActif.ImplementationName = &quot;SdXImpressDocument&quot; then
+ if IsNull(oDocActif.CurrentSelection) then  AucuneSelection = 0
+end if
+
+if oDocActif.ImplementationName = &quot;SwXTextDocument&quot; then
+ oSelection = oDocActif.CurrentSelection
+ oTypeForme = TypeForme(oSelection(0))
+ 
+ if oTypeForme = &quot;Aucune forme sélectionnée ou forme non reconnue&quot; then
+ 
+ if oSelection(0).ImplementationName = &quot;SwXTextRange&quot; then
+
+ ON ERROR GOTO GestionErreur
+ curseurVisible = oDocActif.CurrentController.ViewCursor
+ oText = curseurVisible.getString()
+ curseurVisible.goLeft(Len(oText), false)
+ AucuneSelection = 0
+ end if
+ end if
+ 
+ 
+FinErreur1:
+   On Error GoTo 0 
+   Exit function     
+
+GestionErreur:
+ AucuneSelection = -1
+Resume FinErreur1
+ 
+end if
+
+end function
+
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;&apos;******************************      OPTIONS     ***************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+
+sub GestionOption
+
+if oTypeElement = &quot;Ligne&quot; and oPageTemp(eZorder).Name &lt;&gt; &quot;ah2D_point&quot; then
+     monDlg.getControl(&quot;Label24&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;ListBox2&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;CommandButton16&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;CommandButton17&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;Label25&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;ListBox3&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;CommandButton18&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;CommandButton19&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;TextField19&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;TextField20&quot;).Model.EnableVisible = true
+end if
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then
+     monDlg.getControl(&quot;Label24&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;ListBox2&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton16&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;CommandButton17&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;Label25&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;ListBox3&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton18&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton19&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;TextField19&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;TextField20&quot;).Model.EnableVisible = false
+end if
+if oTypeElement = &quot;Cercle&quot; then
+     monDlg.getControl(&quot;Label24&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;ListBox2&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton16&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton17&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;Label25&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;ListBox3&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton18&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton19&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;TextField19&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;TextField20&quot;).Model.EnableVisible = false
+end if
+if oTypeElement &lt;&gt; &quot;Ligne&quot; and oTypeElement &lt;&gt; &quot;Cercle&quot; then
+     monDlg.getControl(&quot;Label24&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;ListBox2&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton16&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;CommandButton17&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;Label25&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;ListBox3&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton18&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;CommandButton19&quot;).Model.EnableVisible = false
+     monDlg.getControl(&quot;TextField19&quot;).Model.EnableVisible = true
+     monDlg.getControl(&quot;TextField20&quot;).Model.EnableVisible = false
+end if
+
+
+
+end sub
+
+
+
+
+
+sub DeplaceSegment(k1 as integer,k2 as integer, optional ordreElement as integer )   
+Dim i as integer
+Dim posX as Long, posY as Long, posSegmentMove as New com.sun.star.awt.Point
+Dim oDist as double, TestDist as integer
+SupprimePoints_AB
+If IsMissing(ordreElement) then  ordreElement = eZorder
+
+TestDist = ZT_Nbre(monDlg,  &quot;TextField18&quot;, 0.001 , 5 , 0.5 , oReponseDlg(79),)
+
+if TestDist = 1 then
+
+oDist = CDbl(monDlg.GetControl(&quot;TextField18&quot;).Peer.Text)
+PosX = oPageTemp(ordreElement).Position.X
+PosY = oPageTemp(ordreElement).Position.Y
+posSegmentMove.X = PosX + k1 * oDist*1000
+posSegmentMove.Y = PosY + k2 * oDist*1000
+
+if ordreElement = eZorder then
+sx0 = sx0 + k1 * oDist*1000
+sx1 = sx1 + k1 * oDist*1000
+sy0 = sy0 + k2 * oDist*1000
+sy1 = sy1 + k2 * oDist*1000
+end if
+
+oPageTemp(ordreElement).Position = posSegmentMove
+end if   
+end sub
+
+
+
+sub DeplaceDroite_click
+Dim k as integer
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then
+  k = OrdreElement2(eZorder)
+  if k &lt;&gt; -1 then DeplaceSegment(1,0,k)
+end if
+DeplaceSegment(1,0)
+
+end sub
+
+sub DeplaceGauche_click
+Dim k as integer
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then
+  k = OrdreElement2(eZorder)
+  if k &lt;&gt; -1 then DeplaceSegment(-1,0,k)
+end if
+DeplaceSegment(-1,0)
+end sub
+
+sub DeplaceHaut_click
+Dim k as integer
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then
+  k = OrdreElement2(eZorder)
+  if k &lt;&gt; -1 then DeplaceSegment(0,-1,k)
+end if
+DeplaceSegment(0,-1)
+end sub
+
+sub DeplaceBas_click
+Dim k as integer
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then
+  k = OrdreElement2(eZorder)
+  if k &lt;&gt; -1 then DeplaceSegment(0,1,k)
+end if
+DeplaceSegment(0,1)
+end sub
+
+
+
+
+sub PivoteSegment(k as integer)
+Dim oAngle as double, TestAngle as integer, TestPoint as boolean, morceauPoint as integer
+Dim oCentreRot as integer, i as integer, N as integer
+Dim sxc as double, syc as double, x1 as double, y1 as double, x0 as double, y0 as double
+
+N = oPageTemp.count
+
+TestPoint = false
+oCentreRot = ReponseListe(monDlg,&quot;ListBox2&quot;)(1)
+
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then
+   oCentreRot = 2
+   TestPoint = true
+end if
+
+if TypeForme(oPageTemp(eZorder)) &lt;&gt; &quot;Ligne&quot; and TypeForme(oPageTemp(eZorder)) &lt;&gt; &quot;Cercle&quot; then oCentreRot = 3
+
+TestAngle = ZT_Nbre(monDlg,  &quot;TextField19&quot;,-180 , 180 , 5 , oReponseDlg(71),)
+
+if TestAngle = 1 then
+oAngle = CDbl(monDlg.GetControl(&quot;TextField19&quot;).Peer.Text)
+
+   if oCentreRot = 0 then
+   sx1 = sx0 +  sLong*1000*cos((sAngle+ k * oAngle)*pi/180)
+   sy1 = sy0 -  sLong*1000*sin((sAngle + k * oAngle)*pi/180)
+   end if
+   if oCentreRot = 1 then
+   sx0 = sx1 -  sLong*1000*cos((sAngle+ k * oAngle)*pi/180)
+   sY0 = sy1 +  slong*1000*sin((sAngle + k * oAngle)*pi/180)
+   end if
+   if oCentreRot = 2 then
+   sxc = (sx0 + sx1)/2
+   syc = (sy0 + sy1)/2
+   x1 = sx1
+   y1 = sy1
+   x0 = sx0
+   y0 = sy0
+   sx1 = cos(-k * oAngle * pi/180) * (x1 - sxc) - sin(-k * oAngle * pi/180) * (y1 - syc) + sxc
+   sy1 = sin(-k * oAngle * pi/180) * (x1 - sxc) + cos(-k * oAngle * pi/180) * (y1 - syc) + syc
+   sx0 = cos(-k * oAngle * pi/180) * (x0 - sxc) - sin(-k * oAngle * pi/180) * (y0 - syc) + sxc
+   sy0 = sin(-k * oAngle * pi/180) * (x0 - sxc) + cos(-k * oAngle * pi/180) * (y0 - syc) + syc
+   
+   end if
+if oCentreRot &lt; 3 then
+   SegmentDraw(sx0, sy0, sx1, sy1, 30, &quot;plein&quot;)
+   oPageTemp.Remove(oPageTemp(eZorder))
+   oPageTemp(N-1).Zorder = eZorder
+   oPageTemp(eZorder).LineWidth = sEpaisseur + 100
+   oPageTemp(eZorder).LineColor = RGB(0,0,255)
+   oPageTemp(eZorder).LineStyle = sPointille 
+   if TestPoint = true then oPageTemp(eZorder).Name = &quot;ah2D_point&quot;
+   sAngle = oPageTemp(eZorder).RotateAngle /100     &apos;Angle du segment avec l&apos;horizontal
+   if sAngle &gt; 180 then sAngle = sAngle - 360
+   if sAngle &lt; -180 then sAngle = sAngle + 360
+   monDlg.getControl(&quot;info1&quot;).Text = sLong
+   monDlg.getControl(&quot;info2&quot;).Text = sAngle
+   AffichageApercu
+
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then   &apos;pivote le 2ème segment du point
+   morceauPoint = -1  &apos;initialisation
+   morceauPoint = OrdreElement2(eZorder)
+   if morceauPoint &gt;=0 then
+   oPageTemp(morceauPoint).RotateAngle = oPageTemp(morceauPoint).RotateAngle + k * oAngle * 100
+   end if
+end if
+end if
+
+if oCentreRot = 3 then     &apos;cas d&apos;un objet autre que segment ou cercle
+   oPageTemp(eZorder).RotateAngle = oPageTemp(eZorder).RotateAngle + k * oAngle * 100
+end if
+
+end if
+end sub
+
+
+sub pivotePlus_click
+SupprimePoints_AB
+PivoteSegment(1)
+end sub
+
+sub pivoteMoins_click
+SupprimePoints_AB
+PivoteSegment(-1)
+end sub
+
+
+sub ModifieLongueur(k as integer)
+Dim oExt as integer,i as integer, N as integer
+Dim oDist as double, TestDist as integer
+Dim xAB as double, yAB as double
+Dim x0 as double, y0 as double,x1 as double,y1 as double, sLongProv as double
+
+xAB = (sx1 - sx0)/(sLong*1000)
+yAB = (sy1 - sy0)/(sLong*1000)
+N = oPageTemp.count
+oExt = ReponseListe(monDlg,&quot;ListBox3&quot;)(1)
+
+TestDist = ZT_Nbre(monDlg,  &quot;TextField20&quot;,0.001 , 5 , 0.5 , oReponseDlg(79),)
+
+if TestDist = 1 then
+oDist = CDbl(monDlg.GetControl(&quot;TextField20&quot;).Peer.Text)
+
+if k = -1 and oDist &gt;= sLong then
+  msgbox(oReponseDlg(78), 0, &quot;AHmath3D&quot;)
+
+  else
+  
+  if oExt = 0 then
+  sx0 = sx0 - k * oDist* 1000 * xAB
+  sy0 = sy0 - k * oDist* 1000 * yAB
+  else
+  sx1 = sx1 + k * oDist* 1000 * xAB
+  sy1 = sy1 + k * oDist* 1000 * yAB
+  end if
+
+   sLong = CInt(sqr((sx1-sx0)*(sx1 - sx0) + (sy1-sy0)*(sy1-sy0))/10)/100   &apos;longueur du segment
+   SegmentDraw(sx0, sy0, sx1, sy1, 30, &quot;plein&quot;)
+   oPageTemp.Remove(oPageTemp(eZorder))
+   oPageTemp(N-1).Zorder = eZorder
+   oPageTemp(eZorder).LineWidth = sEpaisseur + 100
+   oPageTemp(eZorder).LineColor = RGB(0,0,255)
+   oPageTemp(eZorder).LineStyle = sPointille
+   sAngle = oPageTemp(eZorder).RotateAngle /100     &apos;Angle du segment avec l&apos;horizontal
+   if sAngle &gt; 180 then sAngle = sAngle - 360
+   if sAngle &lt; -180 then sAngle = sAngle + 360
+
+monDlg.getControl(&quot;info1&quot;).Text = sLong
+monDlg.getControl(&quot;info2&quot;).Text = sAngle
+AffichageApercu
+
+end if
+end if
+end sub
+
+
+sub ModifieLongPlus_click
+SupprimePoints_AB
+ModifieLongueur(1)
+end sub
+
+sub ModifieLongMoins_click
+SupprimePoints_AB
+ModifieLongueur(-1)
+end sub
+
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;************************       NAVIGATION         **************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+sub Termine_click
+
+if monDlg.Model.Step &lt;&gt; 19 then
+   SupprimePoints_AB
+   SupprimeDroiteVerte
+   oPageTemp(eZorder).LineWidth = sEpaisseur
+   oPageTemp(eZorder).LineColor = sCouleur
+   initialisationIntersection
+end if
+   
+   monDlg.Model.Tag= &quot;fin&quot;   &apos;met fin au tag du dialogue quand tout est validé
+   monDlg.EndExecute
+   ah2DStep = 30 &apos;pour terminer sans repasser par les differentes etapes de constructions
+end sub
+
+sub Annule_click
+   monDlg.Model.Tag= &quot;fin&quot;   &apos;met fin au tag du dialogue quand tout est validé
+   monDlg.EndExecute
+   ah2DStep = 31 &apos;pour terminer sans repasser par les differentes etapes de constructions
+end sub
+
+sub IncrementerElement(k as integer)
+Dim PointZorder2 as integer
+    &apos;k = 1 pour suivant     k = -1 pour précédent
+    &apos;K = 2 pour dernier     k = -2 pour premier
+
+SupprimePoints_AB
+SupprimeDroiteVerte
+nElements = oPageTemp.count
+
+oPageTemp (eZorder).Linewidth = sEpaisseur
+oPageTemp(eZorder).LineColor = sCouleur
+
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then PointZorder2 = OrdreElement2(eZorder) else PointZorder2 = -1   &apos;-1 pour aucun
+
+if k = 1 then 
+    eZorder = (eZorder + 1) MOD nElements
+    if eZorder = PointZorder2 then eZorder = (eZorder + 1) MOD nElements      &apos; pour eviter la 2ème branche d&apos;un point
+end if
+
+if k = 2 then eZorder = nElements - 1
+
+if k = -1 then
+    eZorder = (eZorder + nElements - 1) MOD nElements
+    if eZorder = PointZorder2 then eZorder = (eZorder + nElements - 1) MOD nElements
+end if
+
+if k = -2 then eZorder = 0
+
+
+
+   oTypeElement = TypeForme(oPageTemp(eZorder))
+   if oTypeElement = &quot;Ligne&quot; then InfoSegment(eZorder,oPageTemp)
+   if oTypeElement = &quot;Cercle&quot; then InfoCercle(eZorder,oPageTemp)
+   if oTypeElement &lt;&gt; &quot;Ligne&quot; and oTypeElement &lt;&gt; &quot;Cercle&quot; then
+       sLong = 0
+       sAngle = 0
+    end if
+    if oTypeElement = &quot;Ligne&quot; and oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then
+       sLong = 0
+       sAngle = 0
+    end if
+        
+    sEpaisseur = oPageTemp(eZorder).LineWidth
+    sCouleur = oPageTemp(eZorder).LineColor
+    oPageTemp(eZorder).LineWidth = sEpaisseur + 100
+    oPageTemp(eZorder).LineColor = RGB(0,0,255)
+    monDlg.getControl(&quot;info1&quot;).Text = sLong
+    monDlg.getControl(&quot;info2&quot;).Text = sAngle
+    if oTypeElement = &quot;Ligne&quot; then monDlg.getControl(&quot;Label2&quot;).Text = oReponseDlg(84)   else   monDlg.getControl(&quot;Label2&quot;).Text = oReponseDlg(85)
+    AffichageApercu
+
+end sub
+
+
+
+sub ElementSuivant
+IncrementerElement(1)
+IgnorerFormeInconnue(1)
+AffichageFenetreAction
+GestionOption
+end sub
+
+sub ElementPrecedent
+IncrementerElement(-1)
+IgnorerFormeInconnue(-1)
+AffichageFenetreAction
+GestionOption
+end sub
+
+sub IgnorerFormeInconnue(k as integer)  &apos;lors de la navigation   k = 1 ou k = -1
+Dim oTypeForme as string, nbre as integer, compteurforme as integer
+
+if monDlg.GetControl(&quot;CheckBox1&quot;).Model.State = 1 then      &apos;Ignorer les formes inconnues dans la naigation
+  nbre = oPageTemp.count
+  compteurforme = 0
+  oTypeForme = TypeForme (oPageTemp(eZorder))
+
+  While oTypeForme &lt;&gt; &quot;Cercle&quot; and oTypeForme &lt;&gt; &quot;Ligne&quot; and compteurforme &lt;&gt; nbre
+  IncrementerElement(k)
+  oTypeForme = TypeForme (oPageTemp(eZorder))
+  compteurforme = compteurforme + 1
+  Wend
+end if
+end sub
+
+
+sub ElementPremier
+IncrementerElement(-2)
+AffichageFenetreAction
+GestionOption
+end sub
+
+sub ElementDernier
+IncrementerElement(2)
+AffichageFenetreAction
+GestionOption
+end sub
+
+
+
+
+sub SupprimerElement_click
+dim testElementestPoint as boolean, morceauPoint as integer
+
+testElementestPoint = false
+SupprimePoints_AB
+nElements = oPageTemp.count
+morceauPoint = -1
+
+if nElements &gt; 1 then
+  if oPagetemp(eZorder).Name = &quot;ah2D_point&quot; then
+     testElementestPoint = true
+     morceauPoint = OrdreElement2(eZorder)
+     if morceauPoint &gt; eZorder then morceauPoint = morceauPoint - 1   &apos;decalage de 1 du à la supression du premier segment
+  end if
+  oPagetemp.Remove(oPagetemp(eZorder)) 
+  if eZorder = 0 then eZorder = nElements - 2 else eZorder = eZorder - 1  
+  
+  if morceauPoint &gt;=0 then
+    oPagetemp.Remove(oPagetemp(morceauPoint)) 
+    if eZorder = nElements - 2 then eZorder = nElements - 3
+  end if
+  
+   oTypeElement = TypeForme(oPageTemp(eZorder))
+   if oTypeElement = &quot;Ligne&quot; then InfoSegment(eZorder,oPageTemp)
+   if oTypeElement = &quot;Cercle&quot; then InfoCercle(eZorder,oPageTemp)
+    sEpaisseur = oPageTemp(eZorder).LineWidth
+    sCouleur = oPageTemp(eZorder).LineColor
+    oPageTemp(eZorder).LineWidth = sEpaisseur + 100
+    oPageTemp(eZorder).LineColor = RGB(0,0,255)
+    monDlg.getControl(&quot;info1&quot;).Text = sLong
+    monDlg.getControl(&quot;info2&quot;).Text = sAngle
+    if oTypeElement = &quot;Ligne&quot; then monDlg.getControl(&quot;Label2&quot;).Text = oReponseDlg(84)   else   monDlg.getControl(&quot;Label2&quot;).Text = oReponseDlg(85)
+    AffichageApercu
+    nAjout = 0
+    else
+    msgbox(oReponseDlg(86), 0, &quot;AHmath3D&quot;)
+end if
+
+end sub
+
+
+sub supprimerDernier_click
+Dim i as integer
+SupprimePoints_AB
+SupprimeDroiteVerte
+nElements = oPageTemp.count
+if nAjout &gt; 0 then
+ for i = 1 to nAjout
+  oPagetemp.Remove(oPagetemp(nElements - i)) 
+ next
+end if
+nAjout = 0
+
+
+nElements = oPageTemp.count  Rem : gere le cas où l&apos;élément sélectionné est supprimé
+if eZorder&gt;=nElements then eZorder = nElements - 1
+
+
+AffichageFenetreAction
+
+end sub
+
+
+
+
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;******************************      RELIER 2 POINTS      *******************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+
+sub repererPoint
+Dim i as integer, j as integer, nPointsMultiple as integer
+
+TabPointX = Null
+TabPointY = Null
+
+j = 0
+nElements = oPageTemp.count
+Dim varX(2*nElements) as variant, varY(2*nElements) as variant
+
+for i = 0 to 2*nElements - 1   rem initialisation des variables
+varX(i) = Null
+varY(i) = Null
+next
+
+for i = 0 to nElements - 1
+
+if TypeForme(oPageTemp(i)) = &quot;Ligne&quot; then
+  if oPageTemp(i).Name &lt;&gt; &quot;ah2D_point&quot; then
+    varX(j) = oPageTemp(i).Polygon(0).X
+    varY(j) = oPageTemp(i).Polygon(0).Y
+    varX(j+1) = oPageTemp(i).Polygon(1).X
+    varY(j+1) = oPageTemp(i).Polygon(1).Y
+    j = j+2
+  end if
+  if oPageTemp(i).Name = &quot;ah2D_point&quot; then
+    varX(j) = (oPageTemp(i).Polygon(0).X + oPageTemp(i).Polygon(1).X)/2
+    varY(j) = (oPageTemp(i).Polygon(0).Y + oPageTemp(i).Polygon(1).Y)/2
+    j = j+1
+  end if
+end if 
+next
+nPointsMultiple = j   rem : nombre de points non nuls mais présents plusieurs fois
+
+&apos;--------------------------------------- épurer les points avec une precision de 10 (1/10 mm)
+for i = 0 to nPointsMultiple - 2
+    if IsNull(varX(i)) = false then
+    for j = i + 1 to nPointsMultiple - 1
+    if IsNull(varX(j)) = false then
+    if abs(varX(j) - varX(i)) &lt; 10 and abs(varY(j) - varY(i)) &lt; 10 then
+    varX(j) = Null
+    varY(j) = Null
+    end if
+    end if
+    Next
+    end if
+Next
+
+j = 0
+for i = 0 to nPointsMultiple - 1
+if IsNull(varX(i)) = false then  j = j+1
+next
+
+nPoints = j  REM nombre final de points
+
+if nPoints &gt; 1 then
+
+Dim var2X(nPoints-1) as variant, var2Y(nPoints-1) as variant
+j = 0
+for i = 0 to nPointsMultiple-1
+if IsNull(varX(i)) = false then
+var2X(j) = varX(i)
+var2Y(j) = varY(i)
+j = j+1
+end if
+next
+
+TabPointX = var2X
+TabPointY = var2Y
+
+&apos;else
+&apos;msgbox(oReponseDlg(91))
+end if
+end sub
+
+
+
+sub AfficherPointsNavig
+Dim j as integer, i as integer
+
+repererPoint
+
+if nPoints &lt; 2 then 
+  msgbox(oReponseDlg(92), 0, &quot;AHmath3D&quot;)
+  Exit Sub
+end if
+
+nElements = oPageTemp.count
+
+j=0
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then
+  for i = 0 to nPoints - 1
+  if abs(TabPointX(i) - (sx0 + sx1)/2) &lt; 10 and abs(TabPointY(i) - (sy0 + sy1)/2) &lt; 10 then j = i
+  next
+
+
+pxa = TabPointX(j)
+pya = TabPointY(j)
+
+if pxa &lt;&gt; TabPointX(0) and pya &lt;&gt; TabPointY(0) then
+  pxb = TabPointX(0)
+  pyb = TabPointY(0)
+  else
+  pxb = TabPointX(1)
+  pyb = TabPointY(1)
+end if
+end if  
+
+if oPageTemp(eZorder).Name &lt;&gt; &quot;ah2D_point&quot; then
+pxa = TabPointX(0)
+pya = TabPointY(0)
+pxb = TabPointX(1)
+pyb = TabPointY(1)
+
+end if
+
+CercleDraw(pxa,pya,200)
+CercleDraw(pxb,pyb,200)
+oPageTemp(nElements).FillStyle = com.sun.star.drawing.FillStyle.SOLID
+oPageTemp(nElements + 1).FillStyle = com.sun.star.drawing.FillStyle.SOLID
+oPageTemp(nElements).FillColor  = RGB(255,0,0)
+oPageTemp(nElements + 1).FillColor  = RGB(38,251,123)
+oPageTemp(nElements).Name = &quot;PointAB&quot;
+oPageTemp(nElements+1).Name = &quot;PointAB&quot;
+
+
+end sub
+
+
+
+
+
+sub AfficherPointB
+Dim j as integer, i as integer
+
+  repererPoint
+  pxb = TabPointX(0)
+  pyb = TabPointY(0)
+
+nElements = oPageTemp.count
+CercleDraw(pxb,pyb,200)
+oPageTemp(nElements).FillStyle = com.sun.star.drawing.FillStyle.SOLID
+oPageTemp(nElements).FillColor  = RGB(38,251,123)
+oPageTemp(nElements).Name = &quot;PointAB&quot;
+
+end sub
+
+
+
+sub bougerPoint_click(k as integer, xp as double, yp as double,xs as double, ys as double, nomPoint as string, optional PtBseul as boolean)   
+Dim i as integer, j as integer, oIndice as integer
+
+If IsMissing(PtBseul) then PtBseul = false   &apos;pour ne bouger qu&apos;un seul point
+
+if nPoints &gt; 1 then
+
+
+for i = 0 to nPoints - 1
+if xp = TabPointX(i) and yp = TabPointY(i) then j = i
+Next
+if k = 1 then
+ if j &lt; nPoints -1 then
+ xp = TabPointX(j + 1)
+ yp = TabPointY(j + 1)
+ oIndice = j+1
+ else
+ xp = TabPointX(0)
+ yp = TabPointY(0)
+ oIndice = 0
+ end if
+ if PtBseul = false then
+   if xp = xs and yp = ys then
+     if xp = TabPointX(nPoints - 1) and yp = TabPointY(nPoints - 1) then
+     xp = TabPointX(0)
+     yp = TabPointY(0)
+     else
+     xp = TabPointX(oIndice + 1)
+     yp = TabPointY(oIndice + 1)
+     end if
+   end if
+ end if
+end if
+if k = -1 then
+ if j &gt; 0 then
+ xp = TabPointX(j - 1)
+ yp = TabPointY(j - 1)
+ oIndice = j-1
+ else
+ xp = TabPointX(nPoints -1)
+ yp = TabPointY(nPoints -1)
+ oIndice = nPoints -1
+ end if
+if PtBseul = false then
+     if xp = xs and yp = ys then
+        if xp = TabPointX(0) and yp = TabPointY(0) then
+        xp = TabPointX(nPoints -1)
+        yp = TabPointY(nPoints -1)
+        else
+        xp = TabPointX(oIndice - 1)
+        yp = TabPointY(oIndice - 1)
+        end if
+     end if
+end if
+end if  
+  nElements = oPageTemp.count
+  
+  if nomPoint = &quot;A&quot; then 
+  oPagetemp.Remove(oPagetemp(nElements - 2))
+  CercleDraw(xp,yp,200) 
+  oPageTemp(nElements-1).FillStyle = com.sun.star.drawing.FillStyle.SOLID
+  oPageTemp(nElements-1).FillColor  = RGB(255,0,0)
+  oPageTemp(nElements-1).Name = &quot;PointAB&quot;
+  oPageTemp(nElements - 1).Zorder  = nElements -2
+  
+  else
+  oPagetemp.Remove(oPagetemp(nElements - 1))
+  CercleDraw(xp,yp,200) 
+  oPageTemp(nElements-1).FillStyle = com.sun.star.drawing.FillStyle.SOLID
+  oPageTemp(nElements-1).FillColor  = RGB(38,251,123)
+  oPageTemp(nElements-1).Name = &quot;PointAB&quot;
+  end if
+end if
+
+end sub
+
+
+sub PointA_droite
+bougerPoint_click(1, pxa, pya,pxb,pyb,&quot;A&quot;)
+end sub
+
+sub PointA_gauche
+bougerPoint_click(-1, pxa, pya,pxb,pyb,&quot;A&quot;)
+end sub
+
+sub PointB_droite
+bougerPoint_click(1, pxb, pyb,pxa, pya,&quot;B&quot;)
+end sub
+
+sub PointB_gauche
+bougerPoint_click(-1, pxb, pyb,pxa, pya,&quot;B&quot;)
+end sub
+
+
+
+sub SupprimePoints_AB
+nElements = oPageTemp.count
+if nElements &gt; 1 then
+if oPageTemp(nElements - 1).Name = &quot;PointAB&quot; then oPagetemp.Remove(oPagetemp(nElements - 1))
+if oPageTemp(nElements - 2).Name = &quot;PointAB&quot; then oPagetemp.Remove(oPagetemp(nElements - 2))
+end if
+end sub
+
+
+
+sub RecherchePoint
+Dim i as integer, j as integer, nMiniSegments as integer, test as integer
+
+test = ZT_Nbre(monDlg,  &quot;TextField29&quot;, 0.1 , 5 , 0.5 , oReponseDlg(79),)
+if test = 1 then
+ oReponseDlg(6) = CDbl(monDlg.getControl(&quot;TextField29&quot;).Peer.Text)
+ SupprimePoints_AB
+ nElements = oPageTemp.count
+
+ j = 0
+ for i = 0 to nElements -1 
+  if TypeForme(oPageTemp(i)) = &quot;Ligne&quot; then
+     if LgSgtDraw(oPageTemp(i)) &lt; oReponseDlg(6)*sqr(2) then 
+     oPageTemp(i).Name = &quot;ah2D_point&quot;
+     j = j+1
+    end if
+  end if
+ next
+ 
+ 
+if j &gt; 0 then   REM compte le nombre de points trouvés
+  Dim Milieu0 as variant, Milieu1 as variant, iMS(j-1) as integer   &apos;iMS = indice &quot;ordre&quot; minisegment
+  nMiniSegments = j
+
+  j = 0
+  for i = 0 to nElements -1
+  if oPageTemp(i).Name = &quot;ah2D_point&quot; then
+   iMS(j) = i
+   j = j+1
+  end if
+next
+j=0
+
+for i = 0 to nMiniSegments-2
+        if iMS(i) &gt; 0 then
+        Milieu0 = MilSgtDraw(oPageTemp(iMS(i)))
+        for j = i+1 to nMiniSegments-1
+           if iMS(j) &gt; 0 then
+              Milieu1 = MilSgtDraw(oPageTemp(iMS(j)))
+              if abs(Milieu0(0) - Milieu1(0)) &lt; 10 and abs(Milieu0(1) - Milieu1(1)) &lt; 10 then iMS(j) = -1
+           end if
+        next
+       end if
+Next
+j = 0
+for i = 0 to nMiniSegments-1
+  if iMS(i) &gt;= 0 then j = j + 1
+next
+end if
+
+msgbox(j &amp; &quot; &quot; &amp; oReponseDlg(80), 0, &quot;AHmath3D&quot;)
+
+repererPoint
+AffichageApercu
+AffichageFenetreAction
+end if
+end sub
+
+
+function OrdreElement2(ordreElement1 as integer) as integer      &apos;renvoie l&apos;ordre du 2ème segment d&apos;un point  ou -1
+Dim oElement1 as object, oElement2 as object, Milieu0 as variant, Milieu1 as variant,i as integer
+
+OrdreElement2 = -1   &apos;restera à -1 si aucun autre élément est trouvé  
+
+nElements = oPageTemp.count
+oElement1 = oPageTemp(ordreElement1)
+if oElement1.Name = &quot;ah2D_point&quot; then
+   for i = 0 to nElements - 1
+     oElement2 = oPageTemp(i)
+     if  oElement2.Name = &quot;ah2D_point&quot; and i &lt;&gt; ordreElement1 then
+     Milieu0 = MilSgtDraw(oElement1)
+     Milieu1 = MilSgtDraw(oElement2)
+     if abs(Milieu0(0) - Milieu1(0)) &lt; 10 and abs(Milieu0(1) - Milieu1(1)) &lt; 10 then OrdreElement2 = i
+     end if
+   next
+end if
+
+end function
+
+
+sub AnnulePoint
+Dim k as integer
+if oPageTemp(eZorder).Name = &quot;ah2D_point&quot; then oPageTemp(eZorder).Name = &quot;Ligne&quot;
+k = OrdreElement2(eZorder)
+if k&lt;&gt;-1 then oPageTemp(k).Name = &quot;Ligne&quot;
+repererPoint
+end sub
+
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;******************************      INTERSECTION      **********************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+
+
+sub CommandButton33_click    &apos;objet1
+if monDlg.GetControl(&quot;CommandButton33&quot;).Model.State = 1 then
+   InfoInters(0)
+   ElementSuivant
+   
+   
+   if intersZorder(1) = eZorder then ElementSuivant
+
+   if (intersType(0) = &quot;Ligne&quot; and intersName(0) &lt;&gt; &quot;ah2D_point&quot;) or intersType(0) = &quot;Cercle&quot; then
+      if intersZorder(1) &lt;&gt; intersZorder(0) then
+         oPageTemp(intersZorder(0)).LineColor = RGB(38,251,123)
+         oPageTemp(intersZorder(0)).LineWidth = sEpaisseur + 100
+         monDlg.GetControl(&quot;Label47&quot;).Model.BackgroundColor = RGB(38,251,123)
+      else
+         msgbox (oReponseDlg(90), 0, &quot;AHmath3D&quot;)
+         monDlg.GetControl(&quot;CommandButton33&quot;).Model.State = 0
+         intersZorder(0) = -1
+      end if
+   else
+      msgbox(oReponseDlg(89), 0, &quot;AHmath3D&quot;)
+      monDlg.GetControl(&quot;CommandButton33&quot;).Model.State = 0
+      intersZorder(0) = -1
+   end if
+
+Else
+   oPageTemp(intersZorder(0)).LineColor = sCouleurInters(0)
+   oPageTemp(intersZorder(0)).LineWidth = sEpaisseurInters(0)
+   intersZorder(0) = -1
+   monDlg.GetControl(&quot;Label47&quot;).Model.BackgroundColor = RGB(255,255,255)
+end if
+end sub
+
+
+
+sub CommandButton34_click    &apos;objet2
+if monDlg.GetControl(&quot;CommandButton34&quot;).Model.State = 1 then
+   InfoInters(1)
+   ElementSuivant
+   if intersZorder(0) = eZorder then ElementSuivant
+
+   if (intersType(1) = &quot;Ligne&quot; and intersName(1) &lt;&gt; &quot;ah2D_point&quot;) or intersType(1) = &quot;Cercle&quot; then
+       if intersZorder(1) &lt;&gt; intersZorder(0) then
+          oPageTemp(intersZorder(1)).LineColor = RGB(38,251,123)
+          oPageTemp(intersZorder(1)).LineWidth = sEpaisseur + 100
+          monDlg.GetControl(&quot;Label49&quot;).Model.BackgroundColor = RGB(38,251,123)
+       else
+          msgbox (oReponseDlg(90), 0, &quot;AHmath3D&quot;)
+          monDlg.GetControl(&quot;CommandButton34&quot;).Model.State = 0
+          intersZorder(1) = -1
+       end if
+   else
+       msgbox(oReponseDlg(89), 0, &quot;AHmath3D&quot;)
+       monDlg.GetControl(&quot;CommandButton34&quot;).Model.State = 0
+       intersZorder(1) = -1
+   end if
+
+Else
+   oPageTemp(intersZorder(1)).LineColor = sCouleurInters(1)
+   oPageTemp(intersZorder(1)).LineWidth = sEpaisseurInters(1)
+   intersZorder(1) = -1
+   monDlg.GetControl(&quot;Label49&quot;).Model.BackgroundColor = RGB(255,255,255)
+end if
+end sub
+
+
+
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;******************************      AFFICHAGE FENETRE ACTION      **********************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+Sub AffichageFenetreAction
+
+if nAjout &gt; 0 then monDlg.GetControl(&quot;CommandButton31&quot;).Enable = true else monDlg.GetControl(&quot;CommandButton31&quot;).Enable = false  &apos;bouton supprimer derniere constr.
+
+SupprimePoints_AB 
+oElement = oPageTemp(eZorder)
+if TypeForme(oElement) = &quot;Ligne&quot; and oElement.Name &lt;&gt; &quot;ah2D_point&quot; then
+if numBoutonMenu =50 then monDlg.Model.Step = 1
+if numBoutonMenu =51 then monDlg.Model.Step = 2
+if numBoutonMenu =52 then monDlg.Model.Step = 3
+if numBoutonMenu =53 then monDlg.Model.Step = 4
+if numBoutonMenu =54 then monDlg.Model.Step = 5
+if numBoutonMenu =55 then monDlg.Model.Step = 6
+if numBoutonMenu =57 then monDlg.Model.Step = 16
+if numBoutonMenu =58 then monDlg.Model.Step = 9
+if numBoutonMenu =59 then monDlg.Model.Step = 15
+if numBoutonMenu =60 then
+   monDlg.Model.Step = 18
+   AfficherPointB
+end if 
+if numBoutonMenu =61 then monDlg.Model.Step = 20  
+if numBoutonMenu =62 then monDlg.Model.Step = 22  
+if numBoutonMenu =63 then monDlg.Model.Step = 23
+if numBoutonMenu =64 then monDlg.Model.Step = 24      
+end if
+
+if TypeForme(oElement) = &quot;Ligne&quot; and oElement.Name = &quot;ah2D_point&quot; then
+if numBoutonMenu =50 then monDlg.Model.Step = 17
+if numBoutonMenu =51 then
+   monDlg.Model.Step = 13
+   AfficherPointsNavig
+   if nPoints &lt; 2 then monDlg.Model.Step = 17
+end if   
+if numBoutonMenu =52 then monDlg.Model.Step = 17
+if numBoutonMenu =53 then monDlg.Model.Step = 17
+if numBoutonMenu =54 then monDlg.Model.Step = 17
+if numBoutonMenu =55 then 
+   monDlg.Model.Step = 14
+   oReponseDlg(5) = ReponseListe(monDlg,&quot;ListBox9&quot;)(1)
+   RechercheLignes
+   if oReponseDlg(5) = 1 then AfficherPointB
+   if oReponseDlg(5) = 2 then
+     indDroite = 0
+     TraceLigne(0)
+   end if
+     
+end if
+if numBoutonMenu =57 then monDlg.Model.Step = 16
+if numBoutonMenu =58 then monDlg.Model.Step = 9
+if numBoutonMenu =59 then monDlg.Model.Step = 15
+if numBoutonMenu =60 then monDlg.Model.Step = 17
+if numBoutonMenu =61 then monDlg.Model.Step = 17
+if numBoutonMenu =62 then monDlg.Model.Step = 22  
+if numBoutonMenu =63 then monDlg.Model.Step = 17
+if numBoutonMenu =64 then monDlg.Model.Step = 24     
+end if
+
+if TypeForme(oElement) = &quot;Cercle&quot; then
+if numBoutonMenu =50 then monDlg.Model.Step = 7
+if numBoutonMenu =51 then monDlg.Model.Step = 8
+if numBoutonMenu =52 then monDlg.Model.Step = 17
+if numBoutonMenu =53 then monDlg.Model.Step = 10
+if numBoutonMenu =54 then monDlg.Model.Step = 11
+if numBoutonMenu =55 then monDlg.Model.Step = 12
+if numBoutonMenu =57 then monDlg.Model.Step = 16
+if numBoutonMenu =58 then monDlg.Model.Step = 9
+if numBoutonMenu =59 then monDlg.Model.Step = 15
+if numBoutonMenu =60 then monDlg.Model.Step = 17
+if numBoutonMenu =61 then monDlg.Model.Step = 17
+if numBoutonMenu =62 then monDlg.Model.Step = 22 
+if numBoutonMenu =63 then monDlg.Model.Step = 17
+if numBoutonMenu =64 then monDlg.Model.Step = 24
+
+end if
+
+if TypeForme(oElement) &lt;&gt; &quot;Cercle&quot; and TypeForme(oElement)&lt;&gt; &quot;Ligne&quot; then
+    if numBoutonMenu &lt;&gt; 59 and numBoutonMenu &lt;&gt; 58 and numBoutonMenu &lt;&gt; 62 and numBoutonMenu &lt;&gt; 63 then monDlg.Model.Step = 17
+    if numBoutonMenu = 59 then monDlg.Model.Step = 15
+    if numBoutonMenu = 58 then monDlg.Model.Step = 9
+    if numBoutonMenu =62 then monDlg.Model.Step = 22
+    if numBoutonMenu =64 then monDlg.Model.Step = 24           
+end if
+
+if numBoutonMenu =56 then
+   monDlg.Model.Step = 13
+   if nPoints &gt; 1 then 
+   AfficherPointsNavig
+   else
+   msgbox(oReponseDlg(92), 0, &quot;AHmath3D&quot;)
+   monDlg.Model.Step = 17
+   end if
+end if
+
+ah2DStep = monDlg.Model.Step
+end sub
+
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;******************************      changement des pointillés      **********************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+
+sub GestionPointilles
+Dim i as integer
+
+nElements = oPageTemp.count
+if oDocActif.ImplementationName =  &quot;SwXTextDocument&quot; then
+   DefTirets
+   for i = 0 to nElements - 1
+   if oPageTemp(i).LineStyle = com.sun.star.drawing.LineStyle.DASH then oPageTemp(i).LineDash = oTiret3D_b
+   Next        
+end if
+end sub
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;*************************************     Bissectrice      *****************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+sub CommandButton32_click &apos;objet1 angle quelconque
+ Ligne_Click(&quot;CommandButton32&quot;,&quot;Label66&quot;,0,1)
+end sub
+sub CommandButton37_click  &apos;objet2 angle quelconque
+ Ligne_Click(&quot;CommandButton37&quot;,&quot;Label67&quot;,1,0)
+end sub
+
+sub InitialiseBissectrice
+   monDlg.GetControl(&quot;Label66&quot;).Model.BackgroundColor = RGB(255,255,255)
+   monDlg.GetControl(&quot;CommandButton32&quot;).Model.State = 0
+   monDlg.GetControl(&quot;Label67&quot;).Model.BackgroundColor = RGB(255,255,255)
+   monDlg.GetControl(&quot;CommandButton37&quot;).Model.State = 0
+end sub
+
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;**********************************      CODAGE      ************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+
+sub codageLong(oSegment as object, k as integer, angleCodage as integer)
+Dim PointsX(2) as variant, PointsY(2) as variant, i as integer,j as integer
+Dim oMilieu as variant
+Dim oAngle as double
+
+oAngle = oSegment.RotateAngle
+oMilieu = MilSgtDraw(oSegment)
+
+for j = 1 to k
+
+PointsX(0) = oMilieu(0) + (j-k/2) * 75 * cos(oAngle * pi/18000)  + 100*cos((oAngle - angleCodage)*pi/18000)
+PointsY(0) = oMilieu(1) - (j-k/2) * 75 * sin(oAngle * pi/18000) - 100*sin((oAngle - angleCodage)*pi/18000)
+PointsX(1) = oMilieu(0) + (j-k/2) * 75 * cos(oAngle * pi/18000) 
+PointsY(1) = oMilieu(1) - (j-k/2) * 75 * sin(oAngle * pi/18000)
+PointsX(2) = oMilieu(0) + (j-k/2) * 75 * cos(oAngle * pi/18000)  + 100*cos((oAngle + angleCodage)*pi/18000)
+PointsY(2) = oMilieu(1) - (j-k/2) * 75 * sin(oAngle * pi/18000) - 100*sin((oAngle + angleCodage)*pi/18000)
+LigneBrisee(PointsX, PointsY, 30)
+next
+
+end sub
+
+
+sub coderSegment(oSeul as Boolean, nTraits as integer, angleCodage as integer)
+Dim i as integer
+
+nAjout = 0
+if oSeul = true then
+ codageLong(oPageTemp(eZorder), nTraits, angleCodage)
+ nAjout = 1
+end if
+
+if oSeul = false then
+  nElements = oPageTemp.Count
+    for i = 0 to nElements - 1
+      if TypeForme(oPageTemp(i)) = &quot;Ligne&quot; then
+         if LgSgtDraw(oPageTemp(i)) = sLong then         
+           codageLong(oPageTemp(i), nTraits, angleCodage)
+           nAjout = nAjout + nTraits
+         end if
+      end if
+    next
+end if
+
+end sub
+
+
+function CoordInters(Ligne1 as object, Ligne2 as object) as variant
+Dim a0 as double, b0 as double, c0 as double, a1 as double,b1 as double,c1 as double
+Dim xP1 as double, yP1 as double, var(2) as variant
+Dim e as double, f as double, g as double, h as double, test as double
+Dim angle1 as integer, angle2 as integer
+
+if sAngleInters(0) &lt; 0 then angle1 = FIX((sAngleInters(0) + 180)*100) else angle1 = FIX(sAngleInters(0)*100)
+if sAngleInters(1) &lt; 0 then angle2 = FIX((sAngleInters(1) + 180)*100) else angle2 = FIX(sAngleInters(1)*100)
+
+&apos; equation cartesienne des droites
+    a0 = Point2Y(0) - Point1Y(0)
+    b0 = -(Point2X(0) - Point1X(0))
+    c0 = Point1X(0)*(-a0) + Point1Y(0)*(-b0)
+ 
+    a1 = Point2Y(1) - Point1Y(1)
+    b1 = -(Point2X(1) - Point1X(1))
+    c1 = Point1X(1)*(-a1) + Point1Y(1)*(-b1)
+     
+    &apos;if a0*Point1X(1) + b0*Point1Y(1) + c0 = 0 then
+    if (Point2X(0) - Point1X(0))*(Point1Y(1) - Point1Y(0)) - (Point2Y(0) - Point1Y(0))*(Point1X(1) - Point1X(0)) = 0 then &apos;AB vect AC = 0
+    var(0) = &quot;confondues&quot;
+    
+    e = sqr((Point1X(1) - Point1X(0))*(Point1X(1) - Point1X(0)) + (Point1Y(1) - Point1Y(0))*(Point1Y(1) - Point1Y(0)))
+    f = sqr((Point1X(1) - Point2X(0))*(Point1X(1) - Point2X(0)) + (Point1Y(1) - Point2Y(0))*(Point1Y(1) - Point2Y(0)))
+    g = sqr((Point2X(1) - Point1X(0))*(Point2X(1) - Point1X(0)) + (Point2Y(1) - Point1Y(0))*(Point2Y(1) - Point1Y(0)))
+    h = sqr((Point2X(1) - Point2X(0))*(Point2X(1) - Point2X(0)) + (Point2Y(1) - Point2Y(0))*(Point2Y(1) - Point2Y(0)))
+    test = MinMax(array(e,f,g,h))(0)
+    if test = e then Var = array(&quot;confondues&quot;, (Point1X(1) + Point1X(0))/2, (Point1Y(1) + Point1Y(0))/2
+    if test = f then Var = array(&quot;confondues&quot;, (Point1X(1) + Point2X(0))/2, (Point1Y(1) + Point2Y(0))/2
+    if test = g then Var = array(&quot;confondues&quot;, (Point2X(1) + Point1X(0))/2, (Point2Y(1) + Point1Y(0))/2
+    if test = h then Var = array(&quot;confondues&quot;, (Point2X(1) + Point2X(0))/2, (Point2Y(1) + Point2Y(0))/2
+    end if
+  
+    if angle1 = angle2 and var(0) &lt;&gt; &quot;confondues&quot; then   &apos;(a0*b1-a1*b0) = 0
+    var(0) = &quot;paralleles&quot;
+    var(1) = 0
+    var(2) = 0
+    end if
+    
+    if angle1 &lt;&gt; angle2 then &apos;(a0*b1-a1*b0) &lt;&gt; 0
+      xP1 = (b0*c1-b1*c0)/(a0*b1-a1*b0)
+      yP1 = (a0*c1-a1*c0)/(a1*b0-a0*b1)
+      var(0) = &quot;secantes&quot;
+      var(1) = xP1
+      var(2) = yP1
+    end if
+    CoordInters = var
+end function
+
+
+
+sub Ligne_Click(NomBouton as string, NomLabel as string, numLigneActive as integer, numLignePassive as integer)  &apos;numLigneActive = 0 ou 1
+if monDlg.GetControl(NomBouton).Model.State = 1 then
+   InfoInters(numLigneActive)
+   ElementSuivant
+   if intersZorder(numLignePassive) = eZorder then ElementSuivant
+
+   if (intersType(numLigneActive) = &quot;Ligne&quot; and intersName(1) &lt;&gt; &quot;ah2D_point&quot;) then
+       if intersZorder(numLigneActive) &lt;&gt; intersZorder(numLignePassive) then
+          oPageTemp(intersZorder(numLigneActive)).LineColor = RGB(38,251,123)
+          oPageTemp(intersZorder(numLigneActive)).LineWidth = sEpaisseur + 100
+          monDlg.GetControl(NomLabel).Model.BackgroundColor = RGB(38,251,123)
+       else
+          msgbox (oReponseDlg(90), 0, &quot;AHmath3D&quot;)
+          monDlg.GetControl(NomBouton).Model.State = 0
+          intersZorder(numLigneActive) = -1
+       end if
+   else
+       msgbox(oReponseDlg(95), 0, &quot;AHmath3D&quot;)
+       monDlg.GetControl(NomBouton).Model.State = 0
+       intersZorder(numLigneActive) = -1
+   end if
+
+Else
+   oPageTemp(intersZorder(numLigneActive)).LineColor = sCouleurInters(numLigneActive)
+   oPageTemp(intersZorder(numLigneActive)).LineWidth = sEpaisseurInters(numLigneActive)
+   intersZorder(numLigneActive) = -1
+   monDlg.GetControl(NomLabel).Model.BackgroundColor = RGB(255,255,255)
+end if
+
+end sub
+
+
+&apos;sub CommandButton24_click  &apos;objet2 angle droit
+&apos; Ligne_Click(&quot;CommandButton24&quot;,&quot;Label55&quot;,1,0)
+&apos;end sub
+&apos;sub CommandButton9_click &apos;objet1 angle droit
+&apos; Ligne_Click(&quot;CommandButton9&quot;,&quot;Label54&quot;,0,1)
+&apos;end sub
+
+sub CommandButton25_click &apos;objet1 angle quelconque
+ Ligne_Click(&quot;CommandButton25&quot;,&quot;Label58&quot;,0,1)
+end sub
+sub CommandButton30_click  &apos;objet2 angle quelconque
+ Ligne_Click(&quot;CommandButton30&quot;,&quot;Label59&quot;,1,0)
+end sub
+
+
+sub codageAngle1(dimCodage as double, zorderEl1 as integer, zorderEl2 as integer, typeAngle as string, prolonger as boolean, optional AffMessage as boolean)   Rem : si dimCodage = 0 alors prolonge uniquement les 2 demies droites jusqu&apos;a leur intersection
+Dim monInters as variant
+Dim vIA(1) as variant, vIB(1) as variant, v1(1) as variant
+Dim vIC(1) as variant, vID(1) as variant, v2(1) as variant
+Dim coordAngleDroitX(2) as variant,coordAngleDroitY(2) as variant 
+Dim xA as double, yA as double, xB as double, yB as double, xC as double, yC as double, xD as double, yD as double, xI as double, yI as double
+Dim lgIA as double, lgIB as double, lgIC as double, lgID as double, lgIP as double, lg1 as double, lg2 as double
+
+
+xA = oPageTemp(zorderEl1).Polygon(0).X
+yA = oPageTemp(zorderEl1).Polygon(0).Y
+xB = oPageTemp(zorderEl1).Polygon(1).X
+yB = oPageTemp(zorderEl1).Polygon(1).Y
+xC = oPageTemp(zorderEl2).Polygon(0).X
+yC = oPageTemp(zorderEl2).Polygon(0).Y
+xD = oPageTemp(zorderEl2).Polygon(1).X
+yD = oPageTemp(zorderEl2).Polygon(1).Y
+
+
+monInters = CoordInters(oPageTemp(zorderEl1),oPageTemp(zorderEl2))
+
+if monInters(0) = &quot;paralleles&quot; and AffMessage = true then msgbox(oReponseDlg(98), 0, &quot;AHmath3D&quot;)   rem : dtes parallèles
+if monInters(0) &lt;&gt; &quot;paralleles&quot; then
+   xI = monInters(1)
+   yI = monInters(2)
+   
+   lgIA = sqr((xA-xI)*(xA-xI) + (yA-yI)*(yA-yI))
+   lgIB = sqr((xB-xI)*(xB-xI) + (yB-yI)*(yB-yI))
+   lgIC = sqr((xC-xI)*(xC-xI) + (yC-yI)*(yC-yI))
+   lgID = sqr((xD-xI)*(xD-xI) + (yD-yI)*(yD-yI))
+   
+   vIA = CoordVect2Draw(monInters(1), monInters(2),xA,yA)
+   vIB = CoordVect2Draw(monInters(1), monInters(2),xB,yB)
+   vIC = CoordVect2Draw(monInters(1), monInters(2), xC,yC)
+   vID = CoordVect2Draw(monInters(1), monInters(2), xD,yD)
+
+   
+    if lgIA &gt;= lgIB then 
+        v1 = vIA
+        lg1 = lgIA
+        else
+        v1 = vIB
+        lg1 = lgIB
+    end if
+    
+    if lgIC &gt;= lgID then 
+        v2 = vIC
+        lg2 = lgIC
+        else
+        v2 = vID
+        lg2 = lgID
+    end if
+    
+   lgIP = sqr((v1(0)/lg1 + v2(0)/lg2)*(v1(0)/lg1 + v2(0)/lg2) + (v1(1)/lg1 + v2(1)/lg2)*(v1(1)/lg1 + v2(1)/lg2))
+      
+   coordAngleDroitX(0) = dimCodage*1000*v1(0) / lg1 + xI
+   coordAngleDroitY(0) = dimCodage*1000*v1(1) / lg1 + yI
+   coordAngleDroitX(1) = dimCodage*1000*(v1(0) / lg1 + v2(0) / lg2) + xI
+   coordAngleDroitY(1) = dimCodage*1000*(v1(1) / lg1 + v2(1) / lg2) + yI
+   coordAngleDroitX(2) = dimCodage*1000*v2(0) / lg2 + xI
+   coordAngleDroitY(2) = dimCodage*1000*v2(1) / lg2 + yI
+
+   
+   if typeAngle = &quot;droit&quot; then LigneBrisee(coordAngleDroitX,coordAngleDroitY)
+   if typeAngle = &quot;arrondi&quot; then
+   if monInters(0) = &quot;secantes&quot; then
+   coordAngleDroitX(1) = dimCodage*1000* (v1(0) / lg1 + v2(0) / lg2)/lgIP + xI 
+   coordAngleDroitY(1) = dimCodage*1000* (v1(1) / lg1 + v2(1) / lg2)/lgIP + yI
+  &apos; else
+  &apos; coordAngleDroitX(1) = -dimCodage*1000* v1(1)/lg1 + xI    rem pbme avec angle plat
+ &apos;  coordAngleDroitY(1) = dimCodage*1000* v1(0)/lg1 + yI
+   end if
+   PolygoneBezier3(coordAngleDroitX,coordAngleDroitY)
+   end if
+   if typeAngle = &quot;droit&quot; or typeAngle = &quot;arrondi&quot; then nAjout = nAjout + 1
+   
+&apos; prolonge les droites jusqu&apos;au point d&apos;intersection  -----------------------
+if prolonger = true and monInters(0) = &quot;secantes&quot; then
+  if (vIA(0)*vIB(0)+vIA(1)*vIB(1)&gt;=0) then
+  oPagetemp.Remove(oPagetemp(zorderEl1))&apos;oPagetemp(intersZorder(0)))
+       if  vIA(0)*vIA(0)+vIA(1)*vIA(1) &gt;= vIB(0)*vIB(0)+vIB(1)*vIB(1) then
+       SegmentDraw(monInters(1),monInters(2),xA,yA, 30, &quot;plein&quot;)
+       else
+       SegmentDraw(monInters(1),monInters(2),xB,yB, 30, &quot;plein&quot;)
+       end if
+       nElements = oPageTemp.Count
+       oPageTemp(nElements - 1).Zorder = zorderEl1&apos;intersZorder(0)
+  end if
+  
+  if (vIC(0)*vID(0)+vIC(1)*vID(1)&gt;=0) then
+  oPagetemp.Remove(oPagetemp(zorderEl2))&apos;oPagetemp(intersZorder(1)))
+       if  vIC(0)*vIC(0)+vIC(1)*vIC(1) &gt;= vID(0)*vID(0)+vID(1)*vID(1) then
+       SegmentDraw(monInters(1),monInters(2),xC,yC, 30, &quot;plein&quot;)
+       else
+       SegmentDraw(monInters(1),monInters(2),xD,yD, 30, &quot;plein&quot;)
+       end if
+       nElements = oPageTemp.Count
+       oPageTemp(nElements - 1).Zorder = zorderEl2&apos;intersZorder(1)
+  end if
+end if   
+&apos;-------------------------------------------------------------------------
+end if
+
+SauvCodageAngle = array(xI,yI,coordAngleDroitX(1),coordAngleDroitY(1),v1,v2,lg1,lg2,monInters(0))  &apos;sauvegarde des données pour utilisation ultérieure
+
+end sub
+
+sub CodageAngleX(zorderEl1 as integer, zorderEl2 as integer, dimCodage as double, choixCodage as integer)
+Dim vIP(1) as variant, lgIP as double, oAbs(2) as variant, oOrd(2) as variant, k as integer
+
+
+if choixCodage = 7 then codageAngle1(dimCodage,zorderEl1,zorderEl2, &quot;droit&quot;, true)
+if choixCodage &gt; 0 and choixCodage &lt; 7 then 
+   codageAngle1(dimCodage,zorderEl1,zorderEl2, &quot;arrondi&quot;, true, true)
+   k = 1
+   if choixCodage &lt;&gt; 1 and choixCodage &lt;&gt; 4 then
+      codageAngle1(dimCodage + 0.1,zorderEl1,zorderEl2 , &quot;arrondi&quot;, false)
+      k = 2
+   end if
+   if choixCodage = 3 or choixCodage = 6 then
+   codageAngle1(dimCodage + 0.2 ,zorderEl1,zorderEl2 , &quot;arrondi&quot;, false)
+   k = 3
+   end if
+   if choixCodage &gt; 3 then
+   vIP(0) = SauvcodageAngle(2) - SauvCodageAngle(0)
+   vIP(1) = SauvCodageAngle(3) - SauvCodageAngle(1)
+   lgIP = sqr(vIP(0)*vIP(0) + vIP(1)*vIP(1))
+   oAbs(0) = SauvCodageAngle(2) + vIP(0)*50/lgIP
+   oAbs(1) = SauvCodageAngle(2) - vIP(0)*100/lgIP
+   oAbs(2) = SauvCodageAngle(2) - vIP(0)*(100 + 100*k)/lgIP
+   oOrd(0) = SauvCodageAngle(3) + vIP(1)*50/lgIP
+   oOrd(1) = SauvCodageAngle(3) - vIP(1)*100/lgIP
+   oOrd(2) = SauvCodageAngle(3) - vIP(1)*(100 + 100*k)/lgIP
+   LigneBrisee(oAbs,oOrd)
+   nAjout = nAjout + 1
+   end if
+end if
+
+
+end sub
+
+sub codageMilieu(monZorder as integer, choixCodage as integer)
+Dim oVAB as variant, olgAB as double, o1mmAB as variant, o1mmpAB as variant, cod1 as variant, cod2 as variant
+Dim traitCodageX as variant, traitCodageY as variant
+ovAB = CoordVectDraw(oPageTemp(eZorder))
+olgAB = LgSgtDraw(oPageTemp(eZorder))
+
+o1mmAB = array(ovAB(0)/(10*olgAB),ovAB(1)/(10*olgAB))   &apos;deplacement de 1mm sur AB
+o1mmpAB = array(-ovAB(1)/(10*olgAB),ovAB(0)/(10*olgAB)) &apos;deplacement de 1mm perpendiculairement AB
+cod1 = array(sx0 + 0.25*ovAB(0), sy0 + 0.25*ovAB(1))
+cod2 = array(sx0 + 0.75*ovAB(0), sy0 + 0.75*ovAB(1))
+
+if choixCodage &lt; 4 and choixCodage &gt; 0 then
+traitCodageX = array(cod1(0) + o1mmpAB(0) , cod1(0) , cod1(0) - o1mmpAB(0))
+traitCodageY = array(cod1(1) + o1mmpAB(1) , cod1(1) , cod1(1) - o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+traitCodageX = array(cod2(0) + o1mmpAB(0) , cod2(0) , cod2(0) - o1mmpAB(0))
+traitCodageY = array(cod2(1) + o1mmpAB(1) , cod2(1) , cod2(1) - o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+end if
+if choixCodage =2 or choixCodage = 3 then
+traitCodageX = array(cod1(0) - o1mmAB(0) + o1mmpAB(0) , cod1(0) - o1mmAB(0) , cod1(0) - o1mmAB(0) - o1mmpAB(0))
+traitCodageY = array(cod1(1) - o1mmAB(1) + o1mmpAB(1) , cod1(1) - o1mmAB(1) , cod1(1) - o1mmAB(1) - o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+traitCodageX = array(cod2(0) + o1mmAB(0) + o1mmpAB(0) , cod2(0) + o1mmAB(0) , cod2(0) + o1mmAB(0) - o1mmpAB(0))
+traitCodageY = array(cod2(1) + o1mmAB(1) + o1mmpAB(1) , cod2(1) + o1mmAB(1) , cod2(1) + o1mmAB(1) - o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+end if
+if choixCodage = 3 then
+traitCodageX = array(cod1(0) + o1mmAB(0) + o1mmpAB(0) , cod1(0) + o1mmAB(0) , cod1(0) + o1mmAB(0) - o1mmpAB(0))
+traitCodageY = array(cod1(1) + o1mmAB(1) + o1mmpAB(1) , cod1(1) + o1mmAB(1) , cod1(1) + o1mmAB(1) - o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+traitCodageX = array(cod2(0) - o1mmAB(0) + o1mmpAB(0) , cod2(0) - o1mmAB(0) , cod2(0) - o1mmAB(0) - o1mmpAB(0))
+traitCodageY = array(cod2(1) - o1mmAB(1) + o1mmpAB(1) , cod2(1) - o1mmAB(1) , cod2(1) - o1mmAB(1) - o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+end if
+if choixCodage = 4 then
+traitCodageX = array(cod1(0) - o1mmAB(0) - o1mmpAB(0) , cod1(0) +  o1mmpAB(0)  , cod1(0) + o1mmAB(0) - o1mmpAB(0))
+traitCodageY = array(cod1(1) - o1mmAB(1) - o1mmpAB(1) , cod1(1) +  o1mmpAB(1)  , cod1(1) + o1mmAB(1) - o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+traitCodageX = array(cod2(0) - o1mmAB(0) - o1mmpAB(0) , cod2(0) +  o1mmpAB(0)  , cod2(0) + o1mmAB(0) - o1mmpAB(0))
+traitCodageY = array(cod2(1) - o1mmAB(1) - o1mmpAB(1) , cod2(1) +  o1mmpAB(1)  , cod2(1) + o1mmAB(1) - o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+end if
+if choixCodage = 5 or choixCodage = 6 or choixCodage = 7 then
+traitCodageX = array(cod1(0) - 0.5*o1mmAB(0) - o1mmpAB(0) , cod1(0) +  0.5*o1mmAB(0)  , cod1(0) - 0.5*o1mmAB(0) + o1mmpAB(0))
+traitCodageY = array(cod1(1) - 0.5*o1mmAB(1) - o1mmpAB(1) , cod1(1) +  0.5*o1mmAB(1)  , cod1(1) - 0.5*o1mmAB(1) + o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+traitCodageX = array(cod2(0) - 0.5*o1mmAB(0) - o1mmpAB(0) , cod2(0) +  0.5*o1mmAB(0)  , cod2(0) - 0.5*o1mmAB(0) + o1mmpAB(0))
+traitCodageY = array(cod2(1) - 0.5*o1mmAB(1) - o1mmpAB(1) , cod2(1) +  0.5*o1mmAB(1)  , cod2(1) - 0.5*o1mmAB(1) + o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+end if
+if choixCodage = 6 or choixCodage = 7 then
+traitCodageX = array(cod1(0) - 1.5*o1mmAB(0) - o1mmpAB(0) , cod1(0) - 0.5*o1mmAB(0)   , cod1(0) - 1.5*o1mmAB(0) + o1mmpAB(0))
+traitCodageY = array(cod1(1) - 1.5*o1mmAB(1) - o1mmpAB(1) , cod1(1) - 0.5*o1mmAB(1)  , cod1(1) - 1.5*o1mmAB(1) + o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+traitCodageX = array(cod2(0) - 1.5*o1mmAB(0) - o1mmpAB(0) , cod2(0) - 0.5*o1mmAB(0)  , cod2(0) - 1.5*o1mmAB(0) + o1mmpAB(0))
+traitCodageY = array(cod2(1) - 1.5*o1mmAB(1) - o1mmpAB(1) , cod2(1) - 0.5*o1mmAB(1)  , cod2(1) - 1.5*o1mmAB(1) + o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+end if
+if choixCodage = 7 then
+traitCodageX = array(cod1(0) + 0.5*o1mmAB(0) - o1mmpAB(0) , cod1(0) + 1.5*o1mmAB(0)   , cod1(0) + 0.5*o1mmAB(0) + o1mmpAB(0))
+traitCodageY = array(cod1(1) + 0.5*o1mmAB(1) - o1mmpAB(1) , cod1(1) + 1.5*o1mmAB(1)  , cod1(1) + 0.5*o1mmAB(1) + o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+traitCodageX = array(cod2(0) + 0.5*o1mmAB(0) - o1mmpAB(0) , cod2(0) + 1.5*o1mmAB(0)  , cod2(0) + 0.5*o1mmAB(0) + o1mmpAB(0))
+traitCodageY = array(cod2(1) + 0.5*o1mmAB(1) - o1mmpAB(1) , cod2(1) + 1.5*o1mmAB(1)  , cod2(1) + 0.5*o1mmAB(1) + o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+end if
+if choixCodage = 8 then
+traitCodageX = array(cod1(0) + 0.5*o1mmAB(0) + o1mmpAB(0) , cod1(0) - 0.5*o1mmAB(0) - o1mmpAB(0)   ,  cod1(0) + 0.5*o1mmAB(0) - o1mmpAB(0),cod1(0) - 0.5*o1mmAB(0) + o1mmpAB(0))
+traitCodageY = array(cod1(1) + 0.5*o1mmAB(1) + o1mmpAB(1) , cod1(1) - 0.5*o1mmAB(1) - o1mmpAB(1)   ,  cod1(1) + 0.5*o1mmAB(1) - o1mmpAB(1),cod1(1) - 0.5*o1mmAB(1) + o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+traitCodageX = array(cod2(0) + 0.5*o1mmAB(0) + o1mmpAB(0) , cod2(0) - 0.5*o1mmAB(0) - o1mmpAB(0)   ,  cod2(0) + 0.5*o1mmAB(0) - o1mmpAB(0),cod2(0) - 0.5*o1mmAB(0) + o1mmpAB(0))
+traitCodageY = array(cod2(1) + 0.5*o1mmAB(1) + o1mmpAB(1) , cod2(1) - 0.5*o1mmAB(1) - o1mmpAB(1)   ,  cod2(1) + 0.5*o1mmAB(1) - o1mmpAB(1),cod2(1) - 0.5*o1mmAB(1) + o1mmpAB(1))
+LigneBrisee(traitCodageX,traitCodageY)
+end if
+
+if choixCodage = 1 or  choixCodage = 4 or  choixCodage = 5 or  choixCodage = 8 then nAjout =  nAjout + 2
+if choixCodage = 2 or  choixCodage = 6  then nAjout =  nAjout + 4
+if choixCodage = 3 or  choixCodage = 7  then nAjout =  nAjout + 6
+end sub
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;**********************************      Affichage page      ****************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+sub initialiseZoom
+monDlg.getControl(&quot;TextField1&quot;).Text = oDocTemp.CurrentController.ZoomValue
+end sub
+
+
+sub Zoom_Modif
+Dim test(1) as integer, monTexte as string
+
+monTexte = ReponseTexte(monDlg,&quot;TextField1&quot;)
+test(0) = Texte_Nbre(monTexte,true)
+if test(0) = 1 then
+  oReponseDlg(3) = CDbl(monDlg.getControl(&quot;TextField1&quot;).Peer.Text)
+  if oReponseDlg(3)&gt;=20 and oReponseDlg(3)&lt;=600 then Zoom(oReponseDlg(3))
+end if
+
+end sub
+
+sub DecalerPage(k1 as integer, k2 as integer)   &apos;k1 = +-1 ou 0 k2 = +-1 ou 0
+Dim PosPage As New com.sun.star.awt.Point
+Dim origX as Long, origY as Long
+origX = oDocTemp.CurrentController.ViewOffset.X
+origY = oDocTemp.CurrentController.ViewOffset.Y
+PosPage.X = origX + k1*250
+PosPage.Y = origY + k2*250
+oDocTemp.CurrentController.ViewOffset = PosPage
+end sub
+
+
+sub DecalerPage_G
+DecalerPage(1,0)
+end sub
+
+sub DecalerPage_D
+DecalerPage(-1,0)
+end sub
+
+sub DecalerPage_H
+DecalerPage(0,1)
+end sub
+
+sub DecalerPage_B
+DecalerPage(0,-1)
+end sub
+
+
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;*************************       CERCLE TANGENT         *********************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+&apos;****************************************************************************************************
+sub  CercleTangent
+Dim a as double, b as double, c as double, distPtD as double
+
+nElements = oPageTemp.count
+MiniInfoSegment(0, eZorder)
+pxa = (Point1X(0) + Point2X(0))/2
+pya = (Point1Y(0) + Point2Y(0))/2
+MiniInfoSegment(1, nElements-1)
+SupprimeDroiteVerte
+
+    a = Point2Y(1) - Point1Y(1)
+    b = -(Point2X(1) - Point1X(1))
+    c = Point1X(1)*(-a) + Point1Y(1)*(-b)
+
+ intersZorder(0) = -1
+ intersZorder(1) = -1
+distPtD = abs(a*pxa + b * pya + c)/sqr(a*a + b*b)
+
+CercleDraw(pxa , pya , distPtD)
+
+end sub
+
+
+sub RechercheLignes
+Dim i as integer, k as integer
+nElements = oPageTemp.count
+k=0
+Dim oTab1(nElements - 1) as variant
+
+for i = 0 to nElements-1
+ if TypeForme(oPageTemp(i)) = &quot;Ligne&quot; and oPageTemp(i).Name &lt;&gt; &quot;ah2D_point&quot; then
+    oTab1(k) = CoordSgtDraw(oPageTemp(i))
+    k = k+1
+    end if
+next
+
+if k = 0 then oTab1(0) = array(&quot;aucune&quot;, &quot;aucune&quot;, &quot;aucune&quot;, &quot;aucune&quot;)
+
+Dim oTab2(k) as variant
+for i = 0 to k
+oTab2(i) = oTab1(i)
+next
+
+oListeDroite = oTab2
+
+end sub
+
+
+sub TraceLigne(k as integer)
+Dim oPtA as variant, oPtB as variant, oDroite as variant
+if oListeDroite(0)(0) &lt;&gt; &quot;aucune&quot; then
+nElements = oPageTemp.count
+oDroite = oListeDroite(k)
+oPtA = array(oDroite(0), oDroite(1))
+oPtB = array(oDroite(2), oDroite(3))
+segmentDraw(oPtA(0), oPtA(1), oPtB(0),oPtB(1) , 30, &quot;plein&quot;)
+oPageTemp(nElements).LineColor = RGB(38,251,123)
+oPageTemp(nElements).LineWidth = sEpaisseur + 100
+oPageTemp(nElements).Name = &quot;DroiteVerte&quot;
+end if
+end sub
+
+
+
+sub LigneSuivante_Click(k as integer)
+Dim nbreDroites as integer
+   if oListeDroite(0)(0) = &quot;aucune&quot; then 
+ &apos;     msgbox(oReponseDlg(94),0+64,&quot;AHmath3D&quot;) 
+     Exit Sub
+   end if
+   nElements = oPageTemp.count
+   nbreDroites = Ubound(oListeDroite)
+   oPageTemp.Remove(oPageTemp(nElements - 1))
+   if k = 1 then indDroite = (indDroite + 1) MOD nbreDroites
+   if k = -1 then indDroite = (indDroite + nbreDroites - 1) MOD nbreDroites
+   TraceLigne(indDroite)
+
+end sub
+
+sub LigneSuivante_D
+ LigneSuivante_Click(1)
+end sub
+
+sub LigneSuivante_G
+ LigneSuivante_Click(-1)
+end sub
+
+sub SupprimeDroiteVerte
+nElements = oPageTemp.Count
+if nElements &gt; 1 then
+if oPageTemp(nElements - 1).Name = &quot;DroiteVerte&quot; then oPagetemp.Remove(oPagetemp(nElements - 1))
+end if
+end sub
+</script:module>

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396164  -->
+  <question type="stack">
+    <name>
+      <text>Convexité et position tangente (Exponentielle)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Analyse — Convexité et Tangente</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit \(f\) la fonction définie sur \(\mathbb{R}\) par \( f(x) = {@f@} \).<br><br><strong>1.</strong> Calculer la dérivée seconde de \(f\), notée \(f''(x)\).</p>
+<div style="margin-top: 5px; margin-bottom: 15px;">\(f''(x)\) = [[input:ans_fpp]] [[validation:ans_fpp]]</div>
+<p><strong>2.</strong> En déduire la convexité de \(f\) sur \(\mathbb{R}\).</p>
+<div style="margin-top: 5px; margin-bottom: 15px;">\(f\) est [[input:ans_conv]] [[validation:ans_conv]] sur \(\mathbb{R}\).</div>
+<p><strong>3.</strong> Quelle est la position de la tangente à la courbe représentative de \(f\) en un point quelconque par rapport à cette courbe ?</p>
+<div style="margin-top: 5px;">La tangente est [[input:ans_pos]] [[validation:ans_pos]] la courbe \(\mathcal{C}_f\).</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;"><strong>1. Dérivée seconde :</strong><br>\(f'(x) = {@fp@}\).<br>En dérivant à nouveau, on obtient \(f''(x) = {@fpp@}\).<br><br><strong>2. Convexité :</strong><br>On sait que pour tout \(x\), \(e^x &gt; 0\).<br>{@k@} étant strictement positif, on a {@k@} multiplié par \(e^x &gt; 0\) pour tout \(x\).<br>Ainsi, \(f''(x) &gt; 0\) sur \(\mathbb{R}\), donc \(f\) est <strong>convexe</strong> sur \(\mathbb{R}\).<br><br><strong>3. Position de la tangente :</strong><br>Une propriété fondamentale des fonctions convexes est que la courbe est entièrement située <strong>au-dessus</strong> de chacune de ses tangentes. La tangente est donc <strong>en dessous</strong> de la courbe.</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>k: rand([1,2,3]);
+ m: rand([-2,-1,1,2]);
+ f: k*e^x + m*x;
+ fp: diff(f, x);
+ fpp: diff(fp, x);
+ ta_fpp: fpp;
+ ta_fp: fp;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>f(x)={@f@}, f''(x)={@fpp@}, k={@k@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:convexity</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_conv</name>
+      <type>dropdown</type>
+      <tans><![CDATA[[["convexe", true, "convexe"], ["concave", false, "concave"], ["autre", false, "ni convexe ni concave"]]]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_fpp</name>
+      <type>algebraic</type>
+      <tans>ta_fpp</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_pos</name>
+      <type>dropdown</type>
+      <tans><![CDATA[[["en dessous de", true, "en dessous de"], ["au-dessus de", false, "au-dessus de"], ["confondue avec", false, "confondue avec"]]]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification dérivée seconde</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_fpp</sans>
+        <tans>ta_fpp</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.4</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT-FPP-OK</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-FPP-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Vérification convexité</description>
+        <answertest>String</answertest>
+        <sans>ans_conv</sans>
+        <tans><![CDATA["convexe"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.3</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>2</truenextnode>
+        <trueanswernote>PRT-CONV-OK</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-CONV-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">⚠️ <strong>Incohérence !</strong> Votre dérivée seconde était juste ({@fpp@}). Que pouvez-vous dire du signe de {@k@} multiplié par e^x sachant que e^x &gt; 0 et que {@k@} &gt; 0 ? Concluez sur le signe de f''(x).</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Vérification position tangente</description>
+        <answertest>String</answertest>
+        <sans>ans_pos</sans>
+        <tans><![CDATA["en dessous de"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.3</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-POS-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Vous avez maîtrisé toute la chaîne : Dérivée seconde → Signe → Convexité → Position relative.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-POS-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">⚠️ <strong>Attention à la propriété !</strong> Si une fonction est convexe (f'' &gt; 0), alors sa courbe est <em>au-dessus</em> de ses tangentes. Donc la tangente est <strong>en dessous</strong> de la courbe.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Diagnostic erreur dérivée</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_fpp</sans>
+        <tans>ta_fp</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-PRIME</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">🚨 <strong>Confusion de dérivée !</strong> Vous avez calculé la dérivée première f'(x), mais on demande ici la dérivée <em>seconde</em> f''(x). Il faut dériver une deuxième fois !</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Dérivée seconde incorrecte.</strong> Rappelez-vous que la dérivée de e^x est e^x, et que la dérivée d'une constante est 0.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

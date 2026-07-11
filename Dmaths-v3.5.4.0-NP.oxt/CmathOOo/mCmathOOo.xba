@@ -1,0 +1,1598 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="mCmathOOo" script:language="StarBasic">&apos;*****  BASIC  *****
+&apos;CmathOOo
+&apos;Copyright (C) 2005-2011  Christophe devalland
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See thein
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+&apos;Option Explicit
+
+&apos;public bModeTexte as boolean &apos;IsTextMode 
+global sSearch() as string, sReplace() as string
+const cNbArgMax=3		&apos; nombre d&apos;arguments maximum pour les fonctions acceptant un nb variable
+						&apos; de paramètres (matrices, systèmes...). Cependant, en cas de dépassement, le programme redimensionnera
+						&apos; le tableau. Il n&apos;y aura donc pas d&apos;erreurs, juste un léger ralentissement.
+global iIndexFormule as integer
+global iNbObjets as integer
+public sCas as string
+public bTagCalc as boolean &apos;vrai si la formule est une instruction calc. Utile pour la réévaluation si un paramètre change
+
+sub main
+
+	Dim mgr as Object, AddinCAS as Object
+	Dim Resultat as Variant
+	Expression=&quot;1;2&quot;
+	mgr=getProcessServiceManager()
+	AddinCAS=mgr.createInstance(&quot;CmathOOo.CAS&quot;)
+	Resultat=AddinCAS.cadd(array(&quot;2&quot;,&quot;3&quot;))
+	
+	aFuncInst = GetProcessServiceManager.createInstance(&quot;com.sun.star.sheet.FunctionAccess&quot;)
+   dim aData() as variant
+   aData() = Array (50)
+   result = aFuncInst.callFunction (&quot;cracine&quot;, aData())
+end sub
+
+sub FormuleEtEvalFormelle
+	FormuleEtEval(false)
+end sub
+
+sub FormuleEtEvalNumerique
+	FormuleEtEval(true)
+end sub
+
+sub FormuleEtEval(bEvalNumerique as boolean)
+	dim oViewCursor as Object, oTextCursor as Object, oTempCursor as Object
+	dim oFormule as Object, Arbre as Variant, sFormuleCmath as String, sFormule as String, sFormuleOOo as String
+	dim oFormuleEval as object, sFormuleCmathEval as string, ArbreEval as Variant, sFormuleOOoEval as string, sFormuleEval as string
+	dim iTaille as Integer, bGras as boolean, sPolice as String, i as integer
+	dim sVariable as string
+	dim bAffichage as boolean, bEgal as boolean
+	dim sNbDigits as string
+
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	on error goto textnull
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+	on error goto 0
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    bGras=(oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD)
+    oTempCursor=oTextCursor.Text.CreateTextCursorByRange(oTextCursor.getEnd()) 
+	sFormule=SelectionnerFormule(oTextCursor,0)
+	if sFormule=&quot;&quot; then 
+		&apos; évaluer la dernière formmule
+		oLesObjets=thisComponent.getEmbeddedObjects
+		i=oLesObjets.count
+		do
+			i=i-1
+			if i&lt;0 then i=oLesObjets.count-1
+		loop while not(estFormule(oLesObjets(i))) or i&lt;0
+		if i&gt;=0 then
+			oFormule=oLesObjets(i)
+       		sFormuleCmath=lireTagFormule(oFormule.Model)
+     		Arbre=chaine2arbre(lireTagArbre(oFormule.Model))
+      		if sFormuleExtraite=&quot;&quot; then
+       			&apos; pas de Tag formule, reprendre le contenu de la formule
+				sFormuleCmath=&quot;OOo(&quot;+oFormule.Model.Formula+&quot;)&quot;
+       		end if
+       		bEgal = false
+		else
+			&apos; pas de formule trouvée
+			exit sub
+		endif
+	else
+		bEgal = true
+		if oTextCursor.getstring()=&quot;&quot; then
+			&apos; une seule formule sélectionnée
+			&apos; récupérer l&apos;arbre
+			sEnum=oTextCursor.getAvailableServiceNames
+			oObjets=oTextCursor.createContentEnumeration(sEnum(0))
+			if oObjets.HasMoreElements then
+				oFormule=oObjets.NextElement
+				if oFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+					if oFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+			       		&apos;c&apos;est une formule
+			       		sFormuleCmath=lireTagFormule(oFormule.Model)
+			       		Arbre=chaine2arbre(lireTagArbre(oFormule.Model))
+			       		if sFormuleExtraite=&quot;&quot; then
+			       			&apos; pas de Tag formule, reprendre le contenu de la formule
+							sFormuleCmath=&quot;OOo(&quot;+oFormule.Model.Formula+&quot;)&quot;
+			       		end if
+			       	endif
+			    endif
+			endif 
+		    oTextCursor.goRight(1,True)		
+		else
+			&apos; évaluer la fomule du texte
+			sFormuleCmath=sFormule
+			sFormule=BugDu2x(sFormule)
+			Arbre=cmath2arbre(sFormule)
+			LitParametresFormules &apos;ici pour définir le symbole de la multiplication
+			sFormuleOOo=arbre2OOo(Arbre)
+		    oFormule=InsereFormule(oTextCursor, sPolice, iTaille, bGras,  sFormuleOOo, bModeTexte)
+			ecrireTagFormule(oFormule.Model,sFormuleCmath)
+			ecrireTagArbre(oFormule.Model,arbre2chaine(Arbre))
+		endif
+	
+	endif
+		
+	&apos;évaluer
+	bAffichage=true
+	&apos; s&apos;il c&apos;est une affectation ne pas afficher de résultat
+	if isArray(Arbre) then
+		select case arbre(0)
+		case &quot;:=&quot;
+			bAffichage=false
+			&apos; mettre à jour les formules du document
+			sVariable=arbre2cas(Arbre(1))
+			&apos; voir si c&apos;est une fonction
+			i=instr(sVariable,&quot;(&quot;)
+			if i&gt;0 then	sVariable=left(sVariable,i-1)
+			majCalculsCas(sVariable)
+		end select
+	endif
+	if bEvalNumerique=true then
+		sNbDigits=mParams.LitParametre(&quot;TextFieldDigits&quot;)
+		if sNbDigits=&quot;&quot; then 
+			sNbDigits=&quot;3&quot;
+		endif
+		&apos;if left(sFormuleCmath,8)&lt;&gt;&quot;evaluer(&quot; then 
+			sFormuleCmathEval=&quot;evaluer(&quot;+sFormuleCmath+&quot;,&quot;+sNbDigits+&quot;)&quot;
+		&apos;else
+		&apos;	sFormuleCmathEval=sFormuleCmath
+		&apos;endif
+	else
+		&apos;if left(sFormuleCmath,9)&lt;&gt;&quot;calculer(&quot; then 
+			sFormuleCmathEval=&quot;calculer(&quot;+sFormuleCmath+&quot;)&quot;
+		&apos;else
+		&apos;	sFormuleCmathEval=sFormuleCmath
+		&apos;endif
+	endif
+	if bAffichage=true then
+		if bEgal = true then
+			if bEvalNumerique=true then 
+				oTextCursor.Text.insertString(oTextCursor, &quot; en&quot;, FALSE)
+				InsereExpressionCmathOOo
+				oTextCursor.Text.insertString(oTextCursor, &quot; &quot;, FALSE)
+			else
+				oTextCursor.Text.insertString(oTextCursor, &quot; = &quot;, FALSE)
+			end if
+		endif
+		sFormuleEval=BugDu2x(sFormuleCmathEval)
+		ArbreEval=cmath2arbre(sFormuleEval)
+		sFormuleOOoEval=arbre2OOo(ArbreEval)
+    	oFormuleEval=InsereFormule(oTextCursor, sPolice, iTaille, bGras,  sFormuleOOoEval, bModeTexte)
+		ecrireTagFormule(oFormuleEval.Model,sFormuleCmathEval)
+		ecrireTagArbre(oFormuleEval.Model,arbre2chaine(ArbreEval))
+		ecrireTagCas(oFormuleEval.Model)
+		iIndexFormule=0
+	endif
+	&apos;thisComponent.CurrentController.Select(oTextCursor.getEnd())
+	iIndexFormule=0
+    Exit Sub
+	textnull:
+	on error goto 0
+	&apos; voir si équation seule pour remplacer par le texte de la formule		
+	msgbox(&quot;Impossible d&apos;analyser la zone de texte&quot;)
+end sub
+
+
+sub FormuleTexte
+	Formule(true)
+end sub
+
+sub FormuleCentree
+	Formule(False)
+end sub
+
+sub Formule(bModeTexte as boolean)
+	dim oViewCursor as Object, oTextCursor as Object, oTempCursor as Object
+	dim oFormule as Object, oCurFormle as Object, Arbre as Variant
+	dim sPolice as String, sFormuleCmath as string, sFormule as String, sFormuleOOo as String
+	dim iTaille as Integer, bGras as boolean, i as integer
+	dim sEval as string, sVariable as string
+	
+	    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+&apos;	    if not isEmpty(oViewCursor.Text) then
+		on error goto textnull
+		oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+		on error goto 0
+	    sPolice=oViewCursor.CharFontName
+	    iTaille=oViewCursor.Charheight
+        bGras=(oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD)
+        sCas=&quot;&quot;
+        bTagCalc=false
+	    oTempCursor=oTextCursor.Text.CreateTextCursorByRange(oTextCursor.getEnd())
+	    if not(uneFormuleSelectionnee(OViewCursor, oTempCursor, sPolice, iTaille)) then
+			sFormule=SelectionnerFormule(oTextCursor,0)
+			if sFormule=&quot;&quot; then exit sub
+			sFormuleCmath=sFormule
+			sFormule=BugDu2x(sFormule)
+			Arbre=cmath2arbre(sFormule)
+			LitParametresFormules
+			sFormuleOOo=arbre2OOo(Arbre)
+		    oFormule=InsereFormule(oTextCursor, sPolice, iTaille, bGras, sFormuleOOo, bModeTexte)
+		    oCurFormule=oFormule.Model &apos;Model
+			if not(isNull(oCurFormule)) then
+				ecrireTagFormule(oCurFormule,sFormuleCmath)
+				ecrireTagArbre(oCurFormule,arbre2chaine(Arbre))
+				if sCas&lt;&gt;&quot;&quot; then ecrireTagCas(oCurFormule)
+				&apos; if bTagCalc=true then ecrireTagCalc(oCurFormule,true)
+				&apos; vérifier s&apos;il y a une affectation pour l&apos;envoyer vers giac
+				if isArray(Arbre) then
+					if Arbre(0)=&quot;:=&quot; then
+						&apos; passer l&apos;affectation à giac
+						sCas=arbre2cas(Arbre)
+						sEval=CmathOOoCAS(sCas)
+						&apos; mettre à jour les formules du document
+						sVariable=arbre2cas(Arbre(1))
+						&apos; voir si c&apos;est une fonction
+						i=instr(sVariable,&quot;(&quot;)
+						if i&gt;0 then	sVariable=left(sVariable,i-1)
+						majCalculsCas(sVariable)
+					end if
+				end if
+			end if
+	    &apos; remet à zéro pour le rappel ultérieur des formules précedentes
+	    iIndexFormule=0
+	    end if
+	    Exit Sub
+		textnull:
+		on error goto 0
+		msgbox(&quot;Impossible d&apos;analyser la zone de texte&quot;)	
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+Function InsereFormule(oTextCursor as Object, sPolice as String, iTaille as Integer, bGras as boolean, sFormule as String, bModeTexte as boolean) as object
+dim obj as object
+&apos;dim iGras as integer
+dim version as double
+dim curseurVisible as object 
+if sFormule&lt;&gt;&quot;&quot; then
+	version=OOoVersion()
+	obj=oDocOOo.CreateInstance(&quot;com.sun.star.text.TextEmbeddedObject&quot;)
+	obj.CLSID=&quot;078B7ABA-54FC-457F-8551-6147e776a997&quot;
+    obj.AnchorType=com.sun.star.text.TextContentAnchorType.AS_CHARACTER
+	oDocOOo.getCurrentController().select(oTextCursor)
+    oTextCursor.Text.insertTextContent(oTextCursor, obj, true)
+    &apos;iGras=oViewCursor.CharWeight
+    if version&lt;3.4 then
+    	AffecteParametresFormule(obj.embeddedObject, sPolice, iTaille, bGras, sFormule, bModeTexte)
+    else
+		AffecteParametresFormule(obj.Model, sPolice, iTaille, bGras, sFormule, bModeTexte)		
+	   	obj.ExtendedControlOverEmbeddedObject.update()
+   	endif
+   	obj.LeftMargin=0
+  	obj.RightMargin=0
+  	oDocOOo.CurrentController.Select(oTextCursor.getEnd())
+  	&apos;curseurVisible=ThisComponent.currentcontroller.ViewCursor
+  	&apos;curseurVisible.gotoRange(oTextCursor,false)
+	InsereFormule=obj
+end if
+end function
+
+
+&apos;--------------------------------------------------------------------------------------
+function estFormule(objet as object)
+&apos; renvoie vrai si l&apos;objet est une formule
+	dim a as object
+	if objet.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+		&apos; a=objet.embeddedObject &apos; ne sert à rien mais contourne un bug : la propriété  embeddedObject vaut Null au premier appel si bcp d&apos;équations à la suite
+		if objet.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+			estFormule=true
+		else
+			estFormule=false
+		endif
+	endif
+end function
+
+sub simplifierFormule
+&apos; simplifie la formule précédent le curseur ou bien s&apos;il n&apos;y a pas de formule avant le curseur,
+&apos; insère la dernière formule tapée simplifiée
+	dim oViewCursor as Object, oTextCursor as Object, oTempCursor as Object
+	dim sFormule as string
+	dim oFormuleEval as object, sFormuleCmathEval as string, ArbreEval as Variant, sFormuleOOoEval as string, sFormuleEval as string
+	dim oLesObjets as object, oCurFormule as object
+	dim sEnum as object, oFormule as object, oObjets as object
+	dim i as integer
+	dim sEval as string, sArbre as string, sTagCas as string
+
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	on error goto textnull
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+	on error goto 0
+	&apos; voir si une formule est juste avant le curseur
+	&apos; si oui la modifier
+	oTextCursor.goLeft(1,True)
+	sEnum=oTextCursor.getAvailableServiceNames
+	oObjets=oTextCursor.createContentEnumeration(sEnum(0))
+	oTextCursor.goRight(1,false)
+	if oObjets.HasMoreElements then
+		oFormule=oObjets.NextElement
+		if oFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+			if oFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+				oCurFormule=oFormule.Model
+			endif
+		endif
+	endif
+	if isNull(oCurFormule) then
+		oLesObjets=thisComponent.getEmbeddedObjects
+		i=oLesObjets.count
+		do
+			i=i-1
+			if i&lt;0 then i=oLesObjets.count-1
+		loop while not(estFormule(oLesObjets(i))) or i&lt;0
+		if i&gt;=0 then
+			oFormule=oLesObjets(i)
+			oCurFormule=oFormule.Model		
+		endif
+	end if
+	if not(isNull(oCurFormule)) then
+		LitParametresFormule(oCurFormule)
+		sTagFormule=lireTagFormule(oCurFormule)
+		if sTagFormule=&quot;&quot; then sTagFormule=&quot;&quot;&quot;Simplification impossible&quot;&quot;&quot;
+		if left(sTagFormule,11)&lt;&gt;&quot;simplifier(&quot; then 
+			sFormuleCmathEval=&quot;simplifier(&quot;+sTagFormule+&quot;)&quot;
+		else
+			sFormuleCmathEval=sTagFormule
+		endif
+		sFormuleEval=BugDu2x(sFormuleCmathEval)
+		ArbreEval=cmath2arbre(sFormuleEval)
+		sFormuleOOoEval=arbre2OOo(ArbreEval)
+		if isNull(oLesObjets) then
+			oFormuleEval=oFormule
+			oFormuleEval.Model.formula=sFormuleOOoEval			
+		else
+	    	oFormuleEval=InsereFormule(oTextCursor, sPolice, iTaille, bGras,  sFormuleOOoEval, bModeTexte)
+		endif
+		ecrireTagFormule(oFormuleEval.Model,sFormuleCmathEval)
+		ecrireTagArbre(oFormuleEval.Model,arbre2chaine(ArbreEval))
+		ecrireTagCas(oFormuleEval.Model)
+&apos;			sCas=arbre2cas(arbre)
+&apos;			if problemeEval(sCas)=&quot;&quot; then
+&apos;				if sTagCas&lt;&gt;&quot;&quot; then 
+&apos;					&apos;reprendre le tag de la formule pour conserver les références aux objets
+&apos;					sTagCas=&quot;simplifier(&quot;+sTagCas+&quot;)&quot;
+&apos;				else
+&apos;					sTagCas=&quot;simplifier(&quot;+sCas+&quot;)&quot;
+&apos;				endif
+&apos;				sCas=&quot;simplifier(&quot;+sCas+&quot;)&quot;
+&apos;				sEval=CmathOOoCAS(sCas)
+&apos;				Arbre=cas2arbre(sEval)
+&apos;				sFormule=arbre2OOo(Arbre)
+&apos;				sFormule=BugDu2x(sFormule)
+&apos;				oFormule=InsereFormule(oTextCursor, sPolice, iTaille, bGras, sFormule, bModeTexte)
+&apos;				oCurFormule=oFormule.Model
+&apos;				if not(isNull(oCurFormule)) then
+&apos;					ecrireTagFormule(oCurFormule,arbre2cmath(Arbre))
+&apos;					ecrireTagArbre(oCurFormule,arbre2chaine(Arbre))
+&apos;					ecrireTagCas(oCurFormule,sTagCas)
+&apos;				end if
+&apos;			else
+&apos;				oTextCursor.Text.insertString(oTextCursor, &quot; Impossible à simplifier à cause de &quot;+problemeEval(sCas), FALSE)
+&apos;			endif
+&apos;		endif
+	endif
+	exit sub
+	textnull:
+	on error goto 0
+	msgbox(&quot;Impossible d&apos;analyser la zone de texte&quot;)
+end sub
+
+
+sub formulePrecedente
+&apos; insère au point d&apos;insertion la formule n-1
+&apos; si une formule est présente avant le curseur, elle est effacée
+	dim oViewCursor as Object, oTextCursor as Object, oTempCursor as Object
+	dim oLesObjets as object, oLaFormule as object
+	dim sEnum as object, oFormule as object, oObjets as object
+	dim i as integer
+	dim bPremierAppel as boolean
+	
+	&apos; premier appel ?
+    bPremierAppel=true
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+	oTextCursor.goLeft(1,True)
+	sEnum=oTextCursor.getAvailableServiceNames
+	oObjets=oTextCursor.createContentEnumeration(sEnum(0))
+	oTextCursor.goRight(1,false)
+	if oObjets.HasMoreElements then
+		oFormule=oObjets.NextElement
+		if oFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+			if oFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+				&apos;oFormule.dispose
+				bPremierAppel=false
+			endif
+		endif
+	endif
+	oLesObjets=thisComponent.getEmbeddedObjects
+	if bPremierAppel=true then
+		iNbObjets=oLesObjets.count
+		iIndexFormule=iNbObjets
+	endif
+	if iNbObjets&gt;0 then
+		i=iIndexFormule
+		do
+			i=i-1
+			if i&lt;0 then 
+				i=iNbObjets-1
+				&apos; if i=0 then exit do &apos;une seule formule
+			endif
+		loop while not(estFormule(oLesObjets(i))) &apos; or i=iIndexFormule
+&apos;		if i&lt;&gt;iIndexFormule then
+			oLaFormule=oLesObjets(i)
+			LitParametresFormule(oLaFormule.Model)
+			if bPremierAppel=true then
+			    oFormule=InsereFormule(oTextCursor, sPolice, iTaille, bGras, sTexteFormule, bModeTexte)		
+			else
+				oFormule.Model.formula=sTexteFormule
+			endif
+		    iIndexFormule=i
+&apos;		endif
+	endif
+end sub
+
+sub formuleSuivante
+&apos; insère au point d&apos;insertion la formule n+1
+&apos; si une formule est présente avant le curseur, elle est effacée
+	dim oViewCursor as Object, oTextCursor as Object, oTempCursor as Object
+	dim oLesObjets as object, oLaFormule as object
+	dim sEnum as object, oFormule as object, oObjets as object
+	dim i as integer
+	dim bPremierAppel as boolean
+	
+	&apos; premier appel ?
+    bPremierAppel=true
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+	oTextCursor.goLeft(1,True)
+	sEnum=oTextCursor.getAvailableServiceNames
+	oObjets=oTextCursor.createContentEnumeration(sEnum(0))
+	oTextCursor.goRight(1,false)
+	if oObjets.HasMoreElements then
+		oFormule=oObjets.NextElement
+		if oFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+			if oFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+				&apos;oFormule.dispose
+				bPremierAppel=false
+			endif
+		endif
+	endif
+	oLesObjets=thisComponent.getEmbeddedObjects
+	if bPremierAppel=true then
+		iNbObjets=oLesObjets.count
+		iIndexFormule=0
+	endif
+	if iNbObjets&gt;0 then
+		i=iIndexFormule
+		do
+			i=i+1
+			if i=iNbObjets then i=0
+		loop while not(estFormule(oLesObjets(i))) &apos; or i=iIndexFormule
+&apos;		if i&lt;&gt;iIndexFormule then
+			oLaFormule=oLesObjets(i)
+			LitParametresFormule(oLaFormule.Model)
+			if bPremierAppel=true then
+			    oFormule=InsereFormule(oTextCursor, sPolice, iTaille, bGras, sTexteFormule, bModeTexte)		
+			else
+				oFormule.Model.formula=sTexteFormule
+			endif
+		    iIndexFormule=i
+&apos;		endif
+	endif
+end sub
+
+
+
+
+&apos;--------------------------------------------------------------------------------------
+function uneFormuleSelectionnee(OViewCursor as object, oTextCursor as object, sPolice as string, iTaille as integer) as boolean
+&apos; teste si une seule formule séléctionnée
+&apos; si oui la remplace par sa formule (undo) et renvoie vrai
+&apos; sinon renvoie faux
+
+	dim sFormuleExtraite as string
+	dim oObjets as object, oFormule as object, sFormule as string, sCaractere as string
+	dim iNiveauPar as integer, iAsc as integer
+	dim sEnum() as string, sCarac as string
+	dim sNom1 as string, sNom2 as string
+	uneFormuleSelectionnee=False
+	If oTextCursor.IsCollapsed() then
+		oTextCursor.goLeft(1,True)
+	end if
+	sEnum=oTextCursor.getAvailableServiceNames
+	oObjets=oTextCursor.createContentEnumeration(sEnum(0))
+	if oObjets.HasMoreElements then
+		oFormule=oObjets.NextElement
+		if oFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+			if oFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+	       		&apos;c&apos;est une formule
+	       		sFormuleExtraite=lireTagFormule(oFormule.Model)
+	       		if sFormuleExtraite=&quot;&quot; then
+	       			&apos; pas de Tag formule, reprendre le contenu de la formule
+					sFormuleExtraite=&quot;OOo(&quot;+oFormule.Model.Formula+&quot;)&quot;
+	       		end if
+				oTextCursor.goLeft(1,True)
+				sCarac=left(oTextCursor.getstring(),1)+&quot; &quot;
+				iAsc=asc(sCarac)
+				if sCarac&lt;&gt;&quot; &quot; then oTextCursor.goRight(1,True)
+				if (iAsc&lt;33) then
+					&apos; vérifier s&apos;il y a une formule
+					sEnum=oTextCursor.getAvailableServiceNames
+					oObjets=oTextCursor.createContentEnumeration(sEnum(0))
+					&apos; il y en a déjà au moins une
+					sNom1=oFormule.Name
+					if oObjets.HasMoreElements then
+						oFormule=oObjets.NextElement
+					endif
+					sNom2=oFormule.Name
+					if sNom1=sNom2 then
+						&apos; une seule formule
+						oFormule.dispose
+						&apos;dim i as integer					
+						&apos;do while len(sFormuleExtraite)&gt;0
+						&apos;	i=instr(sFormuleExtraite,&quot;OOo(&quot;)
+						&apos;	if i=0 then 
+						oTextCursor.Text.insertString(oTextCursor, sFormuleExtraite, FALSE)
+						thisComponent.CurrentController.Select(oTextCursor.getEnd())
+						&apos;		i=len(sFormuleExtraite)
+						&apos;	else
+						&apos;		oTextCursor.Text.insertString(oTextCursor, left(sFormuleExtraite,i-1), FALSE)
+								&apos; aller chercher la formule contenue dans OOo
+						&apos;		iNiveauPar=1
+						&apos;		sFormule=&quot;&quot;			
+						&apos;		i=i+3
+						&apos;		do while iNiveauPar&gt;0
+						&apos;			i=i+1
+						&apos;			sCaractere=Mid(sFormuleExtraite,i,1)
+						&apos;			select case sCaractere
+						&apos;			case &quot;(&quot; 
+						&apos;				iNiveauPar=iNiveauPar+1
+						&apos;			case &quot;)&quot;					
+						&apos;				iNiveauPar=iNiveauPar-1
+						&apos;			end select
+						&apos;			sFormule=sFormule+sCaractere
+						&apos;		loop
+						&apos;		sFormule=left(sFormule,len(sFormule)-1)
+						&apos;	    oFormule=InsereFormule(OViewCursor, oTextCursor, sPolice, iTaille, sFormule, bModeTexte)
+						&apos;		if not(isNull(oFormule)) then ecrireTagFormule(oFormule,sFormule)
+						&apos;	endif
+						&apos;	i=i+1
+						&apos;	sFormuleExtraite=mid(sFormuleExtraite,i)
+						&apos;loop
+						uneFormuleSelectionnee=True
+					endif
+				end if
+			endif
+		endif
+	endif
+end function
+
+&apos;--------------------------------------------------------------------------------------
+Function SelectionnerFormuleEnPassantPrimes(oTextCursor as Object,iNbCarac as integer) as String
+&apos; sélectionner iNbCarac caractères sans compter les primes
+dim i as integer
+dim sFormule as string, nbCarac as integer, sCarac as string
+
+sFormule=&quot;&quot;
+nbCarac=0
+for i=1 to iNbCarac
+	do 
+		oTextCursor.goRight(nbCarac,false)
+		nbCarac=nbCarac+1
+		sFormule=SelectionnerFormule(oTextCursor,nbCarac)
+	loop while left(sFormule,1)=&quot;&apos;&quot;   	
+next i
+iNbCarac=nbCarac
+SelectionnerFormuleEnPassantPrimes=sFormule
+end function
+
+&apos;--------------------------------------------------------------------------------------
+Function SelectionnerFormule(oTextCursor as Object,iNbCarac as integer) as String
+&apos; si iNbCarac=0, sélectionner jusqu&apos;à un espace ou équivalent
+&apos; sinon, sélectionner iNbCarac caractères
+
+
+	dim sTexteFormule as string,sFormuleExtraite as string
+	dim i as integer
+	dim oTempCursor as object, oObjets as object, oFormule as object
+	dim sEnum() as string, sCarac as string
+	
+	sTexteFormule=&quot;&quot;
+	If oTextCursor.IsCollapsed() then
+		if iNbCarac=0 then
+			oTextCursor.goLeft(1,True)
+			do while not DebutFormule(oTextCursor)
+				oTextCursor.goLeft(1,True)
+			loop
+		else
+			oTextCursor.goLeft(iNbCarac,True)
+		end if
+	end if
+	&apos; parcours du texte sélectionné à la recherche de formules
+	oTempCursor=oTextCursor.Text.CreateTextCursorByRange(oTextCursor.getEnd())
+	do while oTextCursor.Text.compareRegionStarts(oTempCursor,oTextCursor)&lt;0
+		oTempCursor.goLeft(0,False)
+		oTempCursor.goLeft(1,True)
+		sCarac=oTempCursor.getString()
+		if sCarac&lt;&gt;&quot;&quot; and sCarac&lt;&gt;chr(160) then &apos;éliminer l&apos;espace insécable
+			&apos; c&apos;est du texte
+			sTexteFormule=sCarac+sTexteFormule
+		else
+			sEnum=oTempCursor.getAvailableServiceNames
+			oObjets=oTempCursor.createContentEnumeration(sEnum(0))
+			if oObjets.HasMoreElements then
+				oFormule=oObjets.NextElement
+				if oFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+					if oFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+	  		       		&apos;c&apos;est une formule
+	  		       		sFormuleExtraite=lireTagFormule(oFormule.Model)
+	  		       		sFormuleExtraite=elagueCommentaire(sFormuleExtraite)
+	  		       		if sFormuleExtraite=&quot;&quot; then
+		  		       		&apos; pas de Tag formule, reprendre le contenu de la formule
+		  		       		&apos; 
+							sFormuleExtraite=&quot;OOo(&quot;+oFormule.Model.Formula+&quot;)&quot;
+	  		       		end if
+						sTexteFormule=sFormuleExtraite+sTexteFormule
+&apos;	   	       			if right(sFormuleExtraite,2)=&quot;{}&quot; then
+	   	       				&apos; c&apos;est une insertion telle que {}times{} etc...
+&apos;							sTexteFormule=&quot;**&quot;+mid(sFormuleExtraite,3,len(sFormuleExtraite)-4)+&quot;**&quot;+sTexteFormule
+&apos;						else
+							&apos; c&apos;est une formule
+&apos;							sTexteFormule=&quot;{&quot;+sFormuleExtraite+&quot;}&quot;+sTexteFormule
+&apos;						end if
+					endif
+				endif
+			endif
+	
+		end if
+	loop
+	SelectionnerFormule=sTexteFormule
+end Function
+
+&apos;--------------------------------------------------------------------------------------
+Function DebutFormule(oTextCursor as Object) as boolean
+&apos;repère le début de la formule
+
+	dim sCarac as string
+	dim iAsc as integer
+	
+	sCarac=left(oTextCursor.getstring(),1)
+	iAsc=asc(sCarac+&quot; &quot;)
+	&apos; si espace ou tabulation ou début de phrase alors le début est trouvé
+	if (sCarac=&quot; &quot;) or (iAsc=9) or (iAsc=10) then
+		oTextCursor.goRight(1,True)
+		DebutFormule=True
+	else if (oTextCursor.isStartOfSentence()=True) then
+			DebutFormule=True
+		else
+			DebutFormule=False
+		end if
+	end if
+end function
+
+&apos;-------------------------------------------------------------------------------------
+Function SubstitutionVirgule(sFormule as String) as String
+	&apos; recherche d&apos;une virgule :
+	&apos; si elle est entourée de chiffres elle est fait partie d&apos;un nombre
+	&apos; sinon, c&apos;est un séparateur (listes, ...)
+	dim i as integer, iPosVirg as integer
+	i=1
+	iPosVirg=Instr(sFormule,&quot;,&quot;)
+	Do while iPosVirg&gt;i
+		if InStr(&quot;0123456789&quot;,mid(sFormule,iPosVirg-1,1))=0 or InStr(&quot;0123456789&quot;,mid(sFormule,iPosVirg+1,1))=0 then
+			sFormule=left(sFormule,iPosVirg-1)+&quot;OOo({nitalic ,})&quot;+mid(sFormule,iPosVirg+1)
+			iPosVirg=iPosVirg+14
+		end if
+		i=iPosVirg
+		iPosVirg=i+Instr(mid(sFormule,i+1),&quot;,&quot;)
+	loop
+	SubstitutionVirgule=sFormule
+end function
+
+&apos;-------------------------------------------------------------------------------------
+Function BugDu2x(sFormule as String) as String
+	&apos; recherche d&apos;une multiplication implicite entre un chiffre et une lettre
+	&apos; si trouvée, ajouter deux espaces, symbole de multiplication implicite
+	&apos; pourra être effacé après correction du bug http://www.openoffice.org/issues/show_bug.cgi?id=45689
+	dim i as integer
+	dim iChiffre as integer
+	dim iLettre as integer
+	i=1
+	do while i&lt;len(sFormule)
+		iChiffre=asc(mid(sFormule,i,1))
+		iLettre=asc(mid(sFormule,i+1,1))
+		if ((iChiffre&gt;47 and iChiffre&lt;58) and ((iLettre&gt;96 and iLettre&lt;123) or (iLettre&gt;64 and iLettre&lt;91))) then
+			sFormule=left(sFormule,i)&amp;&quot;  &quot;&amp;mid(sFormule,i+1)
+			i=i+3
+		else
+			i=i+1
+		end if
+	loop
+	BugDu2x=sFormule
+end function
+
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereSymboleExp
+	dim oViewCursor as object, oTextCursor as object
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+ 	oTextCursor.Text.insertString(oTextCursor, &quot;&quot;&quot;e&quot;&quot;%%&lt;cmathFormule&gt;&quot;&quot;e&quot;&quot;&lt;/cmathFormule&gt;&quot;, FALSE)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub BasculeModeI
+	dim oViewCursor as object, oTextCursor as object
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+ 	oTextCursor.Text.insertString(oTextCursor, &quot;&quot;&quot;i&quot;&quot;%%&lt;cmathFormule&gt;&quot;&quot;i&quot;&quot;&lt;/cmathFormule&gt;&quot;, FALSE)
+end sub
+
+
+&apos;--------------------------------------------------------------------------------------
+sub BasculeModeTexte
+	dim oViewCursor as object, oTextCursor as object
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+ 	oTextCursor.Text.insertString(oTextCursor, chr(34), FALSE)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereSymboleRacine
+	dim oViewCursor as object, oTextCursor as object
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+ 	oTextCursor.Text.insertString(oTextCursor, &quot;√&quot;, FALSE)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereSymboleApprox
+	dim oViewCursor as object, oTextCursor as object
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+ 	oTextCursor.Text.insertString(oTextCursor, &quot;≈&quot;, FALSE)
+end sub
+
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereSymboleMultiplication
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    LitParametresFormules
+	InsereFormule(oTextCursor, sPolice, iTaille, oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD, &quot;{}times{} %%&lt;cmathFormule&gt;**&lt;/cmathFormule&gt;&quot;,False)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereSymbolePoint
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    LitParametresFormules
+	InsereFormule(oTextCursor, sPolice, iTaille, oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD, &quot;{}cdot{} %%&lt;cmathFormule&gt;..&lt;/cmathFormule&gt;&quot;,False)
+end sub
+
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereSymboleDivision
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    LitParametresFormules
+	InsereFormule(oTextCursor, sPolice, iTaille,oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD, &quot;{}div{} %%&lt;cmathFormule&gt;//&lt;/cmathFormule&gt;&quot;,False)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereSymboleSoustraction
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor.getStart())
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    LitParametresFormules
+	InsereFormule(oTextCursor, sPolice, iTaille,oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD, &quot;{}-{} %%&lt;cmathFormule&gt;-&lt;/cmathFormule&gt;&quot;,False)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub Vecteur
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer, sFormule as string
+	dim sFormuleOOo as string, iNbCarac as integer
+	dim Arbre as variant
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    
+   	If oTextCursor.IsCollapsed() then
+		&apos; les primes ne comptent pas comme un caractère (fonction vecteurs, etc...)
+	   	iNbCarac=2
+		sFormule=SelectionnerFormuleEnPassantPrimes(oTextCursor,iNbCarac)
+		if left(sFormule,1)&lt;&quot;A&quot; and left(sFormule,1)&lt;&gt;&quot;$&quot; then
+			oTextCursor.goRight(iNbCarac,False)
+			sFormule=SelectionnerFormuleEnPassantPrimes(oTextCursor,1)
+		end if
+	else
+			sFormule=SelectionnerFormule(oTextCursor,0)			
+	end if
+	sFormule=&quot;vec(&quot;+sFormule+&quot;)&quot;
+	Arbre=cmath2arbre(sFormule)
+	sFormuleOOo=arbre2OOo(Arbre)
+	LitParametresFormules
+    oFormule=InsereFormule(oTextCursor, sPolice, iTaille,oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD, sFormuleOOo, bModeTexte)
+	oCurFormule=oFormule.Model
+	if not(isNull(oCurFormule)) then
+		ecrireTagFormule(oCurFormule,sFormule)
+		ecrireTagArbre(oCurFormule,arbre2chaine(Arbre))
+	endif
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub Barre
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer, sFormule as string
+	dim sFormuleOOo as string
+	dim Arbre as variant
+
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+   	If oTextCursor.IsCollapsed() then
+		sFormule=SelectionnerFormuleEnPassantPrimes(oTextCursor,1)
+		&apos;sFormule=SelectionnerFormule(oTextCursor,1)
+	else
+		sFormule=SelectionnerFormule(oTextCursor,0)
+	end if
+	sFormule=&quot;bar(&quot;+sFormule+&quot;)&quot;
+	Arbre=cmath2arbre(sFormule)
+	sFormuleOOo=arbre2OOo(Arbre)
+	LitParametresFormules
+	&apos;if iGras = com.sun.star.awt.FontWeight.BOLD then
+	&apos;	sFormuleOOo=&quot;bold {&quot; &amp; sFormuleOOo &amp; &quot;}&quot;
+	&apos;end if
+    oFormule=InsereFormule(oTextCursor, sPolice, iTaille,oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD, sFormuleOOo, bModeTexte)
+	oCurFormule=oFormule.Model
+	if not(isNull(oCurFormule)) then
+		ecrireTagFormule(oCurFormule,sFormule)
+		ecrireTagArbre(oCurFormule,arbre2chaine(Arbre))
+	endif
+	&apos;InsereFormule(oViewCursor, oTextCursor, sPolice, iTaille, &quot;overline{&quot;+sFormule+&quot;}&quot;,true)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub Angle
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer, iNbCarac as integer
+	dim sFormuleOOo as string
+	dim sFormule as string
+	dim Arbre as variant
+
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+   	If oTextCursor.IsCollapsed() then
+	   	iNbCarac=2
+		sFormule=SelectionnerFormuleEnPassantPrimes(oTextCursor,iNbCarac)
+		oTextCursor.goRight(iNbCarac,False)
+		if left(sFormule,1)&lt;&quot;A&quot; and left(sFormule,1)&lt;&gt;&quot;$&quot; then
+			sFormule=SelectionnerFormuleEnPassantPrimes(oTextCursor,1)
+&apos;			sFormule=SelectionnerFormule(oTextCursor,1)
+		else
+			sFormule=SelectionnerFormuleEnPassantPrimes(oTextCursor,3)
+			&apos;sFormule=SelectionnerFormule(oTextCursor,3)
+			if left(sFormule,1)&lt;&quot;A&quot; and left(sFormule,1)&lt;&gt;&quot;$&quot; then
+				&apos; au cas ou il n&apos;y a que deux caractères...
+				oTextCursor.goRight(1,True)
+				sFormule=mid(sFormule,2)
+			endif
+		end if
+	else
+			sFormule=SelectionnerFormule(oTextCursor,0)			
+	end if
+	sFormule=&quot;ang(&quot;+sFormule+&quot;)&quot;
+	Arbre=cmath2arbre(sFormule)
+	sFormuleOOo=arbre2OOo(Arbre)
+	LitParametresFormules
+	&apos;if iGras = com.sun.star.awt.FontWeight.BOLD then
+	&apos;	sFormuleOOo=&quot;bold {&quot; &amp; sFormuleOOo &amp; &quot;}&quot;
+	&apos;end if
+    oFormule=InsereFormule(oTextCursor, sPolice, iTaille, oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD,sFormuleOOo, bModeTexte)
+	oCurFormule=oFormule.Model
+	if not(isNull(oCurFormule)) then
+		ecrireTagFormule(oCurFormule,sFormule)
+		ecrireTagArbre(oCurFormule,arbre2chaine(Arbre))
+	endif
+	&apos;InsereFormule(oViewCursor, oTextCursor, sPolice, iTaille, &quot;widehat{&quot;+sFormule+&quot;}&quot;,true)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub Racine
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer, sFormule as string, bGras as boolean
+	dim sFormuleOOo as string
+	dim Arbre as variant
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    bGras=(oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD)
+	sFormule=SelectionnerFormule(oTextCursor,0)
+	sFormule=&quot;√(&quot;+sFormule+&quot;)&quot;
+	Arbre=cmath2arbre(sFormule)
+	sFormuleOOo=arbre2OOo(Arbre)
+	LitParametresFormules
+	&apos;if iGras = com.sun.star.awt.FontWeight.BOLD then
+	&apos;	sFormuleOOo=&quot;bold {&quot; &amp; sFormuleOOo &amp; &quot;}&quot;
+	&apos;end if
+    oFormule=InsereFormule(oTextCursor, sPolice, iTaille, bGras, sFormuleOOo, bModeTexte)
+	oCurFormule=oFormule.Model
+	if not(isNull(oCurFormule)) then
+		ecrireTagFormule(oCurFormule,sFormule)
+		ecrireTagArbre(oCurFormule,arbre2chaine(Arbre))
+	endif
+	&apos; InsereFormule(oViewCursor, oTextCursor, sPolice, iTaille, &quot;sqrt{&quot;+TraitementFormule(sFormule,False)+&quot;}&quot;,false)
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub Script
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer, sFormule as string
+	if not PoliceScriptTrouvee(&quot;Cmathscr&quot;) then
+		msgbox(&quot;La police Cmath Script n&apos;est pas installée&quot;)
+		exit sub
+	end if
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    If oTextCursor.IsCollapsed() then
+		sFormule=SelectionnerFormule(oTextCursor,1)
+	end if
+&apos;	InsereFormule(oViewCursor, oTextCursor, sPolice, iTaille, &quot;{font serif nitalic{&quot;+sFormule+&quot;}}&quot;,true)
+	if IsMacOS then
+		oTextCursor.CharFontName=&quot;Cmath Script&quot;
+	else
+		oTextCursor.CharFontName=&quot;Cmathscr&quot;
+	end if
+ 	oTextCursor.goRight(1,False)
+    oTextCursor.CharFontName=sPolice
+end sub
+
+&apos;--------------------------------------------------------------------------------------
+sub Cal
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, iTaille as integer, sFormule as string
+	if not PoliceScriptTrouvee(&quot;Cmathcal&quot;) then
+		msgbox(&quot;La police Cmath Calligraphique n&apos;est pas installée&quot;)
+		exit sub
+	end if
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    If oTextCursor.IsCollapsed() then
+		sFormule=SelectionnerFormule(oTextCursor,1)
+	end if
+&apos;	InsereFormule(oViewCursor, oTextCursor, sPolice, iTaille, &quot;{font serif nitalic{&quot;+sFormule+&quot;}}&quot;,true)
+	if IsMacOS then
+		oTextCursor.CharFontName=&quot;Cmath Calligraphique&quot;
+	else
+		oTextCursor.CharFontName=&quot;Cmathcal&quot;
+	end if
+ 	oTextCursor.goRight(1,False)
+    oTextCursor.CharFontName=sPolice
+end sub
+
+
+
+
+&apos;--------------------------------------------------------------------------------------
+function ArgumentsCmath(sFormule as String, iNbArg as Integer) as Variant
+&apos; renvoie un tableau contenant les arguments de la fonction
+&apos; si iNbArg=0, on ne sait pas à l&apos;avance le nb d&apos;arguments (ex : matrice, ...)
+&apos; sinon, on lit iNbArg arguments
+
+	dim iPos as integer, iCompteurArg as integer, iNiveauPar as integer
+	dim sCaractere as string
+	dim sArguments(iNbArg) as String
+	iCompteurArg=0
+	iPos=1
+	iNiveauPar=0
+	Do While iPos&lt;=len(sFormule)
+		iCompteurArg=iCompteurArg+1
+		Do While iPos&lt;=len(sFormule) AND Mid(sFormule,iPos,1)&lt;&gt;&quot;;&quot; AND Mid(sFormule,iPos,1)&lt;&gt;&quot;,&quot;
+			if UBound(sArguments())&lt;iCompteurArg then
+				&apos;j&apos;en remets 10 de plus
+				redim preserve sArguments(iCompteurArg) as String
+			end if
+			sCaractere=Mid(sFormule,iPos,1)
+			sArguments(iCompteurArg)=sArguments(iCompteurArg) + sCaractere
+			Select Case sCaractere
+			Case &quot;(&quot;
+				iNiveauPar=iNiveauPar+1
+				do while iNiveauPar&gt;0
+					iPos=iPos+1
+					if iPos&gt;len(sFormule) then
+						msgbox(&quot;Erreur de parenthèses !&quot;)
+						stop
+					end if
+					sCaractere=Mid(sFormule,iPos,1)				
+					sArguments(iCompteurArg)=sArguments(iCompteurArg) + sCaractere
+					if sCaractere=&quot;(&quot; then
+						iNiveauPar=iNiveauPar+1
+					end if
+					if sCaractere=&quot;)&quot; then
+						iNiveauPar=iNiveauPar-1
+					end if
+				loop
+			Case &quot;{&quot;	&apos;prévoir {}
+				iNiveauPar=iNiveauPar+1
+				do while iNiveauPar&gt;0
+					iPos=iPos+1
+					if iPos&gt;len(sFormule) then
+						msgbox(&quot;Erreur d&apos;accolades !&quot;)
+						stop
+					end if
+					sCaractere=Mid(sFormule,iPos,1)				
+					sArguments(iCompteurArg)=sArguments(iCompteurArg) + sCaractere
+					if sCaractere=&quot;{&quot; then
+						iNiveauPar=iNiveauPar+1
+					end if
+					if sCaractere=&quot;}&quot; then
+						iNiveauPar=iNiveauPar-1
+					end if
+				loop
+			Case &quot;[&quot;,&quot;]&quot;
+				iNiveauPar=iNiveauPar+1
+				do while iNiveauPar&gt;0
+					iPos=iPos+1
+					if iPos&gt;len(sFormule) then
+						msgbox(&quot;Erreur de crochets !&quot;)
+						stop
+					end if
+					sCaractere=Mid(sFormule,iPos,1)				
+					sArguments(iCompteurArg)=sArguments(iCompteurArg) + sCaractere
+					if sCaractere=&quot;[&quot; or sCaractere=&quot;]&quot; then
+						iNiveauPar=iNiveauPar-1
+					end if
+				loop
+			Case chr(34)
+				iNiveauPar=iNiveauPar+1
+				do while iNiveauPar&gt;0
+					iPos=iPos+1
+					if iPos&gt;len(sFormule) then
+						msgbox(&quot;Erreur de guillemets !&quot;)
+						stop
+					end if
+					sCaractere=Mid(sFormule,iPos,1)				
+					sArguments(iCompteurArg)=sArguments(iCompteurArg) + sCaractere
+					if sCaractere=chr(34) then
+						iNiveauPar=iNiveauPar-1
+					end if
+				loop
+			end select
+			iPos=iPos+1
+		loop
+		if iPos&lt;=len(sFormule) then
+			iPos=iPos+1
+		end if
+	loop
+	&apos;if iNbArg=0 then
+		&apos; la tableau sArguments aura une taille égale au nombre de d&apos;arguments
+	&apos;	redim preserve sArguments(iCompteurArg-1) as String
+	&apos;end if
+	ArgumentsCmath=sArguments()
+end function
+
+
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereExpressionCmathOOo
+&apos; 	parcours les 3 caractères précédents le curseur à la recherche d&apos;une insertion
+&apos; 	convention : 
+&apos; 	les formules sont encadrées de {}
+&apos;	les insertions &quot;autotextes&quot; (F3) sont encadrées de $$
+&apos;	les autres caractères sont insérés dans le texte sans formatage
+
+	dim oViewCursor as object, oTextCursor as object, oObjets as object
+	dim sEnum as object, oFormule as object
+	dim sPolice as string, sSymbole as string, bGras as boolean
+	dim iTaille as integer, i as integer, j as integer, k as integer, iNiveauAcc as integer
+	dim sExpression(1 to 3) as string, iNbCarac(1 to 3) as integer
+	
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+    bGras=(oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD)
+
+    j=1
+	i=1
+	do 
+		on error goto textnull
+		oViewCursor.goLeft(1,True)
+		on error goto 0
+		oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+		&apos; si c&apos;est une formule alors fin du scan		
+		sEnum=oTextCursor.getAvailableServiceNames
+		oObjets=oTextCursor.createContentEnumeration(sEnum(0))
+		if oObjets.HasMoreElements then
+			oFormule=oObjets.NextElement
+			if oFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+				if oFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+  		       		&apos;c&apos;est une formule
+  		       		exit do
+				endif
+			endif
+		endif		
+		sSymbole=oTextCursor.getString()
+		sExpression(j)=sSubstitutionF8(sSymbole)
+		if sExpression(j)&lt;&gt;&quot;&quot; then 
+			iNbCarac(j)=i
+			j=j+1
+		end if
+		i=i+1
+	loop while (i&lt;4 and DebutFormule(oTextCursor)=false)
+	oTextCursor.collapseToEnd
+&apos;	j-1 donne le nb de cas.
+	Select Case j
+	Case 2
+		&apos; pas d&apos;ambiguïté
+		oTextCursor.goLeft(iNbCarac(1),True)
+		j=1
+	Case 1
+		&apos; rien trouvé
+		oViewCursor.collapseToEnd
+		Msgbox(&quot;Aucune insertion trouvée !&quot;)
+		exit sub
+	Case Else
+		&apos; choix par boîte de dialogue
+		dim oDlg as Object, oList as Object
+		DialogLibraries.LoadLibrary(&quot;CmathOOo&quot;)
+		oDlg = CreateUnoDialog( DialogLibraries.CmathOOo.DialogChoixInsertionF8)
+		oList=oDlg.GetControl(&quot;ListBox1&quot;)
+		for i=1 to j-1
+			&apos;oList.Model.StringItemList()=Array(sExpression(1),sExpression(2))
+			oList.addItem(right(sSymbole,iNbcarac(i))&amp;&quot; : &quot;&amp;sExpression(i),i)
+		next i
+		oList.selectItemPos(0,true)
+		oDlg.Execute
+		j=oList.SelectedItemPos+1
+		oDlg.Dispose
+		oTextCursor.goLeft(iNbCarac(j),True)
+	End Select
+	&apos;effacer la selection
+	oTextCursor.String=&quot;&quot;
+	oViewCursor.collapseToEnd
+	&apos; arrivé ici, sExpression(j) contient l&apos;expression à insérer
+	for i=1 to len(sExpression(j))
+		sSymbole=mid(sExpression(j),i,1)
+		Select Case sSymbole
+		Case chr(34)
+			&apos;insérer le texte
+			k=instr(mid(sExpression(j),i+1),chr(34))						
+			if k&gt;0 then
+				oTextCursor.Text.insertString(oTextCursor, mid(sExpression(j),i+1,k-1), FALSE)
+				i=i+k
+			else
+				&apos; s&apos;il n&apos;y a pas de deuxième guillemet (ne devrait pas se produire)
+				oTextCursor.Text.insertString(oTextCursor, &quot; erreur de guillemet &quot;, FALSE)
+				&apos; ignorer le guillemet
+			end if
+			
+		
+		Case &quot;{&quot;
+			&apos; formule
+			k=i
+			&apos; rechercher la formule
+			iNiveauAcc=1
+			do while iNiveauAcc&gt;0
+					k=k+1
+					if k&gt;len(sExpression(j)) then
+						msgbox(&quot;Erreur d&apos;accolades !&quot;)
+						stop
+					end if
+					sSymbole=Mid(sExpression(j),k,1)				
+					if sSymbole=&quot;{&quot; then
+						iNiveauAcc=iNiveauAcc+1
+					end if
+					if sSymbole=&quot;}&quot; then
+						iNiveauAcc=iNiveauAcc-1
+					end if
+			loop
+			LitParametresFormules
+			InsereFormule(oTextCursor, sPolice, iTaille, bGras, mid(sExpression(j),i+1,k-i-1),False)
+			&apos;ecrireTagFormule(oFormule,sFormuleCmath)
+			i=k
+		Case &quot;$&quot;
+			&apos; rechercher l&apos;autotexte
+			k=instr(mid(sExpression(j),i+1),&quot;$&quot;)						
+			if k&gt;0 then
+				dim oAutoTextContainer as object, oGroup as object, oEntry as object
+				oAutoTextContainer = createUnoService(&quot;com.sun.star.text.AutoTextContainer&quot;)
+				on Error GoTo AutoTextErreur
+				oGroup = oAutoTextContainer.getByName(&quot;CmathOOofr&quot;)
+				dim a as string
+				a=mid(sExpression(j),i+1,k-1)
+				oEntry = oGroup.getByName(mid(sExpression(j),i+1,k-1))
+				oEntry.applyTo(oTextCursor)
+&apos;				oTextCursor.goRight(1,True)
+				AutoTextErreur:
+				on error goto 0
+				i=i+k+1
+			end if	
+			&apos;dim Array(0) as new com.sun.star.beans.PropertyValue 
+			&apos;dispatcher.executeDispatch(oFrame, &quot;.uno:ExpandGlossary&quot;, &quot;&quot;, 0, Array())
+			rem dispatcher.executeDispatch(oFrame, &amp;quot;.uno:ResetAttributes&amp;quot;, &amp;quot;&amp;quot;, 0, Array())
+			rem    ligne prÃ©cÃ©dente en commentaire pour Ã©viter le formattage du paragraphe
+			rem    dans le style par dÃ©faut, dont l&amp;apos;alignement...
+			
+		Case Else
+			&apos; ne devrait pas se produire normalement
+			&apos; insérer le texte sans interprétation au cas où...
+			oTextCursor.Text.insertString(oTextCursor, sSymbole, FALSE)
+		end select 
+	next i
+&apos;	oViewCursor.gotoRange(oTextCursor.end)
+	Exit Sub
+	textnull:
+	on error goto 0
+	msgbox(&quot;Zone de texte non détectée&quot;)
+end sub
+
+sub End_DialogChoixInsertionF8(Evenement as Object)
+	dim code as integer
+	code=Evenement.KeyCode
+	if code=com.sun.star.awt.Key.RETURN or code=com.sun.star.awt.Key.SPACE then
+		Evenement.Source.Context.EndExecute
+	end if
+end sub
+
+
+&apos;--------------------------------------------------------------------------------------
+sub InsereFormuleF3
+	dim oViewCursor as object, oTextCursor as object
+	dim sPolice as string, sSymbole as string, sFormule as string
+	dim iTaille as integer
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+	&apos;aller chercher le caractère $
+	oTextCursor.goLeft(1,True)
+	&apos; effacer le saut de ligne
+	if asc(oTextCursor.getstring())=13 then oTextCursor.SetString(&quot;&quot;)
+	do while left(oTextCursor.getstring(),1)&lt;&gt;&quot;$&quot;
+		oTextCursor.goLeft(1,True)
+	loop
+	sFormule=mid(oTextCursor.getString(),2)
+	InsereFormule(oTextCursor, sPolice, iTaille, oViewCursor.CharWeight=com.sun.star.awt.FontWeight.BOLD, sFormule,False)
+end sub
+
+
+
+&apos;--------------------------------------------------------------------------------------
+function bEstCeSigne(char as String) as boolean
+	&apos; si char est une de ces opérations, alors ne pas traiter la somme ou la différence
+	bEstCeSigne=(InStr(&quot;+-*/=&quot;&amp;&quot;&gt;&quot;&amp;&quot;&lt;&quot;&amp;&quot;&amp;&quot;&amp;&quot;|&quot;&amp;&quot;~&quot;&amp;&quot;^&quot;&amp;&quot;_&quot;&amp;&quot;\&quot;,char)&gt;0)
+end function
+
+&apos;----------------------------------------------------------------------------------------
+&apos;gestion de la numérotation
+sub CreerStyleListeNumerotee(oDoc as object)
+dim lesFamilles as object, uneFamille as object, nouvStyle as object
+
+	lesFamilles=oDoc.StyleFamilies
+	uneFamille=lesFamilles.getByName(&quot;NumberingStyles&quot;)
+	if uneFamille.hasByName(&quot;Liste Numerotee CmathOOo&quot;) then
+		nouvStyle=uneFamille.getByName(&quot;Liste Numerotee CmathOOo&quot;)
+	else
+	&apos;création
+		nouvStyle=oDoc.CreateInstance(&quot;com.sun.star.style.NumberingStyle&quot;)
+&apos;		nouvStyle.NumberingRules.IsAutomatic=true
+&apos;		nouvStyle.NumberingRules.IsContinuousNumbering=true
+		uneFamille.insertByName(&quot;Liste Numerotee CmathOOo&quot;,nouvStyle)
+		SetNumberingRuleProperty(nouvStyle,0,&quot;LeftMargin&quot;,500)
+		SetNumberingRuleProperty(nouvStyle,0,&quot;FirstLineOffset&quot;,-500)
+		SetNumberingRuleProperty(nouvStyle,0,&quot;SymbolTextDistance&quot;,0)
+		SetNumberingRuleProperty(nouvStyle,0,&quot;NumberingType&quot;,com.sun.star.style.NumberingType.ARABIC)
+		SetNumberingRuleProperty(nouvStyle,1,&quot;LeftMargin&quot;,1000)
+		SetNumberingRuleProperty(nouvStyle,1,&quot;FirstLineOffset&quot;,-500)
+		SetNumberingRuleProperty(nouvStyle,1,&quot;SymbolTextDistance&quot;,0)
+		SetNumberingRuleProperty(nouvStyle,1,&quot;NumberingType&quot;,com.sun.star.style.NumberingType.CHARS_LOWER_LETTER)
+		SetNumberingRuleProperty(nouvStyle,2,&quot;LeftMargin&quot;,1500)
+		SetNumberingRuleProperty(nouvStyle,2,&quot;FirstLineOffset&quot;,-500)
+		SetNumberingRuleProperty(nouvStyle,2,&quot;SymbolTextDistance&quot;,0)
+		SetNumberingRuleProperty(nouvStyle,2,&quot;NumberingType&quot;,com.sun.star.style.NumberingType.ROMAN_LOWER)
+	end if
+&apos;	a=nouvStyle.NumberingRules
+&apos;	b=a.getCount()
+&apos;	c=a.getByIndex(0)
+ &apos;   d=c(10)
+	&apos;SetNumberingRuleProperty(nouvStyle,0,&quot;CharStyleName&quot;,&quot;Bullet Symbols&quot;)
+	&apos;SetNumberingRuleProperty(nouvStyle,0,&quot;BulletChar&quot;, chr(2022))
+end sub
+
+sub AbaisserNumerotation
+dim oDoc as Object, oCurseur as Object
+oDoc=ThisComponent
+oCurseur=ThisComponent.getCurrentController().getViewCursor()
+if isEmpty(oCurseur.NumberingRules) then
+	CreerStyleListeNumerotee(oDoc)
+	oCurseur.NumberingStyleName=&quot;Liste Numerotee CmathOOo&quot;
+	oCurseur.ParaIsNumberingRestart=true
+else
+	oCurseur.NumberingLevel=oCurseur.NumberingLevel+1
+end if		
+end sub
+
+sub RemonterNumerotation
+dim oCurseur as Object
+oCurseur=ThisComponent.getCurrentController().getViewCursor()
+	if oCurseur.NumberingLevel=0 then
+		oCurseur.NumberingStyleName=&quot;&quot;
+	else
+		oCurseur.NumberingLevel=oCurseur.NumberingLevel-1
+	end if
+end sub
+
+Function DetermineOS as Integer
+	If Getguitype = 1 Then
+		DetermineOS = 1
+	ElseIf Getguitype 	= 4 and FileExists(&quot;/Users&quot;) Then
+		DetermineOS = 3
+	Else
+		DetermineOS = 4
+	Endif
+End Function
+
+
+Function IsMacOS as Boolean
+	IsMacOS = False
+	If Getguitype 	= 4 and FileExists(&quot;/Users&quot;) Then IsMacOS = True
+End Function
+
+Function PoliceScriptTrouvee(sLeNomPoliceScript as String) as Boolean
+	Dim oWindow    &apos;The container window supports the awt XDevice interface.
+	Dim oDescript  &apos;Array of awt FontDescriptor structures
+  	Dim s$         &apos;Temporary string variable to hold all of the string names.
+  	Dim i%         &apos;General index variable
+  	Dim Presente as Boolean
+
+	Presente = False
+	oWindow = ThisComponent.getCurrentController().getFrame().getContainerWindow()
+  	oDescript = oWindow.getFontDescriptors()
+ 	&apos;s = &quot;&quot;
+
+	For i = LBound(oDescript) to UBound(oDescript)
+    	&apos;s = s &amp; oDescript(i).Name &amp; &quot;, &quot;
+    	If oDescript(i).Name = sLeNomPoliceScript Then Presente = True  
+  	Next
+  	PoliceScriptTrouvee = Presente
+End Function
+
+Function OOoVersion() As Double
+  &apos;Retreives the running OOO version
+  &apos;modifié par cdeval : renvoie un décimal
+  Dim aSettings, aConfigProvider
+  Dim aParams2(0) As new com.sun.star.beans.PropertyValue
+  Dim sProvider$, sAccess$
+  sProvider = &quot;com.sun.star.configuration.ConfigurationProvider&quot;
+  sAccess   = &quot;com.sun.star.configuration.ConfigurationAccess&quot;
+  aConfigProvider = createUnoService(sProvider)
+  aParams2(0).Name = &quot;nodepath&quot;
+  aParams2(0).Value = &quot;/org.openoffice.Setup/Product&quot;
+  aSettings = aConfigProvider.createInstanceWithArguments(sAccess, aParams2())
+  OOOVersion=val(aSettings.getbyname(&quot;ooSetupVersion&quot;))
+End Function
+
+
+
+&apos; fonctions obsolètes -------------------------------------------------------------------------------------
+Function SubstitutionsAvantTraitement(sFormule as String) as String
+	dim i as integer, j as integer, iPosAcc as integer, iPosGuil as integer, iNiveauAcc as integer
+	dim iPosCas as integer, iNiveauPar as integer
+	dim iPosVirg as integer, k as integer
+	dim sCaractere as string
+	dim n as integer
+	dim sSubstitution as string
+	
+	if sFormule&lt;&gt;&quot;&quot; then
+		iPosAcc=Instr(sFormule,&quot;{&quot;)
+		iPosGuil=Instr(sFormule,&quot;&quot;&quot;&quot;)
+		if iPosAcc+iPosGuil&gt;0 then &apos;ne pas substituer à l&apos;intérieur d&apos;un commentaire ou d&apos;une formule déjà traitée
+			if (iPosAcc&gt;0 and iPosGuil&gt;iPosAcc) or iPosGuil=0 then
+				iNiveauAcc=1
+				i=iPosAcc
+				do while iNiveauAcc&gt;0
+						i=i+1
+						if i&gt;len(sFormule) then
+							msgbox(&quot;Erreur d&apos;accolades !&quot;)
+							stop
+						end if
+						sCaractere=Mid(sFormule,i,1)				
+						if sCaractere=&quot;{&quot; then
+							iNiveauAcc=iNiveauAcc+1
+						end if
+						if sCaractere=&quot;}&quot; then
+							iNiveauAcc=iNiveauAcc-1
+						end if
+				loop
+				SubstitutionsAvantTraitement=SubstitutionsAvantTraitement(left(sFormule,iPosAcc-1))+mid(sFormule,iPosAcc,i-iPosAcc+1)+SubstitutionsAvantTraitement(mid(sFormule,i+1))
+				exit function
+			else
+				i=Instr(mid(sFormule,iPosGuil+1),&quot;&quot;&quot;&quot;)
+				if i=0 then
+					msgbox(&quot;Erreur de guillemets !&quot;)
+					stop
+				end if
+				SubstitutionsAvantTraitement=SubstitutionsAvantTraitement(left(sFormule,iPosGuil-1))+mid(sFormule,iPosGuil,i+1)+SubstitutionsAvantTraitement(mid(sFormule,i+iPosGuil+1))
+				exit function
+			end if
+		end if
+
+		iPosCas=Instr(sFormule,&quot;cas(&quot;)
+		if iPosCas&gt;0 then &apos;ne pas modifier l&apos;intérieur d&apos;une commande GIAC
+			iNiveauPar=1
+			i=iPosCas+3
+			do while iNiveauPar&gt;0
+				i=i+1
+				if i&gt;len(sFormule) then
+					msgbox(&quot;Erreur de parenthèsage !&quot;)
+					stop
+				end if
+				sCaractere=Mid(sFormule,i,1)				
+				if sCaractere=&quot;(&quot; then
+					iNiveauPar=iNiveauPar+1
+				end if
+				if sCaractere=&quot;)&quot; then
+					iNiveauPar=iNiveauPar-1
+				end if
+			loop
+			SubstitutionsAvantTraitement=SubstitutionsAvantTraitement(left(sFormule,iPosCas-1))+mid(sFormule,iPosCas,i-iPosCas+1)+SubstitutionsAvantTraitement(mid(sFormule,i+1))
+			exit function
+		end if
+		
+		&apos; les substitutions peuvent commencer maintenant		
+		sFormule=BugDu2x(sFormule)
+		sFormule=SubstitutionVirgule(sFormule)
+		&apos; substitutions mots-clé touche F8
+&apos;		i=0
+		i=Instr(sFormule,&quot;$&quot;)
+
+&apos;		do while j&gt;i
+			&apos;i=j
+		if i&gt;0 then
+			&apos; prise en charge des 2 caractères après $
+			sSubstitution=sSubstitutionF8(mid(sFormule,i+1,2))
+			if sSubstitution=&quot;&quot; then
+				sSubstitution=&quot;{color red{&quot;&quot;??&quot;&quot;}}&quot;
+			else
+				&apos; enlever les {} qui encadrent les formules 
+				&apos; les guillemets sont gardés pour que le contenu soit bien du texte dans la formule
+				sSubstitution=EnleveAccolades(sSubstitution)
+			end if
+			sFormule=SubstitutionsAvantTraitement(left(sFormule,i-1))+sSubstitution+SubstitutionsAvantTraitement(mid(sFormule,i+3))
+		else
+		
+			&apos;initialisation si besoin
+			&apos;évite de définir n tableaux identiques lors des appels récursifs
+			if UBound(sSearch())&lt;0 then
+				sSearch() = Array( &quot;arcsin&quot;,&quot;arccos&quot;,&quot;arctan&quot;,&quot;arccot&quot;,&quot;arsinh&quot;,&quot;arcosh&quot;,&quot;artanh&quot;,&quot;arcoth&quot;,_
+								&quot;cosh&quot;,&quot;sinh&quot;,&quot;tanh&quot;,&quot;coth&quot;,&quot;cos&quot;,&quot;sin&quot;,&quot;tan&quot;,&quot;cot&quot;,_
+								&quot;argch&quot;,&quot;argsh&quot;,&quot;argth&quot;,&quot;ch&quot;,&quot;sh&quot;,&quot;th&quot;,_
+								&quot;ln&quot;,&quot;e^&quot;,&quot;--&quot;,&quot;...&quot;,&quot;&lt;=&quot;,&quot;arg&quot;,&quot;card&quot;,_
+								&quot;&gt;=&quot;,&quot;&lt;&gt;&quot;,&quot;==&quot;,&quot;|&quot;,&quot;^-&quot;,&quot;^+&quot;,&quot;=&quot;,&quot;&lt;&quot;,&quot;&gt;&quot;)
+				sReplace() = Array(&quot; arcsin &quot;,&quot; arccos &quot;,&quot; arctan &quot;,&quot; arccot &quot;,&quot; arsinh &quot;,&quot;  arcosh &quot;,&quot; artanh &quot;,&quot; arcoth &quot;,_
+								&quot; cosh &quot;,&quot; sinh &quot;,&quot; tanh &quot;,&quot; coth &quot;,&quot; cos &quot;,&quot; sin &quot;,&quot; tan &quot;,&quot; cot &quot;,_
+								&quot; func argch &quot;,&quot; func argsh &quot;,&quot; func argth &quot;,&quot; func ch &quot;,&quot; func sh &quot;,&quot; func th &quot;,_
+								&quot; ln &quot;,&quot; func e^&quot;,&quot;*rightarrow*&quot;,&quot; dotslow &quot;,&quot;**leslant**&quot;,&quot;&quot;&quot;arg&quot;&quot;&quot;,&quot;&quot;&quot;card&quot;&quot;&quot;,_
+								&quot;**geslant**&quot;,&quot;**neq**&quot;,&quot;**equiv**&quot;,&quot;**divides**&quot;,&quot;^&quot;&quot;−&quot;&quot;&quot;,&quot;^&quot;&quot;+&quot;&quot;&quot;,&quot;**=**&quot;,&quot;**&lt;**&quot;,&quot;**&gt;**&quot;)
+			end if
+			For n = LBound(sSearch()) To UBound(sSearch())
+				i=Instr(1,sFormule,sSearch(n),0)
+				if i&gt;0 then
+					sFormule=SubstitutionsAvantTraitement(left(sFormule,i-1))+sReplace(n)+SubstitutionsAvantTraitement(mid(sFormule,i+len(sSearch(n))))
+					exit for
+				end if
+			Next n
+		end if
+	end if
+	SubstitutionsAvantTraitement=sFormule
+end function
+
+Function EnleveAccolades(sFormule as string) as string
+&apos; enlever les accolades qui encadrent les formules 
+&apos; les guillemets sont gardés pour que le contenu soit bien du texte dans la formule
+&apos; les {} sont remplacés par **
+dim i as integer, j as integer
+dim temp as string, sSymbole as string
+dim iNiveauAcc as integer
+
+temp=&quot;&quot;
+i=inStr(sFormule,&quot;{&quot;)
+j=0
+do while i&gt;j
+		&apos; rechercher la formule
+		temp=temp+mid(sFormule,j+1,i-j-1)
+		j=i
+		iNiveauAcc=1
+		do while iNiveauAcc&gt;0
+			j=j+1
+			if j&gt;len(sFormule) then
+				sFormule=&quot;Erreur d&apos;accolades !&quot;
+			else
+				sSymbole=Mid(sFormule,j,1)				
+				if sSymbole=&quot;{&quot; then
+					iNiveauAcc=iNiveauAcc+1
+				end if
+				if sSymbole=&quot;}&quot; then
+					iNiveauAcc=iNiveauAcc-1
+				end if
+			end if
+		loop
+		if j&lt;=len(sFormule) then
+			&apos; pas d&apos;erreurs d&apos;accolades
+			temp=temp+mid(sFormule,i+1,j-i-1)
+			i=inStr(mid(sFormule,j+1),&quot;{&quot;)+j
+		end if
+
+loop
+temp=temp+mid(sFormule,j+1)
+j=0
+i=Instr(temp,&quot;{}&quot;)
+Do while i&gt;j
+	temp=left(temp,i-1)+&quot;**&quot;+mid(temp,i+2)
+	j=i+2
+	i=j+Instr(mid(temp,j),&quot;{}&quot;)-1
+loop
+
+EnleveAccolades=temp
+end Function
+
+
+
+&apos;-------------------------------------------------------------------------------------------------------
+sub SubstitutionsApresTraitement(sFormule as String) as String
+	dim sSearchAfter() as string, sReplaceAfter() as string
+	dim n as integer, i as integer
+	
+	sSearchAfter() = Array(&quot;;&quot;,&quot;  &quot;,&quot;*=*&quot;,&quot;*&lt;*&quot;,&quot;*&gt;*&quot;,&quot;*&lt;&gt;*&quot;)
+	sReplaceAfter() = Array(&quot;{nitalic ;}&quot;,&quot; &quot;,&quot;=&quot;,&quot;&lt;&quot;,&quot;&gt;&quot;,&quot;&lt;&gt;&quot;)
+	For n = LBound(sSearchAfter()) To UBound(sSearchAfter())
+		i=Instr(sFormule,sSearchAfter(n))
+		do while i&gt;0
+			sFormule=left(sFormule,i-1)+sReplaceAfter(n)+mid(sFormule,i+len(sSearchAfter(n)))
+			i=Instr(i+len(sReplaceAfter(n)),sFormule,sSearchAfter(n))
+		loop
+	Next n
+	SubstitutionsApresTraitement=sFormule
+end sub
+
+
+</script:module>

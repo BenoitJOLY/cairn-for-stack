@@ -1,0 +1,218 @@
+/* ════════════════════════════════════════════════════════════════
+   HÉSTACK — Agrandissement (Phase 1) + Mode assistant (Phase 2)
+   À charger APRÈS style.css :
+     <link rel="stylesheet" href="css/assistant.css">
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── PHASE 1 — Lisibilité ───────────────────────────────────────── */
+:root{
+  --hs-base-font: 18px;     /* 17 = léger · 18 = atelier · 19 = généreux */
+  --hs-panel-w: 340px;      /* largeur du panneau (réglable à la souris) */
+  --hs-panel-h: 46vh;       /* hauteur du tiroir en mode mobile          */
+}
+html{ font-size: var(--hs-base-font); }
+.app{ max-width: 1280px; }
+
+@media (max-width: 980px){
+  :root{ --hs-base-font: 16px; }
+  .type-grid{ grid-template-columns: repeat(5, 1fr); }
+}
+@media (max-width: 640px){
+  :root{ --hs-base-font: 15px; }
+  .type-grid{ grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── PHASE 2 — Mode assistant ───────────────────────────────────── */
+
+/* Interrupteur dans l'en-tête */
+.hs-assist-toggle{
+  display:flex; align-items:center; gap:8px;
+  font-size:.78rem; font-weight:700; color:#fff;
+  cursor:pointer; user-select:none; white-space:nowrap;
+}
+.hs-assist-toggle .hs-switch{
+  position:relative; width:38px; height:21px; border-radius:99px;
+  background:rgba(255,255,255,.28); transition:background .2s; flex-shrink:0;
+}
+.hs-assist-toggle .hs-switch::after{
+  content:""; position:absolute; top:2px; left:2px; width:17px; height:17px;
+  border-radius:50%; background:#fff; transition:transform .2s;
+}
+.hs-assist-toggle.on .hs-switch{ background:#22c55e; }
+.hs-assist-toggle.on .hs-switch::after{ transform:translateX(17px); }
+
+/* Réserve la place du panneau à droite — cible les vrais éléments racine */
+@media (min-width: 1101px){
+  body.hs-assist-on .v4-header,
+  body.hs-assist-on .v4-subbar {
+    padding-right: calc(var(--hs-panel-w) + 16px);
+    transition: padding-right .2s;
+  }
+  body.hs-assist-on .v4-main {
+    margin-right: var(--hs-panel-w);
+    transition: margin-right .2s;
+  }
+}
+
+/* Atténuation des zones non concernées (clics TOUJOURS possibles) */
+body.hs-assist-on .quiz-name-bar,
+body.hs-assist-on .q-list-box,
+body.hs-assist-on .type-grid,
+body.hs-assist-on .form-panel,
+body.hs-assist-on .action-bar{
+  opacity:.4; transition: opacity .25s, box-shadow .25s, outline-color .25s;
+}
+body.hs-assist-on .hs-focus{
+  opacity:1 !important;
+  outline:2.5px solid #2563eb; outline-offset:4px;
+  border-radius:12px; box-shadow:0 0 0 6px rgba(37,99,235,.12);
+}
+
+/* ── Panneau latéral redimensionnable ──────────────────────────── */
+.hs-panel{
+  position:fixed; top:0; right:0; bottom:0; width:var(--hs-panel-w);
+  background:#fff; border-left:1px solid var(--border);
+  box-shadow:-8px 0 28px rgba(15,23,42,.10);
+  z-index:480;                 /* < 500 : les modales le recouvrent */
+  display:flex; flex-direction:column;
+  transform:translateX(100%); transition:transform .28s ease;
+}
+body.hs-assist-on .hs-panel{ transform:translateX(0); }
+
+/* Poignée de redimensionnement (bord gauche en bureau) */
+.hs-resize{
+  position:absolute; top:0; left:-4px; bottom:0; width:9px;
+  cursor:ew-resize; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+}
+.hs-resize::before{
+  content:""; width:3px; height:46px; border-radius:99px;
+  background:#cbd5e1; transition:background .15s;
+}
+.hs-resize:hover::before, body.hs-resizing .hs-resize::before{ background:#2563eb; }
+body.hs-resizing{ user-select:none; cursor:ew-resize; }
+body.hs-resizing .hs-panel{ transition:none; }
+
+.hs-panel-head{
+  background:var(--navy); color:#fff; padding:15px 18px;
+  display:flex; align-items:center; justify-content:space-between; gap:8px; flex-shrink:0;
+}
+.hs-panel-head h2{ font-size:.95rem; font-weight:700; display:flex; align-items:center; gap:8px; margin:0; }
+.hs-panel-off{
+  background:rgba(255,255,255,.16); border:none; color:#fff;
+  border-radius:7px; padding:5px 10px; font-size:.72rem; font-weight:700; cursor:pointer;
+}
+.hs-panel-off:hover{ background:rgba(255,255,255,.3); }
+
+.hs-panel-body{ padding:16px 18px; overflow-y:auto; flex:1; }
+
+/* Liste des grandes étapes */
+.hs-steps{ list-style:none; margin:0 0 16px; padding:0; }
+.hs-steps li{
+  display:flex; align-items:flex-start; gap:10px;
+  padding:8px 11px; border-radius:9px; margin-bottom:5px;
+  font-size:.82rem; font-weight:600; color:var(--slate);
+  border:1.5px solid transparent; transition:.2s;
+}
+.hs-steps li .hs-num{
+  flex-shrink:0; width:22px; height:22px; border-radius:50%;
+  background:#e2e8f0; color:var(--slate);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.74rem; font-weight:800;
+}
+.hs-steps li.done{ color:#15803d; }
+.hs-steps li.done .hs-num{ background:#22c55e; color:#fff; }
+.hs-steps li.current{ background:#eff6ff; border-color:#bfdbfe; color:var(--navy); }
+.hs-steps li.current .hs-num{ background:#2563eb; color:#fff; }
+
+/* Bloc explication de l'étape courante */
+.hs-explain{ background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:13px 15px; }
+.hs-explain-title{
+  font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em;
+  color:#0369a1; margin-bottom:8px;
+}
+.hs-intro{ font-size:.84rem; line-height:1.5; color:#0c4a6e; margin-bottom:11px; }
+.hs-explain-text{ font-size:.86rem; line-height:1.55; color:#0c4a6e; }
+.hs-explain-text strong{ color:#075985; }
+
+/* Sous-étapes détaillées (champ par champ) */
+.hs-sub{ list-style:none; margin:0 0 4px; padding:0; counter-reset:hssub; }
+.hs-sub li{
+  position:relative; padding:8px 10px 8px 34px; margin-bottom:6px;
+  background:#fff; border:1px solid #e0f2fe; border-radius:8px;
+  font-size:.83rem; line-height:1.45; color:#0c4a6e;
+}
+.hs-sub li::before{
+  counter-increment:hssub; content:counter(hssub);
+  position:absolute; left:8px; top:8px; width:19px; height:19px;
+  background:#0ea5e9; color:#fff; border-radius:50%;
+  font-size:.7rem; font-weight:800; display:flex; align-items:center; justify-content:center;
+}
+.hs-sub li strong{ color:#075985; }
+.hs-sub li .opt{ color:#64748b; font-style:italic; font-weight:400; }
+
+.hs-do{
+  margin-top:10px; font-size:.84rem; font-weight:700; color:#065f46;
+  background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:9px 12px; line-height:1.45;
+}
+.hs-tip{
+  margin-top:10px; font-size:.78rem; color:#92400e;
+  background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:9px 12px; line-height:1.5;
+}
+
+/* Variante édition */
+.hs-explain.edit{ background:#fffbeb; border-color:#fcd34d; }
+.hs-explain.edit .hs-explain-title{ color:#b45309; }
+.hs-explain.edit .hs-explain-text{ color:#78350f; }
+
+/* ── Petits écrans : tiroir en bas, redimensionnable en hauteur ── */
+@media (max-width: 1100px){
+  .hs-panel{
+    top:auto; left:0; right:0; bottom:0; width:auto; height:var(--hs-panel-h);
+    border-left:none; border-top:1px solid var(--border);
+    box-shadow:0 -8px 28px rgba(15,23,42,.12);
+    transform:translateY(100%); border-radius:16px 16px 0 0;
+  }
+  body.hs-assist-on .hs-panel{ transform:translateY(0); }
+  body.hs-assist-on .app{ margin-right:0; padding-bottom: calc(var(--hs-panel-h) + 16px); }
+  .hs-resize{
+    top:-4px; left:0; right:0; bottom:auto; width:auto; height:11px; cursor:ns-resize;
+  }
+  .hs-resize::before{ width:46px; height:3px; }
+  body.hs-resizing{ cursor:ns-resize; }
+}
+
+/* ── Guide injecté dans les fenêtres « Prompt IA » ─────────────── */
+.hs-pb-guide{
+  background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px;
+  padding:13px 16px; margin-bottom:16px;
+}
+.hs-pb-guide-title{
+  font-size:.84rem; font-weight:800; color:#3730a3; margin-bottom:9px;
+  display:flex; align-items:center; gap:7px;
+}
+.hs-pb-steps{ margin:0; padding-left:20px; }
+.hs-pb-steps li{
+  font-size:.83rem; line-height:1.5; color:#312e81; margin-bottom:5px;
+}
+.hs-pb-steps li strong{ color:#1e1b4b; }
+
+/* Mise en garde XE / XB dans le générateur de prompt générique */
+.hs-pb-note{
+  margin-top:11px; background:#fffbeb; border:1px solid #fcd34d; border-radius:8px;
+  padding:11px 13px; font-size:.8rem; line-height:1.5; color:#78350f;
+}
+.hs-pb-note strong{ color:#92400e; }
+.hs-pb-note-list{ margin:7px 0; padding-left:18px; }
+.hs-pb-note-list li{ margin-bottom:5px; }
+
+/* ── V4 : Atténuation / mise en avant des zones (mode assistant) ── */
+body.hs-assist-on #quiz-name,
+body.hs-assist-on #v4-editor,
+body.hs-assist-on #palette-zone,
+body.hs-assist-on .v4-subbar{
+  opacity:.4; transition: opacity .25s, box-shadow .25s;
+}
+body.hs-assist-on .v4-subbar.hs-focus{ opacity:1 !important; }
+/* Le modal config est toujours full-opacity (il recouvre tout) */
+body.hs-assist-on #q-config-modal .q-config-modal-box{ opacity:1 !important; }

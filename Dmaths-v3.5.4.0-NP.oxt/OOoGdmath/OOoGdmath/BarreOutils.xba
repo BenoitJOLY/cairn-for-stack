@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="BarreOutils" script:language="StarBasic">REM  *****  BASIC  *****
+&apos;(c) Amélioration et correction de bugs 2014-  Didier Dorange-Pattoret
+
+Sub Main
+       REM *** Modifies the standard bar of the BasicIDE module
+       REM *** Initialize strings
+&apos;       sToolbar = &quot;private:resource/toolbar/standardbar&quot;
+	   sToolbar = &quot;private:resource/toolbar/myBar&quot;
+       sMyToolbarCmdId = &quot;vnd.openoffice.org:MyFunction&quot;
+
+       REM *** Retrieve the module configuration manager from central module configuration manager supplier
+       oModuleCfgMgrSupplier = createUnoService(&quot;com.sun.star.ui.ModuleUIConfigurationManagerSupplier&quot;)
+
+       REM *** Retrieve the module configuration manager with module identifier
+       REM *** See drafts.com.sun.star.frame.ModuleManager for more information
+&apos;       oModuleCfgMgr = oModuleCfgMgrSupplier.getUIConfigurationManager(&quot;com.sun.star.script.BasicIDE&quot; )
+&apos;	   oModuleCfgMgr.removeSettings(sToolbar)
+       
+       oModuleCfgMgr = oModuleCfgMgrSupplier.getUIConfigurationManager(&quot;com.sun.star.text.TextDocument&quot; )
+&apos;	   oModuleCfgMgr.removeSettings(sToolbar)
+
+       oToolbarSettings = oModuleCfgMgr.createSettings()
+
+       REM *** Create a button
+       sString = &quot;My Macro&apos;s&quot;
+       oToolbarItem = CreateToolbarItem( &quot;macro:///OOoGdmath.AdditionForm.Main()&quot;, &quot;OOoGdmath.AdditionForm.Main&quot; )
+	   oToolbarSettings.UIName = &quot;Test3&quot;
+       oToolbarSettings.insertByIndex( 0, oToolbarItem )
+
+       oModuleCfgMgr.insertSettings( sToolbar, oToolbarSettings )
+End Sub
+
+Function CreateToolbarItem( Command as String, Label as String ) as Variant
+       Dim aToolbarItem(3) as new com.sun.star.beans.PropertyValue
+
+       aToolbarItem(0).Name = &quot;CommandURL&quot;
+       aToolbarItem(0).Value = Command
+       aToolbarItem(1).Name = &quot;Label&quot;
+       aToolbarItem(1).Value = Label
+       aToolbarItem(2).Name = &quot;Type&quot;
+       aToolbarItem(2).Value = 0
+       aToolbarItem(3).Name = &quot;ImageURL&quot;
+       aToolbarItem(3).Value = &quot;&quot;
+
+       CreateToolbarItem = aToolbarItem()
+End Function
+</script:module>

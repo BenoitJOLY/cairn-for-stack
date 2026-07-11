@@ -1,0 +1,240 @@
+1. L'architecture cachée de la balise [[jsxgraph]] dans STACK
+
+C'est la découverte majeure. Contrairement à un JSXGraph classique intégré dans une page web, STACK fait ceci :
+
+     Il isole le code dans une balise <iframe srcdoc="...">.
+     Conséquence 1 (HTML) : Il ne faut jamais mettre de balises HTML brutes (<div>, <button>, ou pire, <script>) dans le bloc [[jsxgraph]]. Le parseur de STACK s'attend à du Javascript pur. S'il voit un <, il lève une erreur SyntaxError: expected expression, got '<'.
+     Conséquence 2 (Sécurité CSP) : Le code s'exécute dans un contexte isolé. On ne peut pas modifier la page mère (parent.document). Toute modification du DOM doit rester à l'intérieur de l'iframe.
+     Conséquence 3 (Syntaxe) : Ton instance exige les unités px dans la balise d'ouverture ([[jsxgraph width="620px" height="440px"]]), ce qui est une spécificité de ton filtre.
+
+2. Le mur de feu d'Elea / Moodle (HTMLPurifier)
+
+L'ENT Elea possède des filtres de sécurité (HTMLPurifier et règles CSP) extrêmement agressifs :
+
+     Si l'on place des boutons ou des id dans le texte normal de la question (questiontext), Elea les supprime silencieusement avant l'affichage.
+     C'est pour cela que les solutions classiques (cibler un bouton par son id ou ses data-attributes depuis le Javascript) ont toutes échoué : le bouton n'existait plus au moment où le JS s'exécutait.
+
+3. La solution "Overlay Absolu" (Pour les boutons dans le graphique)
+
+Puisqu'on ne peut pas mettre de HTML, et qu'on ne peut pas agrandir l'iframe (son body a un overflow: hidden strict qui coupe tout ce qui dépasse), la seule méthode qui fonctionne est :
+
+    Créer les boutons entièrement en Javascript pur (document.createElement('button')).
+    Les attacher, non pas au document.body de l'iframe (où ils seraient cachés), mais directement au conteneur de la figure JSXGraph (document.getElementById(divid)).
+    Utiliser du CSS inline (position: absolute; bottom: 0; z-index: 100; background: rgba(...)) pour les superposer en bas du graphique, comme un véritable menu d'oscilloscope.
+
+4. Les subtilités du type de question "Parsons" (STACK 4.4+)
+
+J'ai appris la mécanique interne de ce type de réponse très récent :
+
+     Il nécessite d'inclure une librairie Maxima spécifique : stack_include_contrib("prooflib.mac");.
+     Les étapes ne sont pas de simples listes, mais des paires ["ID", "Texte"].
+     La réponse modèle (ta) n'est pas une liste plate, mais une structure arborescente définie par proof("L1", "L2", ...).
+     Pour évaluer, on "aplatit" cette arborescence (proof_flatten), on génère un ensemble de solutions possibles (proof_alternatives), et on vérifie si la réponse de l'élève appartient à cet ensemble (elementp).
+
+5. Astuces de débogage JSXGraph dans un environnement contraint
+
+     Les points indésirables : Un polygon dans JSXGraph crée des sommets (points) et des bords par défaut, qui sont tous déplaçables. Pour faire un cadre strict, il faut cacher les sommets (vertices: {visible: false, fixed: true}) et dessiner les bords manuellement avec create('segment') (qui ne génère aucun point).
+     Attacher des points à une courbe : Ne pas utiliser create('point') puis chercher à lier leurs coordonnées avec des fonctions complexes. Il faut utiliser create('glider', [x, y, objetCourbe]). Le point glisse alors mathématiquement sur la courbe.
+     Couper une courbe (Clip) : Au lieu de faire des maths complexes pour empêcher un functiongraph de dépasser, il suffit de régler le boundingbox de JSXGraph exactement aux mêmes dimensions que le dessin de l'écran noir. Le moteur SVG/Canvas de l'iframe s'occupe du reste.
+     Plein écran en iframe : La commande element.requestFullscreen() bloque si on la lance sur un conteneur interne dans un srcdoc. Il faut obligatoirement l'appeler sur la racine de l'iframe : document.documentElement.requestFullscreen().
+
+En résumé pour l'avenir :
+
+Désormais, lorsque tu voudras ajouter de l'interactivité complexe (boutons, sliders, menus) à un graphique JSXGraph dans STACK sur Elea, je saurai qu'il faut tout construire en JS pur à l'intérieur de [[jsxgraph]] et utiliser l'overlay absolu sur le divid. C'est la seule faille propre dans cette forteresse !
+
+Voici le **guide de référence ultime** (le "Cheat Sheet") pour générer n'importe quel exercice d'oscilloscope avec JSXGraph dans STACK. 
+
+Il contient le socle commun, la bibliothèque de fonctions, les règles d'or et la structure du PRT détaillé.
+
+---
+
+# 📘 Le Manifeste HéStack : Oscilloscope JSXGraph
+
+## 1. Règles d'Or (À ne jamais oublier)
+1. **Syntaxe Maxima dans JS** : Dans un bloc `[[jsxgraph]]`, on n'utilise **JAMAIS** `{@var@}` mais **TOUJOURS** `{#var#}`.
+2. **La fonction Aléatoire** : Dans les variables STACK, c'est `rand()` (et non `random()`).
+3. **Éviter les Gliders sur les angles** : Pour les signaux carrés ou triangulaires, ne pas utiliser `glider` (qui bug sur les sommets), mais des `point` avec l'option `drag: ['x']` ou `drag: ['y']`.
+4. **Rendre les angles nets** : Pour les signaux carrés/triangles, forcer l'option `{numberPoints: 4000, doAdvancedPlot: false}` sur le `functiongraph` pour empêcher JSXGraph de lisser les angles vifs.
+5. **Le décalage XPOS** : Dans TOUTES les fonctions mathématiques, soustraire `xp` à `xd` pour que le bouton XPOS de la barre de contrôle déplace physiquement la courbe.
+
+---
+
+## 2. Le Socle Commun JavaScript (Le template "Clair")
+
+Gardez ce bloc de base pour initialiser l'oscilloscope. Il gère les échelles, le rendu et la grille.
+
+```javascript
+var lSH=[5e-7,0.000001,0.000002,0.000005,0.00001,0.00002,0.00005,0.0001,0.0002,0.0005,0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5];
+var lSV=[0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10];
+var si=7, ti=9, xp=0, yp=0; /* si et ti définissent l'échelle de départ */
+
+/* Variables Maxima */
+var fq = parseFloat("{#ma_frequence#}");
+var um = parseFloat("{#ma_tension#}");
+
+function SV(){return lSV[si];}
+function SH(){return lSH[ti];}
+function fV(v){return v<0.05?(v*1e3).toPrecision(3)+" mV":v+" V";}
+function fT(s){
+  return s<5e-5?(s*1e6).toPrecision(3)+" \u00B5s"
+        :s<0.05?(s*1e3).toPrecision(3)+" ms"
+        :s.toPrecision(3)+" s";
+}
+var bd=JXG.JSXGraph.initBoard(divid,{ boundingbox:[-5.4,4.5,5.4,-4.8], axis:false, grid:false, showNavigation:false, showCopyright:false, pan:{enabled:false}, zoom:{enabled:false} });
+
+/* Grille et Fond Clair (à copier-coller tel quel) */
+bd.create("polygon",[[-5,-4],[5,-4],[5,4],[-5,4]], {fillColor:"#ffffff",fillOpacity:1,strokeWidth:0, fixed:true,layer:0,highlight:false, vertices:{visible:false, fixed:true}, borders:{visible:false}});
+bd.create("segment",[[-5,-4],[5,-4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[5,-4],[5,4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[5,4],[-5,4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[-5,4],[-5,-4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+var gs={strokeColor:"#e5e7eb",strokeWidth:0.8,fixed:true,layer:1,highlight:false};
+var gc={strokeColor:"#d1d5db",strokeWidth:1.2,fixed:true,layer:1,highlight:false};
+var ts={strokeColor:"#9ca3af",strokeWidth:0.55,fixed:true,layer:1,highlight:false};
+for(var xi=-4;xi<=4;xi++) bd.create("segment",[[xi,-4],[xi,4]],xi===0?gc:gs);
+for(var yi=-3;yi<=3;yi++) bd.create("segment",[[-5,yi],[5,yi]],yi===0?gc:gs);
+bd.create("segment",[[-5,0],[5,0]],gc);
+bd.create("segment",[[0,-4],[0,4]],gc);
+for(var xt=-5;xt<=5.01;xt+=0.2) if(Math.abs(xt%1)>0.05) bd.create("segment",[[xt,-0.07],[xt,0.07]],ts);
+for(var yt=-4;yt<=4.01;yt+=0.2) if(Math.abs(yt%1)>0.05) bd.create("segment",[[-0.07,yt],[0.07,yt]],ts);
+```
+
+---
+
+## 3. La Bibliothèque de Fonctions (Les signaux)
+
+Ajoutez la fonction souhaitée, puis appelez-la dans `bd.create("functiongraph",...)`.
+
+### 🔹 Sinusoïde
+```javascript
+var phase = Math.random() * 2 * Math.PI;
+function phi0(){ var T=fq>0?1/fq:0; return T>0?Math.PI/2+10*Math.PI*SH()/T:0; }
+
+function sinSig(xd){
+  var T=fq>0?1/fq:0, s=SH(), sv=SV();
+  if(T<=0) return 0;
+  var y = um/sv * Math.cos(2*Math.PI*s*(xd-xp)/T - phi0() + phase) + yp;
+  return y>4.5?4.5:y<-4.5?-4.5:y;
+}
+/* Tracé : bd.create("functiongraph",[sinSig,-5,5], {strokeColor:"#2563eb",strokeWidth:3,...}); */
+```
+
+### 🔹 Carré
+```javascript
+function carreSig(xd){
+  var s=SH(), sv=SV(), T=fq>0?1/fq:0;
+  if(T<=0) return yp;
+  var Td=T/s, ph=(((xd-xp)/Td)%1+1)%1;
+  var y = (ph<0.5 ? um : -um)/sv + yp;
+  return y>4.5?4.5:y<-4.5?-4.5:y;
+}
+/* Tracé : bd.create("functiongraph",[carreSig,-5,5], {strokeColor:"#2563eb",strokeWidth:3, numberPoints:4000, doAdvancedPlot:false,...}); */
+```
+
+### 🔹 Triangle
+```javascript
+function triSig(xd){
+  var s=SH(), sv=SV(), T=fq>0?1/fq:0;
+  if(T<=0) return yp;
+  var Td=T/s, ph=(((xd-xp)/Td+0.25)%1+1)%1;
+  var raw = ph<0.5 ? (-um+4*um*ph) : (3*um-4*um*ph);
+  var y = raw/sv + yp;
+  return y>4.5?4.5:y<-4.5?-4.5:y;
+}
+/* Tracé : bd.create("functiongraph",[triSig,-5,5], {strokeColor:"#2563eb",strokeWidth:3, numberPoints:4000, doAdvancedPlot:false,...}); */
+```
+
+### 🔹 RC Charge (Exponentielle croissante)
+*Attention : `ta` doit être injecté en ms depuis Maxima.*
+```javascript
+function rcChargeSig(xd){
+  var t=(xd-xp+5)*SH(), sv=SV(); /* +5 pour centrer le t=0 au milieu */
+  var y = t>=0 ? ev/sv*(1-Math.exp(-t/ta))+yp : 0+yp;
+  return y>4.5?4.5:y<-4.5?-4.5:y;
+}
+```
+
+### 🔹 RC Décharge (Exponentielle décroissante)
+```javascript
+function rcDechargeSig(xd){
+  var t=(xd-xp+5)*SH(), sv=SV();
+  var y = t>=0 ? ev/sv*Math.exp(-t/ta)+yp : ev/sv+yp;
+  return y>4.5?4.5:y<-4.5?-4.5:y;
+}
+```
+
+### 🔹 Retard Ultrasons (2 sinusoïdes)
+```javascript
+function sinRetard(xd, dt){
+  var T=fq>0?1/fq:0, s=SH(), sv=SV();
+  if(T<=0) return 0;
+  var xd2 = xd - dt/s; /* dt est le retard en ms */
+  var y = um/sv * Math.cos(2*Math.PI*s*(xd2-xp)/T - phi0() + phase) + yp;
+  return y>4.5?4.5:y<-4.5?-4.5:y;
+}
+/* Tracer CH1 puis CH2 avec un dt différent (ex: sinRetard(xd, 0) et sinRetard(xd, dt) ) */
+```
+
+---
+
+## 4. Les Curseurs et la Barre de Contrôle
+
+Le bloc des curseurs (Points avec drag limité + Segments + Texte $\Delta t$ / $\Delta V$). **Toujours inclure la fonction `toggleGroup`** pour les cacher/afficher avec les boutons $\blacksquare$ X et $\blacksquare$ Y.
+
+*(Copier-coller le bloc `CURSEURS VIOLETS` et `CURSEURS ROUGES` d'un des exercices précédents, ils sont standardisés).*
+
+La barre de contrôle (V/div, t/div, YPOS) est aussi un bloc fixe à copier-coller en bas du script JSXGraph.
+
+---
+
+## 5. La Préparation Maxima (Côté Question Variables)
+
+**Règle absolue :** Toujours préparer les réponses avec `stackunits()` pour forcer l'unité attendue par le PRT.
+
+```maxima
+/* Exemple pour un RC Charge */
+ev_val: 2.0 + rand(10)/10; /* Tension entre 2 et 3 V */
+ta_val: 1.0 + rand(10)/10; /* Tau entre 1 et 2 ms */
+
+/* Création des réponses modèles avec unités */
+ta_tau: stackunits(ta_val, ms);
+ta_E: stackunits(ev_val, V);
+tau_unit: ms;
+E_unit: V;
+```
+
+---
+
+## 6. Le PRT "Intelligent" (Côté Arbre de notes)
+
+Pour noter avec précision (0.25 pt pour l'unité, 0.25 pt pour la valeur) et donner du feedback logique, utilisez cette structure de PRT à 6 nœuds :
+
+**Dans "Variables de feedback" du PRT :**
+```maxima
+/* --- Extraction de l'unité de la réponse 1 (ex: tau) --- */
+stud_si_tau : stack_unit_si_to_si_base(ans_tau);
+teach_si_tau : tau_unit;
+v_pure_e_tau : subst(map(lambda([u], u=1), listofvars(stud_si_tau)), stud_si_tau);
+v_pure_t_tau : subst(map(lambda([u], u=1), listofvars(teach_si_tau)), teach_si_tau);
+eleve_unit_tau : 2 * stud_si_tau / v_pure_e_tau;
+teacher_unit_tau : 2 * teach_si_tau / v_pure_t_tau;
+
+/* (Répéter pour la réponse 2, ex: E) */
+```
+
+**Structure de l'arbre :**
+*   **Nœud 0 (Unité 1) :** `UnitsAbsolute` entre `eleve_unit_tau` et `teacher_unit_tau`. (Vrai -> +0.25 -> Nœud 1)
+*   **Nœud 1 (Valeur 1) :** `UnitsRelative` entre `ans_tau` et `ta_tau` (opt: 0.05). (Vrai -> +0.25 -> Nœud 2)
+*   **Nœud 2 (Unité 2) :** `UnitsAbsolute` entre `eleve_unit_E` et `teacher_unit_E`. (Vrai -> +0.25 -> Nœud 3)
+*   **Nœud 3 (Valeur 2) :** `UnitsRelative` entre `ans_E` et `ta_E` (opt: 0.05). (Vrai -> +0.25 -> Fin)
+*   **Nœud 4 (Fallback / Cohérence) :** Si le Nœud 1 est faux. On teste quand même l'unité de E (Nœud 2 bis) puis la valeur de E.
+    *   *Feedback jaune si E est juste mais Tau faux :* "Votre tension est bonne, mais vous vous êtes trompé sur le temps."
+*   **Nœud 5 (Cohérence mathématique) :** Exemple pour les Ultrasons. Si $\Delta t$ est faux, on calcule `d_calc_eleve: v * ans_dt / 2;` et on compare `ans_d` à `d_calc_eleve`.
+    *   *Feedback jaune si cohérent :* "Votre formule $d = v\Delta t / 2$ est bonne, mais comme votre $\Delta t$ était faux..."
+
+---
+**Avec ce mémo, pour créer un nouvel oscilloscope, il vous suffit de :**
+1. Copier le Socle Commun JS.
+2. Copier la fonction mathématique souhaitée dans la Bibliothèque.
+3. Déclarer 2 variables Maxima avec `stackunits()`.
+4. Copier-coller le squelette du PRT à 6 nœuds et adapter les noms de variables.

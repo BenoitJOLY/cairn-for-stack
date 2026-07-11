@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CarreForm" script:language="StarBasic">&apos;OOoGdmath 
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Dim oCarreForm as Object
+
+Sub Main
+	oCarreForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;CarreForm&quot;)
+	ChangeTitreDialog(oCarreForm)
+    oCarreForm.Model.ImageControl1.ImageURL=fCheminImages &amp; &quot;car1.gif&quot;
+    oCarreForm.Model.ImageControl2.ImageURL=fCheminImages &amp; &quot;car2.gif&quot;
+&apos;	RestaureForm(oCarreForm)
+	MAJ_Label()
+&apos;	Renomme(evt)
+	oCarreForm.Execute()
+End Sub
+Private Sub CarreForm_AnnulerBouton_Click()
+    oCarreForm.EndExecute()
+End Sub
+Private Sub CarreForm_CheckBox1_Click()
+    oCarreForm.Model.CheckBox7.Enabled = oCarreForm.Model.CheckBox1.State Or oCarreForm.Model.CheckBox2.State
+End Sub
+Private Sub CarreForm_CheckBox10_Click()
+    oCarreForm.Model.TextField6.Enabled = oCarreForm.Model.CheckBox10.State
+End Sub
+Private Sub CarreForm_CheckBox2_Click()
+    oCarreForm.Model.CheckBox7.Enabled = oCarreForm.Model.CheckBox1.State Or oCarreForm.Model.CheckBox2.State
+End Sub
+Private Sub CarreForm_CheckBox3_Click()
+    oCarreForm.Model.CheckBox8.Enabled = oCarreForm.Model.CheckBox3.State Or oCarreForm.Model.CheckBox4.State
+    oCarreForm.Model.CheckBox6.Enabled = Not (oCarreForm.Model.CheckBox3.State And oCarreForm.Model.CheckBox4.State)
+End Sub
+Private Sub CarreForm_CheckBox4_Click()
+    oCarreForm.Model.CheckBox8.Enabled = oCarreForm.Model.CheckBox3.State Or oCarreForm.Model.CheckBox4.State
+    oCarreForm.Model.CheckBox6.Enabled = Not (oCarreForm.Model.CheckBox3.State And oCarreForm.Model.CheckBox4.State)
+End Sub
+Private Sub CarreForm_CheckBox5_Click()
+    oCarreForm.Model.CheckBox40.Enabled = oCarreForm.Model.CheckBox5.State
+End Sub
+Private Sub CarreForm_Image1_Click()
+    oCarreForm.Model.OptionButton1.State = True
+End Sub
+Private Sub CarreForm_Image11_Click()
+    ChangeCouleur oCarreForm.Model.ImageControl11
+End Sub
+Private Sub CarreForm_Image12_Click()
+    ChangeCouleur oCarreForm.Model.ImageControl12
+End Sub
+Private Sub CarreForm_Image2_Click()
+    oCarreForm.Model.OptionButton2.State = True
+End Sub
+Private Sub CarreForm_Image4_Click()
+    ChangeCouleur oCarreForm.Model.ImageControl4
+End Sub
+Private Sub CarreForm_Image5_Click()
+    ChangeCouleur oCarreForm.Model.ImageControl5
+End Sub
+Private Sub CarreForm_Image6_Click()
+    ChangeCouleur oCarreForm.Model.ImageControl6
+End Sub
+
+Private Sub CarreForm_OkBouton_Click()
+Dim UneLigne As String
+Dim afmesure, t1, a, posx, posy, x0, y0, x1, y1, x2, y2, x3, y3
+Dim UnCarre as Object, ga, gb, mm1, mm2, xm, ym, rayon, xn, yn
+dim Shapes as Object
+dim CestUneFigureGeometrique as Boolean
+dim Group as Object
+dim coeff
+
+    oCarreForm.EndExecute()
+
+	SauveForm(oCarreForm)
+
+&apos; Dessiner un carre
+	CestUneFigureGeometrique=oCarreForm.Model.CheckBox12.State
+    afmesure = oCarreForm.Model.CheckBox5.State
+    t1 = oCarreForm.Model.TextField1.Text
+    RemplaceVirgulePoint t1
+    a = Val(t1) * 1000
+    t1 = oCarreForm.Model.TextField1.Text
+    If (oCarreForm.Model.OptionButton2.State) Then a = a / Sqr(2)
+    If oCarreForm.Model.CheckBox12.State Then
+        posx = (xmin + xmax) / 2 - a / 2
+        posy = (ymin + ymax) / 2 - a / 2
+    Else
+        PointInsertion posx, posy
+    End If
+    Shapes=InitialiseGroupe()
+    InitialiseDessin(false)
+    x0 = posx
+    y0 = posy
+    x1 = x0 + a
+    y1 = y0
+    x2 = x1
+    y2 = y0 + a
+    x3 = x0
+    y3 = y2
+    UnCarre=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oCarreForm.Model.ImageControl6)
+    If oCarreForm.Model.CheckBox11.State Then
+        MarqueAngleDroit x0, y0, x1, y1, Shapes, oCarreForm.Model.ImageControl6
+        MarqueAngleDroit x1, y1, x2, y2, Shapes, oCarreForm.Model.ImageControl6
+        MarqueAngleDroit x2, y2, x3, y3, Shapes, oCarreForm.Model.ImageControl6
+        MarqueAngleDroit x3, y3, x0, y0, Shapes, oCarreForm.Model.ImageControl6
+    End If
+    If afmesure Then
+    	a = oCarreForm.Model.CheckBox40.State
+        If oCarreForm.Model.OptionButton2.State Then
+            InsereTexte t1 &amp; MIif(oCarreForm.Model.CheckBox40.State, &quot;&quot;, &quot; cm&quot;), (x0 + x2) / 2, (y0 + y2) / 2, shapes, 0
+        Else
+            InsereTexte t1 &amp; MIif(oCarreForm.Model.CheckBox40.State, &quot;&quot;, &quot; cm&quot;), (x0 + x3) / 2, (y0 + y3) / 2, Shapes, 0
+        End If
+    End If
+    ga = 20
+    gb = ga - 2
+    If CestUneFigureGeometrique Then
+        AjoutePoint x0, y0, oCarreForm.Model.TextField2.Text, InsereTexte(oCarreForm.Model.TextField2.Text, (ga * x0 - x1 - x3) / gb, (ga * y0 - y1 - y3) / gb)
+        AjoutePoint x1, y1, oCarreForm.Model.TextField3.Text, InsereTexte(oCarreForm.Model.TextField3.Text, (ga * x1 - x0 - x2) / gb, (ga * y1 - y0 - y2) / gb)
+        AjoutePoint x2, y2, oCarreForm.Model.TextField4.Text, InsereTexte(oCarreForm.Model.TextField4.Text, (ga * x2 - x1 - x3) / gb, (ga * y2 - y1 - y3) / gb)
+        AjoutePoint x3, y3, oCarreForm.Model.TextField5.Text, InsereTexte(oCarreForm.Model.TextField5.Text, (ga * x3 - x1 - x2) / gb, (ga * y3 - y1 - y2) / gb)
+        LesCarres(NbCarre).nom = oCarreForm.Model.TextField2.Text &amp; oCarreForm.Model.TextField3.Text &amp; oCarreForm.Model.TextField4.Text &amp; oCarreForm.Model.TextField5.Text
+        LesCarres(NbCarre).Point(0) = oCarreForm.Model.TextField2.Text
+        LesCarres(NbCarre).Point(1) = oCarreForm.Model.TextField3.Text
+        LesCarres(NbCarre).Point(2) = oCarreForm.Model.TextField4.Text
+        LesCarres(NbCarre).Point(3) = oCarreForm.Model.TextField5.Text
+        LesCarres(NbCarre).Shape = UnCarre
+        NbCarre = NbCarre + 1
+    End If
+    If oCarreForm.Model.CheckBox9.State And Not CestUneFigureGeometrique Then
+    	NormaliseCoordonnees xn, yn, x1, y1, x0, y0, x3, y3
+        Call InsereTexte(oCarreForm.model.TextField2.Text, xn, yn, Shapes, 0, 0, 0)
+    	NormaliseCoordonnees xn, yn, x0, y0, x1, y1, x2, y2
+        Call InsereTexte(oCarreForm.model.TextField3.Text, xn, yn, Shapes, 0, 0, 0)
+    	NormaliseCoordonnees xn, yn, x3, y3, x2, y2, x1, y1
+        Call InsereTexte(oCarreForm.model.TextField4.Text, xn, yn, Shapes, 0, 0, 0)
+    	NormaliseCoordonnees xn, yn, x2, y2, x3, y3, x0, y0
+        Call InsereTexte(oCarreForm.model.TextField5.Text, xn, yn, Shapes, 0, 0, 0)
+    End If
+    mm1 = False
+    mm2 = False
+    If oCarreForm.Model.CheckBox1.State Then
+        InsereLigne x0, y0, x2, y2, Shapes, oCarreForm.Model.ImageControl4
+        If oCarreForm.Model.CheckBox7.Enabled And oCarreForm.Model.CheckBox7.State Then
+            CodeLongueur x0, y0, (x0 + x2) / 2, (y0 + y2) / 2, 2, Shapes, oCarreForm.Model.ImageControl4
+            CodeLongueur x2, y2, (x0 + x2) / 2, (y0 + y2) / 2, 2, Shapes, oCarreForm.Model.ImageControl4
+            If Not oCarreForm.Model.CheckBox2.State Then
+                MarqueMilieu x0, y0, x2, y2, Shapes, oCarreForm.Model.ImageControl4
+                mm1 = True
+            End If
+        End If
+    End If
+    If oCarreForm.Model.CheckBox2.State Then
+        InsereLigne x1, y1, x3, y3, Shapes, oCarreForm.Model.ImageControl4
+        If oCarreForm.Model.CheckBox7.Enabled And oCarreForm.Model.CheckBox7.State Then
+            CodeLongueur x1, y1, (x1 + x3) / 2, (y1 + y3) / 2, 2, Shapes, oCarreForm.Model.ImageControl4
+            CodeLongueur x3, y3, (x1 + x3) / 2, (y1 + y3) / 2, 2, Shapes, oCarreForm.Model.ImageControl4
+            If Not oCarreForm.Model.CheckBox1.State Then
+                MarqueMilieu x1, y1, x3, y3, Shapes, oCarreForm.Model.ImageControl4
+                mm2 = True
+            End If
+        End If
+    End If
+    If oCarreForm.Model.CheckBox7.Enabled And oCarreForm.Model.CheckBox7.State And oCarreForm.Model.CheckBox1.State And oCarreForm.Model.CheckBox2.State Then
+        MarqueAngleDroit((x0 + x2)/2, (y0 + y2)/2, x0, y0, Shapes, oCarreForm.Model.ImageControl4)
+    End If
+    If oCarreForm.Model.CheckBox6.State Then
+        If Not oCarreForm.Model.CheckBox3.State Then
+            CodeLongueur x0, y0, x1, y1, 4, Shapes, oCarreForm.Model.ImageControl6
+            CodeLongueur x2, y2, x3, y3, 4, Shapes, oCarreForm.Model.ImageControl6
+        End If
+        If Not oCarreForm.Model.CheckBox4.State Then
+            CodeLongueur x2, y2, x1, y1, 4, Shapes, oCarreForm.Model.ImageControl6
+            CodeLongueur x0, y0, x3, y3, 4, Shapes, oCarreForm.Model.ImageControl6
+        End If
+    End If
+    If oCarreForm.Model.CheckBox3.State Then
+        InsereLigne((x0 + x1) / 2, y1, (x0 + x1) / 2, y2, Shapes, oCarreForm.Model.ImageControl5)
+        MarqueAngleDroit((x0 + x1) / 2, (y0 + y1) / 2, x1, y1, Shapes, oCarreForm.Model.ImageControl5)
+        CodeLongueur x0, y0, (x0 + x1) / 2, (y0 + y1) / 2, 3, Shapes, oCarreForm.Model.ImageControl5
+        CodeLongueur x1, y1, (x0 + x1) / 2, (y0 + y1) / 2, 3, Shapes, oCarreForm.Model.ImageControl5
+        MarqueAngleDroit((x2 + x3) / 2, (y2 + y3) / 2, x3, y3, Shapes, oCarreForm.Model.ImageControl5)
+        CodeLongueur x2, y2, (x2 + x3) / 2, (y2 + y3) / 2, 3, Shapes, oCarreForm.Model.ImageControl5
+        CodeLongueur x3, y3, (x2 + x3) / 2, (y2 + y3) / 2, 3, Shapes, oCarreForm.Model.ImageControl5
+    End If
+    If oCarreForm.Model.CheckBox4.State Then
+        InsereLigne x0, (y0 + y3) / 2, x1, (y0 + y3) / 2, Shapes, oCarreForm.Model.ImageControl5
+        MarqueAngleDroit((x0 + x3) / 2, (y0 + y3) / 2, x0, y0, Shapes, oCarreForm.Model.ImageControl5)
+        CodeLongueur x0, y0, (x0 + x3) / 2, (y0 + y3) / 2, 3,Shapes, oCarreForm.Model.ImageControl5
+        CodeLongueur x3, y3, (x0 + x3) / 2, (y0 + y3) / 2, 3, Shapes, oCarreForm.Model.ImageControl5
+        MarqueAngleDroit((x1 + x2) / 2, (y1 + y2) / 2, x2, y2, Shapes, oCarreForm.Model.ImageControl5)
+        CodeLongueur x1, y1, (x1 + x2) / 2, (y1 + y2) / 2, 3, Shapes, oCarreForm.Model.ImageControl5
+        CodeLongueur x2, y2, (x1 + x2) / 2, (y1 + y2) / 2, 3, Shapes, oCarreForm.Model.ImageControl5
+    End If
+    If oCarreForm.Model.CheckBox10.State Then
+        xm = (x0 + x2) / 2
+        ym = (y0 + y2) / 2
+        
+        If (Not oCarreForm.Model.CheckBox2.State) And (Not mm1) Then MarqueMilieu x0, y0, x2, y2, Shapes, oCarreForm.Model.ImageControl6
+        If (Not oCarreForm.Model.CheckBox1.State) And (Not mm2) Then MarqueMilieu x1, y1, x3, y3, Shapes, oCarreForm.Model.ImageControl6
+        AjoutePoint xm, ym, oCarreForm.Model.TextField6.Text, InsereTexte(oCarreForm.Model.TextField6.Text,xm-200, ym-200, Shapes), False
+    End If
+    If oCarreForm.Model.CheckBox18.State Or oCarreForm.Model.CheckBox19.State Then
+        xm = (x0 + x2) / 2
+        ym = (y0 + y2) / 2
+        If oCarreForm.Model.CheckBox18.State Then
+            rayon = Sqr((x0 - xm) ^ 2 + (y0 - ym) ^ 2)
+            InsereCercle xm, ym, rayon, Shapes, oCarreForm.Model.ImageControl11
+        End If
+        If oCarreForm.Model.CheckBox19.State Then
+            rayon = Sqr((x0 - x1) ^ 2 + (y0 - y1) ^ 2) / 2
+            InsereCercle xm, ym, rayon, Shapes, oCarreForm.Model.ImageControl12
+        End If
+    End If
+	Dim aPoint As New com.sun.star.awt.Point
+    Dim TheSize as new com.sun.star.awt.Size
+	aPoint.x=3000
+	aPoint.y=3000
+	Group = GroupeObjet(Shapes)
+	Group.Position=aPoint
+	TheSize=Group.Size
+	coeff=oCarreForm.Model.Echelle.Text
+	RemplaceVirgulePoint(coeff)
+	TheSize.width = TheSize.Width*val(coeff)/100
+	TheSize.height= TheSize.Height*val(coeff)/100
+	Group.Size=TheSize
+	TermineDessin()
+&apos;    DeplaceSelection posx, posy
+ &apos;   Selection.ShapeRange.ScaleHeight Echelle / 100, msoFalse, msoScaleFromTopLeft
+&apos;    Selection.ShapeRange.ScaleWidth Echelle / 100, msoFalse, msoScaleFromTopLeft
+End Sub
+Private Sub CarreForm_OptionButton1_Click()
+    oCarreForm.Model.CheckBox1.State = 0
+    oCarreForm.Model.CheckBox2.State = 0
+    oCarreForm.Model.CheckBox3.State = 0
+    oCarreForm.Model.CheckBox4.State = 0
+End Sub
+Private Sub CarreForm_OptionButton2_Click()
+    oCarreForm.Model.CheckBox1.State = 0
+    oCarreForm.Model.CheckBox2.State = 1
+    oCarreForm.Model.CheckBox3.State = 0
+    oCarreForm.Model.CheckBox4.State = 0
+End Sub
+Private Sub CarreForm_TextBox2_Change()
+    oCarreForm.Model.CheckBox1.Label = &quot;[&quot; &amp; oCarreForm.Model.TextField2.Text &amp; oCarreForm.Model.TextField4.Text &amp; &quot;]&quot;
+    oCarreForm.Model.CheckBox3.Label = &quot;[&quot; &amp; oCarreForm.Model.TextField2.Text &amp; oCarreForm.Model.TextField3.Text &amp; &quot;]&quot;
+    oCarreForm.Model.CheckBox4.Label = &quot;[&quot; &amp; oCarreForm.Model.TextField2.Text &amp; oCarreForm.Model.TextField5.Text &amp; &quot;]&quot;
+End Sub
+Private Sub CarreForm_TextBox3_Change()
+    oCarreForm.Model.CheckBox2.Label = &quot;[&quot; &amp; oCarreForm.Model.TextField3.Text &amp; oCarreForm.Model.TextField5.Text &amp; &quot;]&quot;
+    oCarreForm.Model.CheckBox3.Label = &quot;[&quot; &amp; oCarreForm.Model.TextField2.Text &amp; oCarreForm.Model.TextField3.Text &amp; &quot;]&quot;
+End Sub
+Private Sub CarreForm_TextBox4_Change()
+    oCarreForm.Model.CheckBox1.Label = &quot;[&quot; &amp; oCarreForm.Model.TextField2.Text &amp; oCarreForm.Model.TextField4.Text &amp; &quot;]&quot;
+End Sub
+Private Sub CarreForm_TextBox5_Change()
+    oCarreForm.Model.CheckBox2.Label = &quot;[&quot; &amp; oCarreForm.Model.TextField3.Text &amp; oCarreForm.Model.TextField5.Text &amp; &quot;]&quot;
+    oCarreForm.Model.CheckBox4.Label = &quot;[&quot; &amp; oCarreForm.Model.TextField2.Text &amp; oCarreForm.Model.TextField5.Text &amp; &quot;]&quot;
+End Sub
+Private Sub MAJ_Label()
+	CarreForm_TextBox2_Change()
+	CarreForm_TextBox3_Change()
+	CarreForm_TextBox4_Change()
+	CarreForm_TextBox5_Change()
+	CarreForm_OptionButton1_Click()
+	CarreForm_OptionButton2_Click()
+End Sub
+
+Private Sub Renomme(evt as Object)
+	GRenomme evt, oCarreForm, Array(&quot;TextField2&quot;, &quot;TextField3&quot;, &quot;TextField4&quot;, &quot;TextField5&quot;)
+End Sub
+
+</script:module>

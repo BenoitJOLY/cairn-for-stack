@@ -1,0 +1,925 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="mImportFromLaTeX" script:language="StarBasic">&apos;*****  BASIC  *****
+&apos;CmathOOo
+&apos;Copyright (C) 2006  Christophe devalland
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+option explicit
+
+Public bModeTexte as Boolean
+Public oViewCursor as Object
+Public oDocOOo as Object
+
+Sub Main
+	&apos;	PasteFromLatex
+	&apos;stop
+	&apos;ImportLatexFile
+	InitVariablesLaTeX2OOo
+	
+stop
+	dim oDocLatex as object
+	dim oCurseurLatex as object
+	dim oCurseurDebut  as object, oCurseurFin as object
+	dim sTexteLatex as string
+	
+	oDocLatex=ThisComponent
+	bModeTexte=False
+	&apos;oDocLatex est le document contenant le texte Latex
+	oDocOOo = StarDesktop.loadComponentFromURL( &quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0,Array( MakePropertyValue( &quot;Hidden&quot;, false) ) )
+	bModeTexte=False
+	oCurseurLatex=oDocLatex.text.createTextCursor
+	oCurseurLatex.gotoEnd(true)
+	sTexteLatex=SubstitutionsLatexAvantTraitement(oCurseurLatex.string)
+&apos;	msgbox(oCurseurLatex.string)
+	DocLatex2OOo(oDocLatex, oDocOOo, sTexteLatex)
+&apos;	oDocOOo.close( True )
+End Sub
+
+
+
+sub PasteFromLatex
+	dim oDocLatex as object
+	dim oCurseurLatex as object
+	dim oCurseurDebut  as object, oCurseurFin as object
+	dim sTexteLatex as string, s as object
+	dim a as variant
+	oDocOOo=ThisComponent
+	InitVariablesLaTeX2OOo
+	bModeTexte=False
+	&apos;oDocLatex est le document contenant le texte Latex
+	&apos;	oDocLatex = StarDesktop.loadComponentFromURL( &quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0,Array( MakePropertyValue( &quot;Hidden&quot;, false) ) )
+	&apos;oDocLatex.CurrentController.Frame.ContainerWindow.Visible=False
+	&apos; le texte est dans le presse-papier
+	oViewCursor=oDocOOo.currentcontroller.ViewCursor
+	oDocOOo.text.insertControlCharacter(oViewCursor,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)
+	oDocOOo.text.insertString(oViewCursor,&quot;ImportLatex-&quot;,false)
+	ClipboardPaste( oDocOOo )
+	oCurseurLatex=oDocOOo.text.createTextCursorByRange(oViewCursor.End)
+	oCurseurLatex.gotoStartOfParagraph(true)
+	sTexteLatex=oCurseurLatex.string
+	do while left(sTexteLatex,12) &lt;&gt; &quot;ImportLatex-&quot; 
+		oCurseurLatex.gotoPreviousParagraph(true)
+		oCurseurLatex.gotoStartOfParagraph(true)
+		sTexteLatex=oCurseurLatex.string
+	loop
+	oDocOOo.CurrentController.Select(oCurseurLatex)
+	oCurseurLatex.string=&quot;&quot;
+	&apos; sélectionner tout le document
+	&apos;	oCurseurDebut=oDocLatex.text.createTextCursorByRange(oCurseurLatex.getStart())
+	&apos;	oCurseurFin=oDocLatex.text.createTextCursorByRange(oCurseurLatex.getEnd())
+	&apos;	oCurseurLatex.collapseToStart
+	&apos;conversion
+	&apos;	DocLatex2OOo(oDocLatex, oDocOOo, oCurseurDebut, oCurseurFin)
+	sTexteLatex=mid(sTexteLatex,13)
+	TraduitNewCommand(sTexteLatex)
+	sTexteLatex=SubstitutionsLatexAvantTraitement(sTexteLatex)
+	&apos;oDocOOo=StarDesktop.CurrentComponent
+	&apos;oDocOOo.CurrentController.Frame.ContainerWindow.toFront()
+	&apos;oDocOOo=ThisComponent
+	&apos;oDocOOo.CurrentController.Frame.Activate()
+	DocLatex2OOo(oDocOOo, sTexteLatex)
+end sub
+
+sub ImportLatexFile
+	dim oDocLatex as object
+&apos;	dim oCurseurLatex as object
+	dim oFP as object, slesFichiers() as string, sFichier as string
+	dim oCurseurDebut  as object, oCurseurFin as object, oCurseurLatex as object
+	dim sTexteLatex as string
+	dim propFich(2) as New com.sun.star.beans.PropertyValue
+	dim i as long, j as long
+	dim a as object
+	
+	InitVariablesLaTeX2OOo
+	oDocOOo=ThisComponent
+	bModeTexte=False
+	&apos;oDocLatex est le document contenant le texte Latex
+	oFP=CreateUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
+	With oFP
+&apos;		.DisplayDirectory =
+		.appendFilter(&quot;Sources Latex&quot;,&quot;*.tex&quot;)
+		.appendFilter(&quot;Tous documents&quot;,&quot;*.*&quot;)
+		.CurrentFilter(&quot;Sources Latex&quot;)
+		if .execute=com.sun.star.ui.dialogs.ExecutableDialogResults.OK then
+			slesFichiers=.Files
+	        propFich(0).Name=&quot;FilterName&quot;
+            propFich(0).Value=&quot;Text (encoded)&quot;
+            propFich(1).Name=&quot;FilterOptions&quot;
+            propFich(1).Value=&quot;ISO_8859_1&quot;        &apos;remplace Latin1
+            propFich(2).Name=&quot;Hidden&quot;
+            propFich(2).Value=false
+	
+			oDocLatex = StarDesktop.loadComponentFromURL( slesFichiers(0), &quot;_blank&quot;, 0,propFich())
+			.dispose
+			oDocLatex.CurrentController.Frame.ContainerWindow.Visible=False
+			&apos; rechercher \begin{document}
+			oCurseurLatex=oDocLatex.text.createTextCursor
+			oCurseurLatex.gotoEnd(true)
+			sTexteLatex=oCurseurLatex.string
+			TraduitNewCommand(sTexteLatex)
+&apos;			oDocOOo.Text.insertString(oDocOOo.text.createTextCursor,sTexteLatex,false)			
+			&apos; à enlever :
+			oDocLatex.close( True )
+&apos;			stop
+			
+&apos;			oCurseurDebut=oDocLatex.text.createTextCursor
+&apos;			oCurseurFin=oDocLatex.text.createTextCursor
+&apos;
+&apos;			oCurseurDebut.gotoRange(oTrouveExpression(oDocLatex, oCurseurLatex, &quot;\begin{document}&quot;).start,false)
+&apos;			oCurseurDebut.goRight(len(&quot;\begin{document}&quot;),false)
+&apos;			oCurseurFin.gotoRange(oTrouveExpression(oDocLatex, oCurseurLatex, &quot;\end{document}&quot;).start,false)
+&apos;			oCurseurLatex.gotoRange(oCurseurDebut,false)
+&apos;			oCurseurLatex.gotoRange(oCurseurFin,true)
+			i=instr(sTexteLatex,&quot;\begin{document}&quot;)
+			if i&gt;0 then i=i+len(&quot;\begin{document}&quot;)
+			j=instr(i,sTexteLatex,&quot;\end{document}&quot;)
+
+			if i*j&gt;0 then
+				&apos;conversion
+				sTexteLatex=mid(sTexteLatex,i,j-i)
+				sTexteLatex=SubstitutionsLatexAvantTraitement(sTexteLatex)
+				DocLatex2OOo(oDocOOo, sTexteLatex)
+			else
+				msgbox(&quot;Je ne trouve pas le corps du document.&quot;)
+			end if
+		end if
+	end With
+end sub
+
+function bLitUneLigne(oCurseur as object, oCurseurFin as object, sLigne as string) as boolean
+	&apos; lit la ligne commençant au curseur
+	&apos; si trouvée, le curseur est placé en début de ligne suivante
+	&apos; renvoie true si une ligne est lue
+	
+	if oCurseur.text.compareRegionEnds(oCurseur,oCurseurFin)&gt;0 Then
+&apos;	if oCurseur.isStartOfSentence() and oCurseur.text.compareRegionEnds(oCurseur,oCurseurFin)&gt;0 Then
+		&apos;parcours de l&apos;expression
+		oCurseur.gotoEndOfSentence( True )
+		sLigne=oCurseur.string
+		oCurseur.collapseToEnd()
+		bLitUneLigne=true
+		Do
+			If Not oCurseur.goRight(1, False ) Then Exit Do
+&apos;			If Not oCurseur.gotoNextSentence( False ) Then Exit Do
+		Loop Until oCurseur.isStartOfSentence() or oCurseur.text.compareRegionEnds(oCurseur,oCurseurFin)&lt;=0
+	else
+		bLitUneLigne=false
+	end if
+end function
+
+sub DocLatex2OOo(oDocOOo as object, sTexteLatex as string)
+&apos; convertit la zone de texte contenue dans sTexteLatex au format OOo et le recopie
+&apos; dans oDocOOo
+
+	dim oViewCurseurOOo as Object, oCurseurOOo as Object
+	dim oCurseur as object
+	dim sPolice as String, sFormule as String, bGras as boolean
+	dim iTaille as Integer, i as long, j as long, iFin as long
+	dim k as long, l as long
+	dim sCaractere as string, sLigne as string, sFormuleLatex as string, sFormuleOOo as string
+	dim sTexteEntreAccolades as string, sCommandeLatex as string
+	dim sGraisse as Single
+	dim iItalique as integer
+	dim iCasse as integer
+	dim iAlign as integer
+	dim lCouleurCarac as long
+	dim a as object
+	
+    oViewCurseurOOo = oDocOOo.getCurrentController().getViewCursor()
+	oCurseurOOo=oViewCurseurOOo.Text.createTextCursorByRange(oViewCurseurOOo)
+    sPolice=oViewCurseurOOo.CharFontName
+    iTaille=oViewCurseurOOo.Charheight
+    bGras=(oViewCurseurOOo.CharWeight=com.sun.star.awt.FontWeight.BOLD)
+	iFin=len(sTexteLatex)
+	i=1
+	
+	Do While i&lt;=iFin
+		&apos;parcours du contenu
+		sCaractere=mid(sTexteLatex,i,1)
+&apos;		a=asc(sCaractere)
+		select case sCaractere
+			case &quot;%&quot;
+				&apos;commentaire, rechercher chr(10)
+				j=i+instr(mid(sTexteLatex,i+1),chr(10))
+				if j=i then
+					&apos;pas trouvé
+					i=iFin+1
+				else
+					i=j+1
+				end if
+				
+			case chr(13)
+				&apos; si 2 sauts de lignes alors saut de ligne sinon, ignorer
+				if mid(sTexteLatex,i+1,3)=chr(10)&amp;chr(13)&amp;chr(10) then
+					oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)
+					i=i+4
+				else
+					if not(oCurseurOOo.isStartOfSentence()) then 
+						oDocOOo.Text.insertString(oCurseurOOo,&quot; &quot;,false)
+					end if
+					i=i+1
+				end if				
+			
+			case chr(10), chr(9)
+					i=i+1
+					
+			case chr(32)
+					oDocOOo.Text.insertString(oCurseurOOo,&quot; &quot;,false)
+					do 
+						i=i+1
+					loop while mid(sTexteLatex,i,1)=chr(32)
+			&apos;******************** \\\\\\\\\\\\\\\\ *********************************************	
+			case &quot;\&quot;
+				i=i+1
+				if instr(&quot;{}&quot;,mid(sTexteLatex,i,1))&gt;0 then
+					sCommandeLatex=mid(sTexteLatex,i,1)
+					j=i
+				else
+					mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sCommandeLatex)
+				end if
+				i=j+1
+				select case sCommandeLatex
+				
+				case &quot;{&quot;, &quot;}&quot;
+					oDocOOo.Text.insertString(oCurseurOOo,sCommandeLatex,false)					
+				case &quot;\&quot;
+					oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)
+					do while instr(chr(10)&amp;chr(13),mid(sTexteLatex,j+1,1))&gt;0 and j&lt;iFin
+						j=j+1
+					loop
+					
+				case &quot;bf&quot;
+					oCurseurOOo.CharWeight=com.sun.star.awt.FontWeight.BOLD
+					
+				case &quot;textrm&quot;, &quot;texttt&quot;, &quot;textmd&quot;, &quot;textup&quot;, &quot;textsf&quot;, &quot;textnormal&quot;,&quot;section&quot;
+					&apos; ne rien faire pour le moment.
+					&apos; à perfectionner plus tard
+					if mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sTexteEntreAccolades) then
+						DocLatex2OOo(oDocOOo, mid(sTexteEntreAccolades,2,len(sTexteEntreAccolades)-2))
+					else
+						DocLatex2OOo(oDocOOo, sTexteEntreAccolades)
+					end if
+				
+				case &quot;textbf&quot;
+					sGraisse=oCurseurOOo.CharWeight
+					oCurseurOOo.CharWeight=com.sun.star.awt.FontWeight.BOLD
+					if mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sTexteEntreAccolades) then
+						DocLatex2OOo(oDocOOo, mid(sTexteEntreAccolades,2,len(sTexteEntreAccolades)-2))
+					else
+						DocLatex2OOo(oDocOOo, sTexteEntreAccolades)
+					end if
+					&apos;restaurer l&apos;état
+					oCurseurOOo.CharWeight=sGraisse
+
+				case &quot;textsl&quot;, &quot;textit&quot;, &quot;emph&quot;
+					iItalique=oCurseurOOo.CharPosture
+					oCurseurOOo.CharPosture=com.sun.star.awt.FontSlant.ITALIC
+					if mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sTexteEntreAccolades) then
+						DocLatex2OOo(oDocOOo, mid(sTexteEntreAccolades,2,len(sTexteEntreAccolades)-2))
+					else
+						DocLatex2OOo(oDocOOo, sTexteEntreAccolades)
+					end if
+					&apos;restaurer l&apos;état
+					oCurseurOOo.CharPosture=iItalique
+
+				case &quot;textsc&quot;
+					iCasse=oCurseurOOo.CharCaseMap
+					oCurseurOOo.CharCaseMap=com.sun.star.style.CaseMap.SMALLCAPS
+					if mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sTexteEntreAccolades) then
+						DocLatex2OOo(oDocOOo, mid(sTexteEntreAccolades,2,len(sTexteEntreAccolades)-2))
+					else
+						DocLatex2OOo(oDocOOo, sTexteEntreAccolades)
+					end if
+					&apos;restaurer l&apos;état
+					oCurseurOOo.CharCaseMap=iCasse
+						
+				case &quot;begin&quot;
+					&apos; ************************** begin *******************************************
+					&apos; lire commande
+					mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sTexteEntreAccolades)
+					i=j+1
+					&apos; aller chercher le bon \end
+					k=i
+					l=instr(mid(sTexteLatex,j+1),&quot;\end&quot;&amp;sTexteEntreAccolades)-1
+					if l=-1 then
+						&apos;pas de end trouvé
+						lCouleurCarac=oCurseurOOo.CharColor
+						oCurseurOOo.CharColor=RGB(200,0,0)
+						oDocOOo.Text.insertString(oCurseurOOo,&quot; \end&quot; &amp; sTexteEntreAccolades &amp;&quot; non trouvé &quot;,false)
+						oCurseurOOo.CharColor=lCouleurCarac
+						DocLatex2OOo(oDocOOo, mid(sTexteLatex,i,iFin-i+1))
+						stop
+					else
+						j=j+l
+					end if
+					l=instr(mid(sTexteLatex,k,j-k),&quot;\begin&quot;&amp;sTexteEntreAccolades)-1
+					do while l&gt;=0
+						k=k+l+len(&quot;\begin&quot;&amp;sTexteEntreAccolades)
+						j=j+len(&quot;\end&quot;&amp;sTexteEntreAccolades)
+						l=instr(mid(sTexteLatex,j+1),&quot;\end&quot;&amp;sTexteEntreAccolades)-1
+						if l=-1 then
+							&apos;pas de end trouvé
+							lCouleurCarac=oCurseurOOo.CharColor
+							oCurseurOOo.CharColor=RGB(200,0,0)
+							oDocOOo.Text.insertString(oCurseurOOo,&quot; \end&quot; &amp; sTexteEntreAccolades &amp;&quot; non trouvé &quot;,false)
+							oCurseurOOo.CharColor=lCouleurCarac
+							DocLatex2OOo(oDocOOo, mid(sTexteLatex,i,iFin-i+1))
+							stop
+						else
+							j=j+l
+						end if
+						l=instr(mid(sTexteLatex,k,j-k),&quot;\begin&quot;&amp;sTexteEntreAccolades)-1
+					loop 
+					&apos; entre i et j : contenu
+					
+					
+					select case mid(sTexteEntreAccolades,2,len(sTexteEntreAccolades)-2)
+					case &quot;math&quot;
+						sFormuleOOo=mFormuleLatex2OOo.sFormuleLaTeX2OOo(mid(sTexteLatex,i,j-i))
+						InsereFormule(oCurseurOOo, sPolice, iTaille, false, sFormuleOOo, false)
+
+					
+					case &quot;displaymath&quot;,&quot;equation&quot;,&quot;equation*&quot;
+						&apos; si on est dans une liste : ne pas aller à la ligne
+						if isEmpty(oCurseurOOo.NumberingRules) then
+							iAlign=oCurseurOOo.ParaAdjust
+							oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+							oCurseurOOo.ParaAdjust=com.sun.star.style.ParagraphAdjust.CENTER
+						end if
+						sFormuleOOo=mFormuleLatex2OOo.sFormuleLaTeX2OOo(mid(sTexteLatex,i,j-i))
+						InsereFormule(oCurseurOOo, sPolice, iTaille, false, sFormuleOOo, false)
+						if isEmpty(oCurseurOOo.NumberingRules) then
+							oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+							oCurseurOOo.ParaAdjust=iAlign
+						end if
+					
+					case &quot;enumerate&quot;
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						if isEmpty(oCurseurOOo.NumberingRules) then
+							&apos; mettre ici le style de numérotation
+							CreerStyleListeLatex(oDocOOo)
+							oCurseurOOo.NumberingStyleName=&quot;Liste Latex&quot;
+							oCurseurOOo.ParaIsNumberingRestart=true
+						else
+							oCurseurOOo.NumberingLevel=oCurseurOOo.NumberingLevel+1
+						end if		
+						DocLatex2OOo(oDocOOo, mid(sTexteLatex,i,j-i+1))
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)
+						&apos;restaurer l&apos;état
+						if oCurseurOOo.NumberingLevel=0 then
+							oCurseurOOo.NumberingStyleName=&quot;&quot;
+&apos;							oCurseurOOo.NumberingRules=0
+&apos;							oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+&apos;							dim args1(0) as new com.sun.star.beans.PropertyValue, dispatcher as object
+&apos;							args1(0).Name = &quot;On&quot;
+&apos;							args1(0).Value = false
+&apos;							dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+&apos;							dispatcher.executeDispatch(ThisComponent.CurrentController.Frame, &quot;.uno:DefaultNumbering&quot;, &quot;&quot;, 0, args1())
+						else
+							oCurseurOOo.NumberingLevel=oCurseurOOo.NumberingLevel-1
+						end if
+
+					case &quot;itemize&quot;, &quot;description&quot;, &quot;list&quot;, &quot;trivlist&quot;
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						if isEmpty(oCurseurOOo.NumberingRules) then
+							&apos; mettre ici le style de numérotation
+							oCurseurOOo.NumberingStyleName=&quot;List 1&quot;
+						else
+							oCurseurOOo.NumberingLevel=oCurseurOOo.NumberingLevel+1
+						end if		
+						DocLatex2OOo(oDocOOo, mid(sTexteLatex,i,j-i+1))
+						&apos;restaurer l&apos;état
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						if oCurseurOOo.NumberingLevel=0 then
+							oCurseurOOo.NumberingStyleName=&quot;&quot;
+						else
+							oCurseurOOo.NumberingLevel=oCurseurOOo.NumberingLevel-1
+						end if
+
+					case &quot;center&quot;
+						iAlign=oCurseurOOo.ParaAdjust
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						oCurseurOOo.ParaAdjust=com.sun.star.style.ParagraphAdjust.CENTER
+							DocLatex2OOo(oDocOOo, mid(sTexteLatex,i,j-i+1))
+						&apos;restaurer l&apos;état
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						oCurseurOOo.ParaAdjust=iAlign
+						
+					case &quot;flushleft&quot;
+						iAlign=oCurseurOOo.ParaAdjust
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						oCurseurOOo.ParaAdjust=com.sun.star.style.ParagraphAdjust.LEFT
+						DocLatex2OOo(oDocOOo, mid(sTexteLatex,i,j-i+1))
+						&apos;restaurer l&apos;état
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						oCurseurOOo.ParaAdjust=iAlign
+	
+					case &quot;flushright&quot;
+						iAlign=oCurseurOOo.ParaAdjust
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						oCurseurOOo.ParaAdjust=com.sun.star.style.ParagraphAdjust.RIGHT
+							DocLatex2OOo(oDocOOo, mid(sTexteLatex,i,j-i+1))
+						&apos;restaurer l&apos;état
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						oCurseurOOo.ParaAdjust=iAlign
+
+					case &quot;picture&quot;,&quot;pspicture&quot;
+						&apos;environnements non traduits
+						lCouleurCarac=oCurseurOOo.CharColor
+						oCurseurOOo.CharColor=RGB(200,0,0)
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)		
+						oDocOOo.Text.insertString(oCurseurOOo,&quot;Environnement &quot; &amp; sTexteEntreAccolades &amp;&quot; non traduit.&quot;,false)
+						oCurseurOOo.CharColor=lCouleurCarac
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)		
+						&apos;oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)						
+						&apos;oDocOOo.Text.insertString(oCurseurOOo,mid(sTexteLatex,i,j-i+1),false)
+						&apos;oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)		
+						&apos;oCurseurOOo.CharColor=RGB(200,0,0)
+						&apos;oDocOOo.Text.insertString(oCurseurOOo,&quot;Fin de l&apos;environnement &quot; &amp; sTexteEntreAccolades ,false)
+						&apos;oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)		
+						&apos;oCurseurOOo.CharColor=lCouleurCarac
+					
+					case else
+						&apos; non implémenté encore : traduire l&apos;intérieur
+						lCouleurCarac=oCurseurOOo.CharColor
+						oCurseurOOo.CharColor=RGB(200,0,0)
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)		
+						oDocOOo.Text.insertString(oCurseurOOo,&quot;Environnement &quot; &amp; sTexteEntreAccolades &amp;&quot; non implémenté, tentative de traduction :&quot;,false)
+						oCurseurOOo.CharColor=lCouleurCarac
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)		
+						&apos;oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)						
+						DocLatex2OOo(oDocOOo, mid(sTexteLatex,i,j-i+1))
+						oCurseurOOo.CharColor=RGB(200,0,0)
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)		
+						oDocOOo.Text.insertString(oCurseurOOo,&quot;Fin de l&apos;environnement &quot; &amp; sTexteEntreAccolades ,false)
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)		
+						oCurseurOOo.CharColor=lCouleurCarac
+						
+					end select
+					&apos;j=après le } du  \end
+					j=j+len(&quot;\end&quot;&amp;sTexteEntreAccolades)
+					&apos; ************************** begin *******************************************					
+				case &quot;item&quot;
+					if oCurseurOOo.isStartOfSentence=false then
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)
+					end if
+					j=j+1
+					
+				case else
+					&apos; si argument suivant entre {} alors afficher le texte contenu dans les {}
+					&apos; suppose qu&apos;il n&apos;y a qu&apos;un argument
+					&apos; à perfectionner, certaines commandes ont x&gt;1 arguments
+					k=i
+					if mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,k,l,sTexteEntreAccolades) then
+						oCurseurOOo.CharColor=RGB(200,0,0)
+						oDocOOo.Text.insertString(oCurseurOOo,&quot;commande &quot; &amp; sCommandeLatex &amp; &quot; non implémentée &quot; ,false)
+						oCurseurOOo.CharColor=lCouleurCarac
+						oDocOOo.Text.insertString(oCurseurOOo,sTexteEntreAccolades ,false)
+						j=l
+					end if
+				end select
+				i=j+1
+				
+				&apos;***************** \\\\\\\\\\\\\\\\\\\\\\\\\ ******************************************
+			case &quot;$&quot;
+				if mid(sTexteLatex,i,2)=&quot;$$&quot; then
+					&apos;mode centré
+&apos;					oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)
+					iAlign=oCurseurOOo.ParaAdjust
+					&apos; si on est dans une liste : ne pas aller à la ligne
+					if isEmpty(oCurseurOOo.NumberingRules) then
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						oCurseurOOo.ParaAdjust=com.sun.star.style.ParagraphAdjust.CENTER
+					end if
+					bModeTexte=false
+					i=i+2
+				else
+					&apos;mode texte
+					bModeTexte=true
+					i=i+1
+				end if
+				j=i
+				sFormuleLatex=&quot;&quot;
+				do 
+					sCaractere=mid(sTexteLatex,j,1)
+					
+					&apos; ignorer les commentaires
+					if sCaractere=&quot;%&quot; then
+						do 
+							j=j+1
+							sCaractere=mid(sTexteLatex,j,1)
+						loop while sCaractere&lt;&gt;chr(10) and j&lt;iFin
+					end if
+					if sCaractere&gt;=&quot; &quot; then sFormuleLatex=sFormuleLatex+sCaractere
+					j=j+1
+				loop while sCaractere&lt;&gt;&quot;$&quot; and j&lt;=iFin
+				if sCaractere=&quot;$&quot; then
+					sFormuleOOo=mFormuleLatex2OOo.sFormuleLaTeX2OOo(left(sFormuleLatex,len(sFormuleLatex)-1))
+				else
+					sFormuleOOo=&quot;&quot;&quot;Formule incomplète&quot;&quot;&quot;
+				end if
+				&apos; mettre bModeTexte à la place de false quand OOo ne sera plus bogué
+&apos;				InsereFormule(oDocOOo, oViewCurseurOOo, oCurseurOOo, sPolice, iTaille, sFormuleOOo, false)				
+				InsereFormule(oCurseurOOo, sPolice, iTaille, false, sFormuleOOo, false)
+				if bModeTexte or sCaractere&lt;&gt;&quot;$&quot; then
+					i=j
+				else
+					i=j+1
+					&apos;restaurer l&apos;état
+					if isEmpty(oCurseurOOo.NumberingRules) then
+						oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK,false)		
+						oCurseurOOo.ParaAdjust=iAlign
+					end if
+&apos;					oDocOOo.Text.insertControlCharacter(oCurseurOOo,com.sun.star.text.ControlCharacter.LINE_BREAK,false)
+				end if
+				
+			case &quot;{&quot;
+				&apos;sauvegarder l&apos;état : gras, italic
+				sGraisse=oCurseurOOo.CharWeight
+				iItalique=oCurseurOOo.CharPosture
+				mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sTexteEntreAccolades)
+				DocLatex2OOo(oDocOOo, mid(sTexteEntreAccolades,2,len(sTexteEntreAccolades)-2))
+				&apos;restaurer l&apos;état
+				oCurseurOOo.CharWeight=sGraisse
+				oCurseurOOo.CharPosture=iItalique
+				i=j+1
+				
+			case else
+				oDocOOo.Text.insertString(oCurseurOOo,sCaractere,false)
+				i=i+1
+			end select
+	Loop
+end sub
+
+Sub InsereFormuleObsolete(oDoc as object, oViewCursor as Object, oTextCursor as Object, sPolice as String, iTaille as Integer, sFormule as String, bModeTexte as boolean)
+	dim obj as object, document as object
+	obj=ThisComponent.CreateInstance(&quot;com.sun.star.text.TextEmbeddedObject&quot;)
+	obj.CLSID=&quot;078B7ABA-54FC-457F-8551-6147e776a997&quot;
+    obj.AnchorType=com.sun.star.text.TextContentAnchorType.AS_CHARACTER
+    document   = oDoc.CurrentController.Frame
+	oDoc.getCurrentController().select(oTextCursor)
+    oTextCursor.Text.insertTextContent(oTextCursor, obj, true)        
+  	obj.Model.BaseFontHeight=iTaille
+  	obj.Model.FontNameVariables=sPolice
+  	obj.Model.FontVariablesIsItalic=true
+   	obj.Model.FontNameNumbers=sPolice
+	if IsMacOs then &apos;Mac
+		obj.Model.CustomFontNameSans=&quot;Cmath Calligraphique&quot;
+	   	obj.Model.CustomFontNameSerif=&quot;Cmath Script&quot;
+  	else
+		obj.Model.CustomFontNameSans=&quot;Cmathcal&quot;
+	   	obj.Model.CustomFontNameSerif=&quot;Cmathscr&quot;
+  	end if
+  	obj.Model.FontNameText=sPolice
+  	obj.Model.FontNameFunctions=sPolice
+  	obj.Model.IsScaleAllBrackets=True
+  	obj.Model.RelativeIndexSubscript=0
+  	obj.Model.RelativeIndexSuperscript=0  	
+  	obj.Model.formula=sFormule
+&apos;   	obj.Model.LeftMargin=20
+&apos; 	obj.Model.RightMargin=20
+  	obj.Model.IsTextMode=bModeTexte
+  	obj.Model.setmodified(TRUE)
+   	obj.LeftMargin=0
+  	obj.RightMargin=0
+  	oViewCursor.goLeft(1,False)
+  	oViewCursor.goRight(1,False)
+
+
+
+
+
+&apos;	dim dispatcher as object, obj as object, document as object
+&apos;	ThisComponent.lockControllers
+&apos;	oTextCursor.Text.insertString(oTextCursor, sFormule, true)
+&apos;	oViewCursor.gotoRange(oTextCursor,true)
+ &apos;   document   = oDoc.CurrentController.Frame
+&apos;    dim Array(0) as new com.sun.star.beans.PropertyValue
+&apos;    dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+&apos;    dispatcher.executeDispatch(document, &quot;.uno:InsertObjectStarMath&quot;, &quot;&quot;, 0,Array())
+&apos;	ThisComponent.unlockControllers
+&apos;    obj=oDoc.getCurrentSelection()
+&apos;  	obj.EmbeddedObject.FontNameVariables=sPolice
+&apos;  	obj.EmbeddedObject.FontVariablesIsItalic=true
+&apos;   	obj.EmbeddedObject.FontNameNumbers=sPolice
+&apos;  	obj.EmbeddedObject.FontNameText=sPolice
+&apos;  	obj.EmbeddedObject.FontNameFunctions=sPolice
+&apos;  	obj.EmbeddedObject.BaseFontHeight=iTaille
+&apos;  	obj.EmbeddedObject.IsScaleAllBrackets=True
+&apos;  	obj.EmbeddedObject.RelativeIndexSubscript=0
+&apos;  	obj.EmbeddedObject.RelativeIndexSuperscript=0  	
+&apos;  	obj.EmbeddedObject.IsTextMode=bModeTexte
+&apos;  	obj.EmbeddedObject.setmodified(TRUE)
+&apos;   	obj.LeftMargin=0
+&apos;  	obj.RightMargin=0
+&apos;    dispatcher.executeDispatch(document, &quot;.uno:Escape&quot;, &quot;&quot;, 0, Array())
+&apos;    dispatcher.executeDispatch(document, &quot;.uno:ResetAttributes&quot;, &quot;&quot;, 0, Array())
+&apos;    wait 120
+&apos;    
+&apos;   	oViewCursor.gotoRange(oTextCursor,false)
+
+&apos;  	oViewCursor.goLeft(1,False)
+&apos; 	oViewCursor.goRight(1,False)
+
+
+end sub
+
+function oTrouveExpression(oDocLatex as object, oCurseurLatex as object, sChaine as string) as object
+&apos; trouve une chaine dans le document oDocLatex à partir de oCurseurLatex.
+&apos; renvoie le curseur pointant sur le 1er caractère de la chaine
+&apos; et sur la fin si pas trouvé
+
+	dim oCurseur as object
+	dim sLigne as string, i as long
+	
+	oCurseur=oDocLatex.Text.createTextCursorByRange(oCurseurLatex.Start)
+	Do While bLitUneLigne(oCurseur,oCurseurLatex.End,sLigne)
+		i=instr(sLigne,sChaine)
+		if i&gt;0 then
+			&apos;Do
+			&apos;	If Not oCurseur.gotoPreviousSentence( false ) Then Exit Do
+			&apos;Loop Until oCurseur.isStartOfSentence()
+			oCurseur.goleft(len(sChaine)+1,false)
+			&apos;oCurseur.goRight(i-1,false)
+			oTrouveExpression=oCurseur
+			exit do
+		else
+			oTrouveExpression=oCurseurLatex.End
+		end if
+	loop
+end function
+
+Sub SetNumberingRuleProperty( oCursor,_
+								ByVal nNumberingLevel As Long,_
+								ByVal cPropertyName As String,_
+								ByVal value )
+dim oNumberingRules as object, oNumLevelProperties as object, nPropIndex as integer, oProp as object
+
+	&apos; From the cursor, get the NumberingRules.
+	&apos; Here&apos;s how this works.
+	&apos; The oCursor contains a TextCursor -- described here...
+	&apos;   http://api.openoffice.org/docs/common/ref/com/sun/star/text/TextCursor.html
+	&apos; This service includes a TextRange -- described here...
+	&apos;   http://api.openoffice.org/docs/common/ref/com/sun/star/text/TextRange.html
+	&apos; This service includes the servics CharacterProperties and ParagraphProperties.
+	&apos; Looking closer at ParagraphProperties...
+	&apos;   http://api.openoffice.org/docs/common/ref/com/sun/star/style/ParagraphProperties.html
+	&apos;  you can see that it has the property NumberingRules.
+	&apos; Hence, that is how the next line of code works, it gets the Numbering rules property.
+	&apos;
+	&apos; The object assigned is a...
+	&apos;		http://api.openoffice.org/docs/common/ref/com/sun/star/text/NumberingRules.html
+	oNumberingRules = oCursor.NumberingRules
+
+	&apos; Get the numbering level.
+	&apos; It is an array of PropertyValue&apos;s.
+	oNumLevelProperties = oNumberingRules.getByIndex( nNumberingLevel )
+	
+	&apos; Now find which property number we are interested in.
+	nPropIndex = FindPropertyIndex( oNumLevelProperties, cPropertyName )
+	
+	&apos; If we found the property...
+	If nPropIndex &gt;= 0 Then
+		&apos; Get the property by accessing array subscript.
+		oProp = oNumLevelProperties(nPropIndex)
+		
+		oProp.Value = value
+		
+		&apos; Put the property back into the array.
+		oNumLevelProperties(nPropIndex) = oProp
+		
+		On Error Resume Next
+		&apos; Now put the array back into the NumberingLevel.
+		oNumberingRules.replaceByIndex( nNumberingLevel, oNumLevelProperties )
+		On Error goto 0
+		
+		oCursor.NumberingRules = oNumberingRules
+	EndIf
+End Sub
+
+
+&apos;
+Function FindProperty( aArrayOfProperties, cPropName As String ) As com.sun.star.beans.PropertyValue
+dim oProp as object
+dim nPropIndex as integer
+
+	nPropIndex = FindPropertyIndex( aArrayOfProperties, cPropName )
+	If nPropIndex &gt;= 0 Then
+		oProp = aArrayOfProperties(nPropIndex) &apos; access array subscript
+		FindProperty() = oProp
+	EndIf
+End Function
+
+
+Function FindPropertyIndex( aArrayOfProperties, cPropName As String ) As Long
+dim i as integer
+dim oProp as object
+
+	For i = LBound( aArrayOfProperties ) To UBound( aArrayOfProperties )
+		oProp = aArrayOfProperties(i)
+		If oProp.Name = cPropName Then
+			FindPropertyIndex() = i
+			Exit Function
+		EndIf
+	Next
+End Function
+
+
+sub CreerStyleListeLatex(oDoc as object)
+dim lesFamilles as object, uneFamille as object, nouvStyle as object
+
+	lesFamilles=oDoc.StyleFamilies
+	uneFamille=lesFamilles.getByName(&quot;NumberingStyles&quot;)
+	if uneFamille.hasByName(&quot;Liste Latex&quot;) then
+		nouvStyle=uneFamille.getByName(&quot;Liste Latex&quot;)
+	else
+	&apos;création
+		nouvStyle=oDoc.CreateInstance(&quot;com.sun.star.style.NumberingStyle&quot;)
+		uneFamille.insertByName(&quot;Liste Latex&quot;,nouvStyle)
+&apos;		nouvStyle.NumberingRules.IsAutomatic=true
+&apos;		nouvStyle.NumberingRules.IsContinuousNumbering=true
+		SetNumberingRuleProperty(nouvStyle,0,&quot;LeftMargin&quot;,600)
+		SetNumberingRuleProperty(nouvStyle,0,&quot;FirstLineOffset&quot;,-600)
+		SetNumberingRuleProperty(nouvStyle,0,&quot;SymbolTextDistance&quot;,0)
+		SetNumberingRuleProperty(nouvStyle,0,&quot;NumberingType&quot;,com.sun.star.style.NumberingType.ARABIC)
+		SetNumberingRuleProperty(nouvStyle,1,&quot;LeftMargin&quot;,1200)
+		SetNumberingRuleProperty(nouvStyle,1,&quot;FirstLineOffset&quot;,-600)
+		SetNumberingRuleProperty(nouvStyle,1,&quot;SymbolTextDistance&quot;,0)
+		SetNumberingRuleProperty(nouvStyle,1,&quot;NumberingType&quot;,com.sun.star.style.NumberingType.CHARS_LOWER_LETTER)
+		SetNumberingRuleProperty(nouvStyle,2,&quot;LeftMargin&quot;,1800)
+		SetNumberingRuleProperty(nouvStyle,2,&quot;FirstLineOffset&quot;,-600)
+		SetNumberingRuleProperty(nouvStyle,2,&quot;SymbolTextDistance&quot;,0)
+		SetNumberingRuleProperty(nouvStyle,2,&quot;NumberingType&quot;,com.sun.star.style.NumberingType.ROMAN_LOWER)
+	end if
+&apos;	a=nouvStyle.NumberingRules
+&apos;	b=a.getCount()
+&apos;	c=a.getByIndex(0)
+ &apos;   d=c(10)
+	&apos;SetNumberingRuleProperty(nouvStyle,0,&quot;CharStyleName&quot;,&quot;Bullet Symbols&quot;)
+	&apos;SetNumberingRuleProperty(nouvStyle,0,&quot;BulletChar&quot;, chr(2022))
+
+
+end sub
+
+function SubstitutionsLatexAvantTraitement(sTexteLatex as String) as String
+	dim sSearch() as string, sReplace() as string
+	dim n as integer, i as long
+	
+	sSearch() = Array(&quot;\(&quot;,&quot;\)&quot;,&quot;\[&quot;,&quot;\]&quot;,_
+						&quot;~&quot;,&quot;\&apos;e&quot;,&quot;\`e&quot;,&quot;\^e&quot;,&quot;\`u&quot;,&quot;\^{\i}&quot;,&quot;\^o&quot;,&quot;\`a&quot;,&quot;\¨e&quot;,&quot;\^a&quot;,_
+						&quot;\\&quot;,&quot;\begin {&quot;,&quot;\end {&quot;,chr(13)&amp;chr(13),chr(10)&amp;chr(10),_
+						&quot;\&quot;&amp;chr(13),&quot;\&quot;&amp;chr(10),&quot;\max&quot;,&quot;\min&quot;,&quot;\star&quot;,&quot;{\kern 1pt}&quot;,&quot;\ker&quot;,&quot;\det&quot;,&quot;\mathbb{K}&quot;,&quot;\ne&quot;,&quot;gathered&quot;,&quot;\hfill&quot;,_
+						&quot;Ã©&quot;,&quot;Ã¨&quot;,&quot;Ã¯&quot;,&quot;Ã &quot;,&quot;Ã¹&quot;,&quot;Ãª&quot;,&quot;Ã&quot;,&quot;Ã&quot;,&quot;Ã»&quot;)
+
+						rem ajouts de Didier Dorange-Pattoret le 30 mars 2014 
+	sReplace() = Array(&quot;$&quot;,&quot;$&quot;,&quot;$$&quot;,&quot;$$&quot;,_
+						&quot; &quot;,&quot;é&quot;,&quot;è&quot;,&quot;ê&quot;,&quot;ù&quot;,&quot;î&quot;,&quot;ô&quot;,&quot;à&quot;,&quot;ë&quot;,&quot;â&quot;,_
+						&quot;\\ &quot;,&quot;\begin{&quot;,&quot;\end{&quot;,chr(13)&amp;chr(10)&amp;chr(13)&amp;chr(10),chr(13)&amp;chr(10)&amp;chr(13)&amp;chr(10),_
+						&quot;&quot;,&quot;&quot;,&quot;&quot;&quot;max&quot;&quot;&quot;,&quot;&quot;&quot;min&quot;&quot;&quot;,&quot;*&quot;,&quot;&quot;,&quot;&quot;&quot;ker&quot;&quot;&quot;,&quot;&quot;&quot;det&quot;&quot;&quot;,&quot;&quot;&quot;IK&quot;&quot;&quot;,&quot;&lt;&gt;&quot;,&quot;&quot;,&quot;&quot;,_
+						&quot;é&quot;,&quot;è&quot;,&quot;ï&quot;,&quot;à&quot;,&quot;ù&quot;,&quot;ê&quot;,&quot;É&quot;,&quot;À&quot;,&quot;û&quot;)
+	For n = LBound(sSearch()) To UBound(sSearch())
+		i=Instr(sTexteLatex,sSearch(n))
+		do while i&gt;0
+			sTexteLatex=left(sTexteLatex,i-1)+sReplace(n)+mid(sTexteLatex,i+len(sSearch(n)))
+			i=Instr(i+len(sReplace(n)),sTexteLatex,sSearch(n))
+		loop
+	Next n
+	SubstitutionsLatexAvantTraitement=sTexteLatex
+end function
+
+function TraduitNewCommand(sTexteLatex as String) as String
+&apos; recherche \newcommand, \renewcommand, \def et substitue dans le texte
+dim sSearch() as string, sReplace() as string
+dim n as integer, i as long, j as long, k as long, k0 as long, l as long,m as long
+dim sNom as string, sDefinition as string, sTexteSubstitue as string, sNomLu as string
+dim iNbArg as integer
+dim sArg(1 to 9) as string
+	
+	sSearch() = Array(&quot;\newcommand&quot;,&quot;\renewcommand&quot;,&quot;\providecommand&quot;,&quot;\def&quot;)
+	For n = LBound(sSearch()) To UBound(sSearch())
+		i=Instr(sTexteLatex,sSearch(n))
+		do while i&gt;0
+			i=i+len(sSearch(n))
+			if mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sNom)=true then
+				sNom=mid(sNom,2,len(sNom)-2)
+			end if
+			i=j+1
+			if mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sDefinition)=true then
+				&apos;il n&apos;y a pas d&apos;argument à la commande
+				&apos; substitution
+				k=j+1
+				k=Instr(k,sTexteLatex,sNom,0)
+				do while k&gt;0
+					mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,k,l,sNomLu)
+					if sNomlu=sNom then
+						sTexteLatex=left(sTexteLatex,k-1)+mid(sDefinition,2,len(sDefinition)-2)+mid(sTexteLatex,k+len(sNom))
+						k=k+len(sDefinition)-2
+						k=Instr(k,sTexteLatex,sNom,0)
+					else
+						k=k+len(sNomLu)
+						k=Instr(k,sTexteLatex,sNom,0)
+					end if
+				loop
+				
+			elseif left(sDefinition,1)=&quot;[&quot; then
+				&apos;il y a au moins un argument
+				&apos;lire le nombre d&apos;argument
+				iNbArg=val(mid(sDefinition,2,1))
+				i=j+2
+				&apos;lire la définition
+				if mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sDefinition)=false then
+					&apos; lire la valeur par défaut de #1
+					j=instr(i+1,sTexteLatex,&quot;]&quot;)
+					sDefaut=mid(sTexteLatex,i+1,j-1)
+					i=j+1
+					mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,i,j,sDefinition)
+				end if
+				sDefinition=mid(sDefinition,2,len(sDefinition)-2)
+				
+				&apos; substitution
+				k0=j+1
+				k0=Instr(k0,sTexteLatex,sNom,0)
+				do while k0&gt;0
+					mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,k0,l,sNomLu)
+					if sNomlu=sNom then
+						&apos; lecture des arguments
+						sTexteSubstitue=sDefinition
+						k=k0+len(sNom)
+						mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,k,l,sArg(1))
+						if sArg(1)=&quot;{}&quot; then sArg1=sDefaut
+						for m=2 to iNbArg
+							k=l+1
+							mFormuleLatex2OOo.bTrouveExpressionDroite(sTexteLatex,k,l,sArg(m))
+						next m
+						&apos; enlever les {} et substituer les #m
+						for m=1 to iNbArg
+							sArg(m)=mid(sArg(m),2,len(sArg(m))-2)	
+							Substitue(sTexteSubstitue,1,len(sTexteSubstitue),&quot;#&quot;+LTrim(str(m)),&quot;{&quot;&amp;sArg(m)&amp;&quot;}&quot;)
+						next m
+						sTexteLatex=left(sTexteLatex,k0-1)+sTexteSubstitue+mid(sTexteLatex,l+1)
+						k0=k0+len(sTexteSubstitue)
+						k0=Instr(k0,sTexteLatex,sNom,0)
+					else
+						k0=k0+len(sNomLu)
+						k0=Instr(k0,sTexteLatex,sNom,0)
+					end if
+				loop
+			end if
+			i=j+1
+			i=Instr(i,sTexteLatex,sSearch(n))
+		loop
+	Next n
+	TraduitNewCommand=sTexteLatex	
+end function
+
+sub Substitue(sChaine as String, i as long, j as long, sChercher as String, sRemplacer as String) as integer
+&apos; cherche et remplace dans sChaine de la position i à j la chaine sChercher par sRemplacer
+	Dim iNiveau as integer, k as long, iNB as long
+	dim jtemp as long
+
+
+	iNb=0
+	k=i
+	jtemp=j
+	iNiveau=0
+	do while k&lt;=jtemp-len(sChercher)+1
+		if mid(sChaine,k,len(sChercher))=sChercher then
+			sChaine=left(sChaine,k-1) &amp; sRemplacer &amp; mid(sChaine,k+len(sChercher))
+			jtemp=jtemp+len(sRemplacer)-len(sChercher)
+			k=k+len(sRemplacer)-1
+			iNb=iNb+1
+		end if
+		k=k+1
+	loop
+	j=jtemp
+end sub
+
+Function DetermineOS as Integer
+	If Getguitype = 1 Then
+		DetermineOS = 1
+	ElseIf Getguitype 	= 4 and FileExists(&quot;/Users&quot;) Then
+		DetermineOS = 3
+	Else
+		DetermineOS = 4
+	Endif
+End Function
+
+Function IsMacOS as Boolean
+	IsMacOS = False
+	If Getguitype 	= 4 and FileExists(&quot;/Users&quot;) Then IsMacOS = True
+End Function
+</script:module>

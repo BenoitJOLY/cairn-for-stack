@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>HéStack — Tests de non-régression</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; }
+    header { background: #1e293b; color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+    header h1 { margin: 0; font-size: 1.1rem; }
+    header .ver { font-size: .75rem; color: #94a3b8; }
+    .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: .9rem; font-weight: 600; }
+    .btn-run  { background: #3b82f6; color: #fff; }
+    .btn-save { background: #16a34a; color: #fff; }
+    .btn-reset { background: #dc2626; color: #fff; }
+    .btn-run:hover  { background: #2563eb; }
+    .btn-save:hover { background: #15803d; }
+    .btn-reset:hover { background: #b91c1c; }
+    .summary { padding: 12px 18px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; font-size: .95rem; }
+    .summary.pass { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .summary.fail { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .summary.noref { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .test-card { background: #fff; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .test-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .badge { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 800; flex-shrink: 0; }
+    .badge.pass { background: #22c55e; color: #fff; }
+    .badge.fail { background: #ef4444; color: #fff; }
+    .badge.noref { background: #f59e0b; color: #fff; }
+    .test-name { font-weight: 700; font-size: .95rem; }
+    .test-time { font-size: .75rem; color: #94a3b8; margin-left: auto; }
+    .diff-block { margin-top: 10px; }
+    .diff-label { font-size: .75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    pre { margin: 0; padding: 10px; border-radius: 6px; font-size: .75rem; line-height: 1.5; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+    pre.ref  { background: #f0fdf4; border: 1px solid #86efac; color: #166534; }
+    pre.cur  { background: #fff7ed; border: 1px solid #fdba74; color: #9a3412; }
+    pre.ok   { background: #f0fdf4; border: 1px solid #86efac; color: #166534; }
+    details summary { cursor: pointer; font-size: .8rem; color: #3b82f6; margin-top: 6px; }
+    #hidden-dom { display: none; }
+    .info { font-size: .82rem; color: #64748b; margin-bottom: 16px; line-height: 1.6; }
+    .info code { background: #e2e8f0; padding: 1px 5px; border-radius: 3px; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>HéStack — Tests de non-régression</h1>
+    <div class="ver">Comparez le XML généré par les générateurs à une référence sauvegardée</div>
+  </div>
+</header>
+
+<div class="container">
+  <p class="info">
+    <strong>Utilisation :</strong>
+    Cliquez <strong>Lancer les tests</strong> pour exécuter les générateurs avec des données fixes et comparer au snapshot de référence.
+    Si c'est la première fois (ou après un changement voulu), cliquez <strong>Enregistrer comme référence</strong> pour sauvegarder l'état actuel.
+    Les références sont stockées dans <code>localStorage</code>.
+  </p>
+
+  <div class="toolbar">
+    <button class="btn-run" onclick="runTests()">▶ Lancer les tests</button>
+    <button class="btn-save" onclick="saveRefs()">💾 Enregistrer comme référence</button>
+    <button class="btn-reset" onclick="resetRefs()">✕ Effacer les références</button>
+  </div>
+
+  <div id="summary"></div>
+  <div id="results"></div>
+</div>
+
+<!-- DOM fantôme : éléments lus par les générateurs -->
+<div id="hidden-dom">
+  <!-- Checkbox -->
+  <input id="cb-bareme" value="1">
+  <textarea id="cb-text"></textarea>
+  <input id="cb-xe" value="2">
+  <input id="cb-mode-xb" value="fixe">
+  <input id="cb-xb" value="1">
+  <textarea id="cb-fbc"></textarea>
+  <textarea id="cb-fbe"></textarea>
+  <div id="cb-props">
+    <div class="prop-row">
+      <input type="hidden" class="p-bool" value="true">
+      <input type="text" class="p-text" value="H₂O est une molécule polaire">
+      <input type="text" class="p-fb" value="Correct, la géométrie coudée crée un dipôle.">
+    </div>
+    <div class="prop-row">
+      <input type="hidden" class="p-bool" value="false">
+      <input type="text" class="p-text" value="O₂ est un composé ionique">
+      <input type="text" class="p-fb" value="Non, O₂ est une liaison covalente apolaire.">
+    </div>
+  </div>
+  <!-- warn elements (pour que validateCBDraw ne plante pas en cherchant style) -->
+  <div id="warn-cb-draw" style="display:none"><span id="warn-cb-draw-msg"></span></div>
+
+  <!-- Radio -->
+  <input id="ra-bareme" value="1">
+  <textarea id="ra-text"></textarea>
+  <input id="ra-xe" value="3">
+  <textarea id="ra-fbc"></textarea>
+  <textarea id="ra-fbe"></textarea>
+  <div id="ra-vrais">
+    <div class="prop-row">
+      <input type="hidden" class="p-bool" value="true">
+      <input type="text" class="p-text" value="Paris">
+      <input type="text" class="p-fb" value="Exact, Paris est la capitale de la France.">
+    </div>
+  </div>
+  <div id="ra-faux">
+    <div class="prop-row">
+      <input type="hidden" class="p-bool" value="false">
+      <input type="text" class="p-text" value="Lyon">
+      <input type="text" class="p-fb" value="Non, Lyon est la 2e ville mais pas la capitale.">
+    </div>
+    <div class="prop-row">
+      <input type="hidden" class="p-bool" value="false">
+      <input type="text" class="p-text" value="Bordeaux">
+      <input type="text" class="p-fb" value="Non.">
+    </div>
+  </div>
+  <div id="warn-ra-draw" style="display:none"><span id="warn-ra-draw-msg"></span></div>
+
+  <!-- Dropdown (même structure que radio avec préfixe dd) -->
+  <input id="dd-bareme" value="1">
+  <textarea id="dd-text"></textarea>
+  <input id="dd-xe" value="3">
+  <textarea id="dd-fbc"></textarea>
+  <textarea id="dd-fbe"></textarea>
+  <div id="dd-vrais">
+    <div class="prop-row">
+      <input type="hidden" class="p-bool" value="true">
+      <input type="text" class="p-text" value="H₂O">
+      <input type="text" class="p-fb" value="Correct.">
+    </div>
+  </div>
+  <div id="dd-faux">
+    <div class="prop-row">
+      <input type="hidden" class="p-bool" value="false">
+      <input type="text" class="p-text" value="CO₂">
+      <input type="text" class="p-fb" value="Non.">
+    </div>
+    <div class="prop-row">
+      <input type="hidden" class="p-bool" value="false">
+      <input type="text" class="p-text" value="NaCl">
+      <input type="text" class="p-fb" value="Non.">
+    </div>
+  </div>
+  <div id="warn-dd-draw" style="display:none"><span id="warn-dd-draw-msg"></span></div>
+
+  <!-- Arithmétique / Numerical -->
+  <input id="num-bareme" value="1">
+  <textarea id="num-text"></textarea>
+  <input id="num-val" value="3.14">
+  <input id="num-n" value="3">
+  <input id="num-round" value="n">
+  <input id="num-tol-type" value="relative">
+  <input id="num-tol-val" value="0.05">
+  <input id="num-dec" value="n">
+  <textarea id="num-fbc"></textarea>
+  <textarea id="num-fbe"></textarea>
+  <input type="checkbox" id="num-h-kbd">
+
+  <!-- Algébrique -->
+  <input id="alg-bareme" value="1">
+  <textarea id="alg-text"></textarea>
+  <input id="alg-formula" value="x^2+1">
+  <textarea id="alg-fbc"></textarea>
+  <textarea id="alg-fbe"></textarea>
+  <textarea id="alg-sol"></textarea>
+  <input type="checkbox" id="alg-h-kbd">
+  <input type="checkbox" id="alg-h-vars">
+  <input id="alg-vars" value="">
+
+  <!-- Unité -->
+  <input id="un-bareme" value="1">
+  <textarea id="un-text"></textarea>
+  <input id="un-val" value="9.81">
+  <input id="un-unit" value="m/s^2">
+  <input id="un-tol" value="0.05">
+  <textarea id="un-fbc"></textarea>
+  <textarea id="un-fbe"></textarea>
+  <input type="checkbox" id="un-h-kbd">
+
+  <!-- String -->
+  <input id="str-bareme" value="1">
+  <textarea id="str-text"></textarea>
+  <textarea id="str-ans-rich">Paris</textarea>
+  <input id="str-ans" value="">
+  <input id="str-size" value="15">
+  <input id="str-test" value="String">
+  <textarea id="str-fbc"></textarea>
+  <textarea id="str-fbe"></textarea>
+  <textarea id="str-sol"></textarea>
+  <input type="checkbox" id="str-aide-on">
+
+  <!-- Match (via matchState global) -->
+  <input id="match-bareme" value="2">
+  <textarea id="match-text"></textarea>
+</div>
+
+<!-- Charger les dépendances de l'app dans l'ordre -->
+<script src="../js/i18n.js"></script>
+<script src="../lang/fr.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/rich.js"></script>
+<script src="../js/prop-rows.js"></script>
+<script src="../js/json-import.js"></script>
+<script src="../js/keyboard.js"></script>
+<script src="../js/generators.js"></script>
+<script src="../js/gen-match.js"></script>
+
+<script>
+// ── INIT ────────────────────────────────────────────────
+// Forcer la langue française pour les tests
+if (window.I18N) { I18N.setLang('fr'); }
+
+// Rétablir matchState pour le type match
+const MATCH_FIXTURE = {
+  left:  [ {id:1, html:'H₂O'}, {id:2, html:'CO₂'} ],
+  right: [ {id:1, html:'eau'}, {id:2, html:'dioxyde de carbone'} ],
+  connections: [ {l:0, r:0}, {l:1, r:1} ],
+  selectedLeft: null
+};
+
+// Fonctions manquantes dans le contexte de test (stubs)
+if (typeof getPoolVarNames !== 'function') window.getPoolVarNames = () => [];
+if (typeof getAllSharedMaxima !== 'function') window.getAllSharedMaxima = () => '';
+if (typeof genStrPaletteHTML !== 'function') window.genStrPaletteHTML = () => '';
+
+// ── DÉFINITION DES CAS DE TEST ──────────────────────────
+const TEST_CASES = [
+  { id: 'checkbox',    label: 'Cases à cocher (checkbox)', fn: () => genCheckbox(1) },
+  { id: 'radio',      label: 'Bouton radio',               fn: () => genRadio(1) },
+  { id: 'dropdown',   label: 'Menu déroulant (dropdown)',  fn: () => genDropdown(1) },
+  { id: 'numerical',  label: 'Arithmétique (numerical)',   fn: () => genNumerical(1) },
+  { id: 'algebraic',  label: 'Algébrique',                 fn: () => genAlgebraic(1) },
+  { id: 'units',      label: 'Unité physique',             fn: () => genUnits(1) },
+  { id: 'string',     label: 'Réponse textuelle (string)', fn: () => genString(1) },
+  {
+    id: 'match', label: 'Relier (match)',
+    fn: () => {
+      // Injecter l'état match avant d'appeler le générateur
+      Object.assign(matchState, MATCH_FIXTURE);
+      return genMatch(1);
+    }
+  },
+];
+
+// Sérialise le résultat d'un générateur en chaîne comparable (stable)
+function serialize(result) {
+  return JSON.stringify({
+    bareme:   result.bareme,
+    vars:     result.vars,
+    inputXML: result.inputXML,
+    prtXML:   result.prtXML,
+  }, null, 2);
+}
+
+const STORAGE_KEY = 'hestack_regression_refs_v1';
+
+function loadRefs() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+
+function saveRefs() {
+  const refs = {};
+  TEST_CASES.forEach(tc => {
+    try {
+      const result = tc.fn();
+      refs[tc.id] = serialize(result);
+    } catch(e) {
+      refs[tc.id] = '(ERREUR: ' + e.message + ')';
+    }
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(refs));
+  alert('Références sauvegardées (' + Object.keys(refs).length + ' tests).');
+  runTests();
+}
+
+function resetRefs() {
+  if (!confirm('Supprimer toutes les références sauvegardées ?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  runTests();
+}
+
+function runTests() {
+  const refs = loadRefs();
+  const resultsEl = document.getElementById('results');
+  const summaryEl = document.getElementById('summary');
+  resultsEl.innerHTML = '';
+
+  let nPass = 0, nFail = 0, nNoRef = 0;
+
+  TEST_CASES.forEach(tc => {
+    const t0 = performance.now();
+    let current, error;
+    try {
+      const result = tc.fn();
+      current = serialize(result);
+    } catch(e) {
+      error = e.message;
+    }
+    const elapsed = (performance.now() - t0).toFixed(1);
+
+    const ref = refs[tc.id];
+    let status, label;
+
+    if (error) {
+      status = 'fail'; label = 'ERREUR'; nFail++;
+    } else if (!ref) {
+      status = 'noref'; label = '?'; nNoRef++;
+    } else if (current === ref) {
+      status = 'pass'; label = '✓'; nPass++;
+    } else {
+      status = 'fail'; label = '✗'; nFail++;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'test-card';
+
+    let diffHtml = '';
+    if (error) {
+      diffHtml = `<div class="diff-block"><div class="diff-label">Erreur JS</div><pre class="cur">${escHtml(error)}</pre></div>`;
+    } else if (status === 'noref') {
+      diffHtml = `<div class="diff-block"><div class="diff-label">Sortie actuelle (pas encore de référence)</div><pre class="cur">${escHtml(current)}</pre></div>`;
+    } else if (status === 'fail') {
+      diffHtml = `
+        <div class="diff-block">
+          <div class="diff-label">Référence sauvegardée</div><pre class="ref">${escHtml(ref)}</pre>
+          <div class="diff-label" style="margin-top:8px;">Sortie actuelle</div><pre class="cur">${escHtml(current)}</pre>
+        </div>`;
+    } else {
+      diffHtml = `<details><summary>Voir la sortie XML</summary><div class="diff-block"><pre class="ok">${escHtml(current)}</pre></div></details>`;
+    }
+
+    card.innerHTML = `
+      <div class="test-header">
+        <span class="badge ${status}">${label}</span>
+        <span class="test-name">${escHtml(tc.label)}</span>
+        <span class="test-time">${elapsed} ms</span>
+      </div>
+      ${diffHtml}
+    `;
+    resultsEl.appendChild(card);
+  });
+
+  // Résumé
+  const hasRefs = Object.keys(refs).length > 0;
+  let summClass, summText;
+  if (!hasRefs) {
+    summClass = 'noref';
+    summText = '⚠️ Aucune référence sauvegardée. Cliquez « Enregistrer comme référence » après avoir vérifié que l\'app fonctionne correctement.';
+  } else if (nFail > 0) {
+    summClass = 'fail';
+    summText = `❌ ${nFail} test(s) en échec · ${nPass} ok · ${nNoRef} sans référence`;
+  } else if (nNoRef > 0) {
+    summClass = 'noref';
+    summText = `⚠️ ${nNoRef} test(s) sans référence · ${nPass} ok`;
+  } else {
+    summClass = 'pass';
+    summText = `✅ Tous les ${nPass} tests passent.`;
+  }
+  summaryEl.innerHTML = `<div class="summary ${summClass}">${summText}</div>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Lancer automatiquement au chargement
+window.addEventListener('DOMContentLoaded', runTests);
+</script>
+</body>
+</html>

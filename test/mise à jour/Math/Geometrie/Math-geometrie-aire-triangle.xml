@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396268  -->
+  <question type="stack">
+    <name>
+      <text>Géométrie 3D : Aire d'un triangle</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Géométrie dans l'espace — Aire</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Dans un repère orthonormé de l'espace \((O; \vec{i}, \vec{j}, \vec{k})\), on considère les trois points :</p>
+<div style="display: flex; gap: 30px; justify-content: center; margin: 15px 0; flex-wrap: wrap;">
+<div>\(A \left( {@xa@} \; ; \; {@ya@} \; ; \; {@za@} \right)\)</div>
+<div>\(B \left( {@xb@} \; ; \; {@yb@} \; ; \; {@zb@} \right)\)</div>
+<div>\(C \left( {@xc@} \; ; \; {@yc@} \; ; \; {@zc@} \right)\)</div>
+</div>
+<p><strong>1.</strong> Calculer l'aire du triangle \(ABC\).<br>
+<em>(Arrondir le résultat à \(10^{-2}\) près).</em></p>
+<div style="margin: 10px 0;">\(\mathcal{A}(ABC) = \) [[input:ans_aire]] [[validation:ans_aire]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Dans l'espace, l'aire d'un triangle est la moitié de la norme du produit vectoriel de deux de ses côtés :<br><br>
+\[
+\mathcal{A}(ABC) = \frac{1}{2} \|\vec{AB} \times \vec{AC}\|
+\]<br>
+<strong>1. Calcul des vecteurs :</strong><br>
+\[
+\vec{AB} \begin{pmatrix} {@xb@}-({@xa@}) \\ {@yb@}-({@ya@}) \\ {@zb@}-({@za@}) \end{pmatrix} = \begin{pmatrix} {@ux@} \\ {@uy@} \\ {@uz@} \end{pmatrix} \quad ; \quad \vec{AC} \begin{pmatrix} {@xc@}-({@xa@}) \\ {@yc@}-({@ya@}) \\ {@zc@}-({@za@}) \end{pmatrix} = \begin{pmatrix} {@vx@} \\ {@vy@} \\ {@vz@} \end{pmatrix}
+\]<br>
+<strong>2. Produit vectoriel \(\vec{AB} \times \vec{AC}\) :</strong><br>
+\[
+\vec{AB} \times \vec{AC} = \begin{pmatrix} {@uy@} \times {@vz@} - {@uz@} \times {@vy@} \\ {@uz@} \times {@vx@} - {@ux@} \times {@vz@} \\ {@ux@} \times {@vy@} - {@uy@} \times {@vx@} \end{pmatrix} = \begin{pmatrix} {@cx@} \\ {@cy@} \\ {@cz@} \end{pmatrix}
+\]<br>
+<strong>3. Norme et Aire :</strong><br>
+\[
+\|\vec{AB} \times \vec{AC}\| = \sqrt{{@cx@}^2 + {@cy@}^2 + {@cz@}^2} = \sqrt{{@norme_carre@}} \approx {@sqrt_arr@}
+\]
+\[
+\mathcal{A}(ABC) = \frac{1}{2} \times {@sqrt_arr@} \approx {@aire_arr@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Fonction utilitaire */
+ri(a,b) := a + rand(b - a + 1)$ 
+/* Génération des coordonnées des 3 points */
+xa: ri(-3,3)$ ya: ri(-3,3)$ za: ri(-3,3)$ xb: ri(-3,3)$ yb: ri(-3,3)$ zb: ri(-3,3)$ xc: ri(-3,3)$ yc: ri(-3,3)$ zc: ri(-3,3)$ 
+/* Coordonnées des vecteurs AB et AC */
+ux: xb-xa$ uy: yb-ya$ uz: zb-za$ vx: xc-xa$ vy: yc-ya$ vz: zc-za$ 
+/* Coordonnées du produit vectoriel AB ^ AC */
+cx: uy*vz - uz*vy$ cy: uz*vx - ux*vz$ cz: ux*vy - uy*vx$ 
+/* Carré de la norme du produit vectoriel */
+norme_carre: cx^2 + cy^2 + cz^2$ 
+/* Sécurité : on s'assure que les points ne sont pas alignés (norme_carre != 0) */
+while norme_carre = 0 do (
+    xb: ri(-3,3), yb: ri(-3,3), zb: ri(-3,3),
+    xc: ri(-3,3), yc: ri(-3,3), zc: ri(-3,3),
+    ux: xb-xa, uy: yb-ya, uz: zb-za,
+    vx: xc-xa, vy: yc-ya, vz: zc-za,
+    cx: uy*vz - uz*vy,
+    cy: uz*vx - ux*vz,
+    cz: ux*vy - uy*vx,
+    norme_carre: cx^2 + cy^2 + cz^2
+)$ 
+/* Valeurs attendues */
+aire_exact: sqrt(norme_carre)/2$ aire_arr: 1.00*(round(float(aire_exact)*100)/100)$ sqrt_arr: round(float(sqrt(norme_carre))*100)/100$ 
+/* Erreurs classiques */
+err_para_arr: round(float(sqrt(norme_carre))*100)/100$ err_sans_rac_arr: round(float(norme_carre/2)*100)/100$ aire_2d: abs(ux*vy - uy*vx)/2$ err_2d_arr: round(float(aire_2d)*100)/100$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>A({@xa@};{@ya@};{@za@}), B({@xb@};{@yb@};{@zb@}), C({@xc@};{@yc@};{@zc@}), Aire={@aire_arr@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:geometry-3d-triangle-area</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_aire</name>
+      <type>numerical</type>
+      <tans>aire_arr</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_aire</sans>
+        <tans>aire_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> L'aire du triangle est correctement calculée.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : Aire du parallélogramme (oubli du / 2)</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_aire</sans>
+        <tans>err_para_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-PARA</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Aire du parallélogramme !</strong> Vous avez calculé \(\|\vec{AB} \times \vec{AC}\|\), ce qui correspond à l'aire du parallélogramme formé par ces vecteurs. Un triangle représente la <strong>moitié</strong> d'un parallélogramme, il faut donc diviser votre résultat par 2.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-PARA</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : A oublié la racine carrée</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_aire</sans>
+        <tans>err_sans_rac_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-NOROOT</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli de la racine carrée !</strong> Vous avez calculé \(\frac{x^2 + y^2 + z^2}{2}\). La norme d'un vecteur \(\vec{u}(x, y, z)\) est \(\sqrt{x^2 + y^2 + z^2}\), il ne faut pas oublier ce radical.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-NOROOT</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : A calculé l'aire en 2D (projection)</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_aire</sans>
+        <tans>err_2d_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-2D</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Calcul en 2D !</strong> Vous avez ignoré la coordonnée en \(z\) et calculé l'aire dans le plan \((xOy)\). En 3D, il faut obligatoirement utiliser le <strong>produit vectoriel</strong> dans l'espace pour prendre en compte la profondeur (l'axe \(z\)).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-2D</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur générique (Fallback)</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_aire</sans>
+        <tans>aire_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-GENERIC</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la formule :<br>\(\mathcal{A} = \frac{1}{2} \|\vec{AB} \times \vec{AC}\|\)<br>En n'oubliant pas le calcul complet du produit vectoriel (avec les 3 coordonnées) et la racine carrée pour la norme.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-FALLBACK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>

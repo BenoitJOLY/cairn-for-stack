@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396202  -->
+  <question type="stack">
+    <name>
+      <text>Intégrale définie : Exponentielle et constante</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#475569;border-left:5px solid #334155;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Analyse — Calcul d'intégrale définie</strong>
+        <span style="background:#334155;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+      </div>
+      
+      Calculer la valeur exacte de l'intégrale suivante :<br/><br/>
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:20px; text-align:center; font-size:1.3rem; margin-bottom:15px;">
+        \( I = \int_{{@a@}}^{{@b@}} \left( {@fx@} \right) dx \)
+      </div>
+      
+      <em>(On donnera le résultat exact, en utilisant exp() pour \(e\)).</em><br/><br/>
+      <div>\(I = \) [[input:ans_I]] [[validation:ans_I]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">
+        <div style="font-weight:bold; margin-bottom:10px;">🔑 Correction détaillée</div>
+        <div style="font-size:.9rem;">
+          Une primitive de {@fx@} est :<br/>
+          \(F(x) = \frac{{@c@}}{{@d@}}e^{{@d@}x} + {@f@}x\)<br/><br/>
+          On évalue entre {@a@} et {@b@} :<br/>
+          \(I = F({@b@}) - F({@a@})\)<br/>
+          \(I = \left( \frac{{@c@}}{{@d@}}e^{{@d@}\times {@b@}} + {@f@}\times {@b@} \right) - \left( \frac{{@c@}}{{@d@}}e^{{@d@}\times {@a@}} + {@f@}\times {@a@} \right)\)<br/><br/>
+          \(I = {@ta_I@}\)
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text>/* 1. Paramètres aléatoires */
+d: rand([-1,-2])$ c: rand([2,3])$ f: rand([1,2])$ a: 0$ b: 1$ 
+/* 2. Fonctions */
+fx: c*%e^(d*x) + f$ Fx: (c/d)*%e^(d*x) + f*x$ 
+/* 3. Réponses et pièges */
+ta_I: ev(Fx, x=b) - ev(Fx, x=a)$ ta_err_primitive: Fx$ ta_err_no_x: (c/d)*(%e^(d*b) - %e^(d*a))$ ta_err_coef: c*(%e^(d*b) - %e^(d*a)) + f$</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>I = int({@fx@}, {@a@}, {@b@}) = {@ta_I@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:definite-integral</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_I</name>
+      <type>algebraic</type>
+      <tans>ta_I</tans>
+      <boxsize>30</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>utilisez exp() pour l'exponentielle</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification résultat final</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_I</sans>
+        <tans>ta_I</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Parfait !</strong> Le calcul de la primitive et son évaluation entre les bornes sont exacts.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A donné la primitive</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_I</sans>
+        <tans>ta_err_primitive</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-PRIM</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>Non terminé !</strong> Vous avez donné la forme de la primitive \(F(x)\), mais on demande le <strong>résultat du calcul</strong> de l'intégrale. Il faut calculer \(F({@b@}) - F({@a@})\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-AUTRE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Oubli du terme fx</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_I</sans>
+        <tans>ta_err_no_x</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-CST</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>Oubli d'un terme !</strong> Vous avez correctement intégré l'exponentielle, mais vous avez oublié que la primitive de {@f@} est {@f@}&times;\(x\). Il manque ce terme dans votre évaluation finale.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-AUTRE2</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Coefficient exponentielle</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_I</sans>
+        <tans>ta_err_coef</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-COEF</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>Erreur de coefficient !</strong> Sur l'exponentielle, vous avez intégré {@c@}&times;\(e^{{@d@}x}\) en {@c@}&times;\(e^{{@d@}x}\). Il faut diviser par {@d@} : \(\frac{{@c@}}{{@d@}}e^{{@d@}x}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>Incorrect.</strong> Le calcul est faux. Étape 1 : trouvez la primitive \(F(x)\). Étape 2 : calculez précisément \(F({@b@}) - F({@a@})\) sans faire d'erreur de signe avec les nombres négatifs.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

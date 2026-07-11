@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Mod_Point" script:language="StarBasic" script:moduleType="normal">
+&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+
+&apos;oTaille est le côté du carré contenant le point x
+
+function Point(xPoint as Double, yPoint as Double, optional oTaille as integer) as object
+Dim monPoint as object
+monPoint = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;) 
+If IsMissing(oTaille) then oTaille = 300 &apos;0,3 cm
+SegmentDraw(xPoint - oTaille/2 ,yPoint + oTaille/2,xPoint + oTaille/2,yPoint - oTaille/2 )
+SegmentDraw(xPoint + oTaille/2,yPoint + oTaille/2,xPoint - oTaille/2,yPoint - oTaille/2 )
+monPoint= ChoixFormes(true, 2, oDocTemp)
+Point = GroupFormes(monPoint)
+End function
+
+
+
+sub ConstPoint(oStep as integer)
+Dim oNewPoint as object, oErreurPoint as integer, oSgt as object, oCercle as Object
+Dim oA as New com.sun.star.awt.Point, oB as New com.sun.star.awt.Point, oC as New com.sun.star.awt.Point, oM as New com.sun.star.awt.Point
+Dim oU1 as New com.sun.star.awt.Point
+Dim oInfo as variant
+Dim a as double, b as double, n as double
+
+if oStep = 1 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox1&quot;,&quot;ListBox&quot;)(1)
+    oReponseDlg(2) = RepControl(monDlg,&quot;ListBox16&quot;,&quot;ListBox&quot;)(1)   
+    oReponseDlg(3) = RepControl(monDlg,&quot;ListBox17&quot;,&quot;ListBox&quot;)(1)   
+    a = CDbl(RepControl(monDlg,&quot;TextField2&quot;,&quot;TextField&quot;))   
+    b = CDbl(RepControl(monDlg,&quot;TextField3&quot;,&quot;TextField&quot;))  
+    	
+	if oReponseDlg(1) = 0 then
+	oSgt = oCollectionSegments(oReponseDlg(2))
+	oInfo = InfoForme(oSgt)
+	oNewPoint = Point(oInfo(3).X, oInfo(3).Y)
+	End if
+	if oReponseDlg(1) = 1 then
+	oSgt = oCollectionSegments(oReponseDlg(2))
+	oInfo = InfoForme(oSgt)
+    oReponseDlg(2) = CDbl(RepControl(monDlg,&quot;TextField2&quot;,&quot;TextField&quot;)) * 1000
+    oNewPoint = Point(oInfo(1).X + oReponseDlg(2) * cos(oInfo(5) * pi/180) , oInfo(1).Y - oReponseDlg(2) * sin(oInfo(5) * pi/180) )
+	End if
+	if oReponseDlg(1) = 2 then 
+	oA = oListePointsExistants(oReponseDlg(2))
+	oB = oListePointsExistants(oReponseDlg(3))
+	if oReponseDlg(2) = oReponseDlg(3)  then 
+		Msgbox(Trad(monDlg,MesMessages2(12)), 0+48, &quot;AHmath2D&quot;)
+		Exit sub
+	End if
+	c = DistancePtPt(oA,oB)
+	if ExistenceTriangle(a,b,c) = false or oReponseDlg(2) = oReponseDlg(3)  then 
+		Msgbox(Trad(monDlg,MesMessages2(11)), 0+48, &quot;AHmath2D&quot;)
+		Exit sub
+	End if
+	
+	if RepControl(monDlg,&quot;OptionButton1&quot;,&quot;OptionButton&quot;) = true then oC = CoordCdeABC(Array(oA,oB), b, a, &quot;+&quot;)
+	if RepControl(monDlg,&quot;OptionButton2&quot;,&quot;OptionButton&quot;) = true then oC = CoordCdeABC(Array(oA,oB), b, a, &quot;-&quot;)
+	oNewPoint = Point(oC.X,oC.Y)
+	End if
+	if oReponseDlg(1) = 3 then 
+	oA = oListePointsExistants(oReponseDlg(2))
+	oB = oListePointsExistants(oReponseDlg(3))
+	if oReponseDlg(2) = oReponseDlg(3)  then 
+		Msgbox(Trad(monDlg,MesMessages2(12)), 0+48, &quot;AHmath2D&quot;)
+		Exit sub
+	End if
+	if RepControl(monDlg,&quot;OptionButton1&quot;,&quot;OptionButton&quot;) = true then oM = Rotation(oB,a,oA)
+	if RepControl(monDlg,&quot;OptionButton2&quot;,&quot;OptionButton&quot;) = true then oM = Rotation(oB,-a,oA)
+	oU1 = Vecteur(oB,oM,1)
+	oC = TranslationKV(b,oU1,oB)
+	oNewPoint = Point(oC.X,oC.Y)
+	End if
+	if oReponseDlg(1) = 4 then 
+	oA = oListePointsExistants(oReponseDlg(2))
+    oM.X = oA.X + a * 1000
+    oM.Y = oA.Y 
+	if RepControl(monDlg,&quot;OptionButton1&quot;,&quot;OptionButton&quot;) = true then oC = Rotation(oA,b,oM)
+	if RepControl(monDlg,&quot;OptionButton2&quot;,&quot;OptionButton&quot;) = true then oC = Rotation(oA,-b,oM)
+	oNewPoint = Point(oC.X,oC.Y)
+	End if
+	if oReponseDlg(1) = 5 then 
+	oCercle = oCollectionArcCercles(oReponseDlg(2))
+	oInfo = InfoForme(oCercle)
+	oNewPoint = Point(oInfo(3).X,oInfo(3).Y)
+	End if
+	if oReponseDlg(1) = 6 then 
+	oCercle = oCollectionArcCercles(oReponseDlg(2))
+	oInfo = InfoForme(oCercle)
+	oM.X = oInfo(3).X + oInfo(4)
+	oM.Y = oInfo(3).Y
+	oC = Rotation(oInfo(3),a,oM)
+	oNewPoint = Point(oC.X,oC.Y)
+	End if
+ 
+mesFormes.add(oNewpoint)
+SauvDerniereConstruction(oNewpoint)
+end if
+
+
+
+&apos;oStep = 40    -&gt; construire un point quand ElementSimple est vide
+
+if oStep = 40 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox40&quot;,&quot;ListBox&quot;)(1)
+    if oReponseDlg(1) = 0 then
+    oNewPoint = Point(10500,15000)
+    End if
+mesFormes.add(oNewpoint)  
+SauvDerniereConstruction(oNewpoint)  
+end if
+
+
+
+end sub
+
+&apos;**********************************************************************************************
+sub RecherchePoint
+Dim oCollectionTemp as object,oCollectionPointsSup as object, monPoint as object, oTrait1 as object, oTrait2 as object, oNvPoint as object
+Dim i as integer, oInfo1 as variant
+
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox23&quot;,&quot;ListBox&quot;)(1)
+	oReponseDlg(2) = CDbl(RepControl(monDlg,&quot;TextField9&quot;,&quot;TextField&quot;))/10
+	oReponseDlg(3) = RepControl(monDlg,&quot;ListBox11&quot;,&quot;ListBox&quot;)(1)
+	
+	    if oReponseDlg(1) = 0 then
+	    	oCollectionTemp = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;) 
+	    	monPoint = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;) 
+	    	oCollectionPointsSup = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;) 
+	    	
+	    	For i = 0 to mesFormes.count -1
+	    	oInfo1 = InfoForme(mesFormes(i))
+	    	If oInfo1(10) = &quot;Segment&quot; and oInfo1(4) &lt;= oReponseDlg(2) * sqr(2) then
+	    	oCollectionTemp.add(mesFormes(i))
+	    	End if
+	    	Next
+	    	If oCollectionTemp.count &lt;= 1 then msgbox(Trad(monDlg,MesMessages2(5)))
+	    	If oCollectionTemp.count &gt; 1 then
+	    	n = oCollectionTemp.count
+	    	While n &gt; 1
+	    		oTrait1 = oCollectionTemp(0)
+	    		oInfo1 = InfoForme(oTrait1)
+	    		For i = 1 to n - 1
+	    		oTrait2 = oCollectionTemp(i)
+	    		oInfo2 = InfoForme(oTrait2)
+	    		if abs(oInfo1(3).X - oInfo2(3).X)&lt;=15 and abs(oInfo1(3).Y - oInfo2(3).Y) &lt;= 15 then    &apos;precision à 0,15 mm des centres
+	    			monPoint.add(oTrait1)
+	    			monPoint.add(oTrait2)
+	    			oNvPoint = GroupFormes(monPoint) 
+	    			oCollectionPointsSup.add(oNvPoint)
+	    			mesFormes.remove(oTrait1)
+	    			mesFormes.remove(oTrait2)
+	    			oCollectionTemp.remove(oTrait1)
+	    			oCollectionTemp.remove(oTrait2)
+	    			monPoint.remove(oTrait1)
+	    			monPoint.remove(oTrait2)
+	    		End if
+	    		if oCollectionTemp.Count &lt;&gt; n then exit for
+	    		Next
+				if oCollectionTemp.Count = n then oCollectionTemp.remove(oTrait1)
+				n = oCollectionTemp.count
+	    	Wend
+	    	msgbox(oCollectionPointsSup.count &amp;&quot; &quot; &amp; Trad(monDlg,Mesmessages2(6)))
+
+	    	if oCollectionPointsSup.count &lt;&gt; 0 then 
+	    		For i = 0 to oCollectionPointsSup.count - 1
+	    		mesFormes.add(oCollectionPointsSup(i))
+	    		Next
+	    	end if
+
+	    	oCollectionPointsSup.dispose
+	    	monPoint.dispose
+	    	oCollectionTemp.dispose
+	    	End if
+	    
+	    End if
+	    if oReponseDlg(1) = 1 then
+	    	
+			monPoint = oCollectionPointsMarques(oReponseDlg(3))
+			oTrait1 = monPoint(0)
+			oTrait2 = monPoint(1)
+	    	mesFormes.Remove(monPoint)
+	    	mesFormes.add(oTrait1)
+	    	mesFormes.add(oTrait2)
+	       	oPageTemp.Ungroup(monPoint)
+	    End if
+	    oNbrObjets = NbrObjetsDessines(mesFormes)
+
+End sub
+
+</script:module>

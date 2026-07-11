@@ -1,0 +1,1808 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module1" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) 2008-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye  
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.com
+&apos;
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+REM  *****  BASIC  *****
+&apos;Option Explicit
+Global bVerifSauvegarde as Boolean
+Global bExecCoordColonne, bOptionCoordColonneChanged as Boolean  rem Coordonnées en colonne si True, True si changement du mode coordonnees colonne par CTRL+MAJ+C
+Global bMajusculesItalic, bOptionMajusculesItalicChanged as Boolean  rem Majuscules en Italiique si True, True si changement du mode Majuscule en Italique par CTRL+MAJ+W
+Public sEq as String rem chaine contenant la formule qui est ecrite
+Global sDerniereFormule, sSaisieDerniereFormule, sAVDerniereFormule as String 
+Global bEcritduTexteSelectionne rem sert a déterminer si le texte ecrite est passé par la macro Selec
+rem chaines contenant la source de la derniere formule ecrite, le texte exrit par l&apos;utilisateur, la source des formules concaténées
+Public Erreur, ErreurSurBase, bBoite as Boolean &apos;bBoite=True si la boite existe, ErreurSurBase = True si erreur ecriture en base 2 ou 10
+&apos;Global bTaquetPose as Boolean &apos; prend la valeur true si un taquet est pose
+&apos;Global oCursorTaquet as Object &apos;le curseur au taquet pose
+Public iAverto as Integer &apos;iTaille contient la taille de la formule
+Public Brac1,Brac2,Brac3,Brac4,Brac5,Brac6 as String &apos;Brac1 à gauche, 2 à droite, 3 le 4, 4 pour \, 5 pour left, 6 pour right.
+rem iAverto contient le numéro de ligne du message
+Private sNomPolice as String &apos;contient le nom de la police du curseur visible.
+Public aSel as New com.sun.star.awt.Selection &apos;GF pour Metentre Form et Form1
+Public aSel0 as New com.sun.star.awt.Selection &apos;GF pour Metentre Form
+Public aSel1 as New com.sun.star.awt.Selection &apos;GF pour Metentre Form1
+Public CursorPos as Integer &apos;for TextField1 in FormuleGraphique GF may 2007
+Public obj as Object
+
+REM Insert HelpText of any CommandButton, allow space before and after, GF Sept.2008 
+REM Same method possible with property Tag (in german: Zusatzinformation): CBevent.Tag
+Sub MetHelptext(event)
+&apos;Xray event
+	CBevent = event.source.Peer
+ 	MetEntre(&quot; &quot; + CBevent.AccessibleContext.ToolTipText + &quot; &quot;,&quot;&quot;)
+End Sub
+
+REM the following is needed for visible accolades in many dialogues (formule, racine...)
+Sub MetentreAccolades2	&apos;GF
+MetEntre(&quot;\{&quot;,&quot;\}&quot;) 
+End Sub	
+
+Sub Metgeslant	&apos;GF
+MetEntre(&quot;`geslant`&quot;,&quot;&quot;)
+End Sub
+
+Sub Metleslant	&apos;GF
+MetEntre(&quot;`leslant`&quot;,&quot;&quot;)
+End Sub
+
+Sub MetentreExp
+MetEntre(&quot;^{&quot;,&quot;}&quot;) 
+End Sub	
+
+Sub MetentreIndex
+MetEntre(&quot;_{&quot;,&quot;}&quot;) 
+End Sub	
+
+Sub LoadParCro
+Call VerifOperationnel
+oBoite=LoadDialog(&quot;Dmaths&quot;,&quot;ParCro&quot; )
+oBoite.Execute()
+End Sub
+
+Sub MetLPi
+MetEntre(&quot; pi &quot;,&quot;&quot;)
+End Sub
+
+Sub MetLcdot
+MetEntre(&quot;`cdot`&quot;,&quot;&quot;)
+End Sub
+
+Sub MetLtimes
+MetEntre(&quot;`times`&quot;,&quot;&quot;)
+End Sub
+
+Sub InsertBlanc
+oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+oDocument= oDesktop.getCurrentComponent()
+oText = oDocument.Text
+oCursor = oDocument.currentcontroller.getViewCursor()
+oCursor.getText().insertString(oCursor.getStart(),&quot; &quot;,false)
+&apos;MRI oCursor
+End Sub
+
+Function recul(N as Integer)
+oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+oDocument= oDesktop.getCurrentComponent()
+oText = oDocument.Text
+oCursor = oDocument.currentcontroller.getViewCursor()
+oCursor.Goleft(N,False)
+End Function
+
+Sub recul1
+recul(1)
+End Sub
+
+Sub recul2
+recul(2)
+End Sub
+
+Sub recul5
+recul(5)
+End Sub
+
+Sub recul6
+recul(6)
+End Sub
+
+Sub recul8
+recul(8)
+End Sub
+
+Sub recul10
+recul(10)
+End Sub
+
+Sub recul11
+recul(11)
+End Sub
+
+Sub recul12
+recul(12)
+End Sub
+
+Sub recul3
+recul(3)
+End Sub
+
+Sub recul14
+recul(14)
+End Sub
+
+Sub recul21
+recul(21)
+End Sub
+
+Sub recul22
+recul(22)
+End Sub
+
+Sub recul26
+recul(26)
+End Sub
+
+Sub recul32
+recul(32)
+End Sub
+
+rem Traite norme, valeur absolue , factoriel
+rem modifiee le 1er decembre 2012
+Sub TraitNoVa(sMot,Indice,LongMot,bNorme)
+	If Mid(sMot,Indice,1)=&quot;|&quot; and Instr(Indice+1,sMot,&quot;|&quot;)=0 and bNorme=False Then  
+	sMot=Mid(sMot,1,Indice-1)+&quot; divides &quot;+Mid(sMot,Indice+1,LongMot-Indice)
+	Indice=Indice+8
+	LongMot=LongMot+8
+	Endif
+	If Mid(sMot,Indice,1)=&quot;|&quot; and Mid(sMot,Indice+1,1)&lt;&gt;&quot;|&quot; and bNorme=False Then  
+	sMot=Mid(sMot,1,Indice-1)+&quot; abs{&quot;+Mid(sMot,Indice+1,LongMot-Indice)
+	Indice=Indice+4
+	LongMot=LongMot+4
+	bNorme=True
+	Endif
+	If Mid(sMot,Indice,1)=&quot;|&quot; and Mid(sMot,Indice+1,1)&lt;&gt;&quot;|&quot; and bNorme=True Then  
+	sMot=Mid(sMot,1,Indice-1)+&quot;}&quot;+Mid(sMot,Indice+1,LongMot-Indice)	
+	bNorme=False
+	Endif
+	If Mid(sMot,Indice,2)=&quot;||&quot; and bNorme=False Then  
+	sMot=Mid(sMot,1,Indice-1)+&quot; left ldline &quot;+Mid(sMot,Indice+2,LongMot-Indice-1)
+	Indice=Indice+12
+	LongMot=LongMot+12
+	bNorme=True
+	Endif
+	If Mid(sMot,Indice,2)=&quot;||&quot; and bNorme=True Then  
+	sMot=Mid(sMot,1,Indice-1)+&quot; right ldline &quot;+Mid(sMot,Indice+2,LongMot-Indice-1)
+	Indice=Indice+13
+	LongMot=LongMot+13
+	bNorme=False
+	Endif
+	If Mid(sMot,Indice,1)=&quot;!&quot; Then
+	sMot=Mid(sMot,1,Indice-1)+&quot; nitalic &quot;+Mid(sMot,Indice,LongMot-Indice+1)
+	Indice=Indice+9
+	LongMot=LongMot+9
+	Endif
+End Sub
+
+Function StopCar(oCurs as Object, iCar as Long, bGauche as Boolean) as Boolean
+Rem ecrite le 18 septembre 2010, sert a arreter le curseur
+	Dim bResul as Boolean, iVar as Integer
+	bResul = False
+	
+	If ((Not bGauche and oCurs.isEndOfParagraph) or (bGauche and oCurs.isStartOfParagraph)) Then bResul = True
+	&apos;--------------------------------------------------------------------------------------------------------
+	
+	If (iCar = 9 or iCar = 10 or iCar = 13 or iCar = 32 or iCar = -2) Then bResul = True
+	
+	If bGauche and iCar=45 Then
+		oCurs.Goleft(1,True)
+		If oCurs.string = &quot;-&quot; Then bResul = True
+		If oCurs.Goleft(1,False) Then oCurs.Goright(2,False)
+		&apos;oCurs.Goleft(0,False) modification du 12 mai 2013
+		&apos;oCurs.Goright(1,False)
+	Endif
+
+
+	If bGauche and iCar=95 Then
+		oCurs.Goleft(1,True)
+		If oCurs.string = &quot;_&quot; Then bResul = True
+		oCurs.Goleft(0,False)
+		oCurs.Goright(1,False)
+	Endif
+
+	If bGauche and iCar=46 then
+		oCurs.Goleft(3,True)
+		If Mid(oCurs.String,3,1)=&quot;.&quot; and Mid(oCurs.String,2,1)=&quot;.&quot; and Mid(oCurs.String,1,1)&lt;&gt;&quot;)&quot; and Mid(oCurs.String,1,1)&lt;&gt;&quot;]&quot; _
+			and Mid(oCurs.String,1,1)&lt;&gt;&quot;+&quot; and Mid(oCurs.String,1,1)&lt;&gt;&quot;*&quot; and Mid(oCurs.String,1,1)&lt;&gt;&quot;×&quot; Then
+			bResul = True
+		End if
+		If  Mid(oCurs.String,1,1)=&quot;…&quot; or Mid(oCurs.String,2,1)=&quot;…&quot; Then
+			bResul = True			
+		End if
+		iVar = Len(oCurs.string)
+		oCurs.Goleft(0,False)
+		oCurs.Goright(iVar,False)
+	Endif
+	StopCar = bResul
+End Function
+
+rem ---------------------------------------------------------------------------------------------------------
+rem macro reprise le 18 novembre 2012 pour introduire la fonction annulation
+Function Selec 
+	Dim LongsEq as Integer,I as Integer,N as Integer,NbreBlanc as Integer
+	Dim Test as String
+	Dim oDesktop as Object, oDocument as Object,oText as Object, oVCursor as Object, oTextActif as Object
+	Dim oCursor as Object, oCursor2 as Object, oCursorBarre as Object
+		oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+		oDocument= oDesktop.getCurrentComponent()
+		oText = oDocument.Text
+		oVCursor = oDocument.currentcontroller.getViewCursor()
+		oTextActif = oVCursor.Text &apos; la zone de texte actif page ou cellule ....
+		oCursor = oTextActif.createTextCursorByRange(oVCursor)
+		oCursor2 = oTextActif.createTextCursorByRange(oCursor)
+		
+	
+	
+
+	Erreur=False
+	If oVCursor.IsCollapsed Then
+		If oCursor.isEndOfParagraph and oCursor.isStartOfParagraph Then Goto Probleme1
+		Dim Car as Long	
+
+		Car = -1
+		Do until StopCar(oCursor,Car,False)	
+			oCursor.Goright(1,True)
+			If Len(oCursor.String())&lt;&gt;0 Then Car = Asc(oCursor.String()) Else  Car = -2			
+			oCursor.Goright(0,False)			
+		Loop
+		If (Not oCursor.isEndOfParagraph and Car&lt;&gt;-1)  Then oCursor.Goleft(1,False)
+
+
+		Car = -1
+		Do Until StopCar(oCursor2,Car,True)
+			oCursor2.Goleft(1,True)
+			If Len(oCursor2.String())&lt;&gt;0 Then
+			    on error resume next
+				Car = Asc(oCursor2.String())
+				on error goto 0
+			Else
+				Car = -2
+			Endif
+			oCursor2.Goleft(0,False)
+		Loop
+
+	&apos; réajustement de curseur
+		If (Not oCursor2.isStartOfParagraph and Car&lt;&gt;-1) Then oCursor2.Goright(1,False)
+				If  Car = -2  Then
+			If oCursor2.isStartOfParagraph Then
+				oCursor2.Goright(1,False)
+			Else
+				oCursor2.Goright(1,True)
+			Endif
+		Endif
+		If (Car = 9 or Car = 32) and oCursor2.isStartOfParagraph Then oCursor2.Goright(1,False) 
+   
+
+		oCursor.GotoRange(oCursor2,True)
+	&apos;------------------------------------------------------------------------------------
+		If Len(oCursor.GetString())&gt;0 Then
+		    		If Asc(oCursor.GetString())=10 or Asc(oCursor.GetString())=32 Then oCursor.Goleft(1,True)
+		Endif
+	    If Len(oCursor2.GetString()) = 0 Then oCursor2.Goright(1,False)
+	&apos;------------------------------------------------------------------------------------	    	
+	
+		sEq=oCursor.GetString()
+		
+
+		If Len(sEq) = 0  Then Goto Probleme1
+		
+		oVCursor.gotoRange(oCursor,True)
+	
+	Else
+		sEq=oCursor.getString()
+	Endif
+	
+	rem dans cette partie on traite les caractères surlignés ou double surlignés Remarque uniquement pour OOo &gt;= 3.1
+	If OOoNumVersion &gt;=310 Then 
+		oCursorBarre = oTextActif.createTextCursorByRange(oCursor)
+		oCursorBarre.CollapseToStart
+		Dim bOuv, bdOuv as Boolean, iCompteur, J as Integer
+		bOuv = False : bdOuv = False : iCompteur = Len(SEq) : J = 0
+		For I=1 To iCompteur
+			J = J + 1
+			oCursorBarre.goRight(1,True)
+			If (oCursorBarre.CharOverline = com.sun.star.awt.FontUnderline.SINGLE and bOuv = False) Then
+				bOuv = Not bOuv 
+				sEq = Mid(sEq,1,J-1) &amp; &quot; overline{&quot; &amp; Mid(sEq,J,Len(sEq)-J+1)
+				J = J + 9
+			Endif
+			If (oCursorBarre.CharOverline &lt;&gt; com.sun.star.awt.FontUnderline.SINGLE and bOuv = True) Then
+				bOuv = Not bOuv
+				sEq = Mid(sEq,1,J) &amp; &quot;}&quot; &amp; Mid(sEq,J+1,Len(sEq)-J)
+				J = J + 2
+			Endif		
+			If (oCursorBarre.CharOverline = com.sun.star.awt.FontUnderline.DOUBLE and bdOuv = False) Then
+				bdOuv = Not bdOuv 
+				sEq = Mid(sEq,1,J-1) &amp; &quot; overline{overline{&quot; &amp; Mid(sEq,J,Len(sEq)-J+1)
+				J = J + 18
+			Endif
+			If (oCursorBarre.CharOverline &lt;&gt; com.sun.star.awt.FontUnderline.DOUBLE and bdOuv = True) Then			
+				bdOuv = Not bdOuv
+				sEq = Mid(sEq,1,J) &amp; &quot;}}&quot; &amp; Mid(sEq,J+1,Len(sEq)-J)
+				J = J + 3
+			Endif	
+			If (I = iCompteur and bOuv ) Then sEq = sEq &amp; &quot;}&quot;
+			If (I = iCompteur and bdOuv) Then sEq = sEq &amp; &quot;}}&quot; rem Ferme l&apos;accolade au dernier caractère 
+			oCursorBarre.goRight(0,False)
+		Next I
+ 	Endif
+ 
+ 	rem fin du traitement des caractères surlignés 
+	If sEq= &quot; &quot; Then Goto Probleme1
+
+	rem vérifie le parenthésage
+	N=0
+	For I=1 To Len(sEq)
+		If Mid(sEq,I,1)=&quot;$&quot; Then N=N+1
+	Next I
+	If Int(N/2)&lt;&gt;Int(N)/2 Then
+		If msgbox(sVocab(iLang,3),256+48+1,&quot;Dmaths&quot;)=2 Then Goto Probleme2 Else Goto FinVerifPar
+	Endif
+	N=0
+	For I=1 To Len(sEq)
+		If Mid(sEq,I,1)=&quot;(&quot; Then 
+			N=N+1 
+		ElseIf  Mid(sEq,I,1)=&quot;)&quot; Then
+			N=N-1		
+		Endif
+	Next I
+	If N&lt;&gt;0 Then
+		If msgbox(sVocab(iLang,3),256+48+1,&quot;Dmaths&quot;)=2 Then Goto Probleme2 Else Goto FinVerifPar
+	Endif
+	N=0
+	For I=1 To Len(sEq)
+		If Mid(sEq,I,1)=&quot;[&quot; or Mid(sEq,I,1)=&quot;]&quot; Then N=N+1		
+	Next I
+	If  Int(N/2)&lt;&gt;Int(N)/2 Then
+		If msgbox(sVocab(iLang,3),256+48+1,&quot;Dmaths&quot;)=2 Then Goto Probleme2 Else Goto FinVerifPar
+	Endif
+	N=0
+	For I=1 To Len(sEq)
+		If Mid(sEq,I,1)=&quot;&amp;&quot; Then N=N+1
+	Next I
+	If Int(N/2)&lt;&gt;Int(N)/2 Then
+		If msgbox(sVocab(iLang,3),256+48+1,&quot;Dmaths&quot;)=2 Then Goto Probleme2 Else Goto FinVerifPar
+	Endif
+	rem fin vérification du parenthésage
+	FinVerifPar:
+
+	rem traitement du §
+	LongsEq=Len(sEq)
+	For I=1 to LongsEq
+		If Mid(sEq,I,1)=&quot;§&quot; Then
+			sEq=Mid(sEq,1,I-1)+&quot;&amp;§&amp;&quot;+Mid(sEq,I+1,LongsEq-I)
+			LongsEq=LongsEq+2
+			I=I+2
+		Endif
+	Next I
+
+	Goto Fin
+
+	
+
+	Probleme1: 
+	Call UnWriteFormula()
+	oVCursor.CollapseToEnd()
+	Goto Finp
+
+	Probleme2: oVCursor.CollapseToEnd()
+
+	Finp: 
+	Erreur = True
+	ErreurSurBase = True
+
+	Fin:
+   	rem ajoute le 17 novembre 2012 initialise a 5
+	If Erreur = False Then oCursor.setString(&quot;&quot;)
+	
+	sAVDerniereFormule = &quot;&quot; rem initialise le texte de la formule eventuellement concatenée
+	sSaisieDerniereFormule = sEq rem memorise le texte sélectionné
+	bEcritduTexteSelectionne = True
+	Selec = sEq
+End Function
+rem fin de Selec
+
+
+Function CoefficientsVecteurs(Mot$,iPos as Integer) as String
+&apos; Jerome Ortais
+&apos; Selectionne et traite avec Dixio une zone dans un calcul de vecteurs. Vérifie que les caractères binaires
+&apos;(*, =, /) en debut ou fin de Mot ne sont pas traites par Dixio. Renvoie la position du dernier caractere traite.
+Dim sMot$, iCurseur as Integer
+Dim bEstVecteurNul as Boolean, iLong as integer
+Const cOperateurs=&quot;+-.=≃≈~≠ &quot;, cNombres=&quot;0123456789,+-*/=≃≈~≠&lt;≤≥&gt;:;){}[]&quot;, cInterdits=&quot;*/=≃≈~≠&lt;≤≥&gt;&quot;
+    sMot=Mot
+    iLong=Len(sMot)
+    iCurseur=1
+    bEstVecteurNul=False
+    Do While InStr(cNombres,Mid(sMot,iPos+iCurseur,1))&gt;0 And iPos+iCurseur&lt;=iLong And Not bEstVecteurNul
+        If Mid(sMot,iCurseur+iPos,1)=&quot;0&quot; Then
+        &apos;Verifie si un 0 est un vecteur nul ou un chiffre.
+            If iPos+iCurseur&lt;iLong Then
+                bEstVecteurNul=(InStr(cOperateurs,Mid(sMot,iPos+iCurseur-1,1))&gt;0) And (InStr(cOperateurs,Mid(sMot,iPos+iCurseur+1,1))&gt;0)
+            Else
+                bEstVecteurNul=(InStr(cOperateurs,Mid(sMot,iPos+iCurseur-1,1))&gt;0)
+            EndIf
+        EndIf
+        iCurseur=iCurseur+1
+    Loop
+    If bEstVecteurNul Then iCurseur=iCurseur-2 Else iCurseur=iCurseur-1
+    Car=Mid(sMot,iPos+iCurseur,1)
+    Select Case iCurseur
+    Case 0
+        If InStr(cInterdits,Mid(sMot,iPos,1))&gt;0 Then
+            CoefficientsVecteurs=Dixio2(Mid(sMot,iPos,1))
+        Else
+            CoefficientsVecteurs=Dixio(Mid(sMot,iPos,1))
+        EndIf
+    Case 1
+        If InStr(cInterdits,Mid(sMot,iPos,1))&gt;0 Then
+            If InStr(cInterdits,Mid(sMot,iPos+1,1))&gt;0 Then
+                &apos; Gere le cas de &gt;=, &lt;=, &lt;&gt;
+                CoefficientsVecteurs=Dixio(Mid(sMot,iPos,2))
+            Else
+                CoefficientsVecteurs=Dixio2(Mid(sMot,iPos,1))_
+                    +Dixio(Mid(sMot,iPos+1,1))
+            EndIf
+        Else
+            If InStr(cInterdits,Mid(sMot,iPos+1,1))&gt;0 Then
+                CoefficientsVecteurs=Dixio(Mid(sMot,iPos,1))_
+                    +Dixio2(Mid(sMot,iPos+1,1))
+            Else
+                CoefficientsVecteurs=Dixio(Mid(sMot,iPos,2))
+            EndIf
+        EndIf
+    Case Else
+        If InStr(cInterdits,Mid(sMot,iPos,1))&gt;0 Then
+            If InStr(cInterdits,Mid(sMot,iPos+iCurseur,1))&gt;0 Then
+                CoefficientsVecteurs=Dixio2(Mid(sMot,iPos,1))_
+                    +Dixio(Mid(sMot,iPos+1,iCurseur-1))_
+                    +Dixio2(Mid(sMot,iPos+iCurseur,1))
+            Else
+                CoefficientsVecteurs=Dixio2(Mid(sMot,iPos,1))_
+                    +Dixio(Mid(sMot,iPos+1,iCurseur))
+            EndIf
+        Else
+            If InStr(cInterdits,Mid(sMot,iPos+iCurseur,1))&gt;0 Then
+                CoefficientsVecteurs=Dixio(Mid(sMot,iPos,iCurseur))_
+                    +Dixio2(Mid(sMot,iPos+iCurseur,1))
+            Else
+                CoefficientsVecteurs=Dixio(Mid(sMot,iPos,iCurseur+1))
+            EndIf
+        EndIf
+    End Select
+    iPos=iPos+iCurseur
+End Function
+
+Function TraiteGeometrie(Chaine$,Param$) as String
+&apos; Jerome Ortais
+&apos; Gere l&apos;affichage des angles, vecteurs et derives pointees.
+Const cOperateurs = &quot;+-. =≃≈~≠&quot;
+
+Dim sChaine$, sParam$, sCar$, cScalaires$
+Dim iLongueur as Integer, iPos as Integer, iPos1 as Integer, iPos2 as Integer, iFin as Integer
+Dim bEstVecteurNul as Boolean
+
+	Rem permet de considerer si option choisie les lettres comme scalaires
+	cScalaires = &quot;0123456789,.+-×*:/=≠≃≈&lt;≤≥&gt;;#\{})]^∧° &apos;&quot;
+	rem modification du 12 mai 2013 pour que les angles ne soient plus traités avec l&apos;option lettres scalaires
+	If bLettresAreScalaires = TRUE and Instr(Param,&quot;widehat&quot;)=0 Then cScalaires = cScalaires &amp; sLettresScalaires &amp;&quot;&quot;
+	rem ---------------------------------------------------------------------------
+	sChaine=Chaine
+	sParam=Param
+	If sChaine=&quot;&quot; Then Goto SortieFonction
+	iLongueur=Len(sChaine)
+	sCar=Mid(sChaine,1,1)
+	Select Case sCar
+	Case &quot;$&quot;
+		&apos; Ce qui est entre $...$ doit etre traite comme une formule.
+		iFin=InStr(2,sChaine,&quot;$&quot;)
+		sChaine=Dmaths.Module2.Dixio(Mid(sChaine,2,iFin-2))_
+			+TraiteGeometrie(Mid(sChaine,iFin+1),sParam)
+	Case &quot;(&quot;    
+		If InStr(sParam,&quot;widehat&quot;)&gt;0 Then
+			&apos; Les valeurs entre parentheses sont des vecteurs.
+			&apos; On appelle TraiteGeometrie sur le contenu des parentheses.
+			iFin=Dmaths.Module2.TrouvePaire(sChaine,1,&quot;(&quot;)
+			sChaine=sParam+&quot;{(&quot;_
+				+TraiteGeometrie(Mid(sChaine,2,iFin-2),&quot; widevec  &quot;)+&quot;)}&quot;_
+				+TraiteGeometrie(Mid(sChaine,iFin+1),sParam)
+		Else
+			iPos=1
+			sChaine=CoefficientsVecteurs(sChaine,iPos)_
+				+TraiteGeometrie(Mid(sChaine,iPos+1),sParam)
+		EndIf
+	Case &quot;.&quot;
+		&apos; Gestion des ..., produits scalaires et . A ameliorer.
+		If iLongueur&gt;=3 Then
+			If Mid(sChaine,1,3)=&quot;...&quot; Then
+				sChaine=&quot; dotslow &quot;_
+					+TraiteGeometrie(Mid(sChaine,4),sParam)
+			Else
+				sChaine=&quot; cdot &quot;+TraiteGeometrie(Mid(sChaine,2),sParam)
+			EndIf
+		Else sChaine=&quot; cdot &quot;+TraiteGeometrie(Mid(sChaine,2),sParam)
+		EndIf
+	Case &quot;0&quot;
+		&apos; Gestion du vecteur nul (un peu basique)
+		bEstVecteurNul=False
+		If InStr(sParam,&quot;widevec&quot;)&gt;0 Then
+			If iLongueur=1 Then
+				bEstVecteurNul=True
+			Else
+				bEstVecteurNul=(InStr(cOperateurs,Mid(sChaine,2,1))&gt;0)
+			EndIf
+		EndIf
+		If bEstVecteurNul Then
+			sChaine=sParam+&quot;{0}&quot;+TraiteGeometrie(Mid(sChaine,2),sParam)
+		Else
+			iPos=1
+			sChaine=CoefficientsVecteurs(sChaine,iPos)_
+				+TraiteGeometrie(Mid(sChaine,iPos+1),sParam)
+		EndIf
+	Case &quot;%&quot;
+		&apos; Gestion du caractere %. On le supprime pour l&apos;ajouter plus tard.
+		sChaine=TraiteGeometrie(Mid(sChaine,2),sParam)
+		&apos; gestion des fractions dans les vecteurs.
+	Case &quot;/&quot;
+		sChaine = &quot; over &quot;  &amp; TraiteGeometrie(Mid(sChaine,2),sParam)
+	Case Else
+		&apos; Gestion des normes de vecteurs
+		If iLongueur&gt;1 Then
+			If Mid(sChaine,1,2)=&quot;||&quot; Then
+				iPos=InStr(3,sChaine,&quot;||&quot;)
+				sChaine=&quot; left ldline &quot;+_
+					TraiteGeometrie(Mid(sChaine,3,iPos-3),sParam)+_
+					&quot; right ldline &quot; +_
+					TraiteGeometrie(Mid(sChaine,iPos+2),sParam)
+				Goto SortieFonction
+			&apos; Gestion de pi
+			ElseIf     Mid(sChaine,1,2)=&quot;pi&quot; Then
+				sChaine=&quot;%pi&quot;+TraiteGeometrie(Mid(sChaine,3),sParam)
+				Goto SortieFonction
+			EndIf
+		EndIf
+		&apos; Si le caractere n&apos;est pas un nombre, c&apos;est un vecteur ou un angle.
+		If InStr(1,cScalaires,sCar,0)=0 Then
+			If iLongueur&gt;1 Then
+				iFin=1
+				While (InStr(&quot;.+-×*:/=≠≃≈&lt;≤≥&gt;;#\{}()[]^∧° &quot;,Mid(sChaine,iFin+1,1))=0) And iFin&lt;iLongueur
+					iFin=iFin+1
+				WEnd
+				sChaine=sParam+&quot;{&quot;+Dixio2(Mid(sChaine,1,iFin))_
+					+&quot;}&quot;+TraiteGeometrie(Mid(sChaine,iFin+1),sParam)
+			Else sChaine=sParam+&quot;{&quot;+Dixio2(sChaine)+&quot;}&quot;
+			EndIf
+			&apos; Le caractere est un nombre ou une operation. On cherche la fin de cette
+			&apos; operation sans vecteur et on lui applique Dixio.
+		Else
+		    iPos=1
+			sChaine=CoefficientsVecteurs(sChaine,iPos)_
+				+TraiteGeometrie(Mid(sChaine,iPos+1),sParam)
+		EndIf
+	End Select
+	SortieFonction:
+	TraiteGeometrie=sChaine
+	Erreur=False
+End Function
+
+Rem cette macro a été écrite le 1er décembre 2012
+rem elle permet de gérer les noms des points (caractères majuscules) en Roman dans les vecteurs
+Function TraiteVecteursRoman(sMot as String, bVecI as Boolean) as String
+	Dim sLaChaine as String
+	Dim LongMot as Integer
+	sLaChaine = sMot
+	LongMot = Len(sMot)
+	For Increment = 1 To LongMot
+		Dim Char2$
+		If Increment &lt; LongMot Then 
+			Char2 = Mid(sLaChaine,Increment+1,1)
+		Else 
+			Char2 = &quot;a&quot; Rem Cette ligne sert à traiter le cas particulier des %
+		Endif
+		If IsMajuscule(Mid(sLaChaine,Increment,1),Char2) Then
+			sLaChaine = GereMajusculesDroites(sLaChaine, Increment ,LongMot,FALSE)
+		Endif	
+	Next Increment	
+	TraiteVecteursRoman = sLaChaine
+End Function
+
+
+
+Rem determine si le caractere est un scalaire
+Function CarIsScalaire(iPos as Integer, MaSource As String) as Boolean
+rem macro cree le 8 septembre
+	Dim sCar as String
+	Dim bReponse as Boolean	
+	bReponse = FALSE
+	sCar = Mid(MaSource,iPos,1)
+	If Instr(1,sLettresScalaires,sCar,0) &gt; 0 Then
+		saEviter = Array(&quot;widevec&quot;,&quot;widehat&quot;,&quot;overline&quot;,&quot;italic&quot;,&quot;nitalic&quot;)	
+		bReponse = TRUE
+		
+		For I = LBound(saEviter) To UBound(saEviter)
+				If iPos = 1 Then
+					If Mid(MaSource,1,3) = Mid(saEviter(I),1,3) then
+						bReponse = FALSE : Goto Termine
+					Endif
+				ElseIf 	iPos = Len(MaSource) Then			
+					If Mid(MaSource,Len(MaSource)-2,3) = Mid(saEviter(I),Len(saEviter(I))-2,3) then
+						bReponse = FALSE : Goto Termine
+					Endif
+				Else
+					If iPos &lt; Len(MaSource)-1 Then
+						If Mid(MaSource,iPos,3) = Mid(saEviter(I),1,3) then
+								bReponse = FALSE : Goto Termine
+						Endif
+					Endif
+					If iPos &gt; 2 Then
+						If Mid(MaSource,iPos-2,3) = Mid(saEviter(I),Len(saEviter(I))-2,3) then
+								bReponse = FALSE : Goto Termine
+						Endif
+					Endif
+					For J=2 To Len(saEviter(I))-1
+						If Mid(MaSource,iPos-1,3) = Mid(saEviter(I),J-1,3) then
+								bReponse = FALSE : Goto Termine
+						Endif						
+					Next J	
+				Endif			
+		Next I		
+	End if
+	Termine:
+	CarIsScalaire = bReponse
+End Function
+
+
+
+Function TraiteVecWidevec(MaSource as String) as String 
+	rem cette macro transforme widevec en vec si un seul caractère ex widevec {u} devient vec {u}
+	rem macro ecrite le 30 aout 2010
+	Dim iPos1,iPos2 as Integer
+	iPos1 = InStr(MaSource,&quot;widevec&quot;)
+	While iPos1 &gt; 0 
+		iPos2 = Instr(iPos1,MaSource,&quot;}&quot;)
+		If (iPos2-iPos1 = 10 or (iPos2-iPos1 = 18 and Mid(MaSource,iPos1+10,6)=&quot;italic&quot;))  Then
+			MaSource = Mid(MaSource,1,iPos1-1) &amp; Mid(MaSource,iPos1+4,Len(MaSource)-iPos1-3)
+		Endif
+		iPos1 = InStr(iPos2,MaSource,&quot;widevec&quot;)
+	Wend
+	TraiteVecWidevec = MaSource
+End Function
+
+
+
+Sub MetenPointe
+	Call VerifOperationnel
+	rem macro modifiée le 15 novembre 2003
+	iAverto=323
+	bPointe=True
+	InsertSourceFormule()
+End Sub
+
+Sub MetenDoublePointe
+	Call VerifOperationnel
+	rem macro modifiée le 15 novembre 2003
+	iAverto=323
+	bDPointe=True
+	InsertSourceFormule()
+End Sub
+
+Sub MetenVecteur
+	Call VerifOperationnel
+	rem macro modifiée le 15 novembre 2003
+	iAverto=4
+	bVecteur=True
+	InsertSourceFormule()
+End Sub
+
+Sub MetenVecteurColonne (sChaine as String) 
+rem macro crée le samedi 21 novembre 2003
+rem cette macro modifie la source d&apos;un vecteur mettre les coordonnées en colonne
+On Error Goto Fin
+Dim iLongChaine as Integer, I as Integer, iGdePar as Integer
+Dim bParent as Boolean, bPointVirgule as Boolean
+iLongChaine = Len (sChaine)
+	bPointVirgule=(InStr(sChaine,&quot;;&quot;)&gt;0)
+	bParent=(InStr(sChaine,&quot;(&quot;)&gt;0)
+	If bParent = True and bPointVirgule = True Then
+		I=1
+		I=InStr(I,sChaine,&quot;(&quot;)
+		iGdePar=InStr(sChaine,&quot;left(&quot;)
+		Do While I&gt;0
+			If iGdePar=0 Or iGdePar+4&lt;&gt;I Then
+				sChaine = Mid(sChaine,1,I-1)+&quot; left(matrix{&quot;+Mid(sChaine,I+1,iLongChaine-I)
+				iGdePar=InStr(I+13,sChaine,&quot;left(&quot;)
+				I=InStr(I+13,sChaine,&quot;(&quot;)
+				iLongChaine = iLongChaine+12
+			Else
+				sChaine = Mid(sChaine,1,I)+&quot;matrix{&quot;+Mid(sChaine,I+1,iLongChaine-I)
+				iGdePar=InStr(I+7,sChaine,&quot;left(&quot;)
+				I=InStr(I+7,sChaine,&quot;(&quot;)
+			EndIf
+		Loop
+		I=1
+		I=InStr(I,sChaine,&quot;`&quot;)
+		Do While I&gt;0
+			sChaine = Mid(sChaine,1,I-1)+Mid(sChaine,I+1)
+			I=InStr(I,sChaine,&quot;`&quot;)
+			iLongChaine = iLongChaine - 1
+		Loop
+		I=1
+		I=InStr(I,sChaine,&quot;nitalic;&quot;)
+		Do While I&gt;0 and I&lt;iLongChaine 
+			sChaine = Mid(sChaine,1,I-1)+&quot;##&quot;+Mid(sChaine,I+8)
+			I=InStr(I+2,sChaine,&quot;nitalic;&quot;)
+			iLongChaine = iLongChaine + 1
+		Loop		
+		I=1
+		I=InStr(I,sChaine,&quot;;&quot;)
+		Do While I&gt;0 and I&lt;iLongChaine 
+			sChaine = Mid(sChaine,1,I-1)+&quot;##&quot;+Mid(sChaine,I+1)
+			I=InStr(I+2,sChaine,&quot;;&quot;)
+			iLongChaine = iLongChaine + 1
+		Loop
+		I=1
+		I=InStr(I,sChaine,&quot;)&quot;)
+		iGdePar=InStr(sChaine,&quot;right)&quot;)
+		Do While I&gt;1
+			If iGdePar=0 Or iGdePar+5&lt;&gt;I Then
+				sChaine=Mid(sChaine,1,I-1)+&quot;}right&quot;+Mid(sChaine,I)
+				iGdePar=InStr(I+7,sChaine,&quot;right)&quot;)
+				I=InStr(I+7,sChaine,&quot;)&quot;)
+				iLongChaine = iLongChaine+6
+			Else
+				sChaine=Mid(sChaine,1,iGdePar-1)+&quot;}&quot;+Mid(sChaine,iGdePar)
+				iGdePar=InStr(I+2,sChaine,&quot;right)&quot;)
+				I=InStr(I+2,sChaine,&quot;)&quot;)
+			EndIf
+		Loop
+	Endif
+	Goto FinMacro
+Fin:
+Print sVocab(iLang,305)
+FinMacro:
+End Sub
+
+
+Sub MetenMesureAlgebrique
+	Call VerifOperationnel
+	 rem macro modifiée le 15 novembre 2003
+	iAverto=5
+	bMesureAlg=True
+	InsertSourceFormule()
+End Sub
+
+Sub MetenAngle
+	Call VerifOperationnel
+    rem macro modifiée le 15 novembre 2003
+	iAverto=6
+	bVecteur=False &apos;ajoute le 7 dec 04 
+	bAngle=True
+	InsertSourceFormule()
+End Sub
+
+
+Sub MetenFormule
+	Call VerifOperationnel
+		rem macro modifiée le 6 fevrier 2005
+	If bVerifSauvegarde = False and Globalscope.BasicLibraries.Standard.HasByname(&quot;DmOptions&quot;) Then Call VerifDateSauvegarde 
+	bVerifSauvegarde = True
+	iAverto = 7
+	InsertSourceFormule()
+End Sub
+
+Sub MetEnBase2
+	MetEnFormule
+	If ErreurSurBase = False Then
+	obj.model.formula = &quot; {overline {&quot; &amp; obj.model.formula &amp; &quot;}} ^ 2&quot;
+	obj.model.relativeindexsuperscript = 30
+	End If
+End Sub
+
+Sub MetEnBase10
+	MetEnFormule
+	If ErreurSurBase = False Then
+	obj.model.formula = &quot; {overline {&quot; &amp; obj.model.formula &amp; &quot;}} ^ 10&quot;
+	obj.model.relativeindexsuperscript = 30
+	End If
+End Sub
+
+
+Function Lissm(sMot,sModule) as string
+rem etudie la chaine et insere limite,integrale,somme,systeme,matrice  
+	Dim sVar as string
+	Compteur=0
+	LongsMot=Len(sMot)
+	
+	
+	rem determine la présence de $
+	For N=1 to LongsMot
+	If Mid(sMot,N,1)=&quot;$&quot; Then Compteur=Compteur+1
+	Next N
+	
+	If Compteur=0 Then
+	sMot=TraiteModule(sMot,sModule)
+	Else
+		N=1
+		Do until N=LongsMot+1
+			If Mid(sMot,N,1)=&quot;$&quot; Then
+				sMot=Mid(sMot,1,N-1)+Mid(sMot,N+1,LongsMot)
+				LongsMot=LongsMot-1
+				Do until Mid(sMot,N,1)=&quot;$&quot;
+				N=N+1
+				Loop
+				sMot=Mid(sMot,1,N-1)+Mid(sMot,N+1,LongsMot)
+				LongsMot=LongsMot-1
+				N=N-1
+			Else
+				M=N
+				Do until Mid(sMot,M,1)=&quot;$&quot; or M=LongsMot
+				M=M+1
+				Loop
+				If N&lt;&gt;1 and M&lt;&gt;LongsMot Then
+				sVar=TraiteModule(Mid(sMot,N,M-N),sModule)
+				sMot=Mid(sMot,1,N-1)+sVar+Mid(sMot,M,LongsMot-M+1)
+				Elseif N=1 Then
+				sVar=TraiteModule(Mid(sMot,N,M-N),sModule)
+				sMot=sVar+Mid(sMot,M,LongsMot-M+1)
+				Else
+				sVar=TraiteModule(Mid(sMot,N,M-N+1),sModule)
+				sMot=Mid(sMot,1,N-1)+sVar
+				Endif
+				LongsMot=Len(sMot)
+				N=N-1+Len(sVar)						
+			Endif
+			N=N+1
+		Loop
+	Endif
+	If Erreur=True Then goto fin
+	sMot=Dmaths.Module2.Dixio(sMot)
+	InsertSourceIntegrale(sMot)
+	fin:
+	Erreur=False
+End Function
+
+Function TraiteModule(Chaine,Module)
+	Dim LongChaine,Mode as integer
+	Dim Resul,sV as string
+	LongChaine=Len(Chaine)
+		Mode=1
+		For I=1 To LongChaine
+		If Mid(Chaine,I,1)=&quot;;&quot; Then Mode=Mode+1
+		Next I
+		
+	If Module=&quot;Limite&quot; Then
+	rem lim from{x rightarrow } {}
+			Dim BI as Integer &apos; rem determine si limite supperposee
+			BI=1
+			Do until Mid(Chaine,BI,1)=&quot;#&quot; or BI = LongChaine
+			BI = BI + 1
+			Loop
+		
+		If Mode&gt;3 Then Goto Pb
+		Resul=&quot;} &quot;
+		N=LongChaine
+		M=N
+		Do until Mid(Chaine,M,1)=&quot;;&quot; or M=1
+		M=M-1
+		Loop
+		If M=1 Then
+		Goto Pb
+		Else
+		Resul=&quot; } { &quot;+Mid(Chaine,M+1,N-M)+Resul
+		N=M-1
+		M=M-1
+		Endif
+		Do until Mid(Chaine,M,1)=&quot;;&quot; or M=1
+		M=M-1
+		Loop
+		If BI = LongChaine Then
+			If M=1 Then
+			Resul=&quot; lim from{ x rightarrow &quot;+Mid(Chaine,1,N)+Resul
+			Else
+			Resul=&quot; lim from{ &quot;+Mid(Chaine,1,M-1)+&quot; rightarrow &quot;+Mid(Chaine,M+1,N-M)+Resul
+			Endif
+		Else
+			If M=1 Then
+			Resul=&quot; lim from{ binom {x rightarrow &quot;+Mid(Chaine,1,BI-1)+&quot;}{&quot;+Mid(Chaine,BI+1,N-BI)+&quot;}&quot;+Resul
+			Else
+			Resul=&quot; lim from{ binom {&quot;+Mid(Chaine,1,M-1)+&quot; rightarrow &quot;+Mid(Chaine,M+1,BI-M-1)+&quot;}{&quot;+Mid(Chaine,BI+1,N-BI)+&quot;}&quot;+Resul
+			Endif
+		Endif
+	Endif
+	rem fin limite
+	
+	If Module=&quot;Integrale&quot; Then
+		If Mode&gt;4 Then Goto Pb
+		If Mode=1 Then Resul=&quot; int &quot;+sBorneInfIntegrales+&quot; {} &quot;+sBorneSupIntegrales+&quot; {} { &quot;+Chaine+&quot; } nitalic{d}x &quot;
+		
+		If Mode=2 Then
+		M=1
+		Do until Mid(Chaine,M,1)=&quot;;&quot;
+		M=M+1
+		Loop
+		Resul=&quot; int &quot;+sBorneInfIntegrales+&quot; {} &quot;+sBorneSupIntegrales+&quot; {} { &quot;+Mid(Chaine,1,M-1)+&quot; } nitalic{d}&quot;+Mid(Chaine,M+1,LongChaine-M)
+		Endif
+		
+		 rem int from{} to {} {} dx 
+		If Mode=3 Then
+		M=1
+		Do until Mid(Chaine,M,1)=&quot;;&quot;
+		M=M+1
+		Loop
+		Resul=&quot; int &quot;+sBorneInfIntegrales+&quot; {&quot;+Mid(Chaine,1,M-1)+&quot;} &quot;+sBorneSupIntegrales+&quot; {&quot;
+		MP=M+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M+1,MP-M-1)+&quot;} { &quot;+Mid(Chaine,MP+1,LongChaine-MP)+&quot; } nitalic{d}x &quot;
+		Endif
+	
+		rem int from{} to {} {} dx 
+		If Mode=4 Then
+		M=1
+		Do until Mid(Chaine,M,1)=&quot;;&quot;
+		M=M+1
+		Loop
+		Resul=&quot; int &quot;+sBorneInfIntegrales+&quot; {&quot;+Mid(Chaine,1,M-1)+&quot;} &quot;+sBorneSupIntegrales+&quot; {&quot;
+		MP=M+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M+1,MP-M-1)+&quot;} { &quot;
+		MP=MP+1
+		M=MP
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M,LongChaine-M-1)+&quot; } nitalic{d}&quot;+Mid(Chaine,MP+1,LongChaine-MP)+&quot; &quot;
+		Endif
+	Endif
+	rem fin integrale
+	
+	If Module=&quot;Somme&quot; Then
+		If Mode&gt;4 or Mode=2 Then Goto Pb
+		If Mode=1 Then Resul=&quot; sum from {} to {} { &quot;+Chaine+&quot; } &quot;
+	
+		rem sum{} to {} {} dx 
+		If Mode=3 Then
+		M=1
+		Do until Mid(Chaine,M,1)=&quot;;&quot;
+		M=M+1
+		Loop
+		Resul=&quot; sum from {&quot;+Mid(Chaine,1,M-1)+&quot;} to {&quot;
+		MP=M+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M+1,MP-M-1)+&quot;} { &quot;+Mid(Chaine,MP+1,LongChaine-MP)+&quot; } &quot;
+		Endif
+	
+		rem sum from{} to {} {} dx 
+		If Mode=4 Then
+		M=1
+		Do until Mid(Chaine,M,1)=&quot;;&quot;
+		M=M+1
+		Loop
+		sV=Mid(Chaine,1,M-1)
+		Resul=&quot; sum from {&quot;+Mid(Chaine,1,M-1)+&quot;=&quot;
+		MP=M+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M+1,MP-M-1)+&quot;} to { &quot;+sV+&quot;=&quot;
+		MP=MP+1
+		M=MP
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M,MP-M)+&quot; } { &quot;+Mid(Chaine,MP+1,LongChaine-MP)+&quot; } &quot;
+		Endif
+	Endif
+	rem fin somme
+	
+	If Module=&quot;Produit&quot; Then
+		If Mode&gt;4 or Mode=2 Then Goto Pb
+		If Mode=1 Then Resul=&quot; prod from {} to {} { &quot;+Chaine+&quot; } &quot;
+	
+		rem sum{} to {} {} dx 
+		If Mode=3 Then
+		M=1
+		Do until Mid(Chaine,M,1)=&quot;;&quot;
+		M=M+1
+		Loop
+		Resul=&quot; prod from {&quot;+Mid(Chaine,1,M-1)+&quot;} to {&quot;
+		MP=M+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M+1,MP-M-1)+&quot;} { &quot;+Mid(Chaine,MP+1,LongChaine-MP)+&quot; } &quot;
+		Endif
+	
+		rem sum from{} to {} {} dx 
+		If Mode=4 Then
+		M=1
+		Do until Mid(Chaine,M,1)=&quot;;&quot;
+		M=M+1
+		Loop
+		sV=Mid(Chaine,1,M-1)
+		Resul=&quot; prod from {&quot;+Mid(Chaine,1,M-1)+&quot;=&quot;
+		MP=M+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M+1,MP-M-1)+&quot;} to { &quot;+sV+&quot;=&quot;
+		MP=MP+1
+		M=MP
+		Do until Mid(Chaine,MP,1)=&quot;;&quot;
+		MP=MP+1
+		Loop
+		Resul=Resul+Mid(Chaine,M,MP-M)+&quot; } { &quot;+Mid(Chaine,MP+1,LongChaine-MP)+&quot; } &quot;
+		Endif
+	Endif
+	rem fin produit
+	
+	If Module=&quot;Racine&quot; Then
+		If Mode&gt;2 Then Goto Pb
+		If Mode=1 Then	Resul=&quot; sqrt{&quot;+Chaine+&quot;}&quot;
+		If Mode=2 Then
+		M=1
+		Do until Mid(Chaine,M,1)=&quot;;&quot;
+		M=M+1
+		Loop
+		Resul=&quot;nroot{&quot;+Mid(Chaine,1,M-1)+&quot;}{&quot;+Mid(Chaine,M+1,LongChaine)+&quot;}&quot;
+		Endif
+	Endif
+	rem fin racine
+	
+	If Module=&quot;Systeme&quot; Then
+		If Mode=1 Then Goto Pb
+			Resul=&quot;left lbrace stack{{ &quot;
+		M=1
+		MP=1
+		Do until MP=LongChaine+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot; or MP=LongChaine
+		MP=MP+1
+		Loop
+		If MP&lt;&gt;LongChaine Then
+		Resul=Resul+Mid(Chaine,M,MP-M)+&quot;} # {&quot;
+		Else
+		Resul=Resul+Mid(Chaine,M,MP-M+1)+&quot; }} right none&quot;
+		Endif	
+		MP=MP+1
+		M=MP
+		Loop		
+	Endif
+	rem fin systeme
+		
+	If Module=&quot;Matrice&quot; Then
+		If Mode=1 Then Goto Pb
+		If bMatricesRondes = True Then 	Resul=&quot;left( matrix{ &quot; Else Resul=&quot;left[ matrix{ &quot; 
+		M=1
+		MP=1
+		Do until MP=LongChaine+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot; or MP=LongChaine or Mid(Chaine,MP,1)=&quot;^&quot;
+		MP=MP+1
+		Loop
+		If MP&lt;&gt;LongChaine Then
+		If Mid(Chaine,MP,1)=&quot;^&quot; Then
+			Resul=Resul+Mid(Chaine,M,MP-M)+&quot; } &quot;
+			If bMatricesRondes = True Then 	Resul=Resul+&quot;right)&quot; Else Resul=Resul+&quot;right]&quot;
+			Resul=Resul+&quot;^&quot;
+		Else
+		Resul=Resul+Mid(Chaine,M,MP-M)+&quot;#&quot;
+		Endif	
+		Else
+		If Mid(Chaine,M-1,1)=&quot;^&quot; Then
+		Resul=Resul+Mid(Chaine,M,MP-M+1)
+		Else 
+		Resul=Resul+Mid(Chaine,M,MP-M+1)+&quot; } &quot;
+		If bMatricesRondes = True Then 	Resul=Resul+&quot;right)&quot; Else Resul=Resul+&quot;right]&quot;
+		Endif
+		Endif	
+		MP=MP+1
+		M=MP
+		Loop		
+	Endif
+	rem fin matrice
+	
+	If Module=&quot;MatriceSysteme&quot; Then
+		If Mode=1 Then Goto Pb
+		Resul=&quot;alignc left lbrace matrix{ &quot; 
+		M=1
+		MP=1
+		Do until MP=LongChaine+1
+		Do until Mid(Chaine,MP,1)=&quot;;&quot; or MP=LongChaine &apos; or Mid(Chaine,MP,1)=&quot;^&quot;
+		MP=MP+1
+		Loop
+		If MP&lt;&gt;LongChaine Then
+			Resul=Resul+Mid(Chaine,M,MP-M)+&quot;#&quot;
+		Else
+		Resul=Resul+Mid(Chaine,M,MP-M+1)+&quot; } &quot;
+		Resul = Resul + &quot;right none&quot;
+		Endif	
+		MP=MP+1
+		M=MP
+		Loop		
+	Endif	
+	rem fin matricesysteme
+	
+	TraiteModule=Resul
+	Goto finT
+	Pb: Avertir(iAverto)
+	Erreur = True
+	finT:
+End Function		
+
+Sub MetenLimite
+	Call VerifOperationnel
+	rem Macro enregistrée : vendredi 23 novembre 2001, 21:00
+	iAverto=8
+	sEq=Dmaths.Module1.Selec
+	If Erreur=True Then Goto Fin
+	Lissm(sEq,&quot;Limite&quot;)
+	Fin:
+End Sub
+
+Sub MetenIntegrale
+	Call VerifOperationnel
+	 rem Macro enregistrée : vendredi 23 novembre 2001, 21:00
+	iAverto=9 
+	sEq=Dmaths.Module1.Selec
+	If Erreur=True Then Goto Fin
+	Lissm(sEq,&quot;Integrale&quot;)
+	Fin:
+End Sub
+
+Sub MetenSomme
+	Call VerifOperationnel
+	rem Macro enregistrée : vendredi 23 novembre 2001, 21:00
+	iAverto=10
+	sEq=Dmaths.Module1.Selec
+	If Erreur=True Then Goto Fin
+	Lissm(sEq,&quot;Somme&quot;)
+	Fin:
+End Sub
+
+Sub MetenProduit
+	Call VerifOperationnel
+	rem Macro enregistrée : mercredi 10 décembre 2003 
+	iAverto=317
+	sEq=Dmaths.Module1.Selec
+	If Erreur=True Then Goto Fin
+	Lissm(sEq,&quot;Produit&quot;)
+	Fin:
+End Sub
+
+Sub MetenRacine
+	Call VerifOperationnel
+	 rem Macro enregistrée : vendredi 23 novembre 2001, 21:00
+	iAverto=11
+	sEq=Dmaths.Module1.Selec
+	If Erreur=True Then Goto Fin
+	Lissm(sEq,&quot;Racine&quot;)
+	Fin:
+End Sub
+
+Sub MetenSysteme
+	Call VerifOperationnel
+	rem Macro enregistrée : vendredi 23 novembre 2001, 21:00
+	bSystemesEspaces = bSystemesAlignes
+	iAverto=12
+	sEq=Dmaths.Module1.Selec
+	If Erreur=True Then Goto Fin
+	If bSystemesAlignes = True Then  Lissm(sEq,&quot;MatriceSysteme&quot;) Else Lissm(sEq,&quot;Systeme&quot;)
+	Fin:
+End Sub
+
+Sub MetenMatrice
+	Call VerifOperationnel
+	rem Macro enregistrée : vendredi 23 novembre 2001, 21:00
+	iAverto=13 
+	sEq=Dmaths.Module1.Selec
+	If Erreur=True Then Goto Fin
+	Lissm(sEq,&quot;Matrice&quot;)
+	Fin:
+End Sub
+
+Sub MetenRacineBleue
+MetEntre(&quot;{nroot{}{&quot;,&quot;}}&quot;)
+End Sub
+
+Sub MetLInfini
+MetEntre(&quot; inf &quot;,&quot;&quot;)
+End Sub
+
+Sub MetLBlanc
+MetEntre(&quot; ` &quot;,&quot;&quot;)
+End Sub
+
+Sub MetLLBlanc &apos;GF does not yet work
+MetEntre(&quot; \~ &quot;,&quot;&quot;)
+End Sub
+
+Sub MetentreAccolades
+Call VerifOperationnel
+MetEntre(&quot;{&quot;,&quot;}&quot;)
+End Sub
+
+Sub MetentreAccoladesVariables
+MetEntre(&quot;left lbrace &quot;,&quot; right rbrace&quot;)
+End Sub
+
+Sub MetentreCrochets
+oBoite=LoadDialog(&quot;Dmaths&quot;,&quot;ParCro&quot; )
+oBoite.Execute()
+End Sub
+
+Sub MetentreParentheses
+Call VerifOperationnel
+MetEntre(&quot;(&quot;,&quot;)&quot;)
+End Sub
+
+Sub MetentreParenthesesVariables
+MetEntre(&quot; left({&quot;,&quot;}right)&quot;)
+End Sub
+
+Sub MetentreCrochets1
+MetEntre(&quot;[&quot;,&quot;]&quot;)
+End Sub
+
+Sub MetentreCrochets2
+MetEntre(&quot;\[&quot;,&quot;\[&quot;)
+End Sub
+
+Sub MetentreCrochets3
+MetEntre(&quot;\]&quot;,&quot;\]&quot;)
+End Sub
+
+Sub MetentreCrochets4
+MetEntre(&quot;\]&quot;,&quot;\[&quot;)
+End Sub
+
+rem ajoutéee le 30 décembre 2013
+Sub MetEnPartieEntiere
+   MetEntre(&quot;{lfloor{&quot;,&quot;}rfloor}&quot;)
+End Sub
+
+rem ajoutéee le 30 décembre 2013
+Sub MetEnIntervalleEntier
+   MetEntre(&quot;ldbracket{&quot;,&quot;}rdbracket&quot;)
+End Sub
+
+
+Sub MetentreCrochets1Variables
+MetEntre(&quot; left[{&quot;,&quot;}right]&quot;)
+End Sub
+
+Sub MetentreCrochets2Variables
+MetEntre(&quot; left[{&quot;,&quot;}right[&quot;)
+End Sub
+
+Sub MetentreCrochets3Variables
+MetEntre(&quot; left]{&quot;,&quot;}right]&quot;)
+End Sub
+
+Sub MetentreCrochets4Variables
+MetEntre(&quot; left]{&quot;,&quot;}right[&quot;)
+End Sub
+
+Sub MetenValeurAbsolue
+MetEntre(&quot;|&quot;,&quot;|&quot;)
+End Sub
+
+Sub MetenNorme
+MetEntre(&quot;||&quot;,&quot;||&quot;)
+End Sub
+
+Sub MetenConjugue
+MetEntre(&quot;{overline{&quot;,&quot;}}&quot;)
+End Sub
+
+Sub InsereObjetFormule
+	Dim  iTailleDElaFormule as Integer
+	Dim oTextActif as Object, oCursor as Object
+	Dim oDesktop as Object, oDocument as Object, oVCursor as Object
+	
+	oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	oDocument= oDesktop.getCurrentComponent()
+	
+	oVCursor = oDocument.currentcontroller.getViewCursor()
+	sEq = oVCursor.String()
+	If Len(sEq)&gt;0 Then
+		oTextActif = oVcursor.Text
+		oCursor = oTextActif.createTextCursorByRange(oVCursor.getstart())
+		If oVCursor.CharHeight &lt;&gt; 0 Then iTailleDElaFormule = oVCursor.CharHeight Else iTailleDElaFormule = oDocument.Text.End.CharHeight
+		If Len(oVCursor.CharFontName)&gt;0 Then sNomPolice = oVCursor.CharFontName Else sNomPolice = oDocument.Text.End.CharFontName
+		rem memorise la police du curseur. 	rem la taille est provisoirement celle du caractère précédent la formule.
+		rem ----------------------------------------------------------------------------------
+			&apos; on fixe la taille de la formule à la taille imposée si option choisie.
+		If  Not bTailleFormCarac Then iTailleDElaFormule = iTailleFormules		
+		If Not bUsingDispatcher Then oVCursor.String() = &quot;&quot;
+	   	WriteFormula(oDocument,oVCursor,oCursor,sEq,iTailleDElaFormule,sNomPolice)
+	Else	
+		oDispHelper = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+		oProvider = ThisComponent.CurrentController.Frame
+		oDispHelper.executeDispatch(oProvider, &quot;.uno:InsertObjectStarMath&quot;, &quot;&quot;, 0, Array())
+	Endif
+End Sub
+
+rem cette macro insere la formule
+rem elle a ete reecrite le 26 decembre 2013
+rem modifiée le 15 mars 2014 pour Writer2Impress version 3.5.2.4
+Sub WriteFormula(oDoc as object, oViewCursor as Object, oTextCursor as Object, sFormule as String, iTaille as Integer, sNomPolice as string)
+
+	dim document as Object
+	
+	If bUsingDispatcher Then
+		oProvider = ThisComponent.CurrentController.Frame
+		oDispHelper = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+ 		dim Array(0) as new com.sun.star.beans.PropertyValue
+ 		oDispHelper.executeDispatch(oProvider, &quot;.uno:InsertObjectStarMath&quot;, &quot;&quot;, 0, Array()) 
+  		obj = ThisComponent.getCurrentSelection()	  
+    	rem on regle les marges
+    	obj.LeftMargin = cint(iMargesFormules)*100 
+		obj.RightMargin = cint(iMargesFormules)*100
+		document   = oDoc.CurrentController
+		oDoc.getCurrentController().select(oTextCursor)
+	  	obj.model.BaseFontHeight= iTaille
+  		rem la police de la formule est celle de la ligne si option choisie
+		If (bPoliceFormCarac = True and obj.model.FontNameVariables &lt;&gt; sNomPolice) Then
+		  	obj.model.FontNameVariables=sNomPolice
+	  		obj.model.FontNameNumbers=sNomPolice
+	  		obj.model.FontNameText=sNomPolice
+	 		obj.model.FontNameFunctions=sNomPolice
+		EndIf
+			obj.model.FontVariablesIsItalic = bItalic
+
+		
+		If obj.model.IsTextMode &lt;&gt; bTextMode Then
+			obj.model.IsTextMode = bTextMode
+		EndIf
+		
+		If bFormulesGras = TRUE Then
+			obj.model.FontTextIsBold = TRUE
+			obj.model.FontFunctionsIsBold = TRUE
+			obj.model.FontNumbersIsBold = TRUE
+			obj.model.FontVariablesIsBold = TRUE
+		End If
+		
+		If bFormulesEncadrees = TRUE Then
+			EncadrerFormule(obj,2)
+		Endif
+
+		obj.model.formula= sFormule
+		
+		rem appel de la macro qui corrige le bug d&apos;affichage des angles et vecteurs sous linux
+		GereMargesFormule(obj)
+		
+		
+		&apos;obj.model.setmodified(true)
+		If OOoNumVersion &gt;=330 Then 
+			obj.ExtendedControlOverEmbeddedObject.update()
+		Else 
+			obj.model.setmodified(true)
+		Endif
+		oDispHelper.executeDispatch(oProvider, &quot;.uno:Escape&quot;, &quot;&quot;, 0, Array()) 
+	
+	
+	Else
+		obj = ThisComponent.CreateInstance(&quot;com.sun.star.text.TextEmbeddedObject&quot;) 
+		obj.CLSID=&quot;078B7ABA-54FC-457F-8551-6147e776a997&quot;
+	    obj.AnchorType=com.sun.star.text.TextContentAnchorType.AS_CHARACTER   
+		rem regle la marge des formules
+	    obj.LeftMargin = cint(iMargesFormules)*100 
+		obj.RightMargin = cint(iMargesFormules)*100	
+	    document   = oDoc.CurrentController
+		oDoc.getCurrentController().select(oTextCursor)
+	    oTextCursor.Text.insertTextContent(oTextCursor, obj, true)    
+	  	obj.model.BaseFontHeight= iTaille
+	  		rem la police de la formule est celle de la ligne si option choisie
+		If (bPoliceFormCarac = True and obj.model.FontNameVariables &lt;&gt; sNomPolice) Then
+		  	obj.model.FontNameVariables=sNomPolice
+	  		obj.model.FontNameNumbers=sNomPolice
+	  		obj.model.FontNameText=sNomPolice
+	 		obj.model.FontNameFunctions=sNomPolice
+		EndIf
+			obj.model.FontVariablesIsItalic = bItalic
+	
+		If obj.model.IsTextMode &lt;&gt; bTextMode Then
+			obj.model.IsTextMode = bTextMode
+		EndIf
+			
+		If bFormulesGras = TRUE Then
+			obj.model.FontTextIsBold = TRUE
+			obj.model.FontFunctionsIsBold = TRUE
+			obj.model.FontNumbersIsBold = TRUE
+			obj.model.FontVariablesIsBold = TRUE
+		End If
+			
+		If bFormulesEncadrees = TRUE Then
+			EncadrerFormule(obj,2)
+		Endif
+	
+		obj.model.formula = sFormule
+		
+		rem appel de la macro qui corrige le bug d&apos;affichage des angles et vecteurs sous linux
+		GereMargesFormule(obj)
+		
+			
+		oViewCursor.goLeft(1,False)
+		oViewCursor.goRight(1,False)
+	    
+	    rem ajustement de la taille de la formule
+	   
+	    
+	EndIf
+		 rem ajustement de la taille de la formule
+		 If OOoNumVersion &gt;=330 Then 
+			obj.ExtendedControlOverEmbeddedObject.update()
+		Else 
+			obj.model.setmodified(true)
+		EndIf
+		
+	
+		If  oDoc.Title = &quot;Writer2Impress.odt&quot; Then  rem on insere une formule dans Impress
+			MaTaille = obj.Size
+			oDoc.getCurrentController().select(obj)
+			ClipBoardCut(oDoc)
+			ToucheEchap(oDoc)
+			oDoc.Close(False)
+			Wait 500
+			ClipBoardPaste(MonDocumentImpress)
+			maformule = MonDocumentImpress.GetCurrentSelection.GetByIndex(0)
+			maformule.setSize(MaTaille)
+		EndIf
+		
+		Goto FinSub:
+		Fin: MsgBox sVocab(iLang,305)
+		FinSub:		
+
+End sub
+
+
+&apos;**************************************************************************************
+&apos; macro écrite le 9 fevrier 2014.
+&apos; Elle sert principalement à corriger le bug d&apos;affichage des angles et vecteurs sous linux
+&apos;**************************************************************************************
+Sub GereMargesFormule(obj as Object)
+		rem initialise les marges
+		obj.model.TopMargin = 0
+		obj.model.BottomMargin = 0
+		
+		rem rehausse la barre de surlignage
+		If InStr(obj.model.Formula,&quot;overline&quot;)&gt;0 or InStr(obj.model.Formula,&quot;bar&quot;)&gt;0 Then			
+			obj.model.RelativeSymbolPrimaryHeight = 10
+		Endif
+			  
+		rem rehausse le chapeau de l&apos;angle et la flèche de vecteur mis au point le 26 mai 2013 corrigée le 9 février 2014
+		If (InStr(obj.model.Formula,&quot;hat&quot;)&gt;0 and getGuitype = 4 and (not IsMacOs))  Then		
+		    If OOoName()&lt;&gt;&quot;LibreOffice&quot; Then
+		    		obj.model.TopMargin = Int(50 + 3.2 * (obj.model.BaseFontHeight-10))
+		    		If InStr(obj.model.Formula,&quot;vec&quot;)&gt;0 Then obj.model.TopMargin = Int(50 + 12.5*(obj.model.BaseFontHeight-8)
+		    Endif
+		Else			
+			If (InStr(obj.model.Formula,&quot;vec&quot;)&gt;0 and OOONumversion() &gt;= 400 and getGuitype = 4 and (not IsMacOs) and OOoName()=&quot;LibreOffice&quot; )  Then		
+					If obj.model.BaseFontHeight &lt;= 10 Then 
+						obj.model.TopMargin = 45 
+					ElseIf obj.model.BaseFontHeight &lt;= 12 Then 
+						obj.model.TopMargin = 50
+					Else			
+						obj.model.TopMargin = Int(45 + 3.4 * (obj.model.BaseFontHeight-10))			
+					Endif
+				&apos;	If InStr(obj.model.Formula,&quot;hat&quot;)&gt;0 Then obj.model.TopMargin = Int(120 + 12.5*(obj.model.BaseFontHeight-8)
+					If ContientLettreLongue(obj.model.Formula) Then obj.model.BottomMargin = 28
+			Else
+				If ContientLettreLongue(obj.model.Formula) Then obj.model.BottomMargin = 20
+			Endif
+		Endif
+End Sub
+
+
+
+
+&apos;**************************************************************************************
+&apos; macro écrite le 17 novembre 2012.
+&apos; Elle eleve la formule remet code source
+&apos;**************************************************************************************
+Sub UnWriteFormula
+	Dim oDoc,oCursor,oVCursor,oText,oTextActif as Object
+	oDoc = ThisComponent
+	oText = oDoc.Text
+	oVCursor = oDoc.currentcontroller.getViewCursor()
+	oTextActif = oVCursor.Text
+	oCursor = oTextActif.createTextCursorByRange(oVCursor)
+	oCursor.Goleft(1,True)
+	If  FormuleACorriger(oCursor)  Then 
+			Dim iTailleDElaFormule as Integer
+			Dim sNomPolice as String
+			If oVCursor.CharHeight &lt;&gt; 0 Then iTailleDElaFormule = oVCursor.CharHeight Else iTailleDElaFormule = oDocument.Text.End.CharHeight
+			If Len(oVCursor.CharFontName)&gt;0 Then sNomPolice = oVCursor.CharFontName Else sNomPolice = oDocument.Text.End.CharFontName
+			If  Not bTailleFormCarac Then iTailleDElaFormule = iTailleFormules
+		If Len(sAVDerniereFormule) &lt;&gt; 0 Then
+			WriteFormula(oDoc,oVCursor,oCursor,sAVDerniereFormule,iTailleDElaFormule,sNomPolice)
+		Endif
+		oCursor.String() = sSaisieDerniereFormule
+	Else
+		Avertir(iAverto)
+	Endif
+	bEcritduTexteSelectionne = False rem reinitialise à sa valeur par defaut
+End Sub
+
+Function FormuleACorriger(oCursor as Object) as Boolean
+	Dim Amodifier as Boolean	
+	Amodifier = False
+	Objets=oCursor.createContentEnumeration(&quot;com.sun.star.text.TextContent&quot;)
+			if Objets.HasMoreElements then
+			      obj = Objets.NextElement
+						if obj.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+								if obj.model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then 							
+										if (obj.model.formula = sDerniereFormule and bEcritduTexteSelectionne = True) then
+													Amodifier = True
+										endif
+								endif
+						endif
+			endif	
+	FormuleACorriger = Amodifier
+End Function 
+
+
+&apos;**************************************************************************************
+&apos; macro écrite le 15 novembre 2003.
+&apos; Elle insert la source de la formule et éventuellement l&apos;écrit
+&apos;**************************************************************************************
+Sub InsertSourceFormule
+&apos;Dim bNorme as Boolean
+	Dim LongsEq, iTailleDElaFormule,  iNbrePas as Integer
+	Dim oTextActif as Object, oCursor as Object
+	Dim oDesktop as Object, oDocument as Object, oVCursor as Object
+	
+	oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	oDocument= oDesktop.getCurrentComponent()
+	
+	oVCursor = oDocument.currentcontroller.getViewCursor()
+	
+	oTextActif = oVcursor.Text
+	oCursor = oTextActif.createTextCursorByRange(oVCursor.getstart())
+	
+	If oVCursor.CharHeight &lt;&gt; 0 Then iTailleDElaFormule = oVCursor.CharHeight Else iTailleDElaFormule = oDocument.Text.End.CharHeight
+	If Len(oVCursor.CharFontName)&gt;0 Then sNomPolice = oVCursor.CharFontName Else sNomPolice = oDocument.Text.End.CharFontName
+	rem memorise la police du curseur. 	rem la taille est provisoirement celle du caractère précédent la formule.
+	sEq = Selec	
+		If Erreur = True Then goto fin
+		If bAngle = True Then
+			sEq = TraiteGeometrie(sEq,&quot; widehat &quot;)		
+			If Not bMajusculesItalic Then sEq = TraiteVecteursRoman(sEq,False) rem ajuste les majuscules en roman si besoin
+		Elseif bVecteur = True Then
+			sEq =TraiteGeometrie(sEq,&quot; widevec &quot;)
+			If Not bMajusculesItalic Then sEq = TraiteVecteursRoman(sEq,False) rem ajuste les majuscules en roman si besoin
+			sEq = TraiteVecWidevec(sEq) Rem Choisit Vec ou Widevec
+
+			If bExecCoordColonne = True Then MetenVecteurColonne (sEq) 
+		Elseif bMesureAlg = True Then
+			sEq=TraiteGeometrie(sEq,&quot; overline &quot;)
+			If Not bMajusculesItalic Then sEq = TraiteVecteursRoman(sEq,False) rem ajuste les majuscules en roman si besoin
+			If bExecCoordColonne = True Then MetenVecteurColonne (sEq) 
+		Elseif bPointe = True Then
+			sEq=TraiteGeometrie(sEq,&quot; dot &quot;)
+		Elseif bDPointe = True Then
+			sEq=TraiteGeometrie(sEq,&quot; ddot &quot;)
+		Else
+		sEq = Dmaths.Module2.Dixio(sEq)
+		Endif
+	
+		rem ----------------------------------------------------------------------------------
+		&apos; on fixe la taille de la formule à la taille imposée si option choisie.
+		If  Not bTailleFormCarac Then iTailleDElaFormule = iTailleFormules	
+
+	PostTraitementFormule(oCursor,oTextActif ,sEq, iNbrePas) rem permet de traiter les caractères et/ou formules précédentes
+
+	oTextActif.insertString(oCursor,sEq,True)
+	oVCursor.GoLeft(iNbrePas,True)
+
+	WriteFormula(oDocument,oVCursor,oCursor,sEq,iTailleDElaFormule,sNomPolice)
+	sDerniereFormule = sEq Rem memorise la source de la derniere formule ecrite
+
+
+	fin:
+	Erreur = False
+End Sub
+
+
+Sub InsertSourceIntegrale ( sMot as String)
+	Dim iTailleDElaFormule, iNbrePas as Integer
+	oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	oDocument= oDesktop.getCurrentComponent()
+	oText = oDocument.Text
+	oVCursor = oDocument.currentcontroller.getViewCursor()
+	oTextActif = oVcursor.Text
+	oCursor = oTextActif.createTextCursorByRange(oVCursor.getstart())
+	If oVCursor.CharHeight &lt;&gt; 0 Then iTailleDElaFormule = oVCursor.CharHeight Else iTailleDElaFormule = oDocument.Text.End.CharHeight
+	If Len(oVCursor.CharFontName)&gt;0 Then sNomPolice = oVCursor.CharFontName Else sNomPolice = oDocument.Text.End.CharFontName
+	rem memorise la police du curseur. 	rem la taille est provisoirement celle du caractère précédent la formule. 
+	If Erreur=True Then goto fin
+	rem ----------------------------------------------------------------------------------
+		&apos; on fixe la taille de la formule à la taille imposée si option choisie.
+	If  Not bTailleFormCarac Then iTailleDElaFormule = iTailleFormules	
+		
+	PostTraitementFormule(oCursor,oTextActif ,sMot, iNbrePas) rem permet de traiter les caractères et/ou formules précédentes
+	oTextActif.insertString(oCursor,sMot,True)
+	oVCursor.GoLeft(iNbrePas,True)
+
+		WriteFormula(oDocument,oVCursor,oCursor,sMot,iTailleDElaFormule,sNomPolice)
+		sDerniereFormule = sMot	Rem memorise la source de la derniere formule ecrite
+	fin:
+	Erreur=False
+End Sub
+ 
+&apos; ecrite par Didier Dorange-Pattoret 
+Sub PostTraitementFormule(oTextCursor, oTextActif as Object,sFormule as String, iNbreCaracteres as Integer)
+	Dim iNbreFormulesPassees as integer
+	Dim sFormulaPre as String &apos;contient le code de la formule précedente
+	Dim Car as Long
+	iNbreCaracteres = Len(sFormule)
+	oTextCursor2 = oTextCursor
+	
+	if (Not oTextCursor2.isStartOfSentence and bConcateneFormules = TRUE) Then
+			iNbreFormulesPassees = 0	
+			Car = -1
+			do until (oTextCursor2.isStartOfSentence()= True  or  Car=9 or Car=10 or Car=13 or Car=32 or Car=46 or Car=95 ) &apos; (oTextCursor2.getString()=&quot; &quot;)) &apos; or (Asc(oTextCursor2.getString())=9))
+				oTextCursor2.goLeft(0,False)
+				oTextCursor2.goLeft(1,True)
+				If oTextCursor2.getString()&lt;&gt;&quot;&quot; Then Car = Asc(oTextCursor2.getString)
+					if (Car=9 or Car=10 or Car=13 or Car=32 or Car=46 or Car=95) Then 
+				&apos;	if (oTextCursor2.getString()=&quot; &quot;) Then &apos; or oTextCursor2.getString()=&quot;.&quot; ) Then 
+						iNbreCaracteres = iNbreCaracteres + iNbreFormulesPassees
+						oTextActif.insertString(oTextCursor,Chr(Car),False)
+						rem incremente le compteur des pas effectues pour ecrire la formule ajoute le 17 novembre 2012
+															
+					elseif oTextCursor2.getString()&lt;&gt;&quot;&quot; Then	rem il y a un caractère
+						sFormule = oTextCursor2.getString() + sFormule
+						iNbreCaracteres = iNbreCaracteres + 1				
+						oTextActif.insertString(oTextCursor2,&quot;&quot;,True)
+						rem incremente le compteur des pas effectues pour ecrire la formule ajoute le 17 novembre 2012
+									
+					else		rem il s&apos;agit d&apos;une formule
+						Objets=oTextCursor2.createContentEnumeration(&quot;com.sun.star.text.TextContent&quot;)
+								if Objets.HasMoreElements then
+									obj = Objets.NextElement
+									if obj.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+										if obj.model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+											rem incremente le compteur des pas effectues pour ecrire la formule ajoute le 17 novembre 2012
+											sFormulaPre = obj.model.Formula
+											sAVDerniereFormule = sFormulaPre &amp; sAVDerniereFormule rem memorise le code des formules concaténées
+											If Left(sFormule,4) = &quot;size&quot; Then 
+												iNbreCaracteres = iNbreCaracteres - Instr(sFormule,&quot;{&quot;)-1
+												sFormule = Mid(sFormule,Instr(sFormule,&quot;{&quot;)+1,Len(sFormule)-Instr(sFormule,&quot;{&quot;)-1)	
+											Endif				
+											If Left(sFormulaPre,4) = &quot;size&quot; Then											
+												sFormule = Mid(sFormulaPre,1,Len(sFormulaPre)-1) &amp; sFormule &amp; &quot;}&quot;
+											Else
+						  		       			sFormule = sFormulaPre + sFormule
+						  		       		Endif
+						  		       		iNbreCaracteres = iNbreCaracteres + Len(obj.model.Formula) &apos;+ 1
+						  		       		iNbreFormulesPassees = iNbreFormulesPassees + 1	
+						  		       		If bUsingDispatcher Then oTextCursor2.String()=&quot; &quot; Else oTextCursor2.String()=&quot;&quot;			  		       	
+										endif
+									endif
+								endif
+					end if	
+				If Car=45 Then rem cette partie traite le cas du caractere -
+					oTextCursor2.goLeft(0,False)
+					oTextCursor2.goLeft(1,True)
+					If oTextCursor2.String = &quot;-&quot; Then 
+						oTextActif.insertString(oTextCursor,&quot;-&quot;,False)	
+					&apos;	oTextCursor2.goright(1,False)						
+						Exit Do
+					Else
+						oTextCursor2.goright(1,False)
+					Endif			
+				Endif
+			loop
+	Elseif (Not bConcateneFormules) Then
+			oTextCursor2.goLeft(0,False)
+			oTextCursor2.goLeft(1,True)		
+			oTextCursor2.goRight(1,False)
+	Endif 
+	
+	Rem ligne ecrite le 12 mai 2013 pour aligner les termes des quotients
+	If Instr(sFormule,&quot;&quot;&quot;&quot;)&gt;0 and Instr(sFormule,&quot;over&quot;)&gt;0 and Instr(sFormule,&quot;alignc&quot;)=0 then sFormule = &quot;alignc &quot; &amp; sFormule
+End Sub
+
+
+
+
+Sub MetEntre (ChaineG,ChaineD as String) &apos; improved with insertion at position of cursor GF may 2007
+	If Form=True or Form1=True Then
+	
+		If Form1=True Then			
+			fSel1 = oBoite.GetControl(TF)
+			aSel = fSel1.Selection 
+		Else
+			fSel0 = oBoiteFormuleGraphique.GetControl(TF)
+			aSel = fSel0.Selection
+		End If
+
+		oTextIndex.Text = Left(oTextIndex.Text,aSel.MIN)+ChaineG+ChaineD+Right(oTextIndex.Text,Len(oTextIndex.Text)-aSel.MIN)
+
+&apos; must not loose the focus! therefore buttons metLcdot etc must have FocusOnClick=False
+
+&apos; new position of cursor:
+		aSel.MIN=aSel.MIN+Len(ChaineG) &apos;between brackets
+		aSel.MAX=aSel.MIN
+		If Form1=True Then
+			oBoite.GetControl(TF).Selection = aSel 
+		Else
+			oBoiteFormuleGraphique.GetControl(TF).Selection = aSel 
+		End If
+		
+	Else
+		oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+		oDocument= oDesktop.getCurrentComponent()
+		oText = oDocument.Text
+		oVCursor = oDocument.currentcontroller.getViewCursor()
+		oTextActif = oVCursor.Text &apos; la zone de texte actif page ou cellule ....
+		oCursor = oTextActif.createTextCursorByRange(oVCursor.Getstart())
+		If oVCursor.iscollapsed Then 
+			oTextActif.insertString(oCursor,ChaineG+ChaineD,True)
+			oVCursor.Goleft(Len(ChaineD),False)
+		Else
+			oCursor.GotoRange(oVCursor.GetEnd(),True)
+			oTextActif.insertString(oCursor,ChaineG+oCursor.GetString()+ChaineD,True)
+		Endif
+	Endif
+
+	If bBoite=True Then oBoite.Endexecute()
+End Sub
+
+Sub VerifDateSauvegarde
+	if iDelaiEntreSauvegardes&lt;&gt;0 Then
+	Dim iLadifdedate as Long
+	if Len(sDateSauvegarde) = 0 Then sDateSauvegarde = &quot;01/01/2011&quot;
+	iLadifdedate = DateValue(date())  - DateValue(sDateSauvegarde)
+	rem		iLadifdedate = iLadifdedate - DateValue(sDateSauvegarde)
+	if iLadifdedate &gt;= iDelaiEntreSauvegardes  Then MsgBox(sVocab(iLang,382)+&quot; &quot;+sDateSauvegarde,48,&quot;Dmaths Backup&quot;)
+	End If
+End Sub
+
+rem macro mise au point le dimanche 26 mai 2013
+Function ContientLettreLongue(LeTexte as String)  as Boolean
+	Dim sLettresLongues as String
+	Dim LeResultat as Boolean
+	sLettresLongues = &quot;fgjpqy&quot;
+	LeResultat = False
+	For I = 1 To Len(sLettresLongues) 
+		If Instr(LeTexte,Mid(sLettresLongues,I,1)) Then LeResultat = True
+	Next I
+	ContientLettreLongue = LeResultat
+End Function
+
+</script:module>

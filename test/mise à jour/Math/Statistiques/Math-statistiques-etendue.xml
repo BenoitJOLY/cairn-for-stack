@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396226  -->
+  <question type="stack">
+    <name>
+      <text>Statistiques : Calcul d'une étendue</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Statistiques — Étendue d'une série</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Lors d'un TP de physique, un élève a relevé une série de 6 mesures (en centimètres), prises dans le désordre :<br><br></p>
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; font-size: 1.1rem; margin-bottom: 15px;">\( S = \left\{ {@str_L@} \right\} \)</div>
+<p>Calculer l'étendue de cette série.<br><em>(Arrondir le résultat à \(10^{-2}\) près).</em><br><br></p>
+<div>\(E \approx\) [[input:ans_etendue]] [[validation:ans_etendue]] cm</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">L'étendue est la différence entre la plus grande et la plus petite valeur de la série :<br>\(E = \text{Max}(S) - \text{Min}(S)\)<br><br>Dans cette série non triée :<br>- La valeur maximale est {@ta_max@}<br>- La valeur minimale est {@ta_min@}<br><br>\(E = {@ta_max@} - ({@ta_min@}) = {@ta_etendue@}\) cm</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. Fonctions statistiques maison (pour les erreurs de confusion) */
+mean(L) := apply("+", L) / length(L);
+var(L) := block([m], m: mean(L), mean((L - m)^2)); 
+/* 2. Génération de 6 nombres décimaux aléatoires (dans le désordre) */
+L: [1.0*rand(80)/10 + 10, 1.0*rand(90)/10 + 12,1.0* rand(70)/10 + 15, 1.0*rand(85)/10 + 18,1.0* rand(60)/10 + 20, 1.0*rand(75)/10 + 22];
+/* 3. Affichage de la liste non triée */
+str_L: simplode(L, " ; "); 
+/* 4. Calculs pour la correction */
+ta_max: float(lmax(L))$ ta_min: float(lmin(L));
+ ta_etendue:1.0*( round((ta_max - ta_min) * 100) / 100); 
+/* 5. Les erreurs classiques pour le PRT */
+/* Erreur 1 : A calculé la variance au lieu de l'étendue */
+ta_err_var: round(float(var(L)) * 100) / 100;
+ /* Erreur 2 : A calculé la moyenne au lieu de l'étendue */
+ta_err_mean: round(float(mean(L)) * 100) / 100;]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>Série={@str_L@}, E={@ta_etendue@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:stats-range</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_etendue</name>
+      <type>numerical</type>
+      <tans>ta_etendue</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification de l'étendue</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_etendue</sans>
+        <tans>ta_etendue</tans>
+        <testoptions>0.015</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Vous avez bien repéré le maximum et le minimum dans la série non triée pour calculer l'étendue.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A calculé la variance</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_etendue</sans>
+        <tans>ta_err_var</tans>
+        <testoptions>0.015</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-VAR</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion !</strong> Vous avez calculé la VARIANCE. L'étendue est beaucoup plus simple : c'est simplement la différence entre la plus grande et la plus petite valeur de la liste (Max - Min).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-AUTRE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : A calculé la moyenne</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_etendue</sans>
+        <tans>ta_err_mean</tans>
+        <testoptions>0.015</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MEAN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion !</strong> Vous avez calculé la MOYENNE. On demande l'ÉTENDUE, qui est un indicateur de dispersion (Max - Min), pas de position centrale.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Cherchez le plus grand et le plus petit nombre de la liste (attention, elle n'est pas triée !), puis soustrayez-les.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

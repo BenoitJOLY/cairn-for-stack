@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>Exercice_sans_titre_2026_06_23_11h31</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+      <div style="background:#2563eb;border-left:5px solid #1e40af;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Bouton radio</strong>
+        <span style="background:#1e40af;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#1e40af;border:1px solid #1e40af;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🔘 Choix unique</span>
+      </div>
+      <!-- ENONCE-START --><div><span class="user-query-container">10 propositions possibles dont 4 vraies. Le programme en tire une vraie et 3 fausses. </span>Pour cet exercice, il y a exactement <strong data-path-to-node="14" data-index-in-node="52">80 combinaisons de tirages</strong> possibles pour l'étudiant.<span class="user-query-container"><br></span></div><div><span class="user-query-container"><br></span></div>
+<div align="center">&nbsp;<span _ngcontent-ng-c1308730055="" class="user-query-container">En 1791, quelle formule politique les députés de l'Assemblée nationale constituante tentent ils de mettre en place en France ?</span></div><!-- ENONCE-END -->
+      <p>[[input:ans1]] [[validation:ans1]]</p>
+    ]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text>&lt;div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);"&gt;&lt;div style="font-weight:bold; color:var(--navy2); margin-bottom:10px; display:flex; align-items:center; gap:8px;"&gt;&lt;span style="font-size:1.2rem;"&gt;🔑&lt;/span&gt; Réponses attendues&lt;/div&gt;&lt;div style="margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #e2e8f0;"&gt;
+                &lt;span style="font-weight:bold;color:var(--navy2);"&gt;Q1 Bouton radio&lt;/span&gt;
+                &lt;span style="color:#64748b;font-size:.85rem;margin-left:6px;"&gt;&lt;p&gt;&lt;strong&gt;La bonne réponse était :&lt;/strong&gt; {@texte_vrai1@}&lt;/p&gt;&lt;p&gt;{@fb_vrai1@}&lt;/p&gt;&lt;/span&gt;
+            &lt;/div&gt;&lt;/div&gt;</text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber/>
+    <stackversion><text/></stackversion>
+    <questionvariables>
+      <text>/* Q1 : Bouton radio (1pt) */
+ta1_all:[["1",true,"Une monarchie constitutionnelle encadrée par la toute première Constitution écrite de l'histoire du pays."],["2",true,"Une monarchie limitée où le roi détient le pouvoir exécutif et l'Assemblée unique exerce le pouvoir législatif."],["3",true,"Un régime de monarchie représentative fondé sur le principe de la souveraineté nationale et le suffrage censitaire."],["4",true,"Un système monarchique rénové associant un souverain héréditaire à une assemblée de représentants des citoyens."],["5",false,"Une république démocratique garantissant le suffrage universel masculin pour l'élection des nouveaux députés."],["6",false,"Une monarchie parlementaire calquée sur le modèle britannique permettant aux ministres d'être révoqués par les députés."],["7",false,"Une démocratie directe accordant aux assemblées primaires de citoyens le droit de veto sur les lois votées."],["8",false,"Une dictature de salut public confiant l'intégralité des pouvoirs régaliens à un comité restreint de députés."],["9",false,"Un empire constitutionnel conciliant l'autorité d'un souverain fort et les libertés individuelles de 1789."],["10",false,"Une république oligarchique dirigée par un Directoire de cinq membres élus parmi les plus riches propriétaires."],["11",false,"Une monarchie absolue de droit divin réaffirmant la prérogative royale contre les empiétements de l'Assemblée."],["12",false,"Une confédération de républiques autonomes calquée sur le système fédéral des jeunes États-Unis d'Amérique."],["13",false,"Un régime présidentiel fort accordant au chef de l'État le pouvoir de dissoudre l'Assemblée à tout moment."]];
+fb1:[["1","En septembre 1791, l'Assemblée nationale constituante promulgue la première Constitution française, maintenant le roi Louis XVI à la tête de l'exécutif mais transférant la souveraineté à la Nation incarnée par l'Assemblée."],["2","La Constitution de 1791 organise une séparation des pouvoirs rigide où le monarque gouverne et applique les lois votées par les représentants élus de la Nation."],["3","Les constituants refusent la démocratie directe et instaurent un système représentatif où seuls les citoyens payant un certain niveau d'impôt participent au vote."],["4","Le compromis de 1791 conserve la figure royale pour assurer la stabilité de l'État tout en soumettant l'autorité du roi au respect d'une charte constitutionnelle supérieure."],["5","Confusion chronologique et idéologique. En 1791, la majorité des députés est hostile à l'idée républicaine, assimilée à l'anarchie. La Première République n'est proclamée qu'en septembre 1792, et le suffrage universel n'apparaît qu'à ce moment."],["6","Erreur technique majeure. C'est le piège de l'exercice. La Constitution de 1791 opte pour une séparation stricte et rigide des pouvoirs. Le roi choisit ses ministres en dehors de l'Assemblée et celle-ci ne peut pas renverser le gouvernement. Le régime parlementaire n'apparaît en France qu'au XIXe siècle."],["7","Contresens conceptuel. Les constituants de 1791 se méfient du peuple et rejettent la démocratie directe. Ils mettent en place un régime représentatif strict où la souveraineté est déléguée exclusivement aux députés de la Nation."],["8","Anachronisme de contexte. Ce mode de gouvernement d'exception correspond à la période de la Terreur et au Comité de salut public créés en 1793. En 1791, l'Assemblée cherche au contraire à limiter l'arbitraire par des lois fixes."],["9","Confusion de régime. Le terme d'Empire renvoie à l'expérience de Napoléon Bonaparte à partir de 1804. En 1791, la France demeure juridiquement et symboliquement un royaume, et le titre de Louis XVI devient \"roi des Français\"."],["10","Confusion chronologique. La république oligarchique et le Directoire correspondent à la Constitution de l'an III, mise en place en 1795 pour sortir de la Terreur. En 1791, le pouvoir exécutif reste entre les mains du roi."],["11","Méconnaissance de la rupture de 1789. La monarchie absolue est détruite dès l'été 1789 lors du serment du Jeu de paume et de la nuit du 4 août. En 1791, le roi ne tient plus son pouvoir de Dieu mais de la Nation et de la loi."],["12","Erreur de modèle politique. Si les révolutionnaires admirent la révolution américaine, ils rejettent le fédéralisme. L'Assemblée constituante réaffirme l'unité et l'indivisibilité du royaume, centralisé par la création des départements."],["13","Anachronisme institutionnel. La notion de régime présidentiel et le droit de dissolution n'existent pas dans l'esprit des constituants de 1791. De plus, le roi possède un droit de veto suspensif mais ne peut en aucun cas dissoudre l'Assemblée."]];
+pV1:sublist(ta1_all,lambda([ex],second(ex)=true));
+pF1:sublist(ta1_all,lambda([ex],second(ex)=false));
+ta1:random_permutation(append(rand_selection(pV1,1),rand_selection(pF1,4-1)));
+la_vraie1:first(sublist(ta1,lambda([ex],second(ex)=true)));
+texte_vrai1:third(la_vraie1);
+fb_vrai1:assoc(first(la_vraie1),fb1);</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@map(first,ta1)@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V4 | hestack-types:radio</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html"><text/></prtcorrect>
+    <prtpartiallycorrect format="html"><text/></prtpartiallycorrect>
+    <prtincorrect format="html"><text/></prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>radio</type>
+      <tans>ta1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[vid1:first(first(sublist(ta1,lambda([ex],second(ex)=true))));
+fbe1:assoc(ans1,fb1);]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>vid1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">{@fbe1@}</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;margin:4px 0;">{@fbe1@}</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+
+  <tags/>
+  </question>
+</quiz>

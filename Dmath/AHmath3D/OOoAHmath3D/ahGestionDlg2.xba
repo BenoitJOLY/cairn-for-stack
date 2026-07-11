@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ahGestionDlg2" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+&apos;--------------------------------------------------------------------------------
+&apos;Affiche une image a un control  Imagecontrol ou commandButton 
+&apos;--------------------------------------------------------------------------------
+Sub AffecterImageFixe(Dial as object, monControl as string , CheminDessin as string)
+Dim case1 as object
+case1 = Dial.getcontrol(monControl)
+case1.Model.ImageURL = ConvertToURL(CheminDessin)
+end sub
+
+
+
+&apos;---------------------------------------------------------------------------------
+&apos;valide une zone texte comme un nombre (option : un entier) compris entre 2 bornes
+&apos;écrit une valeur defaut si elle n&apos;est pas valide et un message alerte
+&apos;function qui renvoie 0 ou 1
+&apos;---------------------------------------------------------------------------------
+
+function ZT_Nbre(Dial as object, CaseTexte as string, borne1 as double, borne2 as double,ValDef as double, monMessage as string , optional entier as boolean) as integer
+Dim  k1 as object, Val1 as Double, VF1 as boolean
+
+if isMissing(entier) then
+   entier = false
+end if
+
+k1 = Dial.getControl(CaseTexte)
+VF1 = estunnombreentrebornes(k1.Peer.Text,borne1,borne2,entier)
+
+if VF1 = false then
+k1.Peer.Text = ValDef
+msgbox(monMessage, 0+48,&quot;AHmath3D&quot;)
+ReceptionFocus(Dial,CaseTexte)
+end if
+
+if VF1 = false then
+ZT_Nbre = 0
+else
+ZT_Nbre = 1
+end if
+end function
+
+
+
+&apos;---------------------------------------------------------------------------------
+&apos;valide une zone texte comme un nombre (option : un entier)
+&apos;function qui renvoie 0 ou 1
+&apos;---------------------------------------------------------------------------------
+
+function Texte_Nbre(oTexte as string, optional entier as boolean) as integer
+Dim  oVal1 as Double, oVal2 as Double, VF1 as boolean
+
+if isMissing(entier) then
+   entier = false
+end if
+
+VF1=IsNumeric(oTexte)
+
+  if VF1 = true then
+  oVal1 = CDbl(oTexte)
+  oVal2 = Fix(oVal1)
+  If entier = true then
+    if oVal1 = oVal2 then
+       VF1 = true
+       else
+       VF1 = false
+    end if
+  end if
+  end if
+If VF1 = false then Texte_Nbre = 0
+If VF1 = true then Texte_Nbre = 1
+end function
+
+&apos;--------------------------------------------------------------------------------
+&apos;change l&apos;image principale suivant certaines conditions
+&apos;--------------------------------------------------------------------------------
+sub ChangerImagePrincipalex4(Dial as object, CaseMaitre as string , Chemin1 as string, Chemin2 as string,Chemin3 as string, Chemin4 as string, Chemin5 as string)
+Dim champFich As Object, cheminFich As String, champImage As Object
+Dim case1 as object, var as double, TestVal as boolean
+
+ case1 = Dial.getcontrol(CaseMaitre)
+ TestVal=IsNumeric(case1.Peer.text)
+
+ if TestVal = true then
+ var = CDbl(case1.Peer.text)
+  if var &gt;=0 and var &lt;= 90  then
+  cheminFich = Chemin1
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  ElseIf   var &gt;90 and var &lt;=180 then
+  cheminFich = Chemin2
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  ElseIf  var &gt;180 and var &lt;=270 then
+  cheminFich = Chemin3
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  ElseIf  var &gt;270 and var &lt;360 then
+  cheminFich = Chemin4
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  else
+  cheminFich = Chemin5
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  end if
+ else
+  cheminFich = Chemin5
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  end if
+end sub
+
+
+&apos;--------------------------------------------------------------------------------
+&apos;change l&apos;image principale suivant certaines conditions
+&apos;--------------------------------------------------------------------------------
+sub ChangerImagePrincipalex2(Dial as object, CaseMaitre as string , Chemin1 as string, Chemin2 as string , Chemin3 as string)
+Dim champFich As Object, cheminFich As String, champImage As Object
+Dim case1 as object, var as double, TestVal as boolean
+
+ case1 = Dial.getcontrol(CaseMaitre)
+ TestVal=IsNumeric(case1.Peer.text)
+
+ if TestVal = true then
+ var = CDbl(case1.Peer.text)
+  if var &gt;=0 and var &lt;= 90  then
+  cheminFich = Chemin1
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  ElseIf   var &gt;=-90 and var &lt;0 then
+  cheminFich = Chemin2
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  else
+  cheminFich = Chemin3
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  end if
+ else
+  cheminFich = Chemin3
+  champImage = Dial.getControl(&quot;ImagePrincipale&quot;)
+  champImage.Model.ImageURL = ConvertToURL(cheminFich)
+  end if
+end sub
+
+&apos;------------------------------------------------------------------------------------
+&apos;modifie le texte d&apos;une checkbox
+&apos;------------------------------------------------------------------------------------
+
+sub Etiquette_Checkbox_modif(Dial as object, maCheckbox as string, monTexte as String)
+Dim  k1 as object
+k1 = Dial.getControl(maCheckbox)
+k1.label = monTexte
+end sub
+
+&apos;---------------------------------------------------------------------------------
+&apos;INITIALISATION DES ELEMENTS COMMUNS A TOUS LES DIALOGUES
+&apos;---------------------------------------------------------------------------------
+
+sub Initialisation(Dial as object,optional CheminDessin as string,optional NbreStyle as integer)
+Dim i as integer
+
+if isMissing(CheminDessin)=false then
+AffecterImageFixe(Dial, &quot;ImagePrincipale&quot; , CheminDessin)  &apos;affiche l&apos;image principale
+end if
+AffectTextLabel2(Dial,&quot;AHmath3D&quot;, &quot;BoutonSite&quot;)     &apos;affiche le texte AHmath3D  sur BoutonSite
+ReceptionFocus(Dial,&quot;BoutonAnnuler&quot;)                 &apos; Met le focus sur Bouton Annuler
+
+if isMissing(NbreStyle)=false then
+for i = 1 to NbreStyle
+Etiquette_Checkbox_modif(Dial, &quot;StyleA&quot;&amp;i,&quot;_____&quot;)
+Etiquette_Checkbox_modif(Dial, &quot;StyleB&quot;&amp;i,&quot;_ _ _&quot;)
+Next
+end if
+end sub
+
+&apos;-----------------------------------------------------------------------------------------------
+&apos;chaque dialogue contenant 2 OptionButton nommés optionCm  et  optionInch
+&apos;cette macro initialise les affichages d&apos;unités nommés UL et UA et les 2 OptionButton
+&apos;----------------------------------------------------------------------------------------------
+
+sub initialisation_Unites(n1 as integer, n2 as integer, optional bloquerCM as boolean)
+Dim nControles as integer, i as integer, uPays as integer, message as string
+
+If IsMissing(bloquerCM) then bloquerCM = false
+
+monDlg.getControl(&quot;optionCm&quot;).Label = &quot;cm&quot;
+monDlg.getControl(&quot;optionCm&quot;).Model.BackgroundColor = RGB(255,102,0)
+monDlg.getControl(&quot;optionInch&quot;).Model.BackgroundColor = RGB(255,102,0)
+monDlg.getControl(&quot;optionInch&quot;).Label = &quot;in&quot;
+&apos;monDlg.getControl(&quot;ZoneUnites&quot;).Model.Label = &quot;cm/inch&quot;
+
+On Error GoTo GestionErreur
+
+if bloquerCM = true then
+   uPays = 3
+   else
+   uPays = UnitePays
+end if
+
+if uPays = 7 then oChoixUnite = CmInch else oChoixUnite = 1
+
+if uPays &lt;&gt; 7 then
+  monDlg.getControl(&quot;optionCm&quot;).state = true
+  monDlg.getControl(&quot;optionInch&quot;).state = false
+  if n1&lt;&gt;0 then
+    for i = 1 to n1
+    monDlg.getControl(&quot;UL&quot;&amp;i).Text = &quot;cm&quot;
+    next
+  end if
+  if n2&lt;&gt;0 then
+  for i = 1 to n2
+  monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;o&quot;
+  next
+  end if
+end if
+if uPays = 7 then
+monDlg.getControl(&quot;optionCm&quot;).state = false
+monDlg.getControl(&quot;optionInch&quot;).state = true
+  if n1&lt;&gt;0 then
+  for i = 1 to n1
+  monDlg.getControl(&quot;UL&quot;&amp;i).Text = &quot;in&quot;
+  next
+  end if
+  if n2&lt;&gt;0 then
+  for i = 1 to n2
+  monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;o&quot;
+  next
+  end if
+end if
+
+   
+FinErreur1:
+   On Error GoTo 0 
+   Exit sub     
+
+GestionErreur:
+message = &quot;cm par defaut/cm by default&quot;
+msgbox(message)
+   oChoixUnite = 1
+   monDlg.getControl(&quot;optionCm&quot;).state = true
+   monDlg.getControl(&quot;optionInch&quot;).state = false
+   if n1&lt;&gt;0 then
+    for i = 1 to n1
+    monDlg.getControl(&quot;UL&quot;&amp;i).Text = &quot;cm&quot;
+    next
+   end if
+   if n2&lt;&gt;0 then
+   for i = 1 to n2
+   monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;o&quot;
+   next
+   end if
+Resume FinErreur1
+
+end sub
+
+
+&apos;------------- -----------------------------------------------------------
+&apos;--gère l&apos;affichage des Label Unité de Longueur (UL) et Unité d&apos;Angle (UA)
+&apos;-------------------------------------------------------------------------
+
+
+sub OptionUnite(n1 as integer, n2 as integer)
+if monDlg.getControl(&quot;optionCm&quot;).state = true then
+oChoixUnite = 1
+  if n1&lt;&gt;0 then
+    for i = 1 to n1
+    if monDlg.getControl(&quot;UL&quot;&amp;i).Text = &quot;in&quot; then monDlg.getControl(&quot;UL&quot;&amp;i).Text = &quot;cm&quot;
+    next
+  end if
+  if n2&lt;&gt;0 then
+  for i = 1 to n2
+  if monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;in&quot; then monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;cm&quot; else monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;o&quot;
+  next
+  end if
+else
+oChoixUnite = CmInch
+  if n1&lt;&gt;0 then
+    for i = 1 to n1
+    if monDlg.getControl(&quot;UL&quot;&amp;i).Text = &quot;cm&quot; then monDlg.getControl(&quot;UL&quot;&amp;i).Text = &quot;in&quot;
+    next
+  end if
+  if n2&lt;&gt;0 then
+    for i = 1 to n2
+    if monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;cm&quot; then monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;in&quot; else monDlg.getControl(&quot;UA&quot;&amp;i).Text = &quot;o&quot;
+    next
+  end if
+end if
+
+end sub
+
+</script:module>

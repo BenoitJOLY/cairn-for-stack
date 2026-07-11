@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CodageAForm" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+public CodageALabel2 as string
+Public oCodageAForm as object
+
+Sub Main
+End Sub
+
+Sub AfficheCodageAForm()
+	oCodageAForm = LoadDialog(&quot;OOoGdmath&quot;,&quot;CodageAForm&quot;)
+	ChangeTitreDialog(oCodageAForm)
+    oCodageAForm.Model.CommandButton1.ImageURL=fCheminImages &amp; &quot;codageangle1.gif&quot;
+    oCodageAForm.Model.CommandButton2.ImageURL=fCheminImages &amp; &quot;codageangle2.gif&quot;
+    oCodageAForm.Model.CommandButton3.ImageURL=fCheminImages &amp; &quot;codageangle3.gif&quot;
+    oCodageAForm.Model.CommandButton4.ImageURL=fCheminImages &amp; &quot;codageangle4.gif&quot;
+    oCodageAForm.Model.CommandButton5.ImageURL=fCheminImages &amp; &quot;codageangle5.gif&quot;
+    oCodageAForm.Model.CommandButton6.ImageURL=fCheminImages &amp; &quot;codageangle6.gif&quot;
+    oCodageAForm.Model.CommandButton7.ImageURL=fCheminImages &amp; &quot;codageangle7.gif&quot;
+    oCodageAForm.Model.CommandButton8.ImageURL=fCheminImages &amp; &quot;codageangle8.gif&quot;
+    oCodageAForm.Model.CommandButton9.ImageURL=fCheminImages &amp; &quot;codageangle9.gif&quot;
+	oCodageAForm.Execute()
+end sub
+
+Sub CodageAForm_CommandButton1_Click()
+    CodageALabel2 = &quot;1&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton2_Click()
+    CodageALabel2 = &quot;4&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton3_Click()
+    CodageALabel2 = &quot;7&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton4_Click()
+    CodageALabel2 = &quot;2&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton5_Click()
+    CodageALabel2 = &quot;5&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton6_Click()
+    CodageALabel2 = &quot;6&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton7_Click()
+    CodageALabel2 = &quot;8&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton8_Click()
+    CodageALabel2 = &quot;6&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton9_Click()
+    CodageALabel2 = &quot;9&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton10_Click()
+    CodageALabel2 = &quot;10&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_CommandButton11_Click()
+    CodageALabel2 = &quot;11&quot;
+    CodageAForm_Terminate()
+End Sub
+
+Sub CodageAForm_Terminate()
+    oCodageAForm.endexecute()
+End Sub
+
+</script:module>

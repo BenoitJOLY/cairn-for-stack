@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Points" dlg:left="206" dlg:top="114" dlg:width="166" dlg:height="108" dlg:help-text="&amp;1050.Points.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1051.Points.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:font-height="12"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="4" dlg:top="17" dlg:width="52" dlg:height="10" dlg:help-text="&amp;1052.Points.Label1.HelpText" dlg:value="&amp;1053.Points.Label1.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="1" dlg:left="60" dlg:top="17" dlg:width="41" dlg:height="10" dlg:help-text="&amp;1054.Points.Label2.HelpText" dlg:value="&amp;1055.Points.Label2.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="2" dlg:left="111" dlg:top="17" dlg:width="47" dlg:height="10" dlg:help-text="&amp;1056.Points.Label3.HelpText" dlg:value="&amp;1057.Points.Label3.Label" dlg:align="center"/>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="3" dlg:left="19" dlg:top="32" dlg:width="24" dlg:height="16" dlg:help-text="&amp;1058.Points.TextField1.HelpText" dlg:align="center" dlg:value="&amp;1059.Points.TextField1.Text"/>
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="4" dlg:left="72" dlg:top="32" dlg:width="24" dlg:height="16" dlg:help-text="&amp;1060.Points.TextField2.HelpText" dlg:align="center" dlg:value="&amp;1061.Points.TextField2.Text"/>
+  <dlg:textfield dlg:id="TextField3" dlg:tab-index="5" dlg:left="125" dlg:top="32" dlg:width="24" dlg:height="16" dlg:help-text="&amp;1062.Points.TextField3.HelpText" dlg:align="center" dlg:value="&amp;1063.Points.TextField3.Text"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="6" dlg:left="70" dlg:top="86" dlg:width="42" dlg:height="16" dlg:help-text="&amp;1064.Points.CommandButton1.HelpText" dlg:value="&amp;1065.Points.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module4.TracePoints?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="7" dlg:left="5" dlg:top="54" dlg:width="155" dlg:height="16" dlg:help-text="&amp;1066.Points.CommandButton2.HelpText" dlg:value="&amp;1067.Points.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module4.PointSupplementaire?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="8" dlg:left="118" dlg:top="86" dlg:width="42" dlg:height="16" dlg:help-text="&amp;1068.Points.CommandButton3.HelpText" dlg:value="&amp;1069.Points.CommandButton3.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module4.FinRepoints?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="0" dlg:id="CommandButton4" dlg:tab-index="9" dlg:left="5" dlg:top="86" dlg:width="42" dlg:height="16" dlg:help-text="&amp;1070.Points.CommandButton4.HelpText" dlg:value="&amp;1071.Points.CommandButton4.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module5.ChoixOptionsDmaths" script:language="StarBasic"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

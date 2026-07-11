@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="CylindreDlg" dlg:left="210" dlg:top="111" dlg:width="335" dlg:height="175" dlg:help-text="&amp;99.CylindreDlg.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;100.CylindreDlg.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="1" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="2" dlg:text-color="0xff0000" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="3" dlg:text-color="0xff950e" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="4" dlg:background-color="0xff" dlg:text-color="0xffffff" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="5" dlg:background-color="0xff00"/>
+  <dlg:style dlg:style-id="6" dlg:font-height="7"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label2" dlg:tab-index="0" dlg:left="14" dlg:top="17" dlg:width="20" dlg:height="8" dlg:help-text="&amp;103.CylindreDlg.Label2.HelpText" dlg:value="&amp;104.CylindreDlg.Label2.Label"/>
+  <dlg:text dlg:style-id="0" dlg:id="Label3" dlg:tab-index="1" dlg:left="57" dlg:top="17" dlg:width="23" dlg:height="8" dlg:help-text="&amp;105.CylindreDlg.Label3.HelpText" dlg:value="&amp;106.CylindreDlg.Label3.Label"/>
+  <dlg:checkbox dlg:id="RepCyl4" dlg:tab-index="5" dlg:left="8" dlg:top="66" dlg:width="83" dlg:height="8" dlg:help-text="&amp;118.CylindreDlg.RepCyl4.HelpText" dlg:value="&amp;119.CylindreDlg.RepCyl4.Label" dlg:checked="false"/>
+  <dlg:checkbox dlg:id="RepCyl5" dlg:tab-index="6" dlg:left="125" dlg:top="108" dlg:width="102" dlg:height="8" dlg:help-text="&amp;120.CylindreDlg.RepCyl5.HelpText" dlg:value="&amp;121.CylindreDlg.RepCyl5.Label" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.GestionCase2?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="RepCyl6" dlg:tab-index="8" dlg:disabled="true" dlg:left="134" dlg:top="119" dlg:width="18" dlg:height="8" dlg:help-text="&amp;122.CylindreDlg.RepCyl6.HelpText" dlg:value="&amp;123.CylindreDlg.RepCyl6.Label" dlg:checked="true"/>
+   <dlg:radio dlg:style-id="1" dlg:id="RepCyl7" dlg:tab-index="7" dlg:disabled="true" dlg:left="155" dlg:top="119" dlg:width="18" dlg:height="8" dlg:help-text="&amp;124.CylindreDlg.RepCyl7.HelpText" dlg:value="&amp;125.CylindreDlg.RepCyl7.Label"/>
+  </dlg:radiogroup>
+  <dlg:checkbox dlg:id="RepCyl8" dlg:tab-index="11" dlg:left="8" dlg:top="108" dlg:width="106" dlg:height="8" dlg:help-text="&amp;126.CylindreDlg.RepCyl8.HelpText" dlg:value="&amp;127.CylindreDlg.RepCyl8.Label" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.GestionCase3?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="RepCyl9" dlg:tab-index="13" dlg:disabled="true" dlg:left="19" dlg:top="119" dlg:width="18" dlg:height="8" dlg:help-text="&amp;128.CylindreDlg.RepCyl9.HelpText" dlg:value="&amp;129.CylindreDlg.RepCyl9.Label" dlg:checked="true"/>
+   <dlg:radio dlg:style-id="1" dlg:id="RepCyl10" dlg:tab-index="12" dlg:disabled="true" dlg:left="39" dlg:top="119" dlg:width="18" dlg:height="8" dlg:help-text="&amp;130.CylindreDlg.RepCyl10.HelpText" dlg:value="&amp;131.CylindreDlg.RepCyl10.Label"/>
+  </dlg:radiogroup>
+  <dlg:checkbox dlg:id="RepCyl11" dlg:tab-index="4" dlg:left="8" dlg:top="140" dlg:width="114" dlg:height="8" dlg:help-text="&amp;132.CylindreDlg.RepCyl11.HelpText" dlg:value="&amp;133.CylindreDlg.RepCyl11.Label" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.GestionCase4?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="RepCyl12" dlg:tab-index="10" dlg:disabled="true" dlg:left="19" dlg:top="151" dlg:width="18" dlg:height="8" dlg:help-text="&amp;134.CylindreDlg.RepCyl12.HelpText" dlg:value="&amp;135.CylindreDlg.RepCyl12.Label" dlg:checked="true"/>
+   <dlg:radio dlg:style-id="1" dlg:id="RepCyl13" dlg:tab-index="9" dlg:disabled="true" dlg:left="39" dlg:top="151" dlg:width="18" dlg:height="8" dlg:help-text="&amp;136.CylindreDlg.RepCyl13.HelpText" dlg:value="&amp;137.CylindreDlg.RepCyl13.Label"/>
+  </dlg:radiogroup>
+  <dlg:checkbox dlg:id="RepCyl14" dlg:tab-index="14" dlg:left="124" dlg:top="140" dlg:width="111" dlg:height="8" dlg:help-text="&amp;138.CylindreDlg.RepCyl14.HelpText" dlg:value="&amp;139.CylindreDlg.RepCyl14.Label" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.GestionCase5?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="RepCyl15" dlg:tab-index="16" dlg:disabled="true" dlg:left="134" dlg:top="151" dlg:width="18" dlg:height="8" dlg:help-text="&amp;140.CylindreDlg.RepCyl15.HelpText" dlg:value="&amp;141.CylindreDlg.RepCyl15.Label" dlg:checked="true"/>
+   <dlg:radio dlg:style-id="1" dlg:id="RepCyl16" dlg:tab-index="15" dlg:disabled="true" dlg:left="154" dlg:top="151" dlg:width="18" dlg:height="8" dlg:help-text="&amp;142.CylindreDlg.RepCyl16.HelpText" dlg:value="&amp;143.CylindreDlg.RepCyl16.Label"/>
+  </dlg:radiogroup>
+  <dlg:checkbox dlg:id="RepCyl17" dlg:tab-index="17" dlg:left="8" dlg:top="81" dlg:width="103" dlg:height="8" dlg:help-text="&amp;144.CylindreDlg.RepCyl17.HelpText" dlg:value="&amp;145.CylindreDlg.RepCyl17.Label" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.GestionCase1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="RepCyl18" dlg:tab-index="19" dlg:disabled="true" dlg:left="115" dlg:top="82" dlg:width="18" dlg:height="8" dlg:help-text="&amp;146.CylindreDlg.RepCyl18.HelpText" dlg:value="&amp;147.CylindreDlg.RepCyl18.Label" dlg:checked="true"/>
+   <dlg:radio dlg:style-id="1" dlg:id="RepCyl19" dlg:tab-index="18" dlg:disabled="true" dlg:left="135" dlg:top="82" dlg:width="18" dlg:height="8" dlg:help-text="&amp;148.CylindreDlg.RepCyl19.HelpText" dlg:value="&amp;149.CylindreDlg.RepCyl19.Label"/>
+  </dlg:radiogroup>
+  <dlg:button dlg:id="BoutonOK" dlg:tab-index="2" dlg:left="246" dlg:top="122" dlg:width="40" dlg:height="25" dlg:help-text="&amp;150.CylindreDlg.BoutonOK.HelpText" dlg:default="true" dlg:value="&amp;151.CylindreDlg.BoutonOK.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.GestionBoutonOK?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="BoutonAnnuler" dlg:tab-index="3" dlg:left="287" dlg:top="122" dlg:width="40" dlg:height="25" dlg:help-text="&amp;152.CylindreDlg.BoutonAnnuler.HelpText" dlg:value="&amp;153.CylindreDlg.BoutonAnnuler.Label" dlg:button-type="cancel"/>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="21" dlg:left="242" dlg:top="116" dlg:width="89" dlg:height="50" dlg:help-text="&amp;167.CylindreDlg.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;168.CylindreDlg.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:img dlg:id="ImagePrincipale" dlg:tab-index="20" dlg:left="246" dlg:top="23" dlg:width="80" dlg:height="80" dlg:help-text="&amp;2325.CylindreDlg.ImagePrincipale.HelpText"/>
+  <dlg:titledbox dlg:style-id="2" dlg:id="FrameControl2" dlg:tab-index="31" dlg:left="5" dlg:top="5" dlg:width="156" dlg:height="44" dlg:help-text="&amp;2328.CylindreDlg.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;2329.CylindreDlg.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:textfield dlg:id="RepCyl1" dlg:tab-index="30" dlg:left="14" dlg:top="28" dlg:width="20" dlg:height="15" dlg:help-text="&amp;2337.CylindreDlg.RepCyl1.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="&amp;2338.CylindreDlg.RepCyl1.Text"/>
+  <dlg:textfield dlg:id="RepCyl2" dlg:tab-index="32" dlg:left="57" dlg:top="28" dlg:width="20" dlg:height="15" dlg:help-text="&amp;2340.CylindreDlg.RepCyl2.HelpText" dlg:align="center" dlg:value="&amp;2341.CylindreDlg.RepCyl2.Text"/>
+  <dlg:titledbox dlg:style-id="2" dlg:id="FrameControl3" dlg:tab-index="35" dlg:left="167" dlg:top="5" dlg:width="64" dlg:height="43" dlg:help-text="&amp;2342.CylindreDlg.FrameControl3.HelpText">
+   <dlg:title dlg:value="&amp;2343.CylindreDlg.FrameControl3.Label"/>
+  </dlg:titledbox>
+  <dlg:textfield dlg:id="RepCyl3" dlg:tab-index="36" dlg:left="183" dlg:top="26" dlg:width="20" dlg:height="15" dlg:help-text="&amp;2347.CylindreDlg.RepCyl3.HelpText" dlg:align="center" dlg:value="&amp;2348.CylindreDlg.RepCyl3.Text">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.GestionImage?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:titledbox dlg:style-id="3" dlg:id="FrameControl4" dlg:tab-index="37" dlg:left="5" dlg:top="53" dlg:width="231" dlg:height="117" dlg:help-text="&amp;2349.CylindreDlg.FrameControl4.HelpText">
+   <dlg:title dlg:value="&amp;2350.CylindreDlg.FrameControl4.Label"/>
+  </dlg:titledbox>
+  <dlg:textfield dlg:id="RepCyl20" dlg:tab-index="38" dlg:disabled="true" dlg:left="185" dlg:top="117" dlg:width="20" dlg:height="15" dlg:help-text="&amp;2353.CylindreDlg.RepCyl20.HelpText" dlg:align="center" dlg:value="&amp;2354.CylindreDlg.RepCyl20.Text"/>
+  <dlg:textfield dlg:id="RepCyl21" dlg:tab-index="39" dlg:disabled="true" dlg:left="72" dlg:top="117" dlg:width="21" dlg:height="15" dlg:help-text="&amp;2357.CylindreDlg.RepCyl21.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="&amp;2358.CylindreDlg.RepCyl21.Text"/>
+  <dlg:text dlg:style-id="4" dlg:id="BoutonSite" dlg:tab-index="22" dlg:left="246" dlg:top="153" dlg:width="81" dlg:height="8" dlg:help-text="&amp;2359.CylindreDlg.BoutonSite.HelpText" dlg:value="&amp;2360.CylindreDlg.BoutonSite.Label" dlg:align="center">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Aide.MonSite?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:text>
+  <dlg:textfield dlg:id="RepCyl22" dlg:tab-index="40" dlg:disabled="true" dlg:left="72" dlg:top="149" dlg:width="20" dlg:height="15" dlg:help-text="&amp;2363.CylindreDlg.RepCyl22.HelpText" dlg:align="center" dlg:value="&amp;2364.CylindreDlg.RepCyl22.Text"/>
+  <dlg:textfield dlg:id="RepCyl23" dlg:tab-index="41" dlg:disabled="true" dlg:left="185" dlg:top="149" dlg:width="20" dlg:height="15" dlg:help-text="&amp;2367.CylindreDlg.RepCyl23.HelpText" dlg:align="center" dlg:value="&amp;2368.CylindreDlg.RepCyl23.Text"/>
+  <dlg:text dlg:style-id="5" dlg:id="Message1" dlg:tab-index="42" dlg:visible="false" dlg:left="-139" dlg:top="-12" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2379.CylindreDlg.Message1.HelpText" dlg:value="&amp;2380.CylindreDlg.Message1.Label"/>
+  <dlg:text dlg:style-id="5" dlg:id="Message2" dlg:tab-index="43" dlg:visible="false" dlg:left="-139" dlg:top="11" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2391.CylindreDlg.Message2.HelpText" dlg:value="&amp;2392.CylindreDlg.Message2.Label"/>
+  <dlg:text dlg:style-id="5" dlg:id="Message3" dlg:tab-index="44" dlg:visible="false" dlg:left="-139" dlg:top="34" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2393.CylindreDlg.Message3.HelpText" dlg:value="&amp;2394.CylindreDlg.Message3.Label"/>
+  <dlg:text dlg:style-id="5" dlg:id="Message4" dlg:tab-index="45" dlg:visible="false" dlg:left="-139" dlg:top="57" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2395.CylindreDlg.Message4.HelpText" dlg:value="&amp;2396.CylindreDlg.Message4.Label"/>
+  <dlg:text dlg:style-id="5" dlg:id="Message5" dlg:tab-index="46" dlg:visible="false" dlg:left="-139" dlg:top="80" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2399.CylindreDlg.Message5.HelpText" dlg:value="&amp;2400.CylindreDlg.Message5.Label"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="RepCyl24" dlg:tab-index="33" dlg:left="93" dlg:top="26" dlg:width="47" dlg:height="8" dlg:help-text="&amp;2401.CylindreDlg.RepCyl24.HelpText" dlg:value="&amp;2402.CylindreDlg.RepCyl24.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="RepCyl25" dlg:tab-index="34" dlg:left="93" dlg:top="36" dlg:width="64" dlg:height="8" dlg:help-text="&amp;2403.CylindreDlg.RepCyl25.HelpText" dlg:value="&amp;2404.CylindreDlg.RepCyl25.Label"/>
+  </dlg:radiogroup>
+  <dlg:checkbox dlg:id="RepCyl26" dlg:tab-index="47" dlg:disabled="true" dlg:left="17" dlg:top="91" dlg:width="74" dlg:height="8" dlg:help-text="&amp;2409.CylindreDlg.RepCyl26.HelpText" dlg:value="&amp;2410.CylindreDlg.RepCyl26.Label" dlg:checked="false"/>
+  <dlg:checkbox dlg:id="RepCyl27" dlg:tab-index="48" dlg:disabled="true" dlg:left="92" dlg:top="91" dlg:width="80" dlg:height="8" dlg:help-text="&amp;2411.CylindreDlg.RepCyl27.HelpText" dlg:value="&amp;2412.CylindreDlg.RepCyl27.Label" dlg:checked="false"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="optionCm" dlg:tab-index="49" dlg:left="292" dlg:top="2" dlg:width="20" dlg:height="8" dlg:help-text="&amp;4775.CylindreDlg.optionCm.HelpText" dlg:value="&amp;4776.CylindreDlg.optionCm.Label">
+    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.OptionUnite_click?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:id="optionInch" dlg:tab-index="50" dlg:left="314" dlg:top="2" dlg:width="20" dlg:height="8" dlg:help-text="&amp;4779.CylindreDlg.optionInch.HelpText" dlg:value="&amp;4780.CylindreDlg.optionInch.Label">
+    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Cylindre.OptionUnite_click?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+  </dlg:radiogroup>
+  <dlg:text dlg:id="UL1" dlg:tab-index="29" dlg:left="35" dlg:top="32" dlg:width="12" dlg:height="10" dlg:help-text="&amp;4781.CylindreDlg.UL1.HelpText" dlg:value="&amp;4782.CylindreDlg.UL1.Label"/>
+  <dlg:text dlg:id="UL2" dlg:tab-index="24" dlg:left="78" dlg:top="34" dlg:width="12" dlg:height="10" dlg:help-text="&amp;4783.CylindreDlg.UL2.HelpText" dlg:value="&amp;4784.CylindreDlg.UL2.Label"/>
+  <dlg:text dlg:style-id="6" dlg:id="UA1" dlg:tab-index="23" dlg:left="203" dlg:top="26" dlg:width="9" dlg:height="10" dlg:help-text="&amp;4785.CylindreDlg.UA1.HelpText" dlg:value="&amp;4786.CylindreDlg.UA1.Label"/>
+  <dlg:text dlg:style-id="6" dlg:id="UA2" dlg:tab-index="26" dlg:disabled="true" dlg:left="95" dlg:top="117" dlg:width="9" dlg:height="10" dlg:help-text="&amp;4787.CylindreDlg.UA2.HelpText" dlg:value="&amp;4788.CylindreDlg.UA2.Label"/>
+  <dlg:text dlg:style-id="6" dlg:id="UA3" dlg:tab-index="25" dlg:disabled="true" dlg:left="205" dlg:top="117" dlg:width="9" dlg:height="10" dlg:help-text="&amp;4789.CylindreDlg.UA3.HelpText" dlg:value="&amp;4790.CylindreDlg.UA3.Label"/>
+  <dlg:text dlg:style-id="6" dlg:id="UA4" dlg:tab-index="27" dlg:disabled="true" dlg:left="92" dlg:top="149" dlg:width="9" dlg:height="10" dlg:help-text="&amp;4791.CylindreDlg.UA4.HelpText" dlg:value="&amp;4792.CylindreDlg.UA4.Label"/>
+  <dlg:text dlg:style-id="6" dlg:id="UA5" dlg:tab-index="28" dlg:disabled="true" dlg:left="206" dlg:top="149" dlg:width="9" dlg:height="10" dlg:help-text="&amp;4793.CylindreDlg.UA5.HelpText" dlg:value="&amp;4794.CylindreDlg.UA5.Label"/>
+ </dlg:bulletinboard>
+</dlg:window>

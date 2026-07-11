@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="CodageLForm" dlg:left="98" dlg:top="10" dlg:width="98" dlg:height="148" dlg:help-text="&amp;395.CodageLForm.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;396.CodageLForm.Title">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="5" dlg:top="7" dlg:width="87" dlg:height="42" dlg:help-text="&amp;397.CodageLForm.Label1.HelpText" dlg:value="&amp;398.CodageLForm.Label1.Label" dlg:align="center" dlg:multiline="true"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="1" dlg:left="136" dlg:top="56" dlg:width="15" dlg:height="14" dlg:page="1" dlg:help-text="&amp;399.CodageLForm.Label2.HelpText" dlg:value="&amp;400.CodageLForm.Label2.Label"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="2" dlg:left="136" dlg:top="72" dlg:width="13" dlg:height="14" dlg:page="1" dlg:help-text="&amp;401.CodageLForm.Label3.HelpText" dlg:value="&amp;402.CodageLForm.Label3.Label"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="3" dlg:left="5" dlg:top="55" dlg:width="26" dlg:height="20" dlg:help-text="&amp;403.CodageLForm.CommandButton1.HelpText" dlg:value="&amp;404.CodageLForm.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton1_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="4" dlg:left="35" dlg:top="55" dlg:width="26" dlg:height="20" dlg:help-text="&amp;405.CodageLForm.CommandButton2.HelpText" dlg:value="&amp;406.CodageLForm.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton2_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="5" dlg:left="66" dlg:top="55" dlg:width="26" dlg:height="20" dlg:help-text="&amp;407.CodageLForm.CommandButton3.HelpText" dlg:value="&amp;408.CodageLForm.CommandButton3.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton3_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton4" dlg:tab-index="6" dlg:left="5" dlg:top="77" dlg:width="26" dlg:height="20" dlg:help-text="&amp;409.CodageLForm.CommandButton4.HelpText" dlg:value="&amp;410.CodageLForm.CommandButton4.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton4_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton5" dlg:tab-index="7" dlg:left="35" dlg:top="77" dlg:width="26" dlg:height="20" dlg:help-text="&amp;411.CodageLForm.CommandButton5.HelpText" dlg:value="&amp;412.CodageLForm.CommandButton5.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton5_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton6" dlg:tab-index="8" dlg:left="66" dlg:top="77" dlg:width="26" dlg:height="20" dlg:help-text="&amp;413.CodageLForm.CommandButton6.HelpText" dlg:value="&amp;414.CodageLForm.CommandButton6.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton6_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton7" dlg:tab-index="9" dlg:left="5" dlg:top="99" dlg:width="26" dlg:height="20" dlg:help-text="&amp;415.CodageLForm.CommandButton7.HelpText" dlg:value="&amp;416.CodageLForm.CommandButton7.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton7_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton8" dlg:tab-index="10" dlg:left="35" dlg:top="99" dlg:width="26" dlg:height="20" dlg:help-text="&amp;417.CodageLForm.CommandButton8.HelpText" dlg:value="&amp;418.CodageLForm.CommandButton8.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton8_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton9" dlg:tab-index="11" dlg:left="66" dlg:top="99" dlg:width="26" dlg:height="20" dlg:help-text="&amp;419.CodageLForm.CommandButton9.HelpText" dlg:value="&amp;420.CodageLForm.CommandButton9.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton9_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton10" dlg:tab-index="12" dlg:left="5" dlg:top="126" dlg:width="42" dlg:height="16" dlg:help-text="&amp;421.CodageLForm.CommandButton10.HelpText" dlg:value="&amp;422.CodageLForm.CommandButton10.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton10_Click" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton11" dlg:tab-index="13" dlg:left="50" dlg:top="126" dlg:width="42" dlg:height="16" dlg:help-text="&amp;423.CodageLForm.CommandButton11.HelpText" dlg:value="&amp;424.CodageLForm.CommandButton11.Label">
+   <script:event script:event-name="on-performaction" script:location="document" script:macro-name="OOoGdmath.CodageLForm.CommandButton11_Click" script:language="StarBasic"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

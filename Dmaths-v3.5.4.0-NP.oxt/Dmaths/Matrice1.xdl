@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Matrice1" dlg:left="155" dlg:top="84" dlg:width="202" dlg:height="89" dlg:help-text="&amp;720.Matrice1.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;721.Matrice1.Title">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="22" dlg:top="22" dlg:width="37" dlg:height="9" dlg:help-text="&amp;722.Matrice1.Label1.HelpText" dlg:value="&amp;723.Matrice1.Label1.Label"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton4" dlg:tab-index="3" dlg:left="134" dlg:top="44" dlg:width="18" dlg:height="13" dlg:help-text="&amp;724.Matrice1.OptionButton4.HelpText" dlg:value="&amp;725.Matrice1.OptionButton4.Label"/>
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="1" dlg:left="59" dlg:top="44" dlg:width="18" dlg:height="13" dlg:help-text="&amp;726.Matrice1.OptionButton1.HelpText" dlg:value="&amp;727.Matrice1.OptionButton1.Label"/>
+   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="2" dlg:left="84" dlg:top="44" dlg:width="18" dlg:height="13" dlg:help-text="&amp;728.Matrice1.OptionButton2.HelpText" dlg:value="&amp;729.Matrice1.OptionButton2.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="4" dlg:left="109" dlg:top="44" dlg:width="18" dlg:height="13" dlg:help-text="&amp;730.Matrice1.OptionButton3.HelpText" dlg:value="&amp;731.Matrice1.OptionButton3.Label"/>
+  </dlg:radiogroup>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="7" dlg:left="28" dlg:top="66" dlg:width="47" dlg:height="18" dlg:help-text="&amp;732.Matrice1.CommandButton1.HelpText" dlg:value="&amp;733.Matrice1.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module2.SaisieMatrice" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="8" dlg:left="97" dlg:top="66" dlg:width="47" dlg:height="18" dlg:help-text="&amp;734.Matrice1.CommandButton2.HelpText" dlg:value="&amp;735.Matrice1.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module2.FinMatriceGraphique" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="6" dlg:left="67" dlg:top="19" dlg:width="15" dlg:height="14" dlg:help-text="&amp;736.Matrice1.TextField1.HelpText" dlg:value="&amp;737.Matrice1.TextField1.Text"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="9" dlg:left="22" dlg:top="44" dlg:width="32" dlg:height="10" dlg:help-text="&amp;738.Matrice1.Label2.HelpText" dlg:value="&amp;739.Matrice1.Label2.Label"/>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="10" dlg:left="12" dlg:top="5" dlg:width="176" dlg:height="56" dlg:help-text="&amp;740.Matrice1.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;741.Matrice1.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton5" dlg:tab-index="5" dlg:left="159" dlg:top="44" dlg:width="18" dlg:height="13" dlg:help-text="&amp;742.Matrice1.OptionButton5.HelpText" dlg:value="&amp;743.Matrice1.OptionButton5.Label"/>
+  </dlg:radiogroup>
+ </dlg:bulletinboard>
+</dlg:window>

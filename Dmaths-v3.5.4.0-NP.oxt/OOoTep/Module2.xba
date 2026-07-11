@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module2" script:language="StarBasic">&apos;OOoTep
+&apos;Copyright (C) 2005-2006 Gilles Daurat
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful, 
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110 - 1301, USA.
+
+Sub Main()
+End Sub
+
+Function CalculeAireTriangle(x0, y0, x1, y1, x2, y2) as Double
+Dim a as Double
+Dim b as Double
+Dim c as Double
+Dim p as Double
+
+	a = sqr((x0 - x1)^2 + (y0 - y1)^2)
+	b = sqr((x1 - x2)^2 + (y1 - y2)^2)
+	c = sqr((x2 - x0)^2 + (y2 - y0)^2)
+	p = (a + b + c) / 2
+	CalculeAireTriangle = sqr(p * (p - a) * (p - b) * (p - c))
+End Function
+
+Sub ChangeTitreDialog(uneDialogue as Object)
+	if instr(1, uneDialogue.Title, VERSION_OOOTEP) = 0 then
+		uneDialogue.Title = uneDialogue.Title + &quot; &quot; + VERSION_OOOTEP
+	End if
+End Sub
+
+Function CalculeAngle(xo, yo, xxx, yyy) as double
+dim tang as double
+dim unAngle as double
+
+	If Abs(xxx - xo) &lt; EPSILON Then
+		If yyy &gt; yo Then
+			UnAngle = Pi / 2
+		Else
+			UnAngle = - Pi / 2
+		End If
+	Else
+		If Abs(yyy - yo) &lt; EPSILON Then
+			tang = 0
+		Else
+			tang = (yyy - yo) / (xxx - xo)
+		End If
+		UnAngle = Atn(tang)
+		If xxx &lt; xo Then
+			If UnAngle &lt; 0 Then
+				UnAngle = UnAngle + Pi
+			Else
+				UnAngle = UnAngle - Pi
+			End If
+		End If
+	End If
+	CalculeAngle() = UnAngle
+end function
+
+Function TrouveFermante(unTexte as String, i as integer) as Integer
+	for j = i + 1 to len(unTexte)
+		c = mid(unTexte, j, 1)
+		if c = chr(34) then 
+			TrouveFermante = j
+			exit For
+		end if
+	next j
+End Function
+
+Function ChargeParametre(texte$, tableau() As String, Optional Separateur)
+Dim nbpv, j, i, a$
+
+	ChargeParametre = - 1
+	if texte$ &lt;&gt; &quot;&quot; then
+		if ismissing(Separateur) then Separateur = &quot;;&quot;
+		if right(texte$,1) &lt;&gt; Separateur Then texte$ = texte$ + Separateur
+		nbpv = 0
+		For j = 1 To Len(texte$)
+			if chr(34) = mid(texte$, j, 1) then j = TrouveFermante(texte$, j) + 1
+			If Mid$(texte$, j, Len(Separateur)) = Separateur Then nbpv = nbpv + 1
+		Next j
+		ReDim tableau(0 To nbpv - 1) as String
+		For j = 0 To nbpv - 1
+			tableau(j) = &quot;&quot;
+		Next j
+		i = 0
+		b$ = &quot;&quot;
+		For j = 1 To Len(texte$)
+			a$ = Mid$(texte$, j, Len(Separateur))
+			If a$ = Separateur Then
+				tableau(i) = b$
+				b$ = &quot;&quot;
+				i = i + 1
+				j = j + Len(Separateur) - 1
+			Else
+				if chr(34) = mid(texte$, j, 1) then 
+					k = TrouveFermante(texte$, j)
+					b$ = b$ + mid(texte$, j, k - j + 1)
+					j = k
+				else
+					b$ = b$ + Mid$(texte$, j, 1)
+				end if
+			End If
+		Next j
+		texte$ = Left$(texte$, Len(texte$) - Len(Separateur))
+		ChargeParametre = i
+	end if
+End Function
+
+Sub CouleurTexte(unTrait as Object, uneCouleur as string)
+	unTrait.Text.CharColor = CLng(uneCouleur)
+end Sub
+
+Sub PoliceTexte(unTrait as Object, TypePolice as string)
+	if (instr(1, TypePolice, &quot;gras&quot;)) then
+		unTrait.Text.CharWeight = com.sun.star.awt.FontWeight.BOLD
+	end if
+	if (instr(1, TypePolice, &quot;italique&quot;)) then
+		unTrait.Text.CharPosture = com.sun.star.awt.FontSlant.ITALIC
+	end if
+end Sub
+
+
+Sub CouleurTrait(unTrait as Object, couleurTrait as string)
+	unTrait.LineColor = RetourneCouleur(couleurTrait)
+end Sub
+
+Sub Echange(val1, val2)
+dim a
+	a = val1
+	val1 = val2
+	val2 = a
+End Sub
+
+function max(a, b) as Variant
+	if a &lt; b then 
+		max() = b
+	else
+		max() = a
+	End if
+End Function
+
+function min(a, b) as Variant
+	if a &lt; b then 
+		min() = a
+	else
+		min() = b
+	End if
+End Function
+
+Function RemplaceTexte(texte As String, texte1 As String, texte2 As String, Optional a) As Integer
+Dim remp As Boolean
+Dim j As Integer
+	if ismissing(a) then a = 1
+	remp = False
+	If Len(texte) &gt; 0 And Len(texte1) &lt;= Len(texte) Then
+		Do
+			a = InStr(a, texte, texte1, 0)
+			If a &lt;&gt; 0 Then
+				texte = Left$(texte, a - 1) + texte2 + Right(texte, Len(texte) + 1 - a - Len(texte1))
+				a = a + MIif(len(texte2) - len(texte1) &gt; 0, len(texte2) - len(texte1), 0) 
+				remp = True
+			End If
+		Loop While (a &lt;&gt; 0)
+	End If
+	RemplaceTexte = remp
+End Function
+
+function GroupeObjet(pgroupe as object) as object
+	Dim UnObjet as object
+	on error resume next
+	a = pgroupe.GetCount()
+	if a &gt; 1 then
+		GroupeObjet = oDocumentDessin.DrawPages.GetByIndex(0).group(pgroupe)
+&apos;	 GroupeObjet = ThisComponent.Drawpage.group(pgroupe)
+&apos;	 GroupeObjet() = ThisComponent.Drawpage.bind(pgroupe)
+	else
+		GroupeObjet = pgroupe.GetByIndex(0)
+	end if
+	on error goto 0
+end function
+
+function InitialiseGroupe() as object
+dim UnGroupe as object
+	UnGroupe = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;)
+	InitialiseGroupe() = UnGroupe
+end function
+
+Sub OpaciteTrait(unTrait as Object, oTrait as string, cTrait as string)
+	unTrait.FillStyle = com.sun.star.drawing.FillStyle.SOLID
+	unTrait.FillTransparence = 100 - val(oTrait)
+	unTrait.FillColor = val(cTrait)
+end Sub
+
+Function SelectionneForme(oDocument as Object, uneForme as Object) as Boolean
+on error goto fin
+	SelectionneForme = False
+	oDocument.CurrentController.Select(uneForme)
+	SelectionneForme = True
+fin:
+on error goto 0
+end Function
+
+Sub InitialiseDessin(Optional visible as Boolean)
+&apos;Didier Dorange - Pattoret
+Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+Dim Array()
+
+	if IsMissing(visible) then visible = True
+	mFileProperties(0).Name = &quot;Hidden&quot;
+	mFileProperties(0).Value = True
+	oPremierDocument = thisComponent
+	if visible then
+		oDocumentDessin = StarDesktop.LoadComponentFromURL(&quot;private:factory/sdraw&quot;, &quot;_blank&quot;, 0, Array())
+&apos;		oDocumentTexte = StarDesktop.LoadComponentFromURL(&quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0, Array())
+	else
+		oDocumentDessin = StarDesktop.LoadComponentFromURL(&quot;private:factory/sdraw&quot;, &quot;_blank&quot;, 0, mFileProperties())
+&apos;		oDocumentTexte = StarDesktop.LoadComponentFromURL(&quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0, mFileProperties())
+		oDocumentDessin.lockControllers
+&apos;		oDocumentTexte.lockControllers
+&apos;		oPremierDocument.lockControllers
+	End if
+	oPageDessin = oDocumentDessin.DrawPages(0)
+&apos;	oPageTexte = oDocumentTexte.drawPage()
+end sub
+
+Sub CopierColler()
+Dim oDispatcher as Object
+Dim oEmptyShapeCollection as Object
+Dim oDrawDocView as Object, oTextDocView as Object
+
+ &apos; Get a dispatcher, because we&apos;ll need it later.
+	oDispatcher = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+ 
+ &apos; Get an empty collection of shapes. We&apos;ll need it later.
+	oEmptyShapeCollection = createUnoService( &quot;com.sun.star.drawing.ShapeCollection&quot; )
+
+ &apos; Get the document&apos;s controller
+	oDrawDocView = oDocumentDessin.getCurrentController()
+	oTextDocView = oPremierDocument.getCurrentController()
+ 
+ &apos; Copy whatever is selected.
+	oDispatcher.executeDispatch( oDrawDocView.Frame, &quot;.uno:Copy&quot;, &quot;&quot;, 0, Array() )
+ 
+ &apos; Select nothing - - i.e. an empty collection of shapes.
+ &apos; If you stopped the macro right now and looked at the drawing - - nothing is selected.
+	oTextDocView.select( oEmptyShapeCollection )
+ 
+ &apos; Now paste whatever is in the clipboard (the shape parameter) onto current page.
+	oDispatcher.executeDispatch( oTextDocView.Frame, &quot;.uno:Paste&quot;, &quot;&quot;, 0, Array() )
+ &apos; After a Paste, the current selection is whatever we just pasted.
+ 
+End Sub
+
+sub TermineDessin()
+&apos; on groupe tous les objets de la feuille
+dim i
+dim unGroupe as Object
+
+	on error resume next
+	
+	oTepForm.Model.Label2.Label = &quot;Ajoute Description Tep...&quot;
+	AjouteDescriptionTep()
+	oTepForm.Model.Label2.Label = &quot;Groupe Objets...&quot;
+	GroupeObjet(oGroupeDessin)
+	oTepForm.Model.Label2.Label = &quot;Sélection Objets...&quot;
+&apos;	unGroupe = InitialiseGroupe()
+	for i = 0 to oPageDessin.Count()
+		SelectionneForme(oDocumentDessin, oPageDessin(i))
+&apos;		unGroupe.add(oPageDessin(i))
+	next i
+	AjouteDescriptionTep2()
+	oTepForm.Model.Label2.Label = &quot;Copier Coller...&quot;
+&apos;	unGroupe = GroupeObjet(unGroupe)
+&apos;	SelectionneForme(oDocumentDessin, unGroupe)
+	CopierColler()
+&apos; Copier()
+&apos; Coller()
+	on error resume next
+	oDocumentDessin.close(True)
+&apos;	oDocumentTexte.close(true)
+	oPremierDocument.unlockControllers
+	on error goto 0
+end sub
+
+Function TraceDroite(x0, y0, x1, y1, xmin, ymin, xmax, ymax, nom$, DemiDroite, Optional options as String) as Object
+Dim x6, y6, x7, y7
+	if IsMissing(options) Then options = &quot;&quot;
+	TrouveExtremite x0, y0, x1, y1, calcAbscisse(xmin), calcOrdonnee(ymax), calcAbscisse(xmax), calcOrdonnee(ymin), DemiDroite, x6, y6, x7, y7
+	TraceDroite = InsereLigne(x6, y6, x7, y7)
+	If nom$ &lt;&gt; &quot;&quot; and RetourneOption(options, &quot;nom&quot;) &lt;&gt; &quot;sansnom&quot; Then
+	    Dim uneTaille as integer
+		uneTaille = 14 + val(RetourneOption(options, &quot;taille&quot;))
+		If DemiDroite Then
+			If abs(x0 - x6) &lt; 10 And abs(y0 - y6) &lt; 10 Then
+				AutreNomObjet = InsereTexte(&quot;[&quot; &amp; nom$ &amp; &quot;)&quot;, x7, y7, uneTaille)
+			Else
+				AutreNomObjet = InsereTexte(&quot;[&quot; &amp; nom$ &amp; &quot;)&quot;, x6, y6, uneTaille)
+			End If
+		Else
+			AutreNomObjet = InsereTexte(&quot;(&quot; &amp; nom$ &amp; &quot;)&quot;, x6, y6, uneTaille)
+		End If
+        CouleurTexte(AutreNomObjet, RetourneCouleur(RetourneOption(options,&quot;couleur&quot;)))
+		PoliceTexte(AutreNomObjet, RetourneOption(Options, &quot;police&quot;))
+	End If
+End Function
+
+function TraceCodageCercle(xxx as single, yyy as single, uneLongueur as Double, options as String, optional sgroupe as object) as object
+Dim traitCodage As Object
+
+	If Not IsMissing( SGroupe ) Then
+		traitCodage = InsereCercle(xxx, yyy, OOoTep_codagelongueur * uneLongueur, sgroupe)
+	else
+		traitCodage = InsereCercle(xxx, yyy, OOoTep_codagelongueur * uneLongueur)
+	end if
+	traitCodage.LineColor = RetourneOption(options, &quot;couleur&quot;)
+	StyleTrait(traitCodage, RetourneOption(options, &quot;style&quot;))	
+	OpaciteTrait(traitCodage, RetourneOption(options, &quot;opacite&quot;), RetourneOption(options, &quot;couleur&quot;))
+	TraceCodageCercle() = traitCodage
+End function
+
+Function TraceCodageTrait(xxx as single, yyy as single, uneLongueur as Double, Angle as single, options as String, Optional SGroupe as object) as object
+Dim traitCodage As Object
+
+	If Not IsMissing( SGroupe ) Then
+		traitCodage = InsereLigne(xxx + OOoTep_codagelongueur * uneLongueur * Cos(Angle), yyy + OOoTep_codagelongueur * uneLongueur * Sin(Angle), xxx - OOoTep_codagelongueur * uneLongueur * Cos(Angle), yyy -  OOoTep_codagelongueur * uneLongueur * Sin(Angle), SGroupe)
+	else
+		traitCodage = InsereLigne(xxx + OOoTep_codagelongueur * uneLongueur * Cos(Angle), yyy + OOoTep_codagelongueur * uneLongueur * Sin(Angle), xxx - OOoTep_codagelongueur * uneLongueur * Cos(Angle), yyy -  OOoTep_codagelongueur * uneLongueur * Sin(Angle))
+	end if
+	traitCodage.LineColor = RetourneOption(options, &quot;couleur&quot;)
+	StyleTrait(traitCodage, RetourneOption(options, &quot;style&quot;))	
+	TraceCodageTrait() = traitCodage
+End function
+
+Sub CodeLongueur(xd as single, yd as single, xa as single, ya as single, typecodage as string, options As String)
+Dim UnObjet As object
+Dim uneLongueur As double
+ 
+	Stypecodage = Trim(Str(typecodage))
+
+	xm1 = (xd + xa) / 2
+	ym1 = (yd + ya) / 2
+	alpha = CalculeAngle(xd, yd, xa, ya)
+&apos;    uneLongueur = min(sqr((xd - xa)^2+(yd - ya)^2) / 5000,1)
+	unelongueur = 1
+	xm0 = xm1 - OOoTep_codagelongueur * Cos(alpha) / 1.5
+	ym0 = ym1 - OOoTep_codagelongueur * Sin(alpha) / 1.5
+	xm2 = xm1 + OOoTep_codagelongueur * Cos(alpha) / 1.5
+	ym2 = ym1 + OOoTep_codagelongueur * Sin(alpha) / 1.5
+	if typeCodage = &quot;/&quot; then
+		TraceCodageTrait(xm1, ym1, uneLongueur, alpha + Pi / 3, options)
+	End if
+	If typecodage = &quot;//&quot; Then 
+		TraceCodageTrait(xm0, ym0, uneLongueur, alpha + Pi / 3, options)
+		TraceCodageTrait(xm1, ym1, uneLongueur, alpha + Pi / 3, options)
+	End If
+	If typecodage = &quot;///&quot; Then
+		TraceCodageTrait(xm0, ym0, uneLongueur, alpha + Pi / 3, options)
+		TraceCodageTrait(xm1, ym1, uneLongueur, alpha + Pi / 3, options)
+		TraceCodageTrait(xm2, ym2, uneLongueur, alpha + Pi / 3, options)
+	End If
+	if typeCodage = &quot;\&quot; then
+		TraceCodageTrait(xm1, ym1, uneLongueur, alpha + 2 * Pi / 3, options)
+	End if
+	If typecodage = &quot;\\&quot; Then 
+		TraceCodageTrait(xm0, ym0, uneLongueur, alpha + 2 * Pi / 3, options)
+		TraceCodageTrait(xm1, ym1, uneLongueur, alpha + 2 * Pi / 3, options)
+	End If
+	If typecodage = &quot;\\\&quot; Then
+		TraceCodageTrait(xm0, ym0, uneLongueur, alpha + 2 * Pi / 3, options)
+		TraceCodageTrait(xm1, ym1, uneLongueur, alpha + 2 * Pi / 3, options)
+		TraceCodageTrait(xm2, ym2, uneLongueur, alpha + 2 * Pi / 3, options)
+	End If
+	If typecodage = &quot;x&quot; Then
+		TraceCodageTrait(xm1, ym1, uneLongueur, alpha + Pi / 3, options)
+		TraceCodageTrait(xm1, ym1, uneLongueur, alpha + 2 * Pi / 3, options)
+	End If
+	If typecodage = &quot;o&quot; Then
+		TraceCodageCercle(xm1, ym1, uneLongueur, options)
+	End If
+End Sub
+
+Sub TrouveExtremite(x0, y0, x1, y1, xmin, ymin, xmax, ymax, DemiDroite, x6, y6, x7, y7)
+Dim y4, y2, x2, x4, x3, y3, x5, y5
+Dim niv 
+Dim encore as Boolean
+Dim x(4), y(4)
+
+	xu = x0
+	yu = y0
+	xv = x1
+	yv = y1
+	xi = xmin
+	xa = xmax
+	yi = ymin
+	ya = ymax
+	niv = 0
+	if yv - yu = 0 Then
+		niv = 1
+	Else
+		if ya - yu = 0 then
+			x(0) = xu
+			y(0) = yu
+		else
+			x(0) = ( ya - yu ) * ( xv - xu ) / ( yv - yu ) + xu
+			y(0) = ya
+		End if
+		if yi - yu = 0 Then
+			x(1) = xu
+			y(1) = yu
+		Else
+			x(1) = ( yi - yu ) * ( xv - xu ) / ( yv - yu ) + xu
+			y(1) = yi
+		End If
+	End if
+
+	if xv - xu = 0 Then
+		niv = 2
+	Else
+		if xa - xu = 0 then
+			x(2) = xu
+			y(2) = yu
+		else
+			x(2) = xa
+			y(2) = ( xa - xu ) * ( yv - yu ) / ( xv - xu ) + yu
+		End if
+		if yi - yu = 0 Then
+			x(3) = xu
+			y(3) = yu
+		Else
+			x(3) = xi
+			y(3) = ( xi - xu ) * ( yv - yu ) / ( xv - xu ) + yu
+		End If
+	End if
+
+	if niv = 1 then
+		x6 = x(2)
+		y6 = y(2)
+		x7 = x(3)
+		y7 = y(3)
+	end if	
+	if niv = 2 then
+		x6 = x(0)
+		y6 = y(0)
+		x7 = x(1)
+		y7 = y(1)
+	end if	
+	if niv = 0 Then
+		do 
+			encore = False
+			for i = 0 to 2
+				if x(i) &gt; x(i+1) then
+					Echange(x(i), x(i+1))
+					Echange(y(i), y(i+1))
+					encore = True
+				end if
+			next i
+		Loop While encore
+		x6 = x(1)
+		y6 = y(1)
+		x7 = x(2)
+		y7 = y(2)
+	End if
+	
+	If DemiDroite Then
+		If x1 &lt;&gt; x0 Then
+			If Sgn(x1 - x0) = Sgn(x6 - x0) Then
+				x7 = x0
+				y7 = y0
+			Else
+				x6 = x0
+				y6 = y0
+			End If
+		Else
+			If Sgn(y1 - y0) = Sgn(y6 - y0) Then
+				x7 = x0
+				y7 = y0
+			Else
+				x6 = x0
+				y6 = y0
+			End If
+		End If
+	End If
+
+End Sub
+
+Sub TrouveExtremiteOld(x0, y0, x1, y1, xmin, ymin, xmax, ymax, DemiDroite, x6, y6, x7, y7)
+Dim y4, y2, x2, x4, x3, y3, x5, y5
+dim x6b as Boolean
+
+&apos;	Trouveintersection(x0, y0, x1, y1, xmin, ymin, xmax, ymin, x2, y2)
+&apos;	Trouveintersection(x0, y0, x1, y1, xmax, ymin, xmax, ymax, x3, y3)
+&apos;	Trouveintersection(x0, y0, x1, y1, xmax, ymax, xmin, ymax, x4, y4)
+&apos;	Trouveintersection(x0, y0, x1, y1, xmin, ymax, xmin, ymin, x5, y5)
+
+	x6b = False	
+	if Trouveintersection(x0, y0, x1, y1, xmin, ymin, xmax, ymin, x2, y2) and x2 &lt;= xmax + 1 and x2 &gt;= xmin - 1 then
+		if x6b then
+			x7 = x2
+			y7 = y2
+		else
+			x6 = x2
+			y6 = y2
+			x6b = True
+		end if
+	End if
+	if Trouveintersection(x0, y0, x1, y1, xmax, ymin, xmax, ymax, x3, y3) and y3 &lt;= ymax + 1 and y3 &gt;= ymin - 1 then
+		if x6b then
+			x7 = x3
+			y7 = y3
+		else
+			x6 = x3
+			y6 = y3
+			x6b = True
+		end if
+	End if
+	if Trouveintersection(x0, y0, x1, y1, xmax, ymax, xmin, ymax, x4, y4) and x4 &lt;= xmax + 1 and x4 &gt;= xmin - 1 then
+		if x6b then
+			x7 = x4
+			y7 = y4
+		else
+			x6 = x4
+			y6 = y4
+			x6b = True
+		end if
+	End if
+	if Trouveintersection(x0, y0, x1, y1, xmin, ymax, xmin, ymin, x5, y5) and y5 &gt;= ymin - 1 and y5 &lt;= ymax + 1 then
+		if x6b then
+			x7 = x5
+			y7 = y5
+		else
+			x6 = x5
+			y6 = y5
+			x6b = True
+		end if
+	End if
+	If DemiDroite Then
+		If x1 &lt;&gt; x0 Then
+			If Sgn(x1 - x0) = Sgn(x6 - x0) Then
+				x7 = x0
+				y7 = y0
+			Else
+				x6 = x0
+				y6 = y0
+			End If
+		Else
+			If Sgn(y1 - y0) = Sgn(y6 - y0) Then
+				x7 = x0
+				y7 = y0
+			Else
+				x6 = x0
+				y6 = y0
+			End If
+		End If
+	End If
+End Sub
+
+Function TrouveIntersectionSegment(x0 as single, y0 as single, x1 as single, y1 as single, xint as single, yint as single) as Boolean
+dim x2 as single, y2 as single
+dim xxmin as single, xxmax as single, yymin as single, yymax as single
+
+	TrouveIntersectionSegment = False
+	xxmin = calcAbscisse(xmin)
+	xxmax = calcAbscisse(xmax)
+	yymin = calcOrdonnee(ymin)
+	yymax = calcOrdonnee(ymax)
+	TrouveIntersection(xxmin, yymin, xxmin, yymax, x0, y0, x1, y1, x2, y2)
+	if x0 &lt;= x2 and x2 &lt;= x1 and y0 &lt;= y2 and y2 &lt;= y1 then
+		xint = x2
+		yint = y2
+		TrouveIntersectionSegment = True
+	end if
+	TrouveIntersection(xxmin, yymax, xxmax, yymax, x0, y0, x1, y1, x2, y2)
+	if x0 &lt;= x2 and x2 &lt;= x1 and y0 &lt;= y2 and y2 &lt;= y1 then
+		xint = x2
+		yint = y2
+		TrouveIntersectionSegment = True
+	end if
+	TrouveIntersection(xxmax, yymax, xxmax, yymin, x0, y0, x1, y1, x2, y2)
+	if x0 &lt;= x2 and x2 &lt;= x1 and y0 &lt;= y2 and y2 &lt;= y1 then
+		xint = x2
+		yint = y2
+		TrouveIntersectionSegment = True
+	end if
+	TrouveIntersection(xxmax, yymin, xxmin, yymin, x0, y0, x1, y1, x2, y2)
+	if x0 &lt;= x2 and x2 &lt;= x1 and y0 &lt;= y2 and y2 &lt;= y1 then
+		xint = x2
+		yint = y2
+		TrouveIntersectionSegment = True
+	end if
+End Function
+
+function TrouveIntersection(x0, y0, x1, y1, x2, y2, x3, y3, xint, yint) as boolean
+Dim ua,ub
+Dim den
+
+	den = (y3 - y2)*(x1-x0)-(x3-x2)*(y1-y0)
+	num = (x3-x2)*(y0-y2) - (y4-y2)*(x0-x2)
+	if (den&lt;&gt;0) then
+		ua = num/den
+		xint = x0 + ua * (x1 - x0)
+		yint = y0 + ua * (y1 - y0)
+		TrouveIntersection = True
+	Else
+		xint = &quot;n&quot;
+		yint = &quot;n&quot;
+		TrouveIntersection = False
+	End If
+End Function
+
+Sub StyleTrait(unTrait as Object, sTrait as string)
+Dim mesTirets As New com.sun.star.drawing.LineDash
+
+	Select Case sTrait
+	case &quot;0&quot;
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+		unTrait.LineWidth = OOoTep_epaisseur0
+	case &quot;1&quot;
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+		unTrait.LineWidth = OOoTep_epaisseur1
+	case &quot;2&quot;
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+		unTrait.LineWidth = OOoTep_epaisseur2
+	case &quot;3&quot;
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+		unTrait.LineWidth = OOoTep_epaisseur3
+	case &quot;4&quot;
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+		unTrait.LineWidth = OOoTep_epaisseur4
+	case &quot;6&quot;
+		with mesTirets
+			.style = com.sun.star.drawing.DashStyle.RECT
+			.Dots = 0
+			.Dashes = 1
+			.DashLen = 100
+			.Distance = 50
+		End With
+		unTrait.LineWidth = OOoTep_epaisseur6
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.DASH
+		unTrait.LineDash = mesTirets
+	case &quot;7&quot;
+		with mesTirets
+			.style = com.sun.star.drawing.DashStyle.RECT
+			.Dots = 0
+			.Dashes = 1
+			.DashLen = 200
+			.Distance = 100
+		End With
+		unTrait.LineWidth = OOoTep_epaisseur7
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.DASH
+		unTrait.LineDash = mesTirets
+	case &quot;8&quot;
+		with mesTirets
+			.style = com.sun.star.drawing.DashStyle.Rect
+			.Dots = 0
+			.Dashes = 1
+			.DashLen = 300
+			.Distance = 200
+		End With
+		unTrait.LineWidth = OOoTep_epaisseur8
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.DASH
+		unTrait.LineDash = mesTirets
+	case &quot;9&quot;
+		with mesTirets
+			.style = com.sun.star.drawing.DashStyle.Rect
+			.Dots = 0
+			.Dashes = 1
+			.DashLen = 400
+			.Distance = 300
+		End With
+		unTrait.LineWidth = OOoTep_epaisseur9
+		unTrait.LineStyle = com.sun.star.drawing.LineStyle.DASH
+		unTrait.LineDash = mesTirets
+	End Select
+end Sub
+
+Function MIif(unEtat as Boolean, valeur1, valeur2) as variant
+	If unEtat then
+		MIif() = valeur1
+	Else
+		MIif() = valeur2
+	End If
+End Function
+
+
+</script:module>

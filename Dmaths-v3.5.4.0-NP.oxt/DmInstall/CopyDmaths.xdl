@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:style-id="0" dlg:id="CopyDmaths" dlg:left="184" dlg:top="46" dlg:width="213" dlg:height="273" dlg:help-text="&amp;176.CopyDmaths.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;177.CopyDmaths.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:background-color="0xfffbfc"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:img dlg:id="ImageControl1" dlg:tab-index="0" dlg:left="27" dlg:top="13" dlg:width="159" dlg:height="28" dlg:help-text="&amp;178.CopyDmaths.ImageControl1.HelpText" dlg:src="file:///C:/Program%20Files/Dmaths/logo.gif"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="1" dlg:left="8" dlg:top="45" dlg:width="197" dlg:height="201" dlg:help-text="&amp;179.CopyDmaths.Label1.HelpText" dlg:value="&amp;180.CopyDmaths.Label1.Label"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="2" dlg:left="145" dlg:top="251" dlg:width="50" dlg:height="18" dlg:help-text="&amp;181.CopyDmaths.CommandButton1.HelpText" dlg:value="&amp;182.CopyDmaths.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:DmInstall.Options.End_About_Dmaths?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="3" dlg:left="83" dlg:top="251" dlg:width="50" dlg:height="18" dlg:help-text="&amp;183.CopyDmaths.CommandButton2.HelpText" dlg:value="&amp;184.CopyDmaths.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:DmInstall.Options.Display_Licence?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="4" dlg:left="21" dlg:top="251" dlg:width="50" dlg:height="18" dlg:help-text="&amp;185.CopyDmaths.CommandButton3.HelpText" dlg:value="&amp;186.CopyDmaths.CommandButton3.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:DmInstall.Options.Join_dmaths?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

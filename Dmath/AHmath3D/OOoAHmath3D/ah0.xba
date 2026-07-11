@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ah0" script:language="StarBasic">REM  *****  BASIC  *****
+
+Global ah3Dmespolices() as string, ah3DTest as variant   rem : module NomPointDroite
+
+
+Public oDocTemp as Object
+Public oPageTemp as Object
+Public oDocActif as object
+Public oPageActive as object
+Public oSolide as object
+
+Public oReponseDlg(100) as variant
+Public monDlg as object
+
+Public oTiret3D as  New com.sun.star.drawing.LineDash
+Public oTiret3D_b as  New com.sun.star.drawing.LineDash
+Public oTiret3D_c as  New com.sun.star.drawing.LineDash
+Public oTiret3D_w as  New com.sun.star.drawing.LineDash
+Public oTiret3D_bw as  New com.sun.star.drawing.LineDash
+Public oTiret3D_cw as  New com.sun.star.drawing.LineDash
+
+Public Const CmInch = 2.54 
+Public oChoixUnite as Double  &apos;1 pour cm  ou CmInch pour inch
+
+
+&apos;----------------------------- Definitions des lignes pointillées
+
+Rem suivant que le document ouvert est writer ou draw, le résultat n&apos;est pas le même
+
+sub DefTirets
+
+With oTiret3D  &apos;proprité des tirets des aretes cachées
+  .Style = 0 &apos;com.sun.star.drawing.DashStyle.RECT
+  .Dashes = 1     &apos; suivis de 2 tirets
+  .DashLen = 100 &apos;100  &apos; de 1 mm
+  .Distance = 200 &apos; espacés de 2 mm
+End With
+
+With oTiret3D_w  &apos;proprité des tirets des aretes cachées pour un objet writer
+  .Style = 0 &apos;com.sun.star.drawing.DashStyle.RECT
+  .Dashes = 1     &apos; suivis de 2 tirets
+  .DashLen = 60 &apos;100  &apos; de 1 mm
+  .Distance = 110 &apos; espacés de 0,75 mm
+End With
+
+With oTiret3D_b  &apos;proprité des tirets des aretes cachées
+  .Style = 0 &apos;com.sun.star.drawing.DashStyle.RECT
+  .Dashes = 1    
+  .DashLen = 150  
+  .Distance = 250 
+End With
+
+With oTiret3D_bw  &apos;proprité des tirets des aretes cachées pour un objet writer
+  .Style = 0 &apos;com.sun.star.drawing.DashStyle.RECT
+  .Dashes = 1     
+  .DashLen = 85  
+  .Distance = 142 
+End With
+
+With oTiret3D_c  &apos;proprité des tirets des aretes cachées
+  .Style = 0 &apos;com.sun.star.drawing.DashStyle.RECT
+  .Dashes = 1    
+  .DashLen = 200  
+  .Distance = 360 
+End With
+
+With oTiret3D_cw  &apos;proprité des tirets des aretes cachées pour un objet writer
+  .Style = 0 &apos;com.sun.star.drawing.DashStyle.RECT
+  .Dashes = 1     
+  .DashLen = 120  
+  .Distance = 200 
+End With
+
+&apos;with oTiretClassique  &apos;&quot;Ultrafine Dashed&quot;
+&apos;  .Style = 0
+&apos;  .Dots = 1      
+&apos;  .DotLen = 51    
+&apos;  .Dashes = 1     
+&apos;  .DashLen = 51  
+&apos;  .Distance = 51 
+&apos;End With
+end sub
+
+
+
+&apos;------------------------------------------------------------------------------------------------------
+&apos; ouvre Draw , crée un dessin (maConstruction), le copie, 
+&apos; ferme draw et le colle dans writer ou draw deja ouvert
+&apos; maConstruction = Module.routine 
+&apos; la routine devant être présente dans le module concerné
+&apos;cette routine devant permettre de construire 1 dessin dans draw et de le selectionner
+&apos;------------------------------------------------------------------------------------------------------
+
+
+sub DRAWversDocActif(maConstruction as string)
+Dim oFormeDraw as object
+
+   oDocActif = thisComponent
+   if oDocActif.ImplementationName = &quot;SwXTextDocument&quot; then oPageActive = oDocActif.DrawPage
+   if oDocActif.ImplementationName = &quot;SdXImpressDocument&quot; then oPageActive = oDocActif.DrawPages(0)
+   
+   ChargerDoc(false)
+   lancerMacro(maConstruction)
+   SelectionFormes(0,oDocTemp)
+   oFormeDraw = LastForme(oDocTemp)&apos;Draw
+   oFormeDraw.SizeProtect = false
+   DispatchSimple(&quot;Copy&quot;,  oDocTemp.CurrentController.Frame)
+   DispatchSimple(&quot;Paste&quot;, oDocActif.CurrentController.Frame)
+   oDocTemp.close(True)
+end sub
+
+&apos;--------------------------------------------------------------------------------------------------
+&apos;Lance une macro de lab bibliothèque OOoAHmath3D ModuleMacro = nommodule.nomroutine
+&apos; d&apos;après le livre de Bernard Marcelly et Laurent Godard : Macros OOoBASIC et API
+&apos;--------------------------------------------------------------------------------------------------
+
+Sub lancerMacro(ModuleMacro as string)
+Dim disp as object, resu As Variant, noArgs()
+fenetre = StarDesktop.CurrentFrame
+disp = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+resu = disp.executeDispatch(fenetre, &quot;macro:///OOoAHmath3D.&quot; &amp; ModuleMacro, &quot;&quot;, 0, noArgs)
+if resu.State &lt;&gt; 1 then
+  MsgBox(&quot;Echec de lancement de la macro&quot;)
+end if
+End Sub
+
+
+&apos;-----------------------------------------------------------------------------------------------------
+&apos; ouvre openOffice Draw ou writer en visible ou caché et définit les variables Public oDocTemp et oPageTemp
+&apos;oTypeDoc = &quot;draw&quot; ou &quot;writer&quot;
+&apos;-----------------------------------------------------------------------------------------------------
+sub ChargerDoc (visible as boolean, optional oTypeDoc as string)
+Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+
+if Ismissing(oTypeDoc) then oTypeDoc = &quot;draw&quot;
+
+  mFileProperties(0).Name=&quot;Hidden&quot;
+  if visible = true then
+    mFileProperties(0).Value=false
+  else
+    mFileProperties(0).Value=True
+  end if
+ oDocTemp=StarDesktop.LoadComponentFromURL(&quot;private:factory/s&quot; &amp; oTypeDoc,&quot;_blank&quot;, 0, mFileProperties())
+ 
+if oDocTemp.ImplementationName = &quot;SwXTextDocument&quot; then oPageTemp = oDocTemp.DrawPage
+if oDocTemp.ImplementationName = &quot;SdXImpressDocument&quot; then oPageTemp = oDocTemp.DrawPages(0)
+
+end sub
+&apos;-------------------------------------------------------------------------------------------------------
+&apos; rend openoffice visible ou caché
+&apos;-------------------------------------------------------------------------------------------------------
+sub DocVisible(optional visible as boolean)
+	if IsMissing(visible) then visible = True
+    oDocTemp.CurrentController.Frame.ContainerWindow.Visible = visible
+end sub
+
+
+&apos;--------------------------------------------------------------------
+&apos; fonction qui renvoie l&apos;unité utilisée dans draw
+&apos;----------------------------------------------------------------------
+
+function UnitePays() as integer
+Dim monDocument As Object, oInst As Object, oUnitePays as integer
+
+ChargerDoc(false)
+oInst = oDocTemp.createInstance(&quot;com.sun.star.drawing.DocumentSettings&quot;)
+oUnitePays = oInst.MeasureUnit
+oDocTemp.close(true)
+&apos;if oUnitePays = 0 then msgbox(&quot;0.01 mm&quot;)
+&apos;if oUnitePays = 1 then msgbox(&quot;0.1 mm&quot;)
+&apos;if oUnitePays = 2 then msgbox(&quot;mm&quot;)
+&apos;if oUnitePays = 3 then msgbox(&quot;cm&quot;)
+&apos;if oUnitePays = 4 then msgbox(&quot;0.001 inch&quot;)
+&apos;if oUnitePays = 5 then msgbox(&quot;0.01 inch&quot;)
+&apos;if oUnitePays = 6 then msgbox(&quot;0.1 inch&quot;)
+&apos;if oUnitePays = 7 then msgbox(&quot;inch&quot;)
+
+UnitePays = oUnitePays
+End function
+
+
+&apos;-----------------------------------------------------------------------
+&apos;--------------------renvoi sur le site officiel
+&apos;---------------------------------------------------------------------
+
+sub MonSite
+Dim sv As Object, doc As String
+sv = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+doc = &quot;http://ahmath3d.free.fr/aide/aide.html&quot;
+sv.execute(doc, &quot;&quot;, 0)
+end sub
+
+&apos;----------------------------------------------------------------------
+&apos;-------------------------- déselectionne
+&apos;---------------------------------------------------------------------
+Sub Deselection(optional oDoc as object)
+
+if Ismissing(oDoc) then oDoc = thisComponent
+if oDoc.ImplementationName = &quot;SwXTextDocument&quot; then Echappe(oDoc)
+if oDoc.ImplementationName = &quot;SdXImpressDocument&quot; then  oDoc.CurrentController.select(NULL)
+
+Rem : select(null) ne fonctionne pas avec writer
+Rem : Echappe ne fonctionne pas avec Draw   
+end sub
+
+&apos;----------------------------------------------------------------------
+&apos;---------- renvoie les dimensions d&apos;une page avec ou sans les marges
+&apos;---------------------------------------------------------------------
+
+function dimPage(optional dimMarges as boolean , optional oDoc as object )
+dim oLxH As New com.sun.star.awt.Point ,oLargeurPage as integer, oHauteurPage as integer
+dim mH as integer, mB as integer, mG as integer, mD as integer  &apos;dim des marges
+dim pStyle as object, sPageStyle as string
+
+if IsMissing(oDoc) then oDoc = ThisComponent
+if IsMissing(dimMarges) then dimMarges = true
+
+if oDoc.ImplementationName = &quot;SdXImpressDocument&quot; then
+oLargeurPage = oDoc.CurrentController.CurrentPage.Width
+oHauteurPage = oDoc.CurrentController.CurrentPage.Height
+mH = oDoc.CurrentController.CurrentPage.BorderTop
+mB = oDoc.CurrentController.CurrentPage.BorderBottom
+mG = oDoc.CurrentController.CurrentPage.BorderLeft
+mD = oDoc.CurrentController.CurrentPage.BorderRight
+end if
+
+if oDoc.ImplementationName = &quot;SwXTextDocument&quot; then
+ sPageStyle = oDoc.CurrentController.getViewCursor().PageStyleName 
+ pstyle = oDoc.StyleFamilies.getByName(&quot;PageStyles&quot;).getByName(sPageStyle)
+ oLargeurPage = pStyle.Width
+ oHauteurPage = pStyle.Height
+ mH = pStyle.TopMargin
+ mB = pStyle.BottomMargin
+ mG = pStyle.LeftMargin
+ mD = pStyle.RightMargin
+end if
+
+if dimMarges = true then
+mH = 0
+mB = 0
+mG = 0
+mD = 0
+end if
+
+oLxH.x = oLargeurPage - mG - mD
+oLxH.y = oHauteurPage - mH - mB
+dimPage = oLxH
+
+end function
+
+</script:module>

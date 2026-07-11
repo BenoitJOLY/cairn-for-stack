@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ahSegment" script:language="StarBasic">&apos;OOoGdmath 
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+&apos;**********************************************************************************
+&apos;                    A HAGUET   07/2014
+&apos;***********************************************************************************
+
+Option Explicit
+
+Dim oSegmentForm as Object
+
+Sub Main
+	oSegmentForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;ahSegmentForm&quot;)
+	&apos;ChangeTitreDialog(oSegmentForm)
+    oSegmentForm.Model.ImageControl1.ImageURL=fCheminImages &amp; &quot;segment1.gif&quot;
+    oSegmentForm.Model.ImageControl2.ImageURL=fCheminImages &amp; &quot;segment2.png&quot;
+    oSegmentForm.Model.CommandButton3.ImageURL=fCheminImages &amp; &quot;segment3.png&quot;
+    TexteAide(oSegmentForm,&quot;TextField1&quot;,&quot;0&lt;=...&lt;=20&quot;)
+    TexteAide(oSegmentForm,&quot;TextField3&quot;,&quot;-180&lt;=...&lt;=180&quot;)
+    TexteAide(oSegmentForm,&quot;TextField4&quot;,&quot;-20&lt;=...&lt;=20&quot;)
+    TexteAide(oSegmentForm,&quot;TextField5&quot;,&quot;-20&lt;=...&lt;=20&quot;)
+    TexteAide(oSegmentForm,&quot;TextField6&quot;,&quot;-20&lt;=...&lt;=20&quot;)
+    TexteAide(oSegmentForm,&quot;TextField7&quot;,&quot;-20&lt;=...&lt;=20&quot;)
+    
+	oSegmentForm.Execute()
+    if oSegmentForm.Model.Tag= &quot;OK&quot; then
+    ConstructionSegment
+    end if
+    oSegmentForm.dispose
+End Sub
+
+Private Sub ahSegmentForm_CheckBox1_Click()
+    oSegmentForm.Model.TextField2.Enabled = oSegmentForm.Model.CheckBox1.State
+End Sub
+
+Private Sub ahSegmentForm_Aide_Click()
+    msgbox(oSegmentForm.Model.Label15.Label)
+End Sub
+
+
+Private Sub ahSegmentForm_OkBouton_Click()
+Dim i as integer, test(6) as integer
+
+&apos;-----------------------Gestion des erreurs de saisie
+test(1) = ZT_Nbre(oSegmentForm,  &quot;TextField1&quot;, 0 , 20 , 5 ,  oSegmentForm.Model.Label12.Label,) 
+test(2) = ZT_Nbre(oSegmentForm,  &quot;TextField3&quot;, -180 , 180 , 0 ,  oSegmentForm.Model.Label13.Label,) 
+for i = 4 to 7
+test(i-1) = ZT_Nbre(oSegmentForm,  &quot;TextField&quot;&amp;i, -20 , 20 , 5 ,  oSegmentForm.Model.Label14.Label,) 
+next 
+test(0) = test(1)*test(2)*test(3)*test(4)*test(5)*test(6)   
+&apos;---------------------- (test(0) contient 1 si tout est ok 0 sinon)
+
+if test(0) = 1 then
+    oSegmentForm.Model.Tag= &quot;OK&quot; 
+    oSegmentForm.endExecute
+end if
+
+End Sub
+
+
+sub ConstructionSegment()
+Dim L as double, pt1 as double,stylePt1 as boolean, i as integer, ahSegment as object
+
+Shapes=InitialiseGroupe()
+InitialiseDessin(false)
+
+L = CDbl(oSegmentForm.getControl(&quot;TextField1&quot;).Peer.Text)
+     
+   InsereLigne(0,0,L*1000,0,Shapes)
+   if oSegmentForm.getControl(&quot;ListBox1&quot;).selectedItemPos = 1 then    &apos;point A
+   InsereLigne(0,-100,0,100,Shapes)
+   elseif oSegmentForm.getControl(&quot;ListBox1&quot;).selectedItemPos = 0 then
+   croix(0,0,shapes)
+   end if
+  
+   if oSegmentForm.getControl(&quot;ListBox2&quot;).selectedItemPos = 1 then    &apos;point B
+   InsereLigne(L*1000,-100,L*1000,100,Shapes)
+   elseif oSegmentForm.getControl(&quot;ListBox2&quot;).selectedItemPos = 0 then
+   croix(L*1000,0,Shapes)
+   end if
+  
+   if oSegmentForm.Model.CheckBox1.state then
+   InsereTexte(Mid$(oSegmentForm.getControl(&quot;TextField2&quot;).Peer.Text, 1, 1), -400, -800, Shapes)
+   InsereTexte(Mid$(oSegmentForm.getControl(&quot;TextField2&quot;).Peer.Text, 2, 1), L*1000-400, -800, Shapes)
+   end if
+
+&apos;----------points supplémentaires
+for i=1 to 4
+if oSegmentForm.getControl(&quot;CheckBox&quot;&amp;i+1).state = 1 then
+pt1 = CDbl(oSegmentForm.getControl(&quot;TextField&quot;&amp;i+3).Peer.Text)*1000
+stylePt1 = oSegmentForm.getControl(&quot;ListBox&quot;&amp;i+2).selectedItemPos
+
+ if stylePt1= 0 then
+    croix(pt1,0,Shapes)
+    else
+    InsereLigne(pt1,100,pt1,-100,Shapes)
+ end if
+ if oSegmentForm.getControl(&quot;TextField&quot;&amp;i+7).Peer.Text&lt;&gt;&quot;&quot; then
+    InsereTexte(Mid$(oSegmentForm.getControl(&quot;TextField&quot;&amp;i+7).Peer.Text, 1, 1), pt1-400, -800, Shapes)
+ end if
+end if
+next
+
+ahSegment = GroupeObjet(Shapes)
+ahSegment.RotateAngle = CDbl(oSegmentForm.getControl(&quot;TextField3&quot;).Peer.Text)*100
+TermineDessin()
+end sub
+
+
+</script:module>

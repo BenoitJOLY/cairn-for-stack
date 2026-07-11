@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="TailleFormule" dlg:left="163" dlg:top="89" dlg:width="152" dlg:height="163" dlg:help-text="&amp;1544.TailleFormule.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1545.TailleFormule.Title">
+ <dlg:bulletinboard>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="0" dlg:left="20" dlg:top="138" dlg:width="45" dlg:height="16" dlg:help-text="&amp;1546.TailleFormule.CommandButton1.HelpText" dlg:value="&amp;1547.TailleFormule.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.TailleEquations.FixeTailleFormule" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="1" dlg:left="94" dlg:top="138" dlg:width="45" dlg:height="16" dlg:help-text="&amp;1548.TailleFormule.CommandButton2.HelpText" dlg:value="&amp;1549.TailleFormule.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.TailleEquations.FinTailleFormule" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="2" dlg:left="2" dlg:top="53" dlg:width="90" dlg:height="10" dlg:help-text="&amp;1550.TailleFormule.CheckBox1.HelpText" dlg:value="&amp;1551.TailleFormule.CheckBox1.Label" dlg:checked="true"/>
+  <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="3" dlg:left="2" dlg:top="93" dlg:width="90" dlg:height="10" dlg:help-text="&amp;1552.TailleFormule.CheckBox2.HelpText" dlg:value="&amp;1553.TailleFormule.CheckBox2.Label" dlg:checked="false"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="4" dlg:left="12" dlg:top="7" dlg:width="62" dlg:height="12" dlg:help-text="&amp;1554.TailleFormule.Label1.HelpText" dlg:value="&amp;1555.TailleFormule.Label1.Label"/>
+  <dlg:checkbox dlg:id="CheckBox3" dlg:tab-index="5" dlg:left="2" dlg:top="83" dlg:width="90" dlg:height="10" dlg:help-text="&amp;1556.TailleFormule.CheckBox3.HelpText" dlg:value="&amp;1557.TailleFormule.CheckBox3.Label" dlg:checked="false"/>
+  <dlg:checkbox dlg:id="CheckBox4" dlg:tab-index="6" dlg:left="2" dlg:top="73" dlg:width="90" dlg:height="10" dlg:help-text="&amp;1558.TailleFormule.CheckBox4.HelpText" dlg:value="&amp;1559.TailleFormule.CheckBox4.Label" dlg:checked="false"/>
+  <dlg:checkbox dlg:id="CheckBox5" dlg:tab-index="7" dlg:left="2" dlg:top="63" dlg:width="90" dlg:height="10" dlg:help-text="&amp;1560.TailleFormule.CheckBox5.HelpText" dlg:value="&amp;1561.TailleFormule.CheckBox5.Label" dlg:checked="false"/>
+  <dlg:checkbox dlg:id="CheckBox6" dlg:tab-index="8" dlg:left="2" dlg:top="43" dlg:width="139" dlg:height="10" dlg:help-text="&amp;1562.TailleFormule.CheckBox6.HelpText" dlg:value="&amp;1563.TailleFormule.CheckBox6.Label" dlg:checked="false"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="9" dlg:left="9" dlg:top="27" dlg:width="47" dlg:height="12" dlg:help-text="&amp;1564.TailleFormule.Label2.HelpText" dlg:value="&amp;1565.TailleFormule.Label2.Label" dlg:align="right"/>
+  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="10" dlg:left="60" dlg:top="25" dlg:width="90" dlg:height="13" dlg:help-text="&amp;1566.TailleFormule.ComboBox1.HelpText" dlg:value="&amp;1571.TailleFormule.ComboBox1.Text" dlg:spin="true">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="&amp;1567.ComboBox1.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1568.ComboBox1.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1569.ComboBox1.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1570.ComboBox1.StringItemList"/>
+   </dlg:menupopup>
+  </dlg:combobox>
+  <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="11" dlg:left="83" dlg:top="5" dlg:width="21" dlg:height="13" dlg:help-text="&amp;1572.TailleFormule.ComboBox2.HelpText" dlg:value="&amp;1590.TailleFormule.ComboBox2.Text" dlg:spin="true">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="&amp;1573.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1574.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1575.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1576.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1577.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1578.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1579.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1580.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1581.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1582.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1583.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1584.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1585.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1586.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1587.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1588.ComboBox2.StringItemList"/>
+    <dlg:menuitem dlg:value="&amp;1589.ComboBox2.StringItemList"/>
+   </dlg:menupopup>
+  </dlg:combobox>
+  <dlg:checkbox dlg:id="CheckBox7" dlg:tab-index="12" dlg:left="2" dlg:top="103" dlg:width="96" dlg:height="10" dlg:tag="8" dlg:help-text="&amp;2765.TailleFormule.CheckBox7.HelpText" dlg:value="&amp;2766.TailleFormule.CheckBox7.Label" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.TailleEquations.RegleAffichageTailleFormule?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:checkbox dlg:id="CheckBox8" dlg:tab-index="13" dlg:left="2" dlg:top="113" dlg:width="114" dlg:height="10" dlg:tag="7" dlg:help-text="&amp;2771.TailleFormule.CheckBox8.HelpText" dlg:value="&amp;2772.TailleFormule.CheckBox8.Label" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.TailleEquations.RegleAffichageTailleFormule?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:checkbox dlg:id="CheckBox9" dlg:tab-index="14" dlg:left="102" dlg:top="103" dlg:width="48" dlg:height="10" dlg:help-text="&amp;2773.TailleFormule.CheckBox9.HelpText" dlg:value="&amp;2774.TailleFormule.CheckBox9.Label" dlg:checked="false"/>
+  <dlg:progressmeter dlg:id="ProgressBar1" dlg:tab-index="15" dlg:visible="false" dlg:left="2" dlg:top="140" dlg:width="148" dlg:height="10" dlg:help-text="&amp;2862.TailleFormule.ProgressBar1.HelpText"/>
+  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="16" dlg:left="116" dlg:top="111" dlg:width="20" dlg:height="13" dlg:help-text="Paramètre d&apos;alignement des images 2, 5 ou 8. Faire des essais." dlg:value="2" dlg:spin="true">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="2"/>
+    <dlg:menuitem dlg:value="5"/>
+    <dlg:menuitem dlg:value="8"/>
+   </dlg:menupopup>
+  </dlg:combobox>
+  <dlg:checkbox dlg:id="CheckBox10" dlg:tab-index="17" dlg:left="2" dlg:top="123" dlg:width="127" dlg:height="10" dlg:tag="7" dlg:help-text="&amp;2888.TailleFormule.CheckBox10.HelpText" dlg:value="&amp;2889.TailleFormule.CheckBox10.Label" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.TailleEquations.RegleAffichageTailleFormule_Checbox10?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:checkbox dlg:id="CheckBox11" dlg:tab-index="18" dlg:left="94" dlg:top="63" dlg:width="57" dlg:height="10" dlg:help-text="&amp;2903.TailleFormule.CheckBox11.HelpText" dlg:value="&amp;2904.TailleFormule.CheckBox11.Label" dlg:checked="false"/>
+ </dlg:bulletinboard>
+</dlg:window>

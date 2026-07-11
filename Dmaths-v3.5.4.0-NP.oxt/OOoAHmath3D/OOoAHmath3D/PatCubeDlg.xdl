@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="PatCubeDlg" dlg:left="144" dlg:top="34" dlg:width="179" dlg:height="168" dlg:help-text="&amp;1387.PatCubeDlg.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1388.PatCubeDlg.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:text-color="0xff950e" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="1" dlg:text-color="0xff0000" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="2" dlg:background-color="0xff" dlg:text-color="0xffffff" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="3" dlg:background-color="0xff00"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:textfield dlg:id="TextField12" dlg:tab-index="1" dlg:left="143" dlg:top="168" dlg:width="2" dlg:height="0" dlg:help-text="&amp;1426.PatCubeDlg.TextField12.HelpText" dlg:value="&amp;1427.PatCubeDlg.TextField12.Text"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="2" dlg:left="17" dlg:top="46" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1439.PatCubeDlg.OptionButton1.HelpText" dlg:value="&amp;1440.PatCubeDlg.OptionButton1.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="3" dlg:left="47" dlg:top="46" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1441.PatCubeDlg.OptionButton2.HelpText" dlg:value="&amp;1442.PatCubeDlg.OptionButton2.Label"/>
+   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="4" dlg:left="77" dlg:top="46" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1443.PatCubeDlg.OptionButton3.HelpText" dlg:value="&amp;1444.PatCubeDlg.OptionButton3.Label"/>
+   <dlg:radio dlg:id="OptionButton4" dlg:tab-index="5" dlg:left="105" dlg:top="46" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1445.PatCubeDlg.OptionButton4.HelpText" dlg:value="&amp;1446.PatCubeDlg.OptionButton4.Label"/>
+   <dlg:radio dlg:id="OptionButton5" dlg:tab-index="6" dlg:left="131" dlg:top="46" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1447.PatCubeDlg.OptionButton5.HelpText" dlg:value="&amp;1448.PatCubeDlg.OptionButton5.Label"/>
+   <dlg:radio dlg:id="OptionButton6" dlg:tab-index="7" dlg:left="157" dlg:top="46" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1449.PatCubeDlg.OptionButton6.HelpText" dlg:value="&amp;1450.PatCubeDlg.OptionButton6.Label"/>
+   <dlg:radio dlg:id="OptionButton7" dlg:tab-index="8" dlg:left="17" dlg:top="100" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1451.PatCubeDlg.OptionButton7.HelpText" dlg:value="&amp;1452.PatCubeDlg.OptionButton7.Label"/>
+   <dlg:radio dlg:id="OptionButton8" dlg:tab-index="9" dlg:left="48" dlg:top="100" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1453.PatCubeDlg.OptionButton8.HelpText" dlg:value="&amp;1454.PatCubeDlg.OptionButton8.Label"/>
+   <dlg:radio dlg:id="OptionButton9" dlg:tab-index="10" dlg:left="77" dlg:top="100" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1455.PatCubeDlg.OptionButton9.HelpText" dlg:value="&amp;1456.PatCubeDlg.OptionButton9.Label"/>
+   <dlg:radio dlg:id="OptionButton10" dlg:tab-index="11" dlg:left="107" dlg:top="100" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1457.PatCubeDlg.OptionButton10.HelpText" dlg:value="&amp;1458.PatCubeDlg.OptionButton10.Label"/>
+   <dlg:radio dlg:id="OptionButton11" dlg:tab-index="12" dlg:left="137" dlg:top="100" dlg:width="5" dlg:height="6" dlg:help-text="&amp;1459.PatCubeDlg.OptionButton11.HelpText" dlg:value="&amp;1460.PatCubeDlg.OptionButton11.Label"/>
+  </dlg:radiogroup>
+  <dlg:titledbox dlg:style-id="0" dlg:id="FrameControl1" dlg:tab-index="13" dlg:left="83" dlg:top="6" dlg:width="76" dlg:height="31" dlg:help-text="&amp;1461.PatCubeDlg.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;1462.PatCubeDlg.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton12" dlg:tab-index="14" dlg:left="88" dlg:top="20" dlg:width="30" dlg:height="8" dlg:help-text="&amp;1463.PatCubeDlg.OptionButton12.HelpText" dlg:value="&amp;1464.PatCubeDlg.OptionButton12.Label"/>
+   <dlg:radio dlg:id="OptionButton13" dlg:tab-index="15" dlg:left="124" dlg:top="20" dlg:width="30" dlg:height="8" dlg:help-text="&amp;1465.PatCubeDlg.OptionButton13.HelpText" dlg:value="&amp;1466.PatCubeDlg.OptionButton13.Label" dlg:checked="true"/>
+  </dlg:radiogroup>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="19" dlg:left="44" dlg:top="116" dlg:width="89" dlg:height="50" dlg:help-text="&amp;1473.PatCubeDlg.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;1474.PatCubeDlg.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:textfield dlg:id="arete" dlg:tab-index="20" dlg:left="28" dlg:top="16" dlg:width="20" dlg:height="15" dlg:help-text="&amp;1479.PatCubeDlg.arete.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="&amp;1480.PatCubeDlg.arete.Text"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="21" dlg:left="49" dlg:top="22" dlg:width="12" dlg:height="8" dlg:help-text="&amp;1481.PatCubeDlg.Label3.HelpText" dlg:value="&amp;1482.PatCubeDlg.Label3.Label"/>
+  <dlg:titledbox dlg:style-id="1" dlg:id="FrameControl3" dlg:tab-index="22" dlg:left="21" dlg:top="6" dlg:width="54" dlg:height="31" dlg:help-text="&amp;1484.PatCubeDlg.FrameControl3.HelpText">
+   <dlg:title dlg:value="&amp;1485.PatCubeDlg.FrameControl3.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:style-id="2" dlg:id="BoutonSite" dlg:tab-index="18" dlg:left="48" dlg:top="151" dlg:width="81" dlg:height="8" dlg:help-text="&amp;2805.PatCubeDlg.BoutonSite.HelpText" dlg:value="&amp;2806.PatCubeDlg.BoutonSite.Label" dlg:align="center">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Aide.MonSite?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:text>
+  <dlg:button dlg:id="BoutonOK" dlg:tab-index="16" dlg:left="48" dlg:top="123" dlg:width="40" dlg:height="25" dlg:help-text="&amp;2807.PatCubeDlg.BoutonOK.HelpText" dlg:value="&amp;2808.PatCubeDlg.BoutonOK.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCube.GestionBoutonOK?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="BoutonAnnuler" dlg:tab-index="17" dlg:left="90" dlg:top="123" dlg:width="40" dlg:height="25" dlg:help-text="&amp;2809.PatCubeDlg.BoutonAnnuler.HelpText" dlg:value="&amp;2810.PatCubeDlg.BoutonAnnuler.Label" dlg:button-type="cancel"/>
+  <dlg:text dlg:style-id="3" dlg:id="Message1" dlg:tab-index="23" dlg:visible="false" dlg:left="-138" dlg:top="-12" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2819.PatCubeDlg.Message1.HelpText" dlg:value="&amp;2820.PatCubeDlg.Message1.Label"/>
+  <dlg:img dlg:id="ImagePrincipale" dlg:tab-index="0" dlg:left="11" dlg:top="54" dlg:width="162" dlg:height="44" dlg:help-text="&amp;2821.PatCubeDlg.ImagePrincipale.HelpText" dlg:tabstop="true">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCube.ImageOuverture?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:img>
+ </dlg:bulletinboard>
+</dlg:window>

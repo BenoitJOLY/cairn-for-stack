@@ -1,0 +1,2657 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module1" script:language="StarBasic">&apos;OOoTep
+&apos;Copyright (C) 2005-2006 Gilles Daurat
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful, 
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110 - 1301, USA.
+
+Option Explicit
+
+Public Const VERSION_OOOTEP = &quot;2011.02.10&quot;
+Public Const DEBUG = FALSE
+Public Const EPSILON = 0.000001
+
+Public Const AL_HAUT = 0
+Public Const AL_CENTRE = 1
+Public Const AL_BAS = 2
+Public Const AL_GAUCHE = 3
+Public Const AL_DROITE = 4
+Public const TEP_POINT = 0
+Public const TEP_DROITE = 1
+Public const TEP_DROITEEQ = 2
+Public const TEP_DROITEEQR = 3
+Public const TEP_DROITEV = 4
+Public Const TEP_SEGMENT = 5
+Public Const TEP_DEMIDROITE = 6
+Public Const TEP_POLYGONE = 7
+Public Const TEP_VECTEUR = 8
+Public Const TEP_CERCLE = 9
+Public Const TEP_CERCLEDIA = 10
+Public Const TEP_CERCLERAYON = 11
+Public Const TEP_DROITEPARALLELE = 12
+Public Const TEP_DROITEPERPENDICULAIRE = 13
+Public Const TEP_ROTATION = 14
+Public Const TEP_TRANSLATION = 15
+Public Const TEP_SYMETRIQUEPOINT = 16
+Public Const TEP_SYMETRIQUEDROITE = 17
+Public Const TEP_ARC = 18
+Public Const TEP_ANGLE = 19
+Public Const TEP_HOMOTHETIE = 20
+Public Const TEP_GROUPE = 21
+Public Const TEP_VARIABLE = 22
+Public Const TEP_TEXTE = 23
+Public Const TEP_SIMILITUDE = 24
+Public Const TEP_FONCTION = 25
+Public Const TEP_REEL = 26
+Public Const TEP_DROITEANGLE = 27
+
+Public oPageDessin as Object
+Public oDocumentDessin as Object
+Public oPageTexte as Object
+Public oDocumentTexte as Object
+Public oPagePremier as object
+Public oPremierDocument as Object
+Public oGroupeDessin as Object
+
+Public nomFichier as string 
+
+Public NbObjet as integer
+
+Public Sorte(0 to 10000) as integer
+Public Parametres(0 to 10000) as string
+Public Nom(0 to 10000) as string
+
+Public xorig as double
+Public yorig as double
+Public xunit as double
+Public yunit as double
+Public pasx as double
+Public pasy as double
+Public xmin as double
+Public ymin as double
+Public xmax as double
+Public ymax as double
+Public trame as Boolean
+Public grille as Boolean
+
+Public ligne() as string
+Public options() as string
+Public coords() as string
+
+Sub Main
+
+	AfficheDialog1()
+End Sub
+
+Function ChargeFonction(unNom as string) as String
+Dim param() as string
+dim i
+dim oootepTrouve as Boolean
+
+	oootepTrouve = False
+	for i = lbound(ligne) to ubound(ligne)
+		if ChargeParametre(ligne(i), param(), &quot;;&quot;) &gt; 0 then
+			if param(0) = &quot;@oootep&quot; then oootepTrouve = True
+			if param(0) = unNom and oootepTrouve then	ChargeFonction = ligne(i)
+		end if
+	next i
+End Function
+
+Sub ChargeLimite()
+Dim i
+dim param() as String
+dim p1() as string
+
+	trame = False
+	grille = False
+	For i = lbound(ligne) to ubound(ligne)
+		ChargeParametre(ligne(i), param, &quot;;&quot;)
+		if param(0) = &quot;fenetre&quot; then
+			ChargeParametre(param(1), p1, &quot;,&quot;)
+			xmin = p1(0)
+			xmax = p1(1)
+			ymax = p1(3)
+			ymin = p1(2)
+			xunit = CDbl(p1(4)) * 1000 / 30
+			yunit = CDbl(p1(5)) * 1000 / 30
+			ligne(i) = &quot;&quot;
+		end if
+		if param(0) = &quot;trame&quot; then
+			trame = True
+		End if
+		if param(0) = &quot;grille&quot; then
+			grille = True
+		End if
+	next i
+	if xmin &gt; xmax then Echange(xmin, xmax)
+	if ymin &gt; ymax then Echange(ymin, ymax)
+End Sub
+
+Sub AjouteAire(unNom As String, listeObjets as String, options as String)
+Dim lesObjets() as String
+Dim uneAire as Double
+Dim p1() as String
+Dim p2() as String
+Dim p3() as String
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	if Sorte(ChercheObjet(lesObjets(0))) = TEP_CERCLE then
+		ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+		uneAire = Pi * CDbl(p1(2))^2
+	Else
+		if Sorte(ChercheObjet(lesObjets(0))) = TEP_POLYGONE then
+			ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), lesObjets, &quot;;&quot;
+		end if
+		ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p3, &quot;;&quot;)
+		uneAire = 0
+		for i = LBound(lesObjets) + 1 to UBound(lesObjets) - 1
+			ChargeParametre(Parametres(ChercheObjet(lesObjets(i))), p1, &quot;;&quot;)
+			ChargeParametre(Parametres(ChercheObjet(lesObjets(i + 1))), p2, &quot;;&quot;)
+			uneAire = uneAire + CalculeAireTriangle(val(p1(0)), val(p1(1)), val(p2(0)), val(p2(1)), val(p3(0)), val(p3(1)))
+		next i
+	end if
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_VARIABLE
+	Parametres(NbObjet) = trim(str(uneAire))
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteArc(unNom as String, listeObjets as String, options as String, sType as Integer)
+Dim lesObjets() as String
+Dim p1() as String
+Dim p2() as String
+Dim p3() as String
+Dim unRayon as Double
+Dim ang1 as Double
+Dim ang2 as Double
+Dim unTrait as Object
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(1))), p2, &quot;;&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(2))), p3, &quot;;&quot;)
+	if sType = TEP_ARC then
+		unRayon = sqr((val(p1(0)) - val(p2(0)))^2 + (val(p1(1)) - val(p2(1)))^2)
+	else
+		unRayon = min(sqr((val(p1(0)) - val(p2(0)))^2 + (val(p1(1)) - val(p2(1)))^2) / 5, sqr((val(p3(0)) - val(p2(0))) ^ 2 + (val(p3(1)) - val(p2(1))) ^ 2) / 5)
+		unRayon = min(unRayon, OOoTep_codageangle / xunit)
+	end if
+	ang1 = CalculeAngle(val(p2(0)), val(p2(1)), val(p1(0)), val(p1(1))) * 180 / Pi
+	ang2 = CalculeAngle(val(p2(0)), val(p2(1)), val(p3(0)), val(p3(1))) * 180 / Pi
+	if ang1 &gt; ang2 then ang2 = ang2 + 360
+	if ang2 - ang1 &gt; 180 and sType = TEP_ANGLE and RetourneOption(options, &quot;rentrant&quot;) = &quot;&quot; then
+		ang2 = ang2 - 360
+		Echange(ang1, ang2)
+		Echange(p3(0), p1(0))
+		Echange(p3(1), p1(1))
+	end if
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		if (sType = TEP_ANGLE) And Abs(ang2 - ang1 - 90) &lt; 0.1 then
+			unTrait = MarqueAngleDroit(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), CalcAbscisse(val(p3(0))), CalcOrdonnee(val(p3(1))), options)
+			OpaciteTrait(unTrait, RetourneOption(options, &quot;opacite&quot;), RetourneOption(options, &quot;couleur&quot;))
+		else
+			If RetourneOption(options, &quot;opacite&quot;) = &quot;0&quot; then
+				unTrait = InsereArcDeCercle(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), ang1 * 100, ang2 * 100, unRayon * xunit, False)
+			else
+				unTrait = InsereArcDeCercle(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), ang1 * 100, ang2 * 100, unRayon * xunit, True)
+				OpaciteTrait(unTrait, RetourneOption(options, &quot;opacite&quot;), RetourneOption(options, &quot;couleur&quot;))
+			end if
+		End If
+		unTrait.LineColor=RetourneCouleur(RetourneOption(options, &quot;couleur&quot;))
+		StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+	End if
+	Sorte(NbObjet) = TEP_ARC
+	Nom(NbObjet) = unNom
+	Parametres(NbObjet) = p2(0) &amp; &quot;;&quot; &amp; p2(1) &amp; &quot;;&quot; &amp; trim(str(unRayon)) &amp; &quot;;&quot; &amp; trim(str(ang1)) &amp; &quot;;&quot; &amp; trim(str(ang2))
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteBarycentre(unNom as String, listeObjets as String, options as String)
+Dim lesObjets() as String
+Dim p1() as String
+Dim tm as Double
+Dim x0 as Double
+Dim y0 as Double
+dim i as integer
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	tm = 0
+	x0 = 0
+	y0 = 0
+	for i = LBound(lesObjets) to UBound(lesObjets) - 1 step 2
+		ChargeParametre(Parametres(ChercheObjet(lesObjets(i))), p1, &quot;;&quot;)	
+		if ChercheObjet(lesobjets(i + 1)) &lt;&gt; - 1 then lesobjets(i + 1) = parametres(ChercheObjet(lesobjets(i + 1)))
+		x0 = x0 + val(lesObjets(i + 1)) * val(p1(0))
+		y0 = y0 + val(lesObjets(i + 1)) * val(p1(1))
+		tm = tm + val(lesObjets(i + 1))
+	next i
+	x0 = x0 / tm
+	y0 = y0 / tm
+	AjoutePoint(unNom, trim(str(x0)) &amp; &quot;,&quot; &amp; trim(str(y0)), options)
+End Sub
+
+Sub AjouteBissectrice(unNom as String, listeObjets as String, options as String)
+Dim lesObjets() As String
+Dim p1() as String
+Dim p2() as String
+Dim p3() as String
+Dim ang as Double
+Dim x0 as string
+Dim y0 as string
+Dim x1 as string
+Dim y1 as string
+Dim unTrait as Object
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)	
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(1))), p2, &quot;;&quot;)	
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(2))), p3, &quot;;&quot;)
+	ang = (CalculeAngle(val(p2(0)), val(p2(1)), val(p1(0)), val(p1(1))) + CalculeAngle(val(p2(0)), val(p2(1)), val(p3(0)), val(p3(1)))) / 2
+	x0 = p2(0)
+	y0 = p2(1)
+	x1 = trim(str(val(x0) + 5000 * cos(ang))
+	y1 = trim(str(val(y0) + 5000 * sin(ang))
+
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		unTrait = TraceDroite(CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)), CalcAbscisse(val(x1)), CalcOrdonnee(val(y1)), xmin, ymin, xmax, ymax, unNom, False, options)
+		unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+		StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+	End if
+	
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_DROITE
+	Parametres(NbObjet) = x0 &amp; &quot;;&quot; &amp; y0 &amp; &quot;;&quot; &amp; x1 &amp; &quot;;&quot; &amp; y1 
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteCercle(unNom as string, coordonnees as string, options as string, typeCercle as integer)
+dim i, j
+dim param() as string
+dim p1() as string
+dim p2() as string
+Dim unTrait as Object
+Dim unRayon as Double
+
+	ChargeParametre(coordonnees, param, &quot;,&quot;)
+	i = ChercheObjet(param(0))
+	ChargeParametre(Parametres(i), p1, &quot;;&quot;)	
+	select case typeCercle
+	case TEP_CERCLE, TEP_CERCLEDIA
+		j = ChercheObjet(param(1))
+		ChargeParametre(Parametres(j), p2, &quot;;&quot;)	
+		unRayon = sqr((val(p1(0)) - val(p2(0)))^2 + (val(p1(1)) - val(p2(1)))^2)
+		if typeCercle = TEP_CERCLEDIA then
+			unRayon = unRayon / 2
+			p1(0) = trim(str((val(p1(0)) + val(p2(0))) / 2))
+			p1(1) = trim(str((val(p1(1)) + val(p2(1))) / 2))
+		end if
+	case TEP_CERCLERAYON
+		unRayon = val(RetourneVariable(param(1)))
+	End Select
+	
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		unTrait = InsereCercle(CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), unRayon * xunit)
+		unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+		StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+		OpaciteTrait(unTrait, RetourneOption(options, &quot;opacite&quot;), RetourneOption(options, &quot;couleur&quot;))
+	end if
+	
+	Sorte(NbObjet) = TEP_CERCLE
+	Nom(NbObjet) = unNom
+	Parametres(NbObjet) = p1(0) &amp; &quot;;&quot; &amp; p1(1) &amp; &quot;;&quot; &amp; trim(str(unRayon))
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteDistance(unNom As String, listeObjets as String, options as String)
+Dim lesObjets() as String
+Dim uneDistance as Double
+Dim p1() as String
+Dim p2() as String
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p2, &quot;;&quot;)
+	uneDistance = sqr((val(p1(0)) - val(p2(0)))^2 + (val(p1(1)) - val(p2(1)))^2)
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_VARIABLE
+	Parametres(NbObjet) = trim(str(uneDistance))
+	NbObjet = NbObjet + 1
+End Sub
+
+
+Sub AjouteDroite(unNom as string, listeObjets as string, options as string, sType as integer)
+dim lesObjets() as string
+dim p1() as string
+dim p2() as string
+dim unTrait as Object
+Dim ang as double
+Dim x0 as string
+Dim y0 as string
+Dim x1 as string
+Dim y1 as string
+dim xint as double
+dim yint as double
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(1))), p2, &quot;;&quot;)
+	ang = CalculeAngle(val(p2(0)), val(p2(1)), val(p2(2)), val(p2(3)))
+	x0 = p1(0)
+	y0 = p1(1)
+	Select Case sType
+	case TEP_DROITEPARALLELE
+		x1 = trim(str(val(p1(0)) + 5 * cos(ang)))
+		y1 = trim(str(val(p1(1)) + 5 * sin(ang)))
+	case TEP_DROITEPERPENDICULAIRE
+		x1 = trim(str(val(p1(0)) - 5 * sin(ang)))
+		y1 = trim(str(val(p1(1)) + 5 * cos(ang)))
+		TrouveIntersection(val(p2(0)), val(p2(1)), val(p2(2)), val(p2(3)), val(x0), val(y0), val(x1), val(y1), xint, yint)
+		If RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; and RetourneOption(options, &quot;quadrant&quot;) &lt;&gt; &quot;0&quot; then
+			unTrait = MarqueAngleDroit(CalcAbscisse(xint), CalcOrdonnee(yint), CalcAbscisse(val(x1)), CalcOrdonnee(val(y1)), options)
+			unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+			StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+		end if
+	End Select
+	
+	If RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		unTrait = TraceDroite(CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)), CalcAbscisse(val(x1)), CalcOrdonnee(val(y1)), xmin, ymin, xmax, ymax, unNom, False, options)
+		unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+		StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+	End If
+	
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_DROITE
+	Parametres(NbObjet) = x0 &amp; &quot;;&quot; &amp; y0 &amp; &quot;;&quot; &amp; x1 &amp; &quot;;&quot; &amp; y1 
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteTangente(unNom as string, listeObjets as string, options as string)
+dim lesObjets() as string
+dim p1() as string
+dim p2() as string
+dim unTrait as Object
+Dim ang as double
+Dim x0 as single
+Dim y0 as single
+Dim x1 as single
+Dim y1 as single
+dim xint as double
+dim yint as double
+dim a as single, b as single, c as single
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	a = lesObjets(0)
+	b = lesObjets(1)
+	c = lesObjets(2)
+
+	if a = 0 then
+		x0 = xmin
+		y0 = - c / b
+		x1 = xmax
+		y1 = - c / b
+	end if
+	if b = 0 then
+		x0 = - c / a
+		y0 = ymin
+		x1 = - c / a
+		y1 = ymax
+	end if
+	if a &lt;&gt; 0 and b &lt;&gt; 0 then
+		x0 = xmin
+		y0 = ( - c - a * x0) / b
+		x1 = xmax
+		y1 = ( - c - a * x1) / b
+	end if
+	x0 = calcAbscisse(x0)
+	x1 = calcAbscisse(x1)
+	y0 = calcOrdonnee(y0)
+	y1 = calcOrdonnee(y1)
+	If RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		unTrait = TraceDroite(x0, y0, x1, y1, xmin, ymin, xmax, ymax, unNom, False, options)
+		unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+		StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+	End If
+	
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_DROITE
+	Parametres(NbObjet) = x0 &amp; &quot;;&quot; &amp; y0 &amp; &quot;;&quot; &amp; x1 &amp; &quot;;&quot; &amp; y1 
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteGroupe(unNom as String, listeObjets as String, options as String)
+	RemplaceTexte(listeObjets, &quot;,&quot;, &quot;;&quot;)
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_GROUPE
+	Parametres(NbObjet) = listeObjets
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteHomothetie(unNom as string, listeObjets as string)
+Dim lesObjets() as String
+Dim p1() as String
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_HOMOTHETIE
+	Parametres(NbObjet) = p1(0) &amp; &quot;;&quot; &amp; p1(1) &amp; &quot;;&quot; &amp; RetourneVariable(lesObjets(1))
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteImage(unNom as String, listeObjets as String, options as String)
+Dim param() as string
+Dim p2() as string
+Dim p1 as String
+dim i as integer, j as integer, k as integer, l as integer
+Dim unTrait as Object
+Dim unRayon as double, ang1 as double, ang2 as Double
+
+	ChargeParametre(listeObjets, param, &quot;,&quot;)
+	i = ChercheObjet(param(0))
+	j = ChercheObjet(param(1))
+	Select Case Sorte(j)
+	case TEP_POINT
+		ImagePoint(i, Parametres(j), p1)
+		AjoutePoint(unNom, p1, options)
+	case TEP_DROITE, TEP_SEGMENT, TEP_DEMIDROITE, TEP_VECTEUR, TEP_DROITEEQR, TEP_DROITEEQ, TEP_DROITEV, TEP_DROITEANGLE
+		ImageDroite(i, Parametres(j), p1)
+		ChargeParametre(p1, p2, &quot;,&quot;)
+		if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+			Select Case Sorte(j)
+			case TEP_SEGMENT
+				unTrait = InsereLigne(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), CalcAbscisse(val(p2(2))), CalcOrdonnee(val(p2(3))))
+			case TEP_DROITE, TEP_DROITEEQR, TEP_DROITEEQ, TEP_DROITEV, TEP_DROITEANGLE
+				unTrait = TraceDroite(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), CalcAbscisse(val(p2(2))), CalcOrdonnee(val(p2(3))), xmin, ymin, xmax, ymax, unNom, False, options)
+			case TEP_DEMIDROITE 
+				unTrait = TraceDroite(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), CalcAbscisse(val(p2(2))), CalcOrdonnee(val(p2(3))), xmin, ymin, xmax, ymax, unNom, True, options)
+			case TEP_VECTEUR 
+				unTrait = InsereVecteur(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), CalcAbscisse(val(p2(2))), CalcOrdonnee(val(p2(3))), RetourneOption(options, &quot;couleur&quot;))
+			End Select
+			unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+			StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+		End if
+		Nom(NbObjet) = unNom
+		Sorte(NbObjet) = Sorte(j)
+		Parametres(NbObjet) = p2(0) &amp; &quot;;&quot; &amp; p2(1) &amp; &quot;;&quot; &amp; p2(2) &amp; &quot;;&quot; &amp; p2(3) 
+		NbObjet = NbObjet + 1		
+	case TEP_CERCLE
+		ChargeParametre(Parametres(j), p2, &quot;;&quot;)
+		unRayon = val(p2(2))
+		unRayon = ImageRayon(i, unRayon)
+		ImagePoint(i, p2(0) &amp; &quot;;&quot; &amp; p2(1), p1)
+		ChargeParametre(p1, p2, &quot;,&quot;)
+		if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+			unTrait = InsereCercle(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), unRayon * xunit)
+	
+			unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+			StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+			OpaciteTrait(unTrait, RetourneOption(options, &quot;opacite&quot;), RetourneOption(options, &quot;couleur&quot;))
+		End if
+		Sorte(NbObjet) = TEP_CERCLE
+		Nom(NbObjet) = unNom
+		Parametres(NbObjet) = p2(0) &amp; &quot;;&quot; &amp; p2(1) &amp; &quot;;&quot; &amp; trim(str(unRayon))
+		NbObjet = NbObjet + 1
+	case TEP_ARC
+		ImageArc(i, Parametres(j), p1)
+		ChargeParametre(p1, p2, &quot;;&quot;)
+		unRayon = val(p2(2))
+		ang1 = val(p2(3))
+		ang2 = val(p2(4))
+		if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+			If RetourneOption(options, &quot;opacite&quot;) = &quot;0&quot; then
+				unTrait = InsereArcDeCercle(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), ang1 * 100, ang2 * 100, unRayon * xunit, False)
+			else
+				unTrait = InsereArcDeCercle(CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), ang1 * 100, ang2 * 100, unRayon * xunit, True)
+				OpaciteTrait(unTrait, RetourneOption(options, &quot;opacite&quot;), RetourneOption(options, &quot;couleur&quot;))
+			end if
+			unTrait.LineColor=RetourneCouleur(RetourneOption(options, &quot;couleur&quot;))
+			StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		End if
+		Sorte(NbObjet) = TEP_ARC
+		Nom(NbObjet) = unNom
+		Parametres(NbObjet) = p1
+		NbObjet = NbObjet + 1
+	case TEP_GROUPE
+		ChargeParametre(Parametres(j), param, &quot;;&quot;)
+		for k = LBound(param) to UBound(param)
+			l = ChercheObjet(param(k))
+			AjouteImage(unNom &amp; &quot;.&quot; &amp; Nom(l), Nom(i) &amp; &quot;,&quot; &amp; Nom(l), options)
+		next k
+	End Select
+End Sub
+
+Sub ImageArc(i as integer, arc1 as string, arc2 as string)
+Dim p2 as String
+Dim p1 as string
+Dim p0 as String
+Dim x0 as single, y0 as single, x1 as single, y1 as single, x2 as single, y2 as single
+Dim unRayon, ang1, ang2
+
+	ChargeParametre(arc1, p2, &quot;;&quot;)
+	unRayon = val(p2(2))
+	ang1 = val(p2(3))
+	ang2 = val(p2(4))
+	x0 = val(p2(0))
+	y0 = val(p2(1))
+	x1 = x0 + unRayon * cos( ang1 * Pi / 180)
+	y1 = y0 + unRayon * sin( ang1 * Pi / 180)
+	x2 = x0 + unRayon * cos( ang2 * Pi / 180)
+	y2 = y0 + unRayon * sin( ang2 * Pi / 180)
+	ImagePoint(i, trim(str(x2)) &amp; &quot;;&quot; &amp; trim(str(y2)), p0)
+	ChargeParametre(p0, p1, &quot;,&quot;)
+	x2 = val(p1(0))
+	y2 = val(p1(1))
+	ImagePoint(i, trim(str(x1)) &amp; &quot;;&quot; &amp; trim(str(y1)), p0)
+	ChargeParametre(p0, p1, &quot;,&quot;)
+	x1 = val(p1(0))
+	y1 = val(p1(1))
+	ImagePoint(i, trim(str(x0)) &amp; &quot;;&quot; &amp; trim(str(y0)), p0)
+	ChargeParametre(p0, p1, &quot;,&quot;)
+	x0 = val(p1(0))
+	y0 = val(p1(1))
+
+	unRayon = sqr((x0 - x1)^2 + (y0 - y1)^2)
+	ang1 = CalculeAngle(x0, y0, x1, y1) * 180 / Pi
+	ang2 = CalculeAngle(x0, y0, x2, y2) * 180 / Pi
+	if ang1 &gt; ang2 then ang2 = ang2 + 360
+	arc2 = trim(str(x0)) &amp; &quot;;&quot; &amp; trim(str(y0)) &amp; &quot;;&quot; &amp; trim(str(unRayon)) &amp; &quot;;&quot; &amp; trim(str(ang1)) &amp; &quot;;&quot; &amp; trim(str(ang2))	
+End Sub
+
+Sub AjouteIntersection(unNom as String, listeObjets as String, options as String, lescoords as String)
+	AjoutePoint(unNom, lescoords, options)
+End Sub
+
+Sub AjoutePointSur(unNom as string, listeObjets as string, options as string, lesCoords as String)
+	AjoutePoint(unNom, lescoords, options)
+End Sub
+
+sub AjouteMediatrice(unNom as string, coordonnees as string, options as string)
+dim x0 as string
+Dim y0 as String
+dim x1 as string
+Dim y1 as String
+dim param() as string
+Dim ang as Double
+Dim p1() as String
+Dim p2() as String
+Dim unTrait as Object
+Dim visibiliteSegment as String
+
+	ChargeParametre(coordonnees, param(), &quot;,&quot;)
+	if Sorte(Chercheobjet(param(0))) = TEP_SEGMENT then
+		ChargeParametre(Parametres(ChercheObjet(param(0))), p1, &quot;;&quot;)
+		ChargeParametre(Parametres(ChercheObjet(param(0))), p2, &quot;;&quot;)
+		ang = CalculeAngle(val(p1(0)), val(p1(1)), val(p1(2)), val(p1(3))) + Pi / 2
+		x0 = trim(str((val(p1(0)) + val(p1(2))) / 2))
+		y0 = trim(str((val(p1(1)) + val(p1(3))) / 2))
+		p2(0) = p1(2)
+		p2(1) = p1(3)
+		visibiliteSegment = p1(4)
+	else
+		ChargeParametre(Parametres(ChercheObjet(param(0))), p1, &quot;;&quot;)
+		ChargeParametre(Parametres(ChercheObjet(param(1))), p2, &quot;;&quot;)
+		ang = CalculeAngle(val(p1(0)), val(p1(1)), val(p2(0)), val(p2(1))) + Pi / 2
+		x0 = trim(str((val(p1(0)) + val(p2(0))) / 2))
+		y0 = trim(str((val(p1(1)) + val(p2(1))) / 2))
+		visibiliteSegment = &quot;&quot;
+	end if
+	x1 = trim(str(val(x0) + 500 * cos(ang)))
+	y1 = trim(str(val(y0) + 500 * sin(ang)))
+
+
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		if Sorte(Chercheobjet(param(0))) = TEP_SEGMENT then
+			If RetourneOption(options, &quot;quadrant&quot;) &lt;&gt; &quot;0&quot; and RetourneOption(visibiliteSegment, &quot;visibilite&quot;) = &quot;v&quot; then
+				unTrait = MarqueAngleDroit(CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)), CalcAbscisse(val(x1)), CalcOrdonnee(val(y1)), options)
+				unTrait.LineColor=RetourneOption(options,&quot;couleur&quot;)
+				StyleTrait(unTrait, RetourneOption(options,&quot;style&quot;))
+			end If
+			if RetourneOption(options, &quot;code&quot;) &lt;&gt; &quot;&quot; then
+				CodeLongueur(CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)), CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), RetourneOption(options, &quot;code&quot;), options)
+				CodeLongueur(CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)), CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), RetourneOption(options, &quot;code&quot;), options)
+			End if
+		End If
+		unTrait = TraceDroite(CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)), CalcAbscisse(val(x1)), CalcOrdonnee(val(y1)), xmin, ymin, xmax, ymax, unNom, False, options)
+		unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+		StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+	End If
+	
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_DROITE
+	Parametres(NbObjet) = x0 &amp; &quot;;&quot; &amp; y0 &amp; &quot;;&quot; &amp; x1 &amp; &quot;;&quot; &amp; y1 
+	NbObjet = NbObjet + 1
+
+end sub
+
+Sub AjouteMesureArc(unNom as String, listeObjets as String, options as String)
+Dim lesObjets() As String
+Dim p1() as String
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	if Sorte(ChercheObjet(lesObjets(0))) = TEP_ARC then
+		ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)	
+	else
+		AjouteArc(&quot;tempo&quot;, listeObjets, &quot;i&quot;, TEP_ARC)
+		NbObjet = NbObjet - 1
+		ChargeParametre(Parametres(NbObjet), p1, &quot;;&quot;)	
+	end if	
+	AjouteVariable(unNom, trim(str(val(p1(2)) * abs(val(p1(4)) - val(p1(3))) * Pi / 180)), options)
+End Sub
+
+sub AjouteMilieu(unNom as string, coordonnees as string, options as string)
+dim x0 as string
+Dim y0 as String
+dim param() as string
+Dim p1() as String
+Dim p2() as String
+
+	ChargeParametre(coordonnees, param(), &quot;,&quot;)
+	if Sorte(Chercheobjet(param(0))) = TEP_SEGMENT then
+		ChargeParametre(Parametres(ChercheObjet(param(0))), p1, &quot;;&quot;)
+		ChargeParametre(Parametres(ChercheObjet(param(0))), p2, &quot;;&quot;)
+		p2(0) = p1(2)
+		p2(1) = p1(3)
+	else
+		ChargeParametre(Parametres(ChercheObjet(param(0))), p1, &quot;;&quot;)
+		ChargeParametre(Parametres(ChercheObjet(param(1))), p2, &quot;;&quot;)
+	end if
+
+	x0 = trim(str((val(p1(0)) + val(p2(0))) / 2))
+	y0 = trim(str((val(p1(1)) + val(p2(1))) / 2))
+
+	AjoutePoint(unNom, x0 &amp; &quot;,&quot; &amp; y0, options)
+
+	If RetourneOption(options,&quot;visibilite&quot;)=&quot;v&quot; then
+		Dim unCodage as string
+		unCodage=RetourneOption(options,&quot;code&quot;)
+		if unCodage&lt;&gt;&quot;&quot; then
+			CodeLongueur(CalcAbscisse(val(p1(0))),CalcOrdonnee(val(p1(1))),CalcAbscisse(val(x0)),CalcOrdonnee(val(y0)),unCodage,options)
+			CodeLongueur(CalcAbscisse(val(x0)),CalcOrdonnee(val(y0)),CalcAbscisse(val(p2(0))),CalcOrdonnee(val(p2(1))),unCodage,options)
+		end if
+	end if
+End Sub
+
+Sub AjoutePerimetre(unNom As String, listeObjets as String, options as String)
+Dim lesObjets() as String
+Dim unPerimetre as Double
+Dim p1() as String
+Dim p2() as String
+Dim p3() as String
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	if Sorte(ChercheObjet(lesObjets(0))) = TEP_CERCLE then
+		ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+		unPerimetre = 2 * Pi * val(p1(2))
+	Else
+		if Sorte(ChercheObjet(lesObjets(0))) = TEP_POLYGONE then
+			ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), lesObjets, &quot;;&quot;
+		end if
+		unPerimetre = 0
+		for i = LBound(lesObjets) to UBound(lesObjets)
+			ChargeParametre(Parametres(ChercheObjet(lesObjets(i))), p1, &quot;;&quot;)
+			if i = UBound(lesObjets) then
+				ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p2, &quot;;&quot;)
+			else
+				ChargeParametre(Parametres(ChercheObjet(lesObjets(i + 1))), p2, &quot;;&quot;)
+			end if
+			unPerimetre = unPerimetre + sqr((val(p1(0)) - val(p2(0)))^2 + (val(p1(1)) - val(p2(1)))^2)
+		next i
+	end if
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_VARIABLE
+	Parametres(NbObjet) = trim(str(unPerimetre))
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteFonction(unNom as String, listeCoord as String, options as String)
+Dim lesPoints() as String
+dim secArray() as Single
+dim triArray() as single
+Dim np as single, i as Integer
+Dim j as Integer, k as Integer
+Dim unPolygone as Object
+Dim cestbon as Boolean
+dim xint as single
+dim yint as single
+
+	if listeCoord = &quot;&quot; then
+		Sorte(NbObjet) = TEP_FONCTION
+		Nom(NbObjet) = unNom
+		Parametres(NbObjet) = options
+		NbObjet = NbObjet + 1
+	else
+
+&apos;		options = Parametres(ChercheObjet(unNom))
+
+		RemplaceTexte listeCoord, chr(13), &quot;&quot;
+		RemplaceTexte listeCoord, chr(10), &quot;&quot;
+		ChargeParametre(listeCoord, lesPoints, &quot;;&quot;)
+		np = ubound(lesPoints()) / 2
+
+		ReDim secArray(0 to np - 1, 0 to 1) as single
+		j = 0
+		for i = 0 to np - 1
+			if i = np - 1 then 
+				cestbon = True
+			else
+				if (lesPoints(2 * i + 1) = &quot;123456789&quot; and lesPoints(2 * i + 2) = &quot;123456789&quot;) then
+					cestbon = True
+				else
+					if (val(lesPoints(2 * i + 1)) &lt; xmin or val(lesPoints(2 * i + 1)) &gt; xmax or val(lesPoints(2 * i + 2)) &lt; ymin or val(lesPoints(2 * i + 2)) &gt; ymax) then
+						cestbon = True
+						if j &gt; 0 then
+							if TrouveIntersectionSegment(secArray(j - 1, 0), secArray(j - 1, 1), calcAbscisse(val(lesPoints(2 * i + 1))), calcOrdonnee(val(lesPoints(2 * i + 2))), xint, yint) then
+								secArray(j, 0) = xint
+								secArray(j, 1) = yint
+								j = j + 1
+							end if
+						end if
+					end if
+					if (val(lesPoints(2 * i + 1)) &gt;= xmin and val(lesPoints(2 * i + 1)) &lt;= xmax and val(lesPoints(2 * i + 2)) &gt;= ymin and val(lesPoints(2 * i + 2)) &lt;= ymax) then
+						if j = 0 and i &gt; 0 then
+							if TrouveIntersectionSegment(calcAbscisse(val(lesPoints(2 * i - 1))), calcOrdonnee(val(lesPoints(2 * i))), calcAbscisse(val(lesPoints(2 * i + 1))), calcOrdonnee(val(lesPoints(2 * i + 2))), xint, yint) then
+								secArray(j, 0) = xint
+								secArray(j, 1) = yint
+								j = j + 1
+							end if
+						end if
+					end if
+					
+				end if
+			end If
+			if cestbon then
+				if j &gt; 0 then
+					ReDim triArray(0 to j - 1, 0 to 1) as single
+					for k = 0 to j - 1
+						triArray(k, 0) = secArray(k, 0)
+						triArray(k, 1) = secArray(k, 1)
+					next k
+					if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+						unPolygone = InsereCourbe(triArray(), j)
+						unPolygone.LineColor = val(RetourneOption(options, &quot;couleur&quot;))
+						StyleTrait(unPolygone, RetourneOption(options, &quot;style&quot;))	
+					End If
+				end if
+				j = 0
+				cestbon = False
+			else
+				secArray(j, 0) = CalcAbscisse(val(lesPoints(2 * i + 1)))
+				secArray(j, 1) = CalcOrdonnee(val(lesPoints(2 * i + 2)))
+				j = j + 1
+			end if
+		next i
+	end if
+End Sub
+
+sub AjoutePoint(unNom as string, coordonnees as string, options as string)
+dim x0 as single, y0 as single
+dim param() as string
+Dim p1() as String
+dim uneCouleur as long
+Dim unTrait as Object
+dim unTexte as Object
+
+	uneCouleur = RetourneCouleur(RetourneOption(options, &quot;couleur&quot;))
+	ChargeParametre(coordonnees, param(), &quot;,&quot;)
+	ChargeParametre(coordonnees, p1(), &quot;,&quot;)
+	param(0) = RetourneVariable(param(0))
+	param(1) = RetourneVariable(param(1))
+	p1(0) = param(0)
+	p1(1) = param(1)
+	x0 = CalcAbscisse(val(param(0)))
+	y0 = CalcOrdonnee(val(param(1)))
+
+	Sorte(NbObjet) = TEP_POINT
+	Nom(NbObjet) = unNom
+	Parametres(NbObjet) = param(0) &amp; &quot;;&quot; &amp; param(1)
+	NbObjet = NbObjet + 1
+
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		Select case RetourneOption(options, &quot;pointille&quot;)
+		case &quot;p1&quot;
+			unTrait = InsereLigne(x0, y0, calcAbscisse(0), y0)
+			StyleTrait(unTrait, &quot;7&quot;)
+			unTrait = InsereLigne(x0, y0, x0, calcOrdonnee(0))
+			StyleTrait(unTrait, &quot;7&quot;)
+		End Select
+		Select case RetourneOption(options, &quot;coord&quot;)
+		case &quot;coord&quot;
+			InsereTexte(param(0), x0, calcOrdonnee(0) + 100, 10, &quot;&quot;)
+			InsereTexte(param(1), calcAbscisse(0), y0, 10, &quot;&quot;)
+		case &quot;coordx&quot;
+			InsereTexte(param(0), x0, calcOrdonnee(0) + 100, 10, &quot;&quot;)
+		case &quot;coordy&quot;
+			InsereTexte(param(1), calcAbscisse(0), y0, 10, &quot;&quot;)
+		End Select
+		
+	 Dim pGroupe As object
+		Select case RetourneOption(options, &quot;point&quot;)
+		case &quot;croix0&quot;
+		 pGroupe = InitialiseGroupe()
+		 unTrait = InsereLigne(x0 - OOoTep_croix0, y0 - OOoTep_croix0, x0 + OOoTep_croix0, y0 + OOoTep_croix0, pGroupe)
+		 unTrait.LineColor = uneCouleur
+		 StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		 unTrait = InsereLigne(x0 - OOoTep_croix0, y0 + OOoTep_croix0, x0 + OOoTep_croix0, y0 - OOoTep_croix0, pGroupe)
+		 unTrait.LineColor = uneCouleur
+		 StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		 pGroupe = GroupeObjet(pGroupe)
+		 oGroupeDessin.add(pGroupe)
+		case &quot;croix1&quot;
+		 pGroupe = InitialiseGroupe()
+		 unTrait = InsereLigne(x0 - OOoTep_croix1, y0 - OOoTep_croix1, x0 + OOoTep_croix1, y0 + OOoTep_croix1, pGroupe)
+		 unTrait.LineColor = uneCouleur
+		 StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		 unTrait = InsereLigne(x0 - OOoTep_croix1, y0 + OOoTep_croix1, x0 + OOoTep_croix1, y0 - OOoTep_croix1, pGroupe)
+		 unTrait.LineColor = uneCouleur
+		 StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		 pGroupe = GroupeObjet(pGroupe)
+		 oGroupeDessin.add(pGroupe)
+		case &quot;croix2&quot;
+		 pGroupe = InitialiseGroupe()
+		 unTrait = InsereLigne(x0 - OOoTep_croix2, y0 - OOoTep_croix2, x0 + OOoTep_croix2, y0 + OOoTep_croix2, pGroupe)
+		 unTrait.LineColor = uneCouleur
+		 StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		 unTrait = InsereLigne(x0 - OOoTep_croix2, y0 + OOoTep_croix2, x0 + OOoTep_croix2, y0 - OOoTep_croix2, pGroupe)
+		 unTrait.LineColor = uneCouleur
+		 StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		 pGroupe = GroupeObjet(pGroupe)
+		 oGroupeDessin.add(pGroupe)
+		case &quot;croix3&quot;
+		 pGroupe = InitialiseGroupe()
+		 unTrait = InsereLigne(x0 - OOoTep_croix3, y0 - OOoTep_croix3, x0 + OOoTep_croix3, y0 + OOoTep_croix3, pGroupe)
+		 unTrait.LineColor = uneCouleur
+		 StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		 unTrait = InsereLigne(x0 - OOoTep_croix3, y0 + OOoTep_croix3, x0 + OOoTep_croix3, y0 - OOoTep_croix3, pGroupe)
+		 unTrait.LineColor = uneCouleur
+		 StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))
+		 pGroupe = GroupeObjet(pGroupe)
+		 oGroupeDessin.add(pGroupe)
+		case &quot;rond1&quot;
+			unTrait = InsereCercle(x0, y0, OOoTep_rond1)
+			unTrait.LineColor = uneCouleur
+			unTrait.FillColor = uneCouleur
+		case &quot;rond2&quot;
+			unTrait = InsereCercle(x0, y0, OOoTep_rond2)
+			unTrait.LineColor = uneCouleur
+			unTrait.FillColor = uneCouleur
+		case &quot;rond3&quot;
+			unTrait = InsereCercle(x0, y0, OOoTep_rond3)
+			unTrait.LineColor = uneCouleur
+			unTrait.FillColor = uneCouleur
+		end Select
+		
+		ChargeParametre(RetourneOption(options, &quot;position&quot;), param(), &quot;;&quot;)
+		x0 = val(p1(0)) + val(param(0))
+		y0 = val(p1(1)) - val(param(1))
+		if RetourneOption(options, &quot;nom&quot;) = &quot;nom&quot; then
+			Dim uneTaille as integer
+			uneTaille = val(OOoTep_taillepolice) + val(RetourneOption(options, &quot;taille&quot;))
+			unTexte = InsereTexte(unNom, CalcAbscisse(x0), CalcOrdonnee(y0), uneTaille)
+&apos;			CouleurTexte(unTexte, uneCouleur)
+			PoliceTexte(unTexte, RetourneOption(Options, &quot;police&quot;))
+		end if
+	end if
+end sub
+
+
+Sub AjoutePolygone(unNom as string, listePoints as String, options as string)
+dim lesPoints() as string
+dim p1() as string
+dim unPolygone as Object
+dim triArray() as single
+dim i, np
+
+	np = ChargeParametre(listePoints, lesPoints, &quot;,&quot;)
+
+	ReDim triArray(0 to np - 1, 0 to 1) as single
+	for i = 0 to np - 1
+		ChargeParametre(Parametres(ChercheObjet(lesPoints(i))), p1, &quot;;&quot;)
+		triArray(i, 0) = CalcAbscisse(val(p1(0)))
+		triArray(i, 1) = CalcOrdonnee(val(p1(1)))
+	next i
+	
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		unPolygone = InserePolygoneB(triArray(), np)
+		unPolygone.LineColor = val(RetourneOption(options, &quot;couleur&quot;))
+		StyleTrait(unPolygone, RetourneOption(options, &quot;style&quot;))	
+		OpaciteTrait(unPolygone, RetourneOption(options, &quot;opacite&quot;), RetourneOption(options, &quot;couleur&quot;))
+	End If
+	
+	RemplaceTexte(listePoints, &quot;,&quot;, &quot;;&quot;)
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_POLYGONE
+	Parametres(NbObjet) = listePoints
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteProjete(unNom as String, listeObjets as String, options as String)
+dim x0 as double
+Dim y0 as double
+dim lesObjets() as string
+Dim p1() as String
+Dim p2() as String
+Dim p3() as String
+Dim ang as Double
+Dim u, num, den
+Dim x1,y1,x2,y2,x3,y3
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)		
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(1))), p2, &quot;;&quot;)		
+&apos;	if UBound(lesObjets) = 2 then
+&apos;		ChargeParametre(Parametres(ChercheObjet(lesObjets(2))), p3, &quot;;&quot;)		
+&apos;		ang = CalculeAngle(val(p3(0)), val(p3(1)), val(p3(2)), val(p3(3)))
+&apos;	else
+&apos;		ang = CalculeAngle(val(p2(0)), val(p2(1)), val(p2(2)), val(p2(3))) + Pi / 2
+&apos;	end if
+&apos;	TrouveIntersection(val(p1(0)), val(p1(1)), val(p1(0)) + 500 * cos(ang), val(p1(1)) + 500 * sin(ang), val(p2(0)), val(p2(1)), val(p2(2)), val(p2(3)), x0, y0)
+	x1 = val(p2(0))
+	y1 = val(p2(1))
+	x2 = val(p2(2))
+	y2 = val(p2(3))
+	x3 = val(p1(0))
+	y3 = val(p1(1))
+	num = (x3 - x1) * (x2 - x1) + (y3 - y1) * (y2 - y1)
+	den = (x2 - x1) ^ 2 + (y2 - y1) ^ 2
+	u=num/den
+	x0 = x1 + u * (x2 - x1)
+	y0 = y1 + u * (y2 - y1)
+	AjoutePoint(unNom, trim(str(x0)) &amp; &quot;,&quot; &amp; trim(str(y0)), options)
+End Sub
+
+Sub StylePolice(unTrait as Object, tp as integer, sp as integer)
+	unTrait.Text.CharHeight = tp
+	unTrait.Text.CharFontName = OOoTep_nompolice
+	select case sp
+	case 0
+		unTrait.Text.CharWeight = com.sun.star.awt.FontWeight.NORMAL
+		unTrait.Text.CharPosture = com.sun.star.awt.FontSlant.NONE
+	case 2
+		unTrait.Text.CharWeight = com.sun.star.awt.FontWeight.BOLD
+		unTrait.Text.CharPosture = com.sun.star.awt.FontSlant.NONE
+	case 1
+		unTrait.Text.CharWeight = com.sun.star.awt.FontWeight.NORMAL
+		unTrait.Text.CharPosture = com.sun.star.awt.FontSlant.ITALIC
+	case 3
+		unTrait.Text.CharWeight = com.sun.star.awt.FontWeight.BOLD
+		unTrait.Text.CharPosture = com.sun.star.awt.FontSlant.ITALIC
+	End select
+End Sub
+
+sub AjouteRepere(xorig, yorig, xunit, yunit, pasx, pasy, options)
+dim i, j
+Dim tp as Integer
+dim sp as integer
+Dim unTrait as Object
+Dim nt, axex as Boolean, axey as Boolean
+Dim n as Integer
+Dim axev as Boolean
+dim cr as String
+
+	axev = (RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot;)
+
+	if axev or trame or grille then
+		tp = val(RetourneOption(options, &quot;tprepere&quot;))
+		sp = val(RetourneOption(options, &quot;sprepere&quot;))
+		cr = RetourneOption(options, &quot;crepere&quot;)
+		axex = (ymin &lt; 0 and ymax &gt; 0)
+		axey = (xmin &lt; 0 and xmax &gt; 0)
+		nt = val(RetourneOption(options, &quot;grepere&quot;))
+
+		for i = int(xmin / pasx) + 1 to int(xmax / pasx)
+			if trame and (i &lt;&gt; 0 or not axev) then
+				unTrait = InsereLigne(calcAbscisse(i * pasx), calcOrdonnee(ymax), calcAbscisse(i * pasx), calcOrdonnee(ymin))
+				unTrait.LineColor = RetourneCouleur(&quot;grisclair&quot;)
+			end if
+			if grille and i &lt;&gt; 0 then
+				for j = int(ymin / pasy) + 1 to int(ymax / pasy)
+					if j &lt;&gt; 0 or not axev then
+						unTrait = InsereCercle(calcAbscisse(i * pasx), calcOrdonnee(j * pasy), 25)
+						unTrait.LineColor = RetourneCouleur(&quot;noir&quot;)
+						OpaciteTrait(unTrait, &quot;100&quot;, RetourneCouleur(&quot;noir&quot;))
+					end if
+				next j
+			end if
+			if axex and axev and i &lt;&gt; 0 then
+				unTrait = InsereLigne(calcAbscisse(i * pasx), calcOrdonnee(0) - MIif((i mod nt) = 0, 200, 100), calcAbscisse(i * pasx), calcOrdonnee(0) + MIif((i mod nt) = 0, 200, 100))
+				unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+&apos;				if (i mod nt) = 0 then InsereTexte(trim(str(i*pasx)), calcAbscisse(i*pasx), calcOrdonnee(0), tp, sp, cr, AL_CENTRE, AL_HAUT)
+			end if
+		Next I
+
+		for i = int(ymin / pasy) + 1 to int(ymax / pasy)
+			if trame and (i &lt;&gt; 0 or not axev) then
+				unTrait = InsereLigne(calcAbscisse(xmin), calcOrdonnee(i * pasy), calcAbscisse(xmax), calcOrdonnee(i * pasy))
+				unTrait.LineColor = RetourneCouleur(&quot;grisclair&quot;)
+			End if
+			if axey and axev and i &lt;&gt; 0 then
+				unTrait = InsereLigne(calcAbscisse(0) - MIif((i mod nt) = 0, 200, 100), calcOrdonnee(i * pasy), calcAbscisse(0) + MIif((i mod nt) = 0, 200, 100), calcOrdonnee(i * pasy))
+				unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+&apos;				if (i mod nt) = 0 then InsereTexte(trim(str(i*pasy)), calcAbscisse(0), calcOrdonnee(i*pasy), tp, sp, cr, AL_DROITE, AL_CENTRE)
+			end if
+		next i
+
+		if axex and axev then InsereVecteur(calcAbscisse(xmin), calcOrdonnee(0), calcAbscisse(xmax), calcOrdonnee(0), RetourneOption(options, &quot;couleur&quot;))
+		if axey and axev then InsereVecteur(calcAbscisse(0), calcOrdonnee(ymin), calcAbscisse(0), calcOrdonnee(ymax), RetourneOption(options, &quot;couleur&quot;))
+		if axex and axey and axev then InsereTexte(&quot;0&quot;, calcAbscisse(0), calcOrdonnee(0), tp, sp, cr, AL_DROITE, AL_HAUT)
+
+		for i = int(xmin / pasx) + 1 to int(xmax / pasx)
+			if axex and axev and i &lt;&gt; 0 then
+				if (i mod nt) = 0 then InsereTexte(trim(str(i * pasx)), calcAbscisse(i * pasx), calcOrdonnee(0), tp, sp, cr, AL_CENTRE, AL_HAUT)
+			end if
+		Next I
+		for i = int(ymin / pasy) + 1 to int(ymax / pasy)
+			if axey and axev and i &lt;&gt; 0 then
+				if (i mod nt) = 0 then InsereTexte(trim(str(i * pasy)), calcAbscisse(0), calcOrdonnee(i * pasy), tp, sp, cr, AL_DROITE, AL_CENTRE)
+			end if
+		next i
+		
+	End if
+end sub
+
+Sub AjouteRotation(unNom as string, listeObjets as string)
+Dim lesObjets() as String
+Dim p1() as String
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_ROTATION
+	Parametres(NbObjet) = p1(0) &amp; &quot;;&quot; &amp; p1(1) &amp; &quot;;&quot; &amp; RetourneVariable(lesObjets(1))
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteSegment(unNom as string, listePoints as string, options as string, sType as integer)
+Dim lesPoints() as string
+Dim p1() as string
+Dim p2() as string
+Dim unTrait as Object
+Dim a as Double
+Dim b as Double
+Dim c as Double
+
+	ChargeParametre(listePoints, lesPoints, &quot;,&quot;)
+
+	select case sType
+	case TEP_DROITEANGLE
+		a = Evalue(lesPoints(2)) * Miif(angle_en_radian, 1, Pi / 180)
+		if RetourneOption(options, &quot;sens&quot;) &lt;&gt; &quot;indirect&quot; Then a = - a
+		ChargeParametre(Parametres(ChercheObjet(lesPoints(0))), p1, &quot;;&quot;)
+		ChargeParametre(Parametres(ChercheObjet(lesPoints(1))), p2, &quot;;&quot;)
+		a = a + CalculeAngle(val(p2(0)), val(p2(1)), val(p2(2)), val(p2(3)))
+		p2(0) = trim(str(val(p1(0)) + 100 * cos(a)))
+		p2(1) = trim(str(val(p1(1)) - 100 * sin(a)))
+	case TEP_DROITEEQR
+		a = Evalue(lesPoints(0))
+		b = Evalue(lesPoints(1))
+		ChargeParametre(&quot;0;&quot; &amp; trim(str(b)), p1, &quot;;&quot;)
+		ChargeParametre(&quot;1;&quot; &amp; trim(str(a + b)), p2, &quot;;&quot;)
+	case TEP_DROITEEQ
+		a = Evalue(lesPoints(0))
+		b = Evalue(lesPoints(1))
+		c = Evalue(lesPoints(2))
+		if a = 0 then
+			ChargeParametre(&quot;0;&quot; &amp; trim(str( - c / b)), p1, &quot;;&quot;)
+			ChargeParametre(&quot;1;&quot; &amp; trim(str( - c / b)), p2, &quot;;&quot;)
+		else
+			if b = 0 then
+				ChargeParametre(trim(str( - c / a)) &amp; &quot;;0&quot; , p1, &quot;;&quot;)
+				ChargeParametre(trim(str( - c / a)) &amp; &quot;;1&quot; , p2, &quot;;&quot;)
+			else
+				ChargeParametre(&quot;0;&quot; &amp; trim(str( - c / b)), p1, &quot;;&quot;)
+				ChargeParametre(&quot;1;&quot; &amp; trim(str(( - a - c) / b)), p2, &quot;;&quot;)
+			end if
+		end if
+	case TEP_DROITEV
+		ChargeParametre(Parametres(ChercheObjet(lesPoints(0))), p1, &quot;;&quot;)
+		ChargeParametre(Parametres(ChercheObjet(lesPoints(1))), p2, &quot;;&quot;)
+		p2(0) = trim(str(val(p1(0)) + val(p2(2)) - val(p2(0)))
+		p2(1) = trim(str(val(p1(1)) + val(p2(3)) - val(p2(1)))
+	case else
+		ChargeParametre(Parametres(ChercheObjet(lesPoints(0))), p1, &quot;;&quot;)
+		ChargeParametre(Parametres(ChercheObjet(lesPoints(1))), p2, &quot;;&quot;)
+	end select
+
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		Select Case sType
+		case TEP_SEGMENT
+			unTrait = InsereLigne(CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))))
+			Dim unCodage as String
+			unCodage = RetourneOption(options, &quot;code&quot;)
+			if unCodage &lt;&gt; &quot;&quot; then
+				CodeLongueur(CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), unCodage, options)
+			End if
+		case TEP_DROITE, TEP_DROITEEQR, TEP_DROITEEQ, TEP_DROITEV, TEP_DROITEANGLE
+			unTrait = TraceDroite(CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), xmin, ymin, xmax, ymax, unNom, False, options)
+		case TEP_DEMIDROITE 
+			unTrait = TraceDroite(CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), xmin, ymin, xmax, ymax, unNom, True, options)
+		case TEP_VECTEUR 
+			unTrait = InsereVecteur(CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), RetourneOption(options, &quot;couleur&quot;))
+		End Select
+		unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+		StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+	End If
+	
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = sType
+	Parametres(NbObjet) = p1(0) &amp; &quot;;&quot; &amp; p1(1) &amp; &quot;;&quot; &amp; p2(0) &amp; &quot;;&quot; &amp; p2(1) &amp; &quot;;&quot; &amp; MIif(options=&quot;&quot;, &quot;v&quot;, options)
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteSegmentLong(unNom as string, listePoints as string, coords as string, options as string)
+Dim lesPoints() as string
+Dim p1() as string
+Dim p2() as string
+Dim unTrait as Object
+Dim a as Double
+Dim b as Double
+Dim c as Double
+Dim l as single
+Dim i, j, k
+
+	ChargeParametre(listePoints, lesPoints, &quot;,&quot;)
+	l = val(RetourneVariable(lesPoints(2)))
+	ChargeParametre(Coords, p1, &quot;,&quot;)
+	ChargeParametre(Coords, p2, &quot;,&quot;)
+	p2(0) = p2(3)
+	p2(1) = p2(4)
+	
+	AjoutePoint(lesPoints(1), p2(0) &amp; &quot;,&quot; &amp; p2(1), options)
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		unTrait = InsereLigne(CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))))
+		Dim unCodage as String
+		unCodage = RetourneOption(options, &quot;code&quot;)
+		if unCodage &lt;&gt; &quot;&quot; then
+			CodeLongueur(CalcAbscisse(val(p1(0))), CalcOrdonnee(val(p1(1))), CalcAbscisse(val(p2(0))), CalcOrdonnee(val(p2(1))), unCodage, options)
+		End if
+		unTrait.LineColor = RetourneOption(options, &quot;couleur&quot;)
+		StyleTrait(unTrait, RetourneOption(options, &quot;style&quot;))	
+	End If
+	
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_SEGMENT
+	Parametres(NbObjet) = p1(0) &amp; &quot;;&quot; &amp; p1(1) &amp; &quot;;&quot; &amp; p2(0) &amp; &quot;;&quot; &amp; p2(1) 
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteSimilitude(unNom as String, listeObjets as String)
+Dim lesObjets() as String
+Dim p1() as String
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_SIMILITUDE
+	Parametres(NbObjet) = p1(0) &amp; &quot;;&quot; &amp; p1(1) &amp; &quot;;&quot; &amp; RetourneVariable(lesObjets(1)) &amp; &quot;;&quot; &amp; RetourneVariable(lesObjets(2))
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteSymetrie(unNom as String, unObjet as string)
+Dim i as Integer
+
+	i = ChercheObjet(unObjet)
+	if Sorte(i) = TEP_POINT then
+		Sorte(NbObjet) = TEP_SYMETRIQUEPOINT
+	else
+		Sorte(NbObjet) = TEP_SYMETRIQUEDROITE
+	end if
+	Parametres(NbObjet) = Parametres(i)
+	Nom(NbObjet) = unNom
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteSymetrique(unNom as String, listeObjets as String, options as String)
+Dim p1() as String
+Dim p2() as String
+Dim lesObjets() as String
+Dim i as Integer
+Dim x1 as Double, y1 as Double
+Dim x2 as Double, y2 as Double
+Dim ang as Double
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	i = ChercheObjet(lesObjets(1))
+	ChargeParametre(Parametres(i), p2, &quot;;&quot;)
+	ChargeParametre(Parametres(ChercheObjet(lesObjets(0))), p1, &quot;;&quot;)
+	x1 = val(p1(0))
+	y1 = val(p1(1))
+	If Sorte(i) = TEP_POINT then
+		x2 = 2 * val(p2(0)) - x1
+		y2 = 2 * val(p2(1)) - y1
+	else
+		ang = CalculeAngle(val(p2(0)), val(p2(1)), val(p2(2)), val(p2(3))) + Pi / 2
+		TrouveIntersection(val(p2(0)), val(p2(1)), val(p2(2)), val(p2(3)), x1, y1, x1 + 10000 * cos(ang), y1 + 10000 * sin(ang), x2, y2)
+		x2 = 2 * x2 - x1
+		y2 = 2 * y2 - y1
+	End if
+	AjoutePoint(unNom, trim(str(x2)) &amp; &quot;,&quot; &amp; trim(str(y2)), options)
+End Sub
+
+Sub AjouteTexte(unNom as String, listeObjets as String, options as String, leVraiTexte as String)
+Dim lesObjets() as String
+Dim i as Integer
+Dim j as Integer
+Dim unTexte as String
+Dim x0 as string
+Dim y0 as string
+Dim p1() as String
+Dim unTrait as Object
+Dim uneTaille as integer
+dim MiseEnForme(1, 1) as integer
+Dim k as Integer
+
+	k = Len(leVraiTexte)
+	ReDim MiseEnForme(0 to k, 0 to 1) as Integer
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	i = ChercheObjet(lesObjets(0))
+	if i &lt;&gt; - 1 then
+		if Sorte(i) = TEP_POINT then
+			ChargeParametre(Parametres(i), p1, &quot;;&quot;)
+			x0 = p1(0)
+			y0 = p1(1)
+			unTexte = lesObjets(1)
+		end if
+	else
+		x0 = lesObjets(0)
+		y0 = lesObjets(1)
+		unTexte = lesObjets(2)
+	end if
+	unTexte = mid(unTexte, 2, len(unTexte) - 2)
+	while instr(1, unTexte, &quot;$&quot;)
+		i = instr(1, unTexte, &quot;$&quot;)
+		j = instr(i + 1, unTexte, &quot;$&quot;)
+		RemplaceTexte(unTexte, mid(unTexte, i, j - i + 1), RetourneVariable(mid(unTexte, i + 1, j - i - 1), options)
+	wend
+
+
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		ChargeParametre(RetourneOption(options, &quot;position&quot;), p1, &quot;;&quot;)
+		x0 = trim(str(val(x0) + val(p1(0))))
+		y0 = trim(str(val(y0) - val(p1(1))))
+		if TesteTexte(leVraiTexte) then
+			leVraiTexte = TraduitTexte(leVraiTexte)
+			if instr(1, options, &quot;rouge&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;color red {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;magenta&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;color magenta {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;blanc&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;color white {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;noir&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;color black {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;cyan&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;color cyan {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;vert&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;color green {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;bleu&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;color blue {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;jaune&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;color yellow {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;gras&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;bold {&quot; &amp; leVraiTexte &amp; &quot;}&quot; Else leVraiTexte = &quot;nbold {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			if instr(1, options, &quot;italique&quot;) &lt;&gt; 0 Then leVraiTexte = &quot;ital {&quot; &amp; leVraiTexte &amp; &quot;}&quot; Else leVraiTexte = &quot;nitalic {&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			uneTaille = 14 + val(RetourneOption(options, &quot;taille&quot;))
+			leVraiTexte = &quot;size &quot; &amp; trim(str(uneTaille)) &amp; &quot;{&quot; &amp; leVraiTexte &amp; &quot;}&quot;
+			unTrait = InsereTexteBis(leVraiTexte, CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)), 0, 1, 1)
+		else
+			RemplaceTexte(leVraiTexte, &quot;£alpha£&quot;, Chr(&amp;h03B1))
+			RemplaceTexte(leVraiTexte, &quot;£beta£&quot;, Chr(&amp;h03B2))
+			RemplaceTexte(leVraiTexte, &quot;£chi£&quot;, Chr(&amp;h03C7))
+			RemplaceTexte(leVraiTexte, &quot;£delta£&quot;, Chr(&amp;h03B4))
+			RemplaceTexte(leVraiTexte, &quot;£epsilon£&quot;, Chr(&amp;h03B5))
+			RemplaceTexte(leVraiTexte, &quot;£phi£&quot;, Chr(&amp;h03D5))
+			RemplaceTexte(leVraiTexte, &quot;£gamma£&quot;, Chr(&amp;h03B3))
+			RemplaceTexte(leVraiTexte, &quot;£iota£&quot;, Chr(&amp;h03B9))
+			RemplaceTexte(leVraiTexte, &quot;£phi2£&quot;, Chr(&amp;h03C6))
+			RemplaceTexte(leVraiTexte, &quot;£kappa£&quot;, Chr(&amp;h03BA))
+			RemplaceTexte(leVraiTexte, &quot;£lambda£&quot;, Chr(&amp;h03BB))
+			RemplaceTexte(leVraiTexte, &quot;£mu£&quot;, Chr(&amp;h03BC))
+			RemplaceTexte(leVraiTexte, &quot;£nu£&quot;, Chr(&amp;h03BD))
+			RemplaceTexte(leVraiTexte, &quot;£omicron£&quot;, Chr(&amp;h03BF))
+			RemplaceTexte(leVraiTexte, &quot;£pi£&quot;, Chr(&amp;h03C0))
+			RemplaceTexte(leVraiTexte, &quot;£theta£&quot;, Chr(&amp;h03B8))
+			RemplaceTexte(leVraiTexte, &quot;£rho£&quot;, Chr(&amp;h03C1))
+			RemplaceTexte(leVraiTexte, &quot;£sigma£&quot;, Chr(&amp;h03C3))
+			RemplaceTexte(leVraiTexte, &quot;£tau£&quot;, Chr(&amp;h03C4))
+			RemplaceTexte(leVraiTexte, &quot;£upsilon£&quot;, Chr(&amp;h03C5))
+			RemplaceTexte(leVraiTexte, &quot;£sampi£&quot;, Chr(&amp;h03D6))
+			RemplaceTexte(leVraiTexte, &quot;£omega£&quot;, Chr(&amp;h03C9))
+			RemplaceTexte(leVraiTexte, &quot;£xi£&quot;, Chr(&amp;h03BE))
+			RemplaceTexte(leVraiTexte, &quot;£psi£&quot;, Chr(&amp;h03C8))
+			RemplaceTexte(leVraiTexte, &quot;£dzeta£&quot;, Chr(&amp;h03B6))
+			RemplaceTexte(leVraiTexte, &quot;£Alpha£&quot;, Chr(&amp;h0391))
+			RemplaceTexte(leVraiTexte, &quot;£Beta£&quot;, Chr(&amp;h0392))
+			RemplaceTexte(leVraiTexte, &quot;£Chi£&quot;, Chr(&amp;h03A7))
+			RemplaceTexte(leVraiTexte, &quot;£Delta£&quot;, Chr(&amp;h0394))
+			RemplaceTexte(leVraiTexte, &quot;£Epsilon£&quot;, Chr(&amp;h0395))
+			RemplaceTexte(leVraiTexte, &quot;£Phi£&quot;, Chr(&amp;h03A6))
+			RemplaceTexte(leVraiTexte, &quot;£Gamma£&quot;, Chr(&amp;h0393))
+			RemplaceTexte(leVraiTexte, &quot;£Eta£&quot;, Chr(&amp;h0397))
+			RemplaceTexte(leVraiTexte, &quot;£Iota£&quot;, Chr(&amp;h0399))
+			RemplaceTexte(leVraiTexte, &quot;£Phi2£&quot;, Chr(&amp;h03D1))
+			RemplaceTexte(leVraiTexte, &quot;Kappa£&quot;, Chr(&amp;h039A))
+			RemplaceTexte(leVraiTexte, &quot;£Lambda£&quot;, Chr(&amp;h039B))
+			RemplaceTexte(leVraiTexte, &quot;£Mu£&quot;, Chr(&amp;h039C))
+			RemplaceTexte(leVraiTexte, &quot;£Nu£&quot;, Chr(&amp;h039D))
+			RemplaceTexte(leVraiTexte, &quot;£Omicron£&quot;, Chr(&amp;h039F))
+			RemplaceTexte(leVraiTexte, &quot;£Pi£&quot;, Chr(&amp;h03B2))
+			RemplaceTexte(leVraiTexte, &quot;£Theta£&quot;, Chr(&amp;h03A0))
+			RemplaceTexte(leVraiTexte, &quot;£Rho£&quot;, Chr(&amp;h0398))
+			RemplaceTexte(leVraiTexte, &quot;£Sigma£&quot;, Chr(&amp;h03A3))
+			RemplaceTexte(leVraiTexte, &quot;£Tau£&quot;, Chr(&amp;h03A4))
+			RemplaceTexte(leVraiTexte, &quot;£Upsilon£&quot;, Chr(&amp;h03A5))
+			RemplaceTexte(leVraiTexte, &quot;£Sampi£&quot;, Chr(&amp;h03C2))
+			RemplaceTexte(leVraiTexte, &quot;£Omega£&quot;, Chr(&amp;h03A9))
+			RemplaceTexte(leVraiTexte, &quot;£Xi£&quot;, Chr(&amp;h039E))
+			RemplaceTexte(leVraiTexte, &quot;£Psi£&quot;, Chr(&amp;h20D7))
+			RemplaceTexte(leVraiTexte, &quot;£Dzeta£&quot;, Chr(&amp;h0396))
+			uneTaille = 14 + val(RetourneOption(options, &quot;taille&quot;))
+			unTrait = InsereTexte(leVraiTexte, CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)), uneTaille)
+			CouleurTexte(unTrait, RetourneOption(options, &quot;couleur&quot;))
+		End If
+	End If
+
+	Sorte(NbObjet) = TEP_TEXTE
+	Nom(NbObjet) = unNom
+	Parametres(NbObjet) = x0 &amp; &quot;;&quot; &amp; y0 &amp; &quot;;&quot; &amp; unTexte
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AdapteTexte(leTexte, liste)
+Dim a as Integer
+
+	if instr(1, ucase(leTexte), ucase(liste) &amp; &quot; &quot;) = 1 Then
+		leTexte = &quot;%&quot; &amp; left(leTexte, len(liste)) &amp;  mid(leTexte, len(liste) + 1)
+	End if
+	do
+		a = instr(1, ucase(leTexte), &quot; &quot; &amp; ucase(liste) &amp; &quot; &quot;)
+		If a &lt;&gt; 0 Then
+			leTexte = left(leTexte, a - 1) &amp; &quot;%&quot; &amp; mid(leTexte, a, len(liste)) &amp; mid(leTexte, a + len(liste))
+		End If
+	Loop While (a &lt;&gt; 0)
+End Sub
+
+Function TraduitTexte(leVraiTexte) as String
+Dim unTexte as String
+Dim i as integer, j as integer
+Dim uneFraction as String
+Dim num as String, den as String
+
+	unTexte = leVraiTexte
+
+	RemplaceTexte(unTexte, &quot;£alpha£&quot;, &quot;%alpha&quot;)
+	RemplaceTexte(unTexte, &quot;£beta£&quot;, &quot;%bêta&quot;)
+	RemplaceTexte(unTexte, &quot;£gamma£&quot;, &quot;%gamma&quot;)
+	RemplaceTexte(unTexte, &quot;£delta£&quot;, &quot;%delta&quot;)
+	RemplaceTexte(unTexte, &quot;£epsilon£&quot;, &quot;%epsilon&quot;)
+	RemplaceTexte(unTexte, &quot;£dzeta£&quot;, &quot;%zêta&quot;)
+	RemplaceTexte(unTexte, &quot;£eta£&quot;, &quot;%êta&quot;)
+	RemplaceTexte(unTexte, &quot;£theta£&quot;, &quot;%thêta&quot;)
+	RemplaceTexte(unTexte, &quot;£iota£&quot;, &quot;%iota&quot;)
+	RemplaceTexte(unTexte, &quot;£kappa£&quot;, &quot;%kappa&quot;)
+	RemplaceTexte(unTexte, &quot;£lambda£&quot;, &quot;%lambda&quot;)
+	RemplaceTexte(unTexte, &quot;£mu£&quot;, &quot;%mu&quot;)
+	RemplaceTexte(unTexte, &quot;£nu£&quot;, &quot;%nu&quot;)
+	RemplaceTexte(unTexte, &quot;£xi£&quot;, &quot;%xi&quot;)
+	RemplaceTexte(unTexte, &quot;£omicron£&quot;, &quot;%omicron&quot;)
+	RemplaceTexte(unTexte, &quot;£pi£&quot;, &quot;%pi&quot;)
+	RemplaceTexte(unTexte, &quot;£rho£&quot;, &quot;%rhô&quot;)
+	RemplaceTexte(unTexte, &quot;£sigma£&quot;, &quot;%sigma&quot;)
+	RemplaceTexte(unTexte, &quot;£tau£&quot;, &quot;%tau&quot;)
+	RemplaceTexte(unTexte, &quot;£upsilon£&quot;, &quot;%upsilon&quot;)
+	RemplaceTexte(unTexte, &quot;£phi£&quot;, &quot;%phi&quot;)
+	RemplaceTexte(unTexte, &quot;£phi2£&quot;, &quot;%varphi&quot;)
+	RemplaceTexte(unTexte, &quot;£chi£&quot;, &quot;%khi&quot;)
+	RemplaceTexte(unTexte, &quot;£psi£&quot;, &quot;%psi&quot;)
+	RemplaceTexte(unTexte, &quot;£omega£&quot;, &quot;%oméga&quot;)
+	RemplaceTexte(unTexte, &quot;£Alpha£&quot;, &quot;%ALPHA&quot;)
+	RemplaceTexte(unTexte, &quot;£Beta£&quot;, &quot;%BÊTA&quot;)
+	RemplaceTexte(unTexte, &quot;£Gamma£&quot;, &quot;%GAMMA&quot;)
+	RemplaceTexte(unTexte, &quot;£Delta£&quot;, &quot;%DELTA&quot;)
+	RemplaceTexte(unTexte, &quot;£Epsilon£&quot;, &quot;%EPSILON&quot;)
+	RemplaceTexte(unTexte, &quot;£Dzeta£&quot;, &quot;%ZÊTA&quot;)
+	RemplaceTexte(unTexte, &quot;£Eta£&quot;, &quot;%ÊTA&quot;)
+	RemplaceTexte(unTexte, &quot;£Theta£&quot;, &quot;%THÉTA&quot;)
+	RemplaceTexte(unTexte, &quot;£Iota£&quot;, &quot;%IOTA&quot;)
+	RemplaceTexte(unTexte, &quot;£Kappa£&quot;, &quot;%KAPPA&quot;)
+	RemplaceTexte(unTexte, &quot;£Lambda£&quot;, &quot;%LAMBDA&quot;)
+	RemplaceTexte(unTexte, &quot;£Mu£&quot;, &quot;%MU&quot;)
+	RemplaceTexte(unTexte, &quot;£Nu£&quot;, &quot;%NU&quot;)
+	RemplaceTexte(unTexte, &quot;£Xi£&quot;, &quot;%XI&quot;)
+	RemplaceTexte(unTexte, &quot;£Omicron£&quot;, &quot;%OMICRON&quot;)
+	RemplaceTexte(unTexte, &quot;£Pi£&quot;, &quot;%PI&quot;)
+	RemplaceTexte(unTexte, &quot;£Rho£&quot;, &quot;%RHÔ&quot;)
+	RemplaceTexte(unTexte, &quot;£Sigma£&quot;, &quot;%SIGMA&quot;)
+	RemplaceTexte(unTexte, &quot;£Tau£&quot;, &quot;%TAU&quot;)
+	RemplaceTexte(unTexte, &quot;£Upsilon£&quot;, &quot;%UPSILON&quot;)
+	RemplaceTexte(unTexte, &quot;£Phi£&quot;, &quot;%PHI&quot;)
+	RemplaceTexte(unTexte, &quot;£Chi£&quot;, &quot;%KHI&quot;)
+	RemplaceTexte(unTexte, &quot;£Psi£&quot;, &quot;%PSI&quot;)
+	RemplaceTexte(unTexte, &quot;£Omega£&quot;, &quot;%OMÉGA&quot;)
+
+	AdapteTexte(unTexte, &quot;le&quot;)
+	do
+		i = instr(1, unTexte, &quot;£r(&quot;)
+		if i &lt;&gt; 0 then 
+			j = TrouveParenthese(unTexte, i + 3)
+			uneFraction = mid(unTexte, i + 3, j - i - 3)
+			unTexte = left(unTexte, i - 1) &amp; &quot;nroot{}{&quot; &amp; uneFraction &amp; &quot;}&quot; &amp; mid(unTexte, j + 1)
+		End If
+	loop while (i &lt;&gt; 0)
+
+	do
+		i = instr(1, unTexte, &quot;£v(&quot;)
+		if i &lt;&gt; 0 then 
+			j = TrouveParenthese(unTexte, i + 3)
+			uneFraction = mid(unTexte, i + 3, j - i - 3)
+			unTexte = left(unTexte, i - 1) &amp; &quot;widevec{&quot; &amp; uneFraction &amp; &quot;}&quot; &amp; mid(unTexte, j + 1)
+		End If
+	loop while (i &lt;&gt; 0)
+
+	do
+		i = instr(1, unTexte, &quot;£a(&quot;)
+		if i &lt;&gt; 0 then 
+			j = TrouveParenthese(unTexte, i + 3)
+			uneFraction = mid(unTexte, i + 3, j - i - 3)
+			unTexte = left(unTexte, i - 1) &amp; &quot;widehat{&quot; &amp; uneFraction &amp; &quot;}&quot; &amp; mid(unTexte, j + 1)
+		End If
+	loop while (i &lt;&gt; 0)
+
+	do
+		i = instr(1, unTexte, &quot;£f(&quot;)
+		if i &lt;&gt; 0 then 
+			j = TrouveParenthese(unTexte, i + 3)
+			uneFraction = mid(unTexte, i + 3, j - i - 3)
+			RetourneNumDen(uneFraction, num, den)
+			unTexte = left(unTexte, i - 1) &amp; &quot;{&quot; &amp; num &amp; &quot;} over {&quot; &amp; den &amp; &quot;}&quot; &amp; mid(unTexte, j + 1)
+		End If
+	loop while (i &lt;&gt; 0)
+	do
+		i = instr(1, unTexte, &quot;£i(&quot;)
+		if i &lt;&gt; 0 then 
+			j = TrouveParenthese(unTexte, i + 3)
+			uneFraction = mid(unTexte, i + 3, j - i - 3)
+			unTexte = left(unTexte, i - 1) &amp; &quot;_{&quot; &amp; uneFraction &amp; &quot;}&quot; &amp; mid(unTexte, j + 1)
+		End If
+	loop while (i &lt;&gt; 0)
+	do
+		i = instr(1, unTexte, &quot;£e(&quot;)
+		if i &lt;&gt; 0 then 
+			j = TrouveParenthese(unTexte, i + 3)
+			uneFraction = mid(unTexte, i + 3, j - i - 3)
+			unTexte = left(unTexte, i - 1) &amp; &quot;^{&quot; &amp; uneFraction &amp; &quot;}&quot; &amp; mid(unTexte, j + 1)
+		End If
+	loop while (i &lt;&gt; 0)
+	do
+		i = instr(1, unTexte, &quot;£c(&quot;)
+		if i &lt;&gt; 0 then
+			j= TrouveParenthese(unTexte, i + 3)
+			uneFraction = mid(unTexte, i + 3, j - i - 3)
+			unTexte = left(unTexte, i - 1) &amp; &quot;[&quot; &amp; uneFraction &amp; &quot;]&quot; &amp; mid(unTexte, j + 1)
+		End if
+	loop while (i &lt;&gt; 0)
+	do
+		i = instr(1, unTexte, &quot;£p(&quot;)
+		if i &lt;&gt; 0 then
+			j= TrouveParenthese(unTexte, i + 3)
+			uneFraction = mid(unTexte, i + 3, j - i - 3)
+			unTexte = left(unTexte, i - 1) &amp; &quot;(&quot; &amp; uneFraction &amp; &quot;)&quot; &amp; mid(unTexte, j + 1)
+		End if
+	Loop While (i &lt;&gt; 0)
+	TraduitTexte() = unTexte
+End Function
+
+Sub RetourneNumDen(uneFraction, num, den)
+Dim np
+Dim i
+
+	np = 0
+	For i = 1 To len(uneFraction)
+		if mid(uneFraction, i, 1) = &quot;(&quot; then np = np + 1
+		if mid(uneFraction, i, 1) = &quot;)&quot; Then np = np - 1
+		if mid(uneFraction, i, 1) = &quot;,&quot; And np = 0 then
+			num = left(uneFraction, i - 1)
+			den = mid(uneFraction, i + 1)
+			Exit Sub
+		End if
+	Next i
+End Sub
+
+Function TrouveParenthese(unTexte, n) as Integer
+Dim np
+Dim i
+
+	np = 0
+	for i = n to len(unTexte)
+		if mid(unTexte, i, 1) = &quot;)&quot; then 
+			if np = 0 then
+				TrouveParenthese() = i
+				Exit Function
+			else
+				np = np - 1
+			end if
+		End If
+		If mid(unTexte, i, 1) = &quot;(&quot; Then np = np + 1
+	next i
+End Function
+
+Function TesteTexte(leTexte) as Boolean
+	TesteTexte() = False
+	if instr(1, leTexte, &quot;£&quot;) then TesteTexte() = True
+	if instr(1, leTexte, &quot;£a(&quot;)&lt;&gt;0 then TesteTexte() = True
+	if instr(1, leTexte, &quot;£c(&quot;)&lt;&gt;0 then TesteTexte() = True
+	if instr(1, leTexte, &quot;£e(&quot;)&lt;&gt;0 then TesteTexte() = True
+	if instr(1, leTexte, &quot;£f(&quot;)&lt;&gt;0 then TesteTexte() = True
+	if instr(1, leTexte, &quot;£i(&quot;)&lt;&gt;0 then TesteTexte() = True
+	if instr(1, leTexte, &quot;£p(&quot;)&lt;&gt;0 then TesteTexte() = True
+	if instr(1, leTexte, &quot;£r(&quot;)&lt;&gt;0 then TesteTexte() = True
+	if instr(1, leTexte, &quot;£v(&quot;)&lt;&gt;0 then TesteTexte() = True
+	if instr(1, leTexte, &quot;£i(&quot;)&lt;&gt;0 then TesteTexte() = True
+End Function
+
+Sub AjouteTexteOld(unNom as String, listeObjets as String, options as String, leVraiTexte as String)
+Dim lesObjets() as String
+Dim i as Integer
+Dim j as Integer
+Dim unTexte as String
+Dim x0 as string
+Dim y0 as string
+Dim p1() as String
+Dim unTrait as Object
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	i = ChercheObjet(lesObjets(0))
+	if i &lt;&gt; - 1 then
+		if Sorte(i) = TEP_POINT then
+			ChargeParametre(Parametres(i), p1, &quot;;&quot;)
+			x0 = p1(0)
+			y0 = p1(1)
+			unTexte = lesObjets(1)
+		end if
+	else
+		x0 = lesObjets(0)
+		y0 = lesObjets(1)
+		unTexte = lesObjets(2)
+	end if
+	unTexte = mid(unTexte, 2, len(unTexte) - 2)
+	while instr(1, unTexte, &quot;$&quot;)
+		i = instr(1, unTexte, &quot;$&quot;)
+		j = instr(i + 1, unTexte, &quot;$&quot;)
+		RemplaceTexte(unTexte, mid(unTexte, i, j - i + 1), RetourneVariable(mid(unTexte, i + 1, j - i - 1), options))
+	wend
+
+	if RetourneOption(options, &quot;visibilite&quot;) = &quot;v&quot; then
+		ChargeParametre(RetourneOption(options, &quot;position&quot;), p1, &quot;;&quot;)
+		x0 = trim(str(val(x0) + val(p1(0))))
+		y0 = trim(str(val(y0) - val(p1(1))))
+&apos;		unTrait = InsereTexte(unTexte, CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)))
+		unTrait = InsereTexte(leVraiTexte, CalcAbscisse(val(x0)), CalcOrdonnee(val(y0)))
+		CouleurTexte(unTrait, RetourneOption(options, &quot;couleur&quot;))
+	End If
+	
+	Sorte(NbObjet) = TEP_TEXTE
+	Nom(NbObjet) = unNom
+	Parametres(NbObjet) = x0 &amp; &quot;;&quot; &amp; y0 &amp; &quot;;&quot; &amp; unTexte
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteTranslation(unNom as string, listeObjets as string)
+Dim lesObjets() as String
+
+	ChargeParametre(listeObjets, lesObjets, &quot;,&quot;)
+	if Sorte(ChercheObjet(lesObjets(0))) = TEP_VECTEUR then
+		Parametres(NbObjet) = Parametres(ChercheObjet(lesObjets(0)))
+	else
+		Parametres(NbObjet) = Parametres(ChercheObjet(lesObjets(0))) &amp; &quot;;&quot; &amp; Parametres(ChercheObjet(lesObjets(1)))
+	End if
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_TRANSLATION
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteVariable(unNom As String, listeObjets as String, options as String)
+	Parametres(NbObjet) = options
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_VARIABLE
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteReel(unNom As String, listeObjets as String, listeCoords as String, options as String)
+&apos; Aurélien	Parametres(NbObjet) = options &amp; &quot;;&quot; &amp; left(listeCoords, len(listeCoords) - 1)
+	Parametres(NbObjet) = options &amp; &quot;;&quot; &amp; listeCoords
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_REEL
+	NbObjet = NbObjet + 1
+End Sub
+
+Sub AjouteVecteur(unNom as String, unObjet as string)
+	Nom(NbObjet) = unNom
+	Sorte(NbObjet) = TEP_VECTEUR
+	Parametres(NbObjet) = &quot;0;0;&quot; &amp; unObjet 
+	NbObjet = NbObjet + 1
+End Sub
+
+function CalcAbscisse(x0 as single) as double
+rem	CalcAbscisse = xorig + val(x0)*xunit
+dim xx as single
+	xx = x0 - xmin
+	xx = xx * xunit
+	CalcAbscisse = xx
+end function
+
+function CalcOrdonnee(y0 as single) as double
+rem	CalcOrdonnee = yorig - val(y0)*yunit
+dim yy as single
+
+	yy = max(ymin, ymax) - y0
+	yy = yy * yunit
+	CalcOrdonnee = yy
+end function
+
+function ChercheObjet(unNom as string) as integer
+Dim i
+
+	ChercheObjet = - 1
+	for i = 0 to NbObjet - 1
+		if Trim(Nom(i)) = Trim(unNom) then 
+			ChercheObjet = i
+			exit for
+		end if
+	next i
+end function
+
+Function Evalue(unTexte As String) as Double
+Dim a as Integer
+	
+	a = instr(1, unTexte, &quot;/&quot;)
+	if a &lt;&gt; 0 then
+		Evalue = val(Left(unTexte, a - 1)) / val(mid(unTexte, a + 1))
+	else
+		Evalue = val(unTexte)
+	End If
+End Function
+
+Sub ExtraitBoiteTEP(leTexte as String)
+Dim i as integer
+Dim lesLignes() as String
+
+	ChargeParametre(leTexte, lesLignes, chr(10))
+	If ubound(lesLignes()) = 0 Then
+		ChargeParametre(leTexte, lesLignes, chr(13))
+	End If
+	redim ligne(lbound(lesLignes) to ubound(lesLignes)) As String
+	redim options(lbound(lesLignes) to ubound(lesLignes)) As String
+	redim coords(lbound(lesLignes) to ubound(lesLignes)) As String
+	
+	for i = lbound(lesLignes) to ubound(lesLignes)
+		ConversionLigneTexte(lesLignes(i), options(i), ligne(i), coords(i))
+		oTepForm.GetControl(&quot;ProgressBar1&quot;).Value = 100 * i / UBound(lesLignes())
+	next i
+
+End Sub
+
+Sub ExtraitLigneTep(ligne() as string, options() as string)
+dim f1 as integer
+dim i as integer
+dim uneLigne as string
+dim uneAction as Boolean
+Dim ti as Integer
+
+&apos;	on error goto fin
+	f1 = freefile
+	i = 0
+	DescriptionOOoTep = &quot;&quot;
+	Open NomFichier For Input as #f1
+	do while not eof(f1)
+		line input #f1, uneLigne
+		i = i + 1
+	loop
+	close #f1
+	
+	redim ligne(0 to i - 1) As String
+	redim options(0 to i - 1) As String
+	redim coords(0 to i - 1) As String
+	
+	oTepForm.GetControl(&quot;ProgressBar1&quot;).Value = 50
+
+	ti = i
+	f1 = freefile
+	i = 0
+	uneAction = False
+	Open NomFichier For Input as #f1
+	do while not eof(f1)
+		line input #f1, uneLigne
+		DescriptionOOoTep = DescriptionOOoTep &amp; uneLigne &amp; chr(10) &amp; chr(13)
+		ConversionLigneTexte(uneLigne, options(i), ligne(i), coords(i))
+		i = i + 1
+		oTepForm.GetControl(&quot;ProgressBar1&quot;).Value = 50 + 50 * i / ti
+	loop
+	close #f1
+
+	Exit Sub
+fin:
+	MsgBox1 &quot;Je n&apos;ai pas trouvé le fichier script indiqué !&quot;
+end Sub
+
+Function NombreTexte(unTexte as String, leTexte as String) as Integer
+Dim i as Integer
+Dim no as Integer
+
+	no = 0
+	i = instr(1, unTexte, leTexte)
+	while(i &lt;&gt; 0)
+		no = no + 1
+		i = instr(i + 1, unTexte, leTexte)
+	wend
+	NombreTexte() = no
+End Function
+
+Sub ConversionLigneTexte(uneLigne as String, lesOptions as String, laLigne as String, lesCoords as string)
+Dim j as integer
+Dim i as integer
+dim k as integer
+dim lesTextes() as String
+Dim nTexte as Integer
+Dim debug as String
+	
+	
+&apos;	RemplaceTexte uneLigne, chr(160), &quot;&quot;
+	
+	nTexte = NombreTexte(uneLigne, &quot;&quot;&quot;&quot;) / 2
+	if nTexte &gt; 0 then Redim lesTextes(nTexte - 1) as String
+	k = 0
+	for i = 0 to nTexte - 1
+		j = instr(k + 1, uneLigne, &quot;&quot;&quot;&quot;)
+		k = instr(j + 1, uneLigne, &quot;&quot;&quot;&quot;)
+		lesTextes(i) = mid(uneLigne, j, k - j + 1)
+	next i
+	for i = 0 to nTexte - 1
+		RemplaceTexte uneligne, lesTextes(i), &quot;OOoTepTexte&quot; &amp; trim(str(i))
+	next i	
+	lesOptions = &quot;&quot;
+	j = instr(1, uneLigne, &quot;{&quot;)
+	if j &lt;&gt; 0 then 
+		k = instr(j, uneLigne, &quot;}&quot;)
+		lesOptions = mid(uneLigne, j, k - j + 1)
+		laLigne = left(uneLigne, j - 1) &amp; mid(uneLigne, k + 1)
+	else
+		laLigne = uneLigne
+	end if
+	j = instr(1, laLigne, &quot;&amp;&amp;&quot;)
+	if j &lt;&gt; 0 then 
+		k = instr(j, laLigne, &quot;;&quot;)
+		lesCoords = trim(mid(laLigne, j + 2, k - j - 3))
+		if right(lesCoords, 1) = &quot;&amp;&quot; then lesCoords = left(lesCoords, len(lesCoords) - 1)
+		RemplaceTexte(lesCoords, &quot;&amp;&quot;, &quot;,&quot;)
+		laLigne = left(laLigne, j - 1) &amp; mid(laLigne, k + 1)
+	end if
+	for j = 1 to len(lesOptions)
+		Select Case mid(lesOptions, j, 1)
+		case &quot;}&quot;, &quot;{&quot;
+			lesOptions = left(lesOptions, j - 1) &amp; mid(lesOptions, j + 1)
+		case &quot;,&quot;, &quot; &quot;
+			lesOptions = left(lesOptions, j - 1) &amp; &quot;;&quot; &amp; mid(lesOptions, j + 1)
+		case &quot;(&quot; 
+			do while(mid(lesOptions, j, 1) &lt;&gt; &quot;)&quot;)
+				j = j + 1
+			loop
+		case &quot;&quot;&quot;&quot; 
+			j = j + 1
+			do while(mid(lesOptions, j, 1) &lt;&gt; &quot;&quot;&quot;&quot;)
+				j = j + 1
+			loop
+		End Select
+	next j
+	for j = 1 to len(laLigne)
+		Select Case mid(laLigne, j, 1)
+		case &quot;}&quot;, &quot;{&quot;
+			laLigne = left(laLigne, j - 1) &amp; mid(laLigne, j + 1)
+		case &quot;,&quot;, &quot; &quot;, &quot;=&quot;
+			laLigne = left(laLigne, j - 1) &amp; &quot;;&quot; &amp; mid(laLigne, j + 1)
+		case &quot;(&quot; 
+			dim np
+			np = 0
+			j = j + 1
+			do while(mid(laLigne, j, 1) &lt;&gt; &quot;)&quot;) or np &gt; 0
+				if mid(laLigne, j, 1) = &quot;(&quot; then np = np + 1
+				if mid(laLigne, j, 1) = &quot;)&quot; then np = np - 1
+				j = j + 1
+			loop
+		case &quot;&quot;&quot;&quot; 
+			j = j + 1
+			do while(mid(laLigne, j, 1) &lt;&gt; &quot;&quot;&quot;&quot;)
+				j = j + 1
+			loop
+		End Select
+	next j
+	RemplaceTexte(laLigne, &quot;(&quot;, &quot;;&quot;)
+	RemplaceTexte(laLigne, &quot;)&quot;, &quot;;&quot;)
+	RemplaceTexte laLigne, &quot;;;&quot;, &quot;;&quot;
+	RemplaceTexte laLigne, &quot;;;&quot;, &quot;;&quot;
+	if left(laLigne, 1) = &quot;;&quot; then laLigne = mid(laLigne, 2)
+	if left(lesOptions, 1) = &quot;;&quot; then lesOptions = mid(lesOptions, 2)
+	if right(laLigne, 1) = &quot;;&quot; then laLigne = left(laLigne, len(laLigne) - 1)
+	if right(lesOptions, 1) = &quot;;&quot; then lesOptions = left(lesOptions, len(lesOptions) - 1)
+	for i = nTexte - 1 to 0 step - 1
+		RemplaceTexte laLigne, &quot;OOoTepTexte&quot; &amp; trim(str(i)), lesTextes(i)
+	next i	
+End Sub 
+
+Sub ImageDroite(i as Integer, p1 as String, p2 as String)
+Dim d1 As String
+Dim d2 As String
+Dim p3() As String
+
+	ChargeParametre(p1, p3, &quot;;&quot;)
+	ImagePoint(i, p3(0) &amp; &quot;;&quot; &amp; p3(1), d1)
+	ImagePoint(i, p3(2) &amp; &quot;;&quot; &amp; p3(3), d2)
+	p2 = d1 &amp; &quot;,&quot; &amp; d2
+End Sub
+
+Function ImageRayon(i as Integer, unRayon as Double) as Double
+Dim p3() as String
+Dim k as Double
+
+	ChargeParametre(Parametres(i), p3, &quot;;&quot;)
+	Select Case Sorte(i)
+	case TEP_SIMILITUDE
+		k = val(p3(2))
+	case TEP_HOMOTHETIE
+		k = val(p3(2))
+	case TEP_ROTATION, TEP_TRANSLATION, TEP_SYMETRIQUEPOINT, TEP_SYMETRIQUEDROITE	
+		k = 1
+	End Select
+	ImageRayon = unRayon * k
+End Function
+
+Function ImageAngle(i as Integer, unangle as double) as double
+Dim p3() as String
+Dim ang as Double
+
+	ChargeParametre(Parametres(i), p3, &quot;;&quot;)
+	Select Case Sorte(i)
+	case TEP_SIMILITUDE
+		ang = val(p3(3)) * Miif(angle_en_radian, Pi / 180, 1)
+		ImageAngle = unangle + ang
+	case TEP_HOMOTHETIE
+		ImageAngle = unangle
+	case TEP_ROTATION
+		ang = val(p3(2)) * Miif(angle_en_radian, Pi / 180, 1)
+		ImageAngle = unangle + ang
+	case TEP_TRANSLATION
+		ImageAngle = unangle
+	case TEP_SYMETRIQUEPOINT
+		ang = Miif(angle_en_radian, Pi, 180)
+		ImageAngle = unangle + ang
+	case TEP_SYMETRIQUEDROITE	
+		ang = CalculeAngle(val(p3(0)), val(p3(1)), val(p3(2)), val(p3(3))) + Pi / 2
+		ImageAngle = unangle + ang
+	End Select
+End Function
+
+Sub ImagePoint(i as Integer, p1 as String, p2 as String)
+Dim p3() as String
+Dim ang as Double
+Dim unRayon as Double
+Dim k as Double
+Dim x0 as Double
+Dim y0 as Double
+Dim x1 as Double
+Dim y1 as Double
+Dim x2 as Double
+Dim y2 as Double
+
+	ChargeParametre(p1, p3, &quot;;&quot;)
+	x1 = val(p3(0))
+	y1 = val(p3(1))
+	ChargeParametre(Parametres(i), p3, &quot;;&quot;)
+	Select Case Sorte(i)
+	case TEP_SIMILITUDE
+		x0 = val(p3(0))
+		y0 = val(p3(1))
+		k = val(p3(2))
+		ang = val(p3(3)) * Miif(angle_en_radian, 1, Pi / 180)
+		ang = CalculeAngle(x0, y0, x1, y1) + ang
+		unRayon = sqr((x0 - x1) ^ 2 + (y0 - y1) ^ 2)
+		x2 = x0 + unRayon * cos(ang)
+		y2 = y0 + unRayon * sin(ang)
+		x2 = k * (x2 - x0) + x0
+		y2 = k * (y2 - y0) + y0
+	case TEP_HOMOTHETIE
+		x0 = val(p3(0))
+		y0 = val(p3(1))
+		k = val(p3(2))
+		x2 = k * (x1 - x0) + x0
+		y2 = k * (y1 - y0) + y0
+	case TEP_ROTATION
+		x0 = val(p3(0))
+		y0 = val(p3(1))
+		ang = val(p3(2)) * Miif(angle_en_radian, 1, Pi / 180)
+		ang = CalculeAngle(x0, y0, x1, y1) + ang
+		unRayon = sqr((x0 - x1) ^ 2 + (y0 - y1) ^ 2)
+		x2 = x0 + unRayon * cos(ang)
+		y2 = y0 + unRayon * sin(ang)
+	case TEP_TRANSLATION
+		x2 = x1 + val(p3(2)) - val(p3(0))
+		y2 = y1 + val(p3(3)) - val(p3(1))
+	case TEP_SYMETRIQUEPOINT
+		x2 = 2 * val(p3(0)) - x1
+		y2 = 2 * val(p3(1)) - y1
+	case TEP_SYMETRIQUEDROITE	
+		ang = CalculeAngle(val(p3(0)), val(p3(1)), val(p3(2)), val(p3(3))) + Pi / 2
+		TrouveIntersection(val(p3(0)), val(p3(1)), val(p3(2)), val(p3(3)), x1, y1, x1 + 1000 * cos(ang), y1 + 1000 * sin(ang), x2, y2)
+		x2 = 2 * x2 - x1
+		y2 = 2 * y2 - y1
+	End Select
+	p2 = trim(str(x2)) &amp; &quot;,&quot; &amp; trim(str(y2))
+End Sub
+
+function InsereArcDeCercle(xorig as long, yorig as long, depart as long, arrivee as long, Rayon as long, Optional formeFerme as Boolean) as object
+	Dim UneForme As object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	
+	If IsMissing(formeFerme) then formeFerme = False
+	aPoint.x = xorig - Rayon
+	aPoint.y = yorig - Rayon
+	aSize.Width = Rayon * 2
+	asize.Height = Rayon * 2
+	UneForme = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+&apos;	UneForme.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	UneForme.Position = aPoint
+	UneForme.Size = aSize
+	oDocumentDessin.DrawPages.GetByIndex(0).add(UneForme)
+	if formeFerme then
+		UneForme.CircleKind = com.sun.star.drawing.CircleKind.SECTION
+	else
+		UneForme.CircleKind = com.sun.star.drawing.CircleKind.ARC
+	end if
+	UneForme.CircleStartAngle = depart
+	if arrivee&gt;36000 then arrivee = arrivee - 36000
+	UneForme.CircleEndAngle = arrivee
+	oGroupeDessin.Add(UneForme)
+	InsereArcDeCercle() = UneForme
+End function
+
+function InsereCercle(xorig as long, yorig as long, Rayon as long) as object
+	Dim UneForme As object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	
+	aPoint.x = xorig - Rayon
+	aPoint.y = yorig - Rayon
+	aSize.Width = Rayon * 2
+	asize.Height = Rayon * 2
+	UneForme = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+&apos;	UneForme.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	UneForme.Position = aPoint
+	UneForme.Size = aSize
+	oDocumentDessin.DrawPages.GetByIndex(0).add(UneForme)
+	UneForme.CircleStartAngle = 0
+	UneForme.CircleEndAngle = 3600
+	UneForme.CircleKind = com.sun.star.drawing.CircleKind.FULL
+	oGroupeDessin.Add(UneForme)
+	InsereCercle() = UneForme
+End function
+
+function InsereLigne(x0 as long, y0 as long, x1 as long, y1 as long, Optional unGroupe as Object) as object
+Dim aPosition as new com.sun.star.awt.Point
+Dim TheSize as new com.sun.star.awt.Size
+Dim xShape as object
+
+	xShape = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.LineShape&quot;)
+&apos;	xShape.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	xShape.LineWidth = 20
+	aPosition.X = x0
+	aPosition.Y = y0
+	xShape.Position = aPosition
+	TheSize.width = x1 - x0
+	TheSize.height = y1 - y0
+	xShape.Size = TheSize
+&apos;	ThisComponent.DrawPage.add( xShape )
+	oDocumentDessin.DrawPages.GetByIndex(0).add( xShape )
+	if IsMissing(unGroupe) then
+		oGroupeDessin.add(xShape)
+	else
+		unGroupe.add(xShape)
+	end if
+	InsereLigne() = xShape
+End Function
+
+Function InsereCourbe(secArray() as single, n as integer) As object
+dim oShape as Object
+dim i as integer
+dim oCoord as New com.sun.star.awt.Point
+dim xl as single, yl as single
+
+	Redim oCoord(0 to n - 1) as New com.sun.star.awt.Point
+
+	oShape = oDocumentDessin.createInstance( &quot;com.sun.star.drawing.PolyLineShape&quot;)
+
+	for i = 0 to n - 1
+		xl = secArray(i, 0)
+		yl = secArray(i, 1)
+		oCoord(i).x = xl
+		oCoord(i).y = yl
+	next i
+	oDocumentDessin.DrawPages.GetByIndex(0).add(oShape)
+	oShape.PolyPolygon = Array(oCoord())
+	oGroupeDessin.Add(oShape)
+ 	InsereCourbe = oShape
+End Function
+
+Function InserePolygoneB(secArray() as single, n as integer) As object
+dim oShape as Object
+dim i as integer
+dim groupage as object
+dim oCoord as New com.sun.star.awt.Point
+
+	Redim oCoord(0 to n - 1) as New com.sun.star.awt.Point
+
+	oShape = oDocumentDessin.createInstance( &quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+
+	for i = 0 to n - 1
+		oCoord(i).x = secArray(i, 0)
+		oCoord(i).y = secArray(i, 1)
+	next i
+	oDocumentDessin.DrawPages.GetByIndex(0).add(oShape)
+	oShape.PolyPolygon = Array(oCoord())
+	oGroupeDessin.add(oShape)
+ 	InserePolygoneB = oShape
+End Function
+
+Sub EnleveEsperluette(unTexte as String)
+Dim param() as String
+
+	ChargeParametre unTexte, param(), &quot;&amp;&quot;
+	if lbound(param()) &lt; ubound(param()) then 
+		if right(param(0), 1) = &quot;;&quot; then param(0) = left(param(0), len(param(0)) - 1)
+		unTexte = param(lbound(param())) &amp; param(ubound(param()))
+	End if
+End Sub
+
+Function RetrouveScriptTep(unTexte as String) as String
+Dim a, i
+Dim param() as String
+Dim leTexte as String
+
+	leTexte = unTexte
+	a = instr(1, leTexte, &quot;@oootep;&quot;)
+	if a &lt;&gt; 0 then leTexte = left(leTexte, a - 1)
+	ChargeParametre leTexte, param(), chr(10)
+	leTexte = &quot;&quot;
+	for i = lbound(param()) to ubound(param())
+		EnleveEsperluette(param(i))
+		leTexte = leTexte &amp; param(i) &amp; chr(10)
+	next i
+	RetrouveScriptTep() = leTexte
+End Function
+
+Function ChercheDescription2(unNom, unGroupe) as string
+	if unGroupe.Name=&quot;OOoTep&quot; then
+		ChercheDescription2() = unGroupe.Description
+	else
+		ChercheDescription2() = &quot;&quot;
+	end if
+End Function
+
+Function ChercheDescription(unNom, unGroupe) as String
+Dim uneForme as Object
+Dim i, a 
+	on error goto fin
+	a = unGroupe.ShapeType
+	if unGroupe.ShapeType = &quot;com.sun.star.drawing.GroupShape&quot; Then
+		for i = 0 to unGroupe.Count - 1
+			uneForme = unGroupe(i)
+			if uneForme.ShapeType = &quot;com.sun.star.drawing.GroupShape&quot; Then
+				ChercheDescription() = ChercheDescription(unNom, uneForme)
+			else
+				a = uneForme.Name
+				if uneForme.Name = &quot;DescriptionOOoTep&quot; then
+					ChercheDescription() = uneForme.Description
+					Exit Function
+				end if	
+			End if
+		next i
+	else
+		if unGroupe.Name = &quot;DescriptionOOoTep&quot; then
+			ChercheDescription() = unGroupe.Description
+			Exit Function
+		end if	
+	End if
+fin:
+	on error goto 0
+	ChercheDescription() = &quot;&quot;
+End Function
+
+Sub MsgBox1(unMessage as String)
+	MsgBox unMessage, 0, &quot;OOoTep - v &quot; &amp; VERSION_OOOTEP
+End Sub
+
+Function RetourneDescriptionTep() as String
+Dim unCurseur as Object
+Dim curseurVisible as Object
+Dim uneDescription as String
+Dim oDispatcher as Object
+Dim Array()
+
+&apos;	uneDescription = ChercheDescription(&quot;DescriptionOOoTep&quot;, thisComponent.CurrentSelection(0))
+	uneDescription = ChercheDescription2(&quot;DescriptionOOoTep&quot;, thisComponent.CurrentSelection(0))
+	if uneDescription = &quot;&quot; then	
+		MsgBox1 &quot;Il faut sélectionner une figure réalisée avec OOoTep !&quot;
+	else
+		TextToClipBoard(uneDescription)
+	End if
+	RetourneDescriptionTep() = uneDescription
+End Function
+
+Function RetourneDescriptionTepBis() as String
+Dim unCurseur as Object
+Dim curseurVisible as Object
+Dim uneDescription as String
+Dim oDispatcher as Object
+Dim Array()
+
+	uneDescription = ChercheDescription(&quot;DescriptionOOoTep&quot;, thisComponent.CurrentSelection(0))
+	if uneDescription = &quot;&quot; then	
+		MsgBox1 &quot;Il faut sélectionner une figure réalisée avec OOoTep !&quot;
+	else
+		oDocumentTexte = StarDesktop.LoadComponentFromURL(&quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0, Array())
+		oDocumentTexte.lockControllers
+		curseurVisible = oDocumentTexte.currentController.viewcursor
+		CurseurVisible.String = uneDescription
+		oDispatcher = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+		oDispatcher.executeDispatch( oDocumentTexte.getCurrentController().Frame, &quot;.uno:Cut&quot;, &quot;&quot;, 0, Array() )
+	
+		on error resume next
+		oDocumentTexte.unlockControllers
+		oDocumentTexte.close(true)
+		on error goto 0
+	End if
+	RetourneDescriptionTep() = uneDescription
+End Function
+
+Sub AjouteDescriptionTep2()
+Dim unObjet as Object
+	set unObjet = oPageDessin(0)
+	unObjet.Description = DescriptionOOoTep
+	unObjet.Name=&quot;OOoTep&quot;
+End Sub
+
+Sub AjouteDescriptionTep()
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	Dim xShape as object
+	Dim oTexte as Object
+	dim ocursor as Object
+	Dim uneTaille as Integer
+	Dim unStyle as Integer
+	Dim uneCouleur as String
+	
+	uneTaille = 1
+	unStyle = 0
+	unecouleur = RGB(255, 255, 255)
+	aPoint = oPageDessin(0).Position
+	xShape = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.TextShape&quot;)
+	aSize.Width = 1
+	aSize.Height = 1
+	xShape.Position = aPoint
+	xShape.Size = aSize
+	xShape.zorder = - 1
+	xShape.Name = &quot;DescriptionOOoTep&quot;
+	oDocumentDessin.DrawPages.GetByIndex(0).add(xShape)
+
+	xShape.Text.TextAutoGrowWidth = False
+	xShape.Text.TextAutoGrowHeight = False
+
+&apos;	xShape.String = DescriptionOOoTep
+	xShape.Description = DescriptionOOoTep
+
+	StylePolice(xShape, uneTaille, unStyle)
+	CouleurTexte(xShape, uneCouleur)
+	xShape.Size = aSize
+
+
+	oGroupeDessin.add(xShape)
+End Sub
+
+Function InsereTexte(UnTexte as string, x0 as long , y0 as long, Optional uneTaille as integer, Optional unStyle as integer, Optional UneCouleur as string, Optional AlignHoriz as integer, Optional AlignVert as integer) as object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	Dim xShape as object
+	Dim oTexte as Object
+	dim ocursor as Object
+	
+	if ismissing(AlignHoriz) then AlignHoriz = AL_GAUCHE
+	if ismissing(AlignVert) then AlignVert = AL_HAUT
+	if ismissing(uneTaille) then uneTaille = OOoTep_taillepolice
+	if ismissing(unStyle) then unStyle = 0
+	if ismissing(uneCouleur) then unecouleur = OOoTep_couleurpolice
+	xShape = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.TextShape&quot;)
+	aPoint.X = x0
+	aPoint.Y = y0
+	aSize.Width = 10
+	aSize.Height = 10
+	xShape.Position = aPoint
+	xShape.Size = aSize
+
+	oDocumentDessin.DrawPages.GetByIndex(0).add(xShape)
+	xShape.String = UnTexte
+	xShape.Text.CharFontName = OOoTep_nompolice
+	StylePolice(xShape, uneTaille, unStyle)
+	CouleurTexte(xShape, uneCouleur)
+	xShape.Text.TextAutoGrowWidth = True
+	xShape.Text.TextAutoGrowHeight = True
+	
+	aSize = xShape.Size
+	aPoint = xShape.Position
+	if AlignHoriz = AL_GAUCHE then aPoint.x = aPoint.x + aSize.Width / 2
+	if AlignHoriz = AL_DROITE then aPoint.x = aPoint.x - aSize.Width / 2
+	if AlignVert = AL_CENTRE then aPoint.y = aPoint.y - aSize.Height / 2
+	if AlignVert = AL_BAS then aPoint.y = aPoint.y - aSize.Height
+	xShape.Position = aPoint
+	oGroupeDessin.add(xShape)
+	InsereTexte() = xShape
+end Function
+
+Function InsereVecteur(x0, y0, x1, y1, Optional uneCouleur as string) as Object
+dim unTrait as Object
+dim ang as double
+dim unPolygone as Object
+Dim secArray(0 to 2, 0 to 1) as single
+
+	if ismissing(uneCouleur) then uneCouleur = OOoTep_couleurdutrait
+	unTrait = InsereLigne(x0, y0, x1, y1)
+	unTrait.LineColor = uneCouleur
+	ang = CalculeAngle(x0, y0, x1, y1)
+	secArray(0, 0) = x1
+	secArray(0, 1) = y1
+	secArray(1, 0) = x1 + 200 * cos(ang + 5 * Pi / 6)
+	secArray(1, 1) = y1 + 200 * sin(ang + 5 * Pi / 6)
+	secArray(2, 0) = x1 + 200 * cos(ang - 5 * Pi / 6)
+	secArray(2, 1) = y1 + 200 * sin(ang - 5 * Pi / 6)
+	unPolygone = InserePolygoneB(secArray(), 3)
+	unPolygone.LineColor = uneCouleur
+	unPolygone.FillStyle = com.sun.star.drawing.FillStyle.SOLID
+	unPolygone.FillColor = uneCouleur
+	InsereVecteur = unPolygone
+End Function
+
+Function MarqueAngleDroit(xd, yd, xs, ys, options as String) as object
+Dim secArray(0 to 3, 0 to 1) as single
+Dim ang as Double
+Dim uneLongueur as Double
+ 
+	ang = CalculeAngle(xd, yd, xs, ys) - (val(RetourneOption(options, &quot;quadrant&quot;)) - 1) * Pi / 2
+    uneLongueur = min(sqr((xd - xs) ^ 2 + (yd - ys) ^ 2) / 5, 400)
+	secArray(0, 0) = xd + uneLongueur * Cos(ang)
+	secArray(0, 1) = yd + uneLongueur * Sin(ang)
+	secArray(1, 0) = xd + uneLongueur * (Cos(ang) - Sin(ang))
+	secArray(1, 1) = yd + uneLongueur * (Sin(ang) + Cos(ang))
+	secArray(2, 0) = xd - uneLongueur * Sin(ang)
+	secArray(2, 1) = yd + uneLongueur * Cos(ang)
+	secArray(3, 0) = xd
+	secArray(3, 1) = yd
+
+	if RetourneOption(options, &quot;opacite&quot;) = &quot;0&quot; then
+		MarqueAngleDroit = InsereCourbe(secArray(), 3)
+	else
+		MarqueAngleDroit = InserePolygoneB(secArray(), 4)
+	end if
+End function
+
+Function RepereTraceEnPoche() as String
+Dim FP as Object, LesFichiers() as string
+
+	FP = CreateUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
+	With FP
+		.DisplayDirectory = ConvertToURL(&quot;&quot;)
+		.appendFilter(&quot;Fichiers swf&quot;, &quot;*.swf&quot;)
+		.appendFilter(&quot;Tous&quot;, &quot;*.*&quot;)
+		.CurrentFilter = &quot;Fichiers swf&quot;
+		
+		if .Execute = com.sun.star.ui.dialogs.ExecutableDialogResults.OK then
+			lesFichiers() = .Files
+			RepereTraceEnPoche() = lesFichiers(0)
+		else
+			RepereTraceEnPoche() = &quot;&quot;
+		end if
+		.Dispose
+	end With	
+End Function
+
+function OuvreFichierTEP() as integer
+Dim FP as Object, LesFichiers() as string
+
+	nomFichier = &quot;&quot;
+	FP = CreateUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
+	With FP
+		.DisplayDirectory = ConvertToURL(&quot;&quot;)
+		.appendFilter(&quot;Fichiers Tep&quot;, &quot;*.txt&quot;)
+		.appendFilter(&quot;Tous&quot;, &quot;*.*&quot;)
+		.CurrentFilter = &quot;Fichiers Tep&quot;
+		
+		if .Execute = com.sun.star.ui.dialogs.ExecutableDialogResults.OK then
+			lesFichiers() = .Files
+			nomFichier = lesFichiers(0)
+			OuvreFichierTEP = 1
+		else
+			OuvreFichierTEP = 0
+		end if
+		.Dispose
+	end With	
+end function
+
+function RetourneCouleur(uneCouleur as string) as long
+Dim laCouleur as String
+
+	laCouleur = uneCouleur
+	select case uneCouleur
+	case &quot;blanc&quot;
+		laCouleur = &quot;0xFFFFFF&quot;
+	case &quot;bleu&quot;
+		laCouleur = &quot;0x0000FF&quot;
+	case &quot;bleuciel&quot;
+		laCouleur = &quot;0xCEDDFF&quot;
+	case &quot;bleufonce&quot;
+		laCouleur = &quot;0x000066&quot;
+	case &quot;bleuocean&quot;
+		laCouleur = &quot;0x6666FF&quot;
+	case &quot;brique&quot;
+		laCouleur = &quot;0x996666&quot;
+	case &quot;cyan&quot;
+		laCouleur = &quot;0x00FFFF&quot;
+	case &quot;grisclair&quot;
+		laCouleur = &quot;0xCCCCCC&quot;
+	case &quot;grisfonce&quot;
+		laCouleur = &quot;0x666666&quot;
+	case &quot;jaune&quot;
+		laCouleur = &quot;0xFFFF00&quot;
+	case &quot;jauneclair&quot;
+		laCouleur = &quot;0xFFFF99&quot;
+	case &quot;jaunepaille&quot;
+		laCouleur = &quot;0xCCCC33&quot;
+	case &quot;kaki&quot;
+		laCouleur = &quot;0x666633&quot;
+	case &quot;kakiclair&quot;
+		laCouleur = &quot;0xC4C486&quot;
+	case &quot;magenta&quot;
+		laCouleur = &quot;0xff00ff&quot;
+	case &quot;marron&quot;
+		laCouleur = &quot;0x996633&quot;
+	case &quot;marronfonce&quot;
+		laCouleur = &quot;0x663333&quot;
+	case &quot;noir&quot;
+		laCouleur = &quot;0x000000&quot;
+	case &quot;orange&quot;
+		laCouleur = &quot;0xFF9900&quot;
+	case &quot;rose&quot;
+		laCouleur = &quot;0xFF9DFF&quot;
+	case &quot;rouge&quot;
+		laCouleur = &quot;0xFF0000&quot;
+	case &quot;rougeclair&quot;
+		laCouleur = &quot;0xFF5E5E&quot;
+	case &quot;rougefonce&quot;
+		laCouleur = &quot;0x990000&quot;
+	case &quot;sapin&quot;
+		laCouleur = &quot;0x004040&quot;
+	case &quot;saumon&quot;
+		laCouleur = &quot;0xFF9999&quot;
+	case &quot;vert&quot;
+		laCouleur = &quot;0x00B000&quot;
+	case &quot;vertclair&quot;
+		laCouleur = &quot;0x00FF00&quot;
+	case &quot;vertfonce&quot;
+		laCouleur = &quot;0x006600&quot;
+	case &quot;vertpale&quot;
+		laCouleur = &quot;0xBDD7CC&quot;
+	case &quot;violetfonce&quot;
+		laCouleur = &quot;0x5B005B&quot;
+	case &quot;violet&quot;
+		laCouleur = &quot;0x9966FF&quot;
+	End Select
+
+	if left(laCouleur, 2) = &quot;0x&quot; then
+		RetourneCouleur = rgb(Clng(&quot;&amp;H&quot; &amp; mid(laCouleur, 3, 2)), Clng(&quot;&amp;H&quot; &amp; mid(laCouleur, 5, 2)), Clng(&quot;&amp;H&quot; &amp; mid(laCouleur, 7, 2)))
+	else
+		if laCouleur = &quot;&quot; then
+			RetourneCouleur = OOoTep_couleurdutrait
+		else
+			RetourneCouleur = laCouleur
+		end if
+	end if
+end function
+
+function RetourneOption(liste as string, nom as string) as string
+dim a as integer, b as integer, i
+dim uTexte as String
+
+	select case nom
+	case &quot;decimale&quot;
+		RetourneOption = &quot;&quot;
+		for i = 0 to 10
+			if TrouveMot(liste, &quot;dec&quot; &amp; trim(str(i))) then RetourneOption = trim(str(i))
+		next i
+	case &quot;pointille&quot;
+		RetourneOption = &quot;&quot;
+		if TrouveMot(liste, &quot;p1&quot;) then RetourneOption = &quot;p1&quot;
+		if TrouveMot(liste, &quot;p2&quot;) then RetourneOption = &quot;p2&quot;
+	case &quot;coord&quot;
+		RetourneOption = &quot;&quot;
+		if TrouveMot(liste, &quot;coord&quot;) then RetourneOption = &quot;coord&quot;
+		if TrouveMot(liste, &quot;coordx&quot;) then RetourneOption = &quot;coordx&quot;
+		if TrouveMot(liste, &quot;coordy&quot;) then RetourneOption = &quot;coordy&quot;
+	case &quot;taille&quot;
+		RetourneOption = &quot;0&quot;
+		if TrouveMot(liste, &quot;car-4&quot;) then RetourneOption = &quot;-6&quot;
+		if TrouveMot(liste, &quot;car-3&quot;) then RetourneOption = &quot;-4&quot;
+		if TrouveMot(liste, &quot;car-2&quot;) then RetourneOption = &quot;-2&quot;
+		if TrouveMot(liste, &quot;car-1&quot;) then RetourneOption = &quot;-1&quot;
+		if TrouveMot(liste, &quot;car+1&quot;) then RetourneOption = &quot;3&quot;
+		if TrouveMot(liste, &quot;car+2&quot;) then RetourneOption = &quot;5&quot;
+		if TrouveMot(liste, &quot;car+3&quot;) then RetourneOption = &quot;6&quot;
+		if TrouveMot(liste, &quot;car+4&quot;) then RetourneOption = &quot;9&quot;
+	case &quot;trace&quot;
+		RetourneOption = &quot;&quot;
+		if TrouveMot(liste, &quot;trace&quot;) then RetourneOption = &quot;trace&quot;
+	case &quot;animation&quot;
+		RetourneOption = &quot;&quot;
+		if TrouveMot(liste, &quot;anime&quot;) then RetourneOption = &quot;anime&quot;
+		if TrouveMot(liste, &quot;oscille&quot;) then RetourneOption = &quot;oscille&quot;
+	case &quot;opacite&quot;
+		RetourneOption = &quot;0&quot;
+		if TrouveMot(liste, &quot;plein0&quot;) then RetourneOption = &quot;0&quot;
+		if TrouveMot(liste, &quot;plein10&quot;) then RetourneOption = &quot;10&quot;
+		if TrouveMot(liste, &quot;plein20&quot;) then RetourneOption = &quot;20&quot;
+		if TrouveMot(liste, &quot;plein30&quot;) then RetourneOption = &quot;30&quot;
+		if TrouveMot(liste, &quot;plein40&quot;) then RetourneOption = &quot;40&quot;
+		if TrouveMot(liste, &quot;plein50&quot;) then RetourneOption = &quot;50&quot;
+		if TrouveMot(liste, &quot;plein60&quot;) then RetourneOption = &quot;60&quot;
+		if TrouveMot(liste, &quot;plein70&quot;) then RetourneOption = &quot;70&quot;
+		if TrouveMot(liste, &quot;plein80&quot;) then RetourneOption = &quot;80&quot;
+		if TrouveMot(liste, &quot;plein90&quot;) then RetourneOption = &quot;90&quot;
+		if TrouveMot(liste, &quot;plein100&quot;) then RetourneOption = &quot;100&quot;
+		if TrouveMot(liste, &quot;plein&quot;) then RetourneOption = &quot;100&quot;
+	case &quot;rentrant&quot;
+		RetourneOption = &quot;&quot;
+		if TrouveMot(liste, &quot;r&quot;) then RetourneOption = &quot;r&quot;
+	case &quot;code&quot;
+		RetourneOption = &quot;&quot;
+		if TrouveMot(liste, &quot;/&quot;) then RetourneOption = &quot;/&quot;
+		if TrouveMot(liste, &quot;//&quot;) then RetourneOption = &quot;//&quot;
+		if TrouveMot(liste, &quot;///&quot;) then RetourneOption = &quot;///&quot;
+		if TrouveMot(liste, &quot;\&quot;) then RetourneOption = &quot;\&quot;
+		if TrouveMot(liste, &quot;\\&quot;) then RetourneOption = &quot;\\&quot;
+		if TrouveMot(liste, &quot;\\\&quot;) then RetourneOption = &quot;\\\&quot;
+		if TrouveMot(liste, &quot;x&quot;) then RetourneOption = &quot;x&quot;
+		if TrouveMot(liste, &quot;o&quot;) then RetourneOption = &quot;o&quot;
+	case &quot;sens&quot;
+		RetourneOption = &quot;direct&quot;
+		if TrouveMot(liste, &quot;indirect&quot;) then RetourneOption = &quot;indirect&quot;
+	case &quot;nom&quot;
+		RetourneOption = &quot;nom&quot;
+		if TrouveMot(liste, &quot;sansnom&quot;) then RetourneOption = &quot;sansnom&quot;
+	case &quot;style&quot;
+		RetourneOption = &quot;1&quot;
+		for i = 0 to 9 
+			if TrouveMot(liste, trim(str(i))) then RetourneOption = trim(str(i))
+		next i
+	case &quot;visibilite&quot;
+		RetourneOption = &quot;v&quot;
+		if TrouveMot(liste, &quot;i&quot;) or TrouveMot(liste, &quot;invisible&quot;) then RetourneOption = &quot;i&quot;	
+		if TrouveMot(liste, &quot;v&quot;) or TrouveMot(liste, &quot;visible&quot;) then RetourneOption = &quot;v&quot;	
+	case &quot;position&quot;
+		RetourneOption = &quot;0;0&quot;
+		a = instr(1, liste, &quot;(&quot;)
+		b = instr(1, liste, &quot;)&quot;)
+		if a &gt; 0 and b &gt; 0 then	
+			uTexte = mid(liste, a + 1, b - a - 1)
+			RemplaceTexte(uTexte, &quot;,&quot;, &quot;;&quot;)
+			RetourneOption = uTexte
+		end if
+	case &quot;sprepere&quot;
+			RetourneOption = &quot;0&quot;
+			if TrouveMot(liste, &quot;0&quot;) then RetourneOption = &quot;0&quot;
+			if TrouveMot(liste, &quot;1&quot;) then RetourneOption = &quot;1&quot;
+			if TrouveMot(liste, &quot;2&quot;) then RetourneOption = &quot;2&quot;
+			if TrouveMot(liste, &quot;3&quot;) then RetourneOption = &quot;3&quot;
+	case &quot;tprepere&quot;
+			RetourneOption = &quot;10&quot;
+			if TrouveMot(liste, &quot;petit&quot;) then RetourneOption = &quot;10&quot;
+			if TrouveMot(liste, &quot;moyen&quot;) then RetourneOption = &quot;12&quot;
+			if TrouveMot(liste, &quot;grand&quot;) then RetourneOption = &quot;14&quot;
+	case &quot;grepere&quot;
+			RetourneOption = &quot;1&quot;
+			if TrouveMot(liste, &quot;num1&quot;) then RetourneOption = &quot;1&quot;
+			if TrouveMot(liste, &quot;num2&quot;) then RetourneOption = &quot;2&quot;
+			if TrouveMot(liste, &quot;num5&quot;) then RetourneOption = &quot;5&quot;
+			if TrouveMot(liste, &quot;num10&quot;) then RetourneOption = &quot;10&quot;
+	case &quot;couleur&quot;, &quot;crepere&quot;
+		if nom = &quot;couleur&quot; then
+			RetourneOption = OOoTep_couleurdutrait
+		else
+			RetourneOption = OOoTep_couleurdutrait
+		end if
+		if TrouveMot(liste, &quot;bleu&quot;) then RetourneOption = RetourneCouleur(&quot;bleu&quot;)
+		if TrouveMot(liste, &quot;bleuciel&quot;) then RetourneOption = RetourneCouleur(&quot;bleuciel&quot;)
+		if TrouveMot(liste, &quot;bleuocean&quot;) then RetourneOption = RetourneCouleur(&quot;bleuocean&quot;)
+		if TrouveMot(liste, &quot;bleufonce&quot;) then RetourneOption = RetourneCouleur(&quot;bleufonce&quot;)
+		if TrouveMot(liste, &quot;jaune&quot;) then RetourneOption = RetourneCouleur(&quot;jaune&quot;)
+		if TrouveMot(liste, &quot;jauneclair&quot;) then RetourneOption = RetourneCouleur(&quot;jauneclair&quot;)
+		if TrouveMot(liste, &quot;jaunepaille&quot;) then RetourneOption = RetourneCouleur(&quot;jaunepaille&quot;)
+		if TrouveMot(liste, &quot;blanc&quot;) then RetourneOption = RetourneCouleur(&quot;blanc&quot;)
+		if TrouveMot(liste, &quot;orange&quot;) then RetourneOption = RetourneCouleur(&quot;orange&quot;)
+		if TrouveMot(liste, &quot;noir&quot;) then RetourneOption = RetourneCouleur(&quot;noir&quot;)
+		if TrouveMot(liste, &quot;gris&quot;) then RetourneOption = RetourneCouleur(&quot;grisfonce&quot;)
+		if TrouveMot(liste, &quot;grisclair&quot;) then RetourneOption = RetourneCouleur(&quot;grisclair&quot;)
+		if TrouveMot(liste, &quot;grisfonce&quot;) then RetourneOption = RetourneCouleur(&quot;grisfonce&quot;)
+		if TrouveMot(liste, &quot;rouge&quot;) then RetourneOption = RetourneCouleur(&quot;rouge&quot;)
+		if TrouveMot(liste, &quot;rougefonce&quot;) then RetourneOption = RetourneCouleur(&quot;rougefonce&quot;)
+		if TrouveMot(liste, &quot;rougeclair&quot;) then RetourneOption = RetourneCouleur(&quot;rougeclair&quot;)
+		if TrouveMot(liste, &quot;vert&quot;) then RetourneOption = RetourneCouleur(&quot;vert&quot;)
+		if TrouveMot(liste, &quot;vertfonce&quot;) then RetourneOption = RetourneCouleur(&quot;vertfonce&quot;)
+		if TrouveMot(liste, &quot;vertclair&quot;) then RetourneOption = RetourneCouleur(&quot;vertclair&quot;)
+		if TrouveMot(liste, &quot;vertpale&quot;) then RetourneOption = RetourneCouleur(&quot;vertpale&quot;)
+		if TrouveMot(liste, &quot;violet&quot;) then RetourneOption = RetourneCouleur(&quot;violet&quot;)
+		if TrouveMot(liste, &quot;violetfonce&quot;) then RetourneOption = RetourneCouleur(&quot;violetfonce&quot;)
+		if TrouveMot(liste, &quot;marron&quot;) then RetourneOption = RetourneCouleur(&quot;marron&quot;)
+		if TrouveMot(liste, &quot;marronfonce&quot;) then RetourneOption = RetourneCouleur(&quot;marronfonce&quot;)
+		if TrouveMot(liste, &quot;rose&quot;) then RetourneOption = RetourneCouleur(&quot;rose&quot;)
+		if TrouveMot(liste, &quot;saumon&quot;) then RetourneOption = RetourneCouleur(&quot;saumon&quot;)
+		if TrouveMot(liste, &quot;sapin&quot;) then RetourneOption = RetourneCouleur(&quot;sapin&quot;)
+		if TrouveMot(liste, &quot;brique&quot;) then RetourneOption = RetourneCouleur(&quot;brique&quot;)
+		if TrouveMot(liste, &quot;kaki&quot;) then RetourneOption = RetourneCouleur(&quot;kaki&quot;)
+		if TrouveMot(liste, &quot;kakiclair&quot;) then RetourneOption = RetourneCouleur(&quot;kakiclair&quot;)
+		if TrouveMot(liste, &quot;cyan&quot;) then RetourneOption = RetourneCouleur(&quot;cyan&quot;)
+		if TrouveMot(liste, &quot;magenta&quot;) then RetourneOption = RetourneCouleur(&quot;magenta&quot;)
+		a = instr(1, liste, &quot;0x&quot;)
+		if a &gt; 0 then RetourneOption = RetourneCouleur(mid(liste, a, 8))
+	case &quot;police&quot;
+		RetourneOption = &quot;&quot;
+		if TrouveMot(liste, &quot;gras&quot;) then RetourneOption = &quot;gras&quot;
+		if TrouveMot(liste, &quot;italique&quot;) then 
+			if RetourneOption = &quot;gras&quot; then
+				RetourneOption = &quot;gras et italique&quot;
+			else
+				RetourneOption = &quot;italique&quot;
+			end if
+		end if
+	case &quot;point&quot;
+		RetourneOption = &quot;croix2&quot;
+		if TrouveMot(liste, &quot;croix0&quot;) then RetourneOption = &quot;croix0&quot;
+		if TrouveMot(liste, &quot;croix1&quot;) then RetourneOption = &quot;croix1&quot;
+		if TrouveMot(liste, &quot;croix2&quot;) then RetourneOption = &quot;croix2&quot;
+		if TrouveMot(liste, &quot;croix3&quot;) then RetourneOption = &quot;croix3&quot;
+		if TrouveMot(liste, &quot;rond1&quot;) then RetourneOption = &quot;rond1&quot;
+		if TrouveMot(liste, &quot;rond2&quot;) then RetourneOption = &quot;rond2&quot;
+		if TrouveMot(liste, &quot;rond3&quot;) then RetourneOption = &quot;rond3&quot;
+	case &quot;quadrant&quot;
+		RetourneOption = &quot;1&quot;
+		if TrouveMot(liste, &quot;q0&quot;) then RetourneOption = &quot;0&quot;
+		if TrouveMot(liste, &quot;q2&quot;) then RetourneOption = &quot;2&quot;
+		if TrouveMot(liste, &quot;q3&quot;) then RetourneOption = &quot;3&quot;
+		if TrouveMot(liste, &quot;q4&quot;) then RetourneOption = &quot;4&quot;
+	End Select
+end function
+
+Function RetourneVariable(unTexte as String, Optional options as String) as String
+Dim i as Integer
+Dim ndec as String
+Dim param() as String
+
+	if IsMissing(options) then options = &quot;&quot;
+	
+	RetourneVariable = unTexte
+	i = ChercheObjet(unTexte)
+	if i &lt;&gt; - 1 then
+		if Sorte(i) = TEP_VARIABLE then 
+			ndec = RetourneOption(options, &quot;decimale&quot;)
+			if ndec &lt;&gt; &quot;&quot; then
+				RetourneVariable = int(val(Parametres(i)) * (10^val(ndec))) / (10^val(ndec))
+			else
+				RetourneVariable = Parametres(i)
+			end if
+		end if
+		if Sorte(i) = TEP_REEL then 
+			ChargeParametre(Parametres(i), param(), &quot;;&quot;)
+			RetourneVariable = param(ubound(param()))
+		end if
+	End if
+End Function
+
+function TrouveMot(liste as string, mot as string) as Boolean
+dim cav as string, cap as string
+dim a
+
+	TrouveMot = False
+	a = instr(1, liste, mot)
+	while((a &gt; 0) and not TrouveMot)
+		if a = 1 then
+			cav = &quot;&quot;
+		else
+			cav = mid(liste, a - 1, 1)
+		end if
+		if a + len(mot) = len(liste) + 1 then
+			cap = &quot;&quot;
+		else
+			cap = mid(liste, a + len(mot), 1)
+		end if
+		if (cav = &quot;&quot; or cav = &quot; &quot; or cav = &quot;;&quot;) and (cap = &quot;&quot; or cap = &quot; &quot; or cap = &quot;;&quot;) then TrouveMot = True
+		a = instr(a + 1, liste, mot)
+	wend
+end function
+
+Function LoadDialog(Libname as String, DialogName as String) &apos;, Optional oLibContainer) rem charge une boite de dialogue
+	Dim oLib, oLibDialog, oRuntimeDialog, oDialogModel, oVar, oVar1 as Object
+	DialogLibraries.LoadLibrary(LibName)
+	oLib = DialogLibraries.GetByName(Libname)
+	oLibDialog = oLib.GetByName(DialogName)
+	oRuntimeDialog = CreateUnoDialog(oLibDialog)
+	oDialogModel = oRuntimeDialog.Model
+	LoadDialog() = oRuntimeDialog
+End Function
+
+
+</script:module>

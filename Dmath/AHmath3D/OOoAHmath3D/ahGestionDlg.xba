@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ahGestionDlg" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+
+&apos;--------------------------------------------------------------------------------------------------------
+&apos;d&apos;après le livre de Bernard Marcelly et Laurent Godard : Macros OOoBASIC et API
+&apos;---------------------------------------------------------------------------------------------------------
+Function CreerDialogue(nomBibli As String, nomDialogue As String, Optional resident As Boolean) As Object
+Dim conteneur As Object, bibli as Object
+On Error GoTo errBibli
+if IsMissing(resident) then resident = False
+if resident then
+  conteneur = GlobalScope.DialogLibraries
+else
+  conteneur = DialogLibraries
+end if
+conteneur.loadLibrary(nomBibli)
+bibli = conteneur.getByName(nomBibli)
+CreerDialogue = CreateUnoDialog(bibli.getByName(nomDialogue))
+On Error Goto 0
+Exit Function &apos; résultat : l&apos;objet dialogue
+errBibli:
+Resume errBibli2
+errBibli2:
+On Error GoTo 0 &apos; résultat : Null
+End Function
+
+&apos;----------------------------------------------------------------------------------
+&apos;positionne le dialogue sur la page
+&apos;----------------------------------------------------------------------------------
+
+sub PositionDlg(Dial as object,Xpos as Long, Ypos as Long, optional Width as Long, optional Height as Long, optional cste as integer)
+
+if IsMissing(Height) then Height = 0
+if IsMissing(Width) then Width = 0
+if IsMissing(cste) then cste = 3                rem : cste = 1 2 3 4 8 12 15  (modifie uniquement : Xpos(1) - Ypos(2) - Xpos et Ypos(3) - Width(4) - Height(8) - width et Height(12))
+                                                rem : 3 + 12 pour tout
+Dial.SetPosSize(Xpos, Ypos, Width, Height, cste)
+
+end sub
+
+&apos;--------------------------------------------------------------------------------
+&apos;rend active  la checkbox CaseEsclave quand la checkbox CaseMaitre est cochée
+&apos;--------------------------------------------------------------------------------
+sub AspectCheckbox(Dial as object, CaseMaitre as string, CaseEsclave as string)
+Dim  k1 as object, k2 as object
+
+k1 = Dial.getControl(CaseEsclave)
+k2 = Dial.getControl(CaseMaitre)
+if k2.Model.State = 1 then
+k1.model.Enabled = true
+else
+k1.model.Enabled = false
+end if
+end sub
+
+
+
+&apos;--------------------------------------------------------------------------------
+&apos;rend actifs et gère les boutons radio caseesclave1 et caseesclave2 quand la checkbox CaseMaitre est cochée
+&apos;--------------------------------------------------------------------------------
+sub Aspect2BoutonsRadio(Dial as object, CaseMaitre as string, CaseEsclave1 as string,CaseEsclave2 as string )
+Dim  k1 as object, k2 as object, k0 as object
+
+k0 = Dial.getControl(CaseEsclave1)
+k1 = Dial.getControl(CaseEsclave2)
+k2 = Dial.getControl(CaseMaitre)
+if k2.Model.State = 1 then
+k0.model.Enabled = true
+k1.model.Enabled = true
+else
+k0.model.Enabled = false
+k0.model.State = true
+k1.model.Enabled = false
+k1.model.State = false
+end if
+end sub
+
+&apos;--------------------------------------------------------------------------------
+&apos;rend active une étiquette CaseEsclave quand la checkbox CaseMaitre est cochée
+&apos;--------------------------------------------------------------------------------
+sub AspectLabel(Dial as object, CaseMaitre as string, CaseEsclave as string)
+Dim  k1 as object, k2 as object
+k1 = Dial.getControl(CaseEsclave)
+k2 = Dial.getControl(CaseMaitre)
+if k2.Model.State = 1 then
+k1.model.Enabled = true
+else
+k1.model.Enabled = false
+end if
+end sub
+
+&apos;--------------------------------------------------------------------------------
+&apos;AffectTextLabel affecte la valeur d&apos;une zone de texte multipliée par un coeff
+&apos; à un label
+&apos;--------------------------------------------------------------------------------
+sub AffectTextLabel(Dial as object, CaseTexte as string, ObjetLabel as String,optional coeff as double)
+Dim  k1 as object, k2 as object
+if isMissing(coeff) then
+   coeff = 1
+end if
+k1 = Dial.getControl(CaseTexte)
+k2 = Dial.getControl(ObjetLabel)
+k2.text = CDbl(k1.Peer.text)*coeff
+end sub
+
+&apos;--------------------------------------------------------------------------------
+&apos;AffectTextLabel2 affecte le texte à un label
+&apos;--------------------------------------------------------------------------------
+sub AffectTextLabel2(Dial as object, monTexte as string, ObjetLabel as String)
+Dim  k1 as object
+k1 = Dial.getControl(ObjetLabel)
+k1.text = monTexte
+end sub
+
+
+&apos;--------------------------------------------------------------------------------
+&apos;AffectTextLabel3 affecte le texte à un listbox et selectionne la première entrée
+&apos;--------------------------------------------------------------------------------
+sub AffectTextLabel3(Dial as object, monTexte as variant, ObjetList as String)
+Dim  k1 as object
+k1 = Dial.getControl(ObjetList)
+&apos;k1.text = monTexte
+k1.Model.StringItemList = monTexte()
+k1.selectItemPos(0, true)
+end sub
+
+
+
+&apos;----------------------------------------------------------------------------
+&apos;-Donne le focus à un élément d&apos;une boite de dialogue
+&apos;---------------------------------------------------------------------------
+sub ReceptionFocus(Dial as object, monElement as string)
+dim k1 as object
+k1 = Dial.getControl(monElement)
+k1.setfocus
+end sub
+
+
+&apos;--------------------------------------------------------------------------------
+&apos; renvoie le chemin menant aux dessins des boites de dialogue
+&apos;--------------------------------------------------------------------------------
+
+function CheminDessin(FinChemin as string) as string
+dim CheminLib as string, k as integer, CheminLibDiv() as string
+
+CheminLib = basiclibraries.getLibraryLinkURL(&quot;OOoAHmath3D&quot;)
+CheminLibDiv = split(CheminLib,&quot;/&quot;)
+Dim monChemin(Ubound(CheminLibDiv))
+
+for k = 0 to (Ubound(CheminLibDiv)-2)
+monChemin(k) = CheminLibDiv(k)
+next 
+monChemin(Ubound(CheminLibDiv))=FinChemin
+
+cheminDessin = join(monChemin(),&quot;/&quot;)
+
+end function
+
+
+&apos;--------------------------------------------------------------------------------
+&apos; renvoie la réponse d&apos;une liste et son rang
+&apos;--------------------------------------------------------------------------------
+function ReponseListe(Dial as object,maListe as string) as variant
+Dim  k1 as object, RepProvisoire(1) as variant
+k1 = Dial.getControl(maListe)
+RepProvisoire(0) =k1.SelectedItem
+RepProvisoire(1)=k1.selectedItemPos
+
+ReponseListe=RepProvisoire
+end function
+
+&apos;--------------------------------------------------------------------------------
+&apos;sélectionne le j ème élément d&apos;une liste - commence à zéro
+&apos;--------------------------------------------------------------------------------
+
+sub SelectionListe(Dial as object,maListe as string,j as integer)
+Dim  k1 as object
+k1 = Dial.getControl(maListe)
+k1.SelectItemPos(j,true)
+end sub
+
+
+&apos;--------------------------------------------------------------------------------
+&apos; renvoie le texte contenu dans une case texte
+&apos;--------------------------------------------------------------------------------
+function ReponseTexte(Dial as object, CaseTexte as string) as string
+Dim  k1 as object
+k1 = Dial.getControl(CaseTexte)
+ReponseTexte=k1.Peer.text
+end function
+
+&apos;-----------------------------------------------------------------------------
+&apos; rend inactif un élément d&apos;une boite de dialogue
+&apos;-----------------------------------------------------------------------------
+
+sub ElementInactif(Dial as object, monElement as string, etat as string)
+Dim k1 as object
+k1 = Dial.getcontrol(monElement)
+if etat=&quot;actif&quot; then
+k1.enable=true
+else
+k1.enable=false
+end if
+
+end sub
+
+
+&apos;-----------------------------------------------------------------------------
+&apos; rend invisible un élément d&apos;une boite de dialogue propriété 
+&apos;-----------------------------------------------------------------------------
+
+sub ElementInvisible(Dial as object, monElement as string, etat as string)
+Dim k1 as object
+k1 = Dial.getcontrol(monElement)
+if etat=&quot;visible&quot; then
+k1.Model.EnableVisible = true
+else
+k1.Model.EnableVisible =false
+end if
+
+end sub
+
+&apos;------------------------------------------------------------------------------
+&apos;affecte un texte d&apos;aide à un élément d&apos;une boite de dialogue
+&apos;--------------------------------------------------------------------------------
+sub TexteAide(Dial as object, monElement as string, messageAide as string)
+Dim k1 as object
+k1 = Dial.getcontrol(monElement)
+k1.Model.HelpText=messageAide
+end sub
+
+
+
+
+</script:module>

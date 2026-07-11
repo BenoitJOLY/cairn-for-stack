@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="FonctionsOffice" script:language="StarBasic">&apos;---------------------------------------------------------------------------------------------
+&apos;La routine utilitaire DispatchSimple permet d’exécuter facilement les commandes de Dispatcher
+&apos; qui ne nécessitent pas d’argument.
+&apos;routine tirée du livre de Bernard Marcelly et Laurent Godard : Macros OOoBASIC et API
+&apos;Commande = nom de la commande &quot;copy&quot; , &quot;Paste&quot; etc...
+&apos;fenetre = 
+&apos;----------------------------------------------------------------------------------------------
+Sub DispatchSimple(Commande As String, Optional fenetre As Variant)
+Dim disp as object, noArgs()
+if IsMissing(fenetre) then
+  fenetre = StarDesktop.CurrentFrame
+end if
+disp = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+On Error GoTo dispErr1
+disp.executeDispatch(fenetre, &quot;.uno:&quot; &amp; Commande, &quot;&quot;, 0, noArgs)
+Suite:
+On Error GoTo 0
+Exit Sub
+dispErr1:
+  MsgBox(&quot;Commande inconnue : &quot; &amp; Commande, 16)
+  Resume Suite
+End Sub
+
+sub Grouper3D(optional oDoc as object)
+   if IsMissing(oDoc) then oDoc = ThisComponent
+   DispatchSimple(&quot;FormatGroup&quot;, oDoc.CurrentController.Frame)
+end sub
+
+sub Degrouper3D(optional oDoc as object)
+   if IsMissing(oDoc) then oDoc = ThisComponent
+   DispatchSimple(&quot;FormatUngroup&quot;, oDoc.CurrentController.Frame)
+end sub
+
+sub Supprimer3D
+   oDocActif = thisComponent &apos;le document ouvert
+   DispatchSimple(&quot;Delete&quot;, oDocActif.CurrentController.Frame)
+end sub
+
+sub Couper3D
+   oDocActif = thisComponent &apos;le document ouvert
+   DispatchSimple(&quot;Cut&quot;, oDocActif.CurrentController.Frame)
+end sub
+
+sub Copier3D
+   oDocActif = thisComponent &apos;le document ouvert
+   DispatchSimple(&quot;Copy&quot;, oDocActif.CurrentController.Frame)
+end sub
+
+sub Coller3D
+   oDocActif = thisComponent &apos;le document ouvert
+   DispatchSimple(&quot;Paste&quot;, oDocActif.CurrentController.Frame)
+end sub
+
+sub SymetrieHoriz
+ oDocActif = thisComponent &apos;le document ouvert
+ DispatchSimple(&quot;FlipVertical&quot;, oDocActif.CurrentController.Frame)
+end sub
+
+sub SymetrieVert
+ oDocActif = thisComponent &apos;le document ouvert
+ DispatchSimple(&quot;FlipHorizontal&quot;, oDocActif.CurrentController.Frame)
+end sub
+
+sub Echappe(optional oDoc as object)
+ if IsMissing(oDoc) then oDoc = ThisComponent
+ DispatchSimple(&quot;Escape&quot;, oDoc.CurrentController.Frame)
+end sub
+</script:module>

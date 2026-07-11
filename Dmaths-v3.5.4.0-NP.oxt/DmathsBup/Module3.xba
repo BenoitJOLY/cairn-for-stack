@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module3" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) 2005-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye 
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.com
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+Public Trad(3,31) as String
+Public iLangNumber as integer 
+Dim oDialog2 as Object
+
+
+Sub Initialisation
+	Globalscope.BasicLibraries.loadLibrary(&quot;Dmaths&quot;)
+	DialogLibraries.loadLibrary(&quot;DmathsBup&quot;)
+	oDialog2 = CreateUnoDialog( DialogLibraries.DmathsBup.Dialog2 )
+	Call ChargementdelaLangue
+	oDialog2.GetControl(&quot;Label1&quot;).Text = Trad(iLangNumber,0)
+	oDialog2.GetControl(&quot;Label2&quot;).Text = Trad(iLangNumber,1)
+	oDialog2.GetControl(&quot;CommandButton1&quot;).Label= Trad(iLangNumber,2)
+	oDialog2.GetControl(&quot;CommandButton2&quot;).Label= Trad(iLangNumber,2)
+	oDialog2.GetControl(&quot;CommandButton3&quot;).Label= Trad(iLangNumber,11)
+	oDialog2.GetControl(&quot;CommandButton4&quot;).Label= Trad(iLangNumber,28)
+	oDialog2.GetControl(&quot;FrameControl1&quot;).Model.Label = Trad(iLangNumber,3)
+	oDialog2.GetControl(&quot;OptionButton1&quot;).Label = Trad(iLangNumber,4)
+	oDialog2.GetControl(&quot;OptionButton2&quot;).Label  = Trad(iLangNumber,5)
+	oDialog2.GetControl(&quot;OptionButton3&quot;).Label  = Trad(iLangNumber,6)	
+	oDialog2.GetControl(&quot;CheckBox1&quot;).Label = Trad(iLangNumber,7)
+	oDialog2.GetControl(&quot;CheckBox2&quot;).Label = Trad(iLangNumber,8)
+	oDialog2.GetControl(&quot;CheckBox3&quot;).Label = Trad(iLangNumber,9)
+	oDialog2.GetControl(&quot;CheckBox4&quot;).Label = Trad(iLangNumber,10)	
+   	If (sRepertoireSourceDefaut=&quot;&quot; or Not FileExists(sRepertoireSourceDefaut)) Then	oDialog2.GetControl(&quot;TextField1&quot;).Text = GetWorkPath Else oDialog2.GetControl(&quot;TextField1&quot;).Text = sRepertoireSourceDefaut
+   	If (sRepertoireBackupDefaut=&quot;&quot; or Not FileExists(sRepertoireBackupDefaut)) Then	oDialog2.GetControl(&quot;TextField2&quot;).Text = GetWorkPath Else oDialog2.GetControl(&quot;TextField2&quot;).Text = sRepertoireBackupDefaut
+	oDialog2.GetControl(&quot;Label3&quot;).Text = Trad(iLang,29)+&quot; &quot;+sDateSauvegarde
+	oDialog2.Execute()
+End Sub
+
+Sub Terminer
+	oDialog2.EndExecute()
+End Sub
+
+
+
+
+Sub ChargementdelaLangue
+iLangNumber = SelectLangNumber 
+&apos;français
+Trad(0,0) = &quot;Répertoire source&quot;
+Trad(0,1) = &quot;Répertoire cible&quot;
+Trad(0,2) = &quot;Parcourir&quot;
+Trad(0,3) = &quot;Sélectionner le mode de copie&quot;
+Trad(0,4) = &quot;Sauvegarder de la source vers la cible&quot;
+Trad(0,5) = &quot;Synchroniser fichiers et répertoires&quot;
+Trad(0,6) = &quot;Restaurer la cible sur la source&quot;
+Trad(0,7) = &quot;Répertoire de sauvegarde daté&quot;
+Trad(0,8) = &quot;Zipper l&apos;archive&quot; 
+Trad(0,9) = &quot;Supprimer le répertoire cible&quot;
+Trad(0,10)= &quot;Supprimer du répertoire cible les fichiers et répertoires qui n&apos;existent pas dans la source &quot;
+Trad(0,11)= &quot;Lancer la sauvegarde&quot;
+Trad(0,12)= &quot;Vous n&apos;avez pas de droits d&apos;écriture dans le répertoire cible&quot;
+Trad(0,13)= &quot;Vous n&apos;avez pas de droits d&apos;écriture dans le répertoire source&quot;
+Trad(0,14)= &quot;Attention vous avez choisi de restaurer !   &quot;
+Trad(0,15)= &quot;Êtes vous sûr ?&quot;
+Trad(0,16)= &quot;La sauvegarde est terminée       &quot;
+Trad(0,17)= &quot;La restauration est terminée       &quot;
+Trad(0,18)= &quot; répertoire(s) copié(s)&quot;
+Trad(0,19)= &quot; fichier(s) copié(s)&quot;
+Trad(0,20)= &quot; répertoire(s) supprimé(s)&quot;
+Trad(0,21)= &quot; fichier(s) supprimé(s)&quot;
+Trad(0,22)= &quot; répertoire(s) examiné(s)&quot;
+Trad(0,23)= &quot;nombre d&apos;erreur(s) : &quot;
+Trad(0,24)= &quot;Nombre de répertoires examinés : &quot;
+Trad(0,25)= &quot;Nombre d&apos;éléments copiés : &quot;
+Trad(0,26)=  &quot; avec les fichiers ou répertoires suivants : &quot;
+Trad(0,27)= &quot;Veuillez patientez ... &quot;
+Trad(0,28)= &quot;Annuler&quot;
+Trad(0,29) = &quot; La dernière sauvegarde a été effectuée le &quot;
+Trad(0,30) = &quot; Attention la synchronisation effacera des fichiers dans le répertoire cible. &quot; &amp; chr(13) &amp; chr(13) &amp; &quot; VERIFIEZ SOIGNEUSEMENT SON EMPLACEMENT ! &quot; 
+Trad(0,31) = &quot; Les répertoires source et cible ne peuvent être identiques ! &quot;
+
+&apos;Deutsch
+Trad(2,0) = &quot;Originalverzeichnis&quot;
+Trad(2,1) = &quot;Backupverzeichnis&quot;
+Trad(2,2) = &quot;Durchsuchen&quot;
+Trad(2,3) = &quot;Auswahl der Aktion&quot;
+Trad(2,4) = &quot;Erstellen eines Backups&quot;
+Trad(2,5) = &quot;Synchronisieren der Dateien und Verzeichnisse&quot;
+Trad(2,6) = &quot;Zurückspielen des Backups über das Original&quot;
+Trad(2,7) = &quot;Backup mit Datum&quot;
+Trad(2,8) = &quot;Komprimierung des Archivs mit ZIP&quot; 
+Trad(2,9) = &quot;Das Backupverzeichnis selbst ausnehmen&quot;
+Trad(2,10)= &quot;Dateien und Verzeichnisse ausnehmen, die im Backup nicht existieren&quot;
+Trad(2,11)= &quot;Start des Backups&quot;
+Trad(2,12)= &quot;Wir haben nicht die Rechte zum Schreiben in das Backupverzeichnis&quot;
+Trad(2,13)= &quot;Wir haben nicht die Rechte zum Schreiben in das Quellverzeichnis&quot;
+Trad(2,14)= &quot;Vorsicht: Sie haben das Zurückspielen des Backups gewählt !   &quot;
+Trad(2,15)= &quot;Sind Sie sicher ?&quot;
+Trad(2,16)= &quot;Das Backup ist fertig       &quot;
+Trad(2,17)= &quot;Das Zurückspielen des Backups ist fertig       &quot;
+Trad(2,18)= &quot; Verzeichnis(se) kopiert&quot;
+Trad(2,19)= &quot; Datei(en) kopiert&quot;
+Trad(2,20)= &quot; Ausgenommene(s) Verzeichnis(se)&quot;
+Trad(2,21)= &quot; Ausgenommene Datei(en)&quot;
+Trad(2,22)= &quot; Geprüfte(s) Verzeichnis(se)&quot;
+Trad(2,23)= &quot;Anzahl der Fehler: &quot;
+Trad(2,24)= &quot;Anzahl der geprüften Verzeichnisse : &quot;
+Trad(2,25)= &quot;Anzahl der kopierten Objekte : &quot;
+Trad(2,26)= &quot;mit den folgenden Dateien oder Verzeichnissen:&quot;
+Trad(2,27)= &quot;Das dauert ein bisschen ... &quot;
+Trad(2,28)= &quot;Abbrechen&quot;
+Trad(2,29)= &quot;Das letzte Backup wurde durchgeführt am &quot;
+Trad(2,30) = &quot; Attention la synchronisation effacera des fichiers dans le répertoire cible. &quot; &amp; chr(13) &amp; chr(13) &amp; &quot; VERIFIEZ SOIGNEUSEMENT SON EMPLACEMENT ! &quot; 
+Trad(2,31) = &quot; Backup and source folders can&apos;t be the same ! &quot;
+
+&apos;english
+&apos;english
+Trad(1,0) = &quot;Source folder&quot;
+Trad(1,1) = &quot;Backup folder&quot;
+Trad(1,2) = &quot;Search ...&quot;
+Trad(1,3) = &quot;Select the action&quot;
+Trad(1,4) = &quot;Backup source to backup folder&quot;
+Trad(1,5) = &quot;Synchronise files and folders&quot;
+Trad(1,6) = &quot;Restore the backup over the source&quot;
+Trad(1,7) = &quot;Dated backup&quot;
+Trad(1,8) = &quot;Compress the archive with ZIP&quot;
+Trad(1,9) = &quot;Exclude the backup folder&quot;
+Trad(1,10)= &quot;Remove files and folders, which do not exist in the source&quot;
+Trad(1,11)= &quot;Start the backup&quot;
+Trad(1,12)= &quot;You do not have the rights to write into the backup folder&quot;
+Trad(1,13)= &quot;You do not have the rights to write into the source folder&quot;
+Trad(1,14)= &quot;Attention ! You have choosen the overwrite the data in the source folder !   &quot;
+Trad(1,15)= &quot;Are you sure ?&quot;
+Trad(1,16)= &quot;The backup is finished       &quot;
+Trad(1,17)= &quot;The restore is finished       &quot;
+Trad(1,18)= &quot; folder(s) copied&quot;
+Trad(1,19)= &quot; file(s) copied&quot;
+Trad(1,20)= &quot; folder(s) excluded&quot;
+Trad(1,21)= &quot; file(s) excluded&quot;
+Trad(1,22)= &quot; folder(s) examined&quot;
+Trad(1,23)= &quot;number of errors: &quot;
+Trad(1,24)= &quot;Number of folders examined : &quot;
+Trad(1,25)= &quot;Number of elements copied : &quot;
+Trad(1,26)=  &quot;with the following files or folders:&quot;
+Trad(1,27)= &quot;Please wait ... &quot;
+Trad(1,28)= &quot;Cancel&quot; 
+Trad(1,29)= &quot;Last backup was done on:&quot;
+Trad(1,30) = &quot;Caution this action may remove files into the backup folder. &quot; &amp; chr(13) &amp; chr(13) &amp; &quot; BE CARREFUL ! &quot; 
+Trad(1,31) = &quot; Backup and source folders can&apos;t be the same ! &quot;
+
+&apos;spanish
+Trad(3,0) = &quot;Source folder&quot;
+Trad(3,1) = &quot;Backup folder&quot;
+Trad(3,2) = &quot;Search ...&quot;
+Trad(3,3) = &quot;Select the action&quot;
+Trad(3,4) = &quot;Backup source to backup folder&quot;
+Trad(3,5) = &quot;Synchronise files and folders&quot;
+Trad(3,6) = &quot;Restore the backup over the source&quot;
+Trad(3,7) = &quot;Dated backup&quot;
+Trad(3,8) = &quot;Compress the archive with ZIP&quot;
+Trad(3,9) = &quot;Exclude the backup folder&quot;
+Trad(3,10)= &quot;Remove files and folders, which do not exist in the source&quot;
+Trad(3,11)= &quot;Start the backup&quot;
+Trad(3,12)= &quot;You do not have the rights to write into the backup folder&quot;
+Trad(3,13)= &quot;You do not have the rights to write into the source folder&quot;
+Trad(3,14)= &quot;Attention ! You have choosen the overwrite the data in the source folder !   &quot;
+Trad(3,15)= &quot;Are you sure ?&quot;
+Trad(3,16)= &quot;The backup is finished       &quot;
+Trad(3,17)= &quot;The restore is finished       &quot;
+Trad(3,18)= &quot; folder(s) copied&quot;
+Trad(3,19)= &quot; file(s) copied&quot;
+Trad(3,20)= &quot; folder(s) excluded&quot;
+Trad(3,21)= &quot; file(s) excluded&quot;
+Trad(3,22)= &quot; folder(s) examined&quot;
+Trad(3,23)= &quot;number of errors: &quot;
+Trad(3,24)= &quot;Number of folders examined : &quot;
+Trad(3,25)= &quot;Number of elements copied : &quot;
+Trad(3,26)=  &quot;with the following files or folders:&quot;
+Trad(3,27)= &quot;Please wait ... &quot;
+Trad(3,28)= &quot;Cancel&quot; 
+Trad(3,29)= &quot;Last backup was done on:&quot;
+Trad(3,30) = &quot;Caution this action may remove files into the backup folder. &quot; &amp; chr(13) &amp; chr(13) &amp; &quot; BE CARREFUL ! &quot; 
+Trad(3,31) = &quot; Backup and source folders can&apos;t be the same ! &quot;
+
+End Sub
+
+
+
+Function SelectLangNumber as Integer
+Dim iLangNumber as integer
+Dim  oPathSubstSrv as Object
+Dim sLangPath as String
+If Globalscope.BasicLibraries.HasByName(&quot;Dmaths&quot;) Then
+	Globalscope.BasicLibraries.loadLibrary(&quot;Dmaths&quot;)
+	If iLang &lt;= 2 Then iLangNumber = iLang Else iLangNumber = 1 
+Else
+	  oPathSubstSrv = createUnoService(&quot;com.sun.star.comp.framework.PathSubstitution&quot;)
+	  sLangPath = ConvertFromUrl(oPathSubstSrv.getSubstituteVariableValue(&quot;$(vlang)&quot;))
+	Select Case sLangPath 
+		Case &quot;french&quot;
+		iLangNumber = 0
+		Case &quot;german&quot;
+		iLangNumber = 2
+		Case &quot;spanish&quot;
+		iLangNumber = 3
+		Case Else
+		iLangNumber = 1
+	End Select
+Endif
+SelectLangNumber = iLangNumber
+End Function
+
+
+Sub Avertissement
+	MsgBox(Trad(0,30),32,&quot;Dmaths&quot;)
+
+End Sub
+</script:module>

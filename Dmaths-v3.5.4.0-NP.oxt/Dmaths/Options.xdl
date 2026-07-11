@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Options" dlg:left="92" dlg:top="54" dlg:width="300" dlg:height="266" dlg:help-text="&amp;792.Options.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;793.Options.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:background-color="0x0" dlg:border="simple"/>
+  <dlg:style dlg:style-id="1" dlg:background-color="0xdcff" dlg:border="simple"/>
+  <dlg:style dlg:style-id="2" dlg:background-color="0xff00" dlg:border="simple"/>
+  <dlg:style dlg:style-id="3" dlg:background-color="0xff0000" dlg:border="simple"/>
+  <dlg:style dlg:style-id="4" dlg:background-color="0xffff00" dlg:border="simple"/>
+  <dlg:style dlg:style-id="5" dlg:background-color="0xccccff" dlg:border="simple"/>
+  <dlg:style dlg:style-id="6" dlg:background-color="0xff" dlg:border="simple"/>
+  <dlg:style dlg:style-id="7" dlg:background-color="0x8000" dlg:border="simple"/>
+  <dlg:style dlg:style-id="8" dlg:background-color="0x280099" dlg:border="none"/>
+  <dlg:style dlg:style-id="9" dlg:background-color="0x94006b" dlg:border="none"/>
+  <dlg:style dlg:style-id="10" dlg:background-color="0xff3366" dlg:border="none"/>
+  <dlg:style dlg:style-id="11" dlg:background-color="0x355e00" dlg:border="none"/>
+  <dlg:style dlg:style-id="12" dlg:background-color="0x198a8a" dlg:border="none"/>
+  <dlg:style dlg:style-id="13" dlg:background-color="0xcc6633" dlg:border="none"/>
+  <dlg:style dlg:style-id="14" dlg:background-color="0x33cc66" dlg:border="none"/>
+  <dlg:style dlg:style-id="15" dlg:background-color="0xe6ff00" dlg:border="none"/>
+  <dlg:style dlg:style-id="16" dlg:background-color="0x993366" dlg:border="none"/>
+  <dlg:style dlg:style-id="17" dlg:background-color="0x2323dc" dlg:border="none"/>
+  <dlg:style dlg:style-id="18" dlg:background-color="0x944794" dlg:border="none"/>
+  <dlg:style dlg:style-id="19" dlg:background-color="0xb84700" dlg:border="none"/>
+  <dlg:style dlg:style-id="20" dlg:background-color="0x7da647" dlg:border="none"/>
+  <dlg:style dlg:style-id="21" dlg:background-color="0x47b8b8" dlg:border="none"/>
+  <dlg:style dlg:style-id="22" dlg:background-color="0xff6633" dlg:border="none"/>
+  <dlg:style dlg:style-id="23" dlg:background-color="0x3deb3d" dlg:border="none"/>
+  <dlg:style dlg:style-id="24" dlg:background-color="0xffff99" dlg:border="none"/>
+  <dlg:style dlg:style-id="25" dlg:background-color="0xff8080" dlg:border="none"/>
+  <dlg:style dlg:style-id="26" dlg:background-color="0xb8ff" dlg:border="none"/>
+  <dlg:style dlg:style-id="27" dlg:background-color="0x6b4794" dlg:border="none"/>
+  <dlg:style dlg:style-id="28" dlg:background-color="0xeb613d" dlg:border="none"/>
+  <dlg:style dlg:style-id="29" dlg:background-color="0xae00" dlg:border="none"/>
+  <dlg:style dlg:style-id="30" dlg:background-color="0xcccc" dlg:border="none"/>
+  <dlg:style dlg:style-id="31" dlg:background-color="0xff9966" dlg:border="none"/>
+  <dlg:style dlg:style-id="32" dlg:background-color="0x23ff23" dlg:border="none"/>
+  <dlg:style dlg:style-id="33" dlg:background-color="0xffff66" dlg:border="none"/>
+  <dlg:style dlg:style-id="34" dlg:background-color="0xccffff" dlg:border="none"/>
+  <dlg:style dlg:style-id="35" dlg:background-color="0x0" dlg:text-color="0xffffff" dlg:border="none"/>
+  <dlg:style dlg:style-id="36" dlg:background-color="0x666699" dlg:border="none"/>
+  <dlg:style dlg:style-id="37" dlg:background-color="0x9999cc" dlg:border="none"/>
+  <dlg:style dlg:style-id="38" dlg:background-color="0xccccff" dlg:border="none"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="0" dlg:left="6" dlg:top="4" dlg:width="138" dlg:height="223" dlg:help-text="&amp;794.Options.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;795.Options.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="1" dlg:left="113" dlg:top="11" dlg:width="15" dlg:height="12" dlg:help-text="&amp;796.Options.TextField1.HelpText" dlg:align="center" dlg:value="&amp;797.Options.TextField1.Text"/>
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="2" dlg:left="113" dlg:top="24" dlg:width="15" dlg:height="12" dlg:help-text="&amp;798.Options.TextField2.HelpText" dlg:align="center" dlg:value="&amp;799.Options.TextField2.Text"/>
+  <dlg:textfield dlg:id="TextField3" dlg:tab-index="3" dlg:left="113" dlg:top="37" dlg:width="15" dlg:height="12" dlg:help-text="&amp;800.Options.TextField3.HelpText" dlg:align="center" dlg:value="&amp;801.Options.TextField3.Text"/>
+  <dlg:textfield dlg:id="TextField4" dlg:tab-index="4" dlg:left="113" dlg:top="50" dlg:width="15" dlg:height="12" dlg:help-text="&amp;802.Options.TextField4.HelpText" dlg:align="center" dlg:value="&amp;803.Options.TextField4.Text"/>
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="5" dlg:left="13" dlg:top="67" dlg:width="61" dlg:height="10" dlg:help-text="&amp;804.Options.CheckBox1.HelpText" dlg:value="&amp;805.Options.CheckBox1.Label" dlg:checked="true"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="6" dlg:left="30" dlg:top="105" dlg:width="7" dlg:height="9" dlg:help-text="&amp;806.Options.OptionButton1.HelpText" dlg:value="&amp;807.Options.OptionButton1.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="7" dlg:left="46" dlg:top="105" dlg:width="7" dlg:height="9" dlg:help-text="&amp;808.Options.OptionButton2.HelpText" dlg:value="&amp;809.Options.OptionButton2.Label"/>
+   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="8" dlg:left="63" dlg:top="105" dlg:width="7" dlg:height="9" dlg:help-text="&amp;810.Options.OptionButton3.HelpText" dlg:value="&amp;811.Options.OptionButton3.Label"/>
+   <dlg:radio dlg:id="OptionButton4" dlg:tab-index="9" dlg:left="80" dlg:top="105" dlg:width="7" dlg:height="9" dlg:help-text="&amp;812.Options.OptionButton4.HelpText" dlg:value="&amp;813.Options.OptionButton4.Label"/>
+   <dlg:radio dlg:id="OptionButton5" dlg:tab-index="10" dlg:left="98" dlg:top="105" dlg:width="7" dlg:height="9" dlg:help-text="&amp;814.Options.OptionButton5.HelpText" dlg:value="&amp;815.Options.OptionButton5.Label"/>
+   <dlg:radio dlg:id="OptionButton6" dlg:tab-index="11" dlg:left="115" dlg:top="105" dlg:width="7" dlg:height="9" dlg:help-text="&amp;816.Options.OptionButton6.HelpText" dlg:value="&amp;817.Options.OptionButton6.Label"/>
+  </dlg:radiogroup>
+  <dlg:textfield dlg:id="TextField5" dlg:tab-index="12" dlg:left="81" dlg:top="169" dlg:width="15" dlg:height="12" dlg:help-text="&amp;818.Options.TextField5.HelpText" dlg:align="center" dlg:value="&amp;819.Options.TextField5.Text"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton7" dlg:tab-index="13" dlg:left="30" dlg:top="137" dlg:width="7" dlg:height="9" dlg:help-text="&amp;820.Options.OptionButton7.HelpText" dlg:value="&amp;821.Options.OptionButton7.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="OptionButton8" dlg:tab-index="14" dlg:left="46" dlg:top="137" dlg:width="7" dlg:height="9" dlg:help-text="&amp;822.Options.OptionButton8.HelpText" dlg:value="&amp;823.Options.OptionButton8.Label"/>
+   <dlg:radio dlg:id="OptionButton9" dlg:tab-index="15" dlg:left="63" dlg:top="137" dlg:width="7" dlg:height="9" dlg:help-text="&amp;824.Options.OptionButton9.HelpText" dlg:value="&amp;825.Options.OptionButton9.Label"/>
+   <dlg:radio dlg:id="OptionButton10" dlg:tab-index="16" dlg:left="80" dlg:top="137" dlg:width="7" dlg:height="9" dlg:help-text="&amp;826.Options.OptionButton10.HelpText" dlg:value="&amp;827.Options.OptionButton10.Label"/>
+   <dlg:radio dlg:id="OptionButton11" dlg:tab-index="17" dlg:left="98" dlg:top="137" dlg:width="7" dlg:height="9" dlg:help-text="&amp;828.Options.OptionButton11.HelpText" dlg:value="&amp;829.Options.OptionButton11.Label"/>
+   <dlg:radio dlg:id="OptionButton12" dlg:tab-index="18" dlg:left="115" dlg:top="137" dlg:width="7" dlg:height="9" dlg:help-text="&amp;830.Options.OptionButton12.HelpText" dlg:value="&amp;831.Options.OptionButton12.Label"/>
+  </dlg:radiogroup>
+  <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="19" dlg:left="18" dlg:top="204" dlg:width="110" dlg:height="12" dlg:help-text="&amp;832.Options.CheckBox2.HelpText" dlg:value="&amp;833.Options.CheckBox2.Label" dlg:checked="false"/>
+  <dlg:textfield dlg:id="TextField6" dlg:tab-index="20" dlg:left="211" dlg:top="11" dlg:width="15" dlg:height="12" dlg:help-text="&amp;834.Options.TextField6.HelpText" dlg:align="center" dlg:value="&amp;835.Options.TextField6.Text"/>
+  <dlg:textfield dlg:id="TextField7" dlg:tab-index="21" dlg:left="185" dlg:top="104" dlg:width="12" dlg:height="12" dlg:help-text="&amp;836.Options.TextField7.HelpText" dlg:align="center" dlg:value="&amp;837.Options.TextField7.Text"/>
+  <dlg:textfield dlg:id="TextField8" dlg:tab-index="22" dlg:left="228" dlg:top="104" dlg:width="12" dlg:height="12" dlg:help-text="&amp;838.Options.TextField8.HelpText" dlg:align="center" dlg:value="&amp;839.Options.TextField8.Text"/>
+  <dlg:textfield dlg:id="TextField9" dlg:tab-index="23" dlg:left="270" dlg:top="104" dlg:width="12" dlg:height="12" dlg:help-text="&amp;840.Options.TextField9.HelpText" dlg:align="center" dlg:value="&amp;841.Options.TextField9.Text"/>
+  <dlg:textfield dlg:id="TextField10" dlg:tab-index="24" dlg:left="185" dlg:top="118" dlg:width="12" dlg:height="12" dlg:help-text="&amp;842.Options.TextField10.HelpText" dlg:align="center" dlg:value="&amp;843.Options.TextField10.Text"/>
+  <dlg:textfield dlg:id="TextField11" dlg:tab-index="25" dlg:left="228" dlg:top="118" dlg:width="12" dlg:height="12" dlg:help-text="&amp;844.Options.TextField11.HelpText" dlg:align="center" dlg:value="&amp;845.Options.TextField11.Text"/>
+  <dlg:textfield dlg:id="TextField12" dlg:tab-index="26" dlg:left="270" dlg:top="118" dlg:width="12" dlg:height="12" dlg:help-text="&amp;846.Options.TextField12.HelpText" dlg:align="center" dlg:value="&amp;847.Options.TextField12.Text"/>
+  <dlg:textfield dlg:id="TextField13" dlg:tab-index="27" dlg:left="253" dlg:top="182" dlg:width="17" dlg:height="12" dlg:help-text="&amp;848.Options.TextField13.HelpText" dlg:align="center" dlg:value="&amp;849.Options.TextField13.Text"/>
+  <dlg:textfield dlg:id="TextField14" dlg:tab-index="28" dlg:left="253" dlg:top="196" dlg:width="17" dlg:height="12" dlg:help-text="&amp;850.Options.TextField14.HelpText" dlg:align="center" dlg:value="&amp;851.Options.TextField14.Text"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="29" dlg:left="190" dlg:top="237" dlg:width="70" dlg:height="20" dlg:help-text="&amp;852.Options.CommandButton1.HelpText" dlg:value="&amp;853.Options.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module3b.ValiderOptions?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl7" dlg:tab-index="30" dlg:left="38" dlg:top="139" dlg:width="6" dlg:height="6" dlg:help-text="&amp;854.Options.ImageControl7.HelpText"/>
+  <dlg:img dlg:style-id="1" dlg:id="ImageControl8" dlg:tab-index="31" dlg:left="54" dlg:top="139" dlg:width="6" dlg:height="6" dlg:help-text="&amp;855.Options.ImageControl8.HelpText"/>
+  <dlg:img dlg:style-id="2" dlg:id="ImageControl9" dlg:tab-index="32" dlg:left="71" dlg:top="139" dlg:width="6" dlg:height="6" dlg:help-text="&amp;856.Options.ImageControl9.HelpText"/>
+  <dlg:img dlg:style-id="3" dlg:id="ImageControl10" dlg:tab-index="33" dlg:left="89" dlg:top="139" dlg:width="6" dlg:height="6" dlg:help-text="&amp;857.Options.ImageControl10.HelpText"/>
+  <dlg:img dlg:style-id="4" dlg:id="ImageControl11" dlg:tab-index="34" dlg:left="106" dlg:top="139" dlg:width="6" dlg:height="6" dlg:help-text="&amp;858.Options.ImageControl11.HelpText"/>
+  <dlg:img dlg:style-id="5" dlg:id="ImageControl12" dlg:tab-index="35" dlg:left="123" dlg:top="139" dlg:width="6" dlg:height="6" dlg:help-text="&amp;859.Options.ImageControl12.HelpText"/>
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl1" dlg:tab-index="36" dlg:left="38" dlg:top="107" dlg:width="6" dlg:height="6" dlg:help-text="&amp;860.Options.ImageControl1.HelpText"/>
+  <dlg:img dlg:style-id="3" dlg:id="ImageControl2" dlg:tab-index="37" dlg:left="54" dlg:top="107" dlg:width="6" dlg:height="6" dlg:help-text="&amp;861.Options.ImageControl2.HelpText"/>
+  <dlg:img dlg:style-id="6" dlg:id="ImageControl3" dlg:tab-index="38" dlg:left="71" dlg:top="107" dlg:width="6" dlg:height="6" dlg:help-text="&amp;862.Options.ImageControl3.HelpText"/>
+  <dlg:img dlg:style-id="7" dlg:id="ImageControl4" dlg:tab-index="39" dlg:left="89" dlg:top="107" dlg:width="6" dlg:height="6" dlg:help-text="&amp;863.Options.ImageControl4.HelpText"/>
+  <dlg:img dlg:style-id="4" dlg:id="ImageControl5" dlg:tab-index="40" dlg:left="106" dlg:top="107" dlg:width="6" dlg:height="6" dlg:help-text="&amp;864.Options.ImageControl5.HelpText"/>
+  <dlg:img dlg:style-id="5" dlg:id="ImageControl6" dlg:tab-index="41" dlg:left="123" dlg:top="107" dlg:width="6" dlg:height="6" dlg:help-text="&amp;865.Options.ImageControl6.HelpText"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="42" dlg:left="13" dlg:top="15" dlg:width="85" dlg:height="10" dlg:help-text="&amp;866.Options.Label1.HelpText" dlg:value="&amp;867.Options.Label1.Label"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="43" dlg:left="13" dlg:top="28" dlg:width="85" dlg:height="10" dlg:help-text="&amp;868.Options.Label2.HelpText" dlg:value="&amp;869.Options.Label2.Label"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="44" dlg:left="13" dlg:top="41" dlg:width="85" dlg:height="10" dlg:help-text="&amp;870.Options.Label3.HelpText" dlg:value="&amp;871.Options.Label3.Label"/>
+  <dlg:titledbox dlg:id="FrameControl3" dlg:tab-index="45" dlg:left="13" dlg:top="128" dlg:width="125" dlg:height="23" dlg:help-text="&amp;872.Options.FrameControl3.HelpText">
+   <dlg:title dlg:value="&amp;873.Options.FrameControl3.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label4" dlg:tab-index="46" dlg:left="13" dlg:top="54" dlg:width="85" dlg:height="10" dlg:help-text="&amp;874.Options.Label4.HelpText" dlg:value="&amp;875.Options.Label4.Label"/>
+  <dlg:titledbox dlg:id="FrameControl4" dlg:tab-index="47" dlg:left="13" dlg:top="158" dlg:width="125" dlg:height="63" dlg:help-text="&amp;876.Options.FrameControl4.HelpText">
+   <dlg:title dlg:value="&amp;877.Options.FrameControl4.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label5" dlg:tab-index="48" dlg:left="27" dlg:top="172" dlg:width="51" dlg:height="12" dlg:help-text="&amp;878.Options.Label5.HelpText" dlg:value="&amp;879.Options.Label5.Label"/>
+  <dlg:titledbox dlg:id="FrameControl5" dlg:tab-index="49" dlg:left="148" dlg:top="4" dlg:width="148" dlg:height="223" dlg:help-text="&amp;880.Options.FrameControl5.HelpText">
+   <dlg:title dlg:value="&amp;881.Options.FrameControl5.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label6" dlg:tab-index="50" dlg:left="155" dlg:top="14" dlg:width="40" dlg:height="12" dlg:help-text="&amp;882.Options.Label6.HelpText" dlg:value="&amp;883.Options.Label6.Label"/>
+  <dlg:titledbox dlg:id="FrameControl6" dlg:tab-index="51" dlg:left="153" dlg:top="42" dlg:width="138" dlg:height="114" dlg:help-text="&amp;884.Options.FrameControl6.HelpText">
+   <dlg:title dlg:value="&amp;885.Options.FrameControl6.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label7" dlg:tab-index="52" dlg:left="158" dlg:top="54" dlg:width="108" dlg:height="12" dlg:help-text="&amp;886.Options.Label7.HelpText" dlg:value="&amp;887.Options.Label7.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label8" dlg:tab-index="53" dlg:left="158" dlg:top="106" dlg:width="25" dlg:height="9" dlg:help-text="&amp;888.Options.Label8.HelpText" dlg:value="&amp;889.Options.Label8.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label9" dlg:tab-index="54" dlg:left="200" dlg:top="106" dlg:width="25" dlg:height="9" dlg:help-text="&amp;890.Options.Label9.HelpText" dlg:value="&amp;891.Options.Label9.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label10" dlg:tab-index="55" dlg:left="243" dlg:top="106" dlg:width="25" dlg:height="9" dlg:help-text="&amp;892.Options.Label10.HelpText" dlg:value="&amp;893.Options.Label10.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label11" dlg:tab-index="56" dlg:left="158" dlg:top="120" dlg:width="25" dlg:height="9" dlg:help-text="&amp;894.Options.Label11.HelpText" dlg:value="&amp;895.Options.Label11.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label12" dlg:tab-index="57" dlg:left="200" dlg:top="120" dlg:width="25" dlg:height="9" dlg:help-text="&amp;896.Options.Label12.HelpText" dlg:value="&amp;897.Options.Label12.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label13" dlg:tab-index="58" dlg:left="243" dlg:top="120" dlg:width="25" dlg:height="9" dlg:help-text="&amp;898.Options.Label13.HelpText" dlg:value="&amp;899.Options.Label13.Label" dlg:align="center"/>
+  <dlg:formattedfield dlg:style-id="8" dlg:id="FormattedField1" dlg:tab-index="59" dlg:left="158" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;900.Options.FormattedField1.HelpText" dlg:readonly="true" dlg:text="1" dlg:align="center" dlg:maxlength="1" dlg:value="1"/>
+  <dlg:formattedfield dlg:style-id="9" dlg:id="FormattedField2" dlg:tab-index="60" dlg:left="170" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;902.Options.FormattedField2.HelpText" dlg:readonly="true" dlg:text="2" dlg:align="center" dlg:maxlength="1" dlg:value="2"/>
+  <dlg:formattedfield dlg:style-id="10" dlg:id="FormattedField3" dlg:tab-index="61" dlg:left="183" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;904.Options.FormattedField3.HelpText" dlg:readonly="true" dlg:text="3" dlg:align="center" dlg:maxlength="1" dlg:value="3"/>
+  <dlg:formattedfield dlg:style-id="11" dlg:id="FormattedField4" dlg:tab-index="62" dlg:left="196" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;906.Options.FormattedField4.HelpText" dlg:readonly="true" dlg:text="4" dlg:align="center" dlg:maxlength="1" dlg:value="4"/>
+  <dlg:formattedfield dlg:style-id="12" dlg:id="FormattedField5" dlg:tab-index="63" dlg:left="210" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;908.Options.FormattedField5.HelpText" dlg:readonly="true" dlg:text="5" dlg:align="center" dlg:maxlength="1" dlg:value="5"/>
+  <dlg:formattedfield dlg:style-id="13" dlg:id="FormattedField6" dlg:tab-index="64" dlg:left="223" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;910.Options.FormattedField6.HelpText" dlg:readonly="true" dlg:text="6" dlg:align="center" dlg:maxlength="1" dlg:value="6"/>
+  <dlg:formattedfield dlg:style-id="14" dlg:id="FormattedField7" dlg:tab-index="65" dlg:left="235" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;912.Options.FormattedField7.HelpText" dlg:readonly="true" dlg:text="7" dlg:align="center" dlg:maxlength="1" dlg:value="7"/>
+  <dlg:formattedfield dlg:style-id="15" dlg:id="FormattedField8" dlg:tab-index="66" dlg:left="248" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;914.Options.FormattedField8.HelpText" dlg:readonly="true" dlg:text="8" dlg:align="center" dlg:maxlength="1" dlg:value="8"/>
+  <dlg:formattedfield dlg:style-id="16" dlg:id="FormattedField9" dlg:tab-index="67" dlg:left="261" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;916.Options.FormattedField9.HelpText" dlg:readonly="true" dlg:text="9" dlg:align="center" dlg:maxlength="1" dlg:value="9"/>
+  <dlg:formattedfield dlg:style-id="17" dlg:id="FormattedField11" dlg:tab-index="68" dlg:left="158" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;918.Options.FormattedField11.HelpText" dlg:readonly="true" dlg:text="11" dlg:align="center" dlg:maxlength="2" dlg:value="11" dlg:format-code="Standard" dlg:format-locale="fr;FR"/>
+  <dlg:formattedfield dlg:style-id="18" dlg:id="FormattedField12" dlg:tab-index="69" dlg:left="170" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;920.Options.FormattedField12.HelpText" dlg:readonly="true" dlg:text="12" dlg:align="center" dlg:maxlength="2" dlg:value="12"/>
+  <dlg:formattedfield dlg:style-id="19" dlg:id="FormattedField13" dlg:tab-index="70" dlg:left="183" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;922.Options.FormattedField13.HelpText" dlg:readonly="true" dlg:text="13" dlg:align="center" dlg:maxlength="2" dlg:value="13"/>
+  <dlg:formattedfield dlg:style-id="20" dlg:id="FormattedField14" dlg:tab-index="71" dlg:left="196" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;924.Options.FormattedField14.HelpText" dlg:readonly="true" dlg:text="14" dlg:align="center" dlg:maxlength="2" dlg:value="14"/>
+  <dlg:formattedfield dlg:style-id="21" dlg:id="FormattedField15" dlg:tab-index="72" dlg:left="210" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;926.Options.FormattedField15.HelpText" dlg:readonly="true" dlg:text="15" dlg:align="center" dlg:maxlength="2" dlg:value="15"/>
+  <dlg:formattedfield dlg:style-id="22" dlg:id="FormattedField16" dlg:tab-index="73" dlg:left="223" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;928.Options.FormattedField16.HelpText" dlg:readonly="true" dlg:text="16" dlg:align="center" dlg:maxlength="2" dlg:value="16"/>
+  <dlg:formattedfield dlg:style-id="23" dlg:id="FormattedField17" dlg:tab-index="74" dlg:left="235" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;930.Options.FormattedField17.HelpText" dlg:readonly="true" dlg:text="17" dlg:align="center" dlg:maxlength="2" dlg:value="17"/>
+  <dlg:formattedfield dlg:style-id="24" dlg:id="FormattedField18" dlg:tab-index="75" dlg:left="248" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;932.Options.FormattedField18.HelpText" dlg:readonly="true" dlg:text="18" dlg:align="center" dlg:maxlength="2" dlg:value="18"/>
+  <dlg:formattedfield dlg:style-id="25" dlg:id="FormattedField19" dlg:tab-index="76" dlg:left="261" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;934.Options.FormattedField19.HelpText" dlg:readonly="true" dlg:text="19" dlg:align="center" dlg:maxlength="2" dlg:value="19"/>
+  <dlg:formattedfield dlg:style-id="26" dlg:id="FormattedField21" dlg:tab-index="77" dlg:left="158" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;936.Options.FormattedField21.HelpText" dlg:readonly="true" dlg:text="21" dlg:align="center" dlg:maxlength="2" dlg:value="21"/>
+  <dlg:formattedfield dlg:style-id="27" dlg:id="FormattedField22" dlg:tab-index="78" dlg:left="170" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;938.Options.FormattedField22.HelpText" dlg:readonly="true" dlg:text="22" dlg:align="center" dlg:maxlength="2" dlg:value="22"/>
+  <dlg:formattedfield dlg:style-id="28" dlg:id="FormattedField23" dlg:tab-index="79" dlg:left="183" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;940.Options.FormattedField23.HelpText" dlg:readonly="true" dlg:text="23" dlg:align="center" dlg:maxlength="2" dlg:value="23"/>
+  <dlg:formattedfield dlg:style-id="29" dlg:id="FormattedField24" dlg:tab-index="80" dlg:left="196" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;942.Options.FormattedField24.HelpText" dlg:readonly="true" dlg:text="24" dlg:align="center" dlg:maxlength="2" dlg:value="24"/>
+  <dlg:formattedfield dlg:style-id="30" dlg:id="FormattedField25" dlg:tab-index="81" dlg:left="210" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;944.Options.FormattedField25.HelpText" dlg:readonly="true" dlg:text="25" dlg:align="center" dlg:maxlength="2" dlg:value="25"/>
+  <dlg:formattedfield dlg:style-id="31" dlg:id="FormattedField26" dlg:tab-index="82" dlg:left="223" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;946.Options.FormattedField26.HelpText" dlg:readonly="true" dlg:text="26" dlg:align="center" dlg:maxlength="2" dlg:value="26"/>
+  <dlg:formattedfield dlg:style-id="32" dlg:id="FormattedField27" dlg:tab-index="83" dlg:left="235" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;948.Options.FormattedField27.HelpText" dlg:readonly="true" dlg:text="27" dlg:align="center" dlg:maxlength="2" dlg:value="27"/>
+  <dlg:formattedfield dlg:style-id="33" dlg:id="FormattedField28" dlg:tab-index="84" dlg:left="248" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;950.Options.FormattedField28.HelpText" dlg:readonly="true" dlg:text="28" dlg:align="center" dlg:maxlength="2" dlg:value="28"/>
+  <dlg:formattedfield dlg:style-id="34" dlg:id="FormattedField29" dlg:tab-index="85" dlg:left="261" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;952.Options.FormattedField29.HelpText" dlg:readonly="true" dlg:text="29" dlg:align="center" dlg:maxlength="2" dlg:value="29"/>
+  <dlg:formattedfield dlg:style-id="35" dlg:id="FormattedField31" dlg:tab-index="86" dlg:left="269" dlg:top="54" dlg:width="12" dlg:height="8" dlg:help-text="&amp;954.Options.FormattedField31.HelpText" dlg:readonly="true" dlg:text="0" dlg:align="center" dlg:maxlength="1" dlg:value="0"/>
+  <dlg:formattedfield dlg:style-id="36" dlg:id="FormattedField10" dlg:tab-index="87" dlg:left="275" dlg:top="70" dlg:width="12" dlg:height="8" dlg:help-text="&amp;956.Options.FormattedField10.HelpText" dlg:readonly="true" dlg:text="10" dlg:align="center" dlg:maxlength="2" dlg:value="10" dlg:format-code="Standard" dlg:format-locale="fr;FR"/>
+  <dlg:formattedfield dlg:style-id="37" dlg:id="FormattedField20" dlg:tab-index="88" dlg:left="275" dlg:top="81" dlg:width="12" dlg:height="8" dlg:help-text="&amp;958.Options.FormattedField20.HelpText" dlg:readonly="true" dlg:text="20" dlg:align="center" dlg:maxlength="2" dlg:value="20"/>
+  <dlg:formattedfield dlg:style-id="38" dlg:id="FormattedField30" dlg:tab-index="89" dlg:left="275" dlg:top="92" dlg:width="12" dlg:height="8" dlg:help-text="&amp;960.Options.FormattedField30.HelpText" dlg:readonly="true" dlg:text="30" dlg:align="center" dlg:maxlength="2" dlg:value="30"/>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="90" dlg:left="13" dlg:top="95" dlg:width="125" dlg:height="23" dlg:help-text="&amp;962.Options.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;963.Options.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="FrameControl7" dlg:tab-index="91" dlg:left="153" dlg:top="160" dlg:width="138" dlg:height="58" dlg:help-text="&amp;964.Options.FrameControl7.HelpText">
+   <dlg:title dlg:value="&amp;965.Options.FrameControl7.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label14" dlg:tab-index="92" dlg:left="160" dlg:top="185" dlg:width="88" dlg:height="12" dlg:help-text="&amp;966.Options.Label14.HelpText" dlg:value="&amp;967.Options.Label14.Label"/>
+  <dlg:text dlg:id="Label15" dlg:tab-index="93" dlg:left="160" dlg:top="199" dlg:width="88" dlg:height="12" dlg:help-text="&amp;968.Options.Label15.HelpText" dlg:value="&amp;969.Options.Label15.Label"/>
+  <dlg:checkbox dlg:id="CheckBox3" dlg:tab-index="94" dlg:left="18" dlg:top="188" dlg:width="119" dlg:height="12" dlg:help-text="&amp;970.Options.CheckBox3.HelpText" dlg:value="&amp;971.Options.CheckBox3.Label" dlg:checked="false"/>
+  <dlg:checkbox dlg:id="CheckBox4" dlg:tab-index="95" dlg:left="160" dlg:top="170" dlg:width="89" dlg:height="12" dlg:help-text="&amp;972.Options.CheckBox4.HelpText" dlg:value="&amp;973.Options.CheckBox4.Label" dlg:checked="false"/>
+  <dlg:text dlg:id="Label16" dlg:tab-index="96" dlg:left="158" dlg:top="134" dlg:width="25" dlg:height="9" dlg:help-text="&amp;974.Options.Label16.HelpText" dlg:value="&amp;975.Options.Label16.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label17" dlg:tab-index="97" dlg:left="200" dlg:top="134" dlg:width="25" dlg:height="9" dlg:help-text="&amp;976.Options.Label17.HelpText" dlg:value="&amp;977.Options.Label17.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label18" dlg:tab-index="98" dlg:left="243" dlg:top="134" dlg:width="25" dlg:height="9" dlg:help-text="&amp;978.Options.Label18.HelpText" dlg:value="&amp;979.Options.Label18.Label" dlg:align="center"/>
+  <dlg:textfield dlg:id="TextField15" dlg:tab-index="99" dlg:left="185" dlg:top="132" dlg:width="12" dlg:height="12" dlg:help-text="&amp;980.Options.TextField15.HelpText" dlg:align="center" dlg:value="&amp;981.Options.TextField15.Text"/>
+  <dlg:textfield dlg:id="TextField16" dlg:tab-index="100" dlg:left="228" dlg:top="132" dlg:width="12" dlg:height="12" dlg:help-text="&amp;982.Options.TextField16.HelpText" dlg:align="center" dlg:value="&amp;983.Options.TextField16.Text"/>
+  <dlg:textfield dlg:id="TextField17" dlg:tab-index="101" dlg:left="270" dlg:top="132" dlg:width="12" dlg:height="12" dlg:help-text="&amp;984.Options.TextField17.HelpText" dlg:align="center" dlg:value="&amp;985.Options.TextField17.Text"/>
+  <dlg:text dlg:id="Label19" dlg:tab-index="102" dlg:left="76" dlg:top="67" dlg:width="19" dlg:height="10" dlg:help-text="&amp;986.Options.Label19.HelpText" dlg:value="&amp;987.Options.Label19.Label"/>
+  <dlg:textfield dlg:id="TextField18" dlg:tab-index="103" dlg:left="98" dlg:top="66" dlg:width="12" dlg:height="12" dlg:help-text="&amp;988.Options.TextField18.HelpText" dlg:align="center" dlg:value="&amp;989.Options.TextField18.Text"/>
+  <dlg:textfield dlg:id="TextField19" dlg:tab-index="104" dlg:left="113" dlg:top="66" dlg:width="12" dlg:height="12" dlg:help-text="&amp;990.Options.TextField19.HelpText" dlg:align="center" dlg:value="&amp;991.Options.TextField19.Text"/>
+  <dlg:textfield dlg:id="TextField20" dlg:tab-index="105" dlg:left="128" dlg:top="66" dlg:width="12" dlg:height="12" dlg:help-text="&amp;992.Options.TextField20.HelpText" dlg:align="center" dlg:value="&amp;993.Options.TextField20.Text"/>
+  <dlg:text dlg:id="Label20" dlg:tab-index="106" dlg:left="155" dlg:top="28" dlg:width="100" dlg:height="12" dlg:help-text="&amp;994.Options.Label20.HelpText" dlg:value="&amp;995.Options.Label20.Label"/>
+  <dlg:textfield dlg:id="TextField21" dlg:tab-index="107" dlg:left="260" dlg:top="26" dlg:width="15" dlg:height="12" dlg:help-text="&amp;996.Options.TextField21.HelpText" dlg:align="center" dlg:value="&amp;997.Options.TextField21.Text"/>
+  <dlg:text dlg:id="Label21" dlg:tab-index="108" dlg:left="105" dlg:top="53" dlg:width="8" dlg:height="12" dlg:help-text="&amp;998.Options.Label21.HelpText" dlg:value="&amp;999.Options.Label21.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label22" dlg:tab-index="109" dlg:left="129" dlg:top="53" dlg:width="12" dlg:height="12" dlg:help-text="&amp;1000.Options.Label22.HelpText" dlg:value="&amp;1001.Options.Label22.Label"/>
+  <dlg:text dlg:id="Label23" dlg:tab-index="110" dlg:left="105" dlg:top="40" dlg:width="8" dlg:height="12" dlg:help-text="&amp;1002.Options.Label23.HelpText" dlg:value="&amp;1003.Options.Label23.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label24" dlg:tab-index="111" dlg:left="129" dlg:top="40" dlg:width="12" dlg:height="12" dlg:help-text="&amp;1004.Options.Label24.HelpText" dlg:value="&amp;1005.Options.Label24.Label"/>
+  <dlg:text dlg:id="Label25" dlg:tab-index="112" dlg:left="105" dlg:top="27" dlg:width="8" dlg:height="12" dlg:help-text="&amp;1006.Options.Label25.HelpText" dlg:value="&amp;1007.Options.Label25.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label26" dlg:tab-index="113" dlg:left="129" dlg:top="27" dlg:width="12" dlg:height="12" dlg:help-text="&amp;1008.Options.Label26.HelpText" dlg:value="&amp;1009.Options.Label26.Label"/>
+  <dlg:text dlg:id="Label27" dlg:tab-index="114" dlg:left="105" dlg:top="14" dlg:width="8" dlg:height="12" dlg:help-text="&amp;1010.Options.Label27.HelpText" dlg:value="&amp;1011.Options.Label27.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label28" dlg:tab-index="115" dlg:left="129" dlg:top="14" dlg:width="12" dlg:height="12" dlg:help-text="&amp;1012.Options.Label28.HelpText" dlg:value="&amp;1013.Options.Label28.Label"/>
+  <dlg:text dlg:id="Label29" dlg:tab-index="116" dlg:left="202" dlg:top="14" dlg:width="8" dlg:height="12" dlg:help-text="&amp;1014.Options.Label29.HelpText" dlg:value="&amp;1015.Options.Label29.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label30" dlg:tab-index="117" dlg:left="227" dlg:top="14" dlg:width="12" dlg:height="12" dlg:help-text="&amp;1016.Options.Label30.HelpText" dlg:value="&amp;1017.Options.Label30.Label"/>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="118" dlg:left="30" dlg:top="237" dlg:width="70" dlg:height="20" dlg:help-text="&amp;1984.Options.CommandButton2.HelpText" dlg:value="&amp;1985.Options.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module3b.SauveOptionsTrace?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="119" dlg:left="110" dlg:top="237" dlg:width="70" dlg:height="20" dlg:help-text="&amp;1986.Options.CommandButton3.HelpText" dlg:value="&amp;1987.Options.CommandButton3.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module3b.ChargeOptionsParDefaut?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:checkbox dlg:id="CheckBox5" dlg:tab-index="120" dlg:left="13" dlg:top="80" dlg:width="100" dlg:height="10" dlg:help-text="&amp;2905.Options.CheckBox5.HelpText" dlg:value="&amp;2906.Options.CheckBox5.Label" dlg:checked="true"/>
+ </dlg:bulletinboard>
+</dlg:window>

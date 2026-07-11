@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="CreePoint" dlg:left="148" dlg:top="48" dlg:width="156" dlg:height="326" dlg:help-text="&amp;274.CreePoint.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;275.CreePoint.Title">
+ <dlg:bulletinboard>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="0" dlg:left="80" dlg:top="297" dlg:width="70" dlg:height="20" dlg:help-text="&amp;276.CreePoint.CommandButton1.HelpText" dlg:value="&amp;277.CreePoint.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module6.FinCreationPoint?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="1" dlg:left="58" dlg:top="5" dlg:width="30" dlg:height="14" dlg:help-text="&amp;278.CreePoint.TextField1.HelpText" dlg:align="center" dlg:maxlength="2" dlg:value="&amp;279.CreePoint.TextField1.Text"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="4" dlg:left="5" dlg:top="6" dlg:width="50" dlg:height="11" dlg:help-text="&amp;280.CreePoint.Label1.HelpText" dlg:value="&amp;281.CreePoint.Label1.Label"/>
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="15" dlg:left="76" dlg:top="59" dlg:width="25" dlg:height="14" dlg:tag="1" dlg:help-text="&amp;282.CreePoint.TextField2.HelpText" dlg:align="right" dlg:value="&amp;283.CreePoint.TextField2.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:id="TextField3" dlg:tab-index="16" dlg:left="118" dlg:top="59" dlg:width="25" dlg:height="14" dlg:tag="1" dlg:help-text="&amp;284.CreePoint.TextField3.HelpText" dlg:align="right" dlg:value="&amp;285.CreePoint.TextField3.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:text dlg:id="Label3" dlg:tab-index="20" dlg:left="9" dlg:top="102" dlg:width="24" dlg:height="11" dlg:help-text="&amp;288.CreePoint.Label3.HelpText" dlg:value="&amp;289.CreePoint.Label3.Label"/>
+  <dlg:text dlg:id="Label4" dlg:tab-index="21" dlg:left="90" dlg:top="102" dlg:width="25" dlg:height="11" dlg:help-text="&amp;290.CreePoint.Label4.HelpText" dlg:value="&amp;291.CreePoint.Label4.Label" dlg:align="right"/>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="13" dlg:left="5" dlg:top="297" dlg:width="70" dlg:height="20" dlg:help-text="&amp;296.CreePoint.CommandButton2.HelpText" dlg:value="&amp;297.CreePoint.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module6.AnnulerCreationPoint" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:text dlg:id="Label5" dlg:tab-index="22" dlg:left="55" dlg:top="102" dlg:width="2" dlg:height="11" dlg:help-text="&amp;298.CreePoint.Label5.HelpText" dlg:value="&amp;299.CreePoint.Label5.Label"/>
+  <dlg:textfield dlg:id="TextField5" dlg:tab-index="19" dlg:left="117" dlg:top="100" dlg:width="25" dlg:height="14" dlg:tag="2" dlg:help-text="&amp;300.CreePoint.TextField5.HelpText" dlg:align="right" dlg:value="&amp;301.CreePoint.TextField5.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:text dlg:id="Label6" dlg:tab-index="23" dlg:left="79" dlg:top="102" dlg:width="3" dlg:height="11" dlg:help-text="&amp;302.CreePoint.Label6.HelpText" dlg:value="&amp;303.CreePoint.Label6.Label"/>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="24" dlg:left="5" dlg:top="121" dlg:width="145" dlg:height="38" dlg:help-text="&amp;304.CreePoint.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;305.CreePoint.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label7" dlg:tab-index="25" dlg:left="55" dlg:top="142" dlg:width="36" dlg:height="11" dlg:help-text="&amp;310.CreePoint.Label7.HelpText" dlg:value="&amp;311.CreePoint.Label7.Label" dlg:align="center"/>
+  <dlg:titledbox dlg:id="FrameControl3" dlg:tab-index="28" dlg:left="5" dlg:top="161" dlg:width="145" dlg:height="38" dlg:help-text="&amp;312.CreePoint.FrameControl3.HelpText">
+   <dlg:title dlg:value="&amp;313.CreePoint.FrameControl3.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label2" dlg:tab-index="29" dlg:left="54" dlg:top="182" dlg:width="37" dlg:height="11" dlg:help-text="&amp;318.CreePoint.Label2.HelpText" dlg:value="&amp;319.CreePoint.Label2.Label" dlg:align="center"/>
+  <dlg:titledbox dlg:id="FrameControl4" dlg:tab-index="5" dlg:left="5" dlg:top="54" dlg:width="145" dlg:height="25" dlg:help-text="&amp;328.CreePoint.FrameControl4.HelpText">
+   <dlg:title dlg:value="&amp;329.CreePoint.FrameControl4.Label"/>
+  </dlg:titledbox>
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="2" dlg:left="23" dlg:top="25" dlg:width="65" dlg:height="11" dlg:help-text="&amp;330.CreePoint.CheckBox1.HelpText" dlg:value="&amp;331.CreePoint.CheckBox1.Label" dlg:checked="true"/>
+  <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="3" dlg:left="23" dlg:top="37" dlg:width="65" dlg:height="11" dlg:help-text="&amp;332.CreePoint.CheckBox2.HelpText" dlg:value="&amp;333.CreePoint.CheckBox2.Label" dlg:checked="true"/>
+  <dlg:titledbox dlg:id="FrameControl5" dlg:tab-index="36" dlg:left="104" dlg:top="3" dlg:width="46" dlg:height="48" dlg:help-text="&amp;350.CreePoint.FrameControl5.HelpText">
+   <dlg:title dlg:value="&amp;351.CreePoint.FrameControl5.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="FrameControl6" dlg:tab-index="45" dlg:left="5" dlg:top="81" dlg:width="145" dlg:height="38" dlg:help-text="&amp;2179.CreePoint.FrameControl6.HelpText">
+   <dlg:title dlg:value="&amp;2180.CreePoint.FrameControl6.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="46" dlg:left="5" dlg:top="201" dlg:width="145" dlg:height="38" dlg:help-text="&amp;2219.CreePoint.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;2220.CreePoint.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label8" dlg:tab-index="47" dlg:left="55" dlg:top="221" dlg:width="36" dlg:height="11" dlg:help-text="&amp;2225.CreePoint.Label8.HelpText" dlg:value="&amp;2226.CreePoint.Label8.Label" dlg:align="center"/>
+  <dlg:menulist dlg:id="ListBox1" dlg:tab-index="32" dlg:left="18" dlg:top="220" dlg:width="35" dlg:height="14" dlg:tag="13" dlg:help-text="&amp;2229.CreePoint.ListBox1.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:menulist dlg:id="ListBox2" dlg:tab-index="33" dlg:left="94" dlg:top="220" dlg:width="35" dlg:height="14" dlg:tag="13" dlg:help-text="&amp;2230.CreePoint.ListBox2.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton13" dlg:tab-index="10" dlg:left="10" dlg:top="207" dlg:width="130" dlg:height="11" dlg:help-text="&amp;2271.CreePoint.OptionButton13.HelpText" dlg:value="&amp;2272.CreePoint.OptionButton13.Label">
+    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocus3?language=Basic&amp;location=application" script:language="Script"/>
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocus3?language=Basic&amp;location=application" script:language="Script"/>
+    <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocus3?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="6" dlg:left="10" dlg:top="60" dlg:width="48" dlg:height="11" dlg:help-text="&amp;2275.CreePoint.OptionButton1.HelpText" dlg:tabstop="true" dlg:value="&amp;2276.CreePoint.OptionButton1.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="7" dlg:left="10" dlg:top="87" dlg:width="130" dlg:height="11" dlg:help-text="&amp;2281.CreePoint.OptionButton2.HelpText" dlg:value="&amp;2282.CreePoint.OptionButton2.Label"/>
+   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="8" dlg:left="10" dlg:top="127" dlg:width="130" dlg:height="11" dlg:help-text="&amp;2285.CreePoint.OptionButton3.HelpText" dlg:value="&amp;2286.CreePoint.OptionButton3.Label"/>
+   <dlg:radio dlg:id="OptionButton4" dlg:tab-index="9" dlg:left="10" dlg:top="167" dlg:width="130" dlg:height="11" dlg:help-text="&amp;2289.CreePoint.OptionButton4.HelpText" dlg:value="&amp;2290.CreePoint.OptionButton4.Label"/>
+  </dlg:radiogroup>
+  <dlg:menulist dlg:id="ListBox3" dlg:tab-index="17" dlg:left="35" dlg:top="100" dlg:width="18" dlg:height="14" dlg:tag="2" dlg:help-text="&amp;2301.CreePoint.ListBox3.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:menulist dlg:id="ListBox4" dlg:tab-index="18" dlg:left="59" dlg:top="100" dlg:width="18" dlg:height="14" dlg:tag="2" dlg:help-text="&amp;2302.CreePoint.ListBox4.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:menulist dlg:id="ListBox5" dlg:tab-index="30" dlg:left="18" dlg:top="180" dlg:width="35" dlg:height="14" dlg:tag="4" dlg:help-text="&amp;2303.CreePoint.ListBox5.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:menulist dlg:id="ListBox6" dlg:tab-index="26" dlg:left="18" dlg:top="140" dlg:width="35" dlg:height="14" dlg:tag="3" dlg:help-text="&amp;2304.CreePoint.ListBox6.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:menulist dlg:id="ListBox7" dlg:tab-index="27" dlg:left="94" dlg:top="140" dlg:width="35" dlg:height="14" dlg:tag="3" dlg:help-text="&amp;2305.CreePoint.ListBox7.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:menulist dlg:id="ListBox8" dlg:tab-index="31" dlg:left="94" dlg:top="180" dlg:width="35" dlg:height="14" dlg:tag="4" dlg:help-text="&amp;2306.CreePoint.ListBox8.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:titledbox dlg:id="FrameControl7" dlg:tab-index="12" dlg:left="5" dlg:top="241" dlg:width="145" dlg:height="38" dlg:help-text="&amp;2307.CreePoint.FrameControl7.HelpText">
+   <dlg:title dlg:value="&amp;2308.CreePoint.FrameControl7.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label9" dlg:tab-index="14" dlg:left="10" dlg:top="262" dlg:width="88" dlg:height="11" dlg:help-text="&amp;2309.CreePoint.Label9.HelpText" dlg:value="&amp;2310.CreePoint.Label9.Label" dlg:align="right" dlg:tabstop="false"/>
+  <dlg:menulist dlg:id="ListBox9" dlg:tab-index="34" dlg:left="108" dlg:top="245" dlg:width="35" dlg:height="14" dlg:tag="14" dlg:help-text="&amp;2311.CreePoint.ListBox9.HelpText" dlg:spin="true" dlg:linecount="100">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:menulist>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton14" dlg:tab-index="11" dlg:left="10" dlg:top="247" dlg:width="96" dlg:height="11" dlg:help-text="&amp;2327.CreePoint.OptionButton14.HelpText" dlg:value="&amp;2328.CreePoint.OptionButton14.Label">
+    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocus3?language=Basic&amp;location=application" script:language="Script"/>
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocus3?language=Basic&amp;location=application" script:language="Script"/>
+    <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocus3?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+  </dlg:radiogroup>
+  <dlg:textfield dlg:id="TextField4" dlg:tab-index="35" dlg:left="100" dlg:top="261" dlg:width="20" dlg:height="14" dlg:tag="14" dlg:help-text="&amp;2329.CreePoint.TextField4.HelpText" dlg:align="right" dlg:value="&amp;2330.CreePoint.TextField4.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module6.GetFocusOptionButton?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:Dmaths.Module6.AnnulerCreationCercle?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="Angle0" dlg:tab-index="39" dlg:left="139" dlg:top="28" dlg:width="8" dlg:height="7" dlg:help-text="&amp;2493.CreePoint.Angle0.HelpText" dlg:value="&amp;2494.CreePoint.Angle0.Label"/>
+   <dlg:radio dlg:id="Angle1" dlg:tab-index="38" dlg:left="135" dlg:top="18" dlg:width="8" dlg:height="7" dlg:help-text="&amp;2495.CreePoint.Angle1.HelpText" dlg:value="&amp;2496.CreePoint.Angle1.Label"/>
+   <dlg:radio dlg:id="Angle2" dlg:tab-index="37" dlg:left="125" dlg:top="14" dlg:width="8" dlg:height="7" dlg:help-text="&amp;2497.CreePoint.Angle2.HelpText" dlg:value="&amp;2498.CreePoint.Angle2.Label"/>
+   <dlg:radio dlg:id="Angle3" dlg:tab-index="44" dlg:left="115" dlg:top="18" dlg:width="8" dlg:height="7" dlg:help-text="&amp;2499.CreePoint.Angle3.HelpText" dlg:value="&amp;2500.CreePoint.Angle3.Label"/>
+   <dlg:radio dlg:id="Angle4" dlg:tab-index="43" dlg:left="111" dlg:top="28" dlg:width="8" dlg:height="7" dlg:help-text="&amp;2501.CreePoint.Angle4.HelpText" dlg:value="&amp;2502.CreePoint.Angle4.Label"/>
+   <dlg:radio dlg:id="Angle5" dlg:tab-index="42" dlg:left="115" dlg:top="38" dlg:width="8" dlg:height="7" dlg:help-text="&amp;2503.CreePoint.Angle5.HelpText" dlg:value="&amp;2504.CreePoint.Angle5.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="Angle6" dlg:tab-index="41" dlg:left="125" dlg:top="42" dlg:width="8" dlg:height="7" dlg:help-text="&amp;2505.CreePoint.Angle6.HelpText" dlg:value="&amp;2506.CreePoint.Angle6.Label"/>
+   <dlg:radio dlg:id="Angle7" dlg:tab-index="40" dlg:left="135" dlg:top="38" dlg:width="8" dlg:height="7" dlg:help-text="&amp;2507.CreePoint.Angle7.HelpText" dlg:value="&amp;2508.CreePoint.Angle7.Label"/>
+  </dlg:radiogroup>
+  <dlg:text dlg:id="Label10" dlg:tab-index="48" dlg:left="104" dlg:top="61" dlg:width="14" dlg:height="11" dlg:help-text="&amp;2667.CreePoint.Label10.HelpText" dlg:value="&amp;2668.CreePoint.Label10.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label11" dlg:tab-index="49" dlg:left="61" dlg:top="61" dlg:width="14" dlg:height="11" dlg:help-text="&amp;2669.CreePoint.Label11.HelpText" dlg:value="&amp;2670.CreePoint.Label11.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label12" dlg:tab-index="50" dlg:left="121" dlg:top="263" dlg:width="16" dlg:height="11" dlg:help-text="&amp;2671.CreePoint.Label12.HelpText" dlg:value="&amp;2672.CreePoint.Label12.Label"/>
+ </dlg:bulletinboard>
+</dlg:window>

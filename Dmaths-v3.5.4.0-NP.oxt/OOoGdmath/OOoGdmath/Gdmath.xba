@@ -1,0 +1,1922 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Gdmath" script:language="StarBasic">&apos;OOoGdmath 
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+option explicit
+
+Global Const VERSION_GDMATH= &quot;2014.11.07&quot;
+Global Const Pi = 3.14159265358979
+Global Const FG_RIEN = 0
+Global Const FG_CROIX = 1
+Global Const FG_TRAIT = 2
+Global Const rText = 0
+Global Const rLabel = 1
+Global Const rHelpText = 2
+Global Const rTitle = 3
+
+
+Global oPageDessin as Object
+Global oDocumentDessin as Object
+Global oPageTexte as Object
+Global oDocumentTexte as Object
+Global oPageDessin1 as Object
+Global oDocumentDessin1 as Object
+Global oPremierDocument as Object
+
+Dim oUneBoite as Object
+Dim BoiteChaineOk as integer
+
+Sub Main
+End Sub
+
+function fCheminImages() as String rem écrite par Jérôme Ortais
+Dim newSplit()
+ReDim NewSplit(0)
+Dim thePath as string
+Dim splitted
+
+    thePath = basiclibraries.getLibraryLinkURL(&quot;OOoGdmath&quot;) rem à adapter.
+    splitted = split(thePath,&quot;/&quot;)
+    newSplit() = splitted()
+    ReDim Preserve newSplit(0 to ubound(splitted)-2)
+    fCheminImages = join(NewSplit(),&quot;/&quot;) &amp; &quot;/&quot; &amp; &quot;OOoGdmath/Bitmaps/&quot;
+End Function
+
+Function GetRepertoirePath(sInstPath as String) as String &apos;donne le répertoire correspondant
+Dim  oPathSubstSrv as Object
+Dim sPath as String
+    sInstPath = &quot;$(&quot; &amp; sInstPath &amp; &quot;)&quot;
+  oPathSubstSrv =createUnoService(&quot;com.sun.star.comp.framework.PathSubstitution&quot;)
+  sPath =ConvertFromUrl(oPathSubstSrv.getSubstituteVariableValue(sInstPath))
+    GetRepertoirePath = sPath
+End Function
+
+Sub ChangeTitreDialog(uneDialogue as Object)
+	InitialiseGdmath()
+	if instr(1,uneDialogue.Title,VERSION_GDMATH)=0 then
+		uneDialogue.Title=Ressource(uneDialogue,rTitle) &amp; &quot; - &quot; &amp; VERSION_GDMATH
+	End if
+End Sub
+
+Sub AACExtraitNDF(Fraction as string, num as string, den as string)
+Dim a
+    a = InStr(1, Fraction, &quot;/&quot;)
+    If a &lt;&gt; 0 Then
+        num = Trim(Left(Fraction, a - 1))
+        den = Trim(Right(Fraction, Len(Fraction) - a))
+    Else
+        num = Trim(Fraction)
+        den = &quot;1&quot;
+    End If
+    If Left(num, 1) = &quot;-&quot; Then num = Mid(num, 2)
+End Sub
+
+Function CestUneFigureGeometrique() as Boolean
+on error resume next
+	CestUneFigureGeometrique=False
+    CestUneFigureGeometrique = (oRectangleForm.Model.CheckBox12.State Or oTriangleForm.Model.CheckBox38.State Or oCercleForm.Model.CheckBox8.State Or oCarreForm.Model.CheckBox12.State)
+End Function
+
+Function MarqueMilieu(x0, y0, x1, y1, ts As Object, Optional UneImage As Image) as Object
+Dim xm, ym, r
+
+    xm = (x0 + x1) / 2
+    ym = (y0 + y1) / 2
+    r = Sqr((x0 - xm) * (x0 - xm) + (y0 - ym) * (y0 - ym))
+    InsereLigne xm - 100 * (y0 - ym) / r, ym + 100 * (x0 - xm) / r, xm + 100 * (y0 - ym) / r, ym - 100 * (x0 - xm) / r, ts, UneImage
+End Function
+
+Sub CopierColler()
+Dim oDispatcher as Object
+Dim oEmptyShapeCollection as Object
+Dim oDrawDocView as Object,oTextDocView as Object
+
+   &apos; Get a dispatcher, because we&apos;ll need it later.
+   oDispatcher = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+   
+   &apos; Get an empty collection of shapes.  We&apos;ll need it lager.
+   oEmptyShapeCollection = createUnoService( &quot;com.sun.star.drawing.ShapeCollection&quot; )
+
+   &apos; Get the document&apos;s controller
+   oDrawDocView = oDocumentDessin.getCurrentController()
+   oTextDocView = oPremierDocument.getCurrentController()
+   
+   &apos; Copy whatever is selected.
+   oDispatcher.executeDispatch( oDrawDocView.Frame, &quot;.uno:Copy&quot;, &quot;&quot;, 0, Array() )
+   
+   &apos; Select nothing -- i.e. an empty collection of shapes.
+   &apos; If you stopped the macro right now and looked at the drawing -- nothing is selected.
+   oTextDocView.select( oEmptyShapeCollection )
+   
+   &apos; Now paste whatever is in the clipboard (the shape parameter) onto current page.
+   oDispatcher.executeDispatch( oTextDocView.Frame, &quot;.uno:Paste&quot;, &quot;&quot;, 0, Array() )
+   &apos; After a Paste, the current selection is whatever we just pasted.
+   
+End Sub
+
+Sub CopierColler1()
+Dim oDispatcher as Object
+Dim oEmptyShapeCollection as Object
+Dim oDrawDocView as Object,oTextDocView as Object
+
+   &apos; Get a dispatcher, because we&apos;ll need it later.
+   oDispatcher = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+   
+   &apos; Get an empty collection of shapes.  We&apos;ll need it lager.
+   oEmptyShapeCollection = createUnoService( &quot;com.sun.star.drawing.ShapeCollection&quot; )
+
+   &apos; Get the document&apos;s controller
+   oDrawDocView = oDocumentDessin.getCurrentController()
+   oTextDocView = oDocumentTexte.getCurrentController()
+   
+   &apos; Copy whatever is selected.
+   oDispatcher.executeDispatch( oTextDocView.Frame, &quot;.uno:Copy&quot;, &quot;&quot;, 0, Array() )
+   
+   &apos; Select nothing -- i.e. an empty collection of shapes.
+   &apos; If you stopped the macro right now and looked at the drawing -- nothing is selected.
+   oDrawDocView.select( oEmptyShapeCollection )
+   
+   &apos; Now paste whatever is in the clipboard (the shape parameter) onto current page.
+   oDispatcher.executeDispatch( oDrawDocView.Frame, &quot;.uno:Paste&quot;, &quot;&quot;, 0, Array() )
+   &apos; After a Paste, the current selection is whatever we just pasted.
+   
+End Sub
+
+Sub Copier1()
+	dim dsp as Object
+
+	dsp=CreateUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dsp.executeDispatch(oDocumentTexte.CurrentController.Frame, &quot;.uno:Cut&quot;, &quot;&quot;, 0, Array())
+End Sub
+
+Sub Coller1()
+	dim dsp as object
+
+	dsp=CreateUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dsp.executeDispatch(oDocumentDessin.GetCurrentController().Frame, &quot;.uno:Paste&quot;, &quot;&quot;, 0, Array())
+	oDocumentDessin.CurrentController.Select(oPageDessin(0))
+End Sub
+
+
+Sub InitialiseDessin(Optional visible as Boolean)
+&apos;Didier Dorange-Pattoret
+Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+Dim Array()
+
+	if IsMissing(visible) then visible = True
+    mFileProperties(0).Name=&quot;Hidden&quot;
+    mFileProperties(0).Value=True
+    oPremierDocument=thisComponent
+    if visible then
+		oDocumentTexte=StarDesktop.LoadComponentFromURL(&quot;private:factory/swriter&quot;,&quot;_blank&quot;, 0, Array())
+	    oPageTexte=oDocumentTexte.drawPage()
+		oDocumentDessin=StarDesktop.LoadComponentFromURL(&quot;private:factory/sdraw&quot;,&quot;_blank&quot;, 0, Array())
+	else
+		oDocumentTexte=StarDesktop.LoadComponentFromURL(&quot;private:factory/swriter&quot;,&quot;_blank&quot;, 0, mFileProperties())
+	    oPageTexte=oDocumentTexte.drawPage()
+		oDocumentDessin=StarDesktop.LoadComponentFromURL(&quot;private:factory/sdraw&quot;,&quot;_blank&quot;, 0, mFileProperties())
+		oDocumentDessin.lockControllers
+		oDocumentTexte.lockControllers
+		oPremierDocument.lockControllers
+	End if
+    oPageDessin=oDocumentDessin.DrawPages(0)
+end sub
+
+sub TermineDessin()
+&apos; on groupe tous les objets de la feuille
+	dim i
+	dim unGroupe as Object
+	on error resume next
+	
+&apos;	unGroupe=InitialiseGroupe()
+	for i=0 to oPageDessin.Count()-1
+		SelectionneForme(oDocumentDessin, oPageDessin(i))
+&apos;		unGroupe.add(oPageDessin(i))
+	next i
+&apos;	unGroupe=GroupeObjet(unGroupe)
+&apos;	SelectionneForme(oDocumentDessin, unGroupe)
+	CopierColler()
+&apos;    Copier()
+&apos;    Coller()
+	on error resume next
+	oDocumentDessin.close(True)
+	oDocumentTexte.close(True)
+	oPremierDocument.unlockControllers
+	on error goto 0
+	
+	If  oPremierDocument.Title = &quot;Writer2Impress.odt&quot; Then rem on insere une formule dans Impress ajoute le 15-03-14 version 3.5.2.4
+			oPremierDocument.Close(False)
+			Wait 500
+			ClipBoardPaste(MonDocumentImpress)		
+	EndIf
+	
+	
+	
+end sub
+
+
+sub TermineDessin2()
+&apos; on groupe tous les objets de la feuille
+	dim i
+	dim unGroupe as Object
+&apos;	on error resume next
+	
+	unGroupe=InitialiseGroupe()
+	for i=0 to oPageDessin.Count()-1
+&apos;		SelectionneForme(oDocumentDessin, oPageDessin(i))
+		unGroupe.add(oPageDessin(i))
+	next i
+	unGroupe=GroupeObjet(unGroupe)
+	SelectionneForme(oDocumentDessin, unGroupe)
+	CopierColler()
+&apos;    Copier()
+&apos;    Coller()
+	on error resume next
+	oDocumentDessin.close(True)
+	oDocumentTexte.close(true)
+	oPremierDocument.unlockControllers
+	on error goto 0
+	
+	If  oPremierDocument.Title = &quot;Writer2Impress.odt&quot; Then  rem on insere une formule dans Impress ajoute le 15-03-14 version 3.5.2.4
+			oPremierDocument.Close(False)
+			Wait 500
+			ClipBoardPaste(MonDocumentImpress)		
+	EndIf
+	
+	
+end sub
+
+
+function CentimetersToPoints(a) as double
+	CentimetersToPoints=a*1000
+end function
+
+function monval(texte as string)
+	remplacevirgulepoint(texte)
+	monval = val(texte)
+end function
+
+Sub RemplaceVirgulePoint(nombre)
+Dim k as Integer
+
+    k = InStr(1, nombre, &quot;,&quot;)
+    If k &lt;&gt; 0 Then nombre = Left$(nombre, k - 1) &amp; &quot;.&quot; &amp; Right$(nombre, Len(nombre) - k)
+End Sub
+
+Sub RemplacePointVirgule(nombre)
+Dim k as Integer
+
+    k = InStr(1, nombre, &quot;.&quot;)
+    If k &lt;&gt; 0 Then nombre = Left$(nombre, k - 1) &amp; &quot;,&quot; &amp; Right$(nombre, Len(nombre) - k)
+End Sub
+
+Sub MarquePointSegment(xi as single, yi as single, x0 as single, y0 as single, x1 as single, y1 as single,optional sGroupe as object)
+Dim r as Single
+
+    r = Sqr((x0 - xi) * (x0 - xi) + (y0 - yi) * (y0 - yi))
+    if not ismissing(sgroupe) then
+	    InsereLigne(xi - 100 * (y0 - yi) / r, yi + 100 * (x0 - xi) / r, xi + 100 * (y0 - yi) / r, yi - 100 * (x0 - xi) / r, sGroupe)
+	else
+	    InsereLigne(xi - 100 * (y0 - yi) / r, yi + 100 * (x0 - xi) / r, xi + 100 * (y0 - yi) / r, yi - 100 * (x0 - xi) / r)
+	end if
+End Sub
+
+function max(val1,val2)
+	if val1&gt;val2 then
+		max()=val1
+	else
+		max()=val2
+	end if
+end function
+
+function min(val1,val2)
+	if val1&gt;val2 then
+		min()=val2
+	else
+		min()=val1
+	end if
+end function
+
+function InsereLigneLongue(l, x0, y0, x1, y1, optional sgroupe as object) as object
+    Dim UnObjet As object
+    Dim r as Single
+    
+    r = Sqr((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1))
+    if not ismissing(sgroupe) then
+	    InsereLigneLongue()=InsereLigne(Min(x0, x1) - Abs(l * (x0 - x1) / r), _
+                Min(y0, y1) - Abs(l * (y0 - y1) / r), _
+                max(x0, x1) + Abs(l * (x0 - x1) / r), _
+                max(y0, y1) + Abs(l * (y0 - y1) / r), sgroupe)
+   	else
+	    InsereLigneLongue()=InsereLigne(Min(x0, x1) - Abs(l * (x0 - x1) / r), _
+                Min(y0, y1) - Abs(l * (y0 - y1) / r), _
+                max(x0, x1) + Abs(l * (x0 - x1) / r), _
+                max(y0, y1) + Abs(l * (y0 - y1) / r))
+   	end if
+End function
+
+function ListBoxSelected(oListBox as object, indice as integer) as boolean
+Dim retour as Boolean
+Dim aa
+Dim i as Integer
+
+	retour=False
+	aa=oListBox.GetSelectedItemsPos()
+	for i=lbound(aa) to ubound(aa)
+		if aa(i)=indice then retour=True
+	next i
+	ListBoxSelected()=retour
+end function
+
+Function TraceCodageTrait(xxx as single, yyy as single, Angle as single, Optional SGroupe as object) as object
+	If Not IsMissing( SGroupe ) Then
+	    TraceCodageTrait()=InsereLigne(xxx + 150 * Cos(Angle), yyy + 150 * Sin(Angle), xxx - 150 * Cos(Angle), yyy - 150 * Sin(Angle), SGroupe)
+	else
+	    TraceCodageTrait()=InsereLigne(xxx + 150 * Cos(Angle), yyy + 150 * Sin(Angle), xxx - 150 * Cos(Angle), yyy - 150 * Sin(Angle))
+	end if
+End function
+
+Sub TrouvePiedHauteur(x0 as single, y0 as single, x1 as single, y1 as single, xs as single, ys as single, xp as single, yp as single)
+Dim uangle as Double
+
+    uangle = CalculeAngle(x0,y0,x1,y1)+Pi/2
+	TrouveIntersection(x0, y0, x1, y1, xs, ys, xs+5000 * Cos(uangle), ys+5000 * Sin(uangle), xp, yp)    
+End Sub
+
+Function TrouveIntersection(x0 as single, y0 as single, x1 as single, y1 as single, x2 as single, y2 as single, x3 as single, y3 as single, xint as single, yint as single) as Boolean
+Dim a1 as single, b1 as single
+Dim a0 as single, b0 as single
+
+	TrouveIntersection() = True
+    If x1 = x0 Then
+        xint = x0
+        If x3 = x2 Then
+            xint = &quot;n&quot;
+            yint = &quot;n&quot;
+			TrouveIntersection() = False
+        Else
+            a1 = (y3 - y2) / (x3 - x2)
+            b1 = -x2 * a1 + y2
+            yint = a1 * xint + b1
+        End If
+    Else
+        a0 = (y1 - y0) / (x1 - x0)
+        b0 = -x0 * a0 + y0
+        If x3 = x2 Then
+            xint = x2
+            yint = a0 * xint + b0
+        Else
+            a1 = (y3 - y2) / (x3 - x2)
+            b1 = -x2 * a1 + y2
+            xint = (b1 - b0) / (a0 - a1)
+            yint = a0 * (b1 - b0) / (a0 - a1) + b0
+        End If
+    End If
+End Function
+
+Sub CalculeOrthocentre(x0 as single, y0 as single, x1 as single, y1 as single, x2 as single, y2 as single, xh as single, yh as single)
+Dim xph1 as single, xph2 as single, yph1 as single, yph2 as single
+
+    TrouvePiedHauteur(x0, y0, x1, y1, x2, y2, xph2, yph2)
+    TrouvePiedHauteur(x0, y0, x2, y2, x1, y1, xph1, yph1)
+    TrouveIntersection(x2, y2, xph2, yph2, x1, y1, xph1, yph1, xh, yh)
+End Sub
+
+function TraceHauteur(xxx0 as single, yyy0 as single, xx1 as single, yy1 as single, xx2 as single, yy2 as single, sGroupe as object, xh1 as single, yh1 as single, xh2 as single, yh2 as single, Optional ProlongerHauteurS as Boolean, Optional ProlongerHauteurP as Boolean, Optional ProlongerCote as Boolean , Optional ProlongerHauteurI as Boolean, Optional xh as single, Optional yh as single) as object
+Dim pGroupe as object
+Dim unObjet as Object
+Dim xx as single, yy as single
+Dim xx0 as single, yy0 as single
+Dim p1 as single, p2 as single
+Dim pp1 as single, pp2 as single
+Dim test1 as Boolean, test2 as Boolean
+Dim angleh as double
+
+	pGroupe=InitialiseGroupe()
+    xx0 = xxx0
+    yy0 = yyy0
+    TrouvePiedHauteur(xx1, yy1, xx2, yy2, xx0, yy0, xx, yy)
+    MarqueAngleDroit(xx, yy, xx0, yy0, pGroupe)
+    If Abs(xx1 - xx2) &gt; Abs(yy1 - yy2) Then
+        test1 = (xx &gt; max(xx1, xx2))
+        test2 = (xx &lt; Min(xx1, xx2))
+        If test1 Then
+            p1 = MIif(xx1 &gt; xx2, xx1, xx2)
+            p2 = MIif(xx1 &gt; xx2, yy1, yy2)
+        End If
+        If test2 Then
+            p1 = MIif(xx1 &lt; xx2, xx1, xx2)
+            p2 = MIif(xx1 &lt; xx2, yy1, yy2)
+        End If
+    Else
+        test1 = (yy &gt; max(yy1, yy2))
+        test2 = (yy &lt; min(yy1, yy2))
+        If test1 Then
+            p1 = MIif(yy1 &gt;yy2, xx1, xx2)
+            p2 = MIif(yy1 &gt;yy2, yy1, yy2)
+        End If
+        If test2 Then
+            p1 = MIif(yy1 &lt;yy2, xx1, xx2)
+            p2 = MIif(yy1 &lt;yy2, yy1, yy2)
+        End If
+    End If
+    If ProlongerCote And (test1 Or test2) Then
+        angleh = CalculeAngle(p1, p2, xx, yy)
+        pp1 = xx + 5000 * Cos(angleh)
+        pp2 = yy + 5000 * Sin(angleh)
+        LaLigne=InsereLigne(p1, p2, pp1, pp2, pGroupe)
+        LaLigne.LineStyle = 0
+    End If
+    If ProlongerHauteurS Or ProlongerHauteurP Then
+        angleh = CalculeAngle(xx0, yy0, xx, yy)
+        If ProlongerHauteurS Then
+            xx0 = xx0 - 5000 * Cos(angleh)
+            yy0 = yy0 - 5000 * Sin(angleh)
+        End If
+        If ProlongerHauteurP Then
+            xx = xx + 5000 * Cos(angleh)
+            yy = yy + 5000 * Sin(angleh)
+        End If
+    End If
+    If ProlongerHauteurI Then
+        angleh = CalculeAngle(xx0, yy0, xx, yy)
+        If xh &lt; Min(xx0, xx) Or yh &lt; Min(yy0, yy) Then
+            If (xx0 &lt; xx And xh &lt; Min(xx0, xx)) Or (yy0 &lt; yy And yh &lt; Min(yy0, yy)) Then
+                xx0 = xh - 5000 * Cos(angleh)
+                yy0 = yh - 5000 * Sin(angleh)
+            Else
+                xx = xh + 5000 * Cos(angleh)
+                yy = yh + 5000 * Sin(angleh)
+            End If
+        End If
+        If xh &gt; max(xx0, xx) Or yh &gt; max(yy0, yy) Then
+            If (xx0 &gt; xx And xh &gt; max(xx0, xx)) Or (yy0 &gt; yy And yh &gt; max(yy0, yy)) Then
+                xx0 = xh - 5000 * Cos(angleh)
+                yy0 = yh - 5000 * Sin(angleh)
+            Else
+                xx = xh + 5000 * Cos(angleh)
+                yy = yh + 5000 * Sin(angleh)
+            End If
+        End If
+    End If
+    InsereLigne(xx0, yy0, xx, yy, pGroupe)
+    xh1 = xx0
+    yh1 = yy0
+    xh2 = xx
+    yh2 = yy
+	UnObjet=GroupeObjet(pGroupe)
+	if not ismissing(sgroupe) then
+	  	sgroupe.add(UnObjet)
+	end if
+    TraceHauteur()=UnObjet
+End function
+
+function InitialiseGroupe() as object
+	dim UnGroupe as object
+	UnGroupe = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;)
+	InitialiseGroupe()=UnGroupe
+end function
+
+function GroupeObjet(pgroupe as object) as object
+	Dim UnObjet as object
+	on error resume next
+	a=pgroupe.GetCount()
+	if a&gt;1 then
+	    GroupeObjet=oDocumentDessin.DrawPages.GetByIndex(0).group(pgroupe)
+&apos;	    GroupeObjet=ThisComponent.Drawpage.group(pgroupe)
+&apos;	    GroupeObjet()=ThisComponent.Drawpage.bind(pgroupe)
+	else
+		GroupeObjet=pgroupe.GetByIndex(0)
+	end if
+end function
+
+function TraceMediane(xxx0 as single, yyy0 as single, xx1 as single, yy1 as single, xx2 as single, yy2 as single, Optional ProlongerMedianeS as boolean, Optional ProlongerMedianeM as boolean,optional sgroupe as object) as object
+dim pGroupe as object
+dim xm, ym
+dim xx3,yy3,xx0,yy0
+dim angleh
+Dim seg1 as Object, seg2 as Object
+Dim lecodage as Integer
+Dim unObjet as Object
+
+	pGroupe = InitialiseGroupe()
+    xm = (xx1 + xx2) / 2
+    ym = (yy1 + yy2) / 2
+    xx0 = xxx0
+    yy0 = yyy0
+    xx3 = xm
+    yy3 = ym
+    If ProlongerMedianeS Or ProlongerMedianeM Then
+        angleh = CalculeAngle(xx0, yy0, xm, ym)
+        If ProlongerMedianeS Then
+            xx0 = xx0 - 5000 * Cos(angleh)
+            yy0 = yy0 - 5000 * Sin(angleh)
+        End If
+        If ProlongerMedianeM Then
+            xx3 = xx3 + 5000 * Cos(angleh)
+            yy3 = yy3 + 5000 * Sin(angleh)
+        End If
+    End If
+    InsereLigne(xx0, yy0, xx3, yy3, pgroupe)
+&apos; on code les longueurs égales
+    If (CInt(CodageLabel2) &lt;&gt; 10) Then
+        Seg1 = InsereLigne(xx1, yy1, xm, ym)
+        Seg1.LineColor = RGB(0, 0, 255)
+        Seg2 = InsereLigne(xx2, yy2, xm, ym)
+        Seg2.LineColor = RGB(255, 0, 0)
+        AfficheCodageLForm
+        oPageDessin.remove(seg1)
+        oPageDessin.remove(seg2)
+        lecodage = CInt(CodageLabel2)
+        If (lecodage = 10) Then lecodage = 0
+    End If
+    If (CInt(CodageLabel2) = 10) Then
+        lecodage = lecodage + 1
+        If lecodage = 10 Then lecodage = 1
+    End If
+    If (CodageLabel2 &lt;&gt; &quot;11&quot;) Then
+        CodeLongueur(xx1, yy1, xm, ym, lecodage, pgroupe)
+        CodeLongueur(xx2, yy2, xm, ym, lecodage, pgroupe)
+    End If
+    UnObjet=GroupeObjet(pgroupe)
+	If Not IsMissing( sgroupe ) Then
+		sgroupe.add(UnObjet)
+	end if
+	TraceMediane()=UnObjet
+End function
+
+function TraceCodageCercle(xxx as single, yyy as single, optional sgroupe as object) as object
+	If Not IsMissing( SGroupe ) Then
+	    TraceCodageCercle()=InsereCercle(xxx, yyy, 150,sgroupe)
+	else
+	    TraceCodageCercle()=InsereCercle(xxx, yyy, 150)
+	end if
+End function
+
+function InsereCercle(xc as single, yc as single, rayon as single, optional sgroupe as object, Optional uneImage as Object) as object
+	Dim UneForme As object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	
+	aPoint.x=xc-rayon
+	aPoint.y=yc-rayon
+	aSize.Width=rayon*2
+	asize.Height=rayon*2
+	UneForme = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+	UneForme.Position=aPoint
+	UneForme.Size=aSize
+&apos;	UneForme.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	UneForme.FillStyle = com.sun.star.drawing.FillStyle.NONE
+	UneForme.LineColor = RGB(0,0,0)
+	UneForme.LineWidth =  20
+&apos;	MRI UneForme
+	oDocumentDessin.DrawPages.GetByIndex(0).add(UneForme)
+	If Not IsMissing( SGroupe ) Then
+		SGroupe.Add(UneForme)
+	end if
+	If Not IsMissing(UneImage) Then
+		IOAttribut(UneForme,UneImage)
+	End If	
+	InsereCercle()=UneForme
+End function
+
+function TraceMediatrice(xx0 as single, yy0 as single, xx1 as single, yy1 as single, xx2 as single, yy2 as single, sgroupe as object, Optional ProlongeMediatrice as boolean, Optional xc as single, Optional yc as single) as object
+Dim xm,ym,k,x1,y1,lecodage,anglem,seg1,seg2,xx,yy
+
+    xm = (xx0 + xx1) / 2
+    ym = (yy0 + yy1) / 2
+    If (xx0 = xx1) Then
+        yy = ym
+        xx = xx2
+    Else
+        k = (yy0 - yy1) / (xx0 - xx1)
+        If Abs(k) &gt; 1 Then
+            xx = xx2
+            yy = ym + (xm - xx) / k
+        Else
+            yy = yy2
+            xx = xm + k * ym - k * yy
+        End If
+    End If
+    x1 = xm + (xm - xx)
+    y1 = ym + (ym - yy)
+    If ProlongeMediatrice Then
+        anglem = CalculeAngle(xx, yy, x1, y1)
+        If x1 = xx Then
+            k = (yc - yy) / (y1 - yy)
+        Else
+            k = (xc - xx) / (x1 - xx)
+        End If
+        If k &gt; 1 Then
+            x1 = xc + 5000 * Cos(anglem)
+            y1 = yc + 5000 * Sin(anglem)
+        End If
+        If k &lt; 0 Then
+            xx = xc - 5000 * Cos(anglem)
+            yy = yc - 5000 * Sin(anglem)
+        End If
+    End If
+    InsereLigne(xx, yy, x1, y1, sGroupe)
+&apos; on trace l&apos;angle droit
+    MarqueAngleDroit(xm, ym, xx, yy, sGroupe)
+&apos; on code les longueurs égales
+    If (CInt(CodageLabel2) &lt;&gt; 10) Then
+        Seg1 = InsereLigne(xx1, yy1, xm, ym)
+        Seg1.LineColor = RGB(0, 0, 255)
+        Seg2 = InsereLigne(xx0, yy0, xm, ym)
+        Seg2.LineColor = RGB(255, 0, 0)
+        AfficheCodageLForm
+        oDocumentDessin.DrawPages.GetByIndex(0).remove(Seg1)
+        oDocumentDessin.DrawPages.GetByIndex(0).Remove(Seg2)
+        lecodage = CInt(CodageLabel2)
+        If (lecodage = 10) Then lecodage = 0
+    End If
+    If (CInt(CodageLabel2) = 10) Then
+        Do
+            lecodage = lecodage + 1
+            If lecodage = 10 Then lecodage = 1
+        Loop While InStr(1, CodageLabel3, Trim(Str(lecodage))) &lt;&gt; 0
+    End If
+    If (CInt(CodageLabel2) &lt; 11) Then
+        CodeLongueur(xx0, yy0, xm, ym, lecodage, sGroupe, &quot;&quot;)
+        CodeLongueur(xx1, yy1, xm, ym, lecodage, sGroupe, &quot;&quot;)
+    End If
+End function
+
+function Croix(x, y, Optional sgroupe as object) as object
+    Dim pGroupe As object
+    Dim unObjet as Object
+    
+    pGroupe=InitialiseGroupe()
+    InsereLigne(x - 100, y - 100, x + 100, y + 100, pGroupe)
+    InsereLigne(x - 100, y + 100, x + 100, y - 100, pGroupe)
+    UnObjet=GroupeObjet(pGroupe)
+    if not ismissing(sgroupe) then
+    	sgroupe.add(UnObjet)
+    end if
+    Croix=UnObjet
+End function
+
+Sub CalculeCentreCirconscrit(x0 as single, y0 as single, x1 as single, y1 as single, x2 as single, y2 as single, xc as single, yc as single)
+Dim a1 as single, b1 as single, c1 as single
+Dim a2 as single, b2 as single, c2 as single
+
+    a1 = 2 * (x1 - x0)
+    b1 = 2 * (y1 - y0)
+    c1 = x1 * x1 - x0 * x0 + y1 * y1 - y0 * y0
+    a2 = 2 * (x2 - x0)
+    b2 = 2 * (y2 - y0)
+    c2 = x2 * x2 - x0 * x0 + y2 * y2 - y0 * y0
+    yc = (c1 * a2 - c2 * a1) / (a2 * b1 - a1 * b2)
+    If a1 = 0 Then
+        xc = (c2 - b2 * yc) / a2
+    Else
+        xc = (c1 - b1 * yc) / a1
+    End If
+End Sub
+
+Function CodeLongueur(xd as single, yd as single, xa as single, ya as single, typecodage as single, optional sgroupe as object) as object
+    Dim xGroupe As object
+    Dim UnObjet As object
+    Dim sTypeCodage
+    Dim xm1, ym1, alpha, xm0,ym0, xm2, ym2
+    
+	xGroupe = InitialiseGroupe()
+    Stypecodage = Trim(Str(typecodage))
+    If InStr(1, CodageLabel3, Stypecodage) = 0 Then
+        CodageLabel3 = CodageLabel3 + Stypecodage
+        If Len(CodageLabel3) = 9 Then
+            CodageLabel3 = &quot;&quot;
+        End If
+    End If
+    xm1 = (xd + xa) / 2
+    ym1 = (yd + ya) / 2
+    alpha = CalculeAngle(xd, yd, xa, ya)
+    xm0 = xm1 - 100 * Cos(alpha)
+    ym0 = ym1 - 100 * Sin(alpha)
+    xm2 = xm1 + 100 * Cos(alpha)
+    ym2 = ym1 + 100 * Sin(alpha)
+    TraceCodageTrait(xm1, ym1, alpha + Pi / 3,xGroupe)
+    If (typecodage Mod 3) = 2 Then 
+    	TraceCodageTrait(xm0, ym0, alpha + Pi / 3,xGroupe)
+    End If
+    If (typecodage Mod 3) = 0 Then
+        TraceCodageTrait(xm0, ym0, alpha + Pi / 3,xGroupe)
+        TraceCodageTrait(xm2, ym2, alpha + Pi / 3,xGroupe)
+    End If
+    If typecodage &gt; 3 And typecodage &lt; 7 Then
+        TraceCodageTrait(xm1, ym1, alpha + 2 * Pi / 3,xGroupe)
+    End If
+    If typecodage &gt; 6 And typecodage &lt; 10 Then
+        TraceCodageCercle(xm1, ym1,xGroupe)
+    End If
+    UnObjet=GroupeObjet(xGroupe)
+	If Not IsMissing( sgroupe ) Then
+		sgroupe.add(UnObjet)
+	end if
+	CodeLongueur()=UnObjet
+End function
+
+Sub Echange(val1, val2)
+Dim Tempo
+    tempo = val1
+    val1 = val2
+    val2 = tempo
+End Sub
+
+function InserePart(xorig as long, yorig as long, depart as long, arrivee as long, Rayon as single, optional sgroupe as object, Optional UneImage as object) as object
+	Dim UneForme As object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	
+	aPoint.x=xorig-Rayon
+	aPoint.y=yorig-Rayon
+	aSize.Width=Rayon*2
+	asize.Height=Rayon*2
+	UneForme = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+&apos;	UneForme.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	UneForme.Position=aPoint
+	UneForme.Size=aSize
+	oDocumentDessin.DrawPages.GetByIndex(0).add(UneForme)
+	UneForme.CircleStartAngle=depart
+	UneForme.CircleEndAngle=arrivee
+	UneForme.CircleKind=com.sun.star.drawing.CircleKind.SECTION
+	If Not IsMissing(UneImage) Then	IOAttribut UneForme, UneImage
+	If Not IsMissing( sgroupe ) Then sgroupe.Add(UneForme)
+	InserePart()=UneForme
+End function
+
+function InsereArcDeCerclePlein(xorig as single, yorig as single, depart as long, arrivee as long, Rayon as single, optional sgroupe as object, Optional UneImage as object) as object
+	Dim UneForme As object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	
+	aPoint.x=xorig-Rayon
+	aPoint.y=yorig-Rayon
+	aSize.Width=Rayon*2
+	asize.Height=Rayon*2
+	UneForme = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+&apos;	UneForme.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	UneForme.Position=aPoint
+	UneForme.Size=aSize
+	oDocumentDessin.DrawPages.GetByIndex(0).add(UneForme)
+	UneForme.CircleStartAngle=depart
+	UneForme.CircleEndAngle=arrivee
+	UneForme.CircleKind=com.sun.star.drawing.CircleKind.SECTION
+	If Not IsMissing(UneImage) Then
+		IOAttribut UneForme, UneImage
+       	UneForme.FillStyle = com.sun.star.drawing.FillStyle.SOLID
+        UneForme.FillColor=UneImage.BackgroundColor
+	end if
+	If Not IsMissing( sgroupe ) Then
+		sgroupe.Add(UneForme)
+	end if
+	InsereArcDeCerclePlein()=UneForme
+End function
+
+function InsereArcDeCercle(xorig as single, yorig as single, depart as long, arrivee as long, Rayon as single, optional sgroupe as object, Optional UneImage as object) as object
+	Dim UneForme As object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	
+	aPoint.x=xorig-Rayon
+	aPoint.y=yorig-Rayon
+	aSize.Width=Rayon*2
+	asize.Height=Rayon*2
+	UneForme = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+&apos;	UneForme.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	UneForme.LineColor = RGB(0,0,0)
+	UneForme.Position=aPoint
+	UneForme.Size=aSize
+	oDocumentDessin.DrawPages.GetByIndex(0).add(UneForme)
+	UneForme.CircleStartAngle=depart
+	UneForme.CircleEndAngle=arrivee
+	UneForme.CircleKind=3
+	If Not IsMissing(UneImage) Then
+		IOAttribut UneForme, UneImage
+	end if
+	If Not IsMissing( sgroupe ) Then
+		sgroupe.Add(UneForme)
+	end if
+	InsereArcDeCercle()=UneForme
+End function
+
+function PetitArcDeCercle(xorig as single, yorig as single, depart as single, arrivee as single, Taille as single, optional sgroupe as object, Optional UneImage as Object) as object
+	Dim UneForme As object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	
+	aPoint.x=xorig-Taille/2
+	aPoint.y=yorig-Taille/2
+	aSize.Width=Taille
+	asize.Height=Taille
+	UneForme = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+	UneForme.Position=aPoint
+	UneForme.Size=aSize
+	oDocumentDessin.DrawPages.GetByIndex(0).add(UneForme)
+	UneForme.CircleStartAngle=depart
+	UneForme.CircleEndAngle=arrivee
+	UneForme.CircleKind=3
+	UneForme.LineColor = RGB(0,0,0)
+	If Not IsMissing( UneImage ) Then
+		IOAttribut UneForme, UneImage
+	end if
+	If Not IsMissing( sgroupe ) Then
+		sgroupe.Add(UneForme)
+	end if
+	PetitArcDeCercle()=UneForme
+End function
+
+function MarqueAngle(xd1 as single, yd1 as single, xangle as single, yangle as single, xd2 as single, yd2 as single, Rentrant as boolean, NombreArc as integer, decale as integer, Optional sgroupe As object) as object
+    Dim UnObjet As object
+	Dim pGroupe as object
+	Dim alpha as single
+	Dim beta as single
+	Dim aa as Single
+	Dim nbforme as Single, toti as integer,i as integer, nombretrait as integer
+	
+	pGroupe = InitialiseGroupe()
+	    
+    alpha = -CalculeAngle(xangle, yangle, xd1, yd1) * 180 / Pi
+    beta = -CalculeAngle(xangle, yangle, xd2, yd2) * 180 / Pi
+    if alpha&gt;beta then Echange alpha,beta
+    If Rentrant Then
+        If alpha - beta &lt; 180 Then
+            beta = beta + 360
+            Echange alpha,beta
+        End If
+&apos;    Else
+&apos;        If alpha - beta &gt; 180 Then
+&apos;            beta = beta + 360
+&apos;            Echange alpha,beta
+&apos;        End If
+    End If
+    nbforme = 0
+    toti = Int((NombreArc - 1) / 3) + 1
+    For i = 0 To toti - 1
+        UnObjet=PetitArcDeCercle(xangle, yangle, alpha*100, beta*100, 1000 + i * 100 + 100 * decale, pGroupe)
+        nbforme = nbforme + 1
+    Next i
+    nombretrait = (NombreArc Mod 3) - 1
+    If nombretrait = -1 Then nombretrait = 2
+    aa = -(alpha + beta) / 2
+    If nombretrait = 1 Then
+        aa = aa * Pi / 180
+        InsereLigne(xangle + (400 + 100 * decale) * Cos(aa), yangle + (400 + 100 * decale) * Sin(aa), xangle + (400 + 100 * decale + toti * 150) * Cos(aa), yangle + (400 + 100 * decale + toti * 150) * Sin(aa), pGroupe)
+        nbforme = nbforme + 1
+    End If
+    If nombretrait = 2 Then
+        ab = (aa - 2) * Pi / 180
+        InsereLigne(xangle + (400 + 100 * decale) * Cos(ab), yangle + (400 + 100 * decale) * Sin(ab), xangle + (400 + 100 * decale + toti * 150) * Cos(ab), yangle + (400 + 100 * decale + toti * 150) * Sin(ab), pGroupe)
+        ab = (aa + 2) * Pi / 180
+        InsereLigne(xangle + (400 + 100 * decale) * Cos(ab), yangle + (400 + 100 * decale) * Sin(ab), xangle + (400 + 100 * decale + toti * 150) * Cos(ab), yangle + (400 + 100 * decale + toti * 150) * Sin(ab), pGroupe)
+        nbforme = nbforme + 2
+    End If
+	UnObjet = GroupeObjet(pGroupe)
+    if not ismissing(sgroupe) then
+    	sgroupe.add(UnObjet)
+    end if
+    MarqueAngle()=UnObjet
+End function
+
+Function CalculeAngle(xo as single,yo as single,xxx as single,yyy as single) as double
+Dim tang as Double
+Dim unAngle as Double
+
+    If Abs(xxx - xo) &lt; 0.000001 Then
+        If yyy &gt; yo Then
+            UnAngle = Pi / 2
+        Else
+            UnAngle = -Pi / 2
+        End If
+    Else
+        If Abs(yyy - yo) &lt; 0.000001 Then
+            tang = 0
+        Else
+            tang = (yyy - yo) / (xxx - xo)
+        End If
+        UnAngle = Atn(tang)
+        If xxx &lt; xo Then
+            If UnAngle &lt; 0 Then
+                UnAngle = UnAngle + Pi
+            Else
+                UnAngle = UnAngle - Pi
+            End If
+        End If
+    End If
+	CalculeAngle()=UnAngle
+end function
+
+Sub IOAttribut(oShape as object, UneImage as Object)
+	OAttribut oShape, UneImage.BackgroundColor, ExtraitEpaisseur(UneImage.Helptext), ExtraitTypeTrait(UneImage.Helptext)
+End Sub
+
+Function ExtraitEpaisseur(LeTexte As String) As String
+Dim LeTexte1
+Dim i,j
+
+	i=instr(1,LeTexte,&quot; &quot;)
+	j=instr(i,LeTexte,&quot;pt&quot;)
+    LeTexte1 = mid(LeTexte, i+1,j-i-1)
+    
+    RemplaceVirgulePoint LeTexte1
+    ExtraitEpaisseur = LeTexte1
+End Function
+
+Function ExtraitTypeTrait(LeTexte As String) As String
+    Select Case Left$(LeTexte, InStr(1, LeTexte, &quot; &quot;) - 1)
+    Case Chaine(&quot;continu&quot;)
+        ExtraitTypeTrait = &quot;msoLineSolid&quot;
+    Case Chaine(&quot;pointille&quot;)
+        ExtraitTypeTrait = &quot;msoLineDash&quot;
+      case else
+      	ExtraitTypeTrait = &quot;&quot;
+    End Select
+End Function
+
+Function Chaine(uneChaine as String) as String
+
+	if BoiteChaineOk = 0 Then 
+		oUneBoite = LoadDialog(&quot;OOoGdmath&quot;,&quot;ChaineForm&quot;)
+		BoiteChaineOk = 1
+	End if
+	Chaine = Ressource(oUneBoite.GetControl(lcase(uneChaine)).Model, rLabel)
+&apos;	oUneBoite.EndExecute()
+End Function
+
+Sub CalculeCentreInscrit(x0 as single, y0 as single, x1 as single, y1 as single, x2 as single, y2 as single, xc as single, yc as single)
+Dim alpha as Double
+Dim beta as Double
+Dim xxx as single, xx as single
+Dim yyy as single, yy as single
+dim aa as Double
+
+    alpha = CalculeAngle(x0, y0, x1, y1) * 180 / Pi
+    beta = CalculeAngle(x0, y0, x2, y2) * 180 / Pi
+    If alpha &gt; beta Then
+        If alpha - beta &gt; 180 Then 
+        	alpha = alpha - 360
+        end if
+    Else
+        If beta - alpha &gt; 180 Then 
+        	beta = beta - 360
+        end if
+    End If
+    aa = (alpha + beta) / 2
+    xx = x0 + 5000 * Cos(aa * Pi / 180)
+    yy = y0 + 5000 * Sin(aa * Pi / 180)
+    alpha = CalculeAngle(x1, y1, x0, y0) * 180 / Pi
+    beta = CalculeAngle(x1, y1, x2, y2) * 180 / Pi
+    If alpha &gt; beta Then
+        If alpha - beta &gt; 180 Then
+        	 alpha = alpha - 360
+        end if
+    Else
+        If beta - alpha &gt; 180 Then
+        	beta = beta - 360
+        end if
+    End If
+    aa = (alpha + beta) / 2
+    xxx = x1 + 5000 * Cos(aa * Pi / 180)
+    yyy = y1 + 5000 * Sin(aa * Pi / 180)
+    TrouveIntersection(x0, y0, xx, yy, x1, y1, xxx, yyy, xc, yc)
+End Sub
+
+Sub ChangeCouleur(UneImage As Object)
+	Dim EpaisseurTrait
+	Dim TexteEpaisseur
+	
+	oCouleurForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;CouleurForm&quot;)
+
+	Dim nCount As Integer
+	Dim sItems As Variant
+	dim oComboBox as Object
+	
+	oComboBox = oCouleurForm.getControl(&quot;ComboBox1&quot;)
+	nCount = oComboBox.getItemCount()
+	oComboBox.removeItems( 0, nCount )
+	sItems = Array( Chaine(&quot;pointille&quot;), Chaine(&quot;continu&quot;))
+	oComboBox.addItems( sItems, 0 )
+
+	TexteEpaisseur = Trim(Str(ExtraitEpaisseur(UneImage.HelpText)))
+    If Left(TexteEpaisseur, 1) = &quot;.&quot; Then 
+    	TexteEpaisseur = &quot;0&quot; &amp; TexteEpaisseur
+    end if
+    oCouleurForm.Model.TextField4.Text = TexteEpaisseur
+    if ExtraitTypeTrait(UneImage.HelpText) = &quot;msoLineSolid&quot; then
+    	ocombobox.Text = Chaine(&quot;continu&quot;)
+    else
+    	ocombobox.Text = Chaine(&quot;pointille&quot;)
+    End If
+
+    oCouleurForm.Model.TextField1.Text=(UneImage.BackgroundColor and RGB(255,0,0))/65536
+    oCouleurForm.Model.TextField2.Text=(UneImage.BackgroundColor and RGB(0,255,0))/256
+    oCouleurForm.Model.TextField3.Text=(UneImage.BackgroundColor and RGB(0,0,255))
+    CouleurForm_MAJLabel()
+    oCouleurForm.Execute()
+    if (oCouleurForm.Model.Label8.Label=&quot;O&quot;) then
+    	UneImage.Backgroundcolor=oCouleurForm.Model.Image1.BackGroundcolor
+    	UneImage.HelpText=oCouleurForm.Model.Image1.HelpText
+    end if
+End Sub
+
+sub DeplaceSelection(posx as long,posy as long,UnObjet as Object)
+	UnObjet.Position = MakePoint(posx, posy)
+end sub
+
+Function InsereCourbe(secArray() as single, n as integer, Optional sgroupe as object, Optional UneImage as object) As object
+dim oShape as Object
+dim i as integer
+dim groupage as object
+dim oCoord as New com.sun.star.awt.Point
+
+	Redim oCoord(0 to n-1) as New com.sun.star.awt.Point
+
+	oShape=oDocumentDessin.createInstance( &quot;com.sun.star.drawing.PolyLineShape&quot;)
+
+	for i=0 to n-1
+		oCoord(i).x=secArray(i,0)
+		oCoord(i).y=secArray(i,1)
+	next i
+	oDocumentDessin.DrawPages.GetByIndex(0).add(oShape)
+	oShape.PolyPolygon=Array(oCoord())
+   	if not ismissing(UneImage) then IOAttribut oShape,UneImage
+   	if not ismissing(sgroupe) then sgroupe.add(oShape)
+   	InsereCourbe=oShape
+End Function
+
+Function InsereVecteur(x0,y0,x1,y1, SGroupe, Optional UneImage) as Object
+dim unTrait as Object
+dim ang as double
+dim unPolygone as Object
+Dim secArray(0 to 2, 0 to 1) as single
+Dim pGroupe as Object
+Dim unObjet as Object
+
+	pGroupe = InitialiseGroupe()
+	if ismissing(uneImage) then
+		unTrait=InsereLigne(x0,y0,x1,y1,pgroupe)
+	else
+		unTrait=InsereLigne(x0,y0,x1,y1,pgroupe, uneImage)
+	end if
+	ang=CalculeAngle(x0,y0,x1,y1)
+	secArray(0,0)=x1
+	secArray(0,1)=y1
+	secArray(1,0)=x1+200*cos(ang+5*Pi/6)
+	secArray(1,1)=y1+200*sin(ang+5*Pi/6)
+	secArray(2,0)=x1+200*cos(ang-5*Pi/6)
+	secArray(2,1)=y1+200*sin(ang-5*Pi/6)
+	if ismissing(uneImage) then
+		unPolygone=InserePolygoneB(secArray(),3,pgroupe)
+		unPolygone.FillStyle = com.sun.star.drawing.FillStyle.SOLID
+		unPolygone.FillColor= 0
+	else
+		unPolygone=InserePolygoneB(secArray(),3,pgroupe,uneImage)
+		unPolygone.FillStyle = com.sun.star.drawing.FillStyle.SOLID
+		unPolygone.FillColor= uneImage.BackgroundColor
+	end if
+	UnObjet = GroupeObjet(pGroupe)
+	sgroupe.add(unObjet)
+	InsereVecteur=UnObjet
+End Function
+
+function InsereLigne(x0 as single, y0 as single, x1 as single, y1 as single, optional SGroupe as object, optional UneImage as object) as object
+Dim aPosition as new com.sun.star.awt.Point
+Dim TheSize as new com.sun.star.awt.Size
+Dim xShape as object
+
+	xShape=oDocumentDessin.createInstance(&quot;com.sun.star.drawing.LineShape&quot;)
+&apos;	xShape.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	xShape.LineWidth = 20
+	aPosition.X = x0
+	aPosition.Y = y0
+	xShape.Position=aPosition
+	TheSize.width = x1-x0
+	TheSize.height=y1-y0
+	xShape.Size=TheSize
+&apos;	ThisComponent.DrawPage.add( xShape )
+	oDocumentDessin.DrawPages.GetByIndex(0).add( xShape )
+	If Not IsMissing( SGroupe ) Then
+		SGroupe.Add(xShape)
+	end if
+	If Not IsMissing(UneImage) Then
+		IOAttribut(xShape, UneImage)
+	Else rem ligne ajoutee par Didier Dorange-Pattoret
+		xShape.LineColor = 0
+	End if
+	InsereLigne()=xShape
+End Function
+
+Function InserePolygone(secArray(), n as integer, Optional sgroupe as object, Optional UneImage as object) As object
+	Dim Ligne as object, Shapes as object, UneCourbe as object
+	dim i, x0 as long, x1 as long, y0 as long, y1 as long
+	
+	Shapes = InitialiseGroupe()
+	for i=0 to n-2
+		x0=secArray(i,0)
+		y0=secArray(i,1)
+		x1=secArray(i+1,0)
+		y1=secArray(i+1,1)
+		If Not IsMissing(UneImage) Then 
+			InsereLigne x0,y0,x1,y1,Shapes,UneImage
+		else
+			InsereLigne x0,y0,x1,y1,Shapes
+		end if
+		next i
+	UneCourbe = GroupeObjet(Shapes)
+	If Not IsMissing(sgroupe) Then 
+		sgroupe.Add(UneCourbe)
+	end if
+	InserePolygone()=UneCourbe
+End Function
+
+Function InserePolygoneB(secArray() as single, n as integer, Optional sgroupe as object, Optional UneImage as object) As object
+dim oShape as Object
+dim i as integer
+dim groupage as object
+dim oCoord as New com.sun.star.awt.Point
+
+	Redim oCoord(0 to n-1)  as New com.sun.star.awt.Point
+
+	oShape=oDocumentDessin.createInstance( &quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+
+	for i=0 to n-1
+		oCoord(i).x=secArray(i,0)
+		oCoord(i).y=secArray(i,1)
+	next i
+	oDocumentDessin.DrawPages.GetByIndex(0).add(oShape)
+	oShape.PolyPolygon=Array(oCoord())
+   	if not ismissing(UneImage) then IOAttribut(oShape,UneImage)
+   	if not ismissing(sgroupe) then sgroupe.add(oShape)
+   	InserePolygoneB=oShape
+End Function
+
+Function InsereQuadrilatere(x0 as single, y0 as single, x1 as single, y1 as single, x2 as single, y2 as single, x3 as single, y3 as single,ts As object, Optional UneImage As object) as object
+	Dim secArray(0 to 4,0 to 1) as single
+
+	secArray(0,0)=x0
+	secArray(0,1)=y0
+	secArray(1,0)=x1
+	secArray(1,1)=y1
+	secArray(2,0)=x2
+	secArray(2,1)=y2
+	secArray(3,0)=x3
+	secArray(3,1)=y3
+	secArray(4,0)=x0
+	secArray(4,1)=y0
+	if ismissing(UneImage) then
+		InsereQuadrilatere() = InserePolygone(secArray(), 5, ts)
+	else
+		InsereQuadrilatere() = InserePolygone(secArray(), 5, ts, UneImage)
+	end if
+End function
+
+Function InsereQuadrilatereB(x0,y0,x1,y1, Optional sgroupe as object, Optional UneImage as object) As object
+	Dim secArray(0 to 3,0 to 1) as single
+
+	secArray(0,0)=x0
+	secArray(0,1)=y0
+	secArray(1,0)=x1
+	secArray(1,1)=y0
+	secArray(2,0)=x1
+	secArray(2,1)=y1
+	secArray(3,0)=x0
+	secArray(3,1)=y1
+	if ismissing(UneImage) then
+		InsereQuadrilatereB = InserePolygoneB(secArray(), 4, sgroupe)
+	else
+		InsereQuadrilatereB = InserePolygoneB(secArray(), 4, sgroupe, UneImage)
+	end if
+End Function
+
+Sub ChargeNomPolice(fparam() as string)
+	Dim i,j,k
+	Dim oToolkit as Object
+	Dim oDevice as Variant
+	Dim oFontDescriptors As Variant
+	Dim param() as String
+	
+	oToolkit = CreateUnoService(&quot;com.sun.star.awt.Toolkit&quot;)
+	oDevice = oToolkit.createScreenCompatibleDevice(0, 0)
+	oFontDescriptors = oDevice.FontDescriptors
+
+	Redim param(lbound(oFontDescriptors) to UBound(oFontDescriptors)) as string
+	
+	thiscomponent.lockcontrollers
+	dim trouve as Boolean
+	k=0
+	for i= LBound(oFontDescriptors) to UBound(oFontDescriptors)
+		trouve=False
+		for j=0 to k-1
+			if param(j)=oFontDescriptors(i).Name then trouve=True
+		next j
+		if not trouve then
+			param(k)=oFontDescriptors(i).Name
+			k=k+1
+		end if		
+	next i
+	thiscomponent.unlockcontrollers
+	redim fparam(0 to k-1)
+	for i=0 to k-1
+		fparam(i)=param(i)
+	next i
+	do 
+		trouve=false
+		for i=0 to k-2
+			if fparam(i)&gt;fparam(i+1) then 
+				Echange(fparam(i), fparam(i+1))
+				trouve=True
+			end if
+		next i
+	loop while(trouve)
+End Sub 
+
+Sub RedresseTexte()
+Dim unDocument as Object
+Dim unGroupe as Object, leGroupe as Object
+Dim uneForme as Object
+Dim i, typeForme as String
+
+	on error goto erreur
+&apos; Cette macro met à 0 l&apos;angle de rotation de tous les textes de la sélection
+	unDocument=thisComponent
+	unGroupe=unDocument.CurrentSelection(0)
+	if unGroupe.ShapeType = &quot;com.sun.star.drawing.GroupShape&quot; Then
+		for i=0 to unGroupe.Count-1
+			uneForme = unGroupe(i)
+			typeForme = uneForme.ShapeType
+			if uneForme.ShapeType = &quot;com.sun.star.drawing.TextShape&quot; then
+				uneForme.RotateAngle = 0
+			end if	
+		next i
+	Endif
+	Exit Sub
+erreur:
+	MsgBoxP &quot;message4&quot;
+End Sub
+
+
+Function InsereTexte(UnTexte as string, x0 as single, y0 as single, Optional sgroupe as object, Optional AngleRot, Optional AlignH as integer, Optional AlignV as integer, Optional Mef as Boolean) as object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	Dim xShape as object
+	Dim oTexte as Object
+	dim ocursor as Object
+	
+	if ismissing(Mef) then Mef=False	
+	if Mef then
+
+&apos; On marque tous les objets du dessin
+		dim i
+		dim maPage
+		
+		on error resume next
+		
+		maPage=oDocumentDessin.DrawPages.GetByIndex(0)
+		for i=0 to maPage.Count()
+			maPage(i).Name=maPage(i).Name &amp; &quot;&amp;&quot;
+		next i
+
+&apos; on met en forme si demande
+		oCursor=oDocumentTexte.Text.CreateTextCursor
+		oDocumentTexte.Text.insertString(oCursor,UnTexte,True)
+		oCursor.goleft(len(UnTexte),True)
+		oDocumentTexte.CurrentController.Select(oCursor)
+		
+		xShape=InsereExpression.InsereExpression(oDocumentTexte)
+		oDocumentTexte.CurrentController.Select(xShape)
+
+		CopierColler1()
+		
+&apos; Le seul objet non marqué est celui qui vient d&apos;être ajouté, il faut le sélectionner
+
+		for i=0 to maPage.Count()
+			if (right(maPage(i).Name,1)=&quot;&amp;&quot;) then
+				maPage(i).Name=left(maPage(i).Name, len(maPage(i).Name)-1)
+			else
+				xShape=maPage(i)
+			end if
+		next i
+	else
+		xShape = oDocumentDessin.createInstance(&quot;com.sun.star.drawing.TextShape&quot;)
+		aPoint.x = x0
+		aPoint.y = y0
+		aSize.Width = 10
+		aSize.Height = 10
+		xShape.Position = aPoint
+		xShape.Size=aSize
+		oDocumentDessin.DrawPages.GetByIndex(0).add(xShape)
+		xShape.String = UnTexte
+		xShape.Text.CharFontName = OOoGdmath_NomPolice
+		xShape.Text.CharHeight = OOoGdmath_TaillePolice
+		xShape.Text.CharPosture = OOoGdmath_ItaliquePolice
+		xShape.Text.CharUnderline = OOoGdmath_SoulignePolice 
+		
+		GereCaracteresDroits(UnTexte,xShape)
+		
+		xShape.Text.TextAutoGrowWidth=True
+		xShape.Text.TextAutoGrowHeight=True
+		
+	end if
+	
+	aSize=xShape.Size
+	if not ismissing(AlignH) then
+		select case AlignH
+		case -1
+			aPoint.x = x0-aSize.Width
+		case 0
+			aPoint.x = x0-aSize.Width/2
+		case 1
+			aPoint.x = x0
+		end Select
+	end if
+	if not ismissing(AlignV) then
+		select case AlignV
+		case -1
+			aPoint.y = y0-aSize.Height
+		case 0
+			aPoint.y = y0-aSize.Height/2
+		case 1
+			aPoint.y = y0
+		end Select
+	end if
+	xShape.Position = aPoint
+	If Not IsMissing(AngleRot) and AngleRot&lt;&gt;0 Then	xShape.RotateAngle = AngleRot
+	If Not IsMissing(sgroupe) Then sgroupe.add(xShape)
+	InsereTexte()=xShape
+end Function
+
+Function InsereTriangleB(x0 as single,y0 as single,x1 as single,y1 as single, x2 as single, y2 as single,optional sgroupe as object, Optional UneImage as object) as object
+Dim secArray(0 to 3, 0 to 1) as single
+
+	secArray(0,0)=x0
+	secArray(0,1)=y0
+	secArray(1,0)=x1
+	secArray(1,1)=y1
+	secArray(2,0)=x2
+	secArray(2,1)=y2
+	secArray(3,0)=x0
+	secArray(3,1)=y0
+	if ismissing(UneImage) then
+		InsereTriangleB() = InserePolygoneB(secArray(), 4, sgroupe)
+	else
+		InsereTriangleB() = InserePolygoneB(secArray(), 4, sgroupe, UneImage)
+	end if
+end function
+
+Function InsereTriangle(x0 as single,y0 as single,x1 as single,y1 as single, x2 as single, y2 as single,optional sgroupe as object, Optional UneImage as object) as object
+Dim secArray(0 to 3, 0 to 1) as single
+
+	secArray(0,0)=x0
+	secArray(0,1)=y0
+	secArray(1,0)=x1
+	secArray(1,1)=y1
+	secArray(2,0)=x2
+	secArray(2,1)=y2
+	secArray(3,0)=x0
+	secArray(3,1)=y0
+	if ismissing(UneImage) then
+		InsereTriangle() = InserePolygone(secArray(), 4, sgroupe)
+	else
+		InsereTriangle() = InserePolygone(secArray(), 4, sgroupe, UneImage)
+	end if
+end function
+
+Function LoadDialog(Libname as String, DialogName as String) &apos;, Optional oLibContainer) rem charge une boite de dialogue
+	Dim oLib,oLibDialog,oRuntimeDialog,oDialogModel,oVar,oVar1 as Object
+	Dim langue As New com.sun.star.lang.Locale
+
+
+	DialogLibraries.LoadLibrary(LibName)
+	oLib = DialogLibraries.GetByName(Libname)
+	oLibDialog = oLib.GetByName(DialogName)
+	oRuntimeDialog = CreateUnoDialog(oLibDialog)
+	oDialogModel=oRuntimeDialog.Model
+	InitialiseForm(oRuntimeDialog)
+	LoadDialog() = oRuntimeDialog
+
+	if BasicLibraries.Standard.hasByName(&quot;DmOptions&quot;) Then
+		select case iLang
+		case 0
+			langue.Language = &quot;fr&quot;
+			langue.Country = &quot;FR&quot;
+		case 1
+			langue.Language = &quot;en&quot;
+			langue.Country = &quot;US&quot;
+		case 2
+			langue.Language = &quot;de&quot;
+			langue.Country = &quot;DE&quot;
+		End Select
+		oRuntimeDialog.Model.ResourceResolver.setCurrentLocale(langue, True)
+	End If
+	if DialogName &lt;&gt; &quot;ChaineForm&quot; And DialogName &lt;&gt; &quot;NommageForm&quot; Then
+		laBoitedeDialogue = oRuntimeDialog
+	End If
+End Function
+
+Function MakePoint( x As Long, y As Long ) As com.sun.star.awt.Point
+   Dim aPoint As New com.sun.star.awt.Point
+   aPoint.x = x
+   aPoint.y = y
+   MakePoint() = aPoint
+End Function 
+
+function MarqueAngleDroit(xd as single, yd as single, xs as single, ys as single, sgroupe As object,Optional UneImage as Object) as object
+Dim pgroupe As object
+Dim alpha as Double
+Dim unObjet as Object
+    
+    pGroupe=initialisegroupe()
+    alpha = CalculeAngle(xd, yd, xs, ys)
+    if ismissing(uneImage) then
+	    InsereLigne(xd + 200 * Cos(alpha), yd + 200 * Sin(alpha), xd + 200 * (Cos(alpha) - Sin(alpha)), yd + 200 * (Sin(alpha) + Cos(alpha)), pgroupe)
+	    InsereLigne(xd - 200 * Sin(alpha), yd + 200 * Cos(alpha), xd + 200 * (Cos(alpha) - Sin(alpha)), yd + 200 * (Sin(alpha) + Cos(alpha)), pgroupe)
+	else
+	    InsereLigne(xd + 200 * Cos(alpha), yd + 200 * Sin(alpha), xd + 200 * (Cos(alpha) - Sin(alpha)), yd + 200 * (Sin(alpha) + Cos(alpha)), pgroupe, uneImage)
+	    InsereLigne(xd - 200 * Sin(alpha), yd + 200 * Cos(alpha), xd + 200 * (Cos(alpha) - Sin(alpha)), yd + 200 * (Sin(alpha) + Cos(alpha)), pgroupe, uneImage)
+	End if
+    UnObjet = GroupeObjet(pGroupe)
+    if not ismissing(sgroupe) then
+    	sgroupe.add(UnObjet)
+    end if
+    MarqueAngleDroit()=UnObjet
+End function
+
+sub PointInsertion(posx,posy)
+	posx=3000
+	posy=3000
+end sub
+
+function TraceBissectrice(xx1 as single, yy1 as single, xxx0 as single, yyy0 as single, xx2 as single, yy2 as single, sgroupe as object, Optional ProlongeBissectriceS as boolean, Optional ProlongeBissectriceI as boolean, Optional xci as integer, Optional yci as integer) as object
+dim pgroupe as object
+dim xx0, yy0
+dim alpha,beta
+dim xx,yy
+dim angleh
+Dim seg1 as Object, seg2 as Object, seg3 as Object, seg4 as Object
+Dim unObjet as Object
+Dim lecodage
+dim aa
+
+	if (ismissing(ProlongeBissectriceS)) then ProlongeBissectriceS=False
+	if (ismissing(ProlongeBissectriceI)) then ProlongeBissectriceI=False
+	pgroupe=InitialiseGroupe()
+    xx0 = xxx0
+    yy0 = yyy0
+    alpha = CalculeAngle(xx0, yy0, xx2, yy2) * 180 / Pi
+    beta = CalculeAngle(xx0, yy0, xx1, yy1) * 180 / Pi
+    If alpha &gt; beta Then
+        If alpha - beta &gt; 180 Then
+        	alpha = alpha - 360
+        end if
+    Else
+        If beta - alpha &gt; 180 Then 
+        	beta = beta - 360
+        end if
+    End If
+    aa = (alpha + beta) / 2
+    xx = xx0 + 5000 * Cos(aa * Pi / 180)
+    yy = yy0 + 5000 * Sin(aa * Pi / 180)
+    If ProlongeBissectriceS Then
+        angleh = CalculeAngle(xx0, yy0, xx, yy)
+        xx0 = xx0 - 5000 * Cos(angleh)
+        yy0 = yy0 - 5000 * Sin(angleh)
+    End If
+    If ProlongeBissectriceI Then
+        angleh = CalculeAngle(xx0, yy0, xx, yy)
+        If xx0 &gt; xx Or yy0 &gt; yy Then
+            If xci &lt; xx Or yci &lt; yy Then
+                xx = xci + 5000 * Cos(angleh)
+                yy = yci + 5000 * Sin(angleh)
+            End If
+        End If
+        If xx0 &lt; xx Or yy0 &lt; yy Then
+            If xci &gt; xx Or yci &gt; yy Then
+                xx = xci + 5000 * Cos(angleh)
+                yy = yci + 5000 * Sin(angleh)
+            End If
+        End If
+    End If
+    InsereLigne(xx0, yy0, xx, yy, pgroupe)
+    If (CInt(CodageALabel2) &lt;&gt; 10) Then
+        Seg1 = InsereLigne(xx0, yy0, xx1, yy1)
+        Seg1.LineColor = RGB(0, 0, 255)
+        Seg2 = InsereLigne(xx0, yy0, xx, yy)
+        Seg2.LineColor = RGB(0, 0, 255)
+        Seg3 = InsereLigne(xx0, yy0, xx2, yy2)
+        Seg3.LineColor = RGB(255, 0, 0)
+        Seg4 = InsereLigne(xx0, yy0, xx + 1, yy)
+        Seg4.LineColor = RGB(255, 0, 0)
+        AfficheCodageAForm
+        oDocumentDessin.DrawPages.GetByIndex(0).remove(Seg1)
+        oDocumentDessin.DrawPages.GetByIndex(0).remove(Seg2)
+        oDocumentDessin.DrawPages.GetByIndex(0).remove(Seg3)
+        oDocumentDessin.DrawPages.GetByIndex(0).remove(Seg4)
+        lecodage = CInt(CodageALabel2)
+        If (lecodage = 10) Then lecodage = 0
+    End If
+    If (CInt(CodageALabel2) = 10) Then
+        lecodage = lecodage + 1
+        If lecodage = 10 Then 
+        	lecodage = 1
+        end if
+    End If
+    If (CodageALabel2 &lt;&gt; &quot;11&quot;) Then
+        MarqueAngle(xx1, yy1, xx0, yy0, xx, yy, (aa &gt; 180), lecodage, 0, pgroupe)
+        MarqueAngle(xx, yy, xx0, yy0, xx2, yy2, (aa &gt; 180), lecodage, 1, pgroupe)
+    End If
+    UnObjet=GroupeObjet(pgroupe)
+    if not ismissing(sgroupe) then
+    	sgroupe.add(UnObjet)
+    end if
+    TraceBissectrice()=UnObjet
+End function
+
+function TraceParallele(xx0, yy0, xx1, yy1, xx2, yy2, optional sgroupe as object) as object
+    UnAngle = CalculeAngle(xx0, yy0, xx1, yy1)
+    ll = 4000
+    if not ismissing(sgroupe) then
+	    UnObjet=InsereLigne(xx2 - ll * Cos(UnAngle), yy2 - ll * Sin(UnAngle), xx2 + ll * Cos(UnAngle), yy2 + ll * Sin(UnAngle), sgroupe)
+	else
+	    UnObjet=InsereLigne(xx2 - ll * Cos(UnAngle), yy2 - ll * Sin(UnAngle), xx2 + ll * Cos(UnAngle), yy2 + ll * Sin(UnAngle))
+	end if
+	TraceParallele()=UnObjet
+End function
+
+function TracePerpendiculaire(xx0 as Single, yy0 as Single, xx1 as Single, yy1 as Single, xx2 as Single, yy2 as Single, optional sgroupe as object) as object
+dim pgroupe as object
+Dim xx as Single, yy as Single
+Dim unAngle as Double
+
+	pGroupe=InitialiseGroupe()
+    TrouvePiedHauteur(xx0, yy0, xx1, yy1, xx2, yy2, xx, yy)
+    UnAngle = CalculeAngle(xx0, yy0, xx1, yy1) + Pi / 2
+    InsereLigne(xx - 5000 * Cos(UnAngle), yy - 5000 * Sin(UnAngle), xx + 5000 * Cos(UnAngle), yy + 5000 * Sin(UnAngle), pgroupe)
+    MarqueAngleDroit(xx, yy, MIif(xx = xx0, xx1, xx0), MIif(yy = yy0, yy1, yy0), pgroupe)
+    UnObjet=GroupeObjet(pGroupe)
+    if not ismissing(sgroupe) then
+    	sgroupe.add(UnObjet)
+    end if
+    TracePerpendiculaire()=UnObjet
+End function
+
+Function SelectionneForme(oDocument as Object, uneForme as Object) as Boolean
+on error goto fin
+	SelectionneForme=False
+	oDocument.CurrentController.Select(uneForme)
+	SelectionneForme=True
+fin:
+end Function
+
+Sub ExtraitPoint(texte$, i, np$, xx, yy, Optional txx as String, Optional tyy  as string)
+Dim a, b, c, coord1$, coord2$, num, den
+
+	if ismissing(txx) then txx=&quot;&quot;
+	if ismissing(tyy) then tyy=&quot;&quot;
+    a = InStr(i, texte$, &quot;(&quot;)
+&apos;    If a = 0 Or a - i &gt; 1 Then
+    If a = 0 Then
+        i = -1
+    Else
+        b = InStr(a, texte$, &quot;;&quot;)
+        If b = 0 Then
+            i = -1
+        Else
+            c = InStr(b, texte$, &quot;)&quot;)
+            If c = 0 Then
+                i = -1
+            Else
+                np$ = &quot;&quot;
+                If a &gt; 1 Then np$ = Left(texte$, a - 1)
+                coord1$ = Mid$(texte$, a + 1, b - a - 1)
+                If txx &lt;&gt; &quot;&quot; Then txx = coord1$
+                RemplaceVirgulePoint coord1$
+                coord2$ = Mid$(texte$, b + 1, c - b - 1)
+                If tyy &lt;&gt; &quot;&quot; Then tyy = coord2$
+                RemplaceVirgulePoint coord2$
+                If InStr(1, coord1$, &quot;/&quot;) &lt;&gt; 0 Then
+                    AACExtraitNDF coord1$, num, den
+                    xx = Val(num) / Val(den)
+                Else
+                    xx = Val(coord1$)
+                End If
+                If InStr(1, coord2$, &quot;/&quot;) &lt;&gt; 0 Then
+                    AACExtraitNDF coord2$, num, den
+                    yy = Val(num) / Val(den)
+                Else
+                    yy = Val(coord2$)
+                End If
+                i = c + 1
+            End If
+        End If
+    End If
+End Sub
+
+Sub OAttribut(oShape As Object, Couleur, epaisseur, style)
+Dim i
+	if oShape.ShapeType = &quot;com.sun.star.drawing.GroupShape&quot; Then
+		for i=0 to oShape.Count-1
+			OAttribut(oShape(i), Couleur, epaisseur, style)
+		next i
+	else
+		OAttributB(oShape, Couleur, epaisseur, style)
+	End if
+End Sub
+
+Sub OAttributB(oShape as Object, Couleur, epaisseur, style)
+Dim mesTirets as new com.sun.star.drawing.LineDash
+
+	with mesTirets
+		.Style = com.sun.star.drawing.DashStyle.RECT
+		.Dots = 0
+		.DotLen = 0
+		.Dashes = 1
+		.DashLen = 100
+		.Distance = 100
+	End With
+    if (style=&quot;msoLineSolid&quot;) then oShape.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+    if (style=&quot;msoLineDash&quot;) then 
+    	oShape.LineStyle = com.sun.star.drawing.LineStyle.DASH
+		oShape.LineDash = mesTirets
+	end if
+	oShape.LineWidth = val(epaisseur)*17639/500
+	oShape.LineColor = Couleur
+End Sub
+
+Sub ExtraitVecteur(texte$, i, x0, y0, x1, y1)
+Dim param() as string
+
+	i=-1
+    if left(texte$,1)=&quot;{&quot; and right(texte$,1)=&quot;}&quot; then
+    	i=ChargeParametre(mid(texte$,2,len(texte$)-2), param(), &quot;;&quot;)
+        RemplaceVirgulePoint param(0)
+        RemplaceVirgulePoint param(1)
+        RemplaceVirgulePoint param(2)
+        RemplaceVirgulePoint param(3)
+        x0 = Val(param(0))
+		y0 = Val(param(1))
+		x1 = Val(param(2))
+		y1 = Val(param(3))
+    End If
+End Sub
+
+Sub ExtraitSegment(texte$, i, x0, y0, x1, y1)
+Dim param() as string
+
+	i=-1
+    if left(texte$,1)=&quot;[&quot; and right(texte$,1)=&quot;]&quot; then
+    	i=ChargeParametre(mid(texte$,2,len(texte$)-2), param(), &quot;;&quot;)
+        RemplaceVirgulePoint param(0)
+        RemplaceVirgulePoint param(1)
+        RemplaceVirgulePoint param(2)
+        RemplaceVirgulePoint param(3)
+        x0 = Val(param(0))
+		y0 = Val(param(1))
+		x1 = Val(param(2))
+		y1 = Val(param(3))
+    End If
+End Sub
+
+Sub MarqueExtremites(x0, y0, x1, y1, Shapes as Object, Optional trait1 As object, Optional trait2 As object)
+Dim xm, ym, r
+
+    xm = (x0 + x1) / 2
+    ym = (y0 + y1) / 2
+    r = Sqr((x0 - xm) * (x0 - xm) + (y0 - ym) * (y0 - ym))
+    trait1=InsereLigne(x0 - 100 * (y0 - ym) / r, y0 + 100 * (x0 - xm) / r, x0 + 100 * (y0 - ym) / r, y0 - 100 * (x0 - xm) / r, Shapes)
+    trait2=InsereLigne(x1 - 100 * (y0 - ym) / r, y1 + 100 * (x0 - xm) / r, x1 + 100 * (y0 - ym) / r, y1 - 100 * (x0 - xm) / r, Shapes)
+End Sub
+
+Sub ExtraitDroite(texte$, i, a, b, c, eqdroite$)
+Dim ffx$, x1, y1, x2, y2, Defini, ffy$
+
+    If UCase(Left(texte$, 1)) = &quot;Y&quot; Then
+&apos; y=f(x)
+        ffx$ = Right(texte$, Len(texte$) - InStr(1, texte$, &quot;=&quot;))
+        RemplaceTexte ffx$, &quot;x&quot;, &quot;(-1)&quot;
+        x1 = -1
+        y1 = CalculeFonction(ffx$, Defini)
+        ffx = Right(texte$, Len(texte$) - InStr(1, texte$, &quot;=&quot;))
+        RemplaceTexte ffx$, &quot;x&quot;, &quot;(+1)&quot;
+        x2 = 1
+        y2 = CalculeFonction(ffx$, Defini)
+    Else
+&apos;x=f(y)
+        If UCase(Left(texte$, 1)) = &quot;X&quot; Then
+            ffy$ = Right(texte$, Len(texte$) - InStr(1, texte$, &quot;=&quot;))
+            RemplaceTexte ffy$, &quot;y&quot;, &quot;(-1)&quot;
+            y1 = -1
+            x1 = CalculeFonction(ffy$, Defini)
+            ffy$ = Right(texte$, Len(texte$) - InStr(1, texte$, &quot;=&quot;))
+            RemplaceTexte ffy$, &quot;y&quot;, &quot;(+1)&quot;
+            y2 = 1
+            x2 = CalculeFonction(ffy$, Defini)
+        Else
+            i = -1
+        End If
+    End If
+    If i &lt;&gt; -1 Then
+        If x1 &lt;&gt; x2 Then
+            a = (y1 - y2) / (x1 - x2)
+            b = -1
+            c = y1 - a * x1
+        Else
+            a = 1
+            b = 0
+            c = -x1
+        End If
+        eqdroite$ = texte$
+    End If
+End Sub
+
+Function getModuleText(LibN As String, ModN As String) As String
+Dim LibContainer As Object
+Dim Lib1 As Object
+dim texte as String
+dim stexte as string
+dim atexte as String
+
+	LibContainer = GlobalScope.BasicLibraries
+	Lib1 = LibContainer.getByName(LibN)
+	if Lib1.hasByName(ModN)  then
+		stexte = Lib1.getByName(ModN)
+		atexte = stexte
+		if instr(1, stexte, &quot;OOoGdmath_NomPolice&quot;) = 0 Then stexte =  stexte &amp; chr(10) &amp; &quot;Public Const OOoGdmath_NomPolice = &quot; &amp; chr(34) &amp; &quot;Times New Roman&quot; &amp; chr(34) &amp; chr(10)
+		if instr(1, stexte, &quot;OOoGdmath_TaillePolice&quot;) = 0 Then stexte =  stexte &amp; chr(10) &amp; &quot;Public Const OOoGdmath_TaillePolice = 12&quot; &amp; chr(10)
+		if instr(1, stexte, &quot;OOoGdmath_ItaliquePolice&quot;) = 0 Then stexte =  stexte &amp; chr(10) &amp; &quot;Public Const OOoGdmath_ItaliquePolice = 2&quot; &amp; chr(10)
+		if instr(1, stexte, &quot;OOoGdmath_SoulignePolice&quot;) = 0 Then stexte = stexte &amp; chr(10) &amp; &quot;Public Const OOoGdmath_SoulignePolice = 0&quot; &amp; chr(10)
+		if instr(1, stexte, &quot;OOoGdmath_GrasPolice&quot;) = 0 Then stexte =  stexte &amp; chr(10) &amp; &quot;Public Const OOoGdmath_GrasPolice = 0&quot; &amp; chr(10)
+		if instr(1, stexte, &quot;OOoGdmath_SensNommage&quot;) = 0 Then stexte =  stexte &amp; chr(10) &amp; &quot;Public Const OOoGdmath_SensNommage = 0&quot; &amp; chr(10)
+		if instr(1, stexte, &quot;OOoGdmath_TypeNommage&quot;) = 0 Then stexte =  stexte &amp; chr(10) &amp; &quot;Public Const OOoGdmath_TypeNommage = 0&quot; &amp; chr(10)
+		if instr(1, stexte, &quot;Sub OOoGdmath()&quot;) = 0 Then stexte =  stexte &amp; chr(10) &amp; chr(10) &amp; &quot;Sub OOoGdmath()&quot; &amp; chr(10) &amp; &quot;Print &quot; &amp; chr(34) &amp; &quot;OOoGdmath&quot; &amp; chr(34) &amp; chr(10) &amp; &quot;End Sub&quot; &amp; chr(10)
+		if atexte &lt;&gt; stexte then saveModuleText LibN, ModN, stexte
+	else
+		texte = chr(10)
+		texte = texte &amp; &quot;Public Const OOoGdmath_NomPolice = &quot; &amp; chr(34) &amp; &quot;Times New Roman&quot; &amp; chr(34) &amp; chr(10)
+		texte = texte &amp; &quot;Public Const OOoGdmath_TaillePolice = 12&quot; &amp; chr(10)
+		texte = texte &amp; &quot;Public Const OOoGdmath_ItaliquePolice = 2&quot; &amp; chr(10)
+		texte = texte &amp; &quot;Public Const OOoGdmath_SoulignePolice = 0&quot; &amp; chr(10)
+		texte = texte &amp; &quot;Public Const OOoGdmath_GrasPolice = 0&quot; &amp; chr(10)
+		texte = texte &amp; &quot;Public Const OOoGdmath_SensNommage = 0&quot; &amp; chr(10)
+		texte = texte &amp; &quot;Public Const OOoGdmath_TypeNommage = 0&quot; &amp; chr(10)
+		texte = texte &amp; chr(10) &amp; chr(10) &amp; &quot;Sub OOoGdmath()&quot; &amp; chr(10)
+		texte = texte &amp; &quot;Print &quot; &amp; chr(34) &amp; &quot;OOoGdmath&quot; &amp; chr(34) &amp; chr(10)
+		texte = texte &amp; &quot;End Sub&quot; &amp; chr(10)
+		Lib1.InsertByName(ModN, texte)
+		stexte = texte
+	end if
+	getModuleText() = stexte
+End Function
+
+&apos; returns true if successful
+Function saveModuleText(LibN As String, ModN As String, newText As String) As Boolean
+Dim LibContainer As Object
+Dim Lib1 As Object
+
+LibContainer = GlobalScope.BasicLibraries
+Lib1 = LibContainer.getByName(LibN)
+if Lib1.hasByName(ModN)  then
+  Lib1.replacebyName(ModN, newText)
+  saveModuleText = true
+else
+	Lib1.insertByName(ModN, &quot;&quot;)
+  saveModuleText = saveModuleText(LibN, ModN, newText)
+end if
+End Function
+
+Sub RemplaceX(texte$, X)
+Dim tx
+
+    RemplaceTexte texte$, &quot;exp&quot;, &quot;esp&quot;
+    tx = InStr(1, UCase(texte$), &quot;X&quot;)
+    While tx &gt; 0
+        texte$ = Left$(texte$, tx - 1) + &quot;(&quot; + Str(X) + &quot;)&quot; + Right$(texte$, Len(texte$) - tx)
+        tx = InStr(tx + 1, UCase(texte$), &quot;X&quot;)
+    Wend
+    RemplaceTexte texte$, &quot;esp&quot;, &quot;exp&quot;
+End Sub
+
+Sub RemplaceY(texte, X)
+Dim tx
+
+    tx = InStr(1, UCase(texte), &quot;Y&quot;)
+    While tx &gt; 0
+        texte = Left(texte, tx - 1) + X + Right(texte, Len(texte) - tx)
+        tx = InStr(tx + 1, UCase(texte), &quot;Y&quot;)
+    Wend
+End Sub
+
+Sub RemplaceT(texte$, X)
+Dim tx
+
+    RemplaceTexte texte$, &quot;tan&quot;, &quot;xan&quot;
+    tx = InStr(1, UCase(texte$), &quot;T&quot;)
+    While tx &gt; 0
+        texte$ = Left(texte$, tx - 1) + X + Right(texte$, Len(texte$) - tx)
+        tx = InStr(tx + 1, UCase(texte$), &quot;T&quot;)
+    Wend
+    RemplaceTexte texte$, &quot;xan&quot;, &quot;tan&quot;
+End Sub
+
+Sub CalculeCoordonnees(xx, yy, posx, posy, dx, dy, angleaxe)
+Dim xxx, yyy
+
+    xxx = posx + xx * dx + yy * dy * Cos(angleaxe)
+    yyy = posy - yy * dy * Sin(angleaxe)
+    xx = xxx
+    yy = yyy
+End Sub
+
+Sub RemplissageForme(zone1, couleur, Transparence)
+	zone1.zOrder = -1
+	zone1.LineStyle = com.sun.star.drawing.LineStyle.NONE
+	zone1.FillStyle = com.sun.star.drawing.FillStyle.SOLID
+	zone1.FillColor = couleur
+	zone1.FillTransparence = Transparence
+End Sub
+
+Function NombreTexte(Debut, texte1, texte2) As Integer
+Dim a, i
+
+    a = Debut
+    i = 0
+    While (a &gt; 0)
+        a = InStr(a, texte1, texte2)
+        If a &gt; 0 Then
+            a = a + 1
+            i = i + 1
+        End If
+        If texte2 = &quot;\s\do&quot; Then
+            If a &gt; 0 Then
+                If Mid(texte1, a + 6, 2) = &quot;\f&quot; Then
+                    i = i - 1
+                End If
+            End If
+        End If
+    Wend
+    NombreTexte = i
+End Function
+
+Function MIif(unEtat as Boolean, valeur1, valeur2) as variant
+	If unEtat then
+		MIif() = valeur1
+	Else
+		MIif() = valeur2
+	End If
+End Function
+
+Sub TraceLigneGroupe(unGroupe as Object, position as String, uneImage As Object, optional v )
+    Dim Group as Object
+    Dim px,py,lx,ly
+	Dim i
+	if ismissing(v) then v=0.1
+	Group = oDocumentDessin.DrawPages.GetByIndex(0).group(unGroupe)
+   	lx = Group.Size.Width
+   	ly = Group.Size.Height
+   	px = Group.Position.x
+   	py = Group.Position.y
+	oDocumentDessin.DrawPages.GetByIndex(0).ungroup(Group)
+    
+    for i=1 to len(position)
+    	select case mid(position, i, 1)
+		case &quot;s&quot;    	
+		    InsereLigne px-lx*v, py+ly+100, px+lx+lx*v, py+ly+100, unGroupe, uneImage
+		case &quot;n&quot;
+			InsereLigne px-lx*v, py, px+lx+lx*v, py, unGroupe, uneImage
+		&apos;case &quot;t&quot;
+		&apos;	InsereLigne px, py+ly+100, px+lx, py+ly+100, unGroupe, uneImage
+	    End Select
+    Next i
+End Sub
+
+Sub NormaliseCoordonnees(x, y, x1, y1, x0, y0, x2, y2, Optional sens)
+Dim n
+	if ismissing(sens) then sens = 300
+	n = sqr((2 * x0 - x1 - x2) ^ 2 + (2 * y0 - y1 - y2) ^ 2)
+	x = (2 * x0 - x1 - x2) / n
+	y = (2 * y0 - y1 - y2) / n
+	x = x0 + sens * x
+	y = y0 + sens * y
+End Sub
+
+Function MVal(unTexte as string)
+	RemplaceVirgulePoint unTexte
+	Mval = val(unTexte)
+End Function
+</script:module>

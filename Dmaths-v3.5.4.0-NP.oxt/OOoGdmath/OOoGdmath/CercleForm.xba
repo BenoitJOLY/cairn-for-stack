@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CercleForm" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Public oCercleForm as object
+
+Sub Main
+	AfficheCercleForm
+End Sub
+
+Sub AfficheCercleForm()
+	oCercleForm = LoadDialog(&quot;OOoGdmath&quot;,&quot;CercleForm&quot;)
+	ChangeTitreDialog(oCercleForm)
+    oCercleForm.Model.Image1.ImageURL=fCheminImages &amp; &quot;cercle1.gif&quot;
+    oCercleForm.Model.Image2.ImageURL=fCheminImages &amp; &quot;cercle2.gif&quot;
+&apos;	RestaureForm(oCercleForm)
+	oCercleForm.Execute()
+End Sub
+
+Private Sub CercleForm_AnnulerBouton_Click()
+	oCercleForm.EndExecute()
+End Sub
+
+Private Sub CercleForm_CheckBox1_Click()
+    oCercleForm.Model.CheckBox10.Enabled = oCercleForm.Model.CheckBox1.State
+End Sub
+
+Private Sub CercleForm_CheckBox2_Click()
+    oCercleForm.Model.TextBox8.Enabled = oCercleForm.Model.CheckBox2.State
+End Sub
+
+Private Sub CercleForm_CheckBox3_Click()
+    oCercleForm.Model.TextBox9.Enabled = oCercleForm.Model.CheckBox3.State
+End Sub
+
+Private Sub CercleForm_CheckBox4_Click()
+    oCercleForm.Model.TextBox10.Enabled = oCercleForm.Model.CheckBox4.State
+End Sub
+
+Private Sub CercleForm_CheckBox5_Click()
+    oCercleForm.Model.TextBox11.Enabled = oCercleForm.Model.CheckBox5.State
+End Sub
+
+Private Sub CercleForm_CheckBox6_Click()
+    oCercleForm.Model.TextBox3.Enabled = oCercleForm.Model.CheckBox6.State
+End Sub
+
+Private Sub CercleForm_CheckBox7_Click()
+    oCercleForm.Model.TextBox2.Enabled = oCercleForm.Model.CheckBox7.State
+End Sub
+
+Private Sub CercleForm_CheckBox11_Click()
+    oCercleForm.Model.TextBox13.Enabled = oCercleForm.Model.CheckBox11.State
+End Sub
+
+Private Sub CercleForm_CheckBox9_Click()
+    oCercleForm.Model.CheckBox7.Enabled = oCercleForm.Model.CheckBox9.State
+    oCercleForm.Model.TextBox2.Enabled = (oCercleForm.Model.CheckBox9.State And oCercleForm.Model.CheckBox7.State)
+End Sub
+
+Private Sub CercleForm_Image1_Click()
+    oCercleForm.Model.OptionButton1.State = True
+End Sub
+
+Private Sub CercleForm_Image2_Click()
+    oCercleForm.Model.OptionButton2.State = True
+End Sub
+
+Private Sub CercleForm_Image3_Click()
+    ChangeCouleur Image3
+End Sub
+
+Private Sub CercleForm_Image4_Click()
+    ChangeCouleur Image4
+End Sub
+
+Private Sub CercleForm_Image5_Click()
+    ChangeCouleur Image5
+End Sub
+
+Private Sub CercleForm_Image6_Click()
+    ChangeCouleur Image6
+End Sub
+
+Private Sub CercleForm_Image7_Click()
+    ChangeCouleur Image7
+End Sub
+
+Private Sub CercleForm_OkBouton_Click()
+Dim UneLigne As object
+Dim UnCercle As object
+Dim ahPoint As Object  &apos;(A Haguet)
+Dim afmesure, t1 as string, a as single, posx, posy, i, aa, xx as single, yy as single, ang, xx1 as Single, yy1 as Single
+Dim dx as Single, dy as Single, dx1 as Single, dy1 as Single, unangle as Double
+
+&apos; dessiner un cercle
+    afmesure = oCercleForm.Model.CheckBox1.State
+	oCercleForm.EndExecute()
+	sauveForm(oCercleForm)
+
+	&apos; on groupe les ojets dessinés  
+	Shapes = InitialiseGroupe()
+	InitialiseDessin(False) 
+    t1 = oCercleForm.Model.TextBox1.Text
+    RemplaceVirgulePoint t1
+    a = Val(t1) * 1000
+    t1 = oCercleForm.Model.TextBox1.Text
+    If (oCercleForm.Model.OptionButton1.State) Then a = a * 2
+    posx=3000
+    posy=3000
+    If CestUneFigureGeometrique Then
+        posx = (xmin + xmax) / 2 - a / 2
+        posy = (ymin + ymax) / 2 - a / 2
+    Else
+        If oCercleForm.Model.Label7.Label &lt;&gt; &quot;&quot; Then
+            If Not oCercleForm.Model.OptionButton1.State Then
+                posx = (Val(oCercleForm.Model.Label7.Label) + Val(oCercleForm.Model.Label9.Label)) / 2 - a / 2
+                posy = (Val(oCercleForm.Model.Label8.Label) + Val(oCercleForm.Model.Label10.Label)) / 2 - a / 2
+            Else
+                posx = Val(oCercleForm.Model.Label7.Label) - a / 2
+                posy = Val(oCercleForm.Model.Label8.Label) - a / 2
+            End If
+        End If
+    End If
+    If oCercleForm.Model.CheckBox9.State Then
+        If oCercleForm.Model.CheckBox7.State Then
+            AjoutePoint posx + a / 2, posy + a / 2, oCercleForm.Model.TextBox2.Text, InsereTexte(oCercleForm.Model.TextBox2.Text, posx + a / 2-200, posy + a / 2 -200, Shapes,0), true,0, Shapes
+        Else
+            croix posx + a / 2, posy + a / 2, Shapes
+        End If
+    End If
+    If afmesure Then InsereTexte t1 &amp; MIif(Not oCercleForm.Model.CheckBox10.State, &quot; cm&quot;, &quot;&quot;), posx + a / 2, posy + a / 2 - 200, Shapes,0
+    UnCercle=InsereCercle(posx + a / 2, posy + a / 2, a / 2, Shapes)
+    UnCercle.FillStyle = com.sun.star.drawing.FillStyle.NONE
+    If oCercleForm.Model.CheckBox2.Enabled Then
+        For i = 1 To Val(oCercleForm.Model.TextBox4.Text)
+            DeplaceRayonCercle(posx + a / 2, posy + a / 2, a / 2, 0, xx, yy)
+            UneLigne = InsereLigne(posx + a / 2, posy + a / 2, xx, yy, Shapes)
+            If oCercleForm.Model.CheckBox2.State Then
+            	unangle = CalculeAngle(posx + a / 2, posy + a / 2, xx, yy)
+            	dx = 200*cos(unangle)
+            	dy = 200*sin(unangle)
+            	AjoutePoint xx, yy, Mid$(oCercleForm.Model.TextBox8.Text, i, 1), IIf(oCercleForm.Model.CheckBox2.State, InsereTexte(Mid$(oCercleForm.Model.TextBox8.Text, i, 1), xx + dx, yy + dy, Shapes),&quot;&quot;),false,0, Shapes
+            End If
+        Next i
+    End If
+    If oCercleForm.Model.CheckBox3.Enabled Then
+        aa = InStr(1, oCercleForm.Model.TextBox9.Text, &quot;[&quot;)
+        For i = 1 To Val(oCercleForm.Model.TextBox5.Text)
+            DeplaceDiametreCercle posx + a / 2, posy + a / 2, a / 2, 0,xx,yy
+            InsereLigne 2 * posx + a - xx, 2 * posy + a - yy, xx, yy,Shapes
+            If oCercleForm.Model.CheckBox3.State Then 
+            	unangle = CalculeAngle(posx + a / 2, posy + a / 2, xx, yy)
+            	dx = 200*cos(unangle)
+            	dy = 200*sin(unangle)
+            	AjoutePoint xx, yy, Mid$(oCercleForm.Model.TextBox9.Text, aa + 1, 1), IIf(oCercleForm.Model.CheckBox3.State, InsereTexte(Mid$(oCercleForm.Model.TextBox9.Text, aa + 1, 1), xx + dx, yy + dy, Shapes),&quot;&quot;), false, 0, Shapes
+				AjoutePoint 2 * posx + a - xx, 2 * posy + a - yy, Mid$(oCercleForm.Model.TextBox9.Text, aa + 2, 1), IIf(oCercleForm.Model.CheckBox3.State, InsereTexte(Mid$(oCercleForm.Model.TextBox9.Text, aa + 2, 1), 2 * posx + a - xx - dx, 2 * posy + a - yy - dy, Shapes),&quot;&quot;), false, 0, Shapes
+			End If
+            aa = InStr(aa + 1, oCercleForm.Model.TextBox9.Text, &quot;[&quot;)
+        Next i
+    End If
+    If oCercleForm.Model.CheckBox4.Enabled Then
+        aa = InStr(1, oCercleForm.Model.TextBox10.Text, &quot;[&quot;)
+        For i = 1 To Val(oCercleForm.Model.TextBox6.Text)
+            DeplaceCordeCercle posx + a / 2, posy + a / 2, a / 2, 0, xx, yy, xx1, yy1
+            InsereLigne xx, yy, xx1, yy1,Shapes
+            If oCercleForm.Model.CheckBox4.State Then 
+            	unangle = CalculeAngle(posx + a / 2, posy + a / 2, xx, yy)
+            	dx = 200*cos(unangle)
+            	dy = 200*sin(unangle)
+            	unangle = CalculeAngle(posx + a / 2, posy + a / 2, xx1, yy1)
+            	dx1 = 200*cos(unangle)
+            	dy1 = 200*sin(unangle)
+            	AjoutePoint xx, xx, Mid$( oCercleForm.Model.TextBox10.Text, aa + 1, 1), IIf( oCercleForm.Model.CheckBox4.State, InsereTexte(Mid$( oCercleForm.Model.TextBox10.Text, aa + 1, 1), xx + dx, yy + dy, Shapes), &quot;&quot;), false, 0, Shapes
+            	AjoutePoint xx1, yy1, Mid$( oCercleForm.Model.TextBox10.Text, aa + 2, 1), IIf( oCercleForm.Model.CheckBox4.State, InsereTexte(Mid$( oCercleForm.Model.TextBox10.Text, aa + 2, 1), xx1 + dx1, yy1 + dy1, Shapes), &quot;&quot;), false, 0, Shapes
+            End If
+            aa = InStr(aa + 1, oCercleForm.Model.TextBox10.Text, &quot;[&quot;)
+        Next i
+    End If
+    If oCercleForm.Model.CheckBox5.Enabled Then
+        For i = 1 To Val(oCercleForm.Model.TextBox7.Text)
+            DeplaceTangenteCercle posx + a / 2, posy + a / 2, a / 2, 0, xx, yy, xx1, yy1
+            ang=CalculeAngle(xx,yy,xx1,yy1)+Pi/2
+            InsereLigne xx1, yy1, 2*xx-xx1,2*yy-yy1,Shapes
+            If oCercleForm.Model.CheckBox5.State Then 
+            	unangle = CalculeAngle(posx + a / 2, posy + a / 2, xx, yy)
+            	dx = 200*cos(unangle)
+            	dy = 200*sin(unangle)
+            	AjoutePoint xx, yy, Mid$(oCercleForm.Model.TextBox11.Text, i, 1), IIf(oCercleForm.Model.CheckBox5.State, InsereTexte(Mid$(oCercleForm.Model.TextBox11.Text, i, 1), xx + dx, yy + dy, Shapes), &quot;&quot;), FG_TRAIT, ang, Shapes
+            End If
+        Next i
+    End If
+    
+    
+    &apos;-------------------------------------------- Ajout 07/2014  (A Haguet) --------------------------------------------------------------------------
+    If oCercleForm.Model.CheckBox11.Enabled Then
+        For i = 1 To Val(oCercleForm.Model.TextBox12.Text)
+            DeplacePointCercle posx + a / 2, posy + a / 2, a / 2, 0, xx, yy
+            ang= CalculeAngle(posx + a / 2, posy + a / 2, xx, yy)
+            ahPoint = croix(xx,yy,Shapes)
+            ahPoint.RotateAngle = ang*-18000/pi + 4500
+            If oCercleForm.Model.CheckBox11.State Then 
+            	dx = 200*cos(ang)
+            	dy = 200*sin(ang)
+            	InsereTexte(Mid$(oCercleForm.Model.TextBox13.Text, i, 1), xx + dx, yy + dy, Shapes)
+            End If
+        Next i
+    End If
+    &apos;-------------------------------------------------------------------------------------------------------------------------------------------------
+    If oCercleForm.Model.CheckBox6.State Then
+        InsereTexte oCercleForm.Model.TextBox3.Text, posx + (a / 2+300) * (1 - Cos(3 * Pi / 4)) - 5, posy + (a / 2+300) * (1 - Sin(3 * Pi / 4)) - 5, Shapes
+    End If
+    If oCercleForm.Model.CheckBox8.State Then
+        LesCercles(NbCercle).Centre = oCercleForm.Model.TextBox2.Text
+        LesCercles(NbCercle).nom = oCercleForm.Model.TextBox3.Text
+        LesCercles(NbCercle).rayon = a / 2
+        LesCercles(NbCercle).Shape = ActiveDocument.Shapes(UnCercle).Name
+        NbCercle = NbCercle + 1
+    End If
+    GroupeObjet(Shapes)
+    TermineDessin()
+&apos;    DeplaceSelection posx, posy
+End Sub
+
+Private Sub CercleForm_TextBox4_Change()
+    oCercleForm.Model.CheckBox2.Enabled = (Val(oCercleForm.Model.TextBox4.Text) &gt; 0)
+    oCercleForm.Model.TextBox8.Enabled = (Val(oCercleForm.Model.TextBox4.Text) &gt; 0 And oCercleForm.Model.CheckBox2.State)
+End Sub
+
+Private Sub CercleForm_TextBox5_Change()
+    oCercleForm.Model.CheckBox3.Enabled = (Val(oCercleForm.Model.TextBox5.Text) &gt; 0)
+    oCercleForm.Model.TextBox9.Enabled = (Val(oCercleForm.Model.TextBox5.Text) &gt; 0 And oCercleForm.Model.CheckBox3.State)
+End Sub
+
+Private Sub CercleForm_TextBox6_Change()
+    oCercleForm.Model.CheckBox4.Enabled = (Val(oCercleForm.Model.TextBox6.Text) &gt; 0)
+    oCercleForm.Model.TextBox10.Enabled = (Val(oCercleForm.Model.TextBox6.Text) &gt; 0 And oCercleForm.Model.CheckBox4.State)
+End Sub
+
+Private Sub CercleForm_TextBox7_Change()
+    oCercleForm.Model.CheckBox5.Enabled = (Val(oCercleForm.Model.TextBox7.Text) &gt; 0)
+    oCercleForm.Model.TextBox11.Enabled = (Val(oCercleForm.Model.TextBox7.Text) &gt; 0 And oCercleForm.Model.CheckBox5.State)
+End Sub
+
+Private Sub CercleForm_TextBox12_Change()
+    oCercleForm.Model.CheckBox11.Enabled = (Val(oCercleForm.Model.TextBox12.Text) &gt; 0)
+    oCercleForm.Model.TextBox13.Enabled = (Val(oCercleForm.Model.TextBox12.Text) &gt; 0 And oCercleForm.Model.CheckBox11.State)
+End Sub
+
+
+</script:module>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396319  -->
+  <question type="stack">
+    <name>
+      <text>Probabilités : Probabilité conditionnelle (Arbre)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Probabilités conditionnelles — Arbre pondéré</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Une entreprise fabrique des pièces mécaniques sur deux chaînes de montage :</p>
+<ul style="margin: 10px 0 10px 20px;">
+<li>La chaîne <strong>A</strong> produit {@p_a_pct@}% des pièces.</li>
+<li>La chaîne <strong>B</strong> produit le reste des pièces.</li>
+</ul>
+<p>On constate que :</p>
+<ul style="margin: 10px 0 10px 20px;">
+<li>{@pd_a_num@}% des pièces issues de la chaîne A sont défectueuses.</li>
+<li>{@pd_b_num@}% des pièces issues de la chaîne B sont défectueuses.</li>
+</ul>
+<p>On prélève une pièce au hasard dans la production totale (toutes les pièces ont la même probabilité d'être choisies). On note \(D\) l'événement "la pièce est défectueuse".</p>
+<p><strong>1.</strong> Calculer la probabilité que la pièce provienne de la chaîne <strong>A</strong>, sachant qu'elle est <strong>défectueuse</strong>.</p>
+<p><em>Le résultat sera donné sous forme de fraction irréductible.</em></p>
+<div style="margin: 15px 0 10px 0;">\(P_D(A) = \) [[input:ans_cond]] [[validation:ans_cond]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour calculer cette probabilité conditionnelle, on utilise la formule :<br><br>
+\[
+P_D(A) = \frac{P(A \cap D)}{P(D)}
+\]<br>
+<strong>1. Calcul des probabilités des intersections :</strong><br>
+\[
+P(A \cap D) = P(A) \times P_A(D) = {@p_a@} \times {@pd_a@} = {@p_a_d@}
+\]
+\[
+P(B \cap D) = P(B) \times P_B(D) = {@p_b@} \times {@pd_b@} = {@p_b_d@}
+\]<br>
+<strong>2. Calcul de la probabilité totale \(P(D)\) (formule des probabilités totales) :</strong><br>
+\[
+P(D) = P(A \cap D) + P(B \cap D) = {@p_a_d@} + {@p_b_d@} = {@p_d@}
+\]<br>
+<strong>3. Application de la formule conditionnelle :</strong><br>
+\[  P_D(A) = \frac {@p_a_d@}{{@p_d@}} = {@ans_correct@} \]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>/* Fonction utilitaire CORRECTE pour Maxima */
+ri(a,b) := a + rand(b - a + 1) - 1;
+
+/* Génération des paramètres */
+p_a_num: ri(4, 8);
+p_a: p_a_num / 10;
+p_b: 1 - p_a;
+p_a_pct: p_a_num * 10;
+
+pd_a_num: ri(2, 8);
+pd_a: pd_a_num / 100;
+
+pd_b_num: ri(1, 5);
+pd_b: pd_b_num / 100;
+
+/* Calculs intermédiaires */
+p_a_d: p_a * pd_a;
+p_b_d: p_b * pd_b;
+p_d: p_a_d + p_b_d;
+
+/* Réponse attendue */
+ans_correct: p_a_d / p_d;
+
+/* Erreurs classiques */
+/* Erreur 1 : A calculé l'intersection P(A inter D) au lieu de la conditionnelle */
+err_inter: p_a_d;
+/* Erreur 2 : A inversé le conditionnement (a calculé P_A(D) au lieu de P_D(A)) */
+err_reverse: pd_a;
+/* Erreur 3 : A donné la probabilité marginale P(A) (ignoré la condition) */
+err_marg: p_a;
+/* Erreur 4 : A calculé la probabilité que ça vienne de B sachant D (l'événement complémentaire) */
+err_complement: p_b_d / p_d;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>P(A)={@p_a_pct@}%, P_A(D)={@pd_a_num@}%, P_B(D)={@pd_b_num@}%, P_D(A)={@ans_correct@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:probabilites-conditionnelles-arbre</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_cond</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>1</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_cond</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> La probabilité conditionnelle est correcte et est bien donnée sous forme de fraction irréductible.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A calculé P(A inter D)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_cond</sans>
+        <tans>err_inter</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-INTER</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Il manque la division !</strong> Vous avez calculé \(P(A \cap D)\). Pour obtenir la probabilité <strong>conditionnelle</strong> \(P_D(A)\), vous devez diviser ce résultat par la probabilité totale \(P(D)\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-INTER</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Inversion du conditionnement P_A(D)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_cond</sans>
+        <tans>err_reverse</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-REVERSE</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Événements inversés !</strong> Vous avez calculé \(P_A(D)\) (probabilité que ce soit défectueux sachant que ça vient de A). On vous demande \(P_D(A)\) (probabilité que ça vienne de A sachant que c'est défectueux). Faites bien attention à l'ordre dans la notation.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-REVERSE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : A donné P(A) au lieu de P_D(A)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_cond</sans>
+        <tans>err_marg</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MARG</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli de la condition !</strong> Vous avez donné la probabilité marginale \(P(A)\). L'information "sachant qu'elle est défectueuse" modifie la probabilité, vous ne pouvez pas simplement donner {@p_a_pct@}%.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-MARG</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur : A calculé P_D(B) au lieu de P_D(A)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_cond</sans>
+        <tans>err_complement</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-COMPLEMENT</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise chaîne !</strong> Vous avez calculé la probabilité que la pièce vienne de la chaîne <strong>B</strong> sachant qu'elle est défectueuse (\(P_D(B)\)). L'énoncé demande la probabilité que ça vienne de la chaîne <strong>A</strong> (\(P_D(A)\)).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la méthode :<br>1. Calculez \(P(A \cap D)\) et \(P(B \cap D)\)<br>2. Calculez la probabilité totale \(P(D)\) en les additionnant<br>3. Appliquez \(P_D(A) = \frac{P(A \cap D)}{P(D)}\)<br><em>(Attention à bien simplifier votre fraction finale).</em></div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

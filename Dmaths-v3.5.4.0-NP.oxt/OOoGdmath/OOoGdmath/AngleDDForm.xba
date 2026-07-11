@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="AngleDDForm" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+Dim oAngleDDForm as Object
+
+Sub Main 
+REM &apos;&apos; and AfficheAngleDDForm() by Gisbert
+&apos;&apos;	oAngleDDForm = LoadDialog(&quot;OOoGdmath&quot;,&quot;AngleDDForm&quot;)
+&apos;&apos;	ChangeTitreDialog(oAngleDDForm)
+&apos;    ChargeCouleurDefaut oAngleDDForm.Model.ImageControl1
+&apos;	RestaureForm(oAngleDDForm)
+&apos;&apos;	oAngleDDForm.Execute()
+	AfficheAngleDDForm()
+End Sub
+
+Sub AfficheAngleDDForm()
+	oAngleDDForm = LoadDialog(&quot;OOoGdmath&quot;,&quot;AngleDDForm&quot;)
+	ChangeTitreDialog(oAngleDDForm)
+    oAngleDDForm.Model.Image1.ImageURL=fCheminImages &amp; &quot;angle.gif&quot;
+&apos;&apos;	RestaureForm(oAngleDDForm)
+	oAngleDDForm.Execute()
+End Sub
+
+
+
+Private Sub AngleDDForm_CheckBox1_Click()
+    oAngleDDForm.Model.TextField3.Enabled = oAngleDDForm.Model.CheckBox1.State
+End Sub
+
+Private Sub AngleDDForm_CommandButton1_Click()
+Dim secArray(0 to 2, 0 to 1) As Single
+Dim posx, posy, tt, Debut, delta, x0, y0, x1, y1, x2, y2, xn, yn
+Dim UneCourbe
+Dim Shapes as Object
+Dim LaBissectrice as Object
+
+    oAngleDDForm.EndExecute()
+    sauveForm(oAngleDDForm)
+    InitialiseDessin(False)
+    Shapes = InitialiseGroupe()
+    PointInsertion posx, posy
+    tt = oAngleDDForm.Model.TextField1.Text
+    RemplaceVirgulePoint tt
+    Debut = Val(tt)
+    tt = oAngleDDForm.Model.TextField2.Text
+    RemplaceVirgulePoint tt
+    delta = Abs(Val(tt))
+    x0 = posx
+    y0 = posy
+    x1 = x0 + 5000 * Cos(Debut * Pi / 180)
+    y1 = y0 - 5000 * Sin(Debut * Pi / 180)
+    x2 = x0 + 5000 * Cos((Debut + delta) * Pi / 180)
+    y2 = y0 - 5000 * Sin((Debut + delta) * Pi / 180)
+    secArray(0, 0) = x1
+    secArray(0, 1) = y1
+    secArray(1, 0) = x0
+    secArray(1, 1) = y0
+    secArray(2, 0) = x2
+    secArray(2, 1) = y2
+    InserePolygone secArray(), 3, Shapes, oAngleDDForm.Model.ImageControl2
+    If oAngleDDForm.Model.CheckBox2.State Then
+    	if delta = 90 then
+	        MarqueAngleDroit x0, y0, x2, y2, Shapes, oAngleDDForm.Model.ImageControl2
+	    Else
+	        MarqueAngle x1, y1, x0, y0, x2, y2, (delta &gt; 180), 1, 0, Shapes, oAngleDDForm.Model.ImageControl2
+	    End If
+	End If
+    If oAngleDDForm.Model.CheckBox3.State Then 
+    	NormaliseCoordonnees( xn, yn, x1, y1, x0, y0, x2, y2, -600)
+    	InsereTexte Str(delta) &amp; &quot;°&quot;, xn, yn, Shapes, 0, 0, 0
+    End if
+    If oAngleDDForm.Model.CheckBox1.State Then
+        If Len(oAngleDDForm.Model.TextField3.Text) = 3 Then
+            InsereTexte Mid$(oAngleDDForm.Model.TextField3.Text, 1, 1), x1 + 500 * Sin(Debut * Pi / 180), y1 + 500 * Cos(Debut * Pi / 180), Shapes, 0, 0, 0
+	    	NormaliseCoordonnees( xn, yn, x1, y1, x0, y0, x2, y2)
+	        InsereTexte Mid$(oAngleDDForm.Model.TextField3.Text, 2, 1), xn, yn, Shapes, 0, 0, 0
+            InsereTexte Mid$(oAngleDDForm.Model.TextField3.Text, 3, 1), x2 - 500 * Sin((Debut + delta) * Pi / 180), y2 - 500 * Cos((Debut + delta) * Pi / 180), Shapes, 0, 0 ,0 
+		end if
+	
+		InsereFormuleOle2(oAngleDDForm.Model.TextField3.Text , &quot;widehat&quot;, x0 + 1000 * Sin((Debut + delta / 2) * Pi / 180) , y0 - 1000 * Cos((Debut + delta / 2) * Pi / 180), Shapes)
+		
+		rem  ancienne version	
+      &apos;  InsereTexte &quot;ang(&quot; &amp; oAngleDDForm.Model.TextField3.Text &amp; &quot;)&quot; , x0 + 1000 * Sin((Debut + delta / 2) * Pi / 180), y0 - 1000 * Cos((Debut + delta / 2) * Pi / 180), Shapes, 0, 0, 0, True
+       
+    End If
+    If oAngleDDForm.Model.CheckBox4.State Then
+        LaBissectrice=TraceBissectrice(x1, y1, x0, y0, x2, y2, Shapes)
+        IOAttribut LaBissectrice, oAngleDDForm.Model.ImageControl1
+    End If
+    GroupeObjet(Shapes)
+    TermineDessin()
+End Sub
+
+Private Sub AngleDDForm_CommandButton2_Click()
+    oAngleDDForm.EndExecute()
+End Sub
+
+Private Sub AngleDDForm_Image1_Click()
+    ChangeCouleur oAngleDDForm.Model.ImageControl1
+End Sub
+
+Private Sub AngleDDForm_Image2_Click()
+    ChangeCouleur oAngleDDForm.Model.ImageControl2
+End Sub
+
+
+</script:module>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="API_Win" script:language="StarBasic">REM  *****  BASIC  *****
+Rem module créé par Didier Dorange-Pattoret le 24 décembre 2015
+
+
+Function IsLO5Win64 As Boolean
+	If (getGuitype = 1 And Instr(GetRepertoirePath(&quot;inst&quot;),&quot;x86&quot;) = 0 and OOoNumVersion()&gt;=500 and ENVIRON(&quot;PROCESSOR_ARCHITECTURE&quot;)=&quot;AMD64&quot;) Then
+		IsLO5Win64 = True
+	Else
+		IsLO5Win64 = False
+	Endif
+End Function
+
+
+Function GetRepertoirePath(sInstPath as String) as String &apos;donne le répertoire correspondant
+	Dim  oPathSubstSrv as Object
+	Dim sPath as String
+		sInstPath = &quot;$(&quot;+sInstPath+&quot;)&quot;
+		oPathSubstSrv = createUnoService(&quot;com.sun.star.comp.framework.PathSubstitution&quot;)
+		sPath = ConvertFromUrl(oPathSubstSrv.getSubstituteVariableValue(sInstPath))
+		GetRepertoirePath = sPath
+End Function
+
+
+Function OOoNumVersion() As Integer
+	  Dim aSettings, aConfigProvider
+	  Dim aParams2(0) As new com.sun.star.beans.PropertyValue
+	  Dim sProvider$, sAccess$
+	  sProvider = &quot;com.sun.star.configuration.ConfigurationProvider&quot;
+	  sAccess   = &quot;com.sun.star.configuration.ConfigurationAccess&quot;
+	  aConfigProvider = createUnoService(sProvider)
+	  aParams2(0).Name = &quot;nodepath&quot;
+	  aParams2(0).Value = &quot;/org.openoffice.Setup/Product&quot;
+	  aSettings = aConfigProvider.createInstanceWithArguments(sAccess, aParams2())
+	  If aSettings.hasbyname(&quot;ooSetupVersionAboutBox&quot;) Then
+	  sOOOVersion = aSettings.getbyname(&quot;ooSetupVersionAboutBox&quot;)
+	  Else
+	  sOOOVersion = aSettings.getbyname(&quot;ooSetupVersion&quot;)
+	  EndIf
+	  If Len(sOOOVersion) = 3 Then sOOOVersion = sOOOVersion &amp; &quot;.0&quot;
+	  OOoNumVersion = Cint(Mid(sOOOVersion,1,1))*100 + Cint(Mid(sOOOVersion,3,1))*10 + Cint(Mid(sOOOVersion,5,1))  
+End Function
+
+
+</script:module>

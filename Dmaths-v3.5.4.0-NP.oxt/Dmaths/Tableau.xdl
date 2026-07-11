@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Tableau" dlg:left="118" dlg:top="82" dlg:width="185" dlg:height="115" dlg:help-text="&amp;1522.Tableau.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1523.Tableau.Title">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="7" dlg:top="13" dlg:width="58" dlg:height="12" dlg:help-text="&amp;1524.Tableau.Label1.HelpText" dlg:value="&amp;1525.Tableau.Label1.Label" dlg:align="right"/>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="1" dlg:left="70" dlg:top="11" dlg:width="14" dlg:height="14" dlg:help-text="&amp;1526.Tableau.TextField1.HelpText" dlg:align="center" dlg:value="&amp;1527.Tableau.TextField1.Text"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="2" dlg:left="92" dlg:top="13" dlg:width="62" dlg:height="12" dlg:help-text="&amp;1528.Tableau.Label2.HelpText" dlg:value="&amp;1529.Tableau.Label2.Label" dlg:align="right"/>
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="3" dlg:left="160" dlg:top="11" dlg:width="14" dlg:height="14" dlg:help-text="&amp;1530.Tableau.TextField2.HelpText" dlg:align="center" dlg:value="&amp;1531.Tableau.TextField2.Text"/>
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="4" dlg:left="15" dlg:top="34" dlg:width="68" dlg:height="13" dlg:help-text="&amp;1532.Tableau.CheckBox1.HelpText" dlg:value="&amp;1533.Tableau.CheckBox1.Label" dlg:checked="false"/>
+  <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="5" dlg:left="15" dlg:top="50" dlg:width="68" dlg:height="13" dlg:help-text="&amp;1534.Tableau.CheckBox2.HelpText" dlg:value="&amp;1535.Tableau.CheckBox2.Label" dlg:checked="false"/>
+  <dlg:checkbox dlg:id="CheckBox3" dlg:tab-index="6" dlg:left="92" dlg:top="33" dlg:width="85" dlg:height="13" dlg:help-text="&amp;1536.Tableau.CheckBox3.HelpText" dlg:value="&amp;1537.Tableau.CheckBox3.Label" dlg:checked="false"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="7" dlg:left="19" dlg:top="80" dlg:width="55" dlg:height="19" dlg:help-text="&amp;1538.Tableau.CommandButton1.HelpText" dlg:value="&amp;1539.Tableau.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Tableau.InsereTableau" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="8" dlg:left="97" dlg:top="80" dlg:width="55" dlg:height="19" dlg:help-text="&amp;1540.Tableau.CommandButton2.HelpText" dlg:value="&amp;1541.Tableau.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Tableau.FinCreationTableau" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:checkbox dlg:id="CheckBox4" dlg:tab-index="9" dlg:left="92" dlg:top="50" dlg:width="85" dlg:height="13" dlg:help-text="&amp;1542.Tableau.CheckBox4.HelpText" dlg:value="&amp;1543.Tableau.CheckBox4.Label" dlg:checked="false"/>
+ </dlg:bulletinboard>
+</dlg:window>

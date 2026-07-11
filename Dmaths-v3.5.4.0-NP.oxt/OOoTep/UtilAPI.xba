@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="UtilAPI" script:language="StarBasic">&apos;**********************************************************************
+&apos; UtilAPI module
+&apos;
+&apos; Module of utility routines for working with the OOo API.
+&apos; These utilities are not specific to Draw, or Writer, 
+&apos; or Calc, for instance.
+&apos;
+&apos;**********************************************************************
+&apos; Copyright (c) 2003 - 2004 Danny Brewer
+&apos; d29583@groovegarden.com
+&apos;
+&apos; This library is free software; you can redistribute it and/or
+&apos; modify it under the terms of the GNU Lesser General Public
+&apos; License as published by the Free Software Foundation; either
+&apos; version 2.1 of the License, or (at your option) any later version.
+&apos;
+&apos; This library is distributed in the hope that it will be useful, 
+&apos; but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos; Lesser General Public License for more details.
+&apos;
+&apos; You should have received a copy of the GNU Lesser General Public
+&apos; License along with this library; if not, write to the Free Software
+&apos; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 - 1307 USA
+&apos;
+&apos; See: http://www.gnu.org/licenses/lgpl.html
+&apos;
+&apos;**********************************************************************
+&apos; If you make changes, please append to the change log below.
+&apos;
+&apos; Change Log
+&apos;  Danny Brewer   Revised 2004 - 10 - 25 - 01
+&apos;
+&apos;**********************************************************************
+
+
+Function GetDocumentFrame( oDoc As Object ) As Object
+Dim oFrame As Object
+Dim oCtrl as Object
+ 
+	&apos; If the caller gave us the document model...
+	If oDoc.supportsService( &quot;com.sun.star.document.OfficeDocument&quot; ) Then
+		&apos; ...then get the controller from that.
+		oCtrl = oDoc.getCurrentController()
+		&apos; ...then get the frame from the controller.
+		oFrame = oCtrl.getFrame()
+
+		&apos; If the caller gave us a document controller...
+	ElseIf HasUnoInterfaces( oDoc, &quot;com.sun.star.frame.XController&quot; ) Then
+		oCtrl = oDoc
+		&apos; ...then get the frame from the controller.
+		oFrame = oCtrl.getFrame()
+ 
+		&apos; If the caller gave us the document frame...
+	ElseIf HasUnoInterfaces( oDoc, &quot;com.sun.star.frame.XFrame&quot; ) Then
+		&apos; ...thanks! That&apos;s just what we wanted!
+		oFrame = oDoc
+	Else
+		&apos; The caller did not give us what we expected!
+		MsgBox1 &quot;GetDocumentFrame called with incorrect parameter.&quot;
+	EndIf
+ 
+	GetDocumentFrame() = oFrame
+End Function
+
+Sub DocumentDispatch( ByVal oDocumentFrame As Object, ByVal cURL As String, Optional cTargetFrameName, Optional nSearchFlags, Optional aDispatchArgs )
+Dim oDispatchHelper as Object
+ 
+	&apos; If they gave us the wrong parameter...
+	If Not IsNull( oDocumentFrame ) Then
+		If Not HasUnoInterfaces( oDocumentFrame, &quot;com.sun.star.frame.XFrame&quot; ) Then
+			&apos; Be sure that we&apos;ve got the document frame.
+			&apos; Someone might have passed us the document model or one of
+			&apos; its controller&apos;s.
+			oDocumentFrame = GetDocumentFrame( oDocumentFrame )
+		EndIf
+	EndIf
+ 
+	If IsMissing( cTargetFrameName ) Then
+		cTargetFrameName = &quot;&quot;
+	EndIf
+	If IsMissing( nSearchFlags ) Then
+		nSearchFlags = 0
+	EndIf
+	If IsMissing( aDispatchArgs ) Then
+		aDispatchArgs = Array()
+	EndIf
+ 
+	oDispatchHelper = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+	oDispatchHelper.executeDispatch( oDocumentFrame, cURL, cTargetFrameName, nSearchFlags, aDispatchArgs )
+End Sub 
+
+Sub ClipBoardToText(cText as String)
+dim oDoc
+dim oText
+dim oCursor
+
+	oDoc = StarDesktop.loadComponentFromURL( &quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0, Array( MakePropertyValue( &quot;Hidden&quot;, True ) ) )
+	&apos; Get the text of the document.
+	oText = oDoc.getText()
+	&apos; Get a cursor that can move over or to any part of the text.
+	oCursor = oText.createTextCursor()
+
+	&apos; Insert text and paragraph breaks into the text, at the cursor position.
+	oText.insertString( oCursor, cText, False )
+
+	ClipboardPaste( oDoc )
+	SelectAll( oDoc )
+	cText = oText.GetString(oCursor)
+	oDoc.close( True )
+End Sub
+
+Sub TextToClipboard( ByVal cText As String )
+dim oDoc
+dim oText
+dim oCursor
+
+	oDoc = StarDesktop.loadComponentFromURL( &quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0, Array( MakePropertyValue( &quot;Hidden&quot;, True ) ) )
+
+	&apos; Get the text of the document.
+	oText = oDoc.getText()
+	&apos; Get a cursor that can move over or to any part of the text.
+	oCursor = oText.createTextCursor()
+
+	&apos; Insert text and paragraph breaks into the text, at the cursor position.
+	oText.insertString( oCursor, cText, False )
+
+	SelectAll( oDoc )
+	ClipboardCopy( oDoc )
+
+	oDoc.close( True )
+End Sub
+
+Sub SelectAll( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:SelectAll&quot; )
+End Sub
+
+Sub ClipboardCopy( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:Copy&quot; )
+End Sub
+
+Sub ClipboardPaste( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:Paste&quot; )
+End Sub
+
+Function MakePropertyValue( Optional cName As String, Optional uValue ) As com.sun.star.beans.PropertyValue
+Dim oPropertyValue as New com.sun.star.beans.PropertyValue
+	oPropertyValue = createUnoStruct( &quot;com.sun.star.beans.PropertyValue&quot; )
+	If Not IsMissing( cName ) Then
+		oPropertyValue.Name = cName
+	EndIf
+	If Not IsMissing( uValue ) Then
+		oPropertyValue.Value = uValue
+	EndIf
+	MakePropertyValue() = oPropertyValue
+End Function 
+
+
+</script:module>

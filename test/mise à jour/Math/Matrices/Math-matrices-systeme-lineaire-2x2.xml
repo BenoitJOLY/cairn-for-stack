@@ -1,0 +1,314 @@
+L'analyse de cette question sur les systèmes linéaires révèle une **approche mathématique exemplaire** (construction inversée parfaite selon le Pôle 2.3 pour garantir des solutions entières). 
+
+Cependant, le code contient **plusieurs non-conformités majeures** vis-à-vis du Document de Spécification, dont une qui peut **provoquer un crash silencieux de l'import Moodle**.
+
+### 🛑 Les Non-Conformités Détectées
+
+1. **ALERT FATAL (Pôle 1.3) :** Il manque l'espace avant la fermeture du CDATA dans `<specificfeedback>`. Risque de corruption du PRT lors de l'import.
+2. **ALERT LOGS (Pôle 2.1) :** Quasiment toutes les instructions Maxima se terminent par un point-virgule `;` au lieu d'un dollar `$`. Cela va inonder les logs de débogage de Moodle avec les résultats d'évaluation intermédiaires.
+3. **Versionnage (Pôle 1.2) :** `<stackversion>` est à `2026010500` au lieu de `2024092500`.
+4. **Terminaison de Cascade (Pôle 4.9) :** Le nœud 3 fait office de "Fallback" de manière sauvage dans sa branche Fausse. La règle impose un nœud dédié (Nœud 4) pour clore l'arbre.
+
+### 💡 Subtilité Archivistique (À ajouter au document)
+Le code utilise une fonction `rnz` (Random Non-Zero) et un pattern `sconcat` pour formater l'affichage des équations (éviter le `+ -` disgracieux). C'est une excellente pratique qui mérite d'être standardisée.
+
+---
+
+### 📝 Mises à jour proposées pour le Document de Spécification
+
+#### ➕ Ajout dans le **PÔLE 2.9** (Redéfinition Locale)
+
+*Ajouter après le paragraphe sur le tirage aléatoire inclusif :*
+```markdown
+*   **OBLIGATOIRE (Fonction Anti-Zéro) :** Lorsqu'un tirage aléatoire nécessite impérativement des coefficients non nuls (ex: pour éviter des équations triviales comme `0x + 2y = 4`), il est **OBLIGATOIRE** de créer une fonction utilitaire locale d'exclusion (ex: `rnz(a,b) := block([v], v: ri(a,b), if v=0 then rnz(a,b) else v)$`) plutôt que d'utiliser une boucle `while` en aval. Cela garantit la propreté syntaxique à la source.
+```
+
+#### ➕ Ajout dans le **PÔLE 2.2** (Exception Squelette HTML)
+
+*Ajouter à la fin de l'exception :*
+```markdown
+*   **OBLIGATOIRE (Affichage conditionnel des signes) :** Lors de la génération de chaînes représentant des équations algébriques (ex: `2x - 3y = 5`), il est **INTERDIT** de laisser le CAS concaténer naïvement un opérateur `+` avec un coefficient négatif (ce qui donnerait `2x + -3y = 5`). Il est **OBLIGATOIRE** d'utiliser un `if` Maxima dans un `sconcat` pour remplacer dynamiquement `+ -` par `- `.
+```
+
+---
+
+### 🛠️ Le Code XML Corrigé
+
+Voici la version strictement conforme, prête à être importée sans risque.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396251  -->
+  <question type="stack">
+    <name>
+      <text>Matrices : Résolution d'un système linéaire (2×2)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Systèmes linéaires — Résolution</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Résoudre le système suivant :</p>
+<div style="text-align: center; margin: 15px 0; font-size: 1.1rem;">
+\[
+\begin{cases}
+{@eq1@} \\
+{@eq2@}
+\end{cases}
+\]
+</div>
+<p style="font-size: .85rem; color: #64748b; margin-bottom: 8px;"><em>Saisir le couple solution sous la forme : <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">matrix([x],[y])</code></em></p>
+<div>\((x, y) = \) [[input:ans_sys]] [[validation:ans_sys]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée (par les matrices)</div>
+<div style="font-size: .9rem;">
+Le système peut s'écrire sous forme matricielle \(AX = B\) avec :<br><br>
+\(A = \begin{pmatrix} {@a@} & {@b@} \\ {@c@} & {@d@} \end{pmatrix}\), &nbsp; \(X = \begin{pmatrix} x \\ y \end{pmatrix}\) &nbsp; et &nbsp; \(B = \begin{pmatrix} {@e@} \\ {@f@} \end{pmatrix}\)<br><br>
+Si \(A\) est inversible (\(\det(A) \neq 0\)), alors \(X = A^{-1}B\).<br><br>
+<strong>1. Calcul du déterminant :</strong><br>
+\(\det(A) = ({@a@})({@d@}) - ({@b@})({@c@}) = {@a*d@} - ({@b*c@}) = {@det_A@}\)<br><br>
+<strong>2. Calcul de l'inverse :</strong><br>
+\(A^{-1} = \frac{1}{{@det_A@}} \begin{pmatrix} {@d@} & -{@b@} \\ -{@c@} & {@a@} \end{pmatrix}\)<br><br>
+<strong>3. Multiplication \(A^{-1}B\) :</strong><br>
+\[
+X = \frac{1}{{@det_A@}} \begin{pmatrix} {@d@} & -{@b@} \\ -{@c@} & {@a@} \end{pmatrix} \begin{pmatrix} {@e@} \\ {@f@} \end{pmatrix} = \frac{1}{{@det_A@}} \begin{pmatrix} {@d*e - b*f@} \\ {-c*e + a*f@} \end{pmatrix} = {@Sol@}
+\]<br>
+La solution du système est donc \((x, y) = ({@x_sol@}, {@y_sol@})\).
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Fonctions utilitaires */
+ri(a,b) := a + rand(b - a + 1)$
+rnz(a,b) := block([v], v: ri(a,b), if v=0 then rnz(a,b) else v)$
+ 
+/* Génération des coefficients (non nuls pour éviter les cas triviaux) */
+a: rnz(-4,4)$
+b: rnz(-4,4)$
+c: rnz(-4,4)$
+d: rnz(-4,4)$
+
+/* On s'assure que le déterminant n'est pas nul */
+while a*d - b*c = 0 do (
+    a: rnz(-4,4),
+    b: rnz(-4,4),
+    c: rnz(-4,4),
+    d: rnz(-4,4)
+)$ 
+
+/* Génération d'une solution entière simple (Construction inversée) */
+x_sol: ri(-4,4)$
+y_sol: ri(-4,4)$
+
+/* Calcul des seconds membres pour que la solution corresponde */
+e: a*x_sol + b*y_sol$
+f: c*x_sol + d*y_sol$
+
+/* Affichage propre des équations (pour éviter les "+ -") */
+eq1: sconcat(a, "x ", if b>0 then sconcat("+ ", b, "y = ", e) else sconcat("- ", abs(b), "y = ", e))$
+eq2: sconcat(c, "x ", if d>0 then sconcat("+ ", d, "y = ", f) else sconcat("- ", abs(d), "y = ", f))$
+
+/* Matrices et calculs pour la correction */
+A: matrix([a,b],[c,d])$
+B: matrix([e],[f])$
+det_A: a*d - b*c$
+Sol: matrix([x_sol],[y_sol])$
+
+/* Erreurs classiques */
+err_swap: matrix([y_sol],[x_sol])$
+err_sign_x: matrix([-x_sol],[y_sol])$
+err_sign_y: matrix([x_sol],[-y_sol])$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>Système : {@eq1@} / {@eq2@} | Solution : ({@x_sol@}, {@y_sol@})</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:linear-system-2x2</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_sys</name>
+      <type>matrix</type>
+      <tans>Sol</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>matrix([x],[y])</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sys</sans>
+        <tans>Sol</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Excellent !</strong> Le couple solution est correct.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : x et y inversés</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sys</sans>
+        <tans>err_swap</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SWAP</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Variables inversées !</strong> Vous avez trouvé les bons nombres, mais inversé \(x\) et \(y\). Vérifiez toujours en remplaçant dans la <strong>première équation</strong> pour savoir qui est qui.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SWAP</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Erreur de signe sur x</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sys</sans>
+        <tans>err_sign_x</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN-X</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe sur \(x\) !</strong> Le calcul de \(y\) est bon, mais \(x\) a le signe contraire. Si vous utilisez les matrices, vérifiez les signes dans \(A^{-1}\) (la diagonale secondaire change de signe).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SIGN-X</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Erreur de signe sur y</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sys</sans>
+        <tans>err_sign_y</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN-Y</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe sur \(y\) !</strong> Le calcul de \(x\) est bon, mais \(y\) a le signe contraire. Si vous utilisez les matrices, vérifiez les signes dans \(A^{-1}\) (la diagonale secondaire change de signe).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SIGN-Y</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur générique (Fallback)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sys</sans>
+        <tans>Sol</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-GENERIC</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Résolvez le système par substitution, combinaisons linéaires ou matrices (\(X = A^{-1}B\)) et n'oubliez pas de <strong>vérifier votre réponse</strong> en remplaçant \(x\) et \(y\) dans les deux équations.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-FALLBACK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>
+```

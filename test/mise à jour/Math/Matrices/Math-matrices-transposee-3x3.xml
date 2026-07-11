@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396248  -->
+  <question type="stack">
+    <name>
+      <text>Matrices : Transposée d'une matrice (3×3)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Matrices — Transposée</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit la matrice :</p>
+<div style="text-align: center; margin: 15px 0;">\(M = {@M@}\)</div>
+<p><strong>Déterminer</strong> la transposée de \(M\), notée \(M^T\).</p>
+<p style="font-size: .85rem; color: #64748b; margin-bottom: 8px;"><em>Saisir sous la forme : <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">matrix([a,b,c],[d,e,f],[g,h,i])</code></em></p>
+<div>\(M^T = \) [[input:ans_t]] [[validation:ans_t]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+La <strong>transposée</strong> d'une matrice est obtenue en échangeant les <strong>lignes</strong> et les <strong>colonnes</strong>.<br>
+Autrement dit, le coefficient situé à la ligne \(i\) et colonne \(j\) de \(M\) devient le coefficient situé à la ligne \(j\) et colonne \(i\) de \(M^T\) :<br><br>
+\[
+(M^T)_{ij} = M_{ji}
+\]<br>
+<strong>Application :</strong><br><br>
+\[
+M^T = {@M_t@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Fonction utilitaire : entier aléatoire entre a et b */
+ri(a,b) := a + rand(b - a + 1)$ 
+
+/* Génération des 9 coefficients */
+a11: ri(-3,3)$ a12: ri(-3,3)$ a13: ri(-3,3)$ a21: ri(-3,3)$ a22: ri(-3,3)$ a23: ri(-3,3)$ a31: ri(-3,3)$ a32: ri(-3,3)$ a33: ri(-3,3)$ 
+/* Construction de la matrice */
+M: matrix([a11,a12,a13],[a21,a22,a23],[a31,a32,a33])$ 
+/* Transposée correcte */
+M_t: transpose(M)$ 
+/* Erreurs classiques de symétrie */
+err_identite: M$ err_miroir_h: matrix([a13, a12, a11], [a23, a22, a21], [a33, a32, a31])$ err_miroir_v: matrix([a31, a32, a33], [a21, a22, a23], [a11, a12, a13])$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>M={@M@}, M^T={@M_t@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:matrix-transpose-3x3</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_t</name>
+      <type>matrix</type>
+      <tans>M_t</tans>
+      <boxsize>25</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>matrix([ , , ],[ , , ],[ , , ])</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_t</sans>
+        <tans>M_t</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Les lignes et les colonnes ont bien été échangées.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A recopié la matrice identique</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_t</sans>
+        <tans>err_identite</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-IDENTITE</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Rien n'a changé !</strong> Vous avez recopié la matrice \(M\) telle quelle. La transposée nécessite d'<strong>échanger les lignes et les colonnes</strong> (le coefficient en haut à droite passe en bas à gauche, etc.).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-IDENTITE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Miroir horizontal (inversion des colonnes)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_t</sans>
+        <tans>err_miroir_h</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MIROIR-H</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise symétrie !</strong> Vous avez inversé l'ordre des colonnes (effet miroir gauche-droite). La transposée n'est <strong>pas</strong> un miroir, c'est l'échange des <strong>lignes</strong> avec les <strong>colonnes</strong> (la 1ère ligne devient la 1ère colonne).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-MIROIR-H</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Miroir vertical (inversion des lignes)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_t</sans>
+        <tans>err_miroir_v</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MIROIR-V</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise symétrie !</strong> Vous avez inversé l'ordre des lignes (effet miroir haut-bas). La transposée consiste à prendre la <strong>1ère colonne</strong> pour en faire la <strong>1ère ligne</strong>, la <strong>2ème colonne</strong> pour la <strong>2ème ligne</strong>, etc.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-MIROIR-V</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur générique (Fallback)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_t</sans>
+        <tans>M_t</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-GENERIC</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Pour transposer, échangez lignes et colonnes :<br>• La 1ère ligne de \(M\) devient la 1ère colonne de \(M^T\)<br>• La 2ème ligne de \(M\) devient la 2ème colonne de \(M^T\)<br>• La 3ème ligne de \(M\) devient la 3ème colonne de \(M^T\)</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-FALLBACK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>

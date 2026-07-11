@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TrapezeCode" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Dim oTrapezeForm as Object
+
+Sub Main
+	oTrapezeForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;TrapezeForm&quot;)
+	ChangeTitreDialog(oTrapezeForm)
+&apos;	RestaureForm(oTrapezeForm)
+    oTrapezeForm.Model.OptionButton1.ImageURL=fCheminImages &amp; &quot;tra1.gif&quot;
+    oTrapezeForm.Model.OptionButton2.ImageURL=fCheminImages &amp; &quot;tra2.gif&quot;
+    oTrapezeForm.Model.OptionButton3.ImageURL=fCheminImages &amp; &quot;tra3.gif&quot;
+    oTrapezeForm.Model.OptionButton4.ImageURL=fCheminImages &amp; &quot;tra4.gif&quot;
+    oTrapezeForm.Model.OptionButton5.ImageURL=fCheminImages &amp; &quot;tra5.gif&quot;
+    oTrapezeForm.Model.ImageControl1.ImageURL=fCheminImages &amp; &quot;tra6.gif&quot;
+	oTrapezeForm.Execute()
+End Sub
+
+Private Sub TrapezeForm_OptionButton1_Click()
+	oTrapezeForm.Model.CheckBox9.Enabled = True
+	TrapezeForm_CheckBox9_Click
+
+	oTrapezeForm.Model.Label1.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label5.Label = &quot;cm&quot;
+
+	oTrapezeForm.Model.Label2.Label = &quot;c&quot;
+	oTrapezeForm.Model.Label6.Label = &quot;cm&quot;
+	
+	oTrapezeForm.Model.Label3.Label = &quot;e&quot;
+	oTrapezeForm.Model.Label3.FontName = &quot;Tahoma&quot;
+	oTrapezeForm.Model.Label7.Label = &quot;cm&quot;
+
+	oTrapezeForm.Model.Label4.Label = &quot;h&quot;
+	oTrapezeForm.Model.Label4.FontName = &quot;Tahoma&quot;
+	oTrapezeForm.Model.Label8.Label = &quot;cm&quot;
+End Sub
+
+Private Sub TrapezeForm_OptionButton2_Click()
+	oTrapezeForm.Model.CheckBox9.Enabled = False
+	TrapezeForm_CheckBox9_Click
+
+	oTrapezeForm.Model.Label1.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label5.Label = &quot;cm&quot;
+
+	oTrapezeForm.Model.Label2.Label = &quot;c&quot;
+	oTrapezeForm.Model.Label6.Label = &quot;cm&quot;
+	
+	oTrapezeForm.Model.Label3.Label = &quot;d&quot;
+	oTrapezeForm.Model.Label3.FontName = &quot;Tahoma&quot;
+	oTrapezeForm.Model.Label7.Label = &quot;cm&quot;
+
+	oTrapezeForm.Model.Label4.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label4.FontName = &quot;Symbol&quot;
+	oTrapezeForm.Model.Label8.Label = &quot;°&quot;
+End Sub
+
+Private Sub TrapezeForm_OptionButton3_Click()
+	oTrapezeForm.Model.CheckBox9.Enabled = True
+	TrapezeForm_CheckBox9_Click
+	
+	oTrapezeForm.Model.Label1.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label5.Label = &quot;cm&quot;
+
+	oTrapezeForm.Model.Label2.Label = &quot;h&quot;
+	oTrapezeForm.Model.Label6.Label = &quot;cm&quot;
+	
+	oTrapezeForm.Model.Label3.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label3.FontName = &quot;Symbol&quot;
+	oTrapezeForm.Model.Label7.Label = &quot;°&quot;
+
+	oTrapezeForm.Model.Label4.Label = &quot;b&quot;
+	oTrapezeForm.Model.Label4.FontName = &quot;Symbol&quot;
+	oTrapezeForm.Model.Label8.Label = &quot;°&quot;
+End Sub
+
+Private Sub TrapezeForm_OptionButton4_Click()
+	oTrapezeForm.Model.CheckBox9.Enabled = True
+	TrapezeForm_CheckBox9_Click
+
+	oTrapezeForm.Model.Label1.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label5.Label = &quot;cm&quot;
+
+	oTrapezeForm.Model.Label2.Label = &quot;c&quot;
+	oTrapezeForm.Model.Label6.Label = &quot;cm&quot;
+	
+	oTrapezeForm.Model.Label3.Label = &quot;h&quot;
+	oTrapezeForm.Model.Label3.FontName = &quot;Tahoma&quot;
+	oTrapezeForm.Model.Label7.Label = &quot;cm&quot;
+
+	oTrapezeForm.Model.Label4.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label4.FontName = &quot;Symbol&quot;
+	oTrapezeForm.Model.Label8.Label = &quot;°&quot;
+End Sub
+
+Private Sub TrapezeForm_OptionButton5_Click()
+	oTrapezeForm.Model.CheckBox9.Enabled = False
+	TrapezeForm_CheckBox9_Click
+
+	oTrapezeForm.Model.Label1.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label5.Label = &quot;cm&quot;
+
+	oTrapezeForm.Model.Label2.Label = &quot;d&quot;
+	oTrapezeForm.Model.Label6.Label = &quot;cm&quot;
+	
+	oTrapezeForm.Model.Label3.Label = &quot;a&quot;
+	oTrapezeForm.Model.Label3.FontName = &quot;Symbol&quot;
+	oTrapezeForm.Model.Label7.Label = &quot;°&quot;
+
+	oTrapezeForm.Model.Label4.Label = &quot;b&quot;
+	oTrapezeForm.Model.Label4.FontName = &quot;Symbol&quot;
+	oTrapezeForm.Model.Label8.Label = &quot;°&quot;
+End Sub
+
+Sub TrapezeForm_CommandButton1()
+dim Shapes as object
+dim a,b,c,d,ga,gb,e,h,alpha,beta
+dim ang1
+dim ang2
+Dim angle3
+Dim t1,t2,t3,t4
+Dim rayon
+Dim LeCercle as Object
+Dim xn, yn
+Dim sTexte as String
+Dim aTexte() as string
+Dim c1 as String
+Dim x0,y0,x1,y1,x2,y2,x3,y3,xh,yh
+
+	oTrapezeForm.EndExecute()
+	SauveForm(oTrapezeForm)
+
+	InitialiseDessin(false)
+	Shapes = InitialiseGroupe()
+    x0 = 0
+    y0 = 0
+    ga = 20
+    gb = ga - 2
+
+    If oTrapezeForm.Model.OptionButton1.State Then
+		a=val(oTrapezeForm.Model.TextField1.Text)*1000
+		c=val(oTrapezeForm.Model.TextField2.Text)*1000
+		e=val(oTrapezeForm.Model.TextField3.Text)*1000
+		h=val(oTrapezeForm.Model.TextField4.Text)*1000
+        x1 = a
+        y1 = 0
+        x3 = e
+        y3 = x0 - h
+        x2 = e + c
+        y2 = y3
+		xh = x3 + val(oTrapezeForm.Model.TextField10.Text) * 1000
+
+		if oTrapezeForm.Model.CheckBox1.State then
+			t1=oTrapezeForm.Model.TextField1.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label5.Label)
+			t2=oTrapezeForm.Model.TextField2.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label6.Label)
+			t3=oTrapezeForm.Model.TextField3.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label7.Label)
+			t4=oTrapezeForm.Model.TextField4.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label8.Label)
+			InsereTexte t1, (x0 + x1) / 2, (y0 + y1) / 2, Shapes, -CalculeAngle(x0, y0, x1, y1) * 18000 / Pi, 0, 1
+			InsereTexte t2, (x3 + x2) / 2, (y3 + y2) / 2, Shapes, -CalculeAngle(x3, y3, x2, y2) * 18000 / Pi, 0, -1
+			InsereTexte t3, (x0 + x3) / 2, (y3 + y3) / 2, Shapes, -CalculeAngle(x0, y3, x3, y3) * 18000 / Pi, 0, 1
+			InsereTexte t4, (xh + xh) / 2, (y0 + y3) / 2, Shapes, -CalculeAngle(xh, y0, xh, y3) * 18000 / Pi, -1, 0
+		end if
+    End If
+    
+    If oTrapezeForm.Model.OptionButton2.State Then
+		a=val(oTrapezeForm.Model.TextField1.Text) * 1000
+		c=val(oTrapezeForm.Model.TextField2.Text) * 1000
+		d=val(oTrapezeForm.Model.TextField3.Text) * 1000
+		alpha=val(oTrapezeForm.Model.TextField4.Text) * Pi / 180
+        x1 = a
+        y1 = 0
+        x3 = d * cos(alpha)
+        y3 = - d * sin(alpha)
+        x2 = x3 + c
+        y2 = y3
+		if oTrapezeForm.Model.CheckBox1.State then
+			t1=oTrapezeForm.Model.TextField1.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label5.Label)
+			t2=oTrapezeForm.Model.TextField2.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label6.Label)
+			t3=oTrapezeForm.Model.TextField3.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label7.Label)
+			t4=oTrapezeForm.Model.TextField4.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label8.Label)
+			InsereTexte t1, (x0 + x1) / 2, (y0 + y1) / 2, Shapes, -CalculeAngle(x0, y0, x1, y1) * 18000 / Pi, 0, 1
+			InsereTexte t2, (x3 + x2) / 2, (y3 + y2) / 2, Shapes, -CalculeAngle(x3, y3, x2, y2) * 18000 / Pi, 0, -1
+			InsereTexte t3, (x0 + x3) / 2, (y0 + y3) / 2, Shapes, -CalculeAngle(x0, y0, x3, y3) * 18000 / Pi, -1, -1
+		    NormaliseCoordonnees xn, yn, x3, y3, x0, y0, x1, y1, -700
+			InsereTexte t4, xn, yn, Shapes, 0, 1, -1
+		end if
+		if oTrapezeForm.Model.CheckBox7.State then
+			MarqueAngle x3, y3, x0, y0, x1, y1, False, 1, 0, Shapes
+		End If
+    End If
+
+    If oTrapezeForm.Model.OptionButton3.State Then
+		a=val(oTrapezeForm.Model.TextField1.Text) * 1000
+		h=val(oTrapezeForm.Model.TextField2.Text) * 1000
+		alpha=val(oTrapezeForm.Model.TextField3.Text) * Pi / 180
+		beta=val(oTrapezeForm.Model.TextField4.Text) * Pi / 180
+        x1 = a
+        y1 = 0
+        x3 = (h / tan(alpha)) * cos(alpha)
+        y3 = - (h / tan(alpha)) * sin(alpha)
+        x2 = x1 + (h / tan(beta)) * cos( Pi - beta )
+        y2 = y1 - (h / tan(beta)) * sin( Pi - beta )
+		xh = x3 + val(oTrapezeForm.Model.TextField10.Text) * 1000
+
+		if oTrapezeForm.Model.CheckBox1.State then
+			t1=oTrapezeForm.Model.TextField1.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label5.Label)
+			t2=oTrapezeForm.Model.TextField2.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label6.Label)
+			t3=oTrapezeForm.Model.TextField3.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label7.Label)
+			t4=oTrapezeForm.Model.TextField4.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label8.Label)
+			InsereTexte t1, (x0 + x1) / 2, (y0 + y1) / 2, Shapes, -CalculeAngle(x0, y0, x1, y1) * 18000 / Pi, 0, 1
+			InsereTexte t2, (xh + xh) / 2, (y0 + y3) / 2, Shapes, -CalculeAngle(xh, y0, xh, y3) * 18000 / Pi, -1, 0
+		    NormaliseCoordonnees xn, yn, x0, y0, x1, y1, x2, y2, -700
+			InsereTexte t3, xn, yn, Shapes, 0, 0, 0
+		    NormaliseCoordonnees xn, yn, x3, y3, x0, y0, x1, y1, -700
+			InsereTexte t4, xn, yn, Shapes, 0, 0, 0
+		end if
+		if oTrapezeForm.Model.CheckBox7.State then
+			MarqueAngle x3, y3, x0, y0, x1, y1, False, 1, 0, Shapes
+			MarqueAngle x0, y0, x1, y1, x2, y2, False, 1, 0, Shapes
+		End If
+    End If
+
+    If oTrapezeForm.Model.OptionButton4.State Then
+		a=val(oTrapezeForm.Model.TextField1.Text) * 1000
+		c=val(oTrapezeForm.Model.TextField2.Text) * 1000
+		h=val(oTrapezeForm.Model.TextField3.Text) * 1000
+		alpha=val(oTrapezeForm.Model.TextField4.Text) * Pi / 180
+        x1 = a
+        y1 = 0
+        x3 = (h / tan(alpha)) * cos(alpha)
+        y3 = - (h / tan(alpha)) * sin(alpha)
+        x2 = x3 + c
+        y2 = y3
+		xh = x3 + val(oTrapezeForm.Model.TextField10.Text) * 1000
+
+		if oTrapezeForm.Model.CheckBox1.State then
+			t1=oTrapezeForm.Model.TextField1.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label5.Label)
+			t2=oTrapezeForm.Model.TextField2.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label6.Label)
+			t3=oTrapezeForm.Model.TextField3.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label7.Label)
+			t4=oTrapezeForm.Model.TextField4.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label8.Label)
+			InsereTexte t1, (x0 + x1) / 2, (y0 + y1) / 2, Shapes, -CalculeAngle(x0, y0, x1, y1) * 18000 / Pi, 0, 1
+			InsereTexte t2, (x3 + x2) / 2, (y3 + y2) / 2, Shapes, -CalculeAngle(x3, y3, x2, y2) * 18000 / Pi, 0, -1
+			InsereTexte t3, (xh + xh) / 2, (y0 + y3) / 2, Shapes, -CalculeAngle(xh, y0, xh, y3) * 18000 / Pi, -1, 0
+		    NormaliseCoordonnees xn, yn, x3, y3, x0, y0, x1, y1, -700
+			InsereTexte t4, xn, yn, Shapes, 0, 0, 0
+		end if
+		if oTrapezeForm.Model.CheckBox7.State then
+			MarqueAngle x3, y3, x0, y0, x1, y1, False, 1, 0, Shapes
+		End If
+    End If
+
+    If oTrapezeForm.Model.OptionButton5.State Then
+		a=val(oTrapezeForm.Model.TextField1.Text)
+		d=val(oTrapezeForm.Model.TextField2.Text)
+		alpha=val(oTrapezeForm.Model.TextField3.Text)
+		beta=val(oTrapezeForm.Model.TextField4.Text)
+
+        x1 = a
+        y1 = 0
+        x3 = d * cos(alpha)
+        y3 = - d * sin(alpha)
+        x2 = x1 + (d * tan(alpha) / tan(beta)) * cos( Pi - beta )
+        y2 = y1 - (d * tan(alpha) / tan(beta)) * sin( Pi - beta )
+		if oTrapezeForm.Model.CheckBox1.State then
+			t1=oTrapezeForm.Model.TextField1.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label5.Label)
+			t2=oTrapezeForm.Model.TextField2.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label6.Label)
+			t3=oTrapezeForm.Model.TextField3.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label7.Label)
+			t4=oTrapezeForm.Model.TextField4.Text &amp; MIif(oTrapezeForm.Model.CheckBox2.State = 1, &quot;&quot;, &quot; &quot; &amp; oTrapezeForm.Model.Label8.Label)
+			InsereTexte t1, (x0 + x1) / 2, (y0 + y1) / 2, Shapes, -CalculeAngle(x0, y0, x1, y1) * 18000 / Pi, 0, 1
+			InsereTexte t2, (x0 + x3) / 2, (y0 + y3) / 2, Shapes, -CalculeAngle(x0, y0, x3, y3) * 18000 / Pi, 0, 0
+		    NormaliseCoordonnees xn, yn, x0, y0, x1, y1, x2, y2, -700
+			InsereTexte t3, xn, yn, Shapes, 0, 0, 0
+		    NormaliseCoordonnees xn, yn, x3, y3, x0, y0, x1, y1, -700
+			InsereTexte t4, xn, yn, Shapes, 0, 0, 0
+		end if
+		if oTrapezeForm.Model.CheckBox7.State then
+			MarqueAngle x3, y3, x0, y0, x1, y1, False, 1, 0, Shapes
+			MarqueAngle x0, y0, x1, y1, x2, y2, False, 1, 0, Shapes
+		End If
+
+	End If
+
+    If oTrapezeForm.Model.CheckBox5.State Then
+	    NormaliseCoordonnees xn, yn, x3, y3, x0, y0, x1, y1
+        InsereTexte(oTrapezeForm.Model.TextField8.Text, xn, yn, Shapes, 0, 0, 0)
+	    NormaliseCoordonnees xn, yn, x0, y0, x1, y1, x2, y2
+        InsereTexte(oTrapezeForm.Model.TextField7.Text, xn, yn, Shapes, 0, 0, 0)
+	    NormaliseCoordonnees xn, yn, x1, y1, x2, y2, x3, y3
+        InsereTexte(oTrapezeForm.Model.TextField6.Text, xn, yn, Shapes, 0, 0, 0)
+	    NormaliseCoordonnees xn, yn, x2, y2, x3, y3, x0, y0
+        InsereTexte(oTrapezeForm.Model.TextField5.Text, xn, yn, Shapes, 0, 0, 0)
+    End If
+
+	InsereQuadrilatere x0,y0,x1,y1,x2,y2,x3,y3,Shapes,oTrapezeForm.Model.ImageControl2
+    If oTrapezeForm.Model.CheckBox3.State Then
+		InsereLigne x1, y1, x3, y3, Shapes, oTrapezeForm.Model.ImageControl3
+    End if
+    If oTrapezeForm.Model.CheckBox4.State Then
+		InsereLigne x0, y0, x2, y2, Shapes, oTrapezeForm.Model.ImageControl3
+    End if
+
+	if oTrapezeForm.Model.OptionButton1.State or oTrapezeForm.Model.OptionButton3.State or oTrapezeForm.Model.OptionButton4.State Then
+		if oTrapezeForm.Model.CheckBox9.State Then 
+			xh = x3 + mval(oTrapezeForm.Model.TextField10.Text) * 1000
+			InsereLigne xh, y3, xh, y0, Shapes, oTrapezeForm.Model.ImageControl4
+			if oTrapezeForm.Model.CheckBox8.State Then 
+				MarqueAngleDroit xh, y0, xh, y3, Shapes, oTrapezeForm.Model.ImageControl2
+				MarqueAngleDroit xh, y3, x2, y2, Shapes, oTrapezeForm.Model.ImageControl2
+			End If
+		End If
+	End if
+
+	if oTrapezeForm.Model.CheckBox10.State Then
+		&apos; Prolongation du plus petit côté
+		if x3&gt;x0 then
+			InsereLigne x0 - mval(oTrapezeForm.Model.TextField11.Text)*1000, y3, x3, y3, Shapes, oTrapezeForm.Model.ImageControl5
+		else
+			InsereLigne x3 - mval(oTrapezeForm.Model.TextField11.Text)*1000, y0, x0, y0, Shapes, oTrapezeForm.Model.ImageControl5
+		end if
+		if x2&lt;x1 then
+			InsereLigne x1 + mval(oTrapezeForm.Model.TextField11.Text)*1000, y2, x2, y2, Shapes, oTrapezeForm.Model.ImageControl5
+		else
+			InsereLigne x1, y1, x2 + mval(oTrapezeForm.Model.TextField11.Text)*1000, y0, Shapes, oTrapezeForm.Model.ImageControl5
+		end if
+	End if
+
+	if oTrapezeForm.Model.CheckBox11.State Then
+		&apos; Prolongation du plus grand côté
+		if x3&gt;x0 then
+			InsereLigne x0, y0, x0 - mval(oTrapezeForm.Model.TextField12.Text)*1000, y0, Shapes, oTrapezeForm.Model.ImageControl5
+		else
+			InsereLigne x3, y3, x3 - mval(oTrapezeForm.Model.TextField12.Text)*1000, y3, Shapes, oTrapezeForm.Model.ImageControl5
+		end if
+		if x2&lt;x1 then
+			InsereLigne x1 + mval(oTrapezeForm.Model.TextField11.Text)*1000, y1, x1, y1, Shapes, oTrapezeForm.Model.ImageControl5
+		else
+			InsereLigne x2, y2, x2 + mval(oTrapezeForm.Model.TextField11.Text)*1000, y2, Shapes, oTrapezeForm.Model.ImageControl5
+		end if
+	End if
+
+	Dim aPoint As New com.sun.star.awt.Point
+    Dim TheSize as new com.sun.star.awt.Size
+    Dim Group as Object
+    Dim Coeff
+    
+	aPoint.x=3000
+	aPoint.y=3000
+	Group = GroupeObjet(Shapes)
+	Group.Position=aPoint
+	TheSize=Group.Size
+	coeff=oTrapezeForm.Model.Echelle.Text
+	RemplaceVirgulePoint(coeff)
+	TheSize.width = TheSize.Width*val(coeff)/100
+	TheSize.height= TheSize.Height*val(coeff)/100
+	Group.Size=TheSize
+	TermineDessin()
+End sub
+
+Sub TrapezeForm_CommandButton2()
+	oTrapezeForm.EndExecute()
+	SauveForm(oTrapezeForm)
+End sub
+
+Private Sub TrapezeForm_CheckBox1_Click()
+    oTrapezeForm.Model.CheckBox2.Enabled = oTrapezeForm.Model.CheckBox1.State
+End Sub
+
+Private Sub TrapezeForm_CheckBox6_Click()
+    oTrapezeForm.Model.TextField9.Enabled = oTrapezeForm.Model.CheckBox6.State
+End Sub
+
+Private Sub TrapezeForm_CheckBox10_Click()
+    oTrapezeForm.Model.TextField11.Enabled = oTrapezeForm.Model.CheckBox10.State
+    oTrapezeForm.Model.Label14.Enabled = oTrapezeForm.Model.CheckBox10.State
+End Sub
+
+Private Sub TrapezeForm_CheckBox11_Click()
+    oTrapezeForm.Model.TextField12.Enabled = oTrapezeForm.Model.CheckBox11.State
+    oTrapezeForm.Model.Label15.Enabled = oTrapezeForm.Model.CheckBox11.State
+End Sub
+
+Private Sub TrapezeForm_CheckBox9_Click()
+    oTrapezeForm.Model.CheckBox8.Enabled = oTrapezeForm.Model.CheckBox9.State
+	oTrapezeForm.Model.Label11.Enabled = (oTrapezeForm.Model.CheckBox9.State and oTrapezeForm.Model.CheckBox9.Enabled)
+	oTrapezeForm.Model.Label12.Enabled = (oTrapezeForm.Model.CheckBox9.State and oTrapezeForm.Model.CheckBox9.Enabled)
+	oTrapezeForm.Model.Label13.Enabled = (oTrapezeForm.Model.CheckBox9.State and oTrapezeForm.Model.CheckBox9.Enabled)
+	oTrapezeForm.Model.TextField10.Enabled = (oTrapezeForm.Model.CheckBox9.State and oTrapezeForm.Model.CheckBox9.Enabled)
+End Sub
+
+Private Sub TrapezeForm_TextField5_Change()
+    oTrapezeForm.Model.CheckBox3.Label = &quot;[&quot; &amp; oTrapezeForm.Model.TextField5.Text &amp; oTrapezeForm.Model.TextField7.Text &amp; &quot;]&quot;
+    oTrapezeForm.Model.Label13.Label = oTrapezeForm.Model.TextField5.Text
+End Sub
+
+Private Sub TrapezeForm_TextField6_Change()
+    oTrapezeForm.Model.CheckBox4.Label = &quot;[&quot; &amp; oTrapezeForm.Model.TextField6.Text &amp; oTrapezeForm.Model.TextField8.Text &amp; &quot;]&quot;
+End Sub
+
+Private Sub TrapezeForm_Image_Click(evt)
+    ChangeCouleur evt.Source.Model
+End Sub
+
+Private Sub Renomme(evt as Object)
+	GRenomme evt, oTrapezeForm, Array(&quot;TextField5&quot;, &quot;TextField6&quot;, &quot;TextField7&quot;, &quot;TextField8&quot;)
+End Sub
+
+</script:module>

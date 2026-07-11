@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="QuadrillageForm" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Dim oQuadrillageForm as object
+
+Sub Main
+	oQuadrillageForm = LoadDialog(&quot;OOoGdmath&quot;,&quot;QuadrillageForm&quot;)
+	ChangeTitreDialog(oQuadrillageForm)
+&apos;	xray.xray oQuadrillageForm.Model.Image10
+	oQuadrillageForm.Model.Step = 1
+&apos;	RestaureForm(oQuadrillageForm)
+	oQuadrillageForm.Execute()
+End Sub
+
+Private Sub QuadrillageForm_CommandButton1_Click()
+Dim nl, nc, llarg, lhaut,a as boolean
+Dim Shapes as Object,posx,posy
+
+oQuadrillageForm.Model.Step = 2
+oQuadrillageForm.Model.Label12.Label = Chaine(&quot;tracquad&quot;) &apos;&quot;Tracé du quadrillage&quot;
+InitialiseDessin(False)
+PointInsertion posx, posy
+Shapes=InitialiseGroupe()
+nl = Int(Val(oQuadrillageForm.Model.TextField3.Text))
+nc = Int(Val(oQuadrillageForm.Model.TextField4.Text))
+llarg = oQuadrillageForm.Model.TextField1.Text
+RemplaceVirgulePoint llarg
+llarg = Val(llarg) * 1000
+lhaut = oQuadrillageForm.Model.TextField2.Text
+RemplaceVirgulePoint lhaut
+lhaut = Val(lhaut) * 1000
+If (nl * nc &lt;&gt; 0) Then
+    If oQuadrillageForm.Model.OptionButton6.State Then PlateauLogarithmique llarg, lhaut, nl, nc,Shapes
+    If oQuadrillageForm.Model.OptionButton7.State Then PlateauSemilogarithmique llarg, lhaut, nl, nc,Shapes
+    If oQuadrillageForm.Model.OptionButton2.State Then PlateauCarreau nl, nc, 2, 2,Shapes
+    If oQuadrillageForm.Model.OptionButton3.State Then PlateauMillimetre nl, nc, 2, 2,Shapes
+    a=oQuadrillageForm.Model.CheckBox1.State
+    If Not a Then
+        If oQuadrillageForm.Model.OptionButton1.State Then PlateauCarre nl, nc, 2, 2,Shapes
+        If oQuadrillageForm.Model.OptionButton4.State Then PlateauTriangle nl, nc, posx, posy, llarg,Shapes
+        If oQuadrillageForm.Model.OptionButton5.State Then PlateauHexagone nl, nc, posx, posy, llarg,Shapes
+        If oQuadrillageForm.Model.OptionButton8.State Then PlateauRectangle llarg, lhaut, nl, nc,Shapes
+    Else
+        If oQuadrillageForm.Model.OptionButton1.State Then PlateauCelluleCarre nl, nc, 2, 2,Shapes
+        If oQuadrillageForm.Model.OptionButton4.State Then PlateauCelluleTriangle nl, nc, posx, posy, llarg,Shapes
+        If oQuadrillageForm.Model.OptionButton5.State Then PlateauCelluleHexa nl, nc, posx, posy, llarg,Shapes
+        If oQuadrillageForm.Model.OptionButton8.State Then PlateauCelluleRectangle llarg, lhaut, nl, nc,Shapes
+    End If
+End If
+Shapes=GroupeObjet(Shapes)
+DeplaceSelection posx,posy,Shapes
+TermineDessin()
+oQuadrillageForm.EndExecute()
+	sauveForm(oQuadrillageForm)
+End Sub
+
+Private Sub QuadrillageForm_CommandButton2_Click()
+    oQuadrillageForm.EndExecute()
+End Sub
+
+Private Sub QuadrillageForm_CommandButton3_Click()
+    oQuadrillageForm.Model.Image10.HelpText = &quot;Continu 0.75 pt&quot;
+    oQuadrillageForm.Model.Image11.HelpText = &quot;Continu 0.5 pt&quot;
+    oQuadrillageForm.Model.Image12.HelpText = &quot;Continu 0.25 pt&quot;
+    oQuadrillageForm.Model.Image10.BackGroundColor = RGB(0, 0, 0)
+    oQuadrillageForm.Model.Image11.BackGroundColor = RGB(64, 64, 64)
+    oQuadrillageForm.Model.Image12.BackGroundColor = RGB(192, 192, 192)
+End Sub
+
+Private Sub QuadrillageForm_Image10_Click()
+    ChangeCouleur oQuadrillageForm.Model.Image10
+End Sub
+
+Private Sub QuadrillageForm_Image11_Click()
+    ChangeCouleur oQuadrillageForm.Model.Image11
+End Sub
+
+Private Sub QuadrillageForm_Image12_Click()
+    ChangeCouleur oQuadrillageForm.Model.Image12
+End Sub
+
+Private Sub QuadrillageForm_OptionButton1_Click()
+    oQuadrillageForm.Model.CheckBox1.Enabled = True
+    oQuadrillageForm.Model.Image10.Enabled = True
+    oQuadrillageForm.Model.TextField1.Text = &quot;0,5&quot;
+    oQuadrillageForm.Model.TextField2.Text = &quot;0,5&quot;
+    oQuadrillageForm.Model.TextField1.Enabled = False
+    oQuadrillageForm.Model.TextField2.Enabled = False
+    oQuadrillageForm.Model.Image11.Enabled = False
+    oQuadrillageForm.Model.Image12.Enabled = False
+    oQuadrillageForm.Model.Label8.Enabled = False
+    oQuadrillageForm.Model.Label9.Enabled = False
+    oQuadrillageForm.Model.Label10.Enabled = False
+    oQuadrillageForm.Model.CommandButton3.Enabled = False
+End Sub
+
+Private Sub QuadrillageForm_OptionButton2_Click()
+    oQuadrillageForm.Model.Image10.Enabled = False
+    oQuadrillageForm.Model.CheckBox1.Enabled = False
+    oQuadrillageForm.Model.TextField1.Text = &quot;0,8&quot;
+    oQuadrillageForm.Model.TextField2.Text = &quot;0,8&quot;
+    oQuadrillageForm.Model.TextField1.Enabled = False
+    oQuadrillageForm.Model.TextField2.Enabled = False
+    oQuadrillageForm.Model.Image11.Enabled = False
+    oQuadrillageForm.Model.Image12.Enabled = False
+    oQuadrillageForm.Model.Label8.Enabled = False
+    oQuadrillageForm.Model.Label9.Enabled = False
+    oQuadrillageForm.Model.Label10.Enabled = False
+    oQuadrillageForm.Model.CommandButton3.Enabled = False
+End Sub
+
+Private Sub QuadrillageForm_OptionButton3_Click()
+    oQuadrillageForm.Model.Image10.Enabled = True
+    oQuadrillageForm.Model.CheckBox1.Enabled = False
+    oQuadrillageForm.Model.TextField1.Text = &quot;1&quot;
+    oQuadrillageForm.Model.TextField2.Text = &quot;1&quot;
+    oQuadrillageForm.Model.TextField1.Enabled = False
+    oQuadrillageForm.Model.TextField2.Enabled = False
+    oQuadrillageForm.Model.Image11.Enabled = True
+    oQuadrillageForm.Model.Image12.Enabled = True
+    oQuadrillageForm.Model.Label8.Enabled = True
+    oQuadrillageForm.Model.Label9.Enabled = True
+    oQuadrillageForm.Model.Label10.Enabled = True
+    oQuadrillageForm.Model.CommandButton3.Enabled = True
+End Sub
+
+Private Sub QuadrillageForm_OptionButton4_Click()
+    oQuadrillageForm.Model.Image10.Enabled = True
+    oQuadrillageForm.Model.CheckBox1.Enabled = True
+    oQuadrillageForm.Model.TextField1.Text = &quot;1&quot;
+    oQuadrillageForm.Model.TextField2.Text = &quot;&quot;
+    oQuadrillageForm.Model.TextField2.Enabled = False
+    oQuadrillageForm.Model.Image11.Enabled = False
+    oQuadrillageForm.Model.Image12.Enabled = False
+    oQuadrillageForm.Model.Label8.Enabled = False
+    oQuadrillageForm.Model.Label9.Enabled = False
+    oQuadrillageForm.Model.Label10.Enabled = False
+    oQuadrillageForm.Model.CommandButton3.Enabled = False
+End Sub
+
+Private Sub QuadrillageForm_OptionButton5_Click()
+    oQuadrillageForm.Model.CheckBox1.Enabled = True
+    oQuadrillageForm.Model.Image10.Enabled = True
+    oQuadrillageForm.Model.TextField1.Text = &quot;0,5&quot;
+    oQuadrillageForm.Model.TextField2.Text = &quot;&quot;
+    oQuadrillageForm.Model.TextField2.Enabled = False
+    oQuadrillageForm.Model.Image11.Enabled = False
+    oQuadrillageForm.Model.Image12.Enabled = False
+    oQuadrillageForm.Model.Label8.Enabled = False
+    oQuadrillageForm.Model.Label9.Enabled = False
+    oQuadrillageForm.Model.Label10.Enabled = False
+    oQuadrillageForm.Model.CommandButton3.Enabled = False
+End Sub
+
+Private Sub QuadrillageForm_OptionButton6_Click()
+    oQuadrillageForm.Model.Image10.Enabled = False
+    oQuadrillageForm.Model.CheckBox1.Enabled = False
+    oQuadrillageForm.Model.TextField1.Text = &quot;5&quot;
+    oQuadrillageForm.Model.TextField2.Text = &quot;5&quot;
+    oQuadrillageForm.Model.TextField1.Enabled = True
+    oQuadrillageForm.Model.TextField2.Enabled = True
+    oQuadrillageForm.Model.Image11.Enabled = False
+    oQuadrillageForm.Model.Image12.Enabled = False
+    oQuadrillageForm.Model.Label8.Enabled = False
+    oQuadrillageForm.Model.Label9.Enabled = False
+    oQuadrillageForm.Model.Label10.Enabled = False
+    oQuadrillageForm.Model.CommandButton3.Enabled = False
+End Sub
+
+Private Sub QuadrillageForm_OptionButton7_Click()
+    oQuadrillageForm.Model.Image10.Enabled = False
+    oQuadrillageForm.Model.CheckBox1.Enabled = False
+    oQuadrillageForm.Model.TextField1.Text = &quot;5&quot;
+    oQuadrillageForm.Model.TextField2.Text = &quot;5&quot;
+    oQuadrillageForm.Model.TextField1.Enabled = True
+    oQuadrillageForm.Model.TextField2.Enabled = True
+    oQuadrillageForm.Model.Image11.Enabled = False
+    oQuadrillageForm.Model.Image12.Enabled = False
+    oQuadrillageForm.Model.Label8.Enabled = False
+    oQuadrillageForm.Model.Label9.Enabled = False
+    oQuadrillageForm.Model.Label10.Enabled = False
+    oQuadrillageForm.Model.CommandButton3.Enabled = False
+End Sub
+
+Private Sub QuadrillageForm_OptionButton8_Click()
+    oQuadrillageForm.Model.Image10.Enabled = True
+    oQuadrillageForm.Model.CheckBox1.Enabled = True
+    oQuadrillageForm.Model.TextField1.Text = &quot;1&quot;
+    oQuadrillageForm.Model.TextField2.Text = &quot;0,5&quot;
+    oQuadrillageForm.Model.TextField1.Enabled = True
+    oQuadrillageForm.Model.TextField2.Enabled = True
+    oQuadrillageForm.Model.Image11.Enabled = False
+    oQuadrillageForm.Model.Image12.Enabled = False
+    oQuadrillageForm.Model.Label8.Enabled = False
+    oQuadrillageForm.Model.Label9.Enabled = False
+    oQuadrillageForm.Model.Label10.Enabled = False
+    oQuadrillageForm.Model.CommandButton3.Enabled = False
+End Sub
+
+Sub PlateauCarreau(x, y, posx, posy,Shapes)
+Dim j, i
+Dim UneLigne As Object
+
+	oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = 0
+    For j = 1 To y
+        UneLigne = InsereLigne(posx, posy + (j - 1) * 800, posx + x * 800 + 800, posy + (j - 1) * 800, Shapes)
+        UneLigne.LineColor = RGB(255, 0, 0)
+        InsereLigne posx, posy + (j - 1) * 800 - 200, posx + x * 800 + 800, posy + (j - 1) * 800 - 200, Shapes
+        InsereLigne posx, posy + (j - 1) * 800 - 400, posx + x * 800 + 800, posy + (j - 1) * 800 - 400, Shapes
+        InsereLigne posx, posy + (j - 1) * 800 + 200, posx + x * 800 + 800, posy + (j - 1) * 800 + 200, Shapes
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*j/(x+1+y))
+    Next j
+    For i = 0 To x
+        InsereLigne posx + 400 + 800 * i, posy - 500, posx + 400 + 800 * i, posy + 300 + 800 * (y - 1), Shapes
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*(y+i)/(x+1+y))
+    Next i
+End Sub
+
+Sub PlateauCelluleTriangle(lx, ly, x, y, larg,Shapes)
+Dim larg1, j, i, posx, posy
+
+	oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = 0
+    larg1 = larg * Sin(Pi / 3)
+    For j = 1 To ly
+        For i = 1 To lx
+            posx = x + (i - 1) * larg - (Int(j / 2) * 2 = j) * larg / 2
+            posy = y + (j - 1) * larg1
+            If (Int(j / 2) * 2 &lt;&gt; j) Then
+                UnTriangle posx, posy, Shapes, larg, larg1
+                UnTriangleBas posx + larg, posy, Shapes, larg, larg1
+            Else
+                UnTriangleBas posx, posy, Shapes, larg, larg1
+                UnTriangle posx, posy, Shapes, larg, larg1
+            End If
+			oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((j-1)*lx+i)/(lx*ly)
+        Next i
+    Next j
+End Sub
+
+Sub UnTriangle(x, y, ts As object, larg, larg1)
+    InsereTriangle x, y, x + larg / 2, y - larg1, x + larg, y, ts
+End Sub
+
+Sub UnTriangleBas(x, y, ts As object, larg, larg1)
+    InsereTriangle x, y, x - larg / 2, y - larg1, x + larg / 2, y - larg1, ts
+End Sub
+
+Sub PlateauTriangle(x, y, posx, posy, larg,Shapes as object)
+Dim larg1, i, x1, y1, x2, y2
+Dim tot as long
+
+	tot = x + Int(y / 2 + 0.5) + x + Int(y / 2) + y + 1
+	oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = 0
+    larg1 = larg * Sin(Pi / 3)
+    For i = 1 To x + Int(y / 2 + 0.5)
+        If (i &lt; x + 2) Then
+            y1 = posy - larg1
+            x1 = posx + larg / 2 + (i - 1) * larg
+        Else
+            x1 = posx + larg / 2 + x * larg
+            y1 = posy + larg1 + (i - x - 2) * larg1 * 2
+        End If
+        If (i &lt; Int(y / 2) + 1) Then
+            x2 = posx
+            y2 = posy + (i - 1) * 2 * larg1
+        Else
+            x2 = posx - (larg / 2) * (Int(y / 2) * 2 = y) + (i - Int(y / 2) - 1) * larg
+            y2 = posy + (y - 1) * larg1
+        End If
+        InsereLigne x1, y1, x2, y2, Shapes, oQuadrillageForm.Model.Image10
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((i-1)/tot))
+    Next i
+    For i = 1 To x + Int(y / 2)
+        If (i &lt; x + 1) Then
+            y1 = posy - larg1
+            x1 = posx + larg / 2 + (x - 1) * larg - (i - 1) * larg
+        Else
+            x1 = posx
+            y1 = posy + (i - x - 1) * larg1 * 2
+        End If
+        If (i &lt; Int(y / 2 + 0.5)) Then
+            x2 = posx + (larg / 2) + x * larg
+            y2 = posy + larg1 + (i - 1) * 2 * larg1
+        Else
+            x2 = posx - (larg / 2) * (Int(y / 2) * 2 = y) + x * larg - (i - Int(y / 2 + 0.5)) * larg
+            y2 = posy + (y - 1) * larg1
+        End If
+        InsereLigne x1, y1, x2, y2, Shapes, oQuadrillageForm.Model.Image10
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((x + Int(y / 2 + 0.5)+i-1)/tot))
+    Next i
+    For i = 1 To y + 1
+        If (Int(i / 2) * 2 = i) Then
+            x1 = posx
+        Else
+            x1 = posx + larg / 2
+        End If
+        y1 = posy - larg1 + (i - 1) * larg1
+        x2 = x1 + x * larg
+        y2 = y1
+        InsereLigne x1, y1, x2, y2, Shapes, oQuadrillageForm.Model.Image10
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((x + Int(y / 2 + 0.5)+x + Int(y / 2)+i-1)/tot))
+    Next i
+End Sub
+
+Sub UnHexagone(x as long, y as long, ts As object, larg as long, larg1 as long)
+Dim secArray(0 to 3,0 to 1) As single
+
+    secArray(0,0) = x
+    secArray(0,1) = y
+    secArray(1,0) = x + larg / 2
+    secArray(1,1) = y - larg1
+    secArray(2,0) = x + 3 * larg / 2
+    secArray(2,1) = y - larg1
+    secArray(3,0) = x + 2 * larg
+    secArray(3,1) = y
+    InserePolygone secArray(), 4, ts, oQuadrillageForm.Model.Image10
+End Sub
+
+Sub UneCelluleHexa(x as long, y as long, ts As object, larg as long, larg1 as long)
+Dim secArray(0 to 5,0 to 1) As single
+
+    secArray(0,0) = x
+    secArray(0,1)=y
+    secArray(1,0) = x + larg / 2
+    secArray(1,1)= y - larg1
+    secArray(2,0)= x + 3 * larg / 2
+    secArray(2,1)=y - larg1
+    secArray(3,0)= x + 2 * larg
+    secArray(3,1)=y
+    secArray(4,0)= x + 3 * larg / 2
+    secArray(4,1)=y + larg1
+    secArray(5,0) = x + larg / 2
+    secArray(5,1)=y + larg1
+    InserePolygoneB secArray(), 6, ts, oQuadrillageForm.Model.Image10
+End Sub
+
+Sub PlateauCelluleHexa(lx as long, ly as long, x as long, y as long, larg as long, ts as object)
+Dim larg1, j, i
+
+    larg1 = larg * Sin(Pi / 3)
+    For j = 1 To ly
+        For i = 1 To lx
+            If (Int(i / 2) * 2 &lt;&gt; i) Then
+                UneCelluleHexa x + (i - 1) * 3 * larg / 2, y + (j - 1) * 2 * larg1, ts, larg, larg1,oQuadrillageForm.Model.Image10
+            Else
+                UneCelluleHexa x + (i - 1) * 3 * larg / 2, y + (j - 1) * 2 * larg1 + larg1, ts, larg, larg1,oQuadrillageForm.Model.Image10
+            End If
+			oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((j-1)*lx+i)/(lx*ly)
+        Next i
+    Next j
+End Sub
+
+Sub PlateauHexagone(largeur as long, hauteur as long, posx as long, posy as long, larg as long, ts as object)
+Dim larg1 as long, i, j, nbseg, x as long, y as long
+
+    larg1 = larg * Sin(Pi / 3)
+    nbseg = 0
+    For j = 1 To hauteur
+        For i = 1 To largeur
+            If (Int(i / 2) * 2 &lt;&gt; i) Then
+                x = posx + (i - 1) * 3 * larg / 2
+                y = posy + (j - 1) * 2 * larg1
+            Else
+                x = posx + (i - 1) * 3 * larg / 2
+                y = posy + (j - 1) * 2 * larg1 + larg1
+            End If
+            UnHexagone x, y, ts, larg, larg1
+            If (i = 1) Then
+                nbseg = nbseg + 1
+                InsereLigne x, y, x + larg/2, y + larg1, ts, oQuadrillageForm.Model.Image10
+            End If
+            If (i = largeur) Then
+                nbseg = nbseg + 1
+                InsereLigne x + 2 * larg, y, x + 3 * larg / 2, y + larg1, ts, oQuadrillageForm.Model.Image10
+            End If
+            If (j = hauteur) Then
+                nbseg = nbseg + 1
+                InsereLigne x + larg / 2, y + larg1, x + 3 * larg / 2, y + larg1, ts, oQuadrillageForm.Model.Image10
+                If ((i &gt; 1) And (Int(i / 2) * 2 = i)) Then
+                    nbseg = nbseg + 1
+                    InsereLigne x, y, x + larg / 2, y + larg1, ts, oQuadrillageForm.Model.Image10
+                End If
+                If ((i &lt; largeur) And (Int(i / 2) * 2 = i)) Then
+                    nbseg = nbseg + 1
+                    InsereLigne x + 2 * larg, y, x + 3 * larg / 2, y + larg1, ts, oQuadrillageForm.Model.Image10
+                End If
+            End If
+			oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((j-1)*largeur+i)/(hauteur*largeur)
+        Next i
+    Next j
+End Sub
+
+Sub CelluleCarre(posx as long, posy as long, ts As Object)
+Dim x0, y0, x1, y1
+    x0 = posx
+    y0 = posy
+    x1 = posx + 500
+    y1 = posy + 500
+    InsereQuadrilatereB x0, y0, x1, y1, ts
+End Sub
+
+Sub PlateauCelluleCarre(x as long, y as long, posx as long, posy as long, ts as object)
+Dim i as long, j as long
+Dim tot as long
+
+	tot = y * x - 1
+    For j = 0 To y - 1
+        For i = 0 To x - 1
+            CelluleCarre posx + i * 500, posy + j * 500, ts
+			oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*(j*x+i)/tot)
+        Next i
+    Next j
+End Sub
+
+Sub SegmentCmEp(x1 as single, y1 as single, x2 as single, y2 as single, ep, ts As Object)
+Dim UneLigne As Object
+
+	Select Case ep
+    Case 0
+		UneLigne = InsereLigne(x1 * 1000, y1 * 1000, x2 * 1000, y2 * 1000, ts, oQuadrillageForm.Model.Image12
+    Case 1
+		UneLigne = InsereLigne(x1 * 1000, y1 * 1000, x2 * 1000, y2 * 1000, ts, oQuadrillageForm.Model.Image11
+    Case 2
+		UneLigne = InsereLigne(x1 * 1000, y1 * 1000, x2 * 1000, y2 * 1000, ts, oQuadrillageForm.Model.Image10
+	End Select
+End Sub
+
+Sub SegmentCm(x1 as single, y1 as single, x2 as single, y2 as single, ts As Object)
+    InsereLigne x1 * 1000, y1 * 1000, x2 * 1000, y2 * 1000, ts, oQuadrillageForm.Model.Image10
+End Sub
+
+Sub PlateauMillimetre(x as long, y as long, posx as long, posy as long, ts as object)
+Dim i
+Dim tot as long
+
+	tot = 3*x + 3*y
+    For i = 0 To x - 1
+        SegmentCmEp posx + i + 0.1, posy, posx + i + 0.1, posy + y, 0, ts
+        SegmentCmEp posx + i + 0.2, posy, posx + i + 0.2, posy + y, 0, ts
+        SegmentCmEp posx + i + 0.3, posy, posx + i + 0.3, posy + y, 0, ts
+        SegmentCmEp posx + i + 0.4, posy, posx + i + 0.4, posy + y, 0, ts
+        SegmentCmEp posx + i + 0.6, posy, posx + i + 0.6, posy + y, 0, ts
+        SegmentCmEp posx + i + 0.7, posy, posx + i + 0.7, posy + y, 0, ts
+        SegmentCmEp posx + i + 0.8, posy, posx + i + 0.8, posy + y, 0, ts
+        SegmentCmEp posx + i + 0.9, posy, posx + i + 0.9, posy + y, 0, ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*(i/tot))
+    Next i
+    For i = 0 To y - 1
+        SegmentCmEp posx, posy + i + 0.1, posx + x, posy + i + 0.1, 0, ts
+        SegmentCmEp posx, posy + i + 0.2, posx + x, posy + i + 0.2, 0, ts
+        SegmentCmEp posx, posy + i + 0.3, posx + x, posy + i + 0.3, 0, ts
+        SegmentCmEp posx, posy + i + 0.4, posx + x, posy + i + 0.4, 0, ts
+        SegmentCmEp posx, posy + i + 0.6, posx + x, posy + i + 0.6, 0, ts
+        SegmentCmEp posx, posy + i + 0.7, posx + x, posy + i + 0.7, 0, ts
+        SegmentCmEp posx, posy + i + 0.8, posx + x, posy + i + 0.8, 0, ts
+        SegmentCmEp posx, posy + i + 0.9, posx + x, posy + i + 0.9, 0, ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((i+x)/tot))
+    Next i
+    For i = 0 To x - 1
+        SegmentCmEp posx + i + 0.5, posy, posx + i + 0.5, posy + y, 1, ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((i+x+y)/tot))
+    Next i
+    For i = 0 To y - 1
+        SegmentCmEp posx, posy + i + 0.5, posx + x, posy + i + 0.5, 1, ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((i+x+y+x)/tot))
+    Next i
+    For i = 0 To x - 1
+        SegmentCmEp posx + i, posy, posx + i, posy + y, 2, ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((i+x+y+x+y)/tot))
+    Next i
+    For i = 0 To y - 1
+        SegmentCmEp posx, posy + i, posx + x, posy + i, 2, ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((i+x+y+x+y+x)/tot))
+    Next i
+    SegmentCmEp posx + x, posy, posx + x, posy + y, 2, ts
+    SegmentCmEp posx, posy + y, posx + x, posy + y, 2, ts
+End Sub
+
+Sub PlateauSemilogarithmique(llarg as long, hhaut as long, nel as long, neh as long, ts as object)
+Dim ll  as long, hh as long, j, i, x0 as long, y0 as long, x1 as long, y1 as long
+Dim tot as long
+
+	tot = nel * 9 + neh
+    ll = llarg
+    hh = hhaut
+    For j = 0 To nel
+        For i = 1 To 9 + 8 * (j = nel)
+            x0 = 100 + (Log(i) + Log(10) * j) * ll / Log(10)
+            y0 = 100
+            x1 = x0
+            y1 = y0 + hh * neh
+            InsereLigne x0, y0, x1, y1, ts
+			oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((j*9+i-1)/tot))
+        Next i
+    Next j
+    For j = 0 To neh
+        y0 = 100 + hh * neh - j * hh
+        x0 = 100
+        y1 = y0
+        x1 = x0 + ll * nel
+        InsereLigne x0, y0, x1, y1,  ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((nel*9+i)/tot))
+    Next j
+End Sub
+
+Sub PlateauCelluleRectangle(llarg as long, hhaut as long, nel as long, neh as long, ts as object)
+Dim ll as long, hh as long, i, j, x0 as long, y0 as long, x1 as long, y1 as long
+Dim tot as long
+
+	tot = neh * nel
+    ll = llarg
+    hh = hhaut
+    Shapes=InitialiseGroupe()
+    For j = 0 To neh - 1
+        For i = 0 To nel - 1
+            x0 = 100 + i * ll
+            y0 = 100 + j * hh
+            x1 = x0 + ll
+            y1 = y0 + hh
+            InsereQuadrilatere x0, y0, x1, y1, ts,oQuadrillageForm.Model.Image10
+			oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((j*nel+i)/tot))
+        Next i
+    Next j
+End Sub
+
+Sub PlateauRectangle(llarg as long, hhaut as long, nel as long, neh as long, ts as object)
+Dim ll as long, hh as long, i, j, x0 as long, y0 as long, x1 as long, y1 as long
+Dim tot as long
+
+	tot = nel + neh + 2
+    ll = llarg
+    hh = hhaut
+    For i = 0 To nel
+        x0 = 100 + i * ll
+        y0 = 100
+        x1 = x0
+        y1 = 100 + neh * hh
+        InsereLigne x0, y0, x1, y1, ts, oQuadrillageForm.Model.Image10
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*(i/tot))
+    Next i
+    For i = 0 To neh
+        y0 = 100 + i * hh
+        x0 = 100
+        y1 = y0
+        x1 = 100 + nel * ll
+        InsereLigne x0, y0, x1, y1, ts, oQuadrillageForm.Model.Image10
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((nel+1+i)/tot))
+    Next i
+End Sub
+
+Sub PlateauLogarithmique(llarg as long, hhaut as long, nel as long, neh as long,ts as object)
+Dim ll as long, hh as long, i, j, x0 as long, y0 as long, x1 as long, y1 as long
+Dim tot as long
+
+	tot = (nel+1) * 9 + (neh+1) * 9
+    ll = llarg
+    hh = hhaut
+    For j = 0 To nel
+        For i = 1 To 9 + 8 * (j = nel)
+            x0 = 100 + (Log(i) + Log(10) * j) * ll / Log(10)
+            y0 = 100
+            x1 = x0
+            y1 = y0 + hh * neh
+            InsereLigne x0, y0, x1, y1, ts
+			oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((j*9+i-1)/tot))
+        Next i
+    Next j
+    For j = 0 To neh
+        For i = 1 To 9 + 8 * (j = neh)
+            y0 = 100 + hh * neh - (Log(i) + Log(10) * j) * hh / Log(10)
+            x0 = 100
+            y1 = y0
+            x1 = x0 + ll * nel
+            InsereLigne x0, y0, x1, y1, ts
+			oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*(((nel+1)*9+j*9+i-1)/tot))
+        Next i
+    Next j
+End Sub
+
+Sub PlateauCarre(x as long, y as long, posx as long, posy as long, ts as object)
+Dim i, j
+Dim tot as long
+
+	tot = x + y
+    For i = 0 To x
+        InsereLigne posx + i * 500, posy, posx + i * 500, posy + y * 500, ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*(i/tot))
+    Next i
+    For j = 0 To y
+        InsereLigne posx, posy + j * 500, posx + x * 500, posy + j * 500, ts
+		oQuadrillageForm.GetControl(&quot;ProgressBar1&quot;).Value = int(100*((x+j)/tot))
+    Next j
+End Sub
+
+
+</script:module>

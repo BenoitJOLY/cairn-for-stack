@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="110.17574mm"
+   height="41.409199mm"
+   viewBox="0 0 110.17574 41.409199"
+   version="1.1"
+   id="svg973"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="balance.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview975"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.74564394"
+     inkscape:cx="279.62408"
+     inkscape:cy="168.98146"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer10" />
+  <defs
+     id="defs970">
+    <rect
+       x="378.47"
+       y="610.24103"
+       width="119.90466"
+       height="37.51207"
+       id="rect11217" />
+  </defs>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(8.5905702,-103.7763)">
+    <g
+       inkscape:groupmode="layer"
+       id="layer10"
+       inkscape:label="balance electronique"
+       style="display:inline"
+       sodipodi:insensitive="true"
+       transform="translate(-91.035798,-6.4945681)">
+      <g
+         id="g11314"
+         transform="translate(-3.5446682,-32.61094)">
+        <rect
+           style="fill:#666666;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+           id="rect11051"
+           width="107.04896"
+           height="5.3170013"
+           x="88.262215"
+           y="143.38181" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+           id="rect11053"
+           width="96.946655"
+           height="1.7723337"
+           x="92.515823"
+           y="149.05327" />
+        <ellipse
+           style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+           id="path11159"
+           cx="189.37386"
+           cy="176.43582"
+           rx="3.2788174"
+           ry="3.4560506" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+           id="rect11161"
+           width="41.47261"
+           height="19.850136"
+           x="95.706017"
+           y="154.90196" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.05989;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+           id="rect11161-6"
+           width="46.729725"
+           height="19.790249"
+           x="139.05794"
+           y="154.9319"
+           ry="4"
+           rx="4" />
+        <text
+           xml:space="preserve"
+           transform="matrix(0.26458333,0,0,0.26458333,6.203168,-2.1268005)"
+           id="text11215"
+           style="font-size:32px;white-space:pre;shape-inside:url(#rect11217);display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:3.77953;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"><tspan
+             x="378.4707"
+             y="639.35624"
+             id="tspan1257">TARE</tspan></text>
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+           id="rect11271"
+           width="9.7478352"
+           height="1.4178669"
+           x="87.021584"
+           y="182.37314" />
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+           id="rect11273"
+           width="9.7478352"
+           height="1.4178669"
+           x="185.38609"
+           y="182.19591" />
+        <path
+           style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+           d="m 92.161354,151.00283 -5.671468,31.01584 H 195.66564 l -6.02594,-31.54754 z"
+           id="path11302" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="InsereExpression" script:language="StarBasic">&apos;OOoTep
+&apos;Copyright (C) 2005-2006  Gilles Daurat
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+option explicit
+
+public oDoc as object
+
+Sub Main()
+End Sub
+
+Function Coller1() as Object
+Dim oDispatcher as Object
+Dim oEmptyShapeCollection as Object
+Dim oDrawDocView as Object
+
+ &apos; Get a dispatcher, because we&apos;ll need it later.
+	oDispatcher = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+ 
+ &apos; Get an empty collection of shapes. We&apos;ll need it later.
+	oEmptyShapeCollection = createUnoService( &quot;com.sun.star.drawing.ShapeCollection&quot; )
+
+ &apos; Get the document&apos;s controller
+	oDrawDocView = oDocumentDessin.getCurrentController()
+ 
+ &apos; Select nothing - - i.e. an empty collection of shapes.
+ &apos; If you stopped the macro right now and looked at the drawing - - nothing is selected.
+	oDrawDocView.select( oEmptyShapeCollection )
+ 	oDrawDocView.Frame.ContainerWindow.toFront
+ 
+ &apos; Now paste whatever is in the clipboard (the shape parameter) onto current page.
+	oDispatcher.executeDispatch(oDrawDocView.Frame, &quot;.uno:Paste&quot;, &quot;&quot;, 0, Array() )
+	Coller1() = oDocumentDessin.CurrentSelection(0) 
+End Function
+
+Function InsereTexteBis(UnTexte as string, x0, y0, Optional AngleRot, Optional AlignH as integer, Optional AlignV as integer) as object
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	Dim xShape as object
+	Dim oTexte as Object
+	dim ocursor as Object
+	Dim oDispatcher as Object
+	
+&apos; on ouvre un document texte invisible pour mettre en forme
+	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+	Dim Array()
+
+	mFileProperties(0).Name = &quot;Hidden&quot;
+	mFileProperties(0).Value = True
+
+	oDocumentTexte = StarDesktop.LoadComponentFromURL(&quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0, mFileProperties())
+
+	xShape = InsereExpression(oDocumentTexte, unTexte)
+	oDocumentTexte.CurrentController.Select(xShape)
+
+&apos; On copie la formle obtnue dans le document
+	oDispatcher = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+	oDispatcher.executeDispatch( oDocumentTexte.getCurrentController().Frame, &quot;.uno:Cut&quot;, &quot;&quot;, 0, Array() )
+
+&apos; On ferme le fichier texte : on n&apos;en a plus besoin
+	on error resume next
+	oDocumentTexte.close(true)
+	on error goto 0
+
+&apos; On colle le contenu du presse-papier dans le document dessin
+	xShape = Coller1()
+		
+	aSize = xShape.Size
+	if not ismissing(AlignH) then
+		select case AlignH
+		case -1
+			aPoint.x = x0-aSize.Width
+		case 0
+			aPoint.x = x0-aSize.Width / 2
+		case 1
+			aPoint.x = x0
+		end Select
+	end if
+	if not ismissing(AlignV) then
+		select case AlignV
+		case -1
+			aPoint.y = y0-aSize.Height
+		case 0
+			aPoint.y = y0-aSize.Height / 2
+		case 1
+			aPoint.y = y0
+		end Select
+	end if
+	xShape.Position = aPoint
+	If Not IsMissing(AngleRot) and AngleRot &lt;&gt; 0 Then	xShape.RotateAngle = AngleRot
+	oGroupeDessin.Add(xShape)
+	InsereTexteBis() = xShape
+end Function
+
+Function InsereEquation(oDoc) as Object
+	dim odocument   as object
+	dim odispatcher as object
+	dim lesObjets as Object
+	dim i
+	
+	odocument = oDoc.getcurrentController().Frame
+	odispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+
+	odispatcher.executeDispatch(odocument, &quot;.uno:InsertObjectStarMath&quot;, &quot;&quot;, 0, Array())
+	odispatcher.executeDispatch(odocument, &quot;.uno:Escape&quot;, &quot;&quot;, 0, Array())
+	
+	lesObjets = oDoc.EmbeddedObjects
+	For i = 0 to lesObjets.Count - 1
+		if lesObjets(i).supportsService(&quot;com.sun.star.text.TextEmbeddedObject&quot;) then
+			if (lesObjets(i).embeddedObject.supportsService(&quot;com.sun.star.formula.FormulaProperties&quot;)) then InsereEquation = lesObjets(i)
+		end if
+	next i
+End Function
+
+Function InsereExpression(oDoc as Object, Texte as String) as object
+dim oCursor, oText
+Dim xShape as Object
+
+		oCursor = oDoc.currentcontroller.getViewCursor()
+		oText = oDoc.Text
+		oText.insertString(oCursor, Texte, True)
+		xShape = InsereEquation(oDoc)
+		InsereExpression() = xShape
+End Function
+
+
+</script:module>

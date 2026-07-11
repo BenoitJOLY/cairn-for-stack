@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396597  -->
+  <question type="stack">
+    <name>
+      <text>Conversion Base 2 (Binaire) vers Base 10</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#0c4a6e;border-left:5px solid #0369a1;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Numération — Conversion Décimale</strong>
+        <span style="background:#0369a1;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#0369a1;border:1px solid #0369a1;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">💻 Base 10</span>
+      </div>
+      
+      <p><strong>Consigne :</strong> Convertissez le nombre binaire suivant en base 10 (décimal) :</p>
+      <p style="text-align: center; font-size: 1.5em; font-weight: bold; margin: 15px 0;">
+        \( {@bin_str@} _{2} \) = [[input:ans1]] \( _{10} \)
+      </p>
+      <div style="margin-bottom: 15px;">[[validation:ans1]]</div>
+      
+      <div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin:15px 0;">
+        <strong>Conseils pour la saisie :</strong>
+        <ul style="margin:8px 0 0 20px;line-height:1.7">
+          <li>Saisissez uniquement le nombre entier résultat (sans unité).</li>
+          <li>La virgule se note avec un point (ex : <code>12.5</code> si nécessaire, bien que le résultat soit entier).</li>
+        </ul>
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponse attendue
+        </div>
+        <div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">
+          <span style="font-weight:bold;color:#0c4a6e;">Conversion :</span>
+          <p>Pour convertir du binaire vers du décimal, on multiplie chaque chiffre par la puissance de 2 correspondant à son rang (en partant de la droite : \(2^0, 2^1, 2^2...\) ), puis on additionne le tout.</p>
+          <p>{@bin_str@}<sub>2</sub> = {@ta@}<sub>10</sub></p>
+        </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text>/* 1. Génère une liste d'ENTIERS aléatoires (0 et 1) */
+len_bin: rand_with_step(5, 8, 1);
+bin_list: makelist(rand(2), i, 1, len_bin);
+
+/* 2. Convertit la liste en chaîne UNE SEULE FOIS pour l'affichage */
+bin_str: simplode(bin_list);
+
+/* 3. Calcule la vraie réponse décimale (Méthode Horner : ultra rapide sur les listes) */
+ta: block([res: 0],
+    for bit in bin_list do (
+        res: res * 2 + bit
+    ),
+    res
+);
+
+/* 4. Calcule l'erreur classique : lecture inversée */
+ta_rev: block([res: 0],
+    for bit in reverse(bin_list) do (
+        res: res * 2 + bit
+    ),
+    res
+);
+
+/* 5. Le piège : l'élève recopie le binaire (ex: 1011 lu comme mille onze) */
+piege_recopie: block([res: 0],
+    for bit in bin_list do (
+        res: res * 10 + bit
+    ),
+    res
+);</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Binaire: {@bin_str@} | Décimal: {@ta@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec format strict STACK</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>ta</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>1</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse exacte</description>
+        <answertest>EqualComAss</answertest>
+        <sans>ans1</sans>
+        <tans>ta</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1.0000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Correct !</strong> La conversion est bonne.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Recopie du nombre binaire</description>
+        <answertest>EqualComAss</answertest>
+        <sans>ans1</sans>
+        <tans>piege_recopie</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Vous avez recopié le nombre binaire dans la case réponse. La consigne demande de le convertir en base 10 (il faut faire le calcul avec les puissances de 2).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Poids des bits inversés</description>
+        <answertest>EqualComAss</answertest>
+        <sans>ans1</sans>
+        <tans>ta_rev</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de sens de lecture.</strong> Vous avez calculé les puissances de 2 en commençant par la gauche au lieu de la droite !<br>Le bit le plus à droite vaut toujours \(2^0\), le suivant \(2^1\), etc.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Votre résultat est faux. Vérifiez vos calculs de puissances de 2 et leur addition. N'oubliez pas que les bits à "0" ne comptent pas dans la somme finale.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="PyrOrthPc2" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+
+
+REM  *****  BASIC  *****
+
+Option Explicit
+
+Private RepPyrOrthPc2Dlg(15) as variant
+Private monDlg as object
+
+sub PyrOrthPc2MacroPrincipale &apos;macro principale
+
+appelerBoiteDialoguePyrOrthPc2()
+
+if RepPyrOrthPc2Dlg(11) = true then   
+DRAWversWRITER(&quot;PyrOrthPc2.ConstructionPyrOrthPc2()&quot;)
+PositionObjetWriter(LastForme)
+end if
+
+end Sub
+
+
+Sub appelerBoiteDialoguePyrOrthPc2()
+Dim i As Integer
+
+monDlg = CreerDialogue(&quot;OOoAHmath3D&quot;, &quot;PyrOrthPc2Dlg&quot;)			
+&apos;-------------------------initialisation de la boite de dialogue----------------------
+Initialisation(monDlg,CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc11.gif/&quot;),)
+AffecterImageFixe(monDlg, &quot;ImageSecondaire1&quot; , CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpcangle.gif/&quot;))
+AffecterImageFixe(monDlg, &quot;ImageSecondaire2&quot; , CheminDessin(&quot;Dessins/PyrOrth/pyrorthPave.gif/&quot;))
+GestionInfoBulle
+&apos;------------------------ récupération des messages d&apos;erreurs et des infobulles ------
+for i = 1 to 4
+RepPyrOrthPc2Dlg(i + 11) = monDlg.getControl(&quot;Message&quot;&amp;i).Peer.Text
+Next
+&apos;--------------------------------------------------------------------------------------	
+monDlg.execute
+if monDlg.Model.Tag= &quot;OK&quot; then
+monDlg.dispose
+end if
+End Sub
+
+
+Function CoordSommet(x0 as double,y0 as double) as variant
+dim i as integer, AngFuite as double, Longueur as double, Profondeur as double, Hauteur as double, Angle as double
+dim Xsommet as double, Ysommet as double, Xbase1 as double, Ybase1 as double, Xbase2 as double, Ybase2 as double, Xbase3 as double, Ybase3 as double, Xbase4 as double, Ybase4 as double
+dim mesabscisses1 as variant, mesordonnees1 as variant,mesabscisses2 as variant, mesordonnees2 as variant
+Angle = RepPyrOrthPc2Dlg(3)
+Longueur = RepPyrOrthPc2Dlg(0)
+Profondeur = RepPyrOrthPc2Dlg(1)
+Hauteur = RepPyrOrthPc2Dlg(2)
+AngFuite = Angle * pi/180
+
+Xbase1 = x0 + Profondeur*cos(AngFuite)*1000
+Ybase1 = y0 - Profondeur*sin(AngFuite)*1000
+Xbase2 = x0
+Ybase2 = y0
+Xbase3 = x0+Longueur*1000
+Ybase3 = y0
+Xbase4 = x0 + Longueur*1000 + Profondeur*cos(AngFuite)*1000 
+Ybase4 = y0 - Profondeur*sin(AngFuite)*1000
+
+for i = 1 to 4
+if RepPyrOrthPc2Dlg(i+3) = true then 
+   if i = 1 then
+   Xsommet = x0 + Profondeur*cos(AngFuite)*1000 
+   Ysommet = y0 - Profondeur*sin(AngFuite)*1000-Hauteur*1000
+   mesabscisses1 = array(Xsommet,Xbase1,Xbase2,Xbase4,&quot;ND&quot;)
+   mesordonnees1 = array(Ysommet,Ybase1,Ybase2,Ybase4,&quot;ND&quot;)
+   end if
+   if i = 2 then
+   Xsommet = x0 
+   Ysommet = y0 - Hauteur*1000
+   mesabscisses1 = array(Xsommet,Xbase1,Xbase2,Xbase3,&quot;ND&quot;)
+   mesordonnees1 = array(Ysommet,Ybase1,Ybase2,Ybase3,&quot;ND&quot;)
+   end if
+   if i = 3 then
+   Xsommet = x0+Longueur*1000 
+   Ysommet = y0-Hauteur*1000
+   mesabscisses1 = array(Xsommet,Xbase2,Xbase3,Xbase4,&quot;ND&quot;)
+   mesordonnees1 = array(Ysommet,Ybase2,Ybase3,Ybase4,&quot;ND&quot;)
+   end if
+   if i = 4 then
+   Xsommet = x0 + Longueur*1000 + Profondeur*cos(AngFuite)*1000 
+   Ysommet = y0 - Profondeur*sin(AngFuite)*1000-Hauteur*1000
+   mesabscisses1 = array(Xsommet,Xbase1,Xbase3,Xbase4,&quot;ND&quot;)
+   mesordonnees1 = array(Ysommet,Ybase1,Ybase3,Ybase4,&quot;ND&quot;)
+   end if
+end if
+next
+mesabscisses2 = array(Xsommet,Xbase1,Xbase2,Xbase3,Xbase4)
+mesordonnees2 = array(Ysommet,Ybase1,Ybase2,Ybase3,Ybase4)
+CoordSommet = Tableau4xN(mesabscisses1,mesordonnees1,mesabscisses2,mesordonnees2)
+
+end function
+
+
+sub ConstructionPyrOrthPc2()
+TracerPyrOrth(1000,10000)
+end sub
+
+
+
+
+sub TracerBase(x0 as double, y0 as double,A1 as string,A2 as string, A3 as string)
+dim mescoord as variant
+
+mescoord = CoordSommet(x0,y0)
+
+SegmentDraw(mescoord(1)(0) ,mescoord(1)(1), mescoord(2)(0) ,mescoord(2)(1) ,30, A1)
+SegmentDraw(mescoord(2)(0), mescoord(2)(1) , mescoord(3)(0) ,mescoord(3)(1) ,30, A2)
+SegmentDraw(mescoord(3)(0) ,mescoord(3)(1),  mescoord(1)(0) ,mescoord(1)(1) ,30, A3)
+
+
+end sub
+
+sub TracerSommetBase(x0,y0,H1 as string,H2 as string,H3 as string)
+dim mescoord as variant
+
+mescoord = CoordSommet(x0,y0)
+
+SegmentDraw(mescoord(0)(0),mescoord(0)(1),mescoord(1)(0),mescoord(1)(1),30,H1)
+SegmentDraw(mescoord(0)(0),mescoord(0)(1),mescoord(2)(0),mescoord(2)(1),30,H2)
+SegmentDraw(mescoord(0)(0),mescoord(0)(1),mescoord(3)(0),mescoord(3)(1),30,H3)
+end sub
+
+sub TracerPyrOrth(x0 as double, y0 as double)
+dim Angle as double, Angle1 as double, Angle2 as double,Angle3 as double, Angle4 as double, mescoord as variant
+dim Style1 as string, Style2 as string,StyleTrait as string
+dim Xcentre as double, Ycentre as double
+
+Angle = RepPyrOrthPc2Dlg(3)
+mescoord = CoordSommet(x0,y0)
+Xcentre = (mescoord(1)(2)+ mescoord(3)(2))/2
+Ycentre = (mescoord(1)(3)+ mescoord(3)(3))/2
+
+&apos;if mescoord(0)(1)&lt;=MinMax(Lignex(2,mescoord))(0) then
+
+   Angle1 = atn((mescoord(1)(2) - mescoord(0)(0))/(mescoord(1)(3) - mescoord(0)(1))
+   Angle2 = atn((mescoord(2)(2) - mescoord(0)(0))/(mescoord(2)(3) - mescoord(0)(1))
+   Angle3 = atn((mescoord(3)(2) - mescoord(0)(0))/(mescoord(3)(3) - mescoord(0)(1))
+   Angle4 = atn((mescoord(4)(2) - mescoord(0)(0))/(mescoord(4)(3) - mescoord(0)(1))
+
+   if RepPyrOrthPc2Dlg(4) = true then 
+      if Angle &lt;=90 then
+      &apos;Style1 = &quot;plein&quot;
+      TracerBase(x0,y0,&quot;pointillé&quot;,&quot;plein&quot;,&quot;pointillé&quot;)
+      TracerSommetBase(x0,y0,&quot;pointillé&quot;,&quot;plein&quot;,&quot;plein&quot;)
+      end if
+      if Angle &gt;90 and Angle&lt;=180 then
+        if Angle4&gt;Angle2 then
+        Style1 = &quot;plein&quot;
+        else
+        Style1 = &quot;pointillé&quot;
+        end if
+      TracerBase(x0,y0,&quot;plein&quot;,Style1,&quot;pointillé&quot;)
+      TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,Style1)
+     end if
+     if Angle &gt;180 and Angle &lt;=270 then
+     if Angle2 &lt; Angle4 then
+        Style1 = &quot;plein&quot;
+        else
+        Style1 = &quot;pointillé&quot;
+        end if
+      TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+      TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,Style1)
+    end if
+    if Angle &gt; 270 then
+    TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+     TracerSommetBase(x0,y0,&quot;pointillé&quot;,&quot;plein&quot;,&quot;plein&quot;)
+    end if
+  end if
+  
+ if RepPyrOrthPc2Dlg(5) = true then 
+    if Angle &lt;=90 then
+        if Angle3 &lt;Angle1 then
+        Style1 = &quot;plein&quot;
+        else
+        Style1 = &quot;pointillé&quot;
+        end if
+      TracerBase(x0,y0,&quot;pointillé&quot;,&quot;plein&quot;,Style1)
+      TracerSommetBase(x0,y0,Style1,&quot;plein&quot;,&quot;plein&quot;)
+    end if
+    if Angle &gt;90 and Angle&lt;=180 then 
+    TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;pointillé&quot;)
+    TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)    
+    end if
+    if Angle &gt;180 and Angle &lt;=270 then
+    TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+     TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+    end if
+    if Angle &gt; 270 then
+     if Angle3 &gt; Angle1 then
+        Style1 = &quot;pointillé&quot;
+     else
+        Style1 = &quot;plein&quot;
+     end if
+     TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+     TracerSommetBase(x0,y0,Style1,&quot;plein&quot;,&quot;plein&quot;)
+     end if
+ end if
+ 
+ if RepPyrOrthPc2Dlg(6) = true then 
+    if Angle &lt;=90 then
+    TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;pointillé&quot;)
+    TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)   
+    end if
+    if Angle &gt;90 and Angle&lt;=180 then 
+       if Angle2 &gt;Angle4 then
+        Style1 = &quot;plein&quot;
+        else
+        Style1 = &quot;pointillé&quot;
+        end if
+      TracerBase(x0,y0,&quot;plein&quot;,&quot;pointillé&quot;,Style1)
+      TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,Style1)
+    end if
+    if Angle &gt;180 and Angle &lt;=270 then
+      if Angle2 &gt; Angle4 then
+        Style1 = &quot;plein&quot;
+        else
+        Style1 = &quot;pointillé&quot;
+        end if
+      TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+      TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,Style1)
+    end if
+    if Angle &gt; 270 then
+    TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+     TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+    end if
+ end if
+ 
+  if RepPyrOrthPc2Dlg(7) = true then 
+    if Angle &lt;=90 then
+        if Angle1 &lt;Angle3 then
+        Style1 = &quot;plein&quot;
+        else
+        Style1 = &quot;pointillé&quot;
+        end if
+      TracerBase(x0,y0,Style1,&quot;plein&quot;,&quot;pointillé&quot;)
+      TracerSommetBase(x0,y0,Style1,&quot;plein&quot;,&quot;plein&quot;)
+    end if
+    if Angle &gt;90 and Angle&lt;=180 then 
+     TracerBase(x0,y0,&quot;plein&quot;,&quot;pointillé&quot;,&quot;pointillé&quot;)
+    TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;pointillé&quot;)   
+    end if
+    if Angle &gt;180 and Angle &lt;=270 then
+    TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+     TracerSommetBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;pointillé&quot;)
+    end if
+    if Angle &gt; 270 then
+     if Angle3 &gt; Angle1 then
+        Style1 = &quot;plein&quot;
+     else
+        Style1 = &quot;pointillé&quot;
+     end if
+     TracerBase(x0,y0,&quot;plein&quot;,&quot;plein&quot;,&quot;plein&quot;)
+     TracerSommetBase(x0,y0,Style1,&quot;plein&quot;,&quot;plein&quot;)
+     end if
+ end if
+
+
+&apos;----------------------------- tracé de l&apos;angle droit de la  hauteur ---------
+if RepPyrOrthPc2Dlg(8) = 1 then
+     if RepPyrOrthPc2Dlg (4) = true then
+     SegmentDraw(mescoord(1)(2),mescoord(1)(3)-250,mescoord(1)(2)+250,mescoord(1)(3)-250,30,&quot;plein&quot;)
+     SegmentDraw(mescoord(1)(2)+250,mescoord(1)(3),mescoord(1)(2)+250,mescoord(1)(3)-250,30,&quot;plein&quot;)
+     SegmentDraw(mescoord(1)(2),mescoord(1)(3)-250,mescoord(1)(2)-250*cos(Angle*pi/180),mescoord(1)(3)-250+250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     SegmentDraw(mescoord(1)(2)-250*cos(Angle*pi/180),mescoord(1)(3)-250+250*sin(Angle*pi/180),mescoord(1)(2)-250*cos(Angle*pi/180),mescoord(1)(3)+250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     end if
+     if RepPyrOrthPc2Dlg(5) = true then
+     SegmentDraw(mescoord(2)(2),mescoord(2)(3)-250,mescoord(2)(2)+250,mescoord(2)(3)-250,30,&quot;plein&quot;)
+     SegmentDraw(mescoord(2)(2)+250,mescoord(2)(3),mescoord(2)(2)+250,mescoord(2)(3)-250,30,&quot;plein&quot;)
+     SegmentDraw(mescoord(2)(2),mescoord(2)(3)-250,mescoord(2)(2)+250*cos(Angle*pi/180),mescoord(2)(3)-250-250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     SegmentDraw(mescoord(2)(2)+250*cos(Angle*pi/180),mescoord(2)(3)-250-250*sin(Angle*pi/180),mescoord(2)(2)+250*cos(Angle*pi/180),mescoord(2)(3)-250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     end if
+     if RepPyrOrthPc2Dlg(6) = true then
+     SegmentDraw(mescoord(3)(2),mescoord(3)(3)-250,mescoord(3)(2)-250,mescoord(3)(3)-250,30,&quot;plein&quot;)
+     SegmentDraw(mescoord(3)(2)-250,mescoord(3)(3),mescoord(3)(2)-250,mescoord(3)(3)-250,30,&quot;plein&quot;)
+     SegmentDraw(mescoord(3)(2),mescoord(3)(3)-250,mescoord(3)(2)+250*cos(Angle*pi/180),mescoord(3)(3)-250-250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     SegmentDraw(mescoord(3)(2)+250*cos(Angle*pi/180),mescoord(3)(3)-250-250*sin(Angle*pi/180),mescoord(3)(2)+250*cos(Angle*pi/180),mescoord(3)(3)-250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     end if
+     if RepPyrOrthPc2Dlg(7) = true then
+     SegmentDraw(mescoord(4)(2),mescoord(4)(3)-250,mescoord(4)(2)-250,mescoord(4)(3)-250,30,&quot;plein&quot;)
+     SegmentDraw(mescoord(4)(2)-250,mescoord(4)(3),mescoord(4)(2)-250,mescoord(4)(3)-250,30,&quot;plein&quot;)
+     SegmentDraw(mescoord(4)(2),mescoord(4)(3)-250,mescoord(4)(2)-250*cos(Angle*pi/180),mescoord(4)(3)-250+250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     SegmentDraw(mescoord(4)(2)-250*cos(Angle*pi/180),mescoord(4)(3)-250+250*sin(Angle*pi/180),mescoord(4)(2)-250*cos(Angle*pi/180),mescoord(4)(3)+250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     end if
+end if
+&apos;------------------------------tracé de l&apos;angle droit de la base ------------------------------------------------
+if RepPyrOrthPc2Dlg(9) = 1 then
+     if RepPyrOrthPc2Dlg(4) = true then
+     SegmentDraw(mescoord (1)(2)+250, mescoord(1)(3),mescoord(1)(2)+250-250*cos(Angle*pi/180),mescoord(1)(3)+250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     SegmentDraw(mescoord (1)(2)-250*cos(Angle*pi/180), mescoord(1)(3)+250*sin(Angle*pi/180),mescoord(1)(2)+250-250*cos(Angle*pi/180),mescoord(1)(3)+250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     end if
+     if RepPyrOrthPc2Dlg(5) = true then
+     SegmentDraw(mescoord (2)(2)+250, mescoord(2)(3),mescoord(2)(2)+250+250*cos(Angle*pi/180),mescoord(2)(3)-250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     SegmentDraw(mescoord (2)(2)+250*cos(Angle*pi/180), mescoord(2)(3)-250*sin(Angle*pi/180),mescoord(2)(2)+250+250*cos(Angle*pi/180),mescoord(2)(3)-250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     end if
+     if RepPyrOrthPc2Dlg(6) = true then
+     SegmentDraw(mescoord (3)(2)-250, mescoord(3)(3),mescoord(3)(2)-250+250*cos(Angle*pi/180),mescoord(3)(3)-250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     SegmentDraw(mescoord (3)(2)+250*cos(Angle*pi/180), mescoord(3)(3)-250*sin(Angle*pi/180),mescoord(3)(2)-250+250*cos(Angle*pi/180),mescoord(3)(3)-250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     end if
+     if RepPyrOrthPc2Dlg(7) = true then
+     SegmentDraw(mescoord (4)(2)-250, mescoord(4)(3),mescoord(4)(2)-250-250*cos(Angle*pi/180),mescoord(4)(3)+250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     SegmentDraw(mescoord (4)(2)-250*cos(Angle*pi/180), mescoord(4)(3)+250*sin(Angle*pi/180),mescoord(4)(2)-250-250*cos(Angle*pi/180),mescoord(4)(3)+250*sin(Angle*pi/180),30,&quot;plein&quot;)
+     end if
+end if
+
+end sub
+
+&apos;****************************************************Gestion de la boite de dialogue*****************************************************************
+
+Sub GestionInfoBulle
+TexteAide(monDlg,&quot;PyrOrthTr1&quot;, &quot;0&lt; ... &lt;= 20&quot;)
+TexteAide(monDlg,&quot;PyrOrthTr2&quot;, &quot;0&lt; ... &lt;= 20&quot;)
+TexteAide(monDlg,&quot;PyrOrthTr3&quot;, &quot;0&lt; ... &lt;= 20&quot;)
+TexteAide(monDlg,&quot;PyrOrthTr4&quot;, &quot;0&lt;= ... &lt; 360&quot;)
+end sub
+
+sub GestionImage
+if  monDlg.getControl(&quot;PyrOrthTr5&quot;).Model.State = 1 then
+ChangerImagePrincipalex4(monDlg , &quot;PyrOrthTr4&quot; , CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc11.gif/&quot;), CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc12.gif/&quot;),CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc13.gif/&quot;), CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc14.gif/&quot;), CheminDessin(&quot;Dessins/erreur.gif/&quot;))
+end if
+if  monDlg.getControl(&quot;PyrOrthTr6&quot;).Model.State = 1 then
+ChangerImagePrincipalex4(monDlg , &quot;PyrOrthTr4&quot; , CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc21.gif/&quot;), CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc22.gif/&quot;),CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc23.gif/&quot;), CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc24.gif/&quot;), CheminDessin(&quot;Dessins/erreur.gif/&quot;))
+end if
+if  monDlg.getControl(&quot;PyrOrthTr7&quot;).Model.State = 1 then
+ChangerImagePrincipalex4(monDlg , &quot;PyrOrthTr4&quot; , CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc31.gif/&quot;), CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc32.gif/&quot;),CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc33.gif/&quot;), CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc34.gif/&quot;), CheminDessin(&quot;Dessins/erreur.gif/&quot;))
+end if
+if  monDlg.getControl(&quot;PyrOrthTr8&quot;).Model.State = 1 then
+ChangerImagePrincipalex4(monDlg , &quot;PyrOrthTr4&quot; , CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc41.gif/&quot;), CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc42.gif/&quot;),CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc43.gif/&quot;), CheminDessin(&quot;Dessins/PyrTrPc/pyrtrpc44.gif/&quot;), CheminDessin(&quot;Dessins/erreur.gif/&quot;))
+end if
+end sub
+
+
+sub GestionBoutonOK  
+Dim choix as Object, valeur as string,i as integer, test(4) as integer
+
+&apos;-----------------------Gestion des erreurs de saisie
+
+test(1) = ZT_Nbre(monDlg,  &quot;PyrOrthTr1&quot;, 0.001 , 20 , 5 , RepPyrOrthPc2Dlg(12),) 
+test(2) = ZT_Nbre(monDlg,  &quot;PyrOrthTr2&quot;, 0.001 , 20 , 5 , RepPyrOrthPc2Dlg(13),) 
+test(3) = ZT_Nbre(monDlg,  &quot;PyrOrthTr3&quot;, 0.001 , 20 , 5 , RepPyrOrthPc2Dlg(14),)        &apos; 0 ou 1
+test(4) = ZT_Nbre(monDlg,  &quot;PyrOrthTr4&quot;, 0 , 360 , 45 , RepPyrOrthPc2Dlg(15),) 
+test(0) = test(1)*test(2)*test(3)*test(4)   &apos;--test(0) contient 1 si tout est ok 0 sinon
+
+
+if test(0) = 1 then
+&apos;---------------------- recupere toute les données saisie dans une variable globale
+    for i = 1 to 4
+    RepPyrOrthPc2Dlg(i - 1) = CDbl(monDlg.getControl(&quot;PyrOrthTr&quot;&amp;i).Peer.Text)
+    Next
+    for i = 5 to 10
+    RepPyrOrthPc2Dlg(i - 1) = monDlg.getControl(&quot;PyrOrthTr&quot;&amp;i).state  
+    Next    
+    monDlg.Model.Tag= &quot;OK&quot;   &apos;met OK au tag du dialogue quand tout est validé
+    RepPyrOrthPc2Dlg(11) = true   &apos;true quand tout est validé
+    monDlg.endExecute
+end if
+
+End Sub
+
+
+
+
+
+</script:module>

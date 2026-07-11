@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE library:library PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "library.dtd">
+<library:library xmlns:library="http://openoffice.org/2000/library" library:name="AHmath2D" library:readonly="false" library:passwordprotected="false">
+ <library:element library:name="ah2D1"/>
+ <library:element library:name="DialogMain"/>
+ <library:element library:name="Constructions"/>
+ <library:element library:name="ah2DMain"/>
+ <library:element library:name="DialogGestReponse"/>
+ <library:element library:name="Mod_Point"/>
+ <library:element library:name="DialogGestBoutonOK"/>
+ <library:element library:name="Mod_Segment"/>
+ <library:element library:name="Mod_Cercle"/>
+ <library:element library:name="Mod_DroitesPart"/>
+ <library:element library:name="Mod_Isom"/>
+ <library:element library:name="Mod_Inters"/>
+ <library:element library:name="Mod_Polygone"/>
+ <library:element library:name="Mod_Gomme"/>
+ <library:element library:name="Mod_Crayon"/>
+ <library:element library:name="Mod_surface"/>
+ <library:element library:name="Mod_info"/>
+ <library:element library:name="Mod_Modif"/>
+ <library:element library:name="Mod_Nommage"/>
+ <library:element library:name="Mod_Arc"/>
+ <library:element library:name="ah2D_CBLB"/>
+ <library:element library:name="Mod_Codage"/>
+ <library:element library:name="Mod_NomsFin"/>
+</library:library>

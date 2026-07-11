@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bibliothèque de ressources XML</title>
+    <!-- On charge le fichier d'arborescence généré par Python -->
+    <script src="taxonomy.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #333; padding: 20px; margin: 0; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; gap: 30px; }
+        
+        /* --- MENU GAUCHE (L'arborescence) --- */
+        .sidebar { flex: 0 0 350px; background: #f8f9fa; padding: 15px; border-radius: 8px; border-right: 1px solid #eee; max-height: 90vh; overflow-y: auto; }
+        .sidebar h3 { margin-top: 0; font-size: 16px; border-bottom: 2px solid #0d6efd; padding-bottom: 10px; }
+        
+        /* Styles natifs pour créer l'arborescence (triangles déroulants) */
+        details { margin-bottom: 5px; }
+        summary { cursor: pointer; font-weight: bold; padding: 5px; border-radius: 4px; }
+        summary:hover { background: #e9ecef; }
+        
+        /* Niveaux de l'arborescence */
+        .level-matiere > summary { font-size: 15px; color: #0d6efd; }
+        .level-classe > summary { font-size: 14px; color: #495057; margin-left: 15px; }
+        .level-chapitre > summary { font-size: 13px; color: #6c757d; font-weight: normal; font-style: italic; margin-left: 30px; }
+        .tags-container { margin-left: 45px; margin-top: 5px; margin-bottom: 10px; }
+        
+        .tag-btn { 
+            display: inline-block; background: white; color: #495057; border: 1px solid #ccc;
+            padding: 3px 8px; margin: 2px; border-radius: 12px; cursor: pointer; font-size: 12px; transition: 0.2s;
+        }
+        .tag-btn:hover { border-color: #0d6efd; color: #0d6efd; }
+        .tag-btn.active { background: #0d6efd; color: white; border-color: #0d6efd; }
+        .clear-btn { margin-top: 15px; width: 100%; background: #dc3545; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .clear-btn:hover { background: #c82333; }
+
+        /* --- ZONE DROITE (Les fichiers) --- */
+        .main-content { flex: 1; }
+        .main-content h2 { margin-top: 0; color: #2c3e50; }
+        .file-list { list-style: none; padding: 0; margin: 0; }
+        .file-list li { display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #198754; }
+        .file-info { flex: 1; margin-right: 15px; }
+        .file-category { font-size: 12px; color: #6c757d; text-transform: uppercase; margin-bottom: 5px; }
+        .file-name { font-weight: 600; color: #333; font-size: 15px; word-break: break-all; }
+        .file-tags { margin-top: 8px; }
+        .file-tag { font-size: 11px; background: #e2e8f0; color: #4a5568; padding: 2px 8px; border-radius: 10px; margin-right: 5px; }
+        .btn-download { background: #198754; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; white-space: nowrap; }
+        .btn-download:hover { background: #157347; }
+        .no-result { text-align: center; color: #888; padding: 30px; font-style: italic; }
+        .loading { text-align: center; padding: 30px; color: #888; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- MENU GAUCHE -->
+        <div class="sidebar">
+            <h3>📚 Arborescence</h3>
+            <div id="taxonomy-tree">
+                <!-- L'arborescence se construira ici -->
+            </div>
+            <div id="other-tags-section" style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 15px; display: none;">
+                <h3 style="font-size: 14px; margin-top:0;">🔧 Autres filtres (Outils, Bloom...)</h3>
+                <div id="other-tags-buttons"></div>
+            </div>
+            <button class="clear-btn" onclick="resetFilters()">🔄 Réinitialiser les filtres</button>
+        </div>
+
+        <!-- CONTENU DROIT -->
+        <div class="main-content">
+            <h2>📦 Ressources sélectionnées</h2>
+            <ul id="file-list" class="file-list">
+                <li class="loading">Chargement des données en local...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const JSON_URL = 'index.json'; 
+        let allResources = [];
+        let activeTags = new Set();
+        let knownTagsNormalized = new Set(); // Pour stocker les tags de l'arborescence
+
+        // FONCTION MAGIQUE : Ignore les accents, majuscules et espaces pour comparer les tags
+        function normalize(str) {
+            return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+        }
+
+        // 1. Chargement des données JSON
+        async function loadData() {
+            const listElement = document.getElementById('file-list');
+            try {
+                const response = await fetch(JSON_URL);
+                if (!response.ok) throw new Error("Fichier index.json introuvable.");
+                allResources = await response.json();
+                
+                // On pré-normalise les tags de chaque fichier pour aller plus vite
+                allResources.forEach(res => {
+                    res.normalizedTags = res.tags.map(normalize);
+                });
+
+                renderTree();
+                renderOtherTags();
+                filterAndRenderFiles();
+            } catch (error) {
+                listElement.innerHTML = `<li class="no-result" style="color:red;">Erreur : ${error.message}</li>`;
+            }
+        }
+
+        // 2. Création de l'arborescence visuelle
+        function renderTree() {
+            const treeContainer = document.getElementById('taxonomy-tree');
+            
+            for (const [matiere, classes] of Object.entries(TAXONOMY)) {
+                const detailsMatiere = document.createElement('details');
+                detailsMatiere.className = 'level-matiere';
+                detailsMatiere.open = true; // Ouvert par défaut
+                detailsMatiere.innerHTML = `<summary>${matiere}</summary>`;
+                
+                for (const [classe, chapitres] of Object.entries(classes)) {
+                    const detailsClasse = document.createElement('details');
+                    detailsClasse.className = 'level-classe';
+                    detailsClasse.innerHTML = `<summary>${classe}</summary>`;
+                    
+                    for (const [chapitre, motsCles] of Object.entries(chapitres)) {
+                        const detailsChapitre = document.createElement('details');
+                        detailsChapitre.className = 'level-chapitre';
+                        detailsChapitre.innerHTML = `<summary>${chapitre}</summary>`;
+                        
+                        const divTags = document.createElement('div');
+                        divTags.className = 'tags-container';
+                        
+                        motsCles.forEach(mot => {
+                            knownTagsNormalized.add(normalize(mot)); // On l'ajoute aux tags connus
+                            const btn = document.createElement('button');
+                            btn.className = 'tag-btn';
+                            btn.innerText = mot;
+                            btn.onclick = (e) => { e.stopPropagation(); toggleTag(mot, btn); };
+                            divTags.appendChild(btn);
+                        });
+                        
+                        detailsChapitre.appendChild(divTags);
+                        detailsClasse.appendChild(detailsChapitre);
+                    }
+                    detailsMatiere.appendChild(detailsClasse);
+                }
+                treeContainer.appendChild(detailsMatiere);
+            }
+        }
+
+        // 3. Affichage des tags qui ne sont PAS dans l'arborescence (ex: stack, jsxgraph)
+        function renderOtherTags() {
+            const otherContainer = document.getElementById('other-tags-buttons');
+            const otherSection = document.getElementById('other-tags-section');
+            let hasOther = false;
+
+            allResources.forEach(res => {
+                res.tags.forEach(tag => {
+                    if (!knownTagsNormalized.has(normalize(tag))) {
+                        hasOther = true;
+                        const btn = document.createElement('button');
+                        btn.className = 'tag-btn';
+                        btn.innerText = tag;
+                        btn.onclick = () => toggleTag(tag, btn);
+                        otherContainer.appendChild(btn);
+                    }
+                });
+            });
+
+            if (hasOther) otherSection.style.display = 'block';
+        }
+
+        // 4. Logique de filtrage
+        function toggleTag(tag, btnElement) {
+            const normalizedTag = normalize(tag);
+            if (activeTags.has(normalizedTag)) { 
+                activeTags.delete(normalizedTag); 
+                btnElement.classList.remove('active');
+            } else { 
+                activeTags.add(normalizedTag); 
+                btnElement.classList.add('active');
+            }
+            filterAndRenderFiles();
+        }
+
+        function resetFilters() {
+            activeTags.clear();
+            document.querySelectorAll('.tag-btn.active').forEach(btn => btn.classList.remove('active'));
+            filterAndRenderFiles();
+        }
+
+        function filterAndRenderFiles() {
+            const listElement = document.getElementById('file-list');
+            listElement.innerHTML = '';
+            const activeArray = [...activeTags];
+
+            let filteredResources = allResources;
+            
+            if (activeArray.length > 0) {
+                filteredResources = allResources.filter(resource => 
+                    activeArray.every(activeTag => resource.normalizedTags.includes(activeTag))
+                );
+            }
+
+            if (filteredResources.length === 0) {
+                listElement.innerHTML = '<li class="no-result">Aucune ressource ne correspond à cette sélection.</li>';
+                return;
+            }
+
+            filteredResources.forEach(resource => {
+                const li = document.createElement('li');
+                const fullPath = resource.fichier; 
+                const parts = fullPath.split('/');
+                const fileName = parts.pop(); 
+                const categoryParts = parts.slice(2); 
+                const categoryName = categoryParts.join(' / ') || "Dossier racine";
+
+                let localDownloadPath = fullPath;
+                if (localDownloadPath.startsWith('test/')) localDownloadPath = localDownloadPath.substring(5); 
+                
+                const tagsHtml = resource.tags.map(t => `<span class="file-tag">${t}</span>`).join('');
+
+                li.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-category">📁 ${categoryName}</div>
+                        <div class="file-name">${fileName}</div>
+                        <div class="file-tags">${tagsHtml}</div>
+                    </div>
+                    <a href="${localDownloadPath}" download="${fileName}" class="btn-download">⬇ Télécharger</a>
+                `;
+                listElement.appendChild(li);
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

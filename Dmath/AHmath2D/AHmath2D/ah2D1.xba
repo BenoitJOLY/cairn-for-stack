@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ah2D1" script:language="StarBasic" script:moduleType="normal">
+&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+Option explicit
+
+&apos;-------------------------------------------------------------------------------------------------
+&apos;fonction reprise de Dmaths et créée par Didier Dorange Pattoret
+&apos;Renvoie les chaines &quot;OpenOffice&quot; ou &quot;LibreOffice&quot;
+&apos;-------------------------------------------------------------------------------------------------
+
+Function OOoName As String
+  &apos;Retreives the running OOO version
+  Dim aSettings, aConfigProvider
+  Dim aParams2(0) As new com.sun.star.beans.PropertyValue
+  Dim sProvider$, sAccess$
+  sProvider = &quot;com.sun.star.configuration.ConfigurationProvider&quot;
+  sAccess   = &quot;com.sun.star.configuration.ConfigurationAccess&quot;
+  aConfigProvider = createUnoService(sProvider)
+  aParams2(0).Name = &quot;nodepath&quot;
+  aParams2(0).Value = &quot;/org.openoffice.Setup/Product&quot;
+  aSettings = aConfigProvider.createInstanceWithArguments(sAccess, aParams2())
+&apos;  Print aSettings.getbyname(&quot;ooName&quot;)
+  OOoName = aSettings.getbyname(&quot;ooName&quot;)
+End Function
+
+
+sub GestionBugOpenOffice
+if oTypeSB = &quot;OpenOffice&quot; then
+	msgbox(Trad(monDlg,MesMessages2(15)))
+	Exit sub
+End if
+End sub
+
+
+
+&apos;---------------------------------------------------------------------------------------
+&apos;La routine utilitaire DispatchSimple permet d’exécuter facilement les commandes de Dispatcher qui ne nécessitent pas d’argument.
+&apos;routine tirée du livre de Bernard Marcelly et Laurent Godard : Macros OOoBASIC et API
+&apos;Commande = nom de la commande &quot;copy&quot; , &quot;Paste&quot; etc...
+&apos;fenetre = 
+&apos;----------------------------------------------------------------------------------------------
+Sub DispatchSimple(Commande As String, Optional fenetre As Variant)
+Dim disp as object, noArgs()
+if IsMissing(fenetre) then
+  fenetre = StarDesktop.CurrentFrame
+end if
+disp = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+On Error GoTo dispErr1
+disp.executeDispatch(fenetre, &quot;.uno:&quot; &amp; Commande, &quot;&quot;, 0, noArgs)
+Suite:
+On Error GoTo 0
+Exit Sub
+dispErr1:
+  MsgBox(&quot;Commande inconnue : &quot; &amp; Commande, 16)
+  Resume Suite
+End Sub
+
+
+&apos;--------------------------------------------------------------------------------------------------
+&apos;Lance une macro de la bibliothèque AHmath2D ModuleMacro = nommodule.nomroutine
+&apos; d&apos;après le livre de Bernard Marcelly et Laurent Godard : Macros OOoBASIC et API
+&apos;--------------------------------------------------------------------------------------------------
+
+Sub lanceurMacro(ModuleMacro as string)
+Dim disp as object, resu As Variant, noArgs(), fenetre as variant
+fenetre = StarDesktop.CurrentFrame
+disp = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+resu = disp.executeDispatch(fenetre, &quot;macro:///AHmath2D.&quot; &amp; ModuleMacro, &quot;&quot;, 0, noArgs)
+if resu.State &lt;&gt; 1 then MsgBox(&quot;Echec de lancement de la macro&quot;)
+End Sub
+
+&apos;---------------------------------------------------------------------------------------------------
+&apos;function traduction qui récupère du texte quand le multilanguage est activé 
+&apos;d&apos;après le livre de Bernard Marcelly et Laurent Godard : Macros OOoBASIC et API
+&apos;----------------------------------------------------------------------------------------------------
+Function trad(dlg As Object, libelle As String) As String
+Dim rr As Object
+rr = dlg.Model.ResourceResolver
+trad = rr.resolveString(Mid(libelle, 2))
+End Function
+
+
+&apos;--------------------------------------------------------------------------------
+&apos; renvoie le chemin menant aux dessins des boites de dialogue
+&apos;--------------------------------------------------------------------------------
+
+function CheminDessin(FinChemin as string) as string
+dim CheminLib as string, k as integer, CheminLibDiv() as string
+
+CheminLib = basiclibraries.getLibraryLinkURL(&quot;AHmath2D&quot;)
+CheminLibDiv = split(CheminLib,&quot;/&quot;)
+Dim monChemin(Ubound(CheminLibDiv))
+
+for k = 0 to (Ubound(CheminLibDiv)-2)
+monChemin(k) = CheminLibDiv(k)
+next 
+monChemin(Ubound(CheminLibDiv))=FinChemin
+
+cheminDessin = join(monChemin(),&quot;/&quot;)
+
+end function
+
+
+&apos;-----------------------------------------------------------------------------------------------------
+&apos; Ouvre openOffice Draw ou writer en visible ou caché : oTypeDoc = &quot;writer&quot; ou  oTypeDoc = &quot;draw&quot;
+&apos;et définit les variables Public oDocTemp et oPageTemp
+&apos;-----------------------------------------------------------------------------------------------------
+sub ChargerDoc (visible as boolean, optional oTypeDoc as string)
+Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+
+if Ismissing(oTypeDoc) then oTypeDoc = &quot;draw&quot;
+
+ mFileProperties(0).Name= &quot;Hidden&quot;
+   if visible = true then
+      mFileProperties(0).Value=false
+      else
+      mFileProperties(0).Value=True
+   end if
+
+oDocTemp=StarDesktop.LoadComponentFromURL(&quot;private:factory/s&quot; &amp; oTypeDoc,&quot;_blank&quot;, 0, mFileProperties())
+ 
+if oDocTemp.ImplementationName = &quot;SwXTextDocument&quot; then oPageTemp = oDocTemp.DrawPage
+if oDocTemp.ImplementationName = &quot;SdXImpressDocument&quot; then oPageTemp = oDocTemp.DrawPages(0)
+
+oDocTemp.Title = &quot;AHmath2D&quot;
+oPageTemp.Name = &quot;AHmath2D_Temp&quot;
+oDocTemp.CurrentController.Frame.ContainerWindow.IsMaximized = true
+
+end sub
+
+&apos;------------------------------------------------------------------------------------------------
+&apos;Si oMultiple = false -&gt;  renvoie une seule forme d&apos;un document writer ou Draw repérée par son index n
+&apos;                         si n est omis alors renvoie la dernière (n débute à 0)
+&apos;Si oMultiple = true  -&gt; renvoie les n dernières formes d&apos;un document writer ou Draw
+&apos;                        si n est omis alors renvoie toutes les formes (multiple) ou la première (seule)
+&apos;si oDoc est omis alors oDoc est le document actif
+&apos;NB : ChoixForme renvoie un ensemble d&apos;objet
+&apos;------------------------------------------------------------------------------------------------
+function ChoixFormes(oMultiple as boolean, optional n as integer, optional oDoc as object) as object
+Dim oPage as object, oSelection as object, oNbreFormes as integer, oGroupe as object, oElementGroupe as object
+Dim i as integer
+
+if Ismissing(oDoc) then oDoc = thisComponent
+if oDoc.ImplementationName = &quot;SwXTextDocument&quot; then oPage = oDoc.DrawPage
+if oDoc.ImplementationName = &quot;SdXImpressDocument&quot; then oPage = oDoc.DrawPages(0)
+oNbreFormes = oPage.Count
+if Ismissing(n) then 
+	if oMultiple = true then n = oNbreFormes
+	if oMultiple = false then n = 0	
+end if
+
+oSelection = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;)
+
+
+if oMultiple = false then
+ oElementGroupe = oPage.getByIndex(n)  
+ oSelection.add(oElementGroupe)
+else
+ for i = 1 to n
+  oElementGroupe = oPage.getByIndex(oNbreFormes-i)
+  oSelection.add(oElementGroupe)
+ Next
+end if
+ChoixFormes = oSelection
+end function
+
+
+
+&apos;------------------------------------------------------------------------------------------------
+&apos;Groupe oSelection et renvoie la forme groupée
+&apos;si oSelection est omis alors groupe les formes selectionnées physiquement
+&apos;------------------------------------------------------------------------------------------------
+
+function GroupFormes(optional oSelection as object, optional oDoc as object) as object
+Dim oPage as object, oGroupe as object
+
+if Ismissing(oDoc) then oDoc = thisComponent
+if oDoc.ImplementationName = &quot;SwXTextDocument&quot; then oPage = oDoc.DrawPage
+if oDoc.ImplementationName = &quot;SdXImpressDocument&quot; then oPage = oDoc.DrawPages(0)
+if Ismissing(oSelection) then oSelection = oDoc.CurrentSelection
+oGroupe = oPage.group(oSelection)
+GroupFormes = oGroupe
+end function
+
+&apos;------------------------------------------------------------------------------------------------
+&apos;Degroupe oSelection et renvoie la forme groupée
+&apos;si oSelection est omis alors groupe les formes selectionnées physiquement
+&apos;------------------------------------------------------------------------------------------------
+Sub Vidange(oCollection as object)    &apos;vide oCollection
+Dim cst as integer, k as integer
+cst = oCollection.count
+if cst &gt; 0 then
+	For k = 0 to cst - 1
+	oCollection.remove(oCollection(0))
+	Next
+end if
+end sub
+
+Sub Transfert(oCollection1 as object, oCollection2 as object)  &apos;Ajoute les objets de oCollection2 à oCollection1
+Dim cst as integer, k as integer
+cst = oCollection2.count
+if cst &gt; 0 then
+	for k = 0 to cst - 1
+	oCollection1.add(oCollection2(k))
+	next
+end if
+end sub
+
+
+Function DegroupEnElementSimple(oSelection as object, optional oDoc as object) as object
+Dim oGroupeTrouve as boolean, i as integer, nvSelection as object
+
+if Ismissing(oDoc) then oDoc = thisComponent
+
+oGroupeTrouve = true
+nvSelection = oSelection
+
+while oGroupeTrouve = true
+
+	oGroupeTrouve = false
+For i = 0 to nvSelection.count - 1
+	if IsGroupShape(nvSelection(i)) = true then oGroupeTrouve = true
+Next
+if oGroupeTrouve = true then
+	DispatchSimple(&quot;FormatUngroup&quot;, oDoc.CurrentController.Frame)
+	nvSelection = oDoc.CurrentSelection
+End if
+Wend
+
+DegroupEnElementSimple = nvSelection
+
+end function
+
+
+&apos;------------------------------------------------------------------------------------------------
+&apos;Selectionne physiquement la forme ou les formes contenues dans oSelection
+&apos;renvoie la selection groupée si oGrpe = true
+&apos;------------------------------------------------------------------------------------------------
+
+sub SelectFormes(oSelection as object, optional oDoc as object)
+Dim oPage as object
+
+if Ismissing(oDoc) then oDoc = thisComponent
+if oDoc.ImplementationName = &quot;SwXTextDocument&quot; then oPage = oDoc.DrawPage
+if oDoc.ImplementationName = &quot;SdXImpressDocument&quot; then oPage = oDoc.DrawPages(0)
+
+oDoc.CurrentController.select(oSelection)
+
+end sub
+
+&apos;--------------------------------
+&apos;Renvoie l&apos;index sur la page de l&apos;élément oSelection (index à partir de 1)
+&apos;
+&apos;---------------------------------
+
+function IndexForme (oSelection as object, optional oDoc as object) as integer
+Dim oPage as object, oNFormes as integer, i as integer, oNomOrigine as string
+
+if Ismissing(oDoc) then oDoc = thisComponent
+if oDoc.ImplementationName = &quot;SwXTextDocument&quot; then oPage = oDoc.DrawPage
+if oDoc.ImplementationName = &quot;SdXImpressDocument&quot; then oPage = oDoc.DrawPages(0)
+
+oNomOrigine = oSelection.Name
+oSelection.Name = &quot;ah2dNomprovisoire&quot;
+oNFormes = oPage.count
+for i = 1 to oNFormes
+if oPage.getByIndex(i-1).Name = &quot;ah2dNomprovisoire&quot; then
+   IndexForme = i
+end if
+Next
+oSelection.Name = oNomOrigine
+end function
+
+
+&apos;--------------------------------
+&apos;Renvoie les informations d&apos;un segment, d &apos;un cercle ou d&apos;un arc de cercle
+&apos;
+&apos;---------------------------------
+
+function InfoForme(oSelection as object, optional oDoc as object)    as variant        
+dim oPage as object, ext1 as variant , ext2 as variant, ext3 as variant, ext0 as variant
+Dim oType as string, oLong as double, oAngles as variant, oInfo(10) as variant, oTypePrecis as string
+Dim oCouleur(1) as Long, oEpaisseur as Long, oStyle(1) as Long
+Dim oDim as integer, i as variant, oNum as integer, oNum2 as Integer
+Dim oExtA as  New com.sun.star.awt.Point, oExtB as  New com.sun.star.awt.Point, oMil as   New com.sun.star.awt.Point
+Dim oCadre as New com.sun.star.awt.Rectangle
+
+
+if Ismissing(oDoc) then oDoc = thisComponent
+if oDoc.ImplementationName = &quot;SwXTextDocument&quot; then oPage = oDoc.DrawPage
+if oDoc.ImplementationName = &quot;SdXImpressDocument&quot; then oPage = oDoc.DrawPages(0)
+
+oCadre = oSelection.FrameRect
+
+If IsGroupShape(oSelection) = false then
+	oTypePrecis = &quot;Inconnu&quot;   &apos;initialisation de oTypePrecis
+	oStyle = array(oSelection.LineStyle,oSelection.FillStyle)
+	oCouleur = array(oSelection.LineColor,oSelection.FillColor)
+	oEpaisseur = oSelection.LineWidth
+	oType = oSelection.ShapeType
+	
+	if oSelection.ShapeType = &quot;com.sun.star.drawing.LineShape&quot; then
+		oExtA = oSelection.Polygon(0)
+		oExtB = oSelection.Polygon(1)
+		oMil.X = (oExtA.X + oExtB.X)/2
+		oMil.Y = (oExtA.Y + oExtB.Y)/2
+		oLong = CInt(sqr((oExtB.X-oExtA.X)*(oExtB.X-oExtA.X) + (oExtB.Y-oExtA.Y)*(oExtB.Y-oExtA.Y)))/1000   &apos;longueur du segment en cm
+		oAngles = oSelection.RotateAngle /100     &apos;Angle du segment avec l&apos;horizontal
+		oTypePrecis = &quot;Segment&quot;
+		if oAngles &gt; 180 then oAngles = oAngles - 360
+	end if   
+
+	if oSelection.ShapeType = &quot;com.sun.star.drawing.EllipseShape&quot; then
+   		oAngles = Array(oSelection.CircleStartAngle/100,oSelection.CircleEndAngle/100)    &apos;Angle de début et de fin de l&apos;arc avec l&apos;horizontal en degrés
+   
+   		if oSelection.circleKind = 0 then
+   				if CInt(oCadre.Width/10) - CInt(oCadre.Height/10) &lt;= 1 then &apos;précision au centième de cm
+	   				if oSelection.FillStyle = 1 then
+   						oTypePrecis = &quot;Surface coloriée&quot;
+   					Else 			
+   						oTypePrecis = &quot;Cercle&quot;
+   					End if
+   					oLong = oCadre.Width/2  &apos;rayon du cercle en millièmes de centimètre
+   					oExtA.X = oCadre.X + oLong   &apos;coordonnées du centre du cercle
+   					oExtA.Y = oCadre.Y + oLong
+   					oExtB.X = oCadre.X + 2 * oLong  &apos;coordonnées du point à 0°
+   					oExtB.Y = oCadre.Y + oLong
+   					oMil.X =  oCadre.X + oLong    &apos;centre
+   					oMil.Y = oCadre.Y + oLong
+   				end if
+   		End if
+   		
+   		if  oSelection.circleKind &gt; 0 and oSelection.circleKind &lt;= 3 then
+   				oNum = oSelection.circleKind
+   				oNum2 = oSelection.FillStyle
+   				oSelection.circleKind = 0
+   				oCadre = oSelection.FrameRect &apos; pour récupérer les données du cercle éventuel
+   				if CInt(oCadre.Width/10)- CInt(oCadre.Height/10) &lt;= 1   then &apos;précision au centième de cm
+   					oLong = oCadre.Width/2  &apos;rayon du cercle en millièmes de centimètre
+   					oMil.X = oCadre.X + oLong
+   					oMil.Y = oCadre.Y + oLong  &apos;coordonnées du centre du cercle
+					oExtA.X = oMil.X + oLong * cos(oAngles(0)* pi/180)
+					oExtA.Y = oMil.Y - oLong * sin(oAngles(0) * pi/180) &apos; coordonnée de la 1ère extrémité
+ 					oExtB.X = oMil.X + oLong * cos(oAngles(1)* pi/180)
+ 					oExtB.Y = oMil.Y - oLong * sin(oAngles(1) * pi/180)  &apos; coordonnée de la 2ème extrémité
+ 					oSelection.circleKind = oNum
+ 					oSelection.FillStyle = oNum2
+ 					if oNum &lt;&gt; 3 and oNum2 = 1 then oTypePrecis = &quot;Surface coloriée&quot;
+ 					if oNum = 3 then oTypePrecis = &quot;Arc de cercle&quot;
+   					if oSelection.RotateAngle &lt;&gt; 0 then AnnuleRotateAngleArc(oSelection)
+				End if
+		End if
+   	End if
+ 
+	if oSelection.ShapeType = &quot;com.sun.star.drawing.CustomShape&quot; then
+    	if IsCustomShape(oSelection) = &quot;ellipse&quot; then
+   			oCadre = oSelection.FrameRect &apos; pour récupérer les données du cercle ou ellipse
+    		if CInt(oCadre.Width/10) = CInt(oCadre.Height/10) then    &apos;précision au centième de cm
+			oLong = oCadre.Width/2  &apos;rayon du cercle en millièmes de centimètre
+		  	oExtA.X = oCadre.X + oLong
+   			oExtA.Y = oCadre.Y + oLong
+   			oExtB.X = oCadre.X + 2 * oLong
+   			oExtB.Y = oCadre.Y + oLong
+   			oMil.X =  oCadre.X + oLong    &apos;centre
+   			oMil.Y = oCadre.Y + oLong 			
+			oAngles = Array(0,360)    &apos;Données inutiles
+			oTypePrecis = &quot;Cercle&quot;
+  			end if
+   		end if
+	end if
+
+	if oSelection.ShapeType = &quot;com.sun.star.drawing.PolyPolygonShape&quot; then
+			oLong = oCadre.Width/2  &apos; 1/2 largeur du cadre
+			oAngles = &quot;&quot;
+			oTypePrecis = &quot;Surface coloriée&quot;
+	end if
+		oInfo = Array(oCadre,oExtA,oExtB,oMil,oLong,oAngles,oCouleur,oStyle, oEpaisseur,oType, oTypePrecis)      
+End if
+
+
+
+If IsGroupShape(oSelection) = true then  &apos; cas où on a un point : selection(0) est le point  selection(0)(0) est le 1er trait
+
+	oExtA.X = oCadre.X + oCadre.Width/2
+	oExtA.Y = oCadre.Y + oCadre.Height/2
+	oLong = 0
+	oAngles = 0
+&apos;	oType = &quot;com.sun.star.drawing.GroupShape&quot;
+	if oSelection(0)(0).ShapeType = &quot;com.sun.star.drawing.LineShape&quot; then oTypePrecis = &quot;Point&quot;
+	if oSelection(0)(0).ShapeType = &quot;com.sun.star.drawing.OpenBezierShape&quot; then oTypePrecis = &quot;Codage&quot; 
+	if oSelection(0)(0).ShapeType = &quot;com.sun.star.drawing.PolyLineShape&quot; then oTypePrecis = &quot;Codage&quot; 
+	oStyle = array(oSelection(0)(0).LineStyle,oSelection(0)(0).FillStyle)
+	oCouleur = array(oSelection(0)(0).LineColor,oSelection(0)(0).FillColor)
+	oEpaisseur = oSelection(0)(0).LineWidth
+
+ oInfo = Array(oCadre,oExtA,oExtB,oMil,oLong,oAngles,oCouleur,oStyle, oEpaisseur,oType, oTypePrecis)      
+end if
+
+
+   InfoForme = oInfo
+end function
+
+
+&apos;---------------------------------------------------------------------------------------
+&apos;change la couleur et augmente l&apos;epaisseur d&apos;un objet
+&apos;Attention ne fonctionne que sur une forme groupée ne contenant que des elements simples
+&apos; mesStyleRemplissage = array(style ligne, style remplissage) -&gt;    0 (aucun) ou 1
+&apos;---------------------------------------------------------------------------------------
+
+Sub AspectForme(monObjet as Object, monEpaisseur as Long, oVariationEpaisseur as Long, mesCouleurs as Variant, mesStyles as Variant)
+Dim i as integer
+
+if IsGroupShape(monObjet) = false then
+monObjet.LineStyle = mesStyles(0)
+monObjet.FillStyle = mesStyles(1)
+monObjet.LineColor = mesCouleurs(0)
+monObjet.FillColor = mesCouleurs(1)
+monObjet.LineWidth = monEpaisseur + oVariationEpaisseur
+end if
+if IsGroupShape(monObjet) = true then
+for i = 0 to monObjet.count - 1
+monObjet(i).LineStyle = mesStyles(0)
+monObjet(i).FillStyle = mesStyles(1)
+monObjet(i).LineColor = mesCouleurs(0)
+monObjet(i).FillColor = mesCouleurs(1)
+monObjet(i).LineWidth = monEpaisseur + oVariationEpaisseur
+next
+end if
+
+End sub
+
+&apos;--------------------------------
+&apos;Renvoie true si l&apos;objet selectionné sur une page est un objet dessin
+&apos;---------------------------------
+Function IsShape(optional oCollection as object) as Boolean
+IsShape = false
+If IsMissing(oCollection) then oCollection = ThisComponent.CurrentSelection
+if IsNull(oCollection) = False then
+   if oCollection.supportsService(&quot;com.sun.star.drawing.LineProperties&quot;) then IsShape = true
+end if
+end function
+
+&apos;--------------------------------
+&apos;Renvoie true si l&apos;objet selectionné sur une page est une collection d&apos;objets dessins
+&apos;---------------------------------
+Function IsShapeCollection(oCollection as object) as Boolean
+IsShapeCollection = false
+if IsNull(oCollection) = False then
+   if oCollection.supportsService(&quot;com.sun.star.drawing.ShapeCollection&quot;) then IsShapeCollection = true
+end if
+end function
+
+
+&apos;--------------------------------
+&apos;Renvoie true si l&apos;objet un objet Groupé
+&apos;---------------------------------
+Function IsGroupShape(oObjet as object) as Boolean
+IsGroupShape = false
+if IsNull(oObjet) = False then
+   if oObjet.supportsService(&quot;com.sun.star.drawing.GroupShape&quot;) then IsGroupShape = true
+end if
+end function
+
+&apos;--------------------------------
+&apos;Renvoie le nom de la customShape ou false
+&apos;---------------------------------
+Function IsCustomShape(oObjet as object) as variant
+Dim oDim as integer, i as integer
+IsCustomShape = false
+if IsNull(oObjet) = False then
+   if oObjet.supportsService(&quot;com.sun.star.drawing.CustomShape&quot;) then
+    oDim = UBound(oObjet.CustomShapeGeometry)
+    For i = 0 to oDim
+    if oObjet.CustomShapeGeometry(i).Name = &quot;Type&quot; then IsCustomShape = oObjet.CustomShapeGeometry(i).Value
+    next
+   end if
+end if
+end function
+
+
+&apos;--------------------------------
+&apos;Renvoie true ou false si la forme peut être remplie
+&apos;---------------------------------
+Function IsFillShape(oObjet as object) as boolean
+Dim oInfo as variant, oRep as boolean
+oInfo = InfoForme(oObjet)
+oRep = false
+if oInfo(9) = &quot;com.sun.star.drawing.PolyPolygonShape&quot; then oRep = true
+
+if oInfo(9) = &quot;com.sun.star.drawing.EllipseShape&quot; then
+	if oInfo(7)(1) = 1 then oRep = true
+End if
+IsFillShape = oRep
+End Function
+
+&apos;--------------------------------------------------------
+&apos; Renvoie une variable point d&apos;après les 2 coordonnées x0 et y0
+&apos;-------------------------------------------------------------
+
+function CoordPoint(x0 as integer, y0 as integer) as  New com.sun.star.awt.Point
+Dim oPoint as New com.sun.star.awt.Point
+oPoint.X = x0
+oPoint.Y = y0
+CoordPoint = oPoint
+end function
+
+
+&apos;-------------------------------------------------------------------------
+&apos;Renvoi les coordonnées du centre du rectangle encadrant l&apos;objet
+&apos;                       du coin sup gauche du cadre
+&apos;----------------------------------------------------------------------------
+Function CentreCadre (oObjet as object) as variant
+Dim monCadre as New com.sun.star.awt.Rectangle, oCentre as New com.sun.star.awt.Point, oPosition as New com.sun.star.awt.Point
+
+oCentre.X = oObjet.FrameRect.X + oObjet.FrameRect.Width/2
+oCentre.Y = oObjet.FrameRect.Y + oObjet.FrameRect.Height/2
+oPosition. X = oObjet.FrameRect.X
+oPosition.Y = oObjet.FrameRect.Y
+CentreCadre = array(oCentre, oPosition)
+End function
+
+Sub AnnuleRotateAngleArc (oArc as object)
+Dim oAngle1 as Long, oAngle2 as Long
+
+oArc.circleKind = 0
+oAngle1 =  oArc.CircleStartAngle + oArc.RotateAngle
+oAngle2 = oArc.CircleEndAngle + oArc.RotateAngle
+if oAngle1 &gt;= 36000 then oAngle1 = oAngle1 - 36000 
+if oAngle2 &gt;= 36000 then oAngle2 = oAngle2 - 36000 
+
+
+oArc.CircleStartAngle = oAngle1
+oArc.CircleEndAngle = oAngle2
+oArc.RotateAngle = 0
+oArc.circleKind = 3
+
+End sub
+
+
+&apos;Fusionne 2 tableaux dimensionnés et renvoie un tableau
+Function FusionTab(oTab1 as varaiant,oTab2 as variant) as variant
+Dim n1 as integer, n2 as integer, i as integer
+
+n1 = Ubound(oTab1)
+n2 = Ubound(oTab2)
+
+Dim oTab3(n1 + n2 + 1)
+if n1 &lt;&gt; -1 then
+For i = 0 to n1
+oTab3(i) = oTab1(i)
+Next
+End if
+if n2 &lt;&gt; -1 then
+For i = n1+1 to n1 + n2 + 1
+oTab3(i) = oTab2(i-n1-1)
+Next
+End if
+FusionTab = oTab3
+End function
+
+
+&apos;---------------------------------------------------------------------------------------------
+&apos; Fonction tirée (inspirée) du document d&apos;Andrew Pitonyak : OpenOffice.org Macros Explained
+&apos;---------------------------------------------------------------------------------------------
+
+Function PrintPageInformation as variant
+Dim oViewCursor  &apos;Current view cursor
+Dim oStyle  &apos;Current page style 
+Dim lHeight As Long &apos;Page height from Page Style in 1/100 mm
+Dim lWidth  As Long &apos;Page width from Page Style in 1/100 mm
+Dim s As String  &apos;Temporary string variable 
+
+If ThisComponent.ImplementationName = &quot;SwXTextDocument&quot; then
+
+	oViewCursor = ThisComponent.CurrentController.getViewCursor()
+	s = oViewCursor.PageStyleName
+	oStyle = ThisComponent.StyleFamilies.getByName(&quot;PageStyles&quot;).getByName(s)
+	lHeight = oStyle.Height  &apos;Page height in 1/100 mm
+	lWidth  = oStyle.Width  &apos;Page width in 1/100 mm
+
+	Dim dCharHeight As Double &apos;Character height in inches
+	Dim iCurPage As Integer  &apos;Current page
+	Dim dYCursor As Double  &apos;Distance from cursor to top in inches
+	Dim dYBottom As Double  &apos;Distance from cursor to bottom in inches
+	Dim dBottom As Double  &apos;Bottom margin in inches
+	Dim dLeft  As Double  &apos;Left margin in inches
+	Dim dRight  As Double  &apos;Right margin in inches
+	Dim dTop  As Double  &apos;Top margin in inches
+
+	dCharHeight = oViewCursor.CharHeight / 72.0 &apos;Convert points to inches
+	iCurPage =  oViewCursor.getPage()  &apos;Page number
+	dBottom = oStyle.BottomMargin / 2540.0 : dLeft = oStyle.LeftMargin / 2540.0
+	dRight  = oStyle.RightMargin  / 2540.0 : dTop  = oStyle.TopMargin  / 2540.0
+
+	Dim v
+	v = oViewCursor.getPosition()
+	Dim realPageNumber As Long
+	realPageNumber = Fix(v.Y / lHeight)
+	Dim realY : realY = v.Y - realPageNumber * lHeight
+
+	dYCursor = realY/2540.0 + dTop + dCharHeight / 2
+	
+	PrintPageInformation = Array(lWidth/1000,lHeight/1000,dTop * 2.54,dBottom * 2.54,dLeft * 2.54,dRight * 2.54,dYCursor * 2.54)
+End if
+
+if ThisComponent.ImplementationName = &quot;SdXImpressDocument&quot; then
+	Dim maPage as object
+	Dim mBottom As Double  &apos;Bottom margin in 1/100 mm
+	Dim mLeft  As Double  &apos;Left margin  in 1/100 mm
+	Dim mRight  As Double  &apos;Right margin  in 1/100 mm
+	Dim mTop  As Double  &apos;Top margin  in 1/100 mm
+	Dim pHeight As Long &apos;Page height from Page Style in 1/100 mm
+	Dim pWidth  As Long &apos;Page width from Page Style in 1/100 mm
+	maPage = ThisComponent.CurrentController.CurrentPage
+	
+	mBottom = maPage.BorderBottom /1000
+	mRight = maPage.BorderRight /1000
+	mLeft = maPage.BorderLeft /1000
+	mTop = maPage.BorderTop /1000
+	pHeight = maPage.Height /1000
+	pWidth = maPage.Width /1000
+	PrintPageInformation = Array(pWidth,pHeight,mTop,mBottom,mLeft,mRight,pHeight * 0.25)
+End if
+
+End Function
+
+
+</script:module>

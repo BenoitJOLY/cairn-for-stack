@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396286  -->
+  <question type="stack">
+    <name>
+      <text>Suites : Somme des n premiers termes (Géométrique)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Suites numériques — Somme géométrique</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit \((U_n)\) une suite géométrique telle que :</p>
+<div style="display: flex; gap: 30px; justify-content: center; margin: 15px 0; flex-wrap: wrap;">
+<div>\(U_0 = {@U0@}\)</div>
+<div>\(q = {@q@}\)</div>
+</div>
+<p>On souhaite calculer la somme des \(n\) premiers termes : \(S_n = U_0 + U_1 + \dots + U_{n-1}\).</p>
+<p><strong>1.</strong> Exprimer \(S_n\) en fonction de \(n\).</p>
+<div style="margin: 10px 0;">\(S_n = \) [[input:ans_sn]] [[validation:ans_sn]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour calculer la somme des \(n\) premiers termes d'une suite géométrique de raison \(q \neq 1\), on utilise la formule :<br /><br />
+\[
+S_n = U_0 \times \frac{1 - q^n}{1 - q}
+\]<br />
+<strong>Application numérique :</strong><br />
+Ici, \(U_0 = {@U0@}\) et \(q = {@q@}\). On obtient donc :<br />
+\[
+S_n = {@U0@} \times \frac{1 - ({@q@})^n}{1 - ({@q@})} = {@ans_correct@}
+\]
+<br /><em>(Remarque : la forme \(U_0 \times \frac{q^n - 1}{q - 1}\) est mathématiquement équivalente et donc tout aussi correcte).</em>
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Redéfinition locale du tirage aléatoire inclusif (Pôle 2.9) */
+ri(a,b) := a + rand(b - a + 1)$ 
+/* Génération des paramètres */
+U0_pool: [1, 2, 3, 4, 5, -1, -2]$ q_pool: [2, -2, 3, -3, 1/2, -1/2]$ U0: U0_pool[ri(1, length(U0_pool))]$ q: q_pool[ri(1, length(q_pool))]$ 
+/* Dernier terme de la somme (pour construire l'erreur arithmétique) */
+Un_1: U0 * q^(n-1)$ 
+/* Réponse attendue */
+ans_correct: U0 * (1 - q^n) / (1 - q)$ 
+/* Erreurs classiques */
+/* Erreur 1 : A utilisé la formule arithmétique */
+err_arith: n * (U0 + Un_1) / 2$ 
+/* Erreur 2 : A oublié de multiplier par U0 */
+err_no_u0: (1 - q^n) / (1 - q)$ 
+/* Erreur 3 : A mis un exposant n-1 au lieu de n (somme jusqu'à U_{n-2}) */
+err_n_1: U0 * (1 - q^(n-1)) / (1 - q)$ 
+/* Erreur 4 : Erreur de signe fréquente (q^n - 1) / (1 - q) au lieu de (1 - q^n)/(1-q) */
+err_sign: U0 * (q^n - 1) / (1 - q)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>U0={@U0@}, q={@q@}, Sn={@U0@}*(1-({@q@})^n)/(1-({@q@}))</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:suites-geometrique-sn</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_sn</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>25</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> L'expression de la somme est correcte.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A utilisé la formule arithmétique</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>err_arith</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-ARITH</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion de suite !</strong> Vous avez utilisé la formule de la somme d'une suite <strong>arithmétique</strong> (\(n \times \frac{U_0 + U_{n-1}}{2}\)). Ici la suite est <strong>géométrique</strong>, il faut utiliser \(U_0 \times \frac{1 - q^n}{1 - q}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-ARITH</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : A oublié le facteur U_0</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>err_no_u0</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-NOU0</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli du premier terme !</strong> La formule est un produit : il faut multiplier la fraction \(\frac{1 - q^n}{1 - q}\) par le premier terme \(U_0\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-NOU0</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Exposant n-1 au lieu de n</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>err_n_1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-N-1</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvais exposant !</strong> Vous avez écrit \(q^{n-1}\) au lieu de \(q^n\). La somme des \(n\) premiers termes (de \(U_0\) à \(U_{n-1}\)) fait bien apparaître \(q^n\) dans la formule.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-N-1</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur : Erreur de signe (q^n - 1) / (1 - q)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>err_sign</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe !</strong> Vous avez écrit \(\frac{q^n - 1}{1 - q}\). C'est soit \(\frac{1 - q^n}{1 - q}\), soit \(\frac{q^n - 1}{q - 1}\) (le numérateur et le dénominateur changent tous les deux de signe).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la méthode :<br />La formule pour une somme de \(n\) termes est :<br />\(S_n = U_0 \times \frac{1 - q^n}{1 - q}\)<br /><em>(Attention aux parenthèses autour de \(1 - q\)).</em></div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

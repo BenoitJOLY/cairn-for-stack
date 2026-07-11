@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Polyedre0Dlg" dlg:left="185" dlg:top="112" dlg:width="143" dlg:height="121" dlg:help-text="&amp;1506.Polyedre0Dlg.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1507.Polyedre0Dlg.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:background-color="0xff00"/>
+  <dlg:style dlg:style-id="1" dlg:background-color="0xff" dlg:text-color="0xffffff" dlg:font-weight="150"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="8" dlg:top="20" dlg:width="91" dlg:height="10" dlg:help-text="&amp;1508.Polyedre0Dlg.Label1.HelpText" dlg:value="&amp;1509.Polyedre0Dlg.Label1.Label"/>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="5" dlg:left="22" dlg:top="59" dlg:width="89" dlg:height="49" dlg:help-text="&amp;1519.Polyedre0Dlg.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;1520.Polyedre0Dlg.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:textfield dlg:id="NbreSommets" dlg:tab-index="1" dlg:left="102" dlg:top="15" dlg:width="20" dlg:height="20" dlg:help-text="&amp;1523.Polyedre0Dlg.NbreSommets.HelpText" dlg:align="center" dlg:maxlength="2" dlg:value="&amp;1524.Polyedre0Dlg.NbreSommets.Text"/>
+  <dlg:button dlg:id="BoutonOK" dlg:tab-index="2" dlg:left="25" dlg:top="65" dlg:width="40" dlg:height="25" dlg:help-text="&amp;3366.Polyedre0Dlg.BoutonOK.HelpText" dlg:value="&amp;3367.Polyedre0Dlg.BoutonOK.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Polyedre.GestionBoutonOK0?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="BoutonAnnuler" dlg:tab-index="3" dlg:left="68" dlg:top="65" dlg:width="40" dlg:height="25" dlg:help-text="&amp;3368.Polyedre0Dlg.BoutonAnnuler.HelpText" dlg:value="&amp;3369.Polyedre0Dlg.BoutonAnnuler.Label" dlg:button-type="cancel"/>
+  <dlg:text dlg:style-id="0" dlg:id="Message1" dlg:tab-index="6" dlg:visible="false" dlg:left="-140" dlg:top="-12" dlg:width="130" dlg:height="20" dlg:help-text="&amp;3372.Polyedre0Dlg.Message1.HelpText" dlg:value="&amp;3373.Polyedre0Dlg.Message1.Label"/>
+  <dlg:text dlg:style-id="1" dlg:id="BoutonSite" dlg:tab-index="4" dlg:left="25" dlg:top="93" dlg:width="83" dlg:height="8" dlg:help-text="&amp;3374.Polyedre0Dlg.BoutonSite.HelpText" dlg:value="&amp;3375.Polyedre0Dlg.BoutonSite.Label" dlg:align="center"/>
+ </dlg:bulletinboard>
+</dlg:window>

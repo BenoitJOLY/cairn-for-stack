@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="PiDialogFns" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) Andy Lewis.  (lewiss@ntlworld.com)
+&apos;téléchargé sur www.ooomacros.org
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU Lesser General Public Licence (LGPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+&apos;Routines required by the PiDialog box
+
+option explicit
+
+private goPiDialog as object	
+
+function getpiscaling()
+&apos;	DialogLibraries.loadLibrary( &quot;Dmaths2&quot; )
+&apos;	goPiDialog=createUnoDialog(DialogLibraries.Dmaths2.PiDialog)
+	goPiDialog = LoadDialog(&quot;Dmaths2&quot;,&quot;PiDialog&quot;)
+	goPiDialog.Execute()
+	getpiscaling=4*atn(1)*goPiDialog.getControl(&quot;Numerator&quot;).getValue()/goPiDialog.getControl(&quot;Denominator&quot;).getValue()
+end function
+
+sub PiDialogOK_Click()
+	goPiDialog.EndExecute()
+end sub
+
+</script:module>

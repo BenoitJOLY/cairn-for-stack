@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="DialogGestReponse" script:language="StarBasic" script:moduleType="normal">
+&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+
+
+&apos;--------------------------------------------------------------------------------
+&apos; Renvoie true si le texte (string) est un nombre (option : un entier)
+&apos; Attention le marqueur décimal est la virgule et non le point
+&apos;--------------------------------------------------------------------------------
+function TextIsNumber(oTexte as string, optional oEntier as boolean) as boolean
+Dim  oVal1 as Double
+
+if IsMissing(oEntier) then oEntier = false
+TextIsNumber = IsNumeric(oTexte)
+
+If IsNumeric(oTexte) = true then 
+	if oEntier = true then
+		oVal1 = CDbl(oTexte)
+		if oVal1 &lt;&gt; Fix(oVal1) then TextIsNumber = false
+    end if
+end if
+
+end function
+
+
+&apos;--------------------------------------------------------------------------------
+&apos; renvoie la réponse d&apos;un controle liste ou case texte ou cas à cocher
+&apos;--------------------------------------------------------------------------------
+function RepControl(Dial as object,oNomControl as string, oTypeControl as string) as variant
+Dim  k1 as object
+k1 = Dial.getControl(oNomControl)
+
+if oTypeControl = &quot;ListBox&quot; then RepControl = Array(k1.SelectedItem, k1.selectedItemPos)
+if oTypeControl = &quot;TextField&quot; then RepControl = k1.Peer.text
+if oTypeControl = &quot;OptionButton&quot; then  RepControl = k1.State
+if oTypeControl = &quot;CheckBox&quot; then  RepControl = k1.state
+if oTypeControl = &quot;CommandButton&quot; then  RepControl = k1.Model.State
+end function
+
+
+&apos;-----------------------------------------------------------------------------------------
+&apos;---Permet de changer un type d&apos;attribut à une série de controls &quot;binaires&quot; ayant un même nom indéxé
+&apos;--- oTypeAttribut : &quot;Visible&quot; &quot;Actif&quot; &quot;Etat&quot;  Array(&quot;Couleur&quot;,couleur1,couleur2)
+&apos;-----------------------------------------------------------------------------------------
+Sub AttributControl(Dial as object, oNomControl as string, oTypeAttribut as Variant, optional tabNumControlFalse as variant, optional tabNumControlTrue as Variant)
+Dim i as integer
+
+if IsArray(oTypeAttribut)= false then
+	if oTypeAttribut = &quot;Visible&quot; then
+	If IsMissing(tabNumControlFalse) = False then
+		For i = 0 to Ubound(tabNumControlFalse)
+			Dial.getControl(oNomControl + tabNumControlFalse(i)).Model.EnableVisible = false
+		Next
+	End if
+	If IsMissing(tabNumControlTrue) = False then
+		For i = 0 to Ubound(tabNumControlTrue)
+			Dial.getControl(oNomControl +  tabNumControlTrue(i)).Model.EnableVisible = True
+		Next
+	End if
+	End If
+
+	if oTypeAttribut = &quot;Actif&quot; then
+	If IsMissing(tabNumControlFalse) = False then
+		For i = 0 to Ubound(tabNumControlFalse)
+			Dial.getControl(oNomControl + tabNumControlFalse(i)).Model.Enabled = false
+		Next
+	End if
+	If IsMissing(tabNumControlTrue) = False then
+		For i = 0 to Ubound(tabNumControlTrue)
+			Dial.getControl(oNomControl +  tabNumControlTrue(i)).Model.Enabled = True
+		Next
+	End if
+	End if
+	if oTypeAttribut = &quot;Etat&quot; then
+	If IsMissing(tabNumControlFalse) = False then
+		For i = 0 to Ubound(tabNumControlFalse)
+			Dial.getControl(oNomControl + tabNumControlFalse(i)).Model.State = 0
+		Next
+	End if
+	If IsMissing(tabNumControlTrue) = False then
+		For i = 0 to Ubound(tabNumControlTrue)
+			Dial.getControl(oNomControl +  tabNumControlTrue(i)).Model.State = 1
+		Next
+	End if
+	End if
+	
+	if oTypeAttribut = &quot;TaillePolice&quot; then
+	If IsMissing(tabNumControlFalse) = False then
+		For i = 0 to Ubound(tabNumControlFalse)
+			Dial.getControl(oNomControl + tabNumControlFalse(i)).Model.FontHeight = 9
+		Next
+	End if
+	If IsMissing(tabNumControlTrue) = False then
+		For i = 0 to Ubound(tabNumControlTrue)
+			Dial.getControl(oNomControl +  tabNumControlTrue(i)).Model.FontHeight = 10
+		Next
+	End if
+End if
+End If
+if IsArray(oTypeAttribut)= true then
+    If oTypeAttribut(0) = &quot;Couleur&quot; then
+	If IsMissing(tabNumControlFalse) = False then
+		For i = 0 to Ubound(tabNumControlFalse)
+			Dial.getControl(oNomControl + tabNumControlFalse(i)).Model.BackgroundColor = oTypeAttribut(1)
+		Next
+	End if
+	If IsMissing(tabNumControlTrue) = False then
+		For i = 0 to Ubound(tabNumControlTrue)
+			Dial.getControl(oNomControl +  tabNumControlTrue(i)).Model.BackgroundColor = oTypeAttribut(2)
+		Next
+	End if
+	End If
+End if
+
+
+
+End sub
+
+&apos;--------------------------------------------------------------------------------
+&apos; Teste la réponse d&apos;un TextField - nombre
+&apos;--------------------------------------------------------------------------------
+
+function ValideReponseTexte(oDlg as object, oName as string, optional oBorneInf as Double, optional oBorneSup as Double, optional oEntier as boolean, optional oMessageErreur as string ) as boolean
+Dim oRep as Boolean, oTexte as string
+
+oTexte = oDlg.getControl(oName).peer.text
+if IsMissing(oEntier) then oEntier = false
+oRep = TextIsNumber(oTexte, oEntier)
+
+	If oRep = true and IsMissing(oBorneInf) = false then
+		If CDbl(oTexte) &lt; oBorneInf then oRep = false
+	end if
+	If oRep = true and IsMissing(oBorneSup) = false then
+		If CDbl(oTexte) &gt; oBorneSup then oRep = false
+	end if
+	if oRep = false and IsMissing(oMessageErreur) = false then msgbox(Trad(monDlg,oMessageErreur), 0+48, &quot;AHmath2D&quot;)
+ValideReponseTexte = oRep
+
+end function
+
+&apos;--------------------------------------------------------------------------------
+&apos; Teste la réponse d&apos;une listbox
+&apos;--------------------------------------------------------------------------------
+
+function ValideReponseListbox(oDlg as object, oName as string, optional oMessageErreur as string ) as boolean
+Dim oRep as Boolean, oTexte as string
+
+oTexte = oDlg.getControl(oName).SelectedItem
+if oTexte = &quot;#&quot; then 
+	oRep = false
+	Else
+	oRep = true
+End if
+	if oRep = false and IsMissing(oMessageErreur) = false then msgbox(Trad(monDlg,oMessageErreur), 0+48, &quot;AHmath2D&quot;)
+
+ValideReponseListbox = oRep
+end function
+
+
+&apos;--------------------------------------------------------------------------------
+&apos; Teste la réponse d&apos;un TextField nom d&apos;Angle
+&apos;--------------------------------------------------------------------------------
+
+function ValideReponseAngle(oDlg as object, oName as string, optional oMessageErreur as string ) as boolean
+Dim oRep as Boolean, oTexte as string, var as variant
+
+oTexte = oDlg.getControl(oName).peer.text
+var = IndSommetsAngle(oTexte)
+if var(0) = -1 or var(1) = -1 or var(2) = -1 then
+	oRep = false
+	else
+	oRep = true
+End if
+
+if oRep = false and IsMissing(oMessageErreur) = false then msgbox(Trad(monDlg,oMessageErreur), 0+48, &quot;AHmath2D&quot;)
+
+ValideReponseAngle = oRep
+end function
+
+&apos;--------------------------------------------------------------------------------
+&apos; Teste la réponse d&apos;un TextField comme une fraction
+&apos;--------------------------------------------------------------------------------
+
+function ValideReponseFraction(oDlg as object, oName as string, optional oMessageErreur as string ) as boolean
+Dim oRep as Boolean, oTexte as string,numTxt as string,denomTxt as string,  b as Long
+Dim Var1 as boolean, Var2 as boolean
+
+oTexte = oDlg.getControl(oName).peer.text
+b = Instr(1,oTexte,&quot;/&quot;,1)
+if b = 0 then oRep = false
+if b &lt;&gt; 0 then 
+	numTxt = Left (oTexte,b-1)
+	denomTxt = Right(oTexte,Len(oTexte) - b)
+	Var1 = TextIsNumber(numTxt,true)
+	Var2 = TextIsNumber(denomTxt,true)
+	if Var1 = true and var2 = true then
+		oRep = true
+		Else
+		oRep = False
+	End if
+End if
+if oRep = false and IsMissing(oMessageErreur) = false then msgbox(Trad(monDlg,oMessageErreur), 0+48, &quot;AHmath2D&quot;)
+
+ValideReponseFraction = oRep
+end function
+
+
+&apos;--------------------------------------------------------------------------------
+&apos; Affecte oAffichage à un Label ou un TextField ou un ImageControl ou un commandButton
+&apos;oAffichage contient le chemin de l&apos;image a afficher dans le cas d&apos;un ImageControl
+&apos;--------------------------------------------------------------------------------
+sub AffectVarControl(oDlg as object, oAffichage as variant, oNomControl as String, oTypeControl as string)
+if oTypeControl = &quot;Label&quot; then oDlg.getControl(oNomControl).text = oAffichage
+if oTypeControl = &quot;TextField&quot; then oDlg.getControl(oNomControl).peer.text = oAffichage
+if oTypeControl = &quot;ImageControl&quot; then oDlg.getControl(oNomControl).Model.ImageURL = ConvertToURL(oAffichage)
+if oTypeControl = &quot;CommandButton&quot; then oDlg.getControl(oNomControl).Model.ImageURL = ConvertToURL(oAffichage)
+if oTypeControl = &quot;ListBox&quot; then oDlg.getControl(oNomControl).SelectItemPos(oAffichage,true)
+end sub
+
+
+
+&apos;----------------------------------------------------------------------------------
+&apos;positionne le dialogue sur la page
+&apos;----------------------------------------------------------------------------------
+
+sub PositionDlg(Dial as object,Xpos as Long, Ypos as Long, optional Width as Long, optional Height as Long, optional cste as integer)
+
+if IsMissing(Height) then Height = 0
+if IsMissing(Width) then Width = 0
+if IsMissing(cste) then cste = 3                rem : cste = 1 2 3 4 8 12 15  (modifie uniquement : Xpos(1) - Ypos(2) - Xpos et Ypos(3) - Width(4) - Height(8) - width et Height(12))
+                                                rem : 3 + 12 pour tout
+Dial.SetPosSize(Xpos, Ypos, Width, Height, cste)
+
+end sub
+
+
+
+</script:module>

@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="AxesDrawing" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) Andy Lewis.  (lewiss@ntlworld.com)
+&apos;téléchargé sur www.ooomacros.org
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU Lesser General Public Licence (LGPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+&apos;Routines connected with actally drawing the axes.  Requires &quot;AxesSetup&quot;
+
+rem option explicit
+
+Public Const xAxis=0, yAxis=1
+Public Const ShowAxis=0,ShowMinorGrid=1, ShowMinorTicks=2,ShowMajorGrid=3,ShowMajorTicks=4,PiScaling=5
+Public Const MinorTickGap=6,MajorTickGap=7,ScaleGap=8,MinorTickLength=9,MajorTickLength=10,AxisLabel=11
+
+&apos;___________________________________________________________________________________________
+&apos;Draw axes based on parameters stored in Param() which is a Variant array of size (1,11).
+&apos;Parameters to be passed should be stored in the array using the constants defined above:
+&apos;eg Param(yAxis,ScaleGap) is the gap between the numerical values which appear on the y axis
+
+Sub DrawAxes (Param())
+
+If gsScaleRight &lt;= gsScaleLeft Or gsScaleTop &lt;= gsScaleBottom Then Exit Sub
+
+Dim x as single, y as single, xaxispos as single, yaxispos As Single
+Dim sTickStart as single
+Dim ScaleString as String, Numerator as String, Denominator as String, FracPi(1) as long
+
+Dim oText as Object, oPosition as Object
+Dim oScaleWidth as object, oScaleHeight as object
+Dim oShapes as object
+Dim oGroup1 as object, oGroup2 as object, oGroup3 as object, oGroup4 as object
+Dim oGroup5 as object, oGroup6 as object, oGroup7 as object
+
+xaxispos = 0: yaxispos = 0
+If gsScaleLeft &gt; 0 Then yaxispos = gsScaleLeft
+If gsScaleRight &lt; 0 Then yaxispos = gsScaleRight
+If gsScaleBottom &gt; 0 Then xaxispos = gsScaleBottom
+If gsScaleTop &lt; 0 Then xaxispos = gsScaleTop
+
+oScaleWidth=ScaleSize(gsScaleRight-gsScaleLeft,0)
+oScaleHeight=ScaleSize(0,gsScaleTop-gsScaleBottom)
+glLineWidth = 40 : glLineColor = 1 : glLineStyle = 1
+
+if param(XAxis,ShowAxis)=1 then
+
+	oShapes = NewShapeCollection
+	DrawLineShape(ScalePoint(gsScaleLeft,xaxispos),oScaleWidth,,,,oShapes)
+	DrawLineShape(ScalePoint(gsScaleRight,xaxispos),AbsSize(-param(XAxis,MinorTickLength),-param(XAxis,MinorTickLength)),,,,oShapes)
+	DrawLineShape(ScalePoint(gsScaleRight,xaxispos),AbsSize(-param(XAxis,MinorTickLength),param(XAxis,MinorTickLength)),,,,oShapes)
+	oPosition=ScalePoint(gsScaleRight,xaxispos)
+	oText=PlaceText(param(XAxis,AxisLabel), oPosition, 3, &quot;Arial&quot;, 10, oShapes)
+	oPosition.y=oPosition.y+param(XAxis,MajorTickLength)+oText.getsize().height
+	oText.position=oPosition
+	oGroup1 = goPage.Group(oShapes)
+
+	If param(XAxis,ShowMinorTicks)=1 then
+		oShapes = NewShapeCollection
+	
+		sTickStart = -int(-gsScaleLeft/param(XAxis,MinorTickGap))*param(XAxis,MinorTickGap)
+	
+		x = sTickStart
+		Do While x &lt; gsScaleRight
+			If round(x, 6) &lt;&gt; yaxispos or Param(yAxis,ShowAxis)=0 Then
+				DrawLineShape(ScalePoint(x,xaxispos),AbsSize(0,-param(XAxis,MinorTickLength)),,30,,oShapes)
+			End If
+			x = x + param(XAxis,MinorTickGap)
+		Loop
+		oGroup2 = goPage.Group( oShapes )
+	end if
+	
+	If param(XAxis,ShowMajorTicks)=1 then
+		oShapes = NewShapeCollection
+		sTickStart = -int(-gsScaleLeft/param(XAxis,MajorTickGap))*param(XAxis,MajorTickGap)
+		x = sTickStart
+		Do While x &lt; gsScaleRight
+			If round(x, 6) &lt;&gt; yaxispos or Param(yAxis,ShowAxis)=0 Then
+				DrawLineShape(ScalePoint(x,xaxispos),AbsSize(0,-param(XAxis,MajorTickLength)),,30,,oShapes)
+			End If
+			x = x + param(XAxis,MajorTickGap)
+		Loop
+		oGroup3 = goPage.Group( oShapes )
+	end if
+	
+	oShapes = NewShapeCollection
+	oShapes.Add( oGroup1 ) : oShapes.Add( oGroup2 ) :oShapes.Add( oGroup3 )
+	oGroup4 = goPage.Group( oShapes )
+	
+	if param(XAxis,ScaleGap)&gt;0 then
+		oShapes = NewShapeCollection
+		sTickStart = -int(-gsScaleLeft/param(XAxis,ScaleGap))*param(XAxis,ScaleGap)
+		x = sTickStart
+		Do While x &lt;= gsScaleRight
+			If round(x, 6) &lt;&gt; yaxispos or gsScaleBottom&gt;=0 or Param(yAxis,ShowAxis)=0 Then
+				oPosition=ScalePoint(x,xaxispos)
+				oPosition.y=oPosition.y+param(XAxis,MajorTickLength)
+				if param(XAxis,PiScaling)=1 then
+					ApproxDecimaltoFraction(x/3.14159,99,FracPi())
+					if FracPi(0)=1 then
+						Numerator=&quot;&quot;
+					elseif FracPi(0)=-1 then
+						Numerator=&quot;-&quot;
+					else 
+						Numerator=CStr(FracPi(0))
+					end if
+					if FracPi(1)=1 then Denominator=&quot;&quot; else Denominator=&quot;/&quot; &amp; CStr(FracPi(1))	
+					ScaleString=Numerator &amp; &quot;π&quot; &amp; Denominator
+				else
+					ScaleString=CStr(roundsf(x,6))
+				end if	
+				oText=PlaceText(ScaleString,oPosition,2,&quot;Arial&quot;,10,oShapes)
+			End If
+		x=x+param(XAxis,ScaleGap)
+		Loop
+		oGroup5 = goPage.Group( oShapes )
+	end if
+
+end if
+
+if param(YAxis,ShowAxis)=1 then
+
+	oShapes = NewShapeCollection
+	DrawLineShape(ScalePoint(yaxispos,gsScaleBottom),oScaleHeight,,,,oShapes)
+	DrawLineShape(ScalePoint(yaxispos,gsScaleTop),AbsSize(-param(YAxis,MinorTickLength),-param(YAxis,MinorTickLength)),,,,oShapes)
+	DrawLineShape(ScalePoint(yaxispos,gsScaleTop),AbsSize(param(YAxis,MinorTickLength),-param(YAxis,MinorTickLength)),,,,oShapes)
+	oPosition=ScalePoint(yaxispos,gsScaleTop)
+	oText=PlaceText(param(YAxis,AxisLabel),oPosition,5,&quot;Arial&quot;,10,oShapes)
+	&apos;oPosition.y=oPosition.y-oText.getsize().height
+	&apos;oText.position=oPosition
+	oGroup1 = goPage.Group( oShapes )
+
+	If param(YAxis,ShowMinorTicks)=1 then
+		oShapes = NewShapeCollection
+		sTickStart = -int(-gsScaleBottom/param(YAxis,MinorTickGap))*param(YAxis,MinorTickGap)
+		y = sTickStart
+		Do While y &lt; gsScaleTop
+			If round(y, 6) &lt;&gt; xaxispos or Param(xAxis,ShowAxis)=0 Then
+				DrawLineShape(ScalePoint(yaxispos,y),AbsSize(-param(YAxis,MinorTickLength),0),,30,,oShapes)
+			End If
+			y = y + param(YAxis,MinorTickGap)
+		Loop
+		oGroup2 = goPage.Group( oShapes )
+	end if
+	
+	If param(YAxis,ShowMajorTicks)=1 then
+		oShapes = NewShapeCollection
+		sTickStart = -int(-gsScaleBottom/param(YAxis,MajorTickGap))*param(YAxis,MajorTickGap)
+		y = sTickStart
+		Do While y &lt; gsScaleTop
+			If round(y, 6) &lt;&gt; xaxispos or Param(xAxis,ShowAxis)=0 Then
+				DrawLineShape(ScalePoint(yaxispos,y),AbsSize(-param(YAxis,MajorTickLength),0),,30,,oShapes)
+			End If
+			y = y + param(YAxis,MajorTickGap)
+		Loop
+		oGroup3 = goPage.Group( oShapes )
+	end if
+
+	oShapes = NewShapeCollection
+	oShapes.Add( oGroup1 ) : oShapes.Add( oGroup2 ) :oShapes.Add( oGroup3 )
+	oGroup6 = goPage.Group( oShapes )
+	
+	if param(YAxis,ScaleGap)&gt;0 then
+		oShapes = NewShapeCollection
+		sTickStart = -int(-gsScaleBottom/param(YAxis,ScaleGap))*param(YAxis,ScaleGap)
+		y = sTickStart
+		Do While y &lt;= gsScaleTop
+			If round(y, 6) &lt;&gt; xaxispos or gsScaleLeft&gt;=0 or Param(xAxis,ShowAxis)=0 Then
+				oPosition=ScalePoint(yaxispos,y)
+				oPosition.x=oPosition.x-param(YAxis,MajorTickLength)
+				if param(YAxis,PiScaling)=1 then
+					ApproxDecimaltoFraction(y/3.14159,99,FracPi())
+					if FracPi(0)=1 then
+						Numerator=&quot;&quot;
+					elseif FracPi(0)=-1 then
+						Numerator=&quot;-&quot;
+					else 
+						Numerator=CStr(FracPi(0))
+					end if
+					if FracPi(1)=1 then Denominator=&quot;&quot; else Denominator=&quot;/&quot; &amp; CStr(FracPi(1))	
+					ScaleString=Numerator &amp; &quot;π&quot; &amp; Denominator
+				else
+					ScaleString=CStr(roundsf(y,6))
+				end if	
+				oText=PlaceText(ScaleString,oPosition,4,&quot;Arial&quot;,10,oShapes)
+			End If
+		y = y+param(YAxis,ScaleGap)
+		Loop
+		oGroup7 = goPage.Group( oShapes )
+	end if
+
+end if
+
+if param(XAxis,ShowAxis)=1 and param(YAxis,ShowAxis)=1 then
+	oShapes = NewShapeCollection
+	oShapes.Add( oGroup4 ) : oShapes.Add( oGroup6 )
+	oGroup1 = goPage.Group( oShapes )
+	oShapes = NewShapeCollection
+	oShapes.Add( oGroup5 ) : oShapes.Add( oGroup7 )
+	oGroup1 = goPage.Group( oShapes )
+end if
+
+If param(XAxis,ShowMinorGrid) = 1 Then
+	oShapes = NewShapeCollection
+	sTickStart = -int(-gsScaleLeft/param(XAxis,MinorTickGap))*param(XAxis,MinorTickGap)
+	x = sTickStart
+	Do While x &lt;= gsScaleRight
+		If round(x, 6) &lt;&gt; yaxispos Then
+			DrawLineShape(ScalePoint(x,gsScaleBottom),oScaleHeight,,20,2,oShapes)
+		End If
+		x = x + param(XAxis,MinorTickGap)
+	Loop
+	oGroup1 = goPage.Group( oShapes )
+End If
+
+If param(YAxis,ShowMinorGrid) = 1 Then
+	oShapes = NewShapeCollection
+	sTickStart = -int(-gsScaleBottom/param(YAxis,MinorTickGap))*param(YAxis,MinorTickGap)
+	For y = sTickStart To gsScaleTop Step param(YAxis,MinorTickGap)
+		If round(y, 6) &lt;&gt; xaxispos Then
+			DrawLineShape(ScalePoint(gsScaleLeft,y),oScaleWidth,,20,2,oShapes)
+		End If
+	Next y
+	oGroup2 = goPage.Group( oShapes )
+end if
+
+If param(XAxis,ShowMinorGrid)=1 and param(YAxis,ShowMinorGrid)=1 then
+	oShapes = NewShapeCollection
+	oShapes.Add(oGroup1) : oShapes.Add(oGroup2)
+	oGroup1 = goPage.Group(oShapes)
+end if
+
+If param(XAxis,ShowMajorGrid) = 1 Then
+	oShapes = NewShapeCollection
+	sTickStart = -int(-gsScaleLeft/param(XAxis,MajorTickGap))*param(XAxis,MajorTickGap)
+	x = sTickStart
+	Do While x &lt;= gsScaleRight
+		If round(x, 6) &lt;&gt; yaxispos Then
+			DrawLineShape(ScalePoint(x,gsScaleBottom),oScaleHeight,,40,2,oShapes)
+		End If
+		x = x + param(XAxis,MajorTickGap)
+	Loop
+	oGroup1 = goPage.Group(oShapes)
+End If
+
+If param(YAxis,ShowMajorGrid) = 1 Then
+	oShapes = NewShapeCollection
+	sTickStart = -int(-gsScaleBottom/param(YAxis,MajorTickGap))*param(YAxis,MajorTickGap)
+	For y = sTickStart To gsScaleTop Step param(YAxis,MajorTickGap)
+		If round(y, 6) &lt;&gt; xaxispos Then
+			DrawLineShape(ScalePoint(gsScaleLeft,y),oScaleWidth,,40,2,oShapes)
+		End If
+	Next y
+	oGroup2 = goPage.Group(oShapes)
+end if
+
+If param(XAxis,ShowMajorGrid)=1 and param(YAxis,ShowMajorGrid)=1 then
+	oShapes = NewShapeCollection
+	oShapes.Add(oGroup1) : oShapes.Add(oGroup2)
+	oGroup1 = goPage.Group(oShapes)
+end if
+
+End Sub
+
+
+&apos;___________________________________________________________________________________________
+&apos;Calculate default values for MinorTickGap, MajorTickGap, and ScaleGap based on the
+&apos;Global variables for the scaling and diagram size.
+&apos;Axis is an input parameter which should be either xAxis or yAxis
+&apos;Param() needs to be passed in so that the relevant array elements can be changed
+
+sub CalculateDefaultTicks(Axis as Integer,Param())
+	dim Range as single, MinDivs as integer, ScaleBase as integer
+	dim sScaleGap as single, sMajorTickGap as single, sMinorTickGap as single
+	
+	If Axis=xAxis then Range = gsScaleRight - gsScaleLeft else Range = gsScaleTop - gsScaleBottom
+	If Axis=xAxis then MinDivs = roundUp(glDiagramWidth/5000,0) else MinDivs = roundUp(glDiagramHeight/5000,0)
+
+	sScaleGap = RoundScale(Range,MinDivs, ScaleBase)
+	
+	If ScaleBase = 1 or ScaleBase = 10 then
+		sMajorTickGap = sScaleGap/2
+		sMinorTickGap = sScaleGap/10
+	ElseIf ScaleBase = 5 then
+		sMajorTickGap = sScaleGap
+		sMinorTickGap = sScaleGap/5
+	ElseIf ScaleBase = 2 then
+		sMajorTickGap = sScaleGap/2
+		sMinorTickGap = sScaleGap/10
+	EndIf
+	
+	Param(Axis,ScaleGap)=sScaleGap
+	Param(Axis,MajorTickGap)=sMajorTickGap
+	Param(Axis,MinorTickGap)=sMinorTickGap
+End Sub
+
+
+
+</script:module>

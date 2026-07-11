@@ -1,0 +1,1103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="mFormuleLaTeX2OOo" script:language="StarBasic">&apos;*****  BASIC  *****
+&apos;CmathOOo
+&apos;Copyright (C) 2006  Christophe devalland
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+&apos; substitutions
+public test as string
+public sOOoKey() as String
+public sLatexKey() as String
+&apos; opérateurs 
+public sOOoOperator() as String
+public sLatexOperator() as String
+public iTypeOperator() as Integer
+public iIndiceMax as integer
+
+&apos;constantes : types d&apos;opérateurs
+const cFRAC=0
+const cINT=1
+const cNROOT=2
+const cLIMIT=3
+const cLEFT=4
+const cMATRIX=5
+const cNOT=6
+const cBEGIN=7
+const cPMOD=8
+const cTEXT=9
+const cMATHBB=10
+const cOVER=11
+const cUNDER=12
+const cDELETE0=13
+const cDELETE1=14
+const cFUNC=15
+const cBINOM=16
+const cMATHCHOICE=17
+
+sub Main
+	dim oViewCursor as Object, oTextCursor as Object
+	dim sPolice as String, sFormule as String
+	dim iTaille as Integer
+	bModeTexte=False
+    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+	oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+    sPolice=oViewCursor.CharFontName
+    iTaille=oViewCursor.Charheight
+	sFormule=SelectionnerFormule(oTextCursor,0)
+	sFormule=sFormuleLaTeX2OOo(sFormule)
+&apos;	sFormule=sFormatOOo(sFormule)
+&apos;	sFormule=SubstitutionsAvantTraitement(sFormule)
+&apos;	sFormule=TraitementFormule(sFormule,False)
+&apos;	sFormule=SubstitutionsApresTraitement(sFormule)
+    InsereFormule(oTextCursor, sPolice, iTaille, bGras, sFormule, bModeTexte)
+    oTextCursor.text.insertstring(oTextCursor,sFormule,false)
+end sub
+
+sub InitVariablesLaTeX2OOo
+
+		sOOoKey=Array(&quot;im&quot;,&quot;re&quot;,&quot;aleph&quot;,&quot;and&quot;,&quot;approx&quot;,&quot;arccos&quot;,&quot;arccot&quot;,_
+						&quot;acute&quot;,&quot;arcsin&quot;,&quot;arctan&quot;,&quot;backepsilon&quot;,&quot;bar&quot;,&quot;dlrarrow&quot;,&quot;{font serif l}&quot;,_
+						&quot;breve&quot;,&quot;bslash&quot;,&quot;cdot&quot;,&quot;check&quot;,&quot;circ&quot;,&quot;circle&quot;,&quot;coprod&quot;,_
+						&quot;cos&quot;,&quot;cosh&quot;,&quot;cot&quot;,&quot;coth&quot;,&quot;dddot&quot;,&quot;ddot&quot;,&quot;def&quot;,&quot;div&quot;,&quot;divides&quot;,_
+						&quot;dlarrow&quot;,&quot;dlrarrow&quot;,&quot;dot&quot;,&quot;dotsaxis&quot;,&quot;dotsdiag&quot;,&quot;dotsdown&quot;,_
+						&quot;dotslow&quot;,&quot;dotsup&quot;,&quot;dotsvert&quot;,&quot;downarrow&quot;,&quot;drarrow&quot;,&quot;emptyset&quot;,&quot;emptyset&quot;,_
+						&quot;equiv&quot;,&quot;exists&quot;,&quot;exp&quot;,&quot;forall&quot;,&quot;geslant&quot;,&quot;geslant&quot;,&quot;gg&quot;,&quot;grave&quot;,_
+						&quot;hat&quot;,&quot;hbar&quot;,&quot;in&quot;,&quot;infinity&quot;,&quot;infty&quot;,&quot;intersection&quot;,_
+						&quot;leslant&quot;,&quot;leftarrow&quot;,&quot;leslant&quot;,&quot;ll&quot;,&quot;ln&quot;,&quot;log&quot;,&quot;geslant&quot;,&quot;leslant&quot;,_
+						&quot;minusplus&quot;,&quot;nabla&quot;,&quot;ndivides&quot;,&quot;neg&quot;,&quot;neq&quot;,&quot;[&quot;,&quot;]&quot;,_
+						&quot;ni&quot;,&quot;notin&quot;,&quot;&apos;&quot;,&quot;ortho&quot;,&quot;italic&quot;,&quot;bold&quot;,&quot;`&quot;,&quot;~&quot;,&quot;~&quot;,&quot;  &quot;,&quot;&quot;,&quot;~&quot;,&quot;~~&quot;,_
+						&quot;odivide&quot;,&quot;odot&quot;,&quot;ominus&quot;,&quot;oplus&quot;,&quot;or&quot;,&quot;ortho&quot;,&quot;otimes&quot;,&quot;overline&quot;,_
+						&quot;owns&quot;,&quot;parrallel&quot;,&quot;partial&quot;,&quot;phantom&quot;,&quot;plusminus&quot;,&quot;prop&quot;,_
+						&quot;rightarrow&quot;,&quot;*&quot;,&quot;ll&quot;,&quot;gg&quot;,&quot;dlarrow&quot;,&quot;emptyset&quot;,_
+						&quot;setminus&quot;,&quot;sim&quot;,&quot;simeq&quot;,&quot;sin&quot;,&quot;sinh&quot;,&quot;subset&quot;,&quot;subset&quot;,_
+						&quot;subseteq&quot;,&quot;supset&quot;,&quot;supseteq&quot;,&quot;tan&quot;,&quot;tanh&quot;,&quot;tilde&quot;,&quot;times&quot;,_
+						&quot;toward&quot;,&quot;underline&quot;,&quot;union&quot;,&quot;uparrow&quot;,&quot;vec&quot;,&quot;widehat&quot;,&quot;widetilde&quot;,_
+						&quot;widevec&quot;,&quot;wp&quot;,&quot;lbrace&quot;,&quot;rbrace&quot;,&quot;langle&quot;,&quot;rangle&quot;,_
+						&quot;lceil&quot;,&quot;rceil&quot;,&quot;ldbracket&quot;,&quot;rdbracket&quot;,&quot;ldline&quot;,&quot;lfloor&quot;,&quot;rfloor&quot;,_
+						&quot;leftarrow&quot;,&quot;dlarrow&quot;,&quot;rightarrow&quot;,&quot;drarrow&quot;,&quot;dlrarrow&quot;,_
+						&quot;left&quot;,&quot;right&quot;,&quot;notin&quot;,&quot;\\&quot;,&quot;and&quot;,&quot;or&quot;,&quot;neg&quot;,_
+						&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;lbrace&quot;,&quot;rbrace&quot;,_
+						&quot;%alpha&quot;,&quot;%bêta&quot;,&quot;%gamma&quot;,&quot;%GAMMA&quot;,&quot;%delta&quot;,&quot;%DELTA&quot;,_
+						&quot;%epsilon&quot;,&quot;%zêta&quot;,&quot;%êta&quot;,&quot;%thêta&quot;,&quot;%THÊTA&quot;,_
+						&quot;%iota&quot;,&quot;%kappa&quot;,&quot;%lambda&quot;,&quot;%LAMBDA&quot;,&quot;%mu&quot;,_
+						&quot;%nu&quot;,&quot;%xi&quot;,&quot;%XI&quot;,&quot;%omicron&quot;,&quot;%pi&quot;,&quot;%pi&quot;,&quot;%rhô&quot;,_
+						&quot;%sigma&quot;,&quot;%SIGMA&quot;,&quot;%tau&quot;,&quot;%upsilon&quot;,&quot;%UPSILON&quot;,&quot;%phi&quot;,&quot;%PHI&quot;,_
+						&quot;%khi&quot;,&quot;%psi&quot;,&quot;%PSI&quot;,&quot;%oméga&quot;,&quot;%OMÉGA&quot;,&quot;%varepsilon&quot;,&quot;%varthêta&quot;,_
+						&quot;%varpi&quot;,&quot;%varrhô&quot;,&quot;%varsigma&quot;,&quot;%varphi&quot;,&quot;%infini&quot;,_
+						&quot;i&quot;,&quot;j&quot;,&quot;bold&quot;,&quot;&quot;,&quot;font fixed&quot;,&quot;&quot;,&quot;italic&quot;,&quot;font serif nitalic&quot;,_
+						&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;left&quot;,&quot;left&quot;,&quot;left&quot;,&quot;left&quot;,_
+						&quot;right&quot;,&quot;right&quot;,&quot;right&quot;,&quot;right&quot;,&quot;bold&quot;,&quot;&quot;,&quot;&quot;,_
+						&quot;rightarrow&quot;,&quot;rightarrow&quot;,&quot;&quot;,&quot;&quot;)
+						
+		sLatexKey=Array(&quot;\Im&quot;,&quot;\Re&quot;,&quot;\aleph&quot;,&quot;\wedge&quot;,&quot;\approx&quot;,&quot;\arccos&quot;,&quot;\arccot&quot;,_
+						&quot;\acute&quot;,&quot;\arcsin&quot;,&quot;\arctan&quot;,&quot;\backepsilon&quot;,&quot;\bar&quot;,&quot;\iff&quot;,&quot;\ell&quot;,_
+						&quot;\breve&quot;,&quot;\backslash&quot;,&quot;\cdot&quot;,&quot;\check&quot;,&quot;\circ&quot;,&quot;\overset{\circ}&quot;,&quot;\coprod&quot;,_
+						&quot;\cos&quot;,&quot;\cosh&quot;,&quot;\cot&quot;,&quot;\coth&quot;,&quot;\dddot&quot;,&quot;\ddot&quot;,&quot;\defeq&quot;,&quot;\div&quot;,&quot;\mid&quot;,_
+						&quot;\leftarrow&quot;,&quot;\Leftrightarrow&quot;,&quot;\dot&quot;,&quot;\cdots&quot;,&quot;\ddotsup&quot;,&quot;\ddots&quot;,_
+						&quot;\ldots&quot;,&quot;\ddotsup&quot;,&quot;\vdots&quot;,&quot;\downarrow&quot;,&quot;\Rightarrow&quot;,&quot;\emptyset&quot;,&quot;\empty&quot;,_
+						&quot;\equiv&quot;,&quot;\exists&quot;,&quot;\exp&quot;,&quot;\forall&quot;,&quot;\geq&quot;,&quot;\ge&quot;,&quot;\gg&quot;,&quot;\grave&quot;,_
+						&quot;\hat&quot;,&quot;\hbar&quot;,&quot;\in&quot;,&quot;\infty&quot;,&quot;\infty&quot;,&quot;\cap&quot;,_
+						&quot;\leq&quot;,&quot;\leftarrow&quot;,&quot;\le&quot;,&quot;\ll&quot;,&quot;\ln&quot;,&quot;\log&quot;,&quot;\geqslant&quot;,&quot;\leqslant&quot;,_
+						&quot;\mp&quot;,&quot;\nabla&quot;,&quot;\nmid&quot;,&quot;\neg&quot;,&quot;\neq&quot;,&quot;\lbrack&quot;,&quot;\rbrack&quot;,_
+						&quot;\ni&quot;,&quot;\notin&quot;,&quot;\prime&quot;,&quot;\bot&quot;,&quot;\it&quot;,&quot;\bf&quot;,&quot;\,&quot;,&quot;\:&quot;,&quot;\;&quot;,&quot;\ &quot;,&quot;\!&quot;,&quot;\quad&quot;,&quot;\qquad&quot;,_
+						&quot;\oslash&quot;,&quot;\odot&quot;,&quot;\ominus&quot;,&quot;\oplus&quot;,&quot;\vee&quot;,&quot;\perp&quot;,&quot;\otimes&quot;,&quot;\overline&quot;,_
+						&quot;\ni&quot;,&quot;\parallel&quot;,&quot;\partial&quot;,&quot;\phantom&quot;,&quot;\pm&quot;,&quot;\propto&quot;,_
+						&quot;\rightarrow&quot;,&quot;\ast&quot;,&quot;\ll&quot;,&quot;\gg&quot;,&quot;\Leftarrow&quot;,&quot;\varnothing&quot;,_
+						&quot;\setminus&quot;,&quot;\sim&quot;,&quot;\simeq&quot;,&quot;\sin&quot;,&quot;\sinh&quot;,&quot;\subset&quot;,&quot;\sub&quot;,_
+						&quot;\subseteq&quot;,&quot;\supset&quot;,&quot;\subseteq&quot;,&quot;\tan&quot;,&quot;\tanh&quot;,&quot;\tilde&quot;,&quot;\times&quot;,_
+						&quot;\to&quot;,&quot;\underline&quot;,&quot;\cup&quot;,&quot;\uparrow&quot;,&quot;\vec&quot;,&quot;\widehat&quot;,&quot;\widetilde&quot;,_
+						&quot;\overrightarrow&quot;,&quot;\wp&quot;,&quot;\{&quot;,&quot;\}&quot;,&quot;\langle&quot;,&quot;\rangle&quot;,_
+						&quot;\lceil&quot;,&quot;\rceil&quot;,&quot;\llbracket&quot;,&quot;\rrbracket&quot;,&quot;\|&quot;,&quot;\lfloor&quot;,&quot;\rfloor&quot;,_
+						&quot;\longleftarrow&quot;,&quot;\Longleftarrow&quot;,&quot;\longrightarrow&quot;,&quot;\Longrightarrow&quot;,&quot;\Longleftrightarrow&quot;,_
+						&quot;\left&quot;,&quot;\right&quot;,&quot;\notin&quot;,&quot;\cr&quot;,&quot;\land&quot;,&quot;\lor&quot;,&quot;\lnot&quot;,_
+						&quot;\displaystyle&quot;,&quot;\textstyle&quot;,&quot;\scriptstyle&quot;,&quot;\scriptscriptstyle&quot;,&quot;\lbrace&quot;,&quot;\rbrace&quot;,_
+						&quot;\alpha&quot;,&quot;\beta&quot;,&quot;\gamma&quot;,&quot;\Gamma&quot;,&quot;\delta&quot;,&quot;\Delta&quot;,_
+						&quot;\epsilon&quot;,&quot;\zeta&quot;,&quot;\eta&quot;,&quot;\theta&quot;,&quot;\Theta&quot;,_
+						&quot;\iota&quot;,&quot;\kappa&quot;,&quot;\lambda&quot;,&quot;\Lambda&quot;,&quot;\mu&quot;,_
+						&quot;\nu&quot;,&quot;\xi&quot;,&quot;\Xi&quot;,&quot;\omicron&quot;,&quot;\pi&quot;,&quot;\Pi&quot;,&quot;\rho&quot;,_
+						&quot;\sigma&quot;,&quot;\Sigma&quot;,&quot;\tau&quot;,&quot;\upsilon&quot;,&quot;\Upsilon&quot;,&quot;\phi&quot;,&quot;\Phi&quot;,_
+						&quot;\khi&quot;,&quot;\psi&quot;,&quot;\Psi&quot;,&quot;\omega&quot;,&quot;\Omega&quot;,&quot;\varepsilon&quot;,&quot;\vartheta&quot;,_
+						&quot;\varpi&quot;,&quot;\varrho&quot;,&quot;\varsigma&quot;,&quot;\varphi&quot;,&quot;\infty&quot;,_
+						&quot;\imath&quot;,&quot;\jmath&quot;,&quot;\mathbf&quot;,&quot;\mathsf&quot;,&quot;\mathtt&quot;,&quot;\mathnormal&quot;,&quot;\mathit&quot;,&quot;\mathscr&quot;,_
+						&quot;\big&quot;,&quot;\Big&quot;,&quot;\bigg&quot;,&quot;\Bigg&quot;,&quot;\bigl&quot;,&quot;\Bigl&quot;,&quot;\biggl&quot;,&quot;\Biggl&quot;,_
+						&quot;\bigr&quot;,&quot;\Bigr&quot;,&quot;\biggr&quot;,&quot;\Biggr&quot;,&quot;\mathbold&quot;,&quot;\huge&quot;,&quot;\large&quot;,_
+						&quot;\mapsto&quot;,&quot;\longmapsto&quot;,&quot;\mathstrut&quot;,&quot;\boxed&quot;)
+						
+						
+		&apos; les opérateurs qui demandent une réorganisation des arguments
+		sOOoOperator=Array(&quot;over&quot;,&quot;int&quot;,&quot;lim&quot;,&quot;&quot;,&quot;&quot;,_
+							&quot;lint&quot;,&quot;iint&quot;,&quot;iiint&quot;,&quot;coprod&quot;,_
+							&quot;nroot&quot;,&quot;sum&quot;,&quot;prod&quot;,&quot;overbrace&quot;,_
+							&quot;underbrace&quot;,&quot;size&quot;,&quot;func&quot;,&quot;color&quot;,_
+							&quot;set&quot;,&quot;binom&quot;,&quot;matrix&quot;,_
+							&quot;&quot;,&quot;&quot;,&quot;bold&quot;,&quot;italic&quot;,&quot;font serif nitalic&quot;,&quot;&quot;,_
+							&quot;&quot;,&quot;over&quot;,&quot;over&quot;,&quot;&quot;,&quot;&quot;,_
+							&quot;&quot;,&quot;&quot;,&quot;font serif nitalic&quot;,&quot;&quot;)
+		sLatexOperator=Array(&quot;\frac&quot;,&quot;\int&quot;,&quot;\lim&quot;,&quot;\not&quot;,&quot;\pmod&quot;,_
+							&quot;\oint&quot;,&quot;\iint&quot;,&quot;\iiint&quot;,&quot;\coprod&quot;,_
+							&quot;\sqrt&quot;,&quot;\sum&quot;,&quot;\prod&quot;,&quot;\overbrace&quot;,_
+							&quot;\underbrace&quot;,&quot;\size&quot;,&quot;\operatorname&quot;,&quot;\color&quot;,_
+							&quot;\mathbb&quot;,&quot;\binom&quot;,&quot;\begin&quot;,_
+							&quot;\textrm&quot;,&quot;\text&quot;,&quot;\bf&quot;,&quot;\it&quot;,&quot;\cal&quot;,&quot;\mbox&quot;,_
+							&quot;\label&quot;,&quot;\cfrac&quot;,&quot;\dfrac&quot;,&quot;\mathchoice&quot;,&quot;\\&quot;,_
+							&quot;\hspace&quot;,&quot;\mathrm&quot;,&quot;\mathcal&quot;,&quot;\nombre&quot;)
+		iTypeOperator=Array(cFRAC,cINT,cLIMIT,cNOT,cPMOD,_
+							cINT,cINT,cINT,cINT,_
+							cNROOT,cINT,cINT,cOVER,_
+							cUNDER,cDELETE1,cFUNC,cFUNC,_
+							cMATHBB,cBINOM,cBEGIN,_
+							cTEXT,cTEXT,cTEXT,cTEXT,cTEXT,cTEXT,_
+							cDELETE1,cFRAC,cFRAC,cMATHCHOICE,cDELETE0,_
+							cDELETE1,cTEXT,cTEXT,cDELETE0)
+		iIndiceMax=UBound(sOOoKey())
+
+
+end sub
+
+function sFormuleLaTeX2OOo(sFormule as string) as String
+dim sFormuleOOo as string, sMotAChercher as string
+dim i as long, j as long, k as long, l as long
+
+
+
+&apos;	if iIndiceMax&lt;0 then
+		&apos; initialisation des variables si besoin
+		&apos; les mots-clés qui ne demandent qu&apos;une traduction
+&apos;	end if
+	&apos;initialisation de la chaine destinée à recevoir la formule au format Ooo
+	sFormuleOOo=sFormule
+
+	&apos; changement d&apos;orthographe
+
+	&apos; si ^{A} ok sinon, ^abc... -&gt; ^{a}bc... idem avec _abc...
+	i=0
+	j=Instr(sFormuleOOo,&quot;^&quot;)
+	do while j&gt;i
+		i=j
+		if mid(sFormuleOOo,i+1,1)&lt;&gt;&quot;{&quot; and mid(sFormuleOOo,i+1,1)&lt;&gt;&quot;\&quot; then
+			&apos; si ^- ou ^+ ou ^*, mettre &quot;&quot;
+			if instr(&quot;-+*&quot;,mid(sFormuleOOo,i+1,1))&gt;0 then
+				sFormuleOOo=left(sFormuleOOo,i) &amp; &quot;{&quot;&quot;&quot; &amp; mid(sFormuleOOo,i+1,1) &amp; &quot;&quot;&quot;}&quot; &amp;  mid(sFormuleOOo,i+2)			
+			else
+				sFormuleOOo=left(sFormuleOOo,i) &amp; &quot;{&quot; &amp; mid(sFormuleOOo,i+1,1) &amp; &quot;}&quot; &amp;  mid(sFormuleOOo,i+2)
+			end if
+		end if
+		j=i+Instr(mid(sFormuleOOo,i+1),&quot;^&quot;)
+	loop
+	i=0
+	j=Instr(sFormuleOOo,&quot;_&quot;)
+	do while j&gt;i
+		i=j
+		if mid(sFormuleOOo,i+1,1)&lt;&gt;&quot;{&quot; and mid(sFormuleOOo,i+1,1)&lt;&gt;&quot;\&quot; then
+			&apos; si ^- ou ^+ ou ^*, mettre &quot;&quot;
+			if instr(&quot;-+*&quot;,mid(sFormuleOOo,i+1,1))&gt;0 then
+				sFormuleOOo=left(sFormuleOOo,i) &amp; &quot;{&quot;&quot;&quot; &amp; mid(sFormuleOOo,i+1,1) &amp; &quot;&quot;&quot;}&quot; &amp;  mid(sFormuleOOo,i+2)			
+			else
+				sFormuleOOo=left(sFormuleOOo,i) &amp; &quot;{&quot; &amp; mid(sFormuleOOo,i+1,1) &amp; &quot;}&quot; &amp;  mid(sFormuleOOo,i+2)
+			end if
+		end if
+		j=i+Instr(mid(sFormuleOOo,i+1),&quot;_&quot;)
+	loop
+
+	
+
+	&apos; parcours linéaire de la formule
+	i=1
+	do while bTrouveCommandeLatex(sFormuleOOo,i,sMotAChercher)=true
+		j=i+len(sMotAChercher)
+		k=0
+		do while k&lt;=iIndiceMax and sMotAChercher&lt;&gt;sLatexKey(k)
+			k=k+1
+			if k&gt;iIndiceMax then exit do
+		loop
+		if k&lt;=iIndiceMax then
+			sFormuleOOo=left(sFormuleOOo,i-1)&amp;&quot; &quot;&amp;sOooKey(k)&amp;&quot; &quot;&amp;mid(sFormuleOOo,i+len(sLatexKey(k)))
+			j=i+len(sOOoKey(k))+2
+		else
+			&apos; vérifier si c&apos;est un opérateur
+			&apos; sinon erreur
+		end if
+		i=j
+	loop
+	
+	&apos; si . précédé de left ou right alors none
+	i=0
+	j=Instr(sFormuleOOo,&quot;.&quot;)
+	do while j&gt;i
+		i=j
+		l=i-1
+		bTrouveExpressionGauche(sFormuleOOo,k,l)
+		Select case mid(sFormuleOOo,k,l-k+1)
+		case &quot;left&quot;,&quot;right&quot;
+			sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot;none &quot; &amp; mid(sFormuleOOo,i+1)
+			i=i+4
+		end select
+		j=i+Instr(mid(sFormuleOOo,i+1),&quot;.&quot;)
+	loop
+
+	&apos; si | précédé de left ou right alors lline ou rline sinon &quot;|&quot;
+	i=0
+	j=Instr(sFormuleOOo,&quot;|&quot;)
+	do while j&gt;i
+		i=j
+		l=i-1
+		if l&gt;0 then 
+			bTrouveExpressionGauche(sFormuleOOo,k,l)
+		else
+			k=1
+		end if
+		Select case mid(sFormuleOOo,k,l-k+1)
+		case &quot;left&quot;
+			sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot;lline &quot; &amp; mid(sFormuleOOo,i+1)
+			i=i+5
+		case &quot;right&quot;
+			sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot;rline &quot; &amp; mid(sFormuleOOo,i+1)
+			i=i+5
+		case else
+			sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot;&quot;&quot;&quot; &amp; &quot;|&quot; &amp; &quot;&quot;&quot;&quot; &amp; mid(sFormuleOOo,i+1)
+			i=i+2
+		end select
+		j=i+Instr(mid(sFormuleOOo,i+1),&quot;|&quot;)
+	loop
+	
+	&apos; si [  précédé de left ou right alors ok, &quot;[&quot;
+	i=0
+	j=Instr(sFormuleOOo,&quot;[&quot;)
+	do while j&gt;i
+		i=j
+		l=i-1
+		if l&gt;0 then 
+			bTrouveExpressionGauche(sFormuleOOo,k,l)
+		else
+			k=1
+		end if
+		Select case mid(sFormuleOOo,k,l-k+1)
+		case &quot;left&quot;,&quot;right&quot;
+			&apos; ne rien faire : ok
+		case else
+			sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot;&quot;&quot;&quot; &amp; &quot;[&quot; &amp; &quot;&quot;&quot;&quot; &amp; mid(sFormuleOOo,i+1)
+			i=i+2
+		end select
+		j=i+Instr(mid(sFormuleOOo,i+1),&quot;[&quot;)
+	loop
+
+	&apos; si [  précédé de left ou right alors ok, &quot;[&quot;
+	i=0
+	j=Instr(sFormuleOOo,&quot;]&quot;)
+	do while j&gt;i
+		i=j
+		l=i-1
+		if l&gt;0 then 
+			bTrouveExpressionGauche(sFormuleOOo,k,l)
+		else
+			k=1
+		end if
+		Select case mid(sFormuleOOo,k,l-k+1)
+		case &quot;left&quot;,&quot;right&quot;
+			&apos; ne rien faire : ok
+		case else
+			sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot;&quot;&quot;&quot; &amp; &quot;]&quot; &amp; &quot;&quot;&quot;&quot; &amp; mid(sFormuleOOo,i+1)
+			i=i+2
+		end select
+		j=i+Instr(mid(sFormuleOOo,i+1),&quot;]&quot;)
+	loop
+	
+	&apos; changement de grammaire
+	&apos; parcours récursif de la formule
+	sFormuleLaTeX2OOo=sFormatOOo(sFormuleOOo)
+end function
+
+
+function bEstCeDelimiteurSubstitutions(char as String) as boolean
+	bEstCeDelimiteurSubstitutions=(InStr(&quot; +-*/=#!.&quot;&amp;&quot;&quot;&quot;&quot;&amp;&quot;&gt;&quot;&amp;&quot;&lt;&quot;&amp;&quot;&amp;&quot;&amp;&quot;|&quot;&amp;&quot;(&quot;&amp;&quot;)&quot;&amp;&quot;{&quot;&amp;&quot;}&quot;&amp;&quot;~&quot;&amp;&quot;^&quot;&amp;&quot;_&quot;&amp;&quot;[&quot;&amp;&quot;]&quot;&amp;&quot;\&quot;&amp;&quot;;&quot;&amp;chr(10)&amp;chr(13)&amp;&quot;$&quot;,char)&gt;0)
+end function
+
+function bEstCeDelimiteurOperateurs(char as String) as boolean
+	bEstCeDelimiteurOperateurs=(InStr(&quot; +-*/=#!.&quot;&amp;&quot;&quot;&quot;&quot;&amp;&quot;&gt;&quot;&amp;&quot;&lt;&quot;&amp;&quot;&amp;&quot;&amp;&quot;|&quot;&amp;&quot;(&quot;&amp;&quot;)&quot;&amp;&quot;{&quot;&amp;&quot;}&quot;&amp;&quot;~&quot;&amp;&quot;^&quot;&amp;&quot;_&quot;&amp;&quot;[&quot;&amp;&quot;]&quot;&amp;&quot;\&quot;&amp;&quot;;,&quot;&amp;chr(10)&amp;chr(13)&amp;&quot;$&quot;,char)&gt;0)
+end function
+
+
+function bEstCeChiffreOuVirgule(char as String) as boolean
+	bEstCeChiffreOuVirgule=(InStr(&quot;0123456789.,&quot;,char)&gt;0)
+end function
+
+function bTrouveCommandeLatex(sFormule as string, i as long, sMotAChercher as string) as boolean
+&apos; cherche à partir de la position i une commande &quot;\xxx&quot; dans la chaine sFormule
+&apos; i prend la valeur de la position du \ trouvé
+&apos; la fonction revoie la commande trouvée
+	dim k as long
+	dim sCommande as string
+	k=instr(mid(sFormule,i),&quot;\&quot;)
+	if k=0 then
+		bTrouveCommandeLatex=false
+	else
+		k=k+i-1
+		sCommande=mid(sFormule,k,2)
+		i=k
+		k=k+1
+		if not(bEstCeDelimiteurSubstitutions(mid(sFormule,k,1)) or bEstCeChiffreOuVirgule(mid(sFormule,k,1))) then
+			k=k+1
+			do while not(bEstCeDelimiteurSubstitutions(mid(sFormule,k,1)) or bEstCeChiffreOuVirgule(mid(sFormule,k,1))) and (k&lt;=len(sFormule))
+				sCommande=sCommande+mid(sFormule,k,1)
+				k=k+1
+			loop
+		end if
+		sMotAChercher=sCommande
+		bTrouveCommandeLatex=true
+	end if
+end function
+
+function sFormatOOo(sFormuleOOo as String) as String
+	dim i as long, iNiveau as integer
+	dim j as long, k as long
+	dim sFormuleTraitee as string, sMotAChercher as string
+	dim iArg1Debut as long, iArg1Fin as long
+	dim iArg2Debut as long, iArg2Fin as long
+	dim iArg3Debut as long, iArg3Fin as long
+	dim sResteFormuleOOo as string, sArg1 as string,sArg2 as string,sArg3 as string
+	dim bErreur as boolean
+	
+	
+	i=1
+	j=1
+	&apos; parcours récursif de la formule
+	do while bTrouveExpressionSuite(sFormuleOOo,i,j)
+		sFormuleTraitee=sFormatOOo(mid(sFormuleOOo,i+1,j-i-1))
+		sFormuleOOo=left(sFormuleOOo,i) &amp; sFormuleTraitee &amp; mid(sFormuleOOo,j)
+		i=i+len(sFormuleTraitee)+2
+	loop
+	&apos;chercher les mots-clés
+	i=1
+	&apos; parcours linéaire de la formule en évitant les expressions entre {}
+	do while i&lt;len(sFormuleOOo)
+		&apos;rechercher le début d&apos;une commande LaTex \xxx
+		iNiveau=0
+		
+		do while (mid(sFormuleOOo,i,1))&lt;&gt;&quot;\&quot; and (i&lt;=len(sFormuleOOo))
+			&apos;si zone déjà traitée
+			if mid(sFormuleOOo,i,2)=&quot;\{&quot; then i=i+2
+			if mid(sFormuleOOo,i,1)=&quot;{&quot; then
+				iNiveau=iNiveau+1
+				do while iNiveau&gt;0
+					i=i+1
+					if mid(sFormuleOOo,i,1)=&quot;{&quot; and  mid(sFormuleOOo,i-1,2)&lt;&gt;&quot;\{&quot; then
+						iNiveau=iNiveau+1
+					elseif mid(sFormuleOOo,i,1)=&quot;}&quot; and mid(sFormuleOOo,i-1,2)&lt;&gt;&quot;\}&quot; then
+						iNiveau=iNiveau-1
+					end if
+				loop
+			end if
+			i=i+1
+		loop
+		if i&lt;=len(sFormuleOOo) then
+			&apos;parcours de l&apos;expression à la lecture de la commande
+			j=i+2
+			if not(bEstCeDelimiteurSubstitutions(mid(sFormuleOOo,i+1,1)) or bEstCeChiffreOuVirgule(mid(sFormuleOOo,i+1,1))) then
+				do while not(bEstCeDelimiteurSubstitutions(mid(sFormuleOOo,j,1)) or bEstCeChiffreOuVirgule(mid(sFormuleOOo,j,1))) and (j&lt;=len(sFormuleOOo))
+					j=j+1
+				loop
+			end if		
+			&apos; recherche d&apos;opérateur
+			sMotAChercher=mid(sFormuleOOo,i,j-i)
+			for k=0 to UBound(sLatexOperator())
+				if sMotAChercher=sLatexOperator(k) then
+					&apos; changement de grammaire
+					select case iTypeOperator(k)
+					case cFRAC
+						&apos;********************* Type Fractions *************************************
+						&apos;  LatexOperator{A}{B} -&gt; {A}OOoOperator{B}
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)) then
+							&apos; pas d&apos;accolades : 1 seul caractère
+							if left(sArg1,1)&lt;&gt;&quot;\&quot; then
+								iArg1Fin=iArg1Debut
+								sArg1=&quot; &quot;&amp;mid(sFormuleOOo,iArg1Debut,1)&amp;&quot; &quot;
+							end if
+						end if
+						iArg2Debut=iArg1Fin+1
+						iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)) then
+							&apos; pas d&apos;accolades : 1 seul caractère
+							if left(sArg1,1)&lt;&gt;&quot;\&quot; then
+								iArg2Fin=iArg2Debut
+								sArg2=&quot; &quot;&amp;mid(sFormuleOOo,iArg2Debut,1)&amp;&quot; &quot;
+							end if
+						end if
+						if bErreur then
+							j=j+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,iArg2Fin-i+1),i,iArg2Fin+1)
+						else
+							&apos; tout est OK
+							sResteFormuleOoo=mid(sFormuleOOo,iArg2Fin+1)
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot;{alignc{&quot; &amp; sArg1 &amp; sOOoOperator(k) &amp; sArg2 &amp; &quot;}}&quot;
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						end if										
+
+
+					case cINT
+						&apos;********************* Type Intégrale *************************************
+						&apos; \LatexOperator _{A}^{B}{C} -&gt; OOoOperator from{A}to{B}{C} 
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						&apos;détection du &quot;_&quot;
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						if sArg1=&quot;\limits&quot; then
+							&apos; supprimer
+							iArg1Debut=iArg1Fin+1
+							iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+							bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						end if
+						if left(sArg1,1)=&quot;_&quot; then
+							iArg1Debut=iArg1Debut+1
+&apos;							bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)							
+							bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+							iArg2Debut=iArg1Fin+1
+							iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						else
+							sArg1=&quot;{}&quot;
+							iArg1Fin=iArg1Debut
+							iArg2Debut=iArg1Debut
+							iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						end if
+						bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+						if left(sArg2,1)=&quot;^&quot; then
+							iArg2Debut=iArg2Debut+1
+							bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+							iArg3Debut=iArg2Fin+1
+							iArg3Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						else
+							sArg2=&quot;{}&quot;
+							iArg2Fin=iArg2Debut
+							iArg3Debut=iArg2Debut
+							iArg3Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						end if
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg3Debut,iArg3Fin,sArg3)) then
+							&apos; pas d&apos;accolades : pas d&apos;arg3
+							&apos; dans ce cas, il faut analyser le contenu et le transformer
+							sArg3=&quot;&quot;
+							iArg3Fin=iArg3Debut-1
+						end if
+
+						if bErreur then
+							j=j+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,iArg3Fin-i+1),i,iArg3Fin+1)
+						else
+							&apos; tout est OK
+							sResteFormuleOoo=mid(sFormuleOOo,iArg3Fin+1)
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; &quot; &amp; sOOoOperator(k) &amp; &quot; from &quot; &amp; sArg1 &amp; &quot; to &quot; &amp; sArg2 &amp; &quot; &quot; &amp; sArg3
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						end if										
+
+
+
+					Case cLIMIT
+						&apos;********************* Type Limite ****************************************
+						&apos;  \lim _{A}{B} -&gt; lim from{A}{B}
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						if left(sArg1,1)=&quot;_&quot; then
+							iArg1Debut=iArg1Debut+1
+							if not(bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)) then
+								&apos; pas d&apos;accolades : erreur
+								bErreur=true
+							end if
+							iArg2Debut=iArg1Fin+1
+							iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						else
+							sArg1=&quot;{}&quot;
+							iArg1Fin=iArg1Debut
+							iArg2Debut=iArg1Debut
+							iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						end if
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)) then
+							&apos; pas d&apos;accolades : pas d&apos;arg3
+							&apos; dans ce cas, il faut analyser le contenu et le transformer
+							sArg2=&quot;&quot;
+							iArg2Fin=iArg2Debut-1
+						end if
+
+						if bErreur then
+							j=j+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,iArg2Fin-i+1),i,iArg2Fin+1)
+						else
+							&apos; tout est OK
+							sResteFormuleOoo=mid(sFormuleOOo,iArg2Fin+1)
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; &quot; &amp; sOOoOperator(k) &amp; &quot; from &quot; &amp; sArg1 &amp; sArg2
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						end if										
+
+		
+				
+						
+					&apos;********************* Type BEGIN *************************************
+					Case cBEGIN
+						dim sDelimiteurGauche as string
+						dim sDelimiteurDroite as string
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						Select Case sArg1
+						Case &quot;{array}&quot;
+							&apos; aller chercher le modèle {A}
+							iArg2Debut=iArg1Fin+1
+							bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+							&apos; pour l&apos;instant : ignoré
+							iArg1Debut=iArg2Fin+1
+							sDelimiteurGauche=&quot; &quot;
+							sDelimiteurDroite=&quot; &quot;
+							
+						Case &quot;{eqnarray}&quot;,&quot;{eqnarray*}&quot;
+							iArg1Debut=iArg1Fin+1
+							sDelimiteurGauche=&quot; &quot;
+							sDelimiteurDroite=&quot; &quot;
+						
+						Case &quot;{matrix}&quot;
+							iArg1Debut=iArg1Fin+1
+							sDelimiteurGauche=&quot; &quot;
+							sDelimiteurDroite=&quot; &quot;
+						
+						Case &quot;{vmatrix}&quot;
+							iArg1Debut=iArg1Fin+1
+							sDelimiteurGauche=&quot; left lline &quot;
+							sDelimiteurDroite=&quot; right rline &quot;
+						
+						Case &quot;{Vmatrix}&quot;
+							iArg1Debut=iArg1Fin+1
+							sDelimiteurGauche=&quot; left ldline &quot;
+							sDelimiteurDroite=&quot; right rdline &quot;
+												
+						Case &quot;{pmatrix}&quot;
+							iArg1Debut=iArg1Fin+1
+							sDelimiteurGauche=&quot; left( &quot;
+							sDelimiteurDroite=&quot; right) &quot;
+						
+						Case &quot;{bmatrix}&quot;
+							iArg1Debut=iArg1Fin+1
+							sDelimiteurGauche=&quot; left [ &quot;
+							sDelimiteurDroite=&quot; right ] &quot;
+							
+						Case &quot;{Bmatrix}&quot;
+							iArg1Debut=iArg1Fin+1
+							sDelimiteurGauche=&quot; left lbrace &quot;
+							sDelimiteurDroite=&quot; right rbrace &quot;
+
+						Case &quot;{cases}&quot;
+							iArg1Debut=iArg1Fin+1
+							sDelimiteurGauche=&quot; left lbrace &quot;
+							sDelimiteurDroite=&quot; right none &quot;
+							
+						
+						Case else
+						&apos; pas reconnu, convertir en tableau
+						&apos; à faire
+						
+						end select
+						&apos;aller chercher \end
+						iArg1Fin=iArg1Debut
+						&apos; cherche \end{array}
+						if bTrouveEnd(sFormuleOOo,iArg1Fin,sArg1)=true then
+							sArg2=mid(sFormuleOOo,iArg1Debut,iArg1Fin-iArg1Debut)
+							&apos; si la dernière ligne se termine par \\, le supprimer
+							iArg3Debut=len(sArg2)
+							do while asc(mid(sArg2,iArg3Debut))&lt;=32 and iArg3Debut&gt;2
+								iArg3Debut=iArg3Debut-1
+							loop
+							iArg3Debut=iArg3Debut-1
+							sArg3=mid(sArg2,iArg3Debut,2)
+							if sArg3=&quot;\\&quot; then sArg2=left(sArg2,iArg3Debut-1)
+							iSubstitue(sArg2,1,len(sArg2),&quot;\\&quot;,&quot; ## &quot;)
+							iSubstitue(sArg2,1,len(sArg2),&quot;&amp;&quot;,&quot; # &quot;)	
+							iSubstitue(sArg2,1,len(sArg2),&quot;=&quot;,&quot;`=`&quot;)	
+							sArg2=sFormatOOo(sArg2)					
+							sResteFormuleOoo=mid(sFormuleOOo,iArg1Fin+len(&quot;\end&quot; &amp; sArg1))
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; sDelimiteurGauche &amp; sOOoOperator(k) &amp; &quot;{&quot; &amp; sArg2 &amp; &quot;}&quot; &amp; sDelimiteurDroite
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						else
+							&apos;erreur
+							j=len(sFormuleOOo)+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,len(sFormuleOOo)-i),i,len(sFormuleOOo+1)-1
+						end if						
+
+					Case cNROOT
+					&apos;********************* Type Nroot ****************************************
+					&apos; \sqrt[{A}]{B} -&gt; nroot{A}{B}
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						if left(sArg1,1)=&quot;[&quot; then
+							&apos; nroot
+							iArg1Debut=iArg1Debut+1
+							bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+							iArg2Debut=iArg1Fin+2
+							iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+							bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+							sResteFormuleOoo=mid(sFormuleOOo,iArg2Fin+1)
+						else
+							sArg2=sArg1
+							sArg1=&quot;{}&quot;
+							iArg2Fin=iArg1Fin
+						end if
+						sResteFormuleOoo=mid(sFormuleOOo,iArg2Fin+1)
+						sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; &quot; &amp; sOOoOperator(k) &amp; &quot; &quot; &amp; sArg1 &amp; &quot; &quot; &amp; sArg2 &amp; &quot; &quot;
+						j=len(sFormuleOOo)+1
+						sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						
+
+
+					Case cDELETE0
+						&apos;********************* Type Delete 0 ****************************************
+						&apos; opérateur non traduit et effacé, sans argument
+						sFormuleOOo=left(sFormuleOOo,i-1) &amp; mid(sFormuleOOo,j+1)
+						j=j-len(sLatexOperator(k))
+							
+					Case cDELETE1
+						&apos;********************* Type Delete 1 ****************************************
+						&apos; opérateur non traduit et effacé, avec 1 argument
+						iArg1Debut=j
+						iArg1Fin=iArg1Debut &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin)
+						sResteFormuleOoo=mid(sFormuleOOo,iArg1Fin+1)
+						sFormuleOOo=left(sFormuleOOo,i-1)
+						j=len(sFormuleOOo)+1
+						sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+							
+					case cOVER
+						&apos;********************* Type Over *************************************
+						&apos;  \LatexOperator{A}^{B} -&gt; {A}OOoOperator{B}
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)) then
+							&apos; pas d&apos;accolades : erreur
+							bErreur=true
+						end if
+						iArg2Debut=iArg1Fin+1
+						iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+						if left(sArg2,1)&lt;&gt;&quot;^&quot; then
+							bErreur=true
+						end if
+						iArg2Debut=iArg2Debut+1
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)) then
+							&apos; pas d&apos;accolades : erreur
+							bErreur=true
+						end if
+						if bErreur then
+							j=j+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,iArg2Fin-i+1),i,iArg2Fin+1)
+						else
+							&apos; tout est OK
+							sResteFormuleOoo=mid(sFormuleOOo,iArg2Fin+1)
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; sArg1 &amp; sOOoOperator(k) &amp; sArg2
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						end if										
+
+											
+					case cUNDER
+						&apos;********************* Type Under *************************************
+						&apos; \LatexOperateur{A}_{B} -&gt; {A}OOoOperateur{B}
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)) then
+							&apos; pas d&apos;accolades : erreur
+							bErreur=true
+						end if
+						iArg2Debut=iArg1Fin+1
+						iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+						if left(sArg2,1)&lt;&gt;&quot;_&quot; then
+							bErreur=true
+						end if
+						iArg2Debut=iArg2Debut+1
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)) then
+							&apos; pas d&apos;accolades : erreur
+							bErreur=true
+						end if
+						if bErreur then
+							j=j+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,iArg2Fin-i+1),i,iArg2Fin+1)
+						else
+							&apos; tout est OK
+							sResteFormuleOoo=mid(sFormuleOOo,iArg2Fin+1)
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; sArg1 &amp; sOOoOperator(k) &amp; sArg2
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						end if										
+
+					case cFUNC
+						&apos;********************* Type Func *************************************
+						&apos; LatexOperator{A} - &gt; OOoOperator A
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)) then
+							&apos; pas d&apos;accolades : erreur
+							bErreur=true
+						end if
+						if bErreur then
+							j=j+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,iArg1Fin-i+1),i,iArg1Fin+1)
+						else
+							&apos; tout est OK
+							sResteFormuleOoo=mid(sFormuleOOo,iArg1Fin+1)
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; &quot; &amp; sOOoOperator(k) &amp; &quot; &quot; &amp; mid(sArg1,2,len(sArg1)-2) &amp; &quot; &quot;
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						end if										
+
+					case cNOT
+						&apos;********************* Type NOT *************************************
+						&apos; \not\LatexKey - &gt; OOoKey
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						Select Case sArg1
+						case &quot;=&quot;
+							sArg2=&quot;neq&quot;
+						case &quot;subset&quot;
+							sArg2=&quot;nsubset&quot;
+						case &quot;subseteq&quot;
+							sArg2=&quot;nsubseteq&quot;
+						case &quot;supset&quot;
+							sArg2=&quot;nsupset&quot;
+						case &quot;supseteq&quot;
+							sArg2=&quot;nsupseteq&quot;
+						case else
+							bErreur=true
+						end select						
+						if bErreur then
+							j=j+iInsereMessageErreur(sFormuleOOo,&quot;?&quot;,i,iArg1Fin+1)
+						else
+							&apos; tout est OK
+							sResteFormuleOoo=mid(sFormuleOOo,iArg1Fin+1)
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; &quot; &amp; sArg2 &amp; &quot; &quot;
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						end if										
+
+					case cPMOD
+						&apos;********************* Type PMOD *************************************
+						&apos; \pmod{A} - &gt; (mod {A})
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						sResteFormuleOoo=mid(sFormuleOOo,iArg1Fin+1)
+						sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; left (&quot;&amp; &quot;&quot;&quot;&quot; &amp; &quot;mod &quot;&amp;&quot;&quot;&quot;&quot; &amp; sArg1 &amp; &quot; right ) &quot;
+						j=len(sFormuleOOo)+1
+						sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+										
+
+					case cMATHBB
+						&apos;********************* Type cMATHBB *************************************
+						&apos; \mathbb{A} - &gt; setA
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						&apos;enlever les {}
+						sArg1=mid(sArg1,2,len(sArg1)-2)
+
+						sResteFormuleOoo=mid(sFormuleOOo,iArg1Fin+1)
+						sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; set&quot;&amp; sArg1 &amp; &quot; &quot;
+						j=len(sFormuleOOo)+1
+						sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+
+					case cBINOM
+						&apos;********************* Type Binom *************************************
+						&apos;  LatexOperator{A}{B} -&gt; left( OOoOperator{A}{B} right)
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)) then
+							&apos; pas d&apos;accolades : erreur
+							bErreur=true
+						end if
+						iArg2Debut=iArg1Fin+1
+						iArg2Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						if not(bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)) then
+							&apos; pas d&apos;accolades : erreur
+							bErreur=true
+						end if
+						if bErreur then
+							j=j+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,iArg2Fin-i+1),i,iArg2Fin+1)
+						else
+							&apos; tout est OK
+							sResteFormuleOoo=mid(sFormuleOOo,iArg2Fin+1)
+							sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot;{left( &quot; &amp; sOOoOperator(k) &amp; sArg1 &amp; sArg2 &amp; &quot; right)}&quot;
+							j=len(sFormuleOOo)+1
+							sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+						end if										
+
+					case cTEXT
+						&apos;********************* Type TEXT *************************************
+						&apos; LatexOperator{A} - &gt; OOoOperator &quot;A&quot;
+						&apos; avec remplacement des $ par &quot; car une formule peut être incluse dans le texte
+						bErreur=False
+						iArg1Debut=j 
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						if bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)=true then
+							&apos;éliminer les {}
+							sArg1=mid(sArg1,2,len(sArg1)-2)
+						end if
+						sResteFormuleOoo=mid(sFormuleOOo,iArg1Fin+1)
+						isubstitue(sArg1,1,len(sArg1),&quot;$&quot;,&quot;&quot;&quot;&quot;)
+						sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; &quot; &amp; sOOoOperator(k) &amp; &quot;&quot;&quot;&quot; &amp; sArg1 &amp; &quot;&quot;&quot;&quot;
+						j=len(sFormuleOOo)+1
+						sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+
+					case cMATHCHOICE
+						&apos;********************* Type MATHCHOICE *************************************
+						&apos; LatexOperator{A}{B}{C}{D} - &gt; OOoOperator{A}
+						bErreur=False
+						iArg1Debut=j
+						iArg1Fin=len(sFormuleOOo) &apos;inconnu actuellement
+						bTrouveExpressionDroite(sFormuleOOo,iArg1Debut,iArg1Fin,sArg1)
+						iArg2Debut=iArg1Fin+1
+						bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+						iArg2Debut=iArg2Fin+1
+						bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+						iArg2Debut=iArg2Fin+1
+						bTrouveExpressionDroite(sFormuleOOo,iArg2Debut,iArg2Fin,sArg2)
+						sResteFormuleOoo=mid(sFormuleOOo,iArg2Fin+1)
+						sFormuleOOo=left(sFormuleOOo,i-1) &amp; &quot; &quot; &amp; sOOoOperator(k) &amp; sArg1
+						j=len(sFormuleOOo)+1
+						sFormuleOOo=sFormuleOOo &amp; sResteFormuleOOo
+
+
+					end select	
+					exit for
+				end if
+			next k
+			&apos; si pas trouvé erreur
+			if k&gt;UBound(sLatexOperator()) then
+				j=j+iInsereMessageErreur(sFormuleOOo,mid(sFormuleOOo,i,j-i),i,j)
+			end if
+		i=j
+		end if
+	loop
+	sFormatOOo=sFormuleOOo
+end function
+
+function bTrouveExpressionSuite(sFormuleOOo as string,i as long,j as long) as boolean
+&apos; cherche une expression entre {} à partir de la position i
+&apos; renvoie true s&apos;il en existe, faux sinon
+	Dim iNiveau as integer, k as long, iPos as long
+	Dim sCarac as String
+	
+	iPos=i
+	do
+		sCarac=mid(sFormuleOOo,iPos,1)
+
+		if sCarac=&quot;{&quot; then
+			if iPos=1 then 
+				exit do
+			elseif mid(sFormuleOOo,iPos-1,2)&lt;&gt;&quot;\{&quot; then 
+				exit do
+			end if
+		end if
+		iPos=iPos+1
+	loop while iPos&lt;=len(sFormuleOOo)
+	if iPos&lt;=len(sFormuleOOo) then
+		iNiveau=1
+		k=iPos+1
+		do while k&lt;=len(sFormuleOOo) and iNiveau&gt;0
+			sCarac=mid(sFormuleOOo,k,1)
+			if sCarac=&quot;{&quot; and  mid(sFormuleOOo,k-1,2)&lt;&gt;&quot;\{&quot; then 
+				iNiveau=iNiveau+1
+			elseif sCarac=&quot;}&quot; and  mid(sFormuleOOo,k-1,2)&lt;&gt;&quot;\}&quot; then
+				iNiveau=iNiveau-1
+			end if
+			k=k+1
+		loop
+		if iNiveau&gt;0 then
+			msgbox(&quot;Erreur d&apos;accolades dans la formule.&quot;)
+			stop
+		end if
+		j=k-1
+		i=iPos
+		bTrouveExpressionSuite=True
+	else
+		bTrouveExpressionSuite=False		
+	end if
+end function
+
+
+function iInsereMessageErreur(sFormule as string,sInstruction as string, i as long, j as long) as integer
+&apos; insère le message sMessage dans la formule sFormule à partir de la position i et reprend à la position j
+&apos; renvoie la différence de longueur de chaine avant et après le message
+	dim sMessage as string
+	sMessage=&quot;{color red {&quot; &amp; &quot;&quot;&quot;&quot; &amp; sInstruction &amp; &quot;&quot;&quot;&quot; &amp; &quot;}}&quot;
+	sFormule=left(sFormule,i-1)  &amp; sMessage &amp; mid(sFormule,j)
+	iInsereMessageErreur=len(sMessage)-(j-i)
+end function
+
+function bTrouveExpressionGauche(sFormuleOOo as string,i as long,j as long) as boolean
+&apos; cherche une expression dans la chaine sFormuleOOo située à gauche de la position j
+&apos; renvoie true si l&apos;expression trouvée est entre {}, faux sinon
+	Dim iNiveau as integer, k as long, iPos as long
+	Dim sCarac as String
+	
+	
+	iPos=j
+	do while mid(sFormuleOOo,iPos,1)=&quot; &quot;
+		iPos=iPos-1
+	loop
+	j=iPos
+	if mid(sFormuleOOo,j,1)=&quot;}&quot; then
+		&apos; expression avec {}
+		iNiveau=1
+		k=j-1
+		do while k&gt;0 and iNiveau&gt;0
+			sCarac=mid(sFormuleOOo,k,1)
+			if sCarac=&quot;}&quot; then 
+				iNiveau=iNiveau+1
+			elseif sCarac=&quot;{&quot; then
+				iNiveau=iNiveau-1
+			end if
+			k=k-1
+		loop
+		if iNiveau&gt;0 then
+			msgbox(&quot;Erreur d&apos;accolades dans la formule.&quot;)
+			stop
+		end if
+		i=k+1
+		bTrouveExpressionGauche=True
+	else
+		&apos;expression sans {}
+		k=iPos
+		do while k&gt;1 and not bEstCeDelimiteurOperateurs(mid(sFormuleOOo,k,1))
+			k=k-1
+		loop
+		if not bEstCeDelimiteurOperateurs(mid(sFormuleOOo,k,1)) then
+			&apos; début de la formule
+			i=1
+		else
+			i=k+1
+		end if
+		bTrouveExpressionGauche=False		
+	end if
+end function
+
+function bTrouveExpressionDroite(sFormuleOOo as string,i as long,j as long,optional sArgument as string) as boolean
+&apos; cherche une expression dans la chaine sFormuleOOo située à droite de la position i
+&apos; renvoie true si l&apos;expression trouvée est entre {}, faux sinon
+	Dim iNiveau as integer, k as long, iPos as long
+	Dim sCarac as String
+	
+	iPos=i
+	do while mid(sFormuleOOo,iPos,1)=&quot; &quot;
+		iPos=iPos+1
+	loop
+	i=iPos
+	if mid(sFormuleOOo,i,1)=&quot;{&quot; then
+		&apos; expression avec {}
+		iNiveau=1
+		k=i+1
+		do while k&lt;=len(sFormuleOOo) and iNiveau&gt;0
+			sCarac=mid(sFormuleOOo,k,1)
+			if sCarac=&quot;{&quot; and  mid(sFormuleOOo,k-1,2)&lt;&gt;&quot;\{&quot; then 
+				iNiveau=iNiveau+1
+			elseif sCarac=&quot;}&quot; and  mid(sFormuleOOo,k-1,2)&lt;&gt;&quot;\}&quot; then
+				iNiveau=iNiveau-1
+			end if
+			k=k+1
+		loop
+		if iNiveau&gt;0 then
+			msgbox(&quot;Erreur d&apos;accolades dans la formule.&quot;)
+			stop
+		end if
+		j=k-1
+		bTrouveExpressionDroite=True
+	else
+		&apos;expression sans {}
+		k=iPos+1
+		do while k&lt;=len(sFormuleOOo) and not bEstCeDelimiteurOperateurs(mid(sFormuleOOo,k,1))
+			k=k+1
+		loop
+		j=k-1
+		bTrouveExpressionDroite=False		
+	end if
+	if not(IsMissing(sArgument)) then
+		sArgument=mid(sFormuleOOo,i,j-i+1)
+	end if
+end function
+
+function bTrouveEnd(sFormuleOOo as string,i as long,sArgument as string) as boolean
+&apos; cherche \end{sArgument} dans la chaine sFormuleOOo située à droite de la position i
+&apos; renvoie true si l&apos;expression est trouvée, faux sinon
+&apos; i contient la position du \
+
+	Dim j as long
+	Dim sChaineATrouver as string
+	
+	sChaineATrouver=&quot;\end&quot; &amp; sArgument
+	j=instr(i,sFormuleOOo,sChaineATrouver)
+	if j&gt;0 then
+		bTrouveEnd=true
+		i=j
+	else
+		bTrouveEnd=false
+	end if
+end function
+
+
+function iSubstitue(sChaine as String, i as long, j as long, sChercher as String, sRemplacer as String) as integer
+&apos; cherche et remplace dans sChaine de la position i à j la chaine sChercher par sRemplacer
+&apos; en évitant les {} (déjà traités par récursivité)
+&apos; renvoie le nombre de remplacements effectués
+	Dim iNiveau as integer, k as long, iNB as integer
+	dim jtemp as long
+
+
+	iNb=0
+	k=i
+	jtemp=j
+	iNiveau=0
+	do while k&lt;=jtemp-len(sChercher)+1
+		if mid(sChaine,k,1)=&quot;{&quot; then
+				iNiveau=iNiveau+1
+				do while iNiveau&gt;0
+					k=k+1
+					if mid(sChaine,k,1)=&quot;{&quot; and  mid(sChaine,k-1,2)&lt;&gt;&quot;\{&quot; then
+						iNiveau=iNiveau+1
+					elseif mid(sChaine,k,1)=&quot;}&quot; and mid(sChaine,k-1,2)&lt;&gt;&quot;\}&quot; then
+						iNiveau=iNiveau-1
+					end if
+				loop
+		end if
+		if mid(sChaine,k,len(sChercher))=sChercher then
+			sChaine=left(sChaine,k-1) &amp; sRemplacer &amp; mid(sChaine,k+len(sChercher))
+			jtemp=jtemp+len(sRemplacer)-len(sChercher)
+			k=k+len(sRemplacer)-1
+			iNb=iNb+1
+		end if
+		k=k+1
+	loop
+	j=jtemp
+	iSubstitue=iNb
+end function
+</script:module>

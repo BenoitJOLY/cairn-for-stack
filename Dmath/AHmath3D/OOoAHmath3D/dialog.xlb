@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE library:library PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "library.dtd">
+<library:library xmlns:library="http://openoffice.org/2000/library" library:name="OOoAHmath3D" library:readonly="false" library:passwordprotected="false">
+ <library:element library:name="aoDlg"/>
+ <library:element library:name="SphereDlg"/>
+ <library:element library:name="PrismePcDlg"/>
+ <library:element library:name="PyramideDlg"/>
+ <library:element library:name="ConeDlg"/>
+ <library:element library:name="PrismeDlg"/>
+ <library:element library:name="CylindreDlg"/>
+ <library:element library:name="CubePcDlg"/>
+ <library:element library:name="PyrRectPcDlg"/>
+ <library:element library:name="BarreProgDlg"/>
+ <library:element library:name="InserZoneDlg"/>
+ <library:element library:name="PyrOrthPcDlg"/>
+ <library:element library:name="PyrOrthPc2Dlg"/>
+ <library:element library:name="PatPrismeDlg"/>
+ <library:element library:name="PatCylDlg"/>
+ <library:element library:name="PatConeDlg"/>
+ <library:element library:name="PatPyrDlg"/>
+ <library:element library:name="PatCubeDlg"/>
+ <library:element library:name="TroncPyrPcDlg"/>
+ <library:element library:name="Polyedre1Dlg"/>
+ <library:element library:name="PatronDlg"/>
+ <library:element library:name="ah2dDlg"/>
+ <library:element library:name="CalotteDlg"/>
+ <library:element library:name="ConeTroncDlg"/>
+</library:library>

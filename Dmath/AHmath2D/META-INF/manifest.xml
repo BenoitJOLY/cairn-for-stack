@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest>
+ <manifest:file-entry manifest:full-path="AHmath2D/" manifest:media-type="application/vnd.sun.star.basic-library"/>
+ <manifest:file-entry manifest:full-path="pkg-desc/desc_fr.txt" manifest:media-type="application/vnd.sun.star.package-bundle-description"/>
+ <manifest:file-entry manifest:full-path="Addons.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="WriterWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="DrawWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+</manifest:manifest>

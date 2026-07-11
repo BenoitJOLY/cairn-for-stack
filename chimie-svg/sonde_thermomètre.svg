@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="12.923332mm"
+   height="100.51174mm"
+   viewBox="0 0 12.923332 100.51174"
+   version="1.1"
+   id="svg4625"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="sonde_thermomètre.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview4627"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.74564394"
+     inkscape:cx="234.02591"
+     inkscape:cy="291.02362"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs4622" />
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-20.151237,-71.808646)">
+    <g
+       id="g4609"
+       transform="translate(-88.71621,-49.719858)">
+      <rect
+         style="fill:#999999;fill-rule:evenodd;stroke:#4d4d4d;stroke-width:0.944;stroke-dasharray:none"
+         id="rect4549"
+         width="11.979332"
+         height="28.211439"
+         x="109.33945"
+         y="122.0005"
+         rx="1.6069915"
+         ry="10.261003" />
+      <rect
+         style="fill:#4d4d4d;fill-rule:evenodd;stroke:#4d4d4d;stroke-width:0.943999;stroke-dasharray:none"
+         id="rect4553"
+         width="3.4087422"
+         height="75.641609"
+         x="113.62474"
+         y="145.92664"
+         rx="1.6069915"
+         ry="1.008701" />
+    </g>
+  </g>
+</svg>

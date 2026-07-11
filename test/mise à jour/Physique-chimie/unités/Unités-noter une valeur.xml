@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 397526  -->
+  <question type="stack">
+    <name>
+      <text>Rentrez_le_nom_de_votre_exercice</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#d97706;border-left:5px solid #b45309;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Unité</strong>
+        <span style="background:#b45309;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#b45309;border:1px solid #b45309;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📏 Grandeur physique</span>
+      </div>
+      <!-- ENONCE-START -->Quelle est la valeur de g sur Terre ?<!-- ENONCE-END -->
+      <div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>Conseils pour la saisie :</strong><ul style="margin:8px 0 0 20px;line-height:1.7"><li>La virgule se note avec un point (ex : <code>1.32</code>).</li><li>Attention aux parenthèses : les règles de priorité sont respectées.</li><li><strong>Lier nombre et unité</strong> : reliez-les par <code>*</code> (ex : <code>10*m</code> ou <code>9.81*m/s^2</code>).</li><li><strong>Unités complexes</strong> : pour J·kg⁻¹·K⁻¹, tapez <code>J/(kg*K)</code> ou <code>J*kg^(-1)*K^(-1)</code>.</li><li><strong>Unités usuelles</strong> : <code>m</code>, <code>kg</code>, <code>g</code>, <code>mg</code>, <code>N</code>, <code>J</code>, <code>W</code>, <code>Pa</code>, <code>V</code>, <code>A</code>, <code>Ohm</code>, <code>s</code>, <code>min</code>, <code>h</code>, <code>K</code>, <code>degC</code>.</li></ul></div><p>[[input:ans1]] [[validation:ans1]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);"><div style="font-weight:bold; color:var(--navy2); margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div><div style="margin-bottom:4px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:2px;"><span style="font-weight:bold;color:var(--navy2);">Q1 Unité :</span>9.81*m/s^2</div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>/* Q1 : Unité (1pt) */
+ta1:9.81*m/s^2;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@ta1@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec l'aide de Héstack V1.0</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>units</type>
+      <tans>ta1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>/* Normalisation SI */
+           stud_si1 : stack_unit_si_to_si_base(ans1);
+           teach_si1 : stack_unit_si_to_si_base(ta1);
+
+           /* Extraction du nombre pur pour isoler l'unité */
+           v_pure_e1 : subst(map(lambda([u], u=1), listofvars(stud_si1)), stud_si1);
+           v_pure_t1 : subst(map(lambda([u], u=1), listofvars(teach_si1)), teach_si1);
+
+           /* Création de l'unité pure (le coefficient 2 évite les simplifications par défaut) */
+           eleve_unit1 : 2 * stud_si1 / v_pure_e1;
+           teacher_unit1 : 2 * teach_si1 / v_pure_t1;</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>UnitsAbsolute</answertest>
+        <sans>eleve_unit1</sans>
+        <tans>teacher_unit1</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p>L'unité est incorrecte (attendue en base SI : {@teacher_unit1/2@}).</p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description></description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans1</sans>
+        <tans>ta1</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p>Vous avez trouvé la bonne réponse (valeur et unité)</p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p>La valeur numérique ou la précision est incorrecte.</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

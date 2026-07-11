@@ -1,0 +1,4 @@
+﻿Copyright (c) 2011 Alain HAGUET
+Traduções e ajuda: Gisbert FRIEGE - Hélio GUILHERME - Andrea GATTO - Didier DORANGE-PATTORET
+
+Esta extensão integra WRITER e DRAW e permite desenhar em dimensões desejadas, sólidos em perspectiva cavaleira, e modelos que podem ser recortados e colados.

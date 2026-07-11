@@ -1,0 +1,1058 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TailleEquations" script:language="StarBasic">&apos;********************************************************************************
+&apos;Copyright (C) 2003 Laurent Godard
+&apos;dev.godard@wanadoo.fr
+&apos;and Didier Dorange-Pattoret (C) 2003-2014
+&apos; ddorange@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU Lesser General Public
+&apos;License as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;Lesser General Public License for more details.
+&apos;http://www.opensource.org/licenses/lgpl-license.php
+
+&apos;You should have received a copy of the GNU Lesser General Public
+&apos;License along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;******************************************************************************
+&apos;
+&apos;3 modes
+&apos;- 1 objet selectionné : n&apos;influe que sur celui ci
+&apos;- Rien n&apos;est selectionné : influe sur tout le document
+&apos;- Une portion de texte est selectionnée : influe sur les formules incluses
+&apos;
+&apos;
+Public oTailleFormule as Object &apos;ajouté par Didier Dorange-Pattoret
+Public LaTaille as integer &apos;ajouté par Didier Dorange-Pattoret
+Public LaFormule,MonBureau,MonDocument,pgb,LesObjets,oVCursor,oSapos as Object &apos;ajouté par Didier Dorange-Pattoret
+Public oProvider, oDispHelper as Object &apos;ajouté par Didier Dorange-Pattoret
+Public LeTexteATraiter as Object
+Public cas, increment as integer
+Public NbreCaracTraite as Integer
+Public bChangeTaille, bEncadre as Boolean rem True si on change la taille, false si on augmente ou diminue
+Private maBarredeConvertion as Object rem la barre de progression dans les conversions depuis docx
+
+
+Sub EncadreFormule &apos;macro pour encadrer une formule
+	Call VerifOperationnel
+	bEncadre = True
+	LanceModifFormule
+End Sub
+
+
+Sub AffecteTailleFormule
+	Call VerifOperationnel
+	bChangeTaille=True
+	LanceModifFormule
+End Sub
+
+Sub AugmenteTailleFormule
+	Call VerifOperationnel
+	increment = 1
+	LanceModifFormule
+	&apos;augmente la taille d&apos;un point
+End Sub
+
+Sub DiminueTailleFormule
+	Call VerifOperationnel
+	increment = -1
+	&apos;Diminue la taille d&apos;une pointLanceModifFormule
+	LanceModifFormule
+End Sub
+
+
+Sub LanceModifFormule
+
+	oTailleFormule = LoadDialog(&quot;Dmaths&quot;,&quot;TailleFormule&quot; ) &apos;ajouté par Didier Dorange-Pattoret
+	
+	maBarredeConvertion = oTailleFormule.getControl(&quot;ProgressBar1&quot;)	
+	
+	MonBureau = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	MonDocument = MonBureau.getCurrentComponent
+	LaFormule = MonDocument.getCurrentSelection()
+	oVCursor = MonDocument.currentcontroller.getViewCursor()
+	oProvider = ThisComponent.CurrentController.Frame
+    oDispHelper = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+
+	If IsEmpty(oVCursor.TextTable) Then &apos;ajouté par Didier DP
+		oVcurs = oVcursor
+	Else
+		oVcurs = oVCursor.Cell.createTextCursor
+	EndIf
+
+	if IsNull(LaFormule) then
+    Message=sVocab(iLang,302)+chr(10)
+    message=message+sVocab(iLang,303)+chr(10)
+    message=message+chr(10)+sVocab(iLang,304)
+    msgbox message,64,sVocab(iLang,305)
+    exit sub
+	endif
+	
+	
+	Rem on verifie que la selection est eligible	
+	if LaFormule.getImplementationName = &quot;SwXTextGraphicObject&quot; or LaFormule.getImplementationName = &quot;com.sun.star.drawing.SvxShapeCollection&quot; then  &apos;oDispHelper.executeDispatch(oProvider, &quot;.uno:Escape&quot;, &quot;&quot;, 0, Array()) 
+		Avertir (33)
+    	Exit Sub
+	endif
+
+	if LaFormule.getImplementationName = &quot;SwXTextEmbeddedObject&quot; then
+    Rem on verifie que la selection est eligible
+    If LAFormule.CLSID &lt;&gt; &quot;078B7ABA-54FC-457F-8551-6147e776a997&quot; Then
+    	Avertir (33)
+    	Exit Sub
+    Endif
+    &apos;un objet seul est selectionné
+    cas=1    
+    oDispHelper.executeDispatch(oProvider, &quot;.uno:Escape&quot;, &quot;&quot;, 0, Array()) 
+    oVCursor.GoRight(1,False) &apos;ajouté par Didier DP
+    else
+	    if MonDocument.getcurrentcontroller.viewcursor.iscollapsed then
+	        cas=2 &apos;rien selectionné --&gt; on applique à tout
+	        laFormule = MonDocument  
+	        rem objet Text dont les caracteres sont etudies
+	        LeTexteATraiter = monDocument.Text      			
+			oVCurs.GoLeft(1,False)
+		       
+	    else
+	        cas=3 &apos;portion sélectionnée
+	        LeTexteATraiter = MonDocument.getcurrentcontroller.viewcursor.Text
+	        rem objet Text dont les caracteres sont etudies
+	        laFormule=laformule.getbyIndex(0)
+	        MonEnum=laFormule.getAvailableServiceNames
+	        LesObjets=LaFormule.createContentEnumeration(monEnum(0))
+	        oVCurs.GoLeft(1,False)
+	       	        
+	    endif
+	    &apos;mise en place barre de progression
+	    nombreMax=MonDocument.drawpage.count
+	    pgb=MonDocument.currentcontroller.statusIndicator
+	    pgb.Start (sVocab(iLang,306),nombreMax)
+	    pgb.value=0    
+	endif
+
+	oSapos = oVCurs.GetEnd &apos;ajouté par Didier DP
+
+	If bChangeTaille =True Then	&apos;cette partie rappelle les propriétés d&apos;une formule sélectionnée.
+		If cas = 1 Then						
+			oTailleFormule.Model.ComboBox2.Text = DetermineTaille (LaFormule)
+			oTailleFormule.Model.ComboBox1.Text = LaFormule.model.FontNameVariables
+			If LaFormule.model.FontVariablesIsItalic = False Then
+			oTailleFormule.Model.CheckBox1.State = 0
+			Else
+			oTailleFormule.Model.CheckBox1.State = 1
+			Endif
+			
+			&apos; CheckBox5 for property FontTextIsItalic added by Gisbert
+			If LaFormule.model.FontTextIsItalic = False Then
+			oTailleFormule.Model.CheckBox5.State = 0
+			Else
+			oTailleFormule.Model.CheckBox5.State = 1
+			Endif
+
+			If LaFormule.model.IsTextMode = False Then
+			oTailleFormule.Model.CheckBox2.State = 0 
+			Else 
+			oTailleFormule.Model.CheckBox2.State = 1
+			Endif
+
+			If LaFormule.model.FontVariablesIsBold = False Then
+			oTailleFormule.Model.CheckBox3.State = 0 
+			Else 
+			oTailleFormule.Model.CheckBox3.State = 1
+			Endif
+
+			If LaFormule.GetPropertyValue(&quot;LeftBorder&quot;).OuterLineWidth&lt;&gt;0 Then oTailleFormule.Model.CheckBox4.State = 1
+		Else
+			If bTailleFormCarac = TRUE Then 				
+				oTailleFormule.Model.ComboBox2.Text = oVCursor.CharHeight
+			Else
+				oTailleFormule.Model.ComboBox2.Text = iTailleFormules
+			Endif
+			If bPoliceFormCarac = True Then 
+				If Len(oVCursor.CharFontName)&gt;0 Then 
+					oTailleFormule.Model.ComboBox1.Text = oVCursor.CharFontName
+				Else
+					oTailleFormule.Model.ComboBox1.Text = monDocument.Text.End.CharFontName
+				Endif
+			Else
+				oConfigAccess = GetConfigAccess( &quot;/org.openoffice.Office.Math&quot;, True )
+				IdFontVariable = oConfigAccess.StandardFormat.GetByName(&quot;VariableFont&quot;)
+				If Len(IdFontVariable)&gt;0 and oConfigAccess.FontFormatList.HasByName(IdFontVariable) Then
+						 oTailleFormule.Model.ComboBox1.Text = oConfigAccess.FontFormatList.GetByName(IdFontVariable).Name					
+				Else
+					oTailleFormule.Model.ComboBox1.Text = &quot;Thorndale&quot;
+				Endif
+			Endif
+		Endif
+ 	
+		oTailleFormule.Execute()
+
+	Else
+		Call ChangeTaille(increment,true)
+	End If &apos;ajouté par Didier Dorange-Pattoret
+
+End Sub
+	
+
+
+Sub FixeTailleFormule	
+
+	oTailleFormule.getControl(&quot;CommandButton1&quot;).Visible = False
+	oTailleFormule.getControl(&quot;CommandButton2&quot;).Visible = False
+	maBarredeConvertion.Visible = True
+	
+	If  oTailleFormule.GetControl(&quot;CheckBox10&quot;).State = 1 Then rem on convertit un doc ou un docx		
+		
+		ConvertFromDocx
+		
+	Elseif oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = 1 Then rem on convertit les formules en images	
+		
+		Convert_Formulae_to_Bitmaps		
+	
+	Elseif oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = 1 Then  rem on  aligne les formules
+		
+		Forcealign
+	
+	Else	
+		NbreCaracTraite = 0
+		LaTaille = oTailleFormule.Model.ComboBox2.Text
+		if IsNumeric(LaTaille) then
+		Call ChangeTaille(LaTaille, false)
+		endif
+	Endif
+	
+	FinTailleFormule
+End Sub
+
+Sub FinTailleFormule 			&apos;ajouté par Didier Dorange-Pattoret
+	oTailleFormule.EndExecute()	&apos;ajouté par Didier Dorange-Pattoret
+	If not IsEmpty(pgb) then pgb.end						&apos;ajouté par Didier Dorange-Pattoret
+End Sub
+
+
+
+&apos;***********************************************************************
+Sub ChangeTaille(increment as long, Relatif as boolean)
+    Dim iBord as Integer
+	Dim LeNumeroDeVersion as Integer    
+    &apos;on error resume next
+
+    If bChangeTaille= True Then
+        If oTailleFormule.Model.CheckBox4.State = 1 Then
+        bEncadre = True
+        iBord = 2
+        Else
+        iBord = 0
+        Endif
+    EndIf
+
+	LeNumeroDeVersion = OOoNumVersion() rem memorise le numero de Version
+
+    select case cas
+       
+        case 1:
+                if LaFormule.model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+                    iTaille=LaFormule.Width
+                    ChangeSize(LaFormule.model,increment,relatif)
+                    rem introduit pour conserver en mémoire la taille de la formule voir Bordure_Selection
+                    If OOoNumVersion &gt;= 420 Then LaFormule.Description = LaFormule.Size.Height
+                    If bChangeTaille = True Then
+                    	LaFormule.model.FontNameVariables = oTailleFormule.Model.ComboBox1.Text
+	  					LaFormule.model.FontNameNumbers = oTailleFormule.Model.ComboBox1.Text
+	  					LaFormule.model.FontNameText = oTailleFormule.Model.ComboBox1.Text
+	 					LaFormule.model.FontNameFunctions = oTailleFormule.Model.ComboBox1.Text
+                        LaFormule.model.FontVariablesIsItalic = (oTailleFormule.Model.CheckBox1.State = 1)
+                        LaFormule.model.FontTextIsItalic = (oTailleFormule.Model.CheckBox5.State = 1)
+                        LaFormule.model.IsTextMode = (oTailleFormule.Model.CheckBox2.State = 1)
+                        LaFormule.model.FontTextIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                        LaFormule.model.FontFunctionsIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                        LaFormule.model.FontVariablesIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                        LaFormule.model.FontNumbersIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                        
+                    Endif                 
+                    If bChangeTaille= True Then
+                           EncadrerFormule(LaFormule,iBord)
+                    Elseif bEncadre = TRUE Then
+                        EncadrerFormule(LaFormule,2-LaFormule.GetPropertyValue(&quot;LeftBorder&quot;).OuterLineWidth)
+                    Endif 
+                    rem si reformater on repasse dans Dixio ajouté le 9 février 2014                 
+                	If oTailleFormule.GetControl(&quot;CheckBox11&quot;).State = 1 Then
+	                	LaFormule.model.Formula = Dixio(LaFormule.model.Formula) &amp; &quot;&quot;
+	              	    GereMargesFormule(LaFormule) rem règle les marges 
+              	    Endif
+              	    
+                    If OOoNumVersion &gt;=330 Then 
+						LaFormule.ExtendedControlOverEmbeddedObject.update()
+					Else 
+						LaFormule.model.setmodified(true)
+					Endif
+                     If (LaFormule.Width=iTaille and LeNumeroDeVersion &lt; 300 ) Then GereBugChangementTaille(laFormule)
+                 endif
+                 LaFormule.LeftMargin = iMargesFormules*100
+                 LaFormule.RightMargin = iMargesFormules*100
+            &apos;     MonDocument.getcurrentcontroller.Select(LaFormule) &apos;modifie par Didier DP le 7 nov 2012
+                 
+        case 2:
+            LesObjets=Laformule.getEmbeddedObjects
+            nBreObjets = LesObjets.count
+            for i=0 to nBreObjets-1
+                pgb.value=i
+                maBarredeConvertion.Value = 5 + 40*((i+1)/nBreObjets)
+                LaFormule=LesObjets(i)
+                if LaFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+                			on error resume next
+                        if LaFormule.model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then                        	
+                            iTaille = LaFormule.Width
+                            ChangeSize(LaFormule.model,increment,relatif)
+                            rem introduit pour conserver en mémoire la taille de la formule voir Bordure_Selection
+                    		If OOoNumVersion &gt;= 420 Then LaFormule.Description = LaFormule.Size.Height
+                            If bChangeTaille = True Then
+                            LaFormule.model.FontNameVariables = oTailleFormule.Model.ComboBox1.Text
+	  						LaFormule.model.FontNameNumbers = oTailleFormule.Model.ComboBox1.Text
+	  						LaFormule.model.FontNameText = oTailleFormule.Model.ComboBox1.Text
+	 						LaFormule.model.FontNameFunctions = oTailleFormule.Model.ComboBox1.Text  
+                            LaFormule.model.FontVariablesIsItalic = (oTailleFormule.Model.CheckBox1.State = 1)
+                            LaFormule.model.FontTextIsItalic = (oTailleFormule.Model.CheckBox5.State = 1)
+                            LaFormule.model.IsTextMode = (oTailleFormule.Model.CheckBox2.State = 1)
+                            LaFormule.model.FontTextIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                            LaFormule.model.FontFunctionsIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                            LaFormule.model.FontVariablesIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                            LaFormule.model.FontNumbersIsBold = (oTailleFormule.Model.CheckBox3.State = 1) 
+                           	rem incremente de 1 le nombre de caracteres traites de 1
+                            NbreCaracTraite = NbreCaracTraite + 1                     
+                            Endif
+                     	    rem si reformater on repasse dans Dixio ajouté le 9 février 2014                 
+                			If oTailleFormule.GetControl(&quot;CheckBox11&quot;).State = 1 Then
+	                				LaFormule.model.Formula = Dixio(LaFormule.model.Formula) &amp; &quot;&quot;
+	              				    GereMargesFormule(LaFormule) rem règle les marges 
+              	  			  Endif
+                       
+                            If bChangeTaille= True Then
+                                   EncadrerFormule(LaFormule,iBord)
+                            Elseif bEncadre = TRUE Then
+                                EncadrerFormule(LaFormule,2-LaFormule.GetPropertyValue(&quot;LeftBorder&quot;).OuterLineWidth)
+                            Endif
+                            If OOoNumVersion &gt;=330 Then 
+								LaFormule.ExtendedControlOverEmbeddedObject.update()
+							Else 
+								LaFormule.model.setmodified(true)
+							Endif
+                            If (LaFormule.Width=iTaille and LeNumeroDeVersion &lt; 300 ) Then GereBugChangementTaille(laFormule)
+                            LaFormule.LeftMargin = iMargesFormules*100
+                			LaFormule.RightMargin = iMargesFormules*100
+                            on error goto 0
+                       endif
+                endif
+            next i
+            rem la ligne suivante pour regler la taille de TOUS les caractères si option choisie	
+            If bChangeTaille = True Then
+            	If oTailleFormule.Model.CheckBox6.State = 1 Then RegleTailledesCaracteresduTexte(LeTexteATraiter)
+            Endif
+            pgb.end
+            oVCursor.GotoRange(oSapos,False) &apos;ajouté par Didier DP
+            oVCursor.GoRight(1,False)
+		
+        case 3:
+            compte=0
+            while LesObjets.HasMoreElements
+                pgb.value=clng(compte+1)
+                Laformule=LesObjets.NextElement
+                if Laformule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+                    if LaFormule.model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+                        iTaille=LaFormule.Width
+                        ChangeSize(LaFormule.model,increment,relatif)
+                        rem introduit pour conserver en mémoire la taille de la formule voir Bordure_Selection
+                    	If OOoNumVersion &gt;= 420 Then LaFormule.Description = LaFormule.Size.Height
+                        If bChangeTaille = True Then
+                        LaFormule.model.FontNameVariables = oTailleFormule.Model.ComboBox1.Text
+	  					LaFormule.model.FontNameNumbers = oTailleFormule.Model.ComboBox1.Text
+	  					LaFormule.model.FontNameText = oTailleFormule.Model.ComboBox1.Text
+	 					LaFormule.model.FontNameFunctions = oTailleFormule.Model.ComboBox1.Text
+                        LaFormule.model.FontVariablesIsItalic = (oTailleFormule.Model.CheckBox1.State = 1)
+                        LaFormule.model.FontTextIsItalic = (oTailleFormule.Model.CheckBox5.State = 1)
+                        LaFormule.model.IsTextMode = (oTailleFormule.Model.CheckBox2.State = 1)
+                        LaFormule.model.FontTextIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                        LaFormule.model.FontFunctionsIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                        LaFormule.model.FontVariablesIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                        LaFormule.model.FontNumbersIsBold = (oTailleFormule.Model.CheckBox3.State = 1)
+                        rem incremente le nombre de caracteres traites de 1
+                        NbreCaracTraite = NbreCaracTraite + 1
+                        Endif
+                        If bChangeTaille= True Then
+                           EncadrerFormule(LaFormule,iBord)
+                           Elseif bEncadre = TRUE Then
+                            EncadrerFormule(LaFormule,2-LaFormule.GetPropertyValue(&quot;LeftBorder&quot;).OuterLineWidth)
+                        Endif
+                        rem si reformater on repasse dans Dixio ajouté le 9 février 2014                 
+                     	If oTailleFormule.GetControl(&quot;CheckBox11&quot;).State = 1 Then
+	                			LaFormule.model.Formula = Dixio(LaFormule.model.Formula) &amp; &quot;&quot;
+	              	  			GereMargesFormule(LaFormule) rem règle les marges 
+              	  		Endif
+              	        
+                        If OOoNumVersion &gt;=330 Then 
+							LaFormule.ExtendedControlOverEmbeddedObject.update()
+						Else 
+							LaFormule.model.setmodified(true)
+						Endif
+                        If (LaFormule.Width=iTaille and LeNumeroDeVersion &lt; 300 ) Then GereBugChangementTaille(laFormule) 
+                        LaFormule.LeftMargin = iMargesFormules*100
+                 		LaFormule.RightMargin = iMargesFormules*100              
+                    endif
+                endif
+            wend
+            
+            rem la ligne suivante pour regler la taille de TOUS les caractères si option choisie	
+    		If bChangeTaille = True Then
+    			If oTailleFormule.Model.CheckBox6.State = 1 Then RegleTailledesCaracteresduTexte(LeTexteATraiter)
+            Endif
+           pgb.end           
+           oVCursor.GotoRange(oSapos,False) &apos;ajouté par Didier DP
+           oVCursor.GoRight(1,False)
+           
+    end select
+end sub
+
+
+rem correction apportée le 29 décembre 2013
+Sub EncadrerFormule(MyFormule as Object,iBord as Long) &apos;iBord = 2 pour encadrer, 0 sinon	
+
+	MyFormule.SetPropertyValue(&quot;LeftBorderDistance&quot;,14)
+	MyFormule.SetPropertyValue(&quot;RightBorderDistance&quot;,14)
+	If MyFormule.TopBorderDistance = 0 Then	
+	    MyFormule.SetPropertyValue(&quot;TopBorderDistance&quot;,14)
+	    MyFormule.SetPropertyValue(&quot;BottomBorderDistance&quot;,14)
+	Endif
+	MyFormule.SetPropertyValue(&quot;LeftBorder&quot;,Array(0,0,iBord,0))
+	MyFormule.SetPropertyValue(&quot;RightBorder&quot;,Array(0,0,iBord,0))
+	If MyFormule.TopBorderDistance &lt;&gt; 14 Then iBord = 2
+	MyFormule.SetPropertyValue(&quot;TopBorder&quot;,Array(0,0,iBord,0))
+	MyFormule.SetPropertyValue(&quot;BottomBorder&quot;,Array(0,0,iBord,0))
+	
+End Sub
+
+Function DetermineTaille (CetteFormule as Object) as Integer &apos;par Didier DP
+		Dim iPosAcco, iLataille as Integer
+		iLataille = CetteFormule.model.BaseFontHeight
+		If (Mid(CetteFormule.model.formula,1,4) = &quot;size&quot; or Mid(CetteFormule.model.formula,1,5) = &quot; size&quot;) Then
+		iPosAcco = InStr(CetteFormule.model.formula,&quot;{&quot;)
+		iLataille = Cint(Mid(LaFormule.model.formula,5,iPosAcco-1)
+		Endif
+		rem corrige le cas ou la valeur reperee est 0
+		If iLataille = 0 Then iLataille = oVCursor.CharHeight
+		DetermineTaille = iLataille
+End Function
+
+Sub GereBugChangementTaille(oFormule as Object) &apos; par Jérome Ortais
+    Dim oWCurs as Object, oBugFormule as Object, iCptErreur as Integer
+        oWCurs=ThisComponent.Text.CreateTextCursor
+        oWcurs.GotoEnd(False)
+        If (Mid(oFormule.model.Formula,1,5)=&quot;size &quot; or Mid(oFormule.model.Formula,1,6)=&quot; size &quot;) Then
+            oWCurs.String=oFormule.model.Formula
+            &apos;oWCurs.goLeft(Len(oFormule.model.Formula),True)
+        Else
+            sFormule=&quot;size &quot;+oFormule.model.BaseFontHeight+&quot;{&quot;+oFormule.model.Formula+&quot;}&quot;&apos;{}
+              oWCurs.String=sFormule
+            oWCurs.goLeft(Len(sFormule),True)
+          EndIf
+        ThisComponent.getcurrentcontroller().select(oWCurs)
+        &apos; Gere le probleme du executeDispatch qui se fait parfois trop rapidement
+        On Error GoTo TraiteErreur
+        Wait 10
+        dim Array(0) as new com.sun.star.beans.PropertyValue
+        oDispHelper.executeDispatch(oProvider, &quot;.uno:InsertObjectStarMath&quot;, &quot;&quot;, 0, Array()) 
+              
+        oBugFormule = ThisComponent.getCurrentSelection()
+        oFormule.Size=oBugFormule.Size    
+        oBugFormule.dispose
+        oDispHelper.executeDispatch(oProvider, &quot;.uno:Escape&quot;, &quot;&quot;, 0, Array()) 
+        Exit Sub
+        TraiteErreur:
+            If err=423 Then
+                wait 50
+                oDispHelper.executeDispatch(oProvider, &quot;.uno:InsertObjectStarMath&quot;, &quot;&quot;, 0, Array())                   
+	            oBugFormule=ThisComponent.getCurrentSelection()
+                iCptErreur=iCptErreur+50
+                If iCptErreur&lt;2500 Then
+                    Resume
+                Else
+                    oWCurs.String=&quot;&quot;
+                    On Error GoTo 0
+                EndIf
+            Else
+                oWCurs.String=&quot;&quot;
+                On Error GoTo 0
+            EndIf
+
+End Sub
+
+Sub ChangeSize(oFormule,iIncrement,bRelatif) as Boolean rem modifiée le 4 septembre 2010 par DDP
+rem cette macro effectue la modification de la taille corrigee le 2 novembre  2011
+	Dim sFormule as String 
+	Dim iNvlTaille as Integer
+	sFormule = oFormule.Formula
+	If OOONumVersion &gt;= 310 Then 
+		If (Mid(sFormule,1,5) = &quot;size &quot; or Mid(sFormule,1,6)=&quot; size &quot;) Then
+	        iNvlTaille = IIf(bRelatif,CInt(Mid(sFormule,6,InStr(sFormule,&quot;{&quot;)-6)),0) + iIncrement
+        	oFormule.Formula = Mid(sFormule,InStr(sFormule,&quot;{&quot;)+1,Len(sFormule)-InStr(sFormule,&quot;{&quot;)-1)            
+        Else
+       		iNvlTaille = iif(bRelatif,oFormule.BaseFontHeight,0)+iIncrement    	
+        Endif        	    		
+        	oFormule.BaseFontHeight = iNvlTaille
+    Else
+          If (Mid(sFormule,1,5) = &quot;size &quot; or Mid(sFormule,1,6)=&quot; size &quot;) Then
+            iNvlTaille = IIf(bRelatif,CInt(Mid(sFormule,6,InStr(sFormule,&quot;{&quot;)-6)),0)+iIncrement
+            oFormule.Formula = &quot;size &quot;+iNvlTaille+Mid(sFormule,InStr(sFormule,&quot;{&quot;))
+        Else
+            iNvlTaille = iif(bRelatif,oFormule.BaseFontHeight,0)+iIncrement
+            oFormule.Formula = &quot;size &quot;+iNvlTaille+&quot;{&quot;+sFormule+&quot;}&quot;&apos;{}
+        EndIf    	
+   Endif  
+   If Mid(oFormule.Formula,Len(oFormule.Formula)-1,2)=&quot;}{&quot; Then oFormule.Formula = Mid(oFormule.Formula,1,Len(oFormule.Formula)-2)
+   If Mid(oFormule.Formula,Len(oFormule.Formula)-2,3)=&quot;} {&quot; Then oFormule.Formula = Mid(oFormule.Formula,1,Len(oFormule.Formula)-3)
+End Sub
+
+
+Rem cette macro regle la taille des caracteres à l&apos;identique des formules si option choisie
+Sub RegleTailledesCaracteresduTexte(LeTexte as object)
+	Dim oCurseur as Object	
+	NbreCaracTraite = NbreCaracTraite + Len(LeTexte.String)
+	oCurseur = LeTexte.CreateTextCursor
+	oCurseur.gotoStart(False)
+	For i=1 to NbreCaracTraite
+		oCurseur.goright(0,false)
+		oCurseur.goright(1,True)
+		oCurseur.CharHeight = Cint(oTailleFormule.Model.ComboBox2.Text)
+		If (oCurseur.CharFontName &lt;&gt; &quot;OpenSymbol&quot; and oCurseur.CharFontName &lt;&gt; &quot;Symbol&quot; and oCurseur.CharFontName &lt;&gt; sNomPoliceCursive) Then
+			oCurseur.CharFontName = oTailleFormule.Model.ComboBox1.Text
+		Endif 
+		pgb.value = i/20	
+	Next i		
+End Sub
+
+Rem Ecrite le le 5 novembre 2012 par Didier Dorange-Pattoret
+Sub ConvertFromDocx
+		
+		Dim monDocument As Object, adresseDoc, adresse_DocSaved As String
+	
+		monDocument = ThisComponent
+		
+		If monDocument.IsReadOnly Then 
+			 Avertir(29)
+		      Exit Sub	
+		Endif
+		
+		Rem permet d&apos;assurer que l&apos;intégralité du document sera transformé.
+		ToucheEchap(monDocument)
+		
+		adresseDoc = monDocument.Location
+		adresseDoc_DocSaved = getFilePath(monDocument.Location) &amp; &quot;save&quot; &amp; getFileExt(monDocument.Location)
+	
+		rem on verifie sous Windows si Word est installe ...
+		If getguitype = 1 Then
+			On error Goto WordPasInstalle
+			Dim oword As Object, result as Integer
+			oword = CreateObject(&quot;Word.Application&quot;)
+			On error resume next
+			result = Msgbox(sVocab(iLang,30),32+3,sVocab(iLang,31))
+			Select Case result
+			Case 6	
+				Avertir(32)
+				adresseDoc = ConvertFromURL(adresseDoc)
+				oword.Documents.Open(adresseDoc,False,True,False,&quot;&quot;,&quot;&quot;,False,&quot;&quot;,&quot;&quot;,wdOpenFormatAuto,,,,,,&quot;&quot;)    
+				oword.Visible = True     
+		     &apos;   oword.ActiveDocument.SaveAs2(&quot;E:\Documents\Essai\soutien 2.odt&quot;,wdFormatOpenDocumentText,False,&quot;&quot;,True,&quot;&quot;,False,False,False,False,False,msoEncodingEBCDICFrance,False,False,wdCROnly,True,wdCurrent)
+		   	&apos;	 oword.ActiveDocument.Close	
+		   		&apos;	Mondocument.Close(True)		
+				Exit Sub
+			Case 7
+				Goto WordPasInstalle
+			Case 2
+				Exit Sub
+			End Select
+			WordPasInstalle:
+		Endif 
+
+	
+
+		maBarredeConvertion.Value = 0
+
+		rem on sauvegarde le fichier original en le copiant		
+		FileCopy monDocument.Location,adresseDoc_DocSaved
+		maBarredeConvertion.Value = 5
+
+		
+		NbreCaracTraite = 0
+		LaTaille = oTailleFormule.Model.ComboBox2.Text
+		if IsNumeric(LaTaille) then
+		Call ChangeTaille(LaTaille, false)
+		endif
+	
+		If oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = 1 Then Forcealign
+		
+		If oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = 1 Then Convert_Formulae_to_Bitmaps		
+	
+		ConvertToOpenDocument
+		
+		maBarredeConvertion.Value = 100
+
+		oTailleFormule.getControl(&quot;CommandButton1&quot;).Visible = True
+		oTailleFormule.getControl(&quot;CommandButton2&quot;).Visible = True
+		maBarredeConvertion.Visible = False
+
+End Sub
+
+Rem Ecrite le le 5 novembre 2012 par Didier Dorange-Pattoret
+Sub ConvertToOpenDocument
+		Dim monDocument As Object, adresseDoc, adressDoc_odt, adressDoc_Saved As String
+		Dim props(0) As New com.sun.star.beans.PropertyValue
+		monDocument = ThisComponent
+		adressDoc = monDocument.Location
+		adressDoc_Saved = getFilePath(adressDoc) &amp; &quot;save&quot; &amp; getFileExt(adressDoc)
+		adressDoc_odt = getFilePath(adressDoc) &amp; &quot;odt&quot;
+		props(0).Name = &quot;FilterName&quot;
+		props(0).Value = &quot;writer8&quot;
+		monDocument.storeAsURL(adressDoc_odt, props())
+		
+		rem on efface la protection
+		Kill adressDoc
+		FileCopy adressDoc_Saved,adressDoc
+		Kill adressDoc_Saved
+End Sub
+
+
+
+rem pour les fichiers écrits avec des versions &lt; 3.4
+Rem proposition de C Devalland, amelioree par Didier Dorange-Pattoret le 5 novembre 2012
+Sub Forcealign
+	dim obj as object, oLesObjets as object, oLaFormule as object, pgb as object
+	dim nbOjets as integer, i as integer, iTopMargin as integer
+	pgb=ThisComponent.currentcontroller.statusIndicator
+	obj = ThisComponent.createInstance(&quot;com.sun.star.document.Settings&quot;)
+    obj.MathBaselineAlignment = true
+    oLesObjets = ThisComponent.getEmbeddedObjects
+    nbObjets = oLesObjets.count
+    pgb.Start (sVocab(iLang,307),nbObjets)
+    &apos;Print nbObjets
+    for i=0 to nbObjets-1
+    	pgb.value = i
+    	maBarredeConvertion.Value = 45 + 15*((i+1)/nbObjets)
+	    oLaFormule = oLesObjets(i)
+	     if oLaFormule.getImplementationName = &quot;SwXTextEmbeddedObject&quot; then
+	        If IsEmpty(oLaFormule.Model) Then
+	        	rem paramètre alignement pour les images	        	
+	        		oLaFormule.VertOrient = Cint(oTailleFormule.Getcontrol(&quot;ComboBox3&quot;).Text)
+	        Else
+		        If oLaFormule.Model.getImplementationName = &quot;com.sun.star.comp.math.FormulaDocument&quot; then
+		            iTopMargin = oLaFormule.Model.TopMargin
+		            oLaFormule.Model.TopMargin = iTopMargin+1
+		            oLaFormule.Model.TopMargin = 0
+		            oLaFormule.Model.BottomMargin = 5
+		        Endif
+		    Endif
+	    Endif
+	 Next i  
+	 pgb.end	 
+End Sub
+
+
+
+Rem cette macro ecrite le 28 avril 2011 permet de forcer l&apos;alignement des formules
+rem pour les fichiers écrits avec des versions &lt; 3.4 
+Sub Forcealign2
+		Dim obj as Object
+		Dim nbObjets as Integer
+		obj = ThisComponent.createInstance(&quot;com.sun.star.document.Settings&quot;)
+		obj.MathBaselineAlignment=true	 
+		oLesObjets = ThisComponent.getEmbeddedObjects
+		nbObjets = oLesObjets.count-1
+		for i=nbObjets   to 0 Step -1
+		oLaFormule = oLesObjets(i)
+		    if oLaFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+		        if oLaFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+		        	oPosFormule = oLaFormule.getAnchor().getEnd()
+		        	oTextCursor = oLaFormule.getAnchor().getText().createTextCursorByRange(oPosFormule)
+           			oLaFormuleAlignee = ThisComponent.CreateInstance(&quot;com.sun.star.text.TextEmbeddedObject&quot;)
+					oLaFormuleAlignee.CLSID = &quot;078B7ABA-54FC-457F-8551-6147e776a997&quot;
+	   				oLaFormuleAlignee.AnchorType=com.sun.star.text.TextContentAnchorType.AS_CHARACTER  
+           			oTextCursor.getText().insertTextContent( oTextCursor,oLaFormuleAlignee,false)
+           			With oLaFormuleAlignee.Model
+	           			.FontNameVariables =  oLaFormule.Model.FontNameVariables
+	           			.FontNameNumbers =  oLaFormule.Model.FontNameNumbers
+	           			.FontNameFunctions =  oLaFormule.Model.FontNameFunctions
+	           			.FontVariablesIsItalic =  oLaFormule.Model.FontVariablesIsItalic
+	           			.FontTextIsItalic =  oLaFormule.Model.FontTextIsItalic
+	           			.IsTextMode =  oLaFormule.Model.IsTextMode
+	           			.FontTextIsBold =  oLaFormule.Model.FontTextIsBold
+	           			.FontFunctionsIsBold =  oLaFormule.Model.FontFunctionsIsBold
+	           			.FontVariablesIsBold =  oLaFormule.Model.FontVariablesIsBold
+	           			.FontNumbersIsBold =  oLaFormule.Model.FontNumbersIsBold
+	           			.Formula =  oLaFormule.Model.Formula
+	           			.BaseFontHeight =  oLaFormule.Model.BaseFontHeight
+	           			.RelativeSymbolPrimaryHeight =  oLaFormule.Model.RelativeSymbolPrimaryHeight           			
+           			End with
+           			With oLaFormuleAlignee
+	           			.LeftMargin = oLaFormule.LeftMargin
+	           			.RightMargin = oLaFormule.RightMargin
+           			End with
+           			If oLaFormule.BottomBorder.OuterLineWidth = 2 Then EncadrerFormule(oLaFormuleAlignee,2)	 
+           			oLaFormule.dispose
+           			If OOoNumVersion &gt;=330 Then 
+						oLaFormuleAlignee.ExtendedControlOverEmbeddedObject.update()
+					Else 
+						oLaFormuleAlignee.model.setmodified(true)
+					Endif       
+		        endif
+		    endif
+		next i     
+End sub
+
+Rem mise au point par Didier Dorange-Pattoret le 5 novembre 2012
+Sub RegleAffichageTailleFormule(oEvt as Object)
+	Dim MonBouton as String
+	MonBouton = &quot;CheckBox&quot; &amp; oEvt.Source.Model.Tag	
+	oEvt.Source.Context.GetControl(MonBouton).State = 0
+	oTailleFormule.GetControl(&quot;CheckBox1&quot;).Enable = (oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = 0 and oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = 0)
+	oTailleFormule.GetControl(&quot;CheckBox2&quot;).Enable = (oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = 0 and oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = 0)
+	oTailleFormule.GetControl(&quot;CheckBox3&quot;).Enable = (oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = 0 and oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = 0)
+	oTailleFormule.GetControl(&quot;CheckBox4&quot;).Enable = (oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = 0 and oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = 0)
+	oTailleFormule.GetControl(&quot;CheckBox5&quot;).Enable = (oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = 0 and oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = 0)
+	oTailleFormule.GetControl(&quot;CheckBox6&quot;).Enable = (oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = 0 and oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = 0)
+	oTailleFormule.GetControl(&quot;CheckBox9&quot;).Visible = (oTailleFormule.GetControl(&quot;CheckBox7&quot;).State=1)
+	oTailleFormule.GetControl(&quot;CheckBox8&quot;).Visible = (OOoNumVersion &gt;= 340)
+	oTailleFormule.GetControl(&quot;ComboBox3&quot;).Visible = (oTailleFormule.GetControl(&quot;CheckBox8&quot;).State=1) Rem Combobox 3 visible si Checkbox 8 selectionnee	
+End Sub
+
+Rem mise au point par Didier Dorange-Pattoret le 5 novembre 2012
+Sub RegleAffichageTailleFormule_Checbox10(oEvt as Object)
+	Dim MonBouton as String
+	MonBouton = &quot;CheckBox10&quot;	
+	oTailleFormule.GetControl(&quot;CheckBox1&quot;).Enable = 1
+	oTailleFormule.GetControl(&quot;CheckBox2&quot;).Enable = 1
+	oTailleFormule.GetControl(&quot;CheckBox3&quot;).Enable = 1
+	oTailleFormule.GetControl(&quot;CheckBox4&quot;).Enable = 1
+	oTailleFormule.GetControl(&quot;CheckBox5&quot;).Enable = 1
+	oTailleFormule.GetControl(&quot;CheckBox6&quot;).Enable = 1
+	oTailleFormule.GetControl(&quot;CheckBox9&quot;).Enable = 1
+	oTailleFormule.GetControl(&quot;CheckBox8&quot;).Visible = True
+	oTailleFormule.GetControl(&quot;CheckBox9&quot;).Visible = True
+	oTailleFormule.GetControl(&quot;CheckBox7&quot;).State = oEvt.Source.Context.GetControl(MonBouton).State
+	oTailleFormule.GetControl(&quot;CheckBox8&quot;).State = oEvt.Source.Context.GetControl(MonBouton).State
+	oTailleFormule.GetControl(&quot;CheckBox9&quot;).State = oEvt.Source.Context.GetControl(MonBouton).State
+	oTailleFormule.GetControl(&quot;CheckBox11&quot;).State = oEvt.Source.Context.GetControl(MonBouton).State
+	oTailleFormule.GetControl(&quot;CheckBox9&quot;).Visible = oEvt.Source.Context.GetControl(MonBouton).State	
+	oTailleFormule.GetControl(&quot;ComboBox3&quot;).Visible = (oTailleFormule.GetControl(&quot;CheckBox8&quot;).State=1)	
+End Sub
+rem ----------------------------------------------------------------------------------------------------------------
+
+
+
+rem ----------------------------------------------------------------------------------------------------------------
+
+rem macro mise au point le 16 novembre 2012
+
+Sub Convert_Formulae_to_Bitmaps
+		
+		Dim oDoc, oDocDraw, oDrawPage, pgb as Object
+		Dim iCount as Integer
+		Dim s as String
+		oDoc = ThisComponent
+		rem initialise le status indicator
+		pgb = oDoc.currentcontroller.statusIndicator
+		oDrawPage = oDoc.DrawPage	
+		iCount = oDrawPage.Count
+		pgb.Start (sVocab(iLang,308),iCount)
+		
+		rem ouvre un draw document invisible
+		Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+		mFileProperties(0).Name = &quot;Hidden&quot;
+		mFileProperties(0).Value = True
+		sUrl = &quot;private:factory/sdraw&quot;
+		oDocDraw = StarDesktop.LoadComponentFromURL(sUrl,&quot;_blank&quot;,0,mFileProperties()
+		
+		s = &quot;com.sun.star.text.GraphicObject&quot;
+		
+		For I = 0 to iCount-1
+			pgb.Value = i
+			maBarredeConvertion.Value = 60 + 35*((i+1)/iCount)			
+			
+			oMonEquation = oDrawPage.getByIndex(iCount-I-1)		
+			If (oMonEquation.ImplementationName = &quot;SwXTextEmbeddedObject&quot; or (oMonEquation.ImplementationName=&quot;SwXShape&quot; and oMonEquation.ShapeType=&quot;com.sun.star.drawing.GroupShape&quot; and oTailleFormule.GetControl(&quot;CheckBox9&quot;).State=1))   Then
+			
+				on error resume next
+				rem implemente l&apos;image
+				oMonImage = oDoc.createInstance(s)
+				
+				rem memorise la position de la formule
+				oPosFormule = oMonEquation.getAnchor().getEnd()
+		        oAnchor = oMonEquation.getAnchor().getText().createTextCursorByRange(oPosFormule)
+		
+				rem selectionne la formule et memorise ses proprietes		
+				oDoc.CurrentController.Select(oMonEquation)
+				
+				oMonImage.VertOrient = oMonEquation.VertOrient
+				oMonImage.VertOrientPosition = oMonEquation.VertOrientPosition
+				oMonImage.VertOrientRelation = oMonEquation.VertOrientRelation	
+				oMonImage.Size = oMonEquation.Size
+				oMonImage.AnchorType = oMonEquation.AnchorType
+				
+				If oMonEquation.ImplementationName =&quot;SwXTextEmbeddedObject&quot; Then
+				oMonImage.LeftBorder = oMonEquation.LeftBorder
+				oMonImage.LeftBorderDistance = oMonEquation.LeftBorderDistance
+				oMonImage.RightBorder = oMonEquation.RightBorder
+				oMonImage.RightBorderDistance = oMonEquation.RightBorderDistance
+				oMonImage.TopBorder = oMonEquation.TopBorder
+				oMonImage.TopBorderDistance = oMonEquation.TopBorderDistance
+				oMonImage.BottomBorder = oMonEquation.BottomBorder
+				oMonImage.BottomBorderDistance = oMonEquation.BottomBorderDistance				
+				Endif
+				
+				rem copie et supprime la formule
+				ClipboardCopy(oDoc)
+				ToucheSuppr(oDoc)
+				rem colle le metafichier GDI
+				ClipboardPasteSpecial(oDocDraw)
+			 	rem insere l&apos;image		 	
+				oAnchor.getText().insertTextContent( oAnchor , oMonImage , false)	
+			
+				rem colle le graphic ...	
+				oMonImageProvisoire = oDocDraw.DrawPages(0).GetByIndex(0)
+				oMonImage.Graphic = oMonImageProvisoire.Graphic
+				ToucheSuppr(oDocDraw)
+			Endif
+		Next I
+		
+		rem ferme ...
+		pgb.End
+		oDocDraw.dispose
+
+End Sub
+
+
+
+
+rem macro mise au poit le 1er mai 2011, finalisee le 14 novembre 2012
+rem elle convertit les objets dune page en image
+Sub Convert_Formulae_to_Bitmaps_v1
+		
+		Dim oDoc, oDrawPage, oDocDraw as Object
+		oDoc = ThisComponent
+		oDrawPage = oDoc.DrawPage
+		
+		rem implemente le service dexportation
+		Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+		Dim aPos As New com.sun.star.awt.Point
+		Dim props(1) As New com.sun.star.beans.PropertyValue
+		serv = CreateUnoService(&quot;com.sun.star.drawing.GraphicExportFilter&quot;)
+		
+		rem ouvre un draw document invisible
+		mFileProperties(0).Name = &quot;Hidden&quot;
+		mFileProperties(0).Value = True
+		sUrl = &quot;private:factory/sdraw&quot;
+		oDocDraw = StarDesktop.LoadComponentFromURL(sUrl,&quot;_blank&quot;,0,mFileProperties()
+		aPos.X = 0
+		aPos.Y = 0
+		oPage = oDocDraw.DrawPages(0)
+		With oPage
+			.BorderBottom = 0
+			.BorderLeft = 0
+			.BorderRight = 0
+			.BorderTop = 0
+		End with 
+		
+		rem implemente 
+		s = &quot;com.sun.star.text.GraphicObject&quot;
+		oBitmaps = oDoc.CreateInstance(&quot;com.sun.star.drawing.BitmapTable&quot;)
+		
+		rem locale le fichier dexport
+		sURL = ConvertToURL(getRepertoirePath(&quot;user&quot;)&amp; getPathSeparator &amp; &quot;config&quot; &amp; getPathSeparator) &amp; &quot;imag&quot; 
+		
+		rem le status indicator
+		iCount = oDrawPage.Count
+		pgb = oDoc.currentcontroller.statusIndicator
+		pgb.Start (sVocab(iLang,308),iCount)
+		
+		For I = 0 to iCount-1
+			rem les barres de progression bougent
+			pgb.Value = i
+			maBarredeConvertion.Value = 60 + 35*((i+1)/iCount)
+			Rem on repere la formule	
+			oMonEquation = oDrawPage.getByIndex(iCount-I-1)
+		&apos;	MRI oMonEquation
+			If (oMonEquation.ImplementationName = &quot;SwXTextEmbeddedObject&quot;) or (oMonEquation.ImplementationName=&quot;SwXShape&quot; and oMonEquation.ShapeType=&quot;com.sun.star.drawing.GroupShape&quot; and oTailleFormule.GetControl(&quot;CheckBox9&quot;).State=1)   Then
+			&apos;and oMonEquation.CLSID =&quot;078B7ABA-54FC-457F-8551-6147e776a997&quot; ) _
+			 
+				on error resume next
+				oMonImage = oDoc.createInstance(s)
+				oPosFormule = oMonEquation.getAnchor().getEnd()
+		        oAnchor = oMonEquation.getAnchor().getText().createTextCursorByRange(oPosFormule)
+		        &apos; recupere la position
+				oDoc.CurrentController.Select(oMonEquation)
+
+				ClipboardCopy(oDoc)
+				rem copie le presse papier dans le doc draw
+				ClipboardPaste(oDocDraw)
+
+				oMonEquationDraw = oDocDraw.DrawPages(0).getByIndex(0)
+				oMonEquationDraw.setPosition(aPos)
+			
+				oMonEquationDraw.Size = oMonEquation.Size
+						
+				oDocDraw.DrawPages(0).Height =  oMonEquation.Size.Height
+				oDocDraw.DrawPages(0).Width = oMonEquation.Size.Width				
+					
+				serv.setSourceDocument(oPage)
+				props(0).Name = &quot;URL&quot;
+				props(0).Value = sURL + cstr(I) + &quot;.svm&quot;
+				props(1).Name = &quot;FilterName&quot;
+				props(1).Value =&quot;draw_svm_Export&quot;
+				resultat = serv.filter(props())
+				ToucheSuppr(oDocDraw)
+				oAnchor = oMonEquation.getAnchor()
+				oMonImage.graphicURL = sURL &amp; cstr(I) &amp; &quot;.svm&quot;
+				
+				oMonImage.VertOrient = oMonEquation.VertOrient
+				oMonImage.VertOrientPosition = oMonEquation.VertOrientPosition
+				oMonImage.VertOrientRelation = oMonEquation.VertOrientRelation	
+				oMonImage.Size = oMonEquation.Size
+				oMonImage.AnchorType = oMonEquation.AnchorType
+				If oMonEquation.ImplementationName =&quot;SwXTextEmbeddedObject&quot; Then
+					oMonImage.LeftBorder = oMonEquation.LeftBorder
+					oMonImage.LeftBorderDistance = oMonEquation.LeftBorderDistance
+					oMonImage.RightBorder = oMonEquation.RightBorder
+					oMonImage.RightBorderDistance = oMonEquation.RightBorderDistance
+					oMonImage.TopBorder = oMonEquation.TopBorder
+					oMonImage.TopBorderDistance = oMonEquation.TopBorderDistance
+					oMonImage.BottomBorder = oMonEquation.BottomBorder
+					oMonImage.BottomBorderDistance = oMonEquation.BottomBorderDistance
+				Endif
+						
+				
+				oDoc.DrawPage.remove(oMonEquation)
+
+				oAnchor.getText().insertTextContent( oAnchor , oMonImage , false)
+			
+				&apos; insere l&apos;image			
+			
+				sNom = oMonImage.LinkDisplayName
+						
+				If oBitmaps.HasByName(sNom) Then oBitmaps.removeByName(sNom)
+				oBitmaps.InsertByName(sNom,oMonImage.GraphicURL)		
+				sNewURL = oBitmaps.getByName(sNom)
+				oMonImage.graphicURL = sNewURL	
+			Endif
+		Next I
+		rem ferme le document dessin
+		oDocDraw.Dispose()
+		rem supprime les images crees
+		For I = 0 to iCount
+			If FileExists(sURL &amp; cstr(I) &amp; &quot;.svm&quot;) Then Kill sURL &amp; cstr(I) &amp; &quot;.svm&quot;
+		Next i
+		rem on ferme le status indicator
+		pgb.End
+End Sub
+
+
+
+
+rem ---------------------------------------------------------------
+rem ancienne version
+Sub Convert_Formulae_to_Bitmaps_v2
+		
+		Dim oDoc, oDrawPage, oDocDraw as Object
+		oDoc = ThisComponent
+		oDrawPage = oDoc.DrawPage
+		
+		rem implemente le service dexportation
+		Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+		Dim aPos As New com.sun.star.awt.Point
+		Dim props(1) As New com.sun.star.beans.PropertyValue
+		serv = CreateUnoService(&quot;com.sun.star.drawing.GraphicExportFilter&quot;)
+		
+		rem ouvre un draw document invisible
+		mFileProperties(0).Name = &quot;Hidden&quot;
+		mFileProperties(0).Value = True
+		sUrl = &quot;private:factory/sdraw&quot;
+		oDocDraw = StarDesktop.LoadComponentFromURL(sUrl,&quot;_blank&quot;,0,mFileProperties()
+		aPos.X = 0
+		aPos.Y = 0
+		oPage = oDocDraw.DrawPages(0)
+		With oPage
+			.BorderBottom = 0
+			.BorderLeft = 0
+			.BorderRight = 0
+			.BorderTop = 0
+		End with 
+		
+		rem implemente 
+		s = &quot;com.sun.star.text.GraphicObject&quot;
+		
+		rem locale le fichier dexport
+		sURL = ConvertToURL(getRepertoirePath(&quot;user&quot;)&amp; getPathSeparator &amp; &quot;config&quot; &amp; getPathSeparator) &amp; &quot;imag.svm&quot;
+	
+		iCount = oDrawPage.Count-1
+		For I = 0 to iCount
+			wait 200			
+			oMonEquation = oDrawPage.getByIndex(iCount-I)
+		&apos;	If (oMonEquation.ImplementationName = &quot;SwXShape&quot; or oMonEquation.ImplementationName = &quot;SwXTextEmbeddedObject&quot;) Then
+			If (oMonEquation.ImplementationName = &quot;SwXTextEmbeddedObject&quot; or ((oMonEquation.ImplementationName=&quot;SwXShape&quot;)=(oTailleFormule.GetControl(&quot;CheckBox9&quot;).State=1)))   Then
+				oMonImage = oDoc.createInstance(s)
+			&apos;	oAnchor = oMonEquation.getAnchor()
+				oPosFormule = oMonEquation.getAnchor().getEnd()
+		        oAnchor = oMonEquation.getAnchor().getText().createTextCursorByRange(oPosFormule)
+		        &apos; recupere la position
+				oDoc.CurrentController.Select(oMonEquation)
+			wait 200
+				ClipboardCopy(oDoc)
+			wait 200
+				ClipboardPaste(oDocDraw)
+			wait 200	
+				oMonEquationDraw = oDocDraw.DrawPages(0).getByIndex(0)
+				oMonEquationDraw.setPosition(aPos)
+			
+				oMonEquationDraw.Size = oMonEquation.Size
+						
+				oDocDraw.DrawPages(0).Height =  oMonEquation.Size.Height
+				oDocDraw.DrawPages(0).Width = oMonEquation.Size.Width				
+					
+				serv.setSourceDocument(oPage)
+				props(0).Name = &quot;URL&quot;
+				props(0).Value = sURL 
+				props(1).Name = &quot;FilterName&quot;
+				props(1).Value =&quot;draw_svm_Export&quot;
+				resultat = serv.filter(props())
+				ToucheSuppr(oDocDraw)
+				oAnchor = oMonEquation.getAnchor()
+				oMonImage.graphicURL = sURL
+				
+				oMonImage.VertOrient = oMonEquation.VertOrient
+				oMonImage.VertOrientPosition = oMonEquation.VertOrientPosition
+				oMonImage.VertOrientRelation = oMonEquation.VertOrientRelation
+				
+				oMonImage.Size = oMonEquation.Size
+				oMonImage.AnchorType = oMonEquation.AnchorType
+				oDoc.DrawPage.remove(oMonEquation)
+			wait 200
+				oAnchor.getText().insertTextContent( oAnchor , oMonImage , false)
+				&apos; insere l&apos;image
+				&apos;oDoc.Text.InsertTextContent(oAnchor,oMonImage,False)
+				oBitmaps = oDoc.CreateInstance(&quot;com.sun.star.drawing.BitmapTable&quot;)
+				sNom = oMonImage.LinkDisplayName
+				If oBitmaps.HasByName(sNom) Then oBitmaps.removeByName(sNom)
+				oBitmaps.InsertByName(sNom,oMonImage.GraphicURL)
+				sNewURL = oBitmaps.getByName(sNom)
+				oMonImage.graphicURL = sNewURL	
+			Endif
+		Next I
+		oDocDraw.Dispose()
+End Sub
+
+
+
+</script:module>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE library:library PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "library.dtd">
+<library:library xmlns:library="http://openoffice.org/2000/library" library:name="DmInstall" library:readonly="false" library:passwordprotected="false">
+ <library:element library:name="DlgMajA"/>
+ <library:element library:name="Choixrepinstallation"/>
+ <library:element library:name="DmProgInst"/>
+ <library:element library:name="DmOptions"/>
+ <library:element library:name="CopyDmaths"/>
+ <library:element library:name="FinInst"/>
+ <library:element library:name="AddonBarre"/>
+ <library:element library:name="dMessage"/>
+</library:library>

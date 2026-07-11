@@ -1,0 +1,535 @@
+// ── XML GENERATORS: logique ──
+// Refonte : plus de préréglages, le "Type de question" pilote directement
+// 6 constructions (table complète, cases manquantes, identifier l'expression,
+// équivalence, colonnes intermédiaires, simplification), alignées sur les
+// exemples de test/mise à jour/Informatique/tableau logique/*.xml, y compris
+// leurs PRT diagnostiques (détection des erreurs types) et leur feedback
+// général détaillé (table de vérité complète attendue).
+
+function _lgVars(nbVars) { return nbVars === 3 ? ['P', 'Q', 'R'] : ['P', 'Q']; }
+
+function _lgEval(exprStr, vals, vars) {
+    var e = exprStr;
+    vars.forEach(function (vn) {
+        e = e.replace(new RegExp('\\b' + vn + '\\b', 'g'), vals[vn] ? 'true' : 'false');
+    });
+    e = e
+        .replace(/\bimplies\b/gi, '___impl___')
+        .replace(/\bnand\b/gi, '___nand___')
+        .replace(/\bnor\b/gi, '___nor___')
+        .replace(/\bxor\b/gi, '!==')
+        .replace(/\band\b/gi, '&&')
+        .replace(/\bor\b/gi, '||')
+        .replace(/\bnot\b\s*/gi, '!');
+    e = e.replace(/(\S+)\s*___impl___\s*(\S+)/g, '(!$1||$2)')
+         .replace(/(\S+)\s*___nand___\s*(\S+)/g, '(!($1&&$2))')
+         .replace(/(\S+)\s*___nor___\s*(\S+)/g, '(!($1||$2))');
+    try { return !!eval(e); } catch (err) { return null; }
+}
+
+function _lgBuildRow(i, vars) {
+    var vals = {};
+    for (var v = 0; v < vars.length; v++) vals[vars[v]] = !!((i >> (vars.length - 1 - v)) & 1);
+    return vals;
+}
+
+function _lgAreEquiv(e1, e2, vars, nRows) {
+    for (var i = 0; i < nRows; i++) {
+        var vals = _lgBuildRow(i, vars);
+        if (_lgEval(e1, vals, vars) !== _lgEval(e2, vals, vars)) return false;
+    }
+    return true;
+}
+
+// Notation Unicode courte (utilisée dans les options de listes déroulantes,
+// qui ne passent pas par MathJax).
+function _lgToUnicode(exprStr) {
+    return (exprStr || '')
+        .replace(/\bimplies\b/gi, '⇒')
+        .replace(/\bnand\b/gi, 'NAND')
+        .replace(/\bnor\b/gi, 'NOR')
+        .replace(/\bxor\b/gi, '⊕')
+        .replace(/\band\b/gi, '∧')
+        .replace(/\bor\b/gi, '∨')
+        .replace(/\bnot\s*/gi, '¬');
+}
+
+// Notation LaTeX (\land, \lor, \neg, \to, \oplus) pour affichage dans le
+// texte de la question via MathJax (\( ... \)), conforme aux exemples XML
+// de référence (test/mise à jour/Informatique/tableau logique/*.xml).
+function _lgToLatex(exprStr) {
+    var e = ' ' + (exprStr || '') + ' ';
+    e = e
+        .replace(/\bimplies\b/gi, ' \\to ')
+        .replace(/\bnand\b/gi, ' \\uparrow ')
+        .replace(/\bnor\b/gi, ' \\downarrow ')
+        .replace(/\bxor\b/gi, ' \\oplus ')
+        .replace(/\band\b/gi, ' \\land ')
+        .replace(/\bor\b/gi, ' \\lor ')
+        .replace(/\bnot\s*/gi, '\\neg ');
+    return e.replace(/\s+/g, ' ').trim();
+}
+
+function _lgMathBox(exprStr) {
+    return '<div style="text-align:center;font-size:1.3rem;font-weight:bold;margin:15px 0;padding:15px;'
+        + 'background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;font-family:serif;">'
+        + '\\( ' + _lgToLatex(exprStr) + ' \\)</div>';
+}
+
+// Encart de feedback coloré (vert = correct, orange = partiel, rouge = faux),
+// même palette que les exemples XML de référence.
+function _lgBox(kind, html) {
+    var s = kind === 'ok' ? { c: '#15803d', bg: '#f0fdf4' }
+        : kind === 'warn' ? { c: '#ca8a04', bg: '#fefce8' }
+        : { c: '#dc2626', bg: '#fef2f2' };
+    return '<div style="border-left:4px solid ' + s.c + ';padding:10px 14px;background:' + s.bg + ';border-radius:4px;margin:4px 0;"><p>' + html + '</p></div>';
+}
+
+// Encart "Réponse attendue" du feedback général.
+function _lgGenFbBox(bodyHtml) {
+    return '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
+        + '<div style="font-weight:bold;color:#0f766e;margin-bottom:15px;">🔑 Réponse attendue</div>' + bodyHtml + '</div>';
+}
+
+// Table de vérité complète (toutes les lignes, même celles non demandées)
+// utilisée dans le feedback général pour montrer la solution intégrale.
+function _lgFullAnswerTable(vars, exprLatex, allRes) {
+    var head = '<tr style="background:#f1f5f9;">';
+    vars.forEach(function (v) { head += '<th style="border:1px solid #94a3b8;padding:8px 22px;">' + v + '</th>'; });
+    head += '<th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;">\\(' + exprLatex + '\\)</th></tr>';
+    var body = '';
+    for (var i = 0; i < allRes.length; i++) {
+        var vals = _lgBuildRow(i, vars);
+        body += '<tr' + (i % 2 ? ' style="background:#f8fafc;"' : '') + '>';
+        vars.forEach(function (v) { body += '<td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">' + (vals[v] ? 1 : 0) + '</td>'; });
+        body += '<td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">' + (allRes[i] ? 1 : 0) + '</td></tr>';
+    }
+    return '<div style="overflow-x:auto;margin:0 auto;width:fit-content;">'
+        + '<table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">'
+        + '<thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>';
+}
+
+function _lgCellInput(name, target) {
+    return '<input><name>' + name + '</name>'
+        + '<type>algebraic</type><tans>' + target + '</tans>'
+        + '<boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars>'
+        + '<syntaxhint></syntaxhint><syntaxattribute>0</syntaxattribute>'
+        + '<forbidwords></forbidwords><allowwords></allowwords>'
+        + '<forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms>'
+        + '<checkanswertype>0</checkanswertype><mustverify>0</mustverify>'
+        + '<showvalidation>0</showvalidation><options></options></input>';
+}
+
+function _lgTableHeadRow(vars, colLabels) {
+    var h = '<tr style="background:#ede9fe;">';
+    vars.forEach(function (v) { h += '<th style="padding:4px 10px;border:1px solid #c4b5fd;">' + v + '</th>'; });
+    colLabels.forEach(function (c) { h += '<th style="padding:4px 10px;border:1px solid #c4b5fd;color:#7c3aed;">' + c + '</th>'; });
+    return h + '</tr>';
+}
+
+// ── PRT diagnostique séquentiel ──
+// specs: liste ordonnée de { description, sans, tans, score (0..1, fraction
+// du barème), feedback (html), quiet, answertest }. Chaque noeud arrête
+// l'arbre dès qu'il est vrai (truenextnode=-1) ; sinon on passe au suivant.
+// Le dernier noeud sert de filet (sans:'true', tans:'true', quiet:true).
+function _lgSeqNode(X, idx, isLast, spec) {
+    return {
+        name: String(idx), description: spec.description || '',
+        answertest: spec.answertest || 'AlgEquiv',
+        sans: spec.sans, tans: spec.tans,
+        testoptions: '', quiet: spec.quiet ? '1' : '0',
+        truescoremode: '=', truescore: String(spec.score),
+        truepenalty: '0', truenextnode: '-1',
+        trueanswernote: 'PRT' + X + '-' + idx + '-T', truefeedback: spec.feedback || '',
+        falsescoremode: '=', falsescore: '0', falsepenalty: '0',
+        falsenextnode: isLast ? '-1' : String(idx + 1),
+        falseanswernote: 'PRT' + X + '-' + idx + '-F', falsefeedback: ''
+    };
+}
+function _lgSeqPrt(X, bareme, specs) {
+    var nodes = specs.map(function (spec, idx) { return _lgSeqNode(X, idx, idx === specs.length - 1, spec); });
+    var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: '' };
+    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml(prtMeta, nodes) };
+}
+
+function genLogique(X) {
+    var gs = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+    var scenario = gs('lg-scenario') || 'table';
+    var nbVars = parseInt(gs('lg-nb-vars')) || 2;
+    var vars = _lgVars(nbVars);
+    var nRows = Math.pow(2, vars.length);
+    var expr = gs('lg-expr') || '(P and Q) or not(P)';
+    var expr2 = gs('lg-expr2') || '';
+    var expr3 = gs('lg-expr3') || '';
+    var expr4 = gs('lg-expr4') || '';
+    var subexpr1 = gs('lg-subexpr1') || '';
+    var subexpr2 = gs('lg-subexpr2') || '';
+    var tansForm = gs('lg-tans') || '';
+    var nbBlanks = Math.min(nRows, Math.max(1, parseInt(gs('lg-nb-blanks')) || 2));
+    var bareme = parseFloat(gs('lg-bareme')) || 1;
+    var fbOk = gs('lg-fb-ok');
+    var fbWrong = gs('lg-fb-wrong');
+    var fbGen = gs('lg-fbgen');
+    var text = richVal('lg-text');
+
+    var HDR = '<div style="background:#7c3aed;border-left:5px solid #5b21b6;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Logique booléenne</strong>'
+        + '<span style="background:#5b21b6;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>';
+
+    var inputXML = '', prtXML = '', prtMeta, canonicalNodes, questionText, qnote, generalFeedback;
+    var fbOkFinal, fbWrongFinal;
+
+    if (scenario === 'table' || scenario === 'cases') {
+        var isCases = scenario === 'cases';
+        var blankSet = {};
+        if (isCases) {
+            for (var bi = nRows - nbBlanks; bi < nRows; bi++) blankSet[bi] = true;
+        } else {
+            for (var ti = 0; ti < nRows; ti++) blankSet[ti] = true;
+        }
+        var allRes = [];
+        for (var ri = 0; ri < nRows; ri++) allRes[ri] = _lgEval(expr, _lgBuildRow(ri, vars), vars);
+
+        var items = [];
+        var tbl = _lgMathBox(expr)
+            + '<table style="border-collapse:collapse;font-family:monospace;">'
+            + '<thead>' + _lgTableHeadRow(vars, ['\\(' + _lgToLatex(expr) + '\\)']) + '</thead><tbody>';
+        for (var i = 0; i < nRows; i++) {
+            var vals = _lgBuildRow(i, vars);
+            var res = allRes[i];
+            tbl += '<tr style="' + (i % 2 ? 'background:#f9fafb;' : '') + '">';
+            vars.forEach(function (v) { tbl += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;">' + (vals[v] ? 1 : 0) + '</td>'; });
+            if (blankSet[i]) {
+                var name = 'ans' + X + 'r' + i;
+                items.push({ row: i, name: name, target: res ? 1 : 0 });
+                tbl += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;background:#fefce8;">[[input:' + name + ']][[validation:' + name + ']]</td>';
+            } else {
+                tbl += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;">' + (res ? 1 : 0) + '</td>';
+            }
+            tbl += '</tr>';
+        }
+        tbl += '</tbody></table>';
+
+        items.forEach(function (it) { inputXML += _lgCellInput(it.name, String(it.target)); });
+
+        var sansList = '[' + items.map(function (it) { return it.name; }).join(',') + ']';
+        var tansMain = '[' + items.map(function (it) { return it.target; }).join(',') + ']';
+        var tansNeg = '[' + items.map(function (it) { return 1 - it.target; }).join(',') + ']';
+        var tansRev = '[' + items.map(function (it) { return (allRes[nRows - 1 - it.row] ? 1 : 0); }).join(',') + ']';
+
+        var specs = [
+            {
+                description: isCases ? 'Cases correctes' : 'Tableau correct',
+                sans: sansList, tans: tansMain, score: 1,
+                feedback: fbOk || _lgBox('ok', '✅ <strong>' + (isCases ? 'Exact !' : 'Parfait !') + '</strong> ' + (isCases ? 'Vous avez correctement déduit les valeurs manquantes.' : 'Votre tableau est rempli correctement.'))
+            },
+            {
+                description: 'Négation calculée',
+                sans: sansList, tans: tansNeg, score: 0.5,
+                feedback: _lgBox('warn', '🔶 <strong>Presque ça !</strong> Vos résultats correspondent à \\(\\neg(' + _lgToLatex(expr) + ')\\). Vous avez calculé l\'inverse de ce qui était demandé.')
+            }
+        ];
+        if (items.length >= 2) {
+            specs.push({
+                description: 'Ordre inversé',
+                sans: sansList, tans: tansRev, score: 0.5,
+                feedback: _lgBox('warn', nbVars === 3
+                    ? '🔶 <strong>Attention à l\'ordre !</strong> Avec 3 variables, l\'ordre est P (poids fort) → Q → R (poids faible). Vous semblez avoir inversé l\'ordre.'
+                    : '🔶 <strong>Attention à l\'ordre !</strong> Vous avez rempli le tableau en commençant par P=1, Q=1 (de haut en bas), alors qu\'il faut le remplir en commençant par P=0, Q=0 (de bas en haut).')
+            });
+        }
+        specs.push({
+            description: isCases ? 'Cases incorrectes' : 'Tableau incorrect',
+            sans: 'true', tans: 'true', score: 0, quiet: true,
+            feedback: fbWrong || _lgBox('bad', '❌ <strong>Incorrect.</strong> Vérifiez pas à pas l\'évaluation de chaque opérateur. Rappel :<br>• L\'implication \\(P \\to Q\\) est fausse <u>uniquement</u> si P est vrai et Q est faux.<br>• Le NON s\'applique en priorité.')
+        });
+
+        var built = _lgSeqPrt(X, bareme, specs);
+        prtMeta = built.prtMeta; canonicalNodes = built.canonicalNodes; prtXML = built.prtXML;
+
+        var instrText = text || (isCases
+            ? '<p>Certaines cases de la table de vérité manquent. Déduisez leur valeur (0 ou 1) :</p>'
+            : '<p>Complétez entièrement la colonne de résultat de la table de vérité (0 ou 1) :</p>');
+        questionText = HDR + instrText + tbl;
+        qnote = 'Logique Q' + X + ' ' + scenario + ' ' + expr.substring(0, 20);
+        generalFeedback = _mkFbGen(_lgGenFbBox('<p>Expression : \\(' + _lgToLatex(expr) + '\\)</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes)), fbGen);
+
+    } else if (scenario === 'identifier') {
+        var choices = [
+            { key: 'A', ex: expr }, { key: 'B', ex: expr2 },
+            { key: 'C', ex: expr3 }, { key: 'D', ex: expr4 }
+        ].filter(function (c) { return c.ex; });
+        if (!choices.length) choices.push({ key: 'A', ex: expr });
+
+        var allResI = [];
+        for (var ri2 = 0; ri2 < nRows; ri2++) allResI[ri2] = _lgEval(expr, _lgBuildRow(ri2, vars), vars);
+
+        var tbl2 = '<table style="border-collapse:collapse;font-family:monospace;">'
+            + '<thead>' + _lgTableHeadRow(vars, ['?']) + '</thead><tbody>';
+        for (var i2 = 0; i2 < nRows; i2++) {
+            var vals2 = _lgBuildRow(i2, vars);
+            var res2 = allResI[i2];
+            tbl2 += '<tr style="' + (i2 % 2 ? 'background:#f9fafb;' : '') + '">';
+            vars.forEach(function (v) { tbl2 += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;">' + (vals2[v] ? 1 : 0) + '</td>'; });
+            tbl2 += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;background:#f0fdf4;font-weight:bold;color:#15803d;">' + (res2 ? 1 : 0) + '</td></tr>';
+        }
+        tbl2 += '</tbody></table>';
+
+        var choiceList = choices.map(function (c) {
+            return '["' + c.key + '", ' + (c.key === 'A') + ', "' + _lgToUnicode(c.ex) + '"]';
+        }).join(', ');
+        var ansName = 'ans' + X;
+        inputXML = _mkInput({ name: ansName, type: 'dropdown', tans: '<![CDATA[[' + choiceList + ']]]>', boxsize: 15, showvalidation: 0 });
+
+        var negChoice = choices.find(function (c) {
+            return c.key !== 'A' && _lgAreEquiv(c.ex, 'not(' + expr + ')', vars, nRows);
+        });
+
+        var specsI = [{
+            description: 'Bonne expression',
+            answertest: 'String', sans: ansName, tans: '"A"', score: 1,
+            feedback: fbOk || _lgBox('ok', '✅ <strong>Exact !</strong> Vous avez correctement identifié l\'expression logique à partir de sa table de vérité.')
+        }];
+        if (negChoice) {
+            specsI.push({
+                description: 'A choisi la négation de l\'expression',
+                answertest: 'String', sans: ansName, tans: '"' + negChoice.key + '"', score: 0.5,
+                feedback: _lgBox('warn', '🔶 <strong>Presque ça !</strong> L\'expression choisie correspond exactement à l\'<strong>inverse</strong> de la table demandée (les 0 et 1 sont permutés). Vérifiez si vous n\'avez pas confondu avec la négation de la proposition.')
+            });
+        }
+        specsI.push({
+            description: 'Expression incorrecte',
+            sans: 'true', tans: 'true', score: 0, quiet: true,
+            feedback: fbWrong || _lgBox('bad', '❌ <strong>Incorrect.</strong> Pour trouver la bonne expression, repérez les lignes où le résultat vaut <strong>1</strong> et déduisez-en le connecteur logique principal :<br>• Si seul (1,1) donne 1 → <em>ET</em><br>• Si seul (0,0) donne 0 → <em>OU</em><br>• Si seul (1,0) donne 0 → <em>IMPLIQUE</em>')
+        });
+
+        var builtI = _lgSeqPrt(X, bareme, specsI);
+        prtMeta = builtI.prtMeta; canonicalNodes = builtI.canonicalNodes; prtXML = builtI.prtXML;
+
+        var instrText2 = text || '<p>Quelle expression logique correspond à la table de vérité suivante ?</p>';
+        questionText = HDR + instrText2 + tbl2
+            + '<div style="text-align:center;margin:16px 0;"><p><strong>Expression correspondante :</strong></p>[[input:' + ansName + ']][[validation:' + ansName + ']]</div>';
+        qnote = 'Logique Q' + X + ' identifier ' + expr.substring(0, 20);
+        generalFeedback = _mkFbGen(_lgGenFbBox(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI)), fbGen);
+
+    } else if (scenario === 'equivalence') {
+        var items3 = [];
+        var allResE = {};
+        var buildEqTable = function (exprX, tag) {
+            var res = [];
+            var t = '<table style="border-collapse:collapse;font-family:monospace;">'
+                + '<thead>' + _lgTableHeadRow(vars, ['\\(' + _lgToLatex(exprX) + '\\)']) + '</thead><tbody>';
+            for (var i = 0; i < nRows; i++) {
+                var vals = _lgBuildRow(i, vars);
+                var r = _lgEval(exprX, vals, vars);
+                res.push(r ? 1 : 0);
+                var name = 'ans' + X + tag + i;
+                items3.push({ name: name, target: r ? 1 : 0 });
+                t += '<tr style="' + (i % 2 ? 'background:#f9fafb;' : '') + '">';
+                vars.forEach(function (v) { t += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;">' + (vals[v] ? 1 : 0) + '</td>'; });
+                t += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;background:#fefce8;">[[input:' + name + ']][[validation:' + name + ']]</td></tr>';
+            }
+            allResE[tag] = res;
+            return t + '</tbody></table>';
+        };
+        var tblE1 = buildEqTable(expr, 'e1r');
+        var tblE2 = buildEqTable(expr2 || expr, 'e2r');
+        var equiv = _lgAreEquiv(expr, expr2 || expr, vars, nRows);
+        var eqName = 'ans' + X + 'eq';
+        items3.push({ name: eqName, target: equiv ? 'true' : 'false' });
+
+        items3.forEach(function (it) { inputXML += _lgCellInput(it.name, String(it.target)); });
+
+        var e1Names = [], e2Names = [];
+        for (var qi = 0; qi < nRows; qi++) { e1Names.push('ans' + X + 'e1r' + qi); e2Names.push('ans' + X + 'e2r' + qi); }
+        var fbVarsEq = 'salg' + X + ':[' + e1Names.join(',') + '];\n'
+            + 'sblg' + X + ':[' + e2Names.join(',') + '];\n'
+            + 'tables_ok_lg' + X + ':is(salg' + X + '=[' + allResE['e1r'].join(',') + '] and sblg' + X + '=[' + allResE['e2r'].join(',') + ']);';
+
+        canonicalNodes = [
+            {
+                name: '0', description: 'Vérification des tables', answertest: 'AlgEquiv',
+                sans: 'tables_ok_lg' + X, tans: 'true', testoptions: '', quiet: '0',
+                truescoremode: '=', truescore: '0.5', truepenalty: '0', truenextnode: '1',
+                trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
+                falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '2',
+                falseanswernote: 'PRT' + X + '-0-F', falsefeedback: ''
+            },
+            {
+                name: '1', description: 'Tables OK → vérifie l\'équivalence', answertest: 'AlgEquiv',
+                sans: eqName, tans: equiv ? 'true' : 'false', testoptions: '', quiet: '0',
+                truescoremode: '+', truescore: '0.5', truepenalty: '0', truenextnode: '-1',
+                trueanswernote: 'PRT' + X + '-1-T',
+                truefeedback: fbOk || _lgBox('ok', '✅ <strong>Parfait !</strong> Les tables sont correctes et votre conclusion sur l\'équivalence est juste.'),
+                falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
+                falseanswernote: 'PRT' + X + '-1-F',
+                falsefeedback: _lgBox('warn', '🔶 <strong>Tables correctes, mais conclusion fausse !</strong> Comparez les deux colonnes de résultat ligne par ligne. Deux propositions sont équivalentes si et seulement si leurs colonnes sont <u>strictement identiques</u>.')
+            },
+            {
+                name: '2', description: 'Tables incorrectes', answertest: 'AlgEquiv',
+                sans: 'true', tans: 'true', testoptions: '', quiet: '1',
+                truescoremode: '=', truescore: '0', truepenalty: '0', truenextnode: '-1',
+                trueanswernote: 'PRT' + X + '-2-T',
+                truefeedback: fbWrong || _lgBox('bad', '❌ <strong>Tables incorrectes.</strong> Recalculez chaque colonne séparément avant de pouvoir conclure à une équivalence.'),
+                falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
+                falseanswernote: 'PRT' + X + '-2-F', falsefeedback: ''
+            }
+        ];
+        prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVarsEq };
+        prtXML = buildPrtXml(prtMeta, canonicalNodes);
+
+        var instrText3 = text || '<p>Complétez les deux tables de vérité, puis indiquez si les deux propositions sont <strong>logiquement équivalentes</strong> (<code>true</code> ou <code>false</code>) :</p>';
+        questionText = HDR + instrText3
+            + '<div style="display:flex;gap:24px;flex-wrap:wrap;">'
+            + '<div><p><strong>E₁ :</strong> \\(' + _lgToLatex(expr) + '\\)</p>' + tblE1 + '</div>'
+            + '<div><p><strong>E₂ :</strong> ' + (expr2 ? '\\(' + _lgToLatex(expr2) + '\\)' : '—') + '</p>' + tblE2 + '</div>'
+            + '</div>'
+            + '<div style="margin-top:12px;"><p><strong>Équivalentes ?</strong> [[input:' + eqName + ']][[validation:' + eqName + ']]</p></div>';
+        qnote = 'Logique Q' + X + ' equivalence ' + expr.substring(0, 15) + ' vs ' + (expr2 || '').substring(0, 15);
+
+        var eqGenBody = '<p style="text-align:center;margin-bottom:15px;font-size:1.05rem;"><strong>Les deux propositions sont ' + (equiv ? 'logiquement équivalentes.' : 'NON équivalentes.') + '</strong></p>'
+            + '<div style="overflow-x:auto;width:fit-content;margin:0 auto;"><table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">'
+            + '<thead><tr style="background:#f1f5f9;">'
+            + vars.map(function (v) { return '<th style="border:1px solid #94a3b8;padding:8px 18px;">' + v + '</th>'; }).join('')
+            + '<th style="border:1px solid #94a3b8;padding:8px 18px;background:#dbeafe;">\\(' + _lgToLatex(expr) + '\\)</th>'
+            + '<th style="border:1px solid #94a3b8;padding:8px 18px;background:#fef3c7;">\\(' + _lgToLatex(expr2 || expr) + '\\)</th>'
+            + '<th style="border:1px solid #94a3b8;padding:8px 18px;">Identique ?</th></tr></thead><tbody>';
+        for (var qj = 0; qj < nRows; qj++) {
+            var valsQ = _lgBuildRow(qj, vars);
+            var vA = allResE['e1r'][qj], vB = allResE['e2r'][qj];
+            eqGenBody += '<tr' + (qj % 2 ? ' style="background:#f8fafc;"' : '') + '>'
+                + vars.map(function (v) { return '<td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">' + (valsQ[v] ? 1 : 0) + '</td>'; }).join('')
+                + '<td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;">' + vA + '</td>'
+                + '<td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;">' + vB + '</td>'
+                + '<td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-size:1.2rem;">' + (vA === vB ? '✅' : '❌') + '</td></tr>';
+        }
+        eqGenBody += '</tbody></table></div>';
+        generalFeedback = _mkFbGen(_lgGenFbBox(eqGenBody), fbGen);
+
+    } else if (scenario === 'intermediaire') {
+        var se1 = subexpr1 || '(P and Q)';
+        var se2 = subexpr2 || 'not(P)';
+        var items4 = [];
+        var allResFin = [], allResS1 = [], allResS2 = [];
+        var tbl4 = '<table style="border-collapse:collapse;font-family:monospace;">'
+            + '<thead><tr style="background:#ede9fe;">';
+        vars.forEach(function (v) { tbl4 += '<th style="padding:4px 10px;border:1px solid #c4b5fd;">' + v + '</th>'; });
+        tbl4 += '<th style="padding:4px 10px;border:1px solid #bfdbfe;background:#dbeafe;">\\(' + _lgToLatex(se1) + '\\)</th>'
+            + '<th style="padding:4px 10px;border:1px solid #bfdbfe;background:#dbeafe;">\\(' + _lgToLatex(se2) + '\\)</th>'
+            + '<th style="padding:4px 10px;border:1px solid #c4b5fd;color:#7c3aed;">\\(' + _lgToLatex(expr) + '\\)</th></tr></thead><tbody>';
+        var n1Names = [], n2Names = [], nfNames = [];
+        for (var i4 = 0; i4 < nRows; i4++) {
+            var vals4 = _lgBuildRow(i4, vars);
+            var r1 = _lgEval(se1, vals4, vars), r2 = _lgEval(se2, vals4, vars), rf = _lgEval(expr, vals4, vars);
+            allResS1.push(r1 ? 1 : 0); allResS2.push(r2 ? 1 : 0); allResFin.push(rf ? 1 : 0);
+            var n1 = 'ans' + X + 's1r' + i4, n2 = 'ans' + X + 's2r' + i4, nf = 'ans' + X + 'fr' + i4;
+            n1Names.push(n1); n2Names.push(n2); nfNames.push(nf);
+            items4.push({ name: n1, target: r1 ? 1 : 0 }, { name: n2, target: r2 ? 1 : 0 }, { name: nf, target: rf ? 1 : 0 });
+            tbl4 += '<tr style="' + (i4 % 2 ? 'background:#f9fafb;' : '') + '">';
+            vars.forEach(function (v) { tbl4 += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;">' + (vals4[v] ? 1 : 0) + '</td>'; });
+            tbl4 += '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;background:#eff6ff;">[[input:' + n1 + ']][[validation:' + n1 + ']]</td>'
+                + '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;background:#eff6ff;">[[input:' + n2 + ']][[validation:' + n2 + ']]</td>'
+                + '<td style="text-align:center;padding:3px 10px;border:1px solid #e5e7eb;background:#fefce8;">[[input:' + nf + ']][[validation:' + nf + ']]</td></tr>';
+        }
+        tbl4 += '</tbody></table>';
+
+        items4.forEach(function (it) { inputXML += _lgCellInput(it.name, String(it.target)); });
+
+        var allNames = n1Names.concat(n2Names, nfNames);
+        var allTargets = allResS1.concat(allResS2, allResFin);
+        var interNames = n1Names.concat(n2Names);
+        var interTargets = allResS1.concat(allResS2);
+
+        var specs4 = [
+            {
+                description: 'Tout correct',
+                sans: '[' + allNames.join(',') + ']', tans: '[' + allTargets.join(',') + ']', score: 1,
+                feedback: fbOk || _lgBox('ok', '✅ <strong>Parfait !</strong> Toutes les colonnes sont correctement remplies.')
+            },
+            {
+                description: 'Sous-expressions correctes, finale fausse',
+                sans: '[' + interNames.join(',') + ']', tans: '[' + interTargets.join(',') + ']', score: 0.5,
+                feedback: _lgBox('warn', '🔶 <strong>Bonne décomposition, mais erreur finale !</strong> Les sous-expressions sont correctes, mais vérifiez l\'opérateur principal qui les combine.')
+            },
+            {
+                description: 'Seule la finale est correcte',
+                sans: '[' + nfNames.join(',') + ']', tans: '[' + allResFin.join(',') + ']', score: 0.3,
+                feedback: _lgBox('warn', '🔶 <strong>Résultat final correct, mais sous-expressions fausses.</strong> Le résultat est bon, mais vos colonnes intermédiaires contiennent des erreurs. Recalculez-les.')
+            },
+            {
+                description: 'Tout incorrect',
+                sans: 'true', tans: 'true', score: 0, quiet: true,
+                feedback: fbWrong || _lgBox('bad', '❌ <strong>Incorrect.</strong> Procédez colonne par colonne, de gauche à droite. Vérifiez chaque opérateur séparément. Rappel :<br>• <code>NOT</code> : inverse les 0 et 1<br>• <code>AND</code> : vaut 1 uniquement si les deux opérandes valent 1<br>• <code>OR</code> : vaut 0 uniquement si les deux opérandes valent 0<br>• <code>IMPLIES</code> : vaut 0 uniquement si gauche=1 et droite=0')
+            }
+        ];
+        var built3 = _lgSeqPrt(X, bareme, specs4);
+        prtMeta = built3.prtMeta; canonicalNodes = built3.canonicalNodes; prtXML = built3.prtXML;
+
+        var instrText4 = text || '<p>Complétez le tableau en calculant d\'abord les colonnes intermédiaires, puis le résultat final :</p>';
+        questionText = HDR + instrText4 + _lgMathBox(expr) + tbl4;
+        qnote = 'Logique Q' + X + ' intermediaire ' + expr.substring(0, 15);
+
+        var interBody = '<div style="overflow-x:auto;width:fit-content;margin:0 auto;"><table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">'
+            + '<thead><tr style="background:#f1f5f9;">'
+            + vars.map(function (v) { return '<th style="border:1px solid #94a3b8;padding:8px 20px;">' + v + '</th>'; }).join('')
+            + '<th style="border:1px solid #94a3b8;padding:8px 20px;background:#dbeafe;">\\(' + _lgToLatex(se1) + '\\)</th>'
+            + '<th style="border:1px solid #94a3b8;padding:8px 20px;background:#dbeafe;">\\(' + _lgToLatex(se2) + '\\)</th>'
+            + '<th style="border:1px solid #94a3b8;padding:8px 20px;background:#fef9c3;">\\(' + _lgToLatex(expr) + '\\)</th></tr></thead><tbody>';
+        for (var qk = 0; qk < nRows; qk++) {
+            var valsK = _lgBuildRow(qk, vars);
+            interBody += '<tr' + (qk % 2 ? ' style="background:#f8fafc;"' : '') + '>'
+                + vars.map(function (v) { return '<td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">' + (valsK[v] ? 1 : 0) + '</td>'; }).join('')
+                + '<td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">' + allResS1[qk] + '</td>'
+                + '<td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">' + allResS2[qk] + '</td>'
+                + '<td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">' + allResFin[qk] + '</td></tr>';
+        }
+        interBody += '</tbody></table></div>';
+        generalFeedback = _mkFbGen(_lgGenFbBox(interBody), fbGen);
+
+    } else { // simplif
+        var tansMaxima = tansForm || expr;
+        var ansName2 = 'ans' + X;
+        inputXML = '<input><name>' + ansName2 + '</name>'
+            + '<type>algebraic</type><tans>' + tansMaxima + '</tans>'
+            + '<boxsize>15</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars>'
+            + '<syntaxhint></syntaxhint><syntaxattribute>0</syntaxattribute>'
+            + '<forbidwords></forbidwords><allowwords></allowwords>'
+            + '<forbidfloat>0</forbidfloat><requirelowestterms>0</requirelowestterms>'
+            + '<checkanswertype>0</checkanswertype><mustverify>0</mustverify>'
+            + '<showvalidation>0</showvalidation><options></options></input>';
+
+        fbOkFinal = fbOk || '<p>✅ Bonne simplification ! La forme <code>' + tansMaxima + '</code> est logiquement équivalente.</p>';
+        fbWrongFinal = fbWrong || '<p>❌ Incorrect. La forme simplifiée attendue est <code>' + tansMaxima + '</code>.</p>';
+        canonicalNodes = [{
+            name: '0', description: '', answertest: 'PropLogic', sans: ansName2, tans: tansMaxima,
+            testoptions: '', quiet: '0',
+            truescoremode: '=', truescore: String(bareme), truepenalty: '0', truenextnode: '-1',
+            trueanswernote: 'PRT' + X + '-1-T', truefeedback: fbOkFinal,
+            falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
+            falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrongFinal
+        }];
+        prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
+        prtXML = buildPrtXml(prtMeta, canonicalNodes);
+
+        var instrText5 = text || ('<p>Simplifier l\'expression logique suivante :</p>'
+            + _lgMathBox(expr)
+            + '<p>Entrer la forme simplifiée en syntaxe Maxima (<code>P and Q</code>, <code>not(P)</code>, <code>true</code>…).</p>');
+        questionText = HDR + instrText5 + '[[input:' + ansName2 + ']][[validation:' + ansName2 + ']]';
+        qnote = 'Logique Q' + X + ' simplif ' + expr.substring(0, 20);
+        generalFeedback = _mkFbGen(_lgGenFbBox('<p>Forme simplifiée attendue : \\(' + _lgToLatex(tansMaxima) + '\\)</p><p>Expression d\'origine : \\(' + _lgToLatex(expr) + '\\)</p>'), fbGen);
+    }
+
+    questionText += '[[feedback:prt' + X + ']]';
+
+    return {
+        type: 'logique', bareme: bareme, vars: '',
+        qnote: qnote,
+        textFrag: questionText, inputXML: inputXML, prtXML: prtXML,
+        prt: { meta: prtMeta, nodes: canonicalNodes },
+        generalFeedback: generalFeedback, feedbackRef: '[[feedback:prt' + X + ']]'
+    };
+}
+
+// ==============================================================
+
+// ── Types mathématiques avancés : voir js/generators-math.js ──────

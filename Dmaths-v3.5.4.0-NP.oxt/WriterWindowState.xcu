@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="WriterWindowState"  oor:package="org.openoffice.Office.UI">
+	<node oor:name="UIElements">
+		<node oor:name="States">
+			<node oor:name="private:resource/toolbar/addon_org.openoffice.Office.addon.DMathsDisplayBarre" oor:op="replace">
+				<prop oor:name="UIName" oor:type="xs:string">
+					<value xml:lang="fr">Dmaths Afficher/Masquer</value>
+					<value xml:lang="de">Dmaths an/aus-Schalter</value>
+					<value xml:lang="en">Dmaths on/off switch</value>
+					<value xml:lang="it">Dmaths on/off switch</value>
+					<value xml:lang="es">Dmaths on/off switch</value>
+				</prop>
+				<prop oor:name="Docked" oor:type="xs:boolean">
+					<value>true</value>
+    			</prop>
+			</node>
+			<node oor:name="private:resource/toolbar/addon_org.openoffice.Office.addon.DMathsBarre" oor:op="replace">
+				<prop oor:name="UIName" oor:type="xs:string">
+					<value>Dmaths</value>
+				</prop>
+				<prop oor:name="Docked" oor:type="xs:boolean">
+					<value>true</value>
+    			</prop>
+				<prop oor:name="Visible" oor:op="fuse">
+					<value>false</value>
+				</prop>
+			</node>
+			<node oor:name="private:resource/toolbar/addon_org.openoffice.Office.addon.OOoTep-Gdmath" oor:op="replace">
+				<prop oor:name="UIName" oor:type="xs:string">
+					<value>OOoTep-Gdmath</value>
+				</prop>
+				<prop oor:name="Docked" oor:type="xs:boolean">
+					<value>true</value>
+    			</prop>
+				<prop oor:name="Visible" oor:op="fuse">
+					<value>false</value>
+				</prop>
+			</node>
+			<node oor:name="private:resource/toolbar/addon_org.openoffice.Office.addon.OOoGdmathBarre1" oor:op="replace">
+				<prop oor:name="UIName" oor:type="xs:string">
+					<value>Gdmath</value>					
+				</prop>
+				<prop oor:name="Docked" oor:type="xs:boolean">
+					<value>true</value>
+    			</prop>
+				<prop oor:name="Visible" oor:op="fuse">
+					<value>false</value>
+				</prop>
+			</node>	
+			<node oor:name="private:resource/toolbar/addon_org.openoffice.Office.addon.OOoAHmath3D.OfficeToolBar" oor:op="replace">
+				<prop oor:name="UIName" oor:type="xs:string">
+					<value>AHmath3D</value>					
+				</prop>
+				<prop oor:name="Docked" oor:type="xs:boolean">
+					<value>true</value>
+    			</prop>
+				<prop oor:name="Visible" oor:op="fuse">
+					<value>false</value>
+				</prop>
+			</node>			
+		</node>
+	</node>
+</oor:component-data>

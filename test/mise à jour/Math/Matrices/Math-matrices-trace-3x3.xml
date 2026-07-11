@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396247  -->
+  <question type="stack">
+    <name>
+      <text>Matrices : Trace d'une matrice (3×3)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Matrices — Trace</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit la matrice :</p>
+<div style="text-align: center; margin: 15px 0;">\(M = {@M@}\)</div>
+<p><strong>Calculer</strong> la trace de \(M\).</p>
+<div style="margin: 10px 0;">\(\text{tr}(M) = \) [[input:ans_tr]] [[validation:ans_tr]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+La <strong>trace</strong> d'une matrice carrée est la somme des coefficients de sa <strong>diagonale principale</strong> :<br><br>
+\[
+\text{tr}(M) = a_{11} + a_{22} + a_{33}
+\]<br>
+<strong>Application :</strong><br><br>
+\[
+\text{tr}(M) = {@a11@} + {@a22@} + {@a33@} = {@trace_correct@}
+\]<br><br>
+<em style="color: #64748b;">Propriétés utiles : \(\text{tr}(A + B) = \text{tr}(A) + \text{tr}(B)\) &nbsp;et&nbsp; \(\text{tr}(\lambda A) = \lambda\,\text{tr}(A)\).</em>
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>/* Fonction utilitaire : entier aléatoire entre a et b */
+ri(a,b) := a + rand(b - a + 1)$ 
+/* Génération des 9 coefficients */
+a11: ri(-5,5); a12: ri(-5,5); a13: ri(-5,5);
+a21: ri(-5,5); a22: ri(-5,5); a23: ri(-5,5);
+a31: ri(-5,5); a32: ri(-5,5); a33: ri(-5,5);
+
+/* Construction de la matrice */
+M: matrix([a11,a12,a13],[a21,a22,a23],[a31,a32,a33]);
+
+/* Trace correcte */
+trace_correct: a11 + a22 + a33;
+
+/* Erreurs classiques */
+err_det: determinant(M);
+err_somme_tot: a11+a12+a13+a21+a22+a23+a31+a32+a33;
+err_prod_diag: a11*a22*a33;
+err_diag_sec: a13 + a22 + a31;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>M={@M@}, tr(M)={@trace_correct@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:matrix-trace-3x3</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_tr</name>
+      <type>numerical</type>
+      <tans>trace_correct</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_tr</sans>
+        <tans>trace_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Vous avez bien sommé les coefficients de la diagonale principale.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A calculé le déterminant</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_tr</sans>
+        <tans>err_det</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-DET</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion déterminant / trace !</strong> Vous avez calculé le <strong>déterminant</strong> (règle de Sarrus). La trace, c'est beaucoup plus simple : c'est la <strong>somme</strong> des coefficients de la diagonale principale : \(a_{11} + a_{22} + a_{33}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-DET</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Somme de TOUS les coefficients</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_tr</sans>
+        <tans>err_somme_tot</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SOMME-TOT</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Trop de termes !</strong> Vous avez additionné les <strong>9 coefficients</strong> de la matrice. La trace ne concerne <strong>que la diagonale principale</strong> : \(a_{11} + a_{22} + a_{33}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SOMME-TOT</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Produit de la diagonale</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_tr</sans>
+        <tans>err_prod_diag</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-PROD</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise opération !</strong> Vous avez fait le <strong>produit</strong> des coefficients diagonaux (\(a_{11} \times a_{22} \times a_{33}\)). La trace est une <strong>somme</strong>, pas un produit.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-PROD</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur : Diagonale secondaire</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_tr</sans>
+        <tans>err_diag_sec</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-DIAG-SEC</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise diagonale !</strong> Vous avez sommé la <strong>diagonale secondaire</strong> (\(a_{13} + a_{22} + a_{31}\)). La trace utilise la <strong>diagonale principale</strong> (de haut en gauche à bas en droite) : \(a_{11} + a_{22} + a_{33}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> La trace est la somme de la <strong>diagonale principale</strong> :<br>\(\text{tr}(M) = a_{11} + a_{22} + a_{33}\)</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

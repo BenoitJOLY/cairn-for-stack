@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="84.201225mm"
+   height="18.200602mm"
+   viewBox="0 0 84.201217 18.2006"
+   version="1.1"
+   id="svg973"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="plaque_test.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview975"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.786611"
+     inkscape:cx="258.91666"
+     inkscape:cy="-54.187685"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer32" />
+  <defs
+     id="defs970">
+    <rect
+       x="378.47"
+       y="610.24103"
+       width="119.90466"
+       height="37.51207"
+       id="rect11217" />
+  </defs>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-1.025485,-96.299854)">
+    <g
+       inkscape:groupmode="layer"
+       id="layer32"
+       inkscape:label="plaquette de test"
+       style="display:inline"
+       sodipodi:insensitive="true"
+       transform="translate(-41.482432,-5.8121753)">
+      <path
+         id="rect11313"
+         style="display:inline;fill:#cccccc;fill-opacity:1;stroke:#000000;stroke-width:0.444582;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         d="m 42.730208,102.33432 v 17.75602 H 126.48685 V 102.33432 H 120.049 v 13.13563 h -11.8587 v -13.13563 h -7.6259 v 13.27671 H 88.714482 v -13.27671 h -8.053256 v 13.28963 H 68.784949 v -13.28963 h -9.209774 v 13.06484 H 47.711816 v -13.06484 z" />
+    </g>
+  </g>
+</svg>

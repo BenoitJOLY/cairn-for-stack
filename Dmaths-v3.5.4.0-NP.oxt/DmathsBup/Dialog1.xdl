@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog1" dlg:left="165" dlg:top="131" dlg:width="188" dlg:height="102" dlg:closeable="true" dlg:moveable="true" dlg:title="Dmaths Backup">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="24" dlg:top="9" dlg:width="143" dlg:height="14" dlg:value="Veuillez patienter ..." dlg:align="center"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="1" dlg:left="23" dlg:top="29" dlg:width="143" dlg:height="14" dlg:value="Nombre de répertoires examinés :" dlg:align="center"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="2" dlg:left="23" dlg:top="49" dlg:width="143" dlg:height="14" dlg:value="Nombre d&apos;éléments copiés :" dlg:align="center"/>
+  <dlg:progressmeter dlg:id="ProgressBar1" dlg:tab-index="3" dlg:left="13" dlg:top="69" dlg:width="163" dlg:height="19"/>
+ </dlg:bulletinboard>
+</dlg:window>

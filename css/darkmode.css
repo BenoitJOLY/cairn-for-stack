@@ -1,0 +1,304 @@
+/* ════════════════════════════════════════════════════════════════
+   HéStack V4 — darkmode.css
+   options.js applique  data-theme="dark"  sur <html> quand
+   l'utilisateur choisit le thème sombre.
+   Tous les sélecteurs s'appuient sur [data-theme="dark"] — pas de
+   dépendance à prefers-color-scheme ni à Chrome Force Dark.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── color-scheme : bascule les widgets natifs (scrollbars…) ─── */
+:root                    { color-scheme: light; }
+[data-theme="dark"]      { color-scheme: dark;  }
+
+/* ── Redéfinition des variables thème ───────────────────────── */
+[data-theme="dark"] {
+  /* Palette de base */
+  --white:        #0f172a;
+  --bg:           #1e293b;
+  --border:       #334155;
+
+  /* Textes atténués */
+  --hint-color:   #94a3b8;   /* 5.3:1 sur #1e293b ✓ */
+  --footer-muted: #94a3b8;   /* 5.3:1 sur #1e293b ✓ */
+
+  /* Chips de question */
+  --chip-bg:          #1e293b;
+  --chip-border:      #475569;
+  --chip-label-color: #e2e8f0;   /* 12.5:1 sur #1e293b ✓ */
+
+  /* Éditeur V4 */
+  --v4-editor-bg:    #0f172a;
+  --v4-config-bg:    #1a2535;
+  --v4-panel-border: #334155;
+}
+
+/* ── Corps de page ───────────────────────────────────────────── */
+[data-theme="dark"] body {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+/* ── Cartes ──────────────────────────────────────────────────── */
+[data-theme="dark"] .card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+/* ── Chip-ok : état "question complète" ─────────────────────── */
+[data-theme="dark"] .q-chip.chip-ok {
+  background:   #14532d;
+  border-color: #16a34a;
+}
+[data-theme="dark"] .q-chip.chip-ok .chip-label  { color: #bbf7d0; }
+[data-theme="dark"] .q-chip.chip-ok .chip-status { color: #86efac; }
+
+/* ── Barre de nom d'exercice (V3) ────────────────────────────── */
+[data-theme="dark"] .quiz-name-bar       { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .quiz-name-bar input { background: #0f172a; color: #e2e8f0; border-color: #334155; }
+
+/* ── Boîte liste de questions (V3) ───────────────────────────── */
+[data-theme="dark"] .q-list-box   { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .q-list-label { color: #94a3b8; }
+
+/* ── Grille de types de questions ────────────────────────────── */
+[data-theme="dark"] .type-btn        { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .type-btn .lbl   { color: #94a3b8; }
+[data-theme="dark"] .type-btn:hover  { background: #334155; }
+[data-theme="dark"] .type-btn.active { background: #1e40af; border-color: transparent; }
+
+/* ── Formulaire / panneaux d'édition ─────────────────────────── */
+[data-theme="dark"] .form-panel,
+[data-theme="dark"] .config-panel             { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .form-panel label,
+[data-theme="dark"] .prop-label               { color: #94a3b8; }
+[data-theme="dark"] .form-panel input[type="text"],
+[data-theme="dark"] .form-panel input[type="number"],
+[data-theme="dark"] .form-panel select,
+[data-theme="dark"] .form-panel textarea      { background: #0f172a; color: #e2e8f0; border-color: #334155; }
+[data-theme="dark"] .form-panel input:focus,
+[data-theme="dark"] .form-panel select:focus,
+[data-theme="dark"] .form-panel textarea:focus { border-color: #3b82f6; }
+
+/* ── V4 éditeur ──────────────────────────────────────────────── */
+[data-theme="dark"] .v4-editor        { background: var(--v4-editor-bg); }
+[data-theme="dark"] .v4-editor-panel  { background: var(--v4-config-bg); border-color: var(--v4-panel-border); }
+[data-theme="dark"] .v4-config-header { background: #1a2535; border-color: #334155; }
+
+[data-theme="dark"] .palette-block       { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .v4-editor-toolbar   { background: #1a2535; border-color: #334155; }
+[data-theme="dark"] .v4-editor-toolbar button       { color: #94a3b8; }
+[data-theme="dark"] .v4-editor-toolbar button:hover { background: #334155; color: #e2e8f0; }
+[data-theme="dark"] .hs-editor-rich { background: #0f172a; color: #e2e8f0; border-color: #334155; }
+
+/* ── Modales ─────────────────────────────────────────────────── */
+[data-theme="dark"] .modal-box,
+[data-theme="dark"] .pb-modal,
+[data-theme="dark"] .q-config-modal-box          { background: #1e293b; color: #e2e8f0; border-color: #334155; }
+[data-theme="dark"] .modal-box h2, [data-theme="dark"] .modal-box h3,
+[data-theme="dark"] .pb-modal  h2, [data-theme="dark"] .pb-modal  h3 { color: #f1f5f9; }
+[data-theme="dark"] .modal-box label,
+[data-theme="dark"] .pb-modal  label             { color: #94a3b8; }
+
+/* ── Boutons génériques ───────────────────────────────────────── */
+[data-theme="dark"] .btn,
+[data-theme="dark"] button.sec       { background: #334155; color: #e2e8f0; border-color: #475569; }
+[data-theme="dark"] .btn:hover       { background: #475569; }
+[data-theme="dark"] .btn-primary     { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+[data-theme="dark"] .btn-primary:hover { background: #1e40af; }
+
+/* ── Footer ──────────────────────────────────────────────────── */
+[data-theme="dark"] .app-footer          { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .footer-links a      { color: #94a3b8; }
+[data-theme="dark"] .footer-links a:hover { color: #e2e8f0; }
+[data-theme="dark"] .footer-links .sep   { color: #475569; }
+
+/* ── Modales calc-box (copyModal, contactModal) ─────────────── */
+[data-theme="dark"] .calc-box h2,
+[data-theme="dark"] .calc-box h3  { color: #f1f5f9; }
+[data-theme="dark"] .calc-box p   { color: #e2e8f0; }
+
+/* Sections colorées → fond sombre pour éviter le contraste insuffisant */
+[data-theme="dark"] .modal-section {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+[data-theme="dark"] .modal-section p { color: #e2e8f0 !important; }
+
+/* Boîte auteur dans contactModal */
+[data-theme="dark"] .contact-author-box {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+[data-theme="dark"] .contact-author-box p { color: #e2e8f0 !important; }
+
+/* ── Panneau mode assistant ──────────────────────────────────── */
+[data-theme="dark"] .hs-panel            { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .hs-steps li         { color: #94a3b8; }
+[data-theme="dark"] .hs-steps li .hs-num { background: #334155; color: #94a3b8; }
+[data-theme="dark"] .hs-steps li.done    { color: #86efac; }
+[data-theme="dark"] .hs-steps li.done .hs-num { background: #16a34a; color: #fff; }
+[data-theme="dark"] .hs-steps li.current { background: #1e3a5f; border-color: #3b82f6; color: #e2e8f0; }
+[data-theme="dark"] .hs-steps li.current .hs-num { background: #2563eb; color: #fff; }
+
+[data-theme="dark"] .hs-explain          { background: #0f172a; border-color: #334155; }
+[data-theme="dark"] .hs-explain.edit     { background: #1c1a0a; border-color: #854d0e; }
+[data-theme="dark"] .hs-explain-title    { color: #93c5fd; }
+[data-theme="dark"] .hs-explain.edit .hs-explain-title { color: #fcd34d; }
+[data-theme="dark"] .hs-intro,
+[data-theme="dark"] .hs-explain-text     { color: #cbd5e1; }
+[data-theme="dark"] .hs-explain.edit .hs-explain-text { color: #fef3c7; }
+[data-theme="dark"] .hs-explain-text strong,
+[data-theme="dark"] .hs-explain.edit .hs-explain-text strong { color: #e2e8f0; }
+
+[data-theme="dark"] .hs-sub li           { background: #0f172a; border-color: #1e3a5f; color: #cbd5e1; }
+[data-theme="dark"] .hs-sub li strong    { color: #93c5fd; }
+[data-theme="dark"] .hs-sub li .opt      { color: #64748b; }
+
+[data-theme="dark"] .hs-do   { background: #14532d; border-color: #16a34a; color: #bbf7d0; }
+[data-theme="dark"] .hs-tip  { background: #1c1a0a; border-color: #854d0e; color: #fde68a; }
+
+[data-theme="dark"] .hs-pb-guide        { background: #1e1b4b; border-color: #4338ca; }
+[data-theme="dark"] .hs-pb-guide-title  { color: #a5b4fc; }
+[data-theme="dark"] .hs-pb-steps li     { color: #c7d2fe; }
+[data-theme="dark"] .hs-pb-steps li strong { color: #e0e7ff; }
+[data-theme="dark"] .hs-pb-note         { background: #1c1a0a; border-color: #854d0e; color: #fde68a; }
+[data-theme="dark"] .hs-pb-note strong  { color: #fbbf24; }
+
+/* ── Scrollbars ──────────────────────────────────────────────── */
+[data-theme="dark"] ::-webkit-scrollbar             { background: #1e293b; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb       { background: #334155; border-radius: 4px; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ════════════════════════════════════════════════════════════════
+   PRT MANAGER — dark mode complet
+   ════════════════════════════════════════════════════════════════ */
+
+/* Conteneur global */
+[data-theme="dark"] .prt-mngr-box { background: #0f172a; }
+
+/* Panneau arbre (fond SVG) */
+[data-theme="dark"] .prt-tree-panel { background: #111827; border-right-color: #1e293b; }
+[data-theme="dark"] .prt-tree-legend { background: #1e293b; border-bottom-color: #334155; }
+[data-theme="dark"] .prt-leg-hint   { color: #64748b; }
+[data-theme="dark"] .prt-tree-empty { color: #475569; }
+[data-theme="dark"] .prt-tree-svg-wrap { background: #111827; }
+
+/* Poignée de redimensionnement */
+[data-theme="dark"] .prt-resize-handle { background: #1e293b; }
+[data-theme="dark"] .prt-resize-handle:hover,
+[data-theme="dark"] .prt-resize-handle.prt-resizing { background: #3b82f6; }
+
+/* ── Éditeur de nœud (panneau droit) ─────────────────────────── */
+[data-theme="dark"] .prt-node-editor { background: #1e293b; }
+[data-theme="dark"] .prt-ne-placeholder { color: #475569; }
+[data-theme="dark"] .prt-fbvars-panel { background:#0f172a;border-color:#334155; }
+[data-theme="dark"] .prt-fbvars-label { color:#94a3b8; }
+[data-theme="dark"] .prt-fbvars-input { background:#1e293b;border-color:#475569;color:#e2e8f0; }
+
+[data-theme="dark"] .prt-ne-head {
+  color: #e2e8f0;
+  border-bottom-color: #334155;
+}
+[data-theme="dark"] .prt-ne-del-btn {
+  background: #450a0a; color: #f87171; border: 1px solid #7f1d1d;
+}
+[data-theme="dark"] .prt-ne-del-btn:hover { background: #7f1d1d; }
+
+[data-theme="dark"] .prt-ne-section {
+  color: #64748b;
+  border-top-color: #334155;
+}
+[data-theme="dark"] .prt-ne-true-section  { color: #4ade80; border-top-color: #14532d; }
+[data-theme="dark"] .prt-ne-false-section { color: #f87171; border-top-color: #450a0a; }
+
+[data-theme="dark"] .prt-ne-lbl { color: #94a3b8; }
+
+[data-theme="dark"] .prt-ne-inp,
+[data-theme="dark"] .prt-ne-sel {
+  background: #0f172a; border-color: #334155; color: #e2e8f0;
+}
+[data-theme="dark"] .prt-ne-inp:focus,
+[data-theme="dark"] .prt-ne-sel:focus {
+  background: #0f172a; border-color: #3b82f6;
+}
+[data-theme="dark"] .prt-ne-apply-btn { background: #1d4ed8; }
+[data-theme="dark"] .prt-ne-apply-btn:hover { background: #2563eb; }
+
+/* Bouton aide answertest */
+[data-theme="dark"] .prt-help-btn {
+  background: #0c1a2e; border-color: #0369a1; color: #7dd3fc;
+}
+[data-theme="dark"] .prt-help-btn:hover { background: #0f2844; }
+[data-theme="dark"] .prt-at-help {
+  background: #0c1a2e; border-color: #0369a1; color: #bae6fd;
+}
+[data-theme="dark"] .prt-at-help b  { color: #38bdf8; }
+[data-theme="dark"] .prt-at-help em { color: #475569; }
+
+/* Aperçu rich feedback */
+[data-theme="dark"] .prt-rich-prev {
+  background: #0f172a; border-color: #334155; color: #e2e8f0;
+}
+[data-theme="dark"] .prt-rich-prev:hover { border-color: #3b82f6; background: #0c1a2e; }
+[data-theme="dark"] .prt-rich-prev:empty::before { color: #475569; }
+
+/* Bouton mini éditeur rich */
+[data-theme="dark"] .btn-rich-sm {
+  background: #1e293b; border-color: #334155; color: #94a3b8;
+}
+[data-theme="dark"] .btn-rich-sm:hover { background: #334155; color: #e2e8f0; }
+
+/* Templates feedback (✅ Vrai / ❌ Faux / 🔶 Partiel) */
+[data-theme="dark"] .prt-fb-tpl-btn {
+  background: #1e293b; border-color: #334155; color: #94a3b8;
+}
+[data-theme="dark"] .prt-fb-tpl-btn:hover { background: #334155; border-color: #475569; color: #e2e8f0; }
+[data-theme="dark"] .prt-fb-tpl-btn.prt-fb-tpl-active {
+  background: #1d4ed8; border-color: #2563eb; color: #fff;
+}
+
+/* Variables disponibles */
+[data-theme="dark"] .prt-var-std { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .prt-var-q   { background: #14532d; color: #86efac; }
+[data-theme="dark"] .prt-var-fb  { background: #451a03; color: #fde68a; }
+
+/* Bannière de score */
+[data-theme="dark"] .prt-score-ok  { background: #14532d; color: #86efac; border-color: #166534; }
+[data-theme="dark"] .prt-score-err { background: #450a0a; color: #f87171; border-color: #7f1d1d; }
+
+/* Boutons de la barre d'en-tête PRT (déjà sombre, on ajuste les boutons clairs) */
+[data-theme="dark"] .prt-hdr-tidy  { background: #451a03; color: #fde68a; }
+[data-theme="dark"] .prt-hdr-tidy:hover  { background: #78350f; }
+[data-theme="dark"] .prt-hdr-reset { background: #1e293b; color: #cbd5e1; }
+[data-theme="dark"] .prt-hdr-reset:hover { background: #334155; }
+[data-theme="dark"] .prt-hdr-add   { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .prt-hdr-add:hover   { background: #1e40af; color: #fff; }
+[data-theme="dark"] .prt-hdr-save  { background: #14532d; color: #86efac; }
+[data-theme="dark"] .prt-hdr-save:hover  { background: #166534; color: #fff; }
+[data-theme="dark"] .prt-hdr-close { background: #450a0a; color: #f87171; }
+[data-theme="dark"] .prt-hdr-close:hover { background: #7f1d1d; color: #fff; }
+
+
+/* Options avancées dynamiques — dark mode */
+[data-theme="dark"] .exp-adv-title { color: #a78bfa; border-bottom-color: #3b2f6e; }
+[data-theme="dark"] .exp-adv-num { background: #2a1f4e; }
+[data-theme="dark"] .exp-adv-num span { color: #cbd5e1; }
+[data-theme="dark"] .exp-adv-num input[type=number] { background: #1e1b3a; border-color: #5b4fcf; color: #e0e0ee; }
+[data-theme="dark"] .exp-adv-warn { background: #451f00; color: #fde68a; }
+
+/* Panneau options Expert — dark mode */
+[data-theme="dark"] .exp-opts-group { border-color: #3b2f6e; background: #1a1733; }
+[data-theme="dark"] .exp-opts-group-title { color: #a78bfa; border-bottom-color: #3b2f6e; }
+[data-theme="dark"] .exp-opt-name { color: #e0e0ee; }
+[data-theme="dark"] .exp-opt-desc { color: #94a3b8; }
+[data-theme="dark"] .exp-opt-desc code { background: #2d2060; color: #c4b5fd; }
+[data-theme="dark"] .exp-opt-lbl-num input[type=number] { background: #1e1b3a; border-color: #5b4fcf; color: #e0e0ee; }
+[data-theme="dark"] .exp-adv-warn { background: #451f00; color: #fde68a; }
+
+/* Champs num + selects inline dans exp-toggles — dark mode */
+[data-theme="dark"] .exp-chk-num input[type=number] { background: #1e1b3a; border-color: #5b4fcf; color: #e0e0ee; }
+
+/* Zoom PRT — dark mode */
+[data-theme="dark"] .prt-zoom-btn { background:#2d2060;border-color:#4c3a9e;color:#c4b5fd; }
+[data-theme="dark"] .prt-zoom-btn:hover { background:#3b2f8a; }
+[data-theme="dark"] .prt-zoom-label { color:#a78bfa; }

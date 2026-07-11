@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="FinInst" dlg:left="138" dlg:top="140" dlg:width="246" dlg:height="111" dlg:help-text="&amp;330.FinInst.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;331.FinInst.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:border="simple"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:text dlg:style-id="0" dlg:id="Label1" dlg:tab-index="0" dlg:left="16" dlg:top="6" dlg:width="217" dlg:height="63" dlg:help-text="&amp;332.FinInst.Label1.HelpText" dlg:value="&amp;333.FinInst.Label1.Label" dlg:align="center"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="1" dlg:left="92" dlg:top="82" dlg:width="58" dlg:height="19" dlg:help-text="&amp;334.FinInst.CommandButton1.HelpText" dlg:value="&amp;335.FinInst.CommandButton1.Label" dlg:button-type="ok"/>
+ </dlg:bulletinboard>
+</dlg:window>

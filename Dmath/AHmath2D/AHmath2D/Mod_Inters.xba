@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Mod_Inters" script:language="StarBasic" script:moduleType="normal">
+&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+Sub ConstInters(oStep as integer)
+Dim oNvInters1 as object, oNvInters2 as object
+Dim oD1 as object,oD2 as object,oC1 as object, oC2 as object, oM1 as New com.sun.star.awt.Point, oM2 as New com.sun.star.awt.Point,  oI as New com.sun.star.awt.Point
+Dim oU1 as New com.sun.star.awt.Point , oDist2 as double
+Dim r as Long, l as Long, oNbr as variant
+Dim oDist1 as double, oInfo1 as variant, oInfo2 as variant
+
+if oStep = 17 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox7&quot;,&quot;ListBox&quot;)(1)
+	oReponseDlg(2) = RepControl(monDlg,&quot;ListBox34&quot;,&quot;ListBox&quot;)(1)
+	oNbr = oNbrObjets
+	
+	if oReponseDlg(1) = oReponseDlg(2) then 
+		Msgbox(Trad(monDlg,MesMessages2(14)), 0+48, &quot;AHmath2D&quot;)
+		Exit sub
+	End if
+	
+	
+	if oReponseDlg(1) &lt; oNbr(1) and oReponseDlg(2) &lt; oNbr(1) then &apos; 2 droites selectionnées
+		oD1 = oCollectionDroites(oReponseDlg(1))
+		oInfo1 = InfoForme(oD1)
+		oD2 = oCollectionDroites(oReponseDlg(2))
+		oInfo2 = InfoForme(oD2)
+		If IsObject(CoordIntersDroites(oD1, oD2)) = false then
+			exit sub
+		End if
+		oM1 = CoordIntersDroites(oD1, oD2)
+		oNvInters1 = Point(oM1.X,oM1.Y) 
+	End if
+	
+	if oReponseDlg(1) &gt;= oNbr(1) and oReponseDlg(2) &lt; oNbr(1) then &apos; 1 cercle et 1 droite selectionnées	
+		oC1 = oCollectionArcCercles(oReponseDlg(1)-oNbr(1))
+		oInfo1 = InfoForme(oC1)
+		oD2 = oCollectionDroites(oReponseDlg(2))
+		oInfo2 = InfoForme(oD2)
+		oDist1 = DistancePtDte(oInfo1(3),oD2)
+		oU1 = Vecteur(oInfo2(1),oInfo2(2),1)   &apos;vecteur droite D2
+		oU2 = VecteurOrtho(oU1)
+		oM1 = TranslationKV(1,oU2,oInfo1(3))
+		oI = CoordIntersDroites(oD2,Array(oInfo1(3),oM1))
+			if oDist1*1000 &lt; oInfo1(4) and abs(oDist1*1000 - oInfo1(4))&gt; 15 then   &apos;-&gt; 2 points d&apos;intersections
+			r = oInfo1(4)
+			l = oDist1 * 1000
+			oDist2 = CLng(sqr(r*r-l*l))/1000
+			oM1 = TranslationKV(-oDist2,oU1,oI)
+			oM2 = TranslationKV(oDist2,oU1,oI)
+			oNvInters1 = Point(oM1.X,oM1.Y)
+			oNvInters2 = Point(oM2.X,oM2.Y)
+			end if
+			if abs(oDist1*1000 - oInfo1(4)) &lt;= 15 then  &apos;-&gt; tangente (à 0,15 mm près)
+			oNvInters1 = Point(oI.X,oI.Y)
+			end if
+			if oDist1*1000 &gt; oInfo1(4) + 15 then
+				msgbox(Trad(monDlg,mesMessages2(2)))
+				Exit sub
+			End if	
+			
+	End if
+	
+	if oReponseDlg(2) &gt;= oNbr(1) and oReponseDlg(1) &lt; oNbr(1) then &apos; 1 cercle et 1 droite selectionnées	
+		oC1 = oCollectionArcCercles(oReponseDlg(2)-oNbr(1))
+		oInfo1 = InfoForme(oC1)
+		oD2 = oCollectionDroites(oReponseDlg(1))
+		oInfo2 = InfoForme(oD2)
+		oDist1 = DistancePtDte(oInfo1(3),oD2)
+		oU1 = Vecteur(oInfo2(1),oInfo2(2),1)   &apos;vecteur droite D2
+		oU2 = VecteurOrtho(oU1)
+		oM1 = TranslationKV(1,oU2,oInfo1(3))
+		oI = CoordIntersDroites(oD2,Array(oInfo1(3),oM1))
+			if oDist1*1000 &lt; oInfo1(4) and abs(oDist1*1000 - oInfo1(4))&gt; 15 then   &apos;-&gt; 2 points d&apos;intersections
+			r = oInfo1(4)
+			l = oDist1 * 1000
+			oDist2 = CLng(sqr(r*r-l*l))/1000
+			oM1 = TranslationKV(-oDist2,oU1,oI)
+			oM2 = TranslationKV(oDist2,oU1,oI)
+			oNvInters1 = Point(oM1.X,oM1.Y)
+			oNvInters2 = Point(oM2.X,oM2.Y)
+			end if
+			if abs(oDist1*1000 - oInfo1(4)) &lt;= 15 then  &apos;-&gt; tangente (à 0,15 mm près) 1 point d&apos;intersection
+			oNvInters1 = Point(oI.X,oI.Y)
+			end if
+			if oDist1*1000 &gt; oInfo1(4) + 15 then
+				msgbox(Trad(monDlg,mesMessages2(2)))
+				Exit sub
+			End if	
+	End if
+	
+	if oReponseDlg(1) &gt;= oNbr(1) and  oReponseDlg(2) &gt;= oNbr(1) then &apos; intersection entre 2 cercles
+		oC1 = oCollectionArcCercles(oReponseDlg(1)-oNbr(1))
+		oInfo1 = InfoForme(oC1)
+		oC2 = oCollectionArcCercles(oReponseDlg(2)-oNbr(1))
+		oInfo2 = InfoForme(oC2)
+		oDist1 = DistancePtPt(oInfo1(3),oInfo2(3))   &apos;distance entre les 2 centres
+
+		if oDist1*1000 &lt;= 5 and oInfo1(4) = oInfo2(4) then
+			msgbox(Trad(monDlg,mesMessages2(3)))                            &apos; cercles confondus
+			Exit sub
+		End if
+		
+		If oInfo1(4) &lt; oInfo2(4) then          &apos; pour affecter oC1 avec le plus grand rayon
+		oC1 = oCollectionArcCercles(oReponseDlg(2)-oNbr(1))
+		oInfo1 = InfoForme(oC1)
+		oC2 = oCollectionArcCercles(oReponseDlg(1)-oNbr(1))
+		oInfo2 = InfoForme(oC2)
+		End if
+		
+		if oDist1*1000 &gt; oInfo1(4) and oDist1*1000 &gt; oInfo2(4) then  &apos; les centres sont exterieurs à l&apos;autre cercle
+			if oDist1*1000 &gt; oInfo1(4) +  oInfo2(4) + 15 then
+				msgbox(Trad(monDlg,mesMessages2(2)))                            &apos; pas d&apos;intersection
+				Exit sub
+			End if
+			if abs(oDist1*1000 - (oInfo1(4) + oInfo2(4))) &lt;= 15 then   &apos;cercle tangeant si séparés de 0,015 cm
+				oU1 = Vecteur(oInfo1(3),oInfo2(3),1)
+				oM1 = TranslationKV(oInfo1(4)/1000,oU1,oInfo1(3))
+				oNvInters1 = Point(oM1.X,oM1.Y)
+			End if
+			if oDist1*1000 - (oInfo1(4) + oInfo2(4)) &lt; -15 then
+			oM1 = CoordCdeABC(Array(oInfo1(3),oInfo2(3)),oInfo2(4)/1000,oInfo1(4)/1000,&quot;+&quot;)
+			oM2 = CoordCdeABC(Array(oInfo1(3),oInfo2(3)),oInfo2(4)/1000,oInfo1(4)/1000,&quot;-&quot;)
+			oNvInters1 = Point(oM1.X,oM1.Y)
+			oNvInters2 = Point(oM2.X,oM2.Y)
+			End if
+		End if
+		if oDist1*1000 &lt; oInfo1(4) or oDist1*1000 &lt; oInfo2(4) then  &apos; un centre est interieur à l&apos;autre cercle
+			if abs(oInfo1(4) - oInfo2(4)) &gt; oDist1*1000 + 15 then
+				msgbox(Trad(monDlg,mesMessages2(2)))                            &apos; pas d&apos;intersection
+				Exit sub		
+			End if
+			if abs((oInfo1(4) - oInfo2(4)) - oDist1*1000) &lt;= 15 then   &apos;cercle tangent
+			oU1 = Vecteur(oInfo1(3),oInfo2(3),1)
+			oM1 = TranslationKV(oInfo1(4)/1000,oU1,oInfo1(3))
+			oNvInters1 = Point(oM1.X,oM1.Y)
+			End if
+			if (oInfo1(4) - oInfo2(4)) &lt; oDist1*1000 - 15  then
+			oM1 = CoordCdeABC(Array(oInfo1(3),oInfo2(3)),oInfo2(4)/1000,oInfo1(4)/1000,&quot;+&quot;)
+			oM2 = CoordCdeABC(Array(oInfo1(3),oInfo2(3)),oInfo2(4)/1000,oInfo1(4)/1000,&quot;-&quot;)
+			oNvInters1 = Point(oM1.X,oM1.Y)
+			oNvInters2 = Point(oM2.X,oM2.Y)
+			End if
+		
+		
+		End if
+	End if
+End if
+
+mesFormes.add(oNvInters1)
+SauvDerniereConstruction(oNvInters1)
+if Not IsNull(oNvInters2) then
+	mesFormes.add(oNvInters2)
+	SauvDerniereConstruction(oNvInters2,false)
+End if
+
+end sub
+
+
+
+&apos;------------------------------------------------------------------------------------------
+&apos;--- oDroite est soit un objet dessiné, ou soit un tableau de la forme array(PtA, ptB)
+&apos;------------------------------------------------------------------------------------------
+
+Function CoordIntersDroites(oDroite1 as variant, oDroite2 as variant) as variant
+Dim oInfo1 as variant, oInfo2 as variant
+Dim a1 as double,b1 as double,c1 as double,a2 as double,b2 as double,c2 as double, xI as Long, yI as Long
+Dim oPoint as New com.sun.star.awt.Point
+Dim oA1 as New com.sun.star.awt.Point, oB1 as New com.sun.star.awt.Point, oA2 as New com.sun.star.awt.Point, oB2 as New com.sun.star.awt.Point
+Dim oU1 as New com.sun.star.awt.Point, oU2 as New com.sun.star.awt.Point
+
+If IsArray(oDroite1) = false then 
+	oA1 = oDroite1.Polygon(0)
+	Else
+	oA1 = oDroite1(0)
+End if
+If IsArray(oDroite1) = false then 
+	oB1 = oDroite1.Polygon(1)
+	Else
+	oB1 = oDroite1(1)
+End if
+If IsArray(oDroite2) = false then 
+	oA2 = oDroite2.Polygon(0)
+	Else
+	oA2 = oDroite2(0)
+End if
+If IsArray(oDroite2) = false then 
+	oB2 = oDroite2.Polygon(1)
+	Else
+	oB2 = oDroite2(1)
+End if
+
+oU1 = Vecteur(oA1,oB1)
+oU2 = Vecteur(oA2,oB2)
+
+if oU1.X * oU2.Y - oU1.Y * oU2.X = 0 then 
+	CoordIntersDroites = false
+	msgbox(Trad(monDlg,MesMessages2(1)))
+End if
+
+if oU1.X * oU2.Y - oU1.Y * oU2.X &lt;&gt; 0 then    &apos; oSegment1 a pour équation   a1X + b1Y + C = 0  et oSegment2 a pour équation a2X + B2Y + C2 = 0
+	a1 = oB1.Y - oA1.Y
+	b1 = oA1.X - oB1.X
+	c1 = -oA1.X * a1 - oA1.Y * b1
+	
+	a2 = oB2.Y - oA2.Y
+	b2 = oA2.X - oB2.X
+	c2 = -oA2.X * a2 - oA2.Y * b2
+
+	xI = (b1*c2-b2*c1)/(a1*b2-a2*b1)
+    yI = (a1*c2-a2*c1)/(a2*b1-a1*b2)
+
+oPoint.X = xI
+oPoint.Y = yI
+CoordIntersDroites = oPoint
+End if
+
+end Function
+
+
+</script:module>

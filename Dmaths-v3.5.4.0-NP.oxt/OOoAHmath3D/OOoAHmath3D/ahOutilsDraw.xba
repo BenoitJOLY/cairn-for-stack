@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ahOutilsDraw" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+
+Global ahPageDraw as Object
+Global ahDocumentDraw as Object
+
+
+&apos;------------------------------------------------------------------------------------------------------
+&apos; ouvre Draw, crée un dessin (maConstruction), le copie, 
+&apos; ferme draw et le colle dans writer deja ouvert
+&apos; maConstruction = Module.routine 
+&apos; la routine devant être présente dans le module concerné
+&apos;cette routine devant permettre de construire 1 dessin dans draw et de le selectionner
+&apos;------------------------------------------------------------------------------------------------------
+
+sub DRAWversWRITER(maConstruction as string)
+Dim ahDocumentWriter as object, maFormeDraw as object
+   ahDocumentWriter = thisComponent &apos;le document writer ouvert
+   ChargerDraw(false)
+   lancerMacro(maConstruction)
+   GroupSelectDraw(ahDocumentDraw)
+   maFormeDraw = LastFormeDraw
+   DispatchSimple(&quot;Copy&quot;,  ahDocumentDraw.CurrentController.Frame)
+   DispatchSimple(&quot;Paste&quot;, ahDocumentWriter.CurrentController.Frame)
+   ahDocumentDraw.close(True)
+ 
+end sub
+
+&apos;--------------------------------------------------------------------------------------------------
+&apos;Lance une macro de lab bibliothèque OOoAHmath3D ModuleMacro = nommodule.nomroutine
+&apos; d&apos;après le livre de Bernard Marcelly et Laurent Godard : Macros OOoBASIC et API
+&apos;--------------------------------------------------------------------------------------------------
+
+Sub lancerMacro(ModuleMacro as string)
+Dim disp as object, resu As Variant, noArgs()
+fenetre = StarDesktop.CurrentFrame
+disp = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+resu = disp.executeDispatch(fenetre, _
+  &quot;macro:///OOoAHmath3D.&quot; &amp; ModuleMacro, &quot;&quot;, 0, noArgs)
+if resu.State &lt;&gt; 1 then
+  MsgBox(&quot;Echec de lancement de la macro&quot;)
+end if
+End Sub
+
+
+&apos;-----------------------------------------------------------------------------------------------------
+&apos; ouvre openOfficeDraw en visible ou caché et définit les variables glogales ahDocumentDraw et ahPageDraw
+&apos;-----------------------------------------------------------------------------------------------------
+sub ChargerDraw (visible as boolean)
+Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+  mFileProperties(0).Name=&quot;Hidden&quot;
+  if visible = true then
+    mFileProperties(0).Value=false
+  else
+    mFileProperties(0).Value=True
+  end if
+ ahDocumentDraw=StarDesktop.LoadComponentFromURL(&quot;private:factory/sdraw&quot;,&quot;_blank&quot;, 0, mFileProperties())
+ ahPageDraw=ahDocumentDraw.DrawPages(0)
+end sub
+&apos;-------------------------------------------------------------------------------------------------------
+&apos; rend openofficeDraw visible ou caché
+&apos;-------------------------------------------------------------------------------------------------------
+sub Drawvisible(optional visible as boolean)
+	if IsMissing(visible) then visible = True
+    ahDocumentDraw.CurrentController.Frame.ContainerWindow.Visible = visible
+end sub
+&apos;-------------------------------------------------------------------------------------------------------
+&apos; Fonction qui renvoie la dernière forme d&apos;une page Draw &quot;ahPageDraw&quot; définie en globale
+&apos;--------------------------------------------------------------------------------------------------------
+
+Function LastFormeDraw() as object
+Dim monDocument As Object, maPage As Object, NombreFormes as Double
+Dim maForme As Object
+
+monDocument = ahDocumentDraw
+maPage = ahPageDraw
+
+NombreFormes = maPage.Count
+maForme = maPage(NombreFormes - 1)
+LastFormeDraw = maForme
+end Function
+
+&apos;---------------------------------------------------------------------------------------------------------
+&apos; Groupe les n dernières formes d&apos;une page Draw définie en Globale et sélectionne la forme groupée
+&apos;---------------------------------------------------------------------------------------------------------
+sub GroupeFormesDraw (n as variant)
+Dim monDocument As Object, maPage As Object, NombreFormes as double,GroupElements as object, maForme1 as object, maForme2 as object
+Dim i as integer
+monDocument = ahDocumentDraw
+maPage = ahPageDraw
+Drawvisible
+NombreFormes = maPage.Count
+Drawvisible(false)
+GroupElements = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;)
+for i = 1 to n
+GroupElements.add(maPage(NombreFormes - i))
+Next
+maForme1 = maPage.group(GroupElements)
+maForme2 = LastFormeDraw
+monDocument.CurrentController.select(maForme2)
+end sub
+
+&apos;---------------------------------------------------------------------------------------------------------
+&apos; Groupe toutes les formes d&apos;une page Draw sélectionne la forme groupée
+&apos;---------------------------------------------------------------------------------------------------------
+sub GroupSelectDraw (monDocDraw as object)
+Dim monDocument As Object, maPage As Object,GroupElements as object, maForme1 as object, maForme2 as object
+Dim i as integer
+monDocument = monDocDraw
+maPage = monDocDraw.DrawPages(0)
+
+GroupElements = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;)
+
+for i = 0 to  maPage.Count -1
+GroupElements.add(maPage(i))
+Next
+maForme1 = maPage.group(GroupElements)
+maForme2 = LastFormeDraw
+monDocument.CurrentController.select(maForme2)
+end sub
+
+&apos;---------------------------------------------------------------------------------------------------------
+&apos; Dégroupe les formes sélectionnées d&apos;une page Draw 
+&apos;---------------------------------------------------------------------------------------------------------
+Sub DegroupeDraw(monDocDraw as object)
+Dim monDocument As Object, maPage As Object,GroupElements as object, uneForme as object, monGroupe as object
+Dim i as integer
+monDocument = monDocDraw
+maPage = monDocDraw.DrawPages(0)
+
+for n = 0 to maPage.Count -1 &apos; balayer les formes de la page
+monGroupe = maPage(n)
+if monGroupe.ShapeType= &quot;com.sun.star.drawing.GroupShape&quot; then
+for x = 0 to monGroupe.Count-1 &apos; balayer les formes du groupe
+uneForme = monGroupe(x)
+next
+maPage.ungroup(monGroupe)
+end if
+next
+
+GroupElements = createUnoService(&quot;com.sun.star.drawing.ShapeCollection&quot;)
+for i = 0 to  maPage.Count -1
+GroupElements.add(maPage(i))
+Next
+monDocument.CurrentController.select(GroupElements)
+end sub
+
+
+
+</script:module>

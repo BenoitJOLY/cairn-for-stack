@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396375  -->
+  <question type="stack">
+    <name>
+      <text>Limites : Limite en +infini d'une fraction rationnelle</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Limites de fonctions — En +infini</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit \(f\) la fonction définie sur \(\mathbb{R}\) par :</p>
+<div style="text-align: center; font-size: 1.2rem; margin: 25px 0; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+\(f(x) = \frac{{@num@}}{{@den@}}\)
+</div>
+<p> Calculer la limite de la fonction \(f\) en \(+\infty\).</p>
+<p><em>Si la limite est infinie, on saisira <strong>inf</strong> ou <strong>-inf</strong>. Si elle est finie, on saisira la valeur exacte.</em></p>
+<div style="margin: 15px 0 10px 0;">\(\lim\limits_{x \to +\infty} f(x) = \) [[input:ans_lim]] [[validation:ans_lim]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour déterminer la limite d'une fonction rationnelle en \(+\infty\), on compare les degrés du numérateur et du dénominateur.<br /><br />
+Ici :<br />
+- Degré du numérateur : {@deg_num@}<br />
+- Degré du dénominateur : {@deg_den@}<br /><br />
+<strong>Cas n°{@cas_txt@} : {@deg_rule@}</strong><br />
+{@explication@}
+\[
+\lim\limits_{x \to +\infty} f(x) = {@txt_lim@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. INITIALISATIONS PAR DÉFAUT (Sécurité STACK) */
+num: x$ den: x$ ans_correct: 0$ txt_lim: "0"$ cas_txt: "1"$ deg_rule: ""$ explication: ""$ signe_txt: "positif (+)"$ err_sign_inf: 999$ err_0_inf: 999$ err_L_0: 999$ err_0_L: 999$ 
+
+/* 2. GÉNÉRATION ALÉATOIRE */
+r_type: rand(4)$ r_sub: rand(3)$ 
+
+/* --- CAS 1 : Limite = 0 (Degré num < Degré den) --- */
+if r_type = 1 and r_sub = 1 then num: 2*x^2 + 3*x - 1$ 
+if r_type = 1 and r_sub = 2 then num: x^3 - 2*x + 1$ 
+if r_type = 1 and r_sub = 3 then num: 5*x - 2$ 
+if r_type = 1 then den: x^3 - 2*x^2 + x + 1$ 
+if r_type = 1 then ans_correct: 0$ 
+if r_type = 1 then txt_lim: "0"$ 
+
+/* --- CAS 2 : Limite = L réel (Degrés égaux) --- */
+if r_type = 2 and r_sub = 1 then num: 2*x^2 - x + 1$ 
+if r_type = 2 and r_sub = 2 then num: 3*x^2 + 2*x$ 
+if r_type = 2 and r_sub = 3 then num: -4*x^2 + 5$ 
+if r_type = 2 and r_sub = 1 then den: x^2 + 3*x - 2$ 
+if r_type = 2 and r_sub = 2 then den: -x^2 + 4$ 
+if r_type = 2 and r_sub = 3 then den: 2*x^2 - x$ 
+if r_type = 2 and r_sub = 1 then ans_correct: 2$ 
+if r_type = 2 and r_sub = 2 then ans_correct: -3$ 
+if r_type = 2 and r_sub = 3 then ans_correct: -2$ 
+if r_type = 2 and r_sub = 1 then txt_lim: "2"$ 
+if r_type = 2 and r_sub = 2 then txt_lim: "-3"$ 
+if r_type = 2 and r_sub = 3 then txt_lim: "-2"$ 
+
+/* --- CAS 3 : Limite = +inf (Degré num > Degré den, coeff positifs) --- */
+if r_type = 3 and r_sub = 1 then num: x^3 - 2*x + 1$ 
+if r_type = 3 and r_sub = 2 then num: 3*x^4 - x$ 
+if r_type = 3 and r_sub = 3 then num: -2*x^3 + 5$ 
+if r_type = 3 and r_sub = 1 then den: x^2 + 4$ 
+if r_type = 3 and r_sub = 2 then den: 2*x^3 + x^2$ 
+if r_type = 3 and r_sub = 3 then den: -x^2 - 1$ 
+if r_type = 3 then ans_correct: inf$ 
+if r_type = 3 then txt_lim: "+\infty"$ 
+
+/* --- CAS 4 : Limite = -inf (Degré num > Degré den, coeff négatifs) --- */
+if r_type = 4 and r_sub = 1 then num: -x^3 + 2*x^2$ 
+if r_type = 4 and r_sub = 2 then num: 5*x^2 - 1$ 
+if r_type = 4 and r_sub = 3 then num: 2*x^4 - 3$ 
+if r_type = 4 and r_sub = 1 then den: x^2 - 5$ 
+if r_type = 4 and r_sub = 2 then den: -2*x^3 + x$ 
+if r_type = 4 and r_sub = 3 then den: -x^3 + 2*x$ 
+if r_type = 4 then ans_correct: -inf$ 
+if r_type = 4 then txt_lim: "-\infty"$ 
+
+/* 3. CALCULS POUR LA CORRECTION */
+deg_num: hipow(num, x)$ 
+deg_den: hipow(den, x)$ 
+coeff_num: ev(leadcoef(num), simp)$ 
+coeff_den: ev(leadcoef(den), simp)$ 
+
+if coeff_num/coeff_den > 0 then signe_txt: "positif (+)"$ 
+if coeff_num/coeff_den < 0 then signe_txt: "négatif (-)"$ 
+
+if r_type = 1 then cas_txt: "1"$ 
+if r_type = 1 then deg_rule: "Le degré du numérateur ({@deg_num@}) est STRICTEMENT INFÉRIEUR au degré du dénominateur ({@deg_den@})."$ 
+if r_type = 1 then explication: "D'après le cours, dans ce cas, la limite en \(+\infty\) est égale à 0."$ 
+
+if r_type = 2 then cas_txt: "2"$ 
+if r_type = 2 then deg_rule: "Le degré du numérateur ({@deg_num@}) est ÉGAL au degré du dénominateur ({@deg_den@})."$ 
+if r_type = 2 then explication: "D'après le cours, dans ce cas, la limite vaut le quotient des coefficients dominants : \(\frac{{@coeff_num@}}{{@coeff_den@}} = {@ans_correct@}\)."$ 
+
+if r_type = 3 then cas_txt: "3"$ 
+if r_type = 4 then cas_txt: "3"$ 
+if r_type = 3 or r_type = 4 then deg_rule: "Le degré du numérateur ({@deg_num@}) est STRICTEMENT SUPÉRIEUR au degré du dénominateur ({@deg_den@})."$ 
+if r_type = 3 or r_type = 4 then explication: "D'après le cours, dans ce cas, la limite est infinie. On regarde le signe du quotient des coefficients dominants. En \(+\infty\), ce signe est {@signe_txt@}, donc la limite est {@txt_lim@}."$ 
+
+/* 4. GÉNÉRATION DES ERREURS CLASSIQUES */
+if ans_correct = inf then err_sign_inf: -inf$ 
+if ans_correct = -inf then err_sign_inf: inf$ 
+
+if ans_correct = inf or ans_correct = -inf then err_0_inf: 0$ 
+
+if ans_correct = 0 then err_L_0: ev(coeff_num/coeff_den, simp)$ 
+
+if ans_correct#0 and ans_correct#inf and ans_correct#-inf then err_0_L: 0$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>f(x)=({@num@})/({@den@}), Limite={@txt_lim@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:limites-fonction-rationnelle</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_lim</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>inf, -inf ou un nombre</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords>inf</allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> La comparaison des degrés et le signe ont été correctement traités.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur de signe sur l'infini</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>err_sign_inf</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe !</strong> Le degré du numérateur est bien supérieur à celui du dénominateur, la limite est bien infinie. Cependant, vous vous êtes trompé sur le signe du quotient des coefficients dominants. Regardez bien le signe de {@coeff_num@} / {@coeff_den@}.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SIGN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>A répondu 0 au lieu d'une limite infinie</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>err_0_inf</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-0INF</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de comparaison !</strong> Vous avez répondu 0, ce qui correspond au cas où le degré du numérateur est <strong>inférieur</strong> à celui du dénominateur. Ici, le degré du numérateur ({@deg_num@}) est <strong>supérieur</strong> à celui du dénominateur ({@deg_den@}), la limite est donc infinie.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-0INF</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>A donné le rapport des coefficients au lieu de 0</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>err_L_0</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-L0</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvais cas de figure !</strong> Vous avez calculé le rapport des coefficients dominants. On n'utilise ce rapport que lorsque les degrés sont <strong>égaux</strong>. Ici, le degré du numérateur ({@deg_num@}) est <strong>inférieur</strong> à celui du dénominateur ({@deg_den@}), donc la limite vaut 0.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-L0</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>A répondu 0 au lieu d'une limite finie L</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>err_0_L</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-0L</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvais cas de figure !</strong> Les degrés sont égaux ici ({@deg_num@} = {@deg_den@}), la limite n'est donc pas 0. Il faut calculer le quotient des coefficients dominants des termes de plus haut degré.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez le théorème de comparaison des degrés pour les fonctions rationnelles en \(+\infty\) :<br />• Si \(\deg(\text{num}) < \deg(\text{den})\) alors \(\lim = 0\)<br />• Si \(\deg(\text{num}) = \deg(\text{den})\) alors \(\lim = \frac{\text{coeff dominant num}}{\text{coeff dominant den}}\)<br />• Si \(\deg(\text{num}) > \deg(\text{den})\) alors \(\lim = \text{signe} \times \infty\)</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>

@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ahOutilsGeoDraw" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction des bandes de collage
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+Sub LanguetteDraw(x1 as double, y1 as double, x2 as double, y2 as double,sens as String, optional epaisseur as Integer,optional largeur as double)
+
+dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant, lesPoints(3) As New com.sun.star.awt.Point
+Dim x3 as double, y3 as double, x4 as double, y4 as double
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+if Ismissing(largeur) = true then
+   largeur = 0.1
+end if
+
+
+if sens = &quot;droite&quot; then
+x3 = x1+ 0.8*(x2-x1)+largeur*(y2-y1)
+y3= y1+0.8*(y2-y1)-largeur*(x2-x1)
+x4 = x1+ 0.2*(x2-x1)+largeur*(y2-y1)
+y4= y1+ 0.2*(y2-y1)-largeur*(x2-x1)
+end if
+if sens = &quot;gauche&quot; then 
+x3 = x1+ 0.8*(x2-x1)-largeur*(y2-y1)
+y3= y1+0.8*(y2-y1)+largeur*(x2-x1)
+x4 = x1+ 0.2*(x2-x1)-largeur*(y2-y1)
+y4= y1+ 0.2*(y2-y1)+largeur*(x2-x1)
+end if
+
+Doc = oDocTemp
+Page = oPageTemp
+PolyPolygonShape = Doc.createInstance(&quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+Page.add(PolyPolygonShape)   &apos; Page.add must take place before the coordinates are set
+lesPoints(0).X = x1
+lesPoints(0).Y = y1
+lesPoints(1).X = x2
+lesPoints(1).Y = y2
+lesPoints(2).X = x3
+lesPoints(2).Y = y3
+lesPoints(3).X = x4
+lesPoints(3).Y = y4
+PolyPolygonShape.PolyPolygon = Array(lesPoints())
+PolyPolygonShape.LineWidth = epaisseur
+PolyPolygonShape.LineColor=RGB(0,0,0)  &apos;noir
+PolyPolygonShape.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+
+End Sub
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un quadrilatère
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+sub QuadrilatereDraw(x1 as double, y1 as double, x2 as double, y2 as double, x3 as double, y3 as double, x4 as double, y4 as double, optional epaisseur as integer)
+dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant, lesPoints(3) As New com.sun.star.awt.Point
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+Doc = oDocTemp
+Page = oPageTemp
+PolyPolygonShape = Doc.createInstance(&quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+PolyPolygonShape.LineWidth = epaisseur
+Page.add(PolyPolygonShape)   &apos; Page.add must take place before the coordinates are set
+lesPoints(0).X = x1
+lesPoints(0).Y = y1
+lesPoints(1).X = x2
+lesPoints(1).Y = y2
+lesPoints(2).X = x3
+lesPoints(2).Y = y3
+lesPoints(3).X = x4
+lesPoints(3).Y = y4
+PolyPolygonShape.PolyPolygon = Array(lesPoints())
+PolyPolygonShape.FillStyle=com.sun.star.drawing.FillStyle.NONE
+PolyPolygonShape.LineColor=RGB(0,0,0)  &apos;noir
+PolyPolygonShape.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+end sub
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un rectangle connaissant 2 sommets consécutifs de la largeur et la hauteur
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+sub RectangleDraw(x1 as double, y1 as double, x2 as double, y2 as double, h as double, Sens as string, optional epaisseur as integer)
+dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant, lesPoints(3) As New com.sun.star.awt.Point
+dim largeur as double
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+largeur = sqr(PuisN(x2-x1,2)+PuisN(y2-y1,2))
+x3 = x2-(y2-y1)*h/largeur
+y3 = y2+(x2-x1)*h/largeur
+x4 = x1-(y2-y1)*h/largeur
+y4=y1+(x2-x1)*h/largeur
+
+Doc = oDocTemp
+Page = oPageTemp
+PolyPolygonShape = Doc.createInstance(&quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+Page.add(PolyPolygonShape)   &apos; Page.add must take place before the coordinates are set
+lesPoints(0).X = x1
+lesPoints(0).Y = y1
+lesPoints(1).X = x2
+lesPoints(1).Y = y2
+lesPoints(2).X = x3
+lesPoints(2).Y = y3
+lesPoints(3).X = x4
+lesPoints(3).Y = y4
+PolyPolygonShape.PolyPolygon = Array(lesPoints())
+PolyPolygonShape.LineWidth = epaisseur
+PolyPolygonShape.LineColor=RGB(0,0,0)  &apos;noir
+PolyPolygonShape.FillStyle=com.sun.star.drawing.FillStyle.NONE
+PolyPolygonShape.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+end sub
+
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un carré connaissant 2 sommets consécutifs (dans le sens des aiguilles d&apos;une montre)
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+sub CarreDraw(x1 as double, y1 as double, x2 as double, y2 as double, optional epaisseur as integer)
+dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant, lesPoints(3) As New com.sun.star.awt.Point
+dim largeur as double
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+largeur = sqr(PuisN(x2-x1,2)+PuisN(y2-y1,2))
+x3 = x2-(y2-y1)
+y3 = y2+(x2-x1)
+x4 = x1-(y2-y1)
+y4=y1+(x2-x1)
+
+Doc = oDocTemp
+Page = oPageTemp
+PolyPolygonShape = Doc.createInstance(&quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+Page.add(PolyPolygonShape)   &apos; Page.add must take place before the coordinates are set
+lesPoints(0).X = x1
+lesPoints(0).Y = y1
+lesPoints(1).X = x2
+lesPoints(1).Y = y2
+lesPoints(2).X = x3
+lesPoints(2).Y = y3
+lesPoints(3).X = x4
+lesPoints(3).Y = y4
+PolyPolygonShape.PolyPolygon = Array(lesPoints())
+PolyPolygonShape.LineWidth = epaisseur
+PolyPolygonShape.LineColor=RGB(0,0,0)  &apos;noir
+PolyPolygonShape.FillStyle=com.sun.star.drawing.FillStyle.NONE
+PolyPolygonShape.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+end sub
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un Polygone régulier
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+sub polygoneDraw(Xcentre as double, Ycentre as double,x1 as double, y1 as double, n as integer, optional epaisseur as integer)
+dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant, lesPoints(n-1) As New com.sun.star.awt.Point
+Dim R as double, Angle1 as double, L as double
+
+R = sqr(PuisN(Xcentre - x1,2) + PuisN(Ycentre - y1,2)
+L = R*sin(pi/n)
+Angle1 = pi - Atn((Y1-Ycentre)/L)
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+Doc = oDocTemp
+Page = oPageTemp
+PolyPolygonShape = Doc.createInstance(&quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+Page.add(PolyPolygonShape)   &apos; Page.add must take place before the coordinates are set
+for i = 0 to n-1
+lesPoints(i).X = Xcentre + R*cos(i*2*pi/n - Angle1)
+lesPoints(i).Y = Ycentre - R*Sin(i*2*pi/n - Angle1)
+next
+PolyPolygonShape.PolyPolygon = Array(lesPoints())
+PolyPolygonShape.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+PolyPolygonShape.LineWidth = epaisseur
+PolyPolygonShape.LineColor=RGB(0,0,0)  &apos;noir
+PolyPolygonShape.FillStyle=com.sun.star.drawing.FillStyle.NONE
+
+end sub
+
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un Polygone régulier à l&apos;aide de segment
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+sub polygoneDraw2(Xcentre as double, Ycentre as double,x1 as double, y1 as double, n as integer, optional epaisseur as integer)
+dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant, lesPoints(n-1) As New com.sun.star.awt.Point
+Dim R as double, Angle1 as double, L as double
+
+R = sqr(PuisN(Xcentre - x1,2) + PuisN(Ycentre - y1,2)
+L = R*sin(pi/n)
+Angle1 = pi - Atn((Y1-Ycentre)/L)
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+Doc = oDocTemp
+Page = oPageTemp
+PolyPolygonShape = Doc.createInstance(&quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+Page.add(PolyPolygonShape)   &apos; Page.add must take place before the coordinates are set
+for i = 0 to n-1
+lesPoints(i).X = Xcentre + R*cos(i*2*pi/n - Angle1)
+lesPoints(i).Y = Ycentre - R*Sin(i*2*pi/n - Angle1)
+next
+PolyPolygonShape.PolyPolygon = Array(lesPoints())
+PolyPolygonShape.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+PolyPolygonShape.LineWidth = epaisseur
+PolyPolygonShape.LineColor=RGB(0,0,0)  &apos;noir
+PolyPolygonShape.FillStyle=com.sun.star.drawing.FillStyle.NONE
+
+end sub
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un Polygone à n côtés
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+sub polygoneNcotesDraw(mesabscisses as variant,mesordonnees as variant, optional epaisseur as integer)
+dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant
+Dim R as double, Angle1 as double, L as double, n as double
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+n = Ubound(mesabscisses)+1
+
+Dim lesPoints(n-1) As New com.sun.star.awt.Point
+
+Doc = oDocTemp
+Page = oPageTemp
+PolyPolygonShape = Doc.createInstance(&quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+Page.add(PolyPolygonShape)   &apos; Page.add must take place before the coordinates are set
+for i = 0 to n-1
+lesPoints(i).X = mesabscisses(i)
+lesPoints(i).Y = mesordonnees(i)
+next
+PolyPolygonShape.PolyPolygon = Array(lesPoints())
+PolyPolygonShape.LineWidth = epaisseur
+PolyPolygonShape.LineColor=RGB(0,0,0)  &apos;noir
+PolyPolygonShape.FillStyle=com.sun.star.drawing.FillStyle.NONE
+end sub
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;une ligne brisée
+&apos;--------------------------------------------------------------------------------------------------------------------------
+sub LigneBrisee(mesabscisses as variant,mesordonnees as variant, optional epaisseur as integer)
+dim Doc as object, Page as object, oLigneBrisee as object, PolyPolygon As Variant
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+n = Ubound(mesabscisses)+1
+
+Dim lesPoints(n-1) As New com.sun.star.awt.Point
+
+Doc = oDocTemp
+Page = oPageTemp
+oLigneBrisee = Doc.createInstance(&quot;com.sun.star.drawing.PolyLineShape&quot;)
+Page.add(oLigneBrisee)   &apos; Page.add must take place before the coordinates are set
+
+for i = 0 to n-1
+lesPoints(i).X = mesabscisses(i)
+lesPoints(i).Y = mesordonnees(i)
+next
+oLigneBrisee.PolyPolygon = Array(lesPoints())
+oLigneBrisee.LineWidth = epaisseur
+oLigneBrisee.LineColor=RGB(0,0,0)  &apos;noir
+oLigneBrisee.FillStyle=com.sun.star.drawing.FillStyle.NONE
+end sub
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;polygone de bezier 3 sommets
+&apos;-----------------------------------------------------------------------------------------------------------------------
+sub PolygoneBezier3(mesabscisses as variant,mesordonnees as variant, optional epaisseur as integer)
+Dim Doc as object, Page as object, oLigneBezier as object, PolyPolygon As Variant
+Dim lesPoints(3) As New com.sun.star.awt.Point, lesInflex(3) as Long
+Dim BezCoo As New com.sun.star.drawing.PolyPolygonBezierCoords 
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+Doc = oDocTemp
+Page = oPageTemp
+oLigneBezier = Doc.createInstance(&quot;com.sun.star.drawing.OpenBezierShape&quot;)
+
+lesPoints(0).X = mesabscisses(0)
+lesPoints(0).Y = mesordonnees(0)
+lesInflex(0) = com.sun.star.drawing.PolygonFlags.NORMAL
+
+lesPoints(1).X = mesabscisses(1)
+lesPoints(1).Y = mesordonnees(1) 
+lesInflex(1) = com.sun.star.drawing.PolygonFlags.CONTROL
+lesPoints(2).X = mesabscisses(1)
+lesPoints(2).Y = mesordonnees(1) 
+lesInflex(2) = com.sun.star.drawing.PolygonFlags.CONTROL 
+
+lesPoints(3).X = mesabscisses(2)
+lesPoints(3).Y = mesordonnees(2)
+lesInflex(3) = com.sun.star.drawing.PolygonFlags.NORMAL 
+
+
+BezCoo.Coordinates = Array(lesPoints())
+BezCoo.Flags = Array(lesInflex()) 
+Page.add(oLigneBezier)   
+
+oLigneBezier.PolyPolygonBezier = BezCoo 
+oLigneBezier.LineWidth = epaisseur
+oLigneBezier.LineColor=RGB(0,0,0)  &apos;noir
+end sub
+
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un triangle
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+
+sub TriangleDraw(x1 as double, y1 as double, x2 as double, y2 as double, x3 as double, y3 as double, optional epaisseur as integer)
+dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant, lesPoints(2) As New com.sun.star.awt.Point
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+Doc = oDocTemp
+Page = oPageTemp
+PolyPolygonShape = Doc.createInstance(&quot;com.sun.star.drawing.PolyPolygonShape&quot;)
+Page.add(PolyPolygonShape)   &apos; Page.add must take place before the coordinates are set
+lesPoints(0).X = x1
+lesPoints(0).Y = y1
+lesPoints(1).X = x2
+lesPoints(1).Y = y2
+lesPoints(2).X = x3
+lesPoints(2).Y = y3
+PolyPolygonShape.PolyPolygon = Array(lesPoints())
+PolyPolygonShape.LineWidth = epaisseur
+PolyPolygonShape.LineColor=RGB(0,0,0)  &apos;noir
+PolyPolygonShape.FillStyle=com.sun.star.drawing.FillStyle.NONE
+end sub
+
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un point en forme de croix
+&apos; InclinPoint est en radian
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+
+sub PointDraw(x1 as double, y1 as double, InclinPoint as double, optional epaisseur as integer)
+&apos;dim Doc as object, Page as object, PolyPolygonShape as object, PolyPolygon As Variant, lesPoints(2) As New com.sun.star.awt.Point
+
+if Ismissing(epaisseur) = true then epaisseur = 30
+
+SegmentDraw(x1 - 100, y1 - 100  * sin(InclinPoint), x1 + 100, y1 + 100  * sin(InclinPoint),epaisseur,&quot;plein&quot;)
+SegmentDraw(x1 - 100, y1 + 100  * sin(InclinPoint), x1 + 100, y1 - 100  * sin(InclinPoint),epaisseur,&quot;plein&quot;)
+
+end sub
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un cercle
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+
+sub CercleDraw(Xcentre as double,Ycentre as double,rayon as double, optional epaisseur as Long)
+dim Doc as object, Page as object, monCercle as object, dimensionCercle as New com.sun.star.awt.Size, positionCercle As New com.sun.star.awt.Point
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+Doc = oDocTemp
+Page = oPageTemp
+positionCercle.X = Xcentre - rayon
+positionCercle.Y = Ycentre - rayon
+monCercle = Doc.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+monCercle.FillStyle = com.sun.star.drawing.FillStyle.NONE
+monCercle.CircleKind = com.sun.star.drawing.CircleKind.FULL	
+monCercle.LineWidth = epaisseur
+monCercle.LineColor=RGB(0,0,0)  &apos;noir
+ 	
+dimensionCercle.Width = 2*rayon
+dimensionCercle.Height =2*rayon
+
+monCercle.Size = dimensionCercle
+monCercle.Position = positionCercle
+
+Page.add(monCercle) 
+
+end sub
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un morceau de disque
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+
+sub PortionDisqueDraw(Xcentre as double,Ycentre as double,rayon as double,AngleDebut as Long, AngleFin as Long, optional epaisseur as Long)
+dim Doc as object, Page as object, maPortion as object, dimensionPortion as New com.sun.star.awt.Size, positionPortion As New com.sun.star.awt.Point
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+Doc = oDocTemp
+Page = oPageTemp
+positionPortion.X = Xcentre - rayon
+positionPortion.Y = Ycentre - rayon
+maPortion = Doc.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+maPortion.FillStyle = com.sun.star.drawing.FillStyle.NONE
+maPortion.CircleKind = com.sun.star.drawing.CircleKind.SECTION
+maPortion.CircleStartAngle = AngleDebut
+maPortion.CircleEndAngle = AngleFin
+maPortion.LineWidth = epaisseur
+maPortion.LineColor=RGB(0,0,0)  &apos;noir
+ 	
+dimensionPortion.Width = 2*rayon
+dimensionPortion.Height =2*rayon
+maPortion.Size = dimensionPortion
+
+maPortion.Position = positionPortion
+
+Page.add(maPortion) 
+
+end sub
+
+
+
+&apos;-----------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un arc d&apos;ellipse
+&apos;-----------------------------------------------------------------------------------------------------------------------
+&apos;macro pour faire un arc d&apos;ellipse
+&apos;PosX et PosY sont les coordonnées du coin supérieur gauche du rectangle
+&apos;DimLarg est la largeur de l&apos;ellipse entière
+&apos;DimHaut est la hauteur de l&apos;ellipse entière
+&apos;StyleTrait = &quot;plein&quot; ou &quot;pointillé
+&apos;AngleDebut et AngleFin les angles par rapport à l&apos;horizontal
+&apos; les angles sont ceux des arcs de cercles et non arcs d&apos;elllipse
+
+sub ArcEllipseDraw(PosX As Double, PosY As Double, DimLarg As Double, DimHaut As Double, StyleTrait As String, AngleDebut As Double, AngleFin As Double)
+Dim ahArc As object, ahDoc As Object, Page as object
+Dim DimRect As New com.sun.star.awt.Size
+Dim positionDemiEllipse As New com.sun.star.awt.Point
+
+ahDoc = oDocTemp
+Page = oPageTemp
+
+DefTirets
+
+
+ahArc = ahDoc.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
+ahArc.CircleKind = com.sun.star.drawing.CircleKind.ARC
+ahArc.CircleStartAngle = AngleDebut*100
+ahArc.CircleEndAngle = AngleFin*100
+ahArc.LineWidth = 30
+DimRect.Width = DimLarg &apos; 26 mm de large
+DimRect.Height = DimHaut &apos; 12 mm de haut
+ahArc.Size = DimRect
+
+positionDemiEllipse.x = PosX
+positionDemiEllipse.y = PosY
+
+if StyleTrait = &quot;pointillé&quot; then
+  ahArc.LineDash = oTiret3D
+  ahArc.LineStyle = com.sun.star.drawing.LineStyle.DASH
+end if
+if StyleTrait = &quot;plein&quot; then
+  ahArc.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+end if  
+ahArc.LineColor=RGB(0,0,0)  &apos;noir
+ahArc.Position = positionDemiEllipse
+
+Page.add(ahArc)
+end sub
+
+
+
+
+&apos;------------------------------------------------------------------------------------------------------------------------
+&apos;construction d&apos;un segment
+&apos;--------------------------------------------------------------------------------------------------------------------------
+
+sub SegmentDraw(x1 as double, y1 as double, x2 as double, y2 as double, optional epaisseur as integer,StyleTrait as string)
+dim Doc as object, Page as object, SegmentShape as object, PolyPolygon As Variant, lesPoints(1) As New com.sun.star.awt.Point
+
+if Ismissing(epaisseur) = true then
+   epaisseur = 30
+end if
+
+DefTirets
+
+Doc = oDocTemp
+Page = oPageTemp
+SegmentShape = Doc.createInstance(&quot;com.sun.star.drawing.LineShape&quot;)
+SegmentShape.LineWidth = epaisseur
+Page.add(SegmentShape)   &apos; Page.add must take place before the coordinates are set
+lesPoints(0).X = x1
+lesPoints(0).Y = y1
+lesPoints(1).X = x2
+lesPoints(1).Y = y2
+SegmentShape.PolyPolygon = Array(lesPoints())
+SegmentShape.lineColor=RGB(0,0,0) &apos;noir
+
+if StyleTrait = &quot;pointillé&quot; or StyleTrait = 0 then
+  SegmentShape.LineStyle = com.sun.star.drawing.LineStyle.DASH
+  SegmentShape.LineDash = oTiret3D
+end if
+if StyleTrait = &quot;plein&quot; or StyleTrait = 1 then
+  SegmentShape.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+end if  
+Page.add(SegmentShape)
+end sub
+
+
+
+function LgSgtDraw(oSegment as object) as double   rem : en cm
+Dim a as double, b as double, c as double, d as double
+   a = oSegment.Polygon(0).X    &apos; abscisse point A
+   b = oSegment.Polygon(0).Y    &apos; ordonnée point A
+   c = oSegment.Polygon(1).X    &apos; abscisse point B
+   d = oSegment.Polygon(1).Y    &apos; ordonnée point B 
+   LgSgtDraw = CInt(sqr((a - c)*(a - c) + (b - d) * (b - d))/10)/100
+end function
+
+
+function MilSgtDraw(oSegment as object) as variant
+Dim milX as double, milY as double
+milX = (oSegment.Polygon(0).X +  oSegment.Polygon(1).X)/2
+milY = (oSegment.Polygon(0).Y +  oSegment.Polygon(1).Y)/2
+MilSgtDraw = Array(milX, milY)
+end function
+
+
+function CoordSgtDraw(oSegment as object) as variant
+Dim a as double, b as double, c as double, d as double
+   a = oSegment.Polygon(0).X    &apos; abscisse point A
+   b = oSegment.Polygon(0).Y    &apos; ordonnée point A
+   c = oSegment.Polygon(1).X    &apos; abscisse point B
+   d = oSegment.Polygon(1).Y    &apos; ordonnée point B
+CoordSgtDraw = Array(a,b,c,d)
+end function
+
+
+function CoordVectDraw(oSegment as object) as variant
+Dim e as double, f as double, mesCoord(3)  as variant
+
+   mesCoord = CoordSgtDraw(oSegment)
+   e = mesCoord(2) - mesCoord(0)
+   f = mesCoord(3) - mesCoord(1)
+CoordVectDraw = Array(e,f)
+end function
+
+function CoordVect2Draw(aX as double, aY as double,bX as double, bY as double ) as variant
+Dim e as double, f as double
+   e = bX - aX
+   f = bY - aY
+CoordVect2Draw = Array(e,f)
+end function
+
+
+
+</script:module>

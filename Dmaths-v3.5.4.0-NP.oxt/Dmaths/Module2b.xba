@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module2b" script:language="StarBasic">REM  *****  BASIC  *****
+
+Public Form,Form1,Form2 as Boolean
+Public oBoite as Object
+Public oBoiteFormuleGraphique as Object
+Public oTextIndex as Object
+
+
+rem --------------------------------------------------------------------------------------------------
+rem macros pour l&apos;écriture du binôme  by gfriege (GF) fevrier 2006, move to new Module2b and revised: september 2008
+
+Sub BinomGraphique rem DDP corrigee le 15 novembre 2009 	
+	Form1=True
+	If Form=True Then oBoiteFormuleGraphique.Visible = False
+	oBoite = LoadDialog(&quot;Dmaths&quot;,&quot;Binom&quot;)
+	Set oTextIndex = oBoite.getControl(&quot;TextField1&quot;).Peer
+	oBoite.execute()
+	rem ajouté le 9 fevrier 2014
+	If Form=True Then oBoiteFormuleGraphique.Visible=true 
+End Sub
+
+Sub InsereBinom		
+Dim Test,Operator as string
+Dim reduce as Boolean
+
+&apos;	IsFormuleItalic = bItalic
+
+	If oBoite.Model.CheckBox1.State = 1 Then reduce = True Else reduce = False
+
+	If oBoite.Model.OptionButton5.State = 1 Then 
+		Operator = &quot; &quot;	
+		ElseIf oBoite.Model.OptionButton6.State = 1 Then 
+			Operator = &quot; cdot &quot;
+			ElseIf oBoite.Model.OptionButton7.State = 1 Then Operator = &quot; times &quot;
+	End If
+	
+&apos; if empty, write letters n,k,p
+	n_text = &quot;n&quot;
+	p_text = &quot;p&quot;
+	k_text = &quot;k&quot;
+&apos; ... else ...
+	If oBoite.getControl(&quot;TextField1&quot;).Peer.Text&lt;&gt;&quot;&quot; Then n_text = oBoite.getControl(&quot;TextField1&quot;).Peer.Text
+	If oBoite.getControl(&quot;TextField2&quot;).Peer.Text&lt;&gt;&quot;&quot; Then p_text = oBoite.getControl(&quot;TextField2&quot;).Peer.Text
+	If oBoite.getControl(&quot;TextField3&quot;).Peer.Text&lt;&gt;&quot;&quot; Then k_text = oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+&apos; build left hand side	
+	If oBoite.Model.OptionButton2.State=1 Then 
+		Test=Test+&quot;P(X=&quot;+k_text+&quot;)=&quot;
+	ElseIf oBoite.Model.OptionButton3.State=1 Then 
+		Test=Test+&quot;b(&quot;+n_text+&quot;;&quot;+p_text+&quot;;&quot;+k_text+&quot;)=&quot;
+	EndIf
+
+&apos; build right hand side	
+	nk_text=nk_string(n_text,k_text,reduce)
+	q_text=q_string(p_text,reduce)
+	Test=Test+&quot;left( matrix{ &quot;+n_text+&quot;##&quot;+k_text+&quot; } right)&quot;+ Operator +&quot;{&quot;+p_text+&quot;^&quot;+k_text+&quot;}&quot;+ Operator +&quot;{&quot; + q_text+&quot;^{&quot;+nk_text+&quot;}}&quot;	
+	
+	If Form=True Then
+		oText1 = oBoiteFormuleGraphique.getControl(&quot;TextField1&quot;).Peer.Text
+		oBoiteFormuleGraphique.Model.TextField1.Text = Left(oText1,aSel0.MIN) +&quot; &quot; + Test + &quot; &quot; + Right(oText1,Len(oText1)-aSel0.MIN)
+		oBoiteFormuleGraphique.Visible = True
+	Elseif Form2 = True Then
+		sAjout = Test
+	Else
+		Test = Dixio(Test)
+		bVecteur = True
+		InsertSourceIntegrale(Test)
+		bEcritduTexteSelectionne = False
+	Endif
+	Form1 = False
+	oBoite.Endexecute()
+	If Form = True Then 
+		oTextIndex = oBoiteFormuleGraphique.getControl(&quot;TextField1&quot;).Peer
+		CursorPos = CursorPos + Len(Test)
+	End If
+End Sub
+
+Sub binom_hide_LHS
+		oBoite.Model.Label4.enabled=False
+		oBoite.Model.Label5.enabled=False
+		oBoite.Model.Label6.enabled=False
+		oBoite.Model.Label17.enabled=False
+		oBoite.Model.Label18.enabled=False
+End Sub
+
+Sub binom_show_P
+		oBoite.Model.Label4.Label=&quot;P&quot;
+		oBoite.Model.Label4.enabled=True
+		oBoite.Model.Label5.Label=&quot;X = &quot;	
+		oBoite.Model.Label5.enabled=True
+		oBoite.Model.Label6.enabled=True
+		oBoite.Model.Label17.enabled=True
+		oBoite.Model.Label18.enabled=True
+End Sub
+
+Sub binom_show_b
+		oBoite.Model.Label4.Label=&quot;b&quot;
+		oBoite.Model.Label4.enabled=True
+		oBoite.Model.Label5.Label = oBoite.getControl(&quot;TextField1&quot;).Peer.Text + &quot;;&quot; + oBoite.getControl(&quot;TextField2&quot;).Peer.Text + &quot;;&quot;
+		oBoite.Model.Label5.enabled=True
+		oBoite.Model.Label6.enabled=True
+		oBoite.Model.Label17.enabled=True
+		oBoite.Model.Label18.enabled=True
+End Sub
+
+
+Sub binom_n_changed
+		If oBoite.Model.OptionButton3.State=1 Then 
+			oBoite.Model.Label5.Label = oBoite.getControl(&quot;TextField1&quot;).Peer.Text + &quot;;&quot;+ oBoite.getControl(&quot;TextField2&quot;).Peer.Text + &quot;;&quot;
+		EndIf	
+		oBoite.Model.Label9.Label = oBoite.getControl(&quot;TextField1&quot;).Peer.Text
+		If oBoite.Model.CheckBox1.State=1 Then &apos;reduced
+			&apos;rechne
+			oBoite.Model.Label24.Label = oBoite.getControl(&quot;TextField1&quot;).Peer.Text + &quot;-&quot; + oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+		Else
+			oBoite.Model.Label24.Label = oBoite.getControl(&quot;TextField1&quot;).Peer.Text + &quot;-&quot; + oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+		EndIf
+End Sub
+
+Sub binom_k_changed
+		oBoite.Model.Label10.Label = oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+		oBoite.Model.Label13.Label = oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+		oBoite.Model.Label17.Label = oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+		oBoite.Model.Label24.Label = oBoite.getControl(&quot;TextField1&quot;).Peer.Text + &quot;-&quot; + oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+End Sub
+
+Sub binom_p_changed
+		If oBoite.Model.OptionButton3.State=1 Then 
+			oBoite.Model.Label5.Label = oBoite.getControl(&quot;TextField1&quot;).Peer.Text +&quot;;&quot; + oBoite.getControl(&quot;TextField2&quot;).Peer.Text + &quot;;&quot;
+		EndIf	
+		oBoite.Model.Label11.Label = oBoite.getControl(&quot;TextField2&quot;).Peer.Text
+		oBoite.Model.Label12.Label=&quot;(1-&quot; + oBoite.getControl(&quot;TextField2&quot;).Peer.Text + &quot;)&quot;
+End Sub
+
+
+Sub binom_Op(event)
+	BinOp = event.source.model.name
+	Set oBO=oBoite.Model.getByName(BinOp)
+	oBoite.Model.Label15.Label = oBO.Label
+	oBoite.Model.Label16.Label = oBO.Label
+End Sub
+
+
+Sub binom_reduced
+	n_text = oBoite.getControl(&quot;TextField1&quot;).Peer.Text
+	p_text = oBoite.getControl(&quot;TextField2&quot;).Peer.Text
+	k_text = oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+	If oBoite.Model.CheckBox1.State=1 Then
+		oBoite.Model.Label12.Label = q_string(p_text,True)
+		oBoite.Model.Label24.Label = nk_string(n_text,k_text,True)
+	Else	
+		oBoite.Model.Label12.Label = q_string(p_text,False)
+		oBoite.Model.Label24.Label = nk_string(n_text,k_text,False)
+	EndIf	
+End Sub
+
+Function q_string(p_string As String, red As Boolean) As String
+	q_string=&quot;(1-&quot;+p_string+&quot;)&quot;
+	If (val(p_string)&lt;&gt;0) Then
+		iPos = Instr(p_string,&quot;,&quot;) &apos;for the calculation, decimal dot is needed
+		If iPos&lt;&gt;0 Then 
+			Mid(p_string,iPos,1,&quot;.&quot;)
+		End If	
+		p_val=val(p_string) 
+		q_val=1-p_val
+		If red Then q_string=format(q_val)
+	End If	 
+End Function
+
+Function nk_string(n_string As String, k_string As String, red As Boolean) As String
+	nk_string=n_string+&quot;-&quot;+k_string
+	If (val(n_string)&lt;&gt;0) Then n_val=val(n_string)
+	If (val(k_string)&lt;&gt;0) Then k_val=val(k_string)
+	If (val(n_string)&lt;&gt;0) and (val(k_string)&lt;&gt;0) then 
+		nk_val=val(n_string)-val(k_string)
+		If red Then nk_string=str(nk_val)
+	End If	
+End Function
+rem fin macros pour l&apos;écriture du binôme
+
+
+
+rem --------------------------------------------------------------------------------------------------
+rem macros pour l&apos;écriture des isotopes  by gfriege (GF) june/september 2008
+
+Sub IsotopeGraphique
+	Form1=True
+	If Form=True Then oBoiteFormuleGraphique.Visible = False
+	oBoite = LoadDialog(&quot;Dmaths&quot;,&quot;Isotope&quot;)
+	Set oTextIndex = oBoite.getControl(&quot;TextField1&quot;).Peer
+	oBoite.execute()
+	rem ajouté le 9 fevrier 2014
+	If Form=True Then oBoiteFormuleGraphique.Visible=true 
+End Sub
+
+Sub InsereIsotope rem 
+	Dim Test as string
+	Dim oText1 as string
+	
+	If oBoite.Model.OptionButton5.State=1 Then 
+		Operator=&quot; &quot;	
+		ElseIf oBoite.Model.OptionButton6.State=1 Then 
+			Operator=&quot; cdot &quot;
+			ElseIf oBoite.Model.OptionButton7.State=1 Then Operator=&quot; times &quot;
+	End If
+	
+	 	Test=&quot;{} sup {&quot; + oBoite.getControl(&quot;TextField1&quot;).Peer.Text + &quot;} sub {&quot; + oBoite.getControl(&quot;TextField2&quot;).Peer.Text + &quot;} &quot; + oBoite.getControl(&quot;TextField3&quot;).Peer.Text
+	
+		If oBoite.getControl(&quot;TfFact&quot;).Peer.Text &lt;&gt; &quot;&quot; Then	
+			Test = oBoite.getControl(&quot;TfFact&quot;).Peer.Text + Operator + Test
+		End If
+	
+		If oBoite.getControl(&quot;TfExp&quot;).Peer.Text &lt;&gt; &quot;&quot; Then	
+			Test = Test + &quot;{} sup { &quot; + oBoite.getControl(&quot;TfExp&quot;).Peer.Text + &quot; }&quot;
+		End If
+	
+		If oBoite.getControl(&quot;TextField4&quot;).Peer.Text &lt;&gt; &quot;&quot; Then	
+			Test = Test + oBoite.getControl(&quot;TextField4&quot;).Peer.Text
+		End If
+	
+		If Form=True Then
+			oText1=oBoiteFormuleGraphique.getControl(&quot;TextField1&quot;).Peer.Text
+			oBoiteFormuleGraphique.Model.TextField1.Text = Left(oText1,aSel0.MIN)+&quot; &quot;+Test+&quot; &quot;+Right(oText1,Len(oText1)-aSel0.MIN)
+			oBoiteFormuleGraphique.Getcontrol(&quot;TextField1&quot;).SetFocus
+			oBoiteFormuleGraphique.Visible = True
+		Elseif Form2 = True Then
+			sAjout = Test
+		Else
+			Test = Dixio(Test)
+			InsertSourceIntegrale(Test)
+			bEcritduTexteSelectionne = False
+		Endif
+		Form1 = False
+		oBoite.Endexecute()
+		If Form = True Then 
+			oTextIndex = oBoiteFormuleGraphique.getControl(&quot;TextField1&quot;).Peer
+			CursorPos = CursorPos + Len(Test)
+		End If
+End Sub
+
+
+Sub IsotopeFact(event)
+	IsoF = event.source.model.name
+	Set oIF=oBoite.Model.getByName(IsoF)
+	oBoite.Model.LbOp.Label=oIF.Tag
+End Sub
+
+ 	
+Sub IsotopeExp(event)
+	IsoE = event.source.model.name
+	Set oIE=oBoite.Model.getByName(IsoE)
+	oBoite.Model.TfExp.Text=oIE.Tag
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+</script:module>

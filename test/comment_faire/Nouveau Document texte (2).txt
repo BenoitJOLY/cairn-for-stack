@@ -1,0 +1,502 @@
+# DOCUMENT DE SPÉCIFICATION TECHNIQUE UNIQUE
+**Objet :** Développement et maintenance des questions STACK (JSXGraph, Parsons, Numération, Inéquations, Unités, QCM, Algèbre, Texte).
+**Statut :** Norme de conformité obligatoire.
+**Contexte :** Ce document fixe les règles techniques pour éviter les régressions et les bugs critiques identifiés lors du développement sur Moodle (STACK version 2024+). Il doit être fourni en préambule de toute demande de modification ou de création.
+
+---
+
+## PÔLE 1 : Architecture Générale et Intégrité XML
+
+### 1.1. Structure des couches et Isolation
+Le système repose sur trois couches indépendantes : `<questionvariables>` (Maxima), `<input>` / `<prt>` (Notation), `<questiontext>` (Vue).
+*   **CONTEXTE MAINTENANCE (JSXGraph/Oscilloscope) :** Le code généré **NE DOIT PAS** inclure les balises `<input>`, `<prt>`, ou `<questionvariables>`. Seul le contenu de la balise `<questiontext>` est modifié.
+*   **CONTEXTE CRÉATION / REFONTE :** Le code généré doit être un XML complet et valide.
+    *   **INTERDIT :** Utiliser la syntaxe "inline" `{@variable@}` pour créer une zone de saisie.
+    *   **OBLIGATOIRE :** Utiliser impérativement `[[input:nom]]` et `[[validation:nom]]`.
+
+### 1.2. Hiérarchie des balises
+*   **OBLIGATOIRE :** Les balises `<input>` et `<prt>` doivent être des enfants **directs** de `<question>` (jamais de balises englobantes `<inputs>` ou `<prts>`).
+*   **OBLIGATOIRE :** Présence de la balise `<stackversion>` avec la version cible.
+*   **ALERT FATAL (Versionnage) :** La balise `<stackversion>` ne doit **JAMAIS** être vide. L'absence de version cible (ex: `<text></text>`) peut provoquer des comportements indéfinis lors des mises à jour de Moodle. Exigez systématiquement la version exacte définie par l'instance cible (ex: `<text>2024092500</text>`).
+*   **INTERDIT :** Utiliser des balises d'ancienne génération (`<responseprocessors>`, `<ansTestOptions>` vide).
+
+### 1.3. Règle Universelle d'Encapsulation CDATA
+*   **OBLIGATOIRE :** Tous les blocs de code (Maxima, HTML, JS) contenus dans des balises `<text>` **DOIVENT** être encapsulés dans `<![CDATA[ ... ]]>`. 
+*   **ALERT FATAL (Opérateurs de comparaison) :** Si le code Maxima contient des symboles `<`, `>`, `<=`, `>=` ou `&`, l'absence de CDATA provoque une erreur fatale `XML_ERR_NAME_REQUIRED` car le parseur XML les confond avec des balises.
+*   **ALERT FATAL (Anti-corruption de PRT) :** Dans la balise `<specificfeedback>`, il faut **OBLIGATOIREMENT** un espace avant la fermeture du CDATA. La séquence exacte `]]>` à l'intérieur du texte corrompt silencieusement l'import et supprime les PRTs.
+    *   *Non-conformité :* `<![CDATA[[[feedback:prt1]]]>`
+    *   *Conformité :* `<![CDATA[[[feedback:prt1]] ]]>`
+*   **OBLIGATOIRE :** Utiliser des balises HTML strictement conformes (ex: `<br />` avec un espace ou auto-fermantes) même à l'intérieur des blocs CDATA.
+
+---
+
+## PÔLE 2 : Syntaxe Maxima et Calculs (Moteur CAS)
+
+### 2.1. Contraintes de modélisation (Anti-Timeout & Anti-Fonctions Obscures)
+*   **INTERDIT :** Utiliser des fonctions Maxima de conversion de base non garanties dans le cœur de STACK (ex: `integer_to_binary`). Le CAS tente de les résoudre symboliquement et provoque un timeout.
+*   **INTERDIT (Fonctions d'affichage CAS) :** Utiliser des fonctions Maxima non standards ou obsolètes destinées à manipuler l'affichage (ex: `nonsimplification`, `dispform` complexe) pour forcer le rendu visuel d'une expression. Si la fonction n'est pas explicitement supportée par l'API STACK, le CAS lèvera une erreur fatale.
+*   **OBLIGATOIRE :** Toute conversion de base doit être réalisée par un algorithme natif explicite n'utilisant que les opérateurs de base (`mod`, `floor`, `concat`).
+*   **ALERT LOGS (Terminaison d'instruction) :** Dans les `<questionvariables>`, chaque instruction **DOIT** impérativement se terminer par un dollar `$` et **JAMAIS** par un point-virgule `;`. Le point-virgule force le CAS à écrire le résultat de l'évaluation dans les logs de débogage de Moodle. Sur des questions à forte volumétrie, cela provoque une inflation dramatique des logs et ralentit le système.
+
+### 2.2. Séparation Affichage (HTML) vs Calcul (Mathématiques)
+*   **INTERDIT (Habillage mathématique) :** Essayer de forcer l'affichage visuel (parenthèses, mise en forme) directement dans les `<questionvariables>`. Ne JAMAIS utiliser l'apostrophe `'` pour "figer" l'affichage (ex: `za_disp: '(3+%i);`), car Maxima crashe. Ne JAMAIS utiliser `texput` sur une expression composée.
+*   **OBLIGATOIRE (Objets purs) :** Déclarer des objets mathématiques purs dans les variables (ex: `za: 3+%i;`).
+*   **OBLIGATOIRE (Affichage HTML classique) :** Gérer l'affichage visuel uniquement dans le `<questiontext>` en utilisant du HTML/LaTeX autour de la variable (ex: `\( z_A = ({@za@}) \)`).
+*   **OBLIGATOIRE (Ré-encapsulation MathJax des Strings) :** Les variables de type string issues du pattern de découplage parallèle ne contenant que du code LaTeX brut (ex: `x^2`). Si ces variables sont injectées à l'intérieur de balises HTML standards (comme `<th>`, `<td>`, ou `<span>`), il est **OBLIGATOIRE** de les envelopper dans les délimiteurs MathJax `\( \)` directement dans le code HTML (ex: `<th>\({@var@}\)</th>`).
+*   **EXCEPTION (Squelette HTML structurel) :** Il est autorisé de générer des structures HTML complexes (comme des lignes de tableau `<tr>`) dans les variables via `sconcat()`, mais cela ne doit pas servir à contourner les règles d'affichage mathématique ci-dessus.
+*   **OBLIGATOIRE (Affichage conditionnel des signes) :** Lors de la génération de chaînes représentant des équations algébriques (ex: `2x - 3y = 5`), il est **INTERDIT** de laisser le CAS concaténer naïvement un opérateur `+` avec un coefficient négatif (ce qui donnerait `2x + -3y = 5`). Il est **OBLIGATOIRE** d'utiliser un `if` Maxima dans un `sconcat` pour remplacer dynamiquement `+ -` par `- `.
+*   **⚠️ ALERTE ARCHITECTURE AVANCÉE (Pattern de Découplage Parallèle) :** Lorsque le rendu LaTeX par défaut de STACK (via `{@var@}`) est inadapté (ex: symboles logiques mal rendus comme `Rightarrow` au lieu de `\to`, ou nécessité de formatages spécifiques complexes), il est **OBLIGATOIRE** d'utiliser un pattern de tableaux parallèles strictement indexés :
+    *   **OBLIGATOIRE (Tableau d'affichage) :** Créer un tableau de chaînes de caractères (strings) contenant le LaTeX brut souhaité (ex: `disp_pair : ["P \\to Q", "\\neg P \\lor Q"]`).
+    *   **OBLIGATOIRE (Tableau d'évaluation) :** Créer un tableau parallèle contenant les objets Maxima purs pour le moteur CAS (ex: `eval_pair : [P implies Q, not(P) or Q]`).
+    *   **OBLIGATOIRE (Sélection synchrone) :** Le tirage aléatoire ou la logique de sélection ne doit générer qu'un seul index (`idx`), appliqué simultanément aux deux tableaux.
+    *   **OBLIGATOIRE (Syntaxe de déréférencement Vue) :** Dans le `<questiontext>`, l'accès à l'élément tiré aléatoirement d'un tableau parallèle doit utiliser strictement la syntaxe `{@nom_tableau[index]@}`.
+    *   **OBLIGATOIRE (Cast Booléen vers Entier pour HTML) :** Si une boucle génère du HTML (via `sconcat`) destiné à afficher les résultats d'une table de vérité, les booléens Maxima (`true`/`false`) ne doivent **JAMAIS** être concaténés directement. Il est **OBLIGATOIRE** de les convertir en entiers via `if var_bool then 1 else 0` avant la concaténation pour éviter l'affichage textuel "true"/"false".
+    *   **INTERDIT :** Tenter de transformer une expression Maxima en chaîne LaTeX personnalisée à la volée dans les variables pour contourner ce pattern.
+*   **⚠️ ALERTE ÉCHAPPEMENT (Chaînes LaTeX dans Maxima) :** Dans le pattern de découplage parallèle, les variables de type string destinées à afficher du LaTeX doivent obligatoirement échapper les antislashs avec un double antislash `\\` à l'intérieur du code Maxima (ex: `"\\neg"` pour que Moodle reçoive `\neg`). L'oubli de ce double échappement corrompt l'affichage MathJax (ex: affichage plan texte `neg P` au lieu de `¬P`).
+
+### 2.3. Pattern de Génération Constructive (Anti-Cas Impossibles)
+*   **INTERDIT :** Tirer aléatoirement des coefficients d'une équation complexe (ex: polynôme de degré 2) en espérant que ses racines seront entières, rationnelles, ou même réelles. Cela génère des irrégularités ou nécessite des logiques de sauvegarde (`assume`) fragiles.
+*   **OBLIGATOIRE (Construction inversée) :** Pour toute question nécessitant des racines ou des points d'intersection connus, il est **OBLIGATOIRE** de tirer d'abord les racines aléatoires, puis de construire l'expression mathématique *autour* de ces racines (ex: `expr: k*(x-racine1)*(x-racine2)`). Le CAS ne "devine" jamais, il "subit" la construction.
+*   **OBLIGATOIRE (Construction par Inversion) :** Pour les exercices où l'élève doit trouver une approximation numérique d'une solution (ex: TVI, dichotomie), il est **INTERDIT** de tirer aléatoirement les paramètres de l'équation si cela génère une solution irrationnelle imprévisible. Il est **OBLIGATOIRE** de tirer la solution cible $\alpha$ sous forme de nombre décimal propre (ex: `alpha: 1 + rand([...])/10$`), puis de calculer les constantes de l'équation à l'envers pour forcer $f(\alpha) = 0$.
+
+### 2.4. Utilisation des Ensembles Maxima (`{}`) pour les Tuples Non Ordonnés
+*   **OBLIGATOIRE :** Lorsqu'une réponse attendue est une collection d'éléments indépendants dont l'ordre d'écriture n'a pas d'importance (ex: abscisses d'intersection `{1, 2}` ou `{2, 1}`), il est **OBLIGATOIRE** d'utiliser la notation d'ensemble Maxima `{}` (et non la liste `[]`) pour la variable professeur (`ta_ab: {a, b}$`) et d'indiquer le `syntaxhint` associé (`{a, b}`).
+*   **AVANTAGE :** Le test `AlgEquiv` valide nativement l'équivalence des ensembles sans se soucier de l'ordre, éliminant le besoin de créer des nœuds de PRT testant les permutations.
+*   **OBLIGATOIRE (Porte "OU" multi-réponses) :** Lorsqu'une consigne autorise plusieurs réponses distinctes et qu'il suffit d'en donner une seule (ex: "Donner l'équation de *l'une* des deux tangentes"), il est **OBLIGATOIRE** de mettre toutes les réponses acceptables dans un ensemble `ta: {rep1, rep2}$`. Le test `AlgEquiv` validera l'entrée de l'élève si elle correspond à *n'importe quel* élément de l'ensemble, supprimant le besoin de PRTs alternatifs ou de tests logiques complexes.
+
+### 2.5. Forçage de Propriété par Restreint Aléatoire
+*   **OBLIGATOIRE :** Lorsqu'une question porte sur une propriété fixe (ex: "Montrer que la fonction est convexe", "Résoudre une équation admettant 2 solutions"), il est **INTERDIT** de laisser le hasard mathématique générer un contre-exemple (ex: un coefficient $k$ négatif rendrait la fonction concave).
+*   **OBLIGATOIRE (Restreint) :** Le tirage aléatoire doit être restreint à un ensemble garantissant la propriété attendue (ex: `k: rand([1,2,3])$` pour garantir $k > 0$). Cela permet de garder les bonnes réponses et les feedbacks statiques, évitant ainsi des structures `if/else` coûteuses et fragiles dans les `<tans>`.
+
+### 2.6. Garantir la Distinction Aléatoire (Boucle `while`)
+*   **OBLIGATOIRE :** Lorsqu'un exercice nécessite de tirer plusieurs éléments qui **doivent être impérativement différents** (ex: deux racines distinctes $a \neq b$, deux points distincts), il est **OBLIGATOIRE** d'utiliser une boucle `while` pour contraindre le deuxième tirage.
+*   **Syntaxe :** `a: rand([...])$ b: rand([...])$ while a = b do b: rand([...])$`
+*   **ALERT TIMEOUT :** Le pool de tirage doit rester suffisamment grand (ex: 6 éléments minimum pour tirer 2 éléments distincts) pour éviter que la boucle `while` n'itère pas des milliers de fois, ce qui provoquerait un timeout du CAS.
+
+### 2.7. Forçage de la simplification pour l'Affichage (`ev(expr, simp)`)
+*   **OBLIGATOIRE (Séparation Évaluation/Affichage) :** Lorsqu'une expression mathématique possède une forme simplifiée canonique (ex: factorisée, réduite) mais que le `tans` doit rester permissif (pour accepter une forme développée non réduite via `AlgEquiv`), il est **OBLIGATOIRE** de créer deux variables :
+    *   `ta_eval: diff(f, x)$` (Utilisée **uniquement** dans le `<tans>` du PRT).
+    *   `ta_disp: ev(ta_eval, simp)$` (Utilisée **uniquement** dans le `<generalfeedback>` ou le texte de la question).
+*   **INTERDIT :** Utiliser `ev(..., simp)` ou `ratsimp()` sur la variable d'évaluation si l'élève est susceptible de taper une forme algébriquement équivalente mais non simplifiée (cela causerait un rejet injuste de `AlgEquiv`).
+*   **OBLIGATOIRE (Hygiène du code) :** Toute variable de pré-calcul (ex: `err_...`, variable intermédiaire) définie dans les `<questionvariables>` **DOIT** être impérativement utilisée dans un PRT ou dans l'affichage. L'existence de "variables mortes" (non appelées) est formellement **INTERDITE** car elle alourdit inutilement l'évaluation du CAS et nuit à la maintenabilité.
+*   **OBLIGATOIRE (Pattern "Squelette de Calcul") :** Pour les calculs algorithmiques à étapes multiples (ex: règle de Sarrus, dérivées logarithmiques, intégrales par parties), il est **OBLIGATOIRE** de pré-calculer chaque sous-étape intermédiaire dans une variable dédiée (ex: `p1: a11*a22*a33$`, `S1: p1+p2+p3$`). Ces variables doivent servir de double objectif : 
+    1. Construire la variable finale (`det_correct: S1 - S2$`).
+    2. Être injectées individuellement dans le `<generalfeedback>` via `{@p1@}` pour afficher une correction détaillée étape par étape, sans jamais demander au CAS de reconstituer la démarche a posteriori.
+
+### 2.8. Génération de Décimales et Formatage Statistique
+*   **OBLIGATOIRE (Logique du diviseur) :** Pour générer aléatoirement des nombres avec $n$ décimales exactes, il est **OBLIGATOIRE** d'utiliser la logique du diviseur : `rand(10^n) / 10^n` (ex: `rand(10)/10` retourne des nombres entre 0.0 et 10.0 pour 1 décimale ; `rand(100)/100` pour 2 décimales).
+*   **OBLIGATOIRE (Formatage typographique) :** L'affichage d'une liste Maxima `[v1, v2, v3]` utilise des virgules, ce qui est incorrect en typographie française pour les séries statistiques. Il est **OBLIGATOIRE** d'utiliser la fonction `simplode(liste, " ; ")` pour générer une chaîne de caractères séparée par des points-virgules, injectée dans le `<questiontext>`.
+
+### 2.9. Redéfinition Locale de Fonctions (Anti-dépendance Externe)
+*   **CONTEXTE :** Certaines fonctions Maxima utiles en statistiques, en algèbre linéaire ou en analyse textuelle (ex: `mean`, `var`, `std`, `cov`) ne sont pas toujours disponibles par défaut dans le core de STACK sans charger des bibliothèques externes via `load()`.
+*   **INTERDIT :** Utiliser `load("fichier.mac")` dans les `<questionvariables>` si la fonction peut être réécrite en quelques lignes de code simple. Le chargement de fichiers externes ralentit le CAS et peut provoquer des conflits de versions ou des erreurs silencieuses selon les configurations des serveurs.
+*   **OBLIGATOIRE (Redéfinition) :** Il est **OBLIGATOIRE** de redéfinir localement les fonctions nécessaires en utilisant l'opérateur de définition locale `:=` (ex: `mean(L) := apply("+", L) / length(L)$`). Cela garantit un fonctionnement à 100% autonome, reproductible et sûr.
+*   **OBLIGATOIRE (Redéfinition du tirage aléatoire inclusif) :** La fonction native `rand(n)` de Maxima génère un entier dans l'intervalle `[0, n-1]`. Pour générer un entier aléatoire dans un intervalle inclusif personnalisé `[a, b]`, il est **OBLIGATOIRE** de redéfinir localement une fonction utilitaire (ex: `ri(a,b) := a + rand(b - a + 1)$`) plutôt que d'utiliser des syntaxes complexes. Cela garantit un code lisible, autonome, et à l'abri des erreurs d'indexation (off-by-one).
+*   **OBLIGATOIRE (Fonction Anti-Zéro) :** Lorsqu'un tirage aléatoire nécessite impérativement des coefficients non nuls (ex: pour éviter des équations triviales comme `0x + 2y = 4`), il est **OBLIGATOIRE** de créer une fonction utilitaire locale d'exclusion (ex: `rnz(a,b) := block([v], v: ri(a,b), if v=0 then rnz(a,b) else v)$`) plutôt que d'utiliser une boucle `while` en aval. Cela garantit la propreté syntaxique à la source.
+*   **OBLIGATOIRE (Redéfinition des algorithmes de chaînes) :** Pour les questions à réponse textuelle (type `string`) nécessitant des calculs de proximité (ex: distance de Levenshtein), il est **OBLIGATOIRE** de redéfinir localement l'algorithme. 
+*   **OBLIGATOIRE (Optimisation mémoire O(n)) :** L'implémentation de ces algorithmes de chaînes **NE DOIT PAS** utiliser de structures matricielles 2D complètes (qui provoquent un `timeout`). Elle doit obligatoirement utiliser une optimisation en mémoire à une dimension (ex: deux listes unidimensionnelles `prev` et `curr`).
+*   **OBLIGATOIRE (Capsecur de longueur) :** Tout algorithme de traitement de chaîne doit intégrer une condition d'échappement précoce (ex: `if slength(s)>30 then return(100)`) pour empêcher un élève de provoquer un timeout en soumettant un texte de plusieurs milliers de caractères.
+
+---
+
+## PÔLE 3 : Règles d'Inputs et de Validation (Saisie élève)
+
+### 3.1. Cohérence sémantique
+*   **OBLIGATOIRE (Cohérence Flottants/Entiers) :** Équivalence stricte entre le type de nombre généré et le paramètre `<forbidfloat>` de l'input. Si une division peut générer un décimal, `<forbidfloat>` doit être à `0`.
+*   **OBLIGATOIRE (Objets strictement entiers) :** Si le résultat attendu est un objet mathématique garanti entier (matrice d'entiers, fraction d'entiers, entier pur) et que la consigne exige une valeur exacte, `<forbidfloat>` doit être **OBLIGATOIREMENT** à `1`. À défaut, l'élève pourrait saisir une réponse décimale (ex: `1.0` au lieu de `1`) qui serait acceptée à tort.
+*   **OBLIGATOIRE (Échappement RegExp) :** Dans un nœud de PRT utilisant le test `RegExp`, la valeur dans `<tans>` doit obligatoirement être encapsulée dans des guillemets doubles (ex: `<tans>"^[01]+$"</tans>`).
+*   **OBLIGATOIRE (Couplage Constante / allowwords) :** Si la réponse modèle (`<tans>`) d'une primitive contient une constante d'intégration symbolique (ex: `+ k`), il est **OBLIGATOIRE** d'ajouter cette constante exacte dans la balise `<allowwords>` de l'input (ex: `<allowwords>k</allowwords>`). À défaut, le validateur syntaxique de STACK rejettera la réponse de l'élève avec une erreur fatale "Variable inconnue".
+
+### 3.2. Configuration "Quartet" Algébrique (Rigueur requise)
+*   **OBLIGATOIRE (Champ d'application) :** Tout input de type `algebraic` exigeant une **transformation stricte d'expression** (développer, factoriser, réduire) doit obligatoirement avoir cette combinaison :
+    *   `<insertstars>0</insertstars>` : Oblige l'élève à écrire explicitement la multiplication.
+    *   `<checkanswertype>1</checkanswertype>` : Valide que la saisie est une expression algébrique.
+    *   `<mustverify>1</mustverify>` : Force l'élève à valider la syntaxe.
+    *   `<showvalidation>2</showvalidation>` : Affiche l'interprétation du CAS sous le champ pour correction (pont pédagogique essentiel, notamment pour `exp()` vers $e^x$).
+*   **EXCEPTION (Objets Non-Algébriques ou Finis) :** Si l'input `algebraic` attend un **ensemble** (ex: `{a, b}`), une **matrice**, ou un **nombre calculé final** (ex: une aire), le Quartet doit être **désactivé** (`insertstars=0`, `checkanswertype=0`, `mustverify=0`, `showvalidation=0`). L'affichage de l'interprétation CAS sous le champ (`showvalidation=2`) est alors nuisible et confus pour l'élève.
+
+### 3.3. Configuration Numérique (Tolérance)
+*   **OBLIGATOIRE :** Pour un nombre décimal avec tolérance, le type doit être `numerical` avec `<forbidfloat>0</forbidfloat>`.
+*   **INTERDIT :** Utiliser `AlgEquiv` pour comparer des flottants. Le PRT doit utiliser `NumRelative` (ou `NumAbsolute`) avec la tolérance dans `<testoptions>` (ex: `0.01`).
+*   **EXCEPTION (Entier strict dans un champ Numérique) :** Si un input est de type `numerical` avec `<forbidfloat>0</forbidfloat>` (pour autoriser l'élève à saisir une réponse décimale comme `12.0`), MAIS que la logique de génération Maxima garantit mathématiquement que la réponse modèle (`ta`) est un **entier pur** (ex: via `ri(a,b)`), alors la règle d'utilisation de `NumRelative` est annulée. 
+    *   **OBLIGATOIRE :** Le PRT doit utiliser le test `AlgEquiv`. L'utilisation de `NumRelative` avec une tolérance sur un entier pur créerait une faille de validation (ex: acceptation de `14.99` pour `15`). `AlgEquiv` garantit une égalité stricte tout en conservant la souplesse de saisie de l'input `numerical`.
+*   **OBLIGATOIRE (Tolérance de Midpoint pour l'arrondi) :** Lorsqu'un input numérique exige un arrondi à $10^{-n}$ près, l'utilisation de `NumAbsolute` avec une tolérance stricte de $10^{-n}$ est trop risquée (elle rejette les élèves ayant fait un arrondi de milieu de chaîne différent sur les calculs intermédiaires). Il est **OBLIGATOIRE** d'appliquer la règle du Midpoint : régler le `<testoptions>` à la moitié de la précision demandée (ex: pour $10^{-2}$, utiliser `<testoptions>0.015</testoptions>` ou idéalement `0.005` pour un arrondi strictement correct).
+*   **OBLIGATOIRE (Arrondi côté Prof) :** La variable professeur (`ta`) doit être générée en forçant l'arrondi mathématique à la même décimale (ex: `ta: round(float(expr*100)/100)$` pour $10^{-2}$) afin que la comparaison de référence soit stable.
+*   **OBLIGATOIRE (Forçage flottant dans le Tans) :** Lorsqu'un input `numerical` a `<forbidfloat>0</forbidfloat>` ET que la réponse modèle (`ta`) est issue d'un calcul pouvant théoriquement tomber sur un nombre entier (ex: variance entière, écart-type de 0), la variable `ta` doit être **obligatoirement** castée en flottant dans la balise `<tans>`. Multiplier par un flottant trivial (ex: `<tans>1.0*ta_var</tans>`) ou utiliser `float()`. À défaut, si `ta` vaut `2`, l'élève tapant `2.0` sera injustement rejeté par le validateur syntaxique.
+*   **EXCEPTION (Validation d'Encadrement) :** Lorsqu'un input `numerical` n'attend pas une valeur cible unique, mais l'appartenance à un intervalle valide (ex: borne inférieure d'un encadrement), la règle d'utilisation de `NumRelative` est annulée.
+    *   **OBLIGATOIRE :** Le PRT doit utiliser des `<feedbackvariables>` contenant des prédicats booléens (ex: `test: ans_inf <= alpha and alpha - ans_inf <= 0.01$`).
+    *   **OBLIGATOIRE :** Le nœud de PRT doit évaluer ce booléen avec le test `AlgEquiv` contre `true` (ex: `<sans>test</sans>`, `<tans>true</tans>`).
+
+### 3.4. Configuration "Texte Brut" (Type `string`)
+*   **CONTEXTE :** S'applique aux questions où l'élève doit saisir un mot, une phrase ou un terme de vocabulaire (ex: "miel", "dériver").
+*   **OBLIGATOIRE (Désactivation totale) :** Le type `string` exige la désactivation complète du Quartet Algébrique : `insertstars=0`, `checkanswertype=0`, `mustverify=0`, `showvalidation=0`.
+*   **RAISON :** La validation syntaxique (`showvalidation=2`) tenterait d'interpréter le texte français comme une expression mathématique Maxima, ce qui générerait des erreurs de parseur incompréhensibles pour l'élève ou un affichage CAS absurde (ex: interprétation implicite de la multiplication entre lettres).
+*   **OBLIGATOIRE (Forçage du type) :** Si des fonctions de traitement de chaîne sont appliquées dans le PRT, elles doivent intégrer un cast de sécurité : `if stringp(var)=false then var:string(var)$`.
+
+---
+
+## PÔLE 4 : Typologies Spécifiques de Questions (Les "Recettes")
+
+### 4.1. Modélisation des Inéquations
+*   **INTERDIT :** Notation ensembliste (ex: `{x | x > 3}`).
+*   **OBLIGATOIRE :** Utiliser `and` / `or` (ex: `x < x1 or x > x2`). Ajouter `and, or` dans `<allowwords>`.
+*   **OBLIGATOIRE (Génération) :** Tirer les racines au hasard, puis calculer les coefficients (jamais l'inverse, pour éviter les discriminants négatifs). Forcer l'ordre $x_1 < x_2$ avant la construction logique.
+*   **OBLIGATOIRE (Anticipation) :** Pré-calculer une variable `err_sign` en inversant les opérateurs `and`/`or` de la réponse correcte.
+
+### 4.2. Séparation des erreurs d'Unités
+*   **OBLIGATOIRE :** Isoler l'unité dans les `<feedbackvariables>` du PRT pour faire un feedback différencié.
+    ```maxima
+    stud_si : stack_unit_si_to_si_base(ans_VOTRE_INPUT);
+    teach_si : VOTRE_VARIABLE_UNIT_ATTENDUE;
+    v_pure_e : subst(map(lambda([u], u=1), listofvars(stud_si)), stud_si);
+    v_pure_t : subst(map(lambda([u], u=1), listofvars(teach_si)), teach_si);
+    eleve_unit : 2 * stud_si / v_pure_e;
+    teacher_unit : 2 * teach_si / v_pure_t;
+    ```
+*   **STRUCTURE PRT :** Nœud 0 : Test `UnitsAbsolute` (SAns=`eleve_unit`, TAns=`teacher_unit`). Si Vrai -> Nœud 1 : Test `UnitsRelative` (SAns=`ans_INPUT`, TAns=`VARIABLE_TA`).
+
+### 4.3. Parsons Puzzle
+*   **OBLIGATOIRE :** Type d'input `parsons` (jamais `dragndrop`). Inclure `stack_include_contrib("prooflib.mac");` en première ligne.
+*   **OBLIGATOIRE (Formatage) :** Chaque bloc doit être un tableau `[Identifiant, "Texte"]`.
+*   **OBLIGATOIRE (Structure) :** La réponse modèle `ta` doit utiliser `proof()`. Sans cela, erreur `Failed to connect`.
+*   **OBLIGATOIRE (Évaluation) :** Utiliser `parsons_decode`, `proof_flatten` et `elementp` dans le PRT.
+
+### 4.4. Modélisation Expert : Chaînage Logique avec Score Partiel
+*   **INTERDIT :** Utiliser un seul nœud `AlgEquiv` pour évaluer une transformation ou une chaîne logique.
+*   **OBLIGATOIRE (Pattern Routeur) :** Nœud 0 = Test de la 1ère étape. Si Vrai -> Nœud 1 (étape suivante). Si Faux -> Nœuds diagnostiques.
+*   **OBLIGATOIRE (Anticipation "Hors-Étape") :** Pour les calculs itératifs (dérivées successives, primitives), il est **OBLIGATOIRE** de pré-calculer l'étape précédente (ex: `ta_fp: diff(f,x)$`) et de l'utiliser dans un nœud de diagnostic (ex: tester si l'élève a donné $f'$ au lieu de $f''$).
+*   **OBLIGATOIRE (Feedback de Contradiction) :** Lorsqu'un nœud N est atteint après l'échec du nœud N+1 (qui nécessitait que N soit vrai), le feedback du nœud N+1 **DOIT** rappeler la valeur validée au nœud N (ex: *"Votre dérivée seconde était juste ({@fpp@}), cependant..."*) pour forcer l'élève à faire le lien logique.
+
+### 4.5. Questions à Choix Multiples (QCM) : ⚡ PIÈGES CONTEXTUELS
+
+> **⚠️ ALERTE CONFLIT CONTEXTUEL :** La nature de la variable `ans1` change radicalement selon le type d'input. Ne pas appliquer la recette d'un type à un autre.
+
+#### A. QCM Cases à cocher (Type `checkbox`)
+*   **Comportement :** `ans1` est une structure imbriquée complexe (liste de listes).
+*   **OBLIGATOIRE :** Appliquer `flatten([ans1])` dans les `<feedbackvariables>` pour obtenir une liste plate des identifiants cochés.
+*   **OBLIGATOIRE (Calcul du score) :** Utiliser la théorie des ensembles (`setify`, `intersection`, `cardinality`). Formule : `(nb_bons - nb_mauvais) / total_bons`.
+*   **OBLIGATOIRE (Rendu HTML) :** Utiliser la boucle Moodle `[[foreach item="nom_variable"]]{@item@}[[/foreach]]` dans le feedback. Utiliser `[[if test="liste # []"]]` pour masquer une liste vide.
+
+#### B. QCM Choix Unique (Type `radio`) & Menus déroulants (Type `dropdown`)
+*   **Équivalence stricte :** Les types `radio` et `dropdown` partagent exactement le même moteur et la même logique Maxima. Seule la balise XML `<type>` change.
+*   **COMPORTEMENT DOUBLE (L'ID) :** `ans1` est évaluée comme la valeur du premier élément (`[0]`) de l'option choisie par l'élève.
+*   **CAS 1 : ID Sémantique (Recommandé - Simplifié) :** Si l'identifiant de la liste `tans` est *déjà* la chaîne de texte lisible (ex: `tans: [["convexe", true, "convexe"], ...]`), alors `ans1` vaut `"convexe"`.
+    *   **OBLIGATOIRE :** Utiliser directement le test `String` dans le PRT : `<sans>ans1</sans>`, `<tans>"convexe"</tans>`.
+    *   **INTERDIT :** Utiliser des fonctions d'extraction complexes (`sublist`, `lambda`) ou des boucles dans ce cas.
+*   **CAS 2 : ID Technique (Avancé) :** Si l'identifiant est un index technique (ex: `tans: [["1", true, "Texte long..."], ...]`), alors `ans1` vaut `"1"`.
+    *   **OBLIGATOIRE :** Évaluer avec `String` sur `"1"`, puis utiliser `assoc(ans1, liste_feedback)` dans les variables de feedback pour retrouver le texte long à afficher.
+*   **INTERDIT (Dans tous les cas) :** Utiliser `flatten([ans1])` ou des boucles `[[foreach]]` pour ces types d'inputs.
+
+#### C. Grille Vrai / Faux (Multiples inputs `radio`)
+*   **OBLIGATOIRE :** Modèle de données à 4 éléments : `["Énoncé", Booléen, "Explication Vrai", "Explication Faux"]`.
+*   **OBLIGATOIRE (Inputs multiples) :** Un input `radio` indexé par proposition (ex: `ans1p01`). Regrouper toutes les validations dans une balise cachée : `<div style="display:none">[[validation:...]]</div>`.
+*   **OBLIGATOIRE (Inversion Tans) :** Le `<tans>` doit inverser la bonne réponse dynamiquement : `if second(ta[X]) then [[1,true,"Vrai"],[2,false,"Faux"]] else [[1,false,"Vrai"],[2,true,"Faux"]]`.
+*   **OBLIGATOIRE (Anti-défaut) :** L'option `<options>nonotanswered</options>` est obligatoire pour chaque input.
+*   **OBLIGATOIRE (Évaluation) :** Évaluer avec `is(ansX = (if second(ta[X]) then 1 else 2))` et utiliser l'opérateur ternaire Maxima pour le feedback inline.
+
+### 4.6. Modélisation des Tableaux de Vérité / Grilles Multiples
+*   **INTERDIT :** Créer un PRT distinct ou des nœuds de validation distincts pour chaque cellule d'un tableau (ex: 8 inputs = 8 PRTs).
+*   **OBLIGATOIRE (Agrégation en liste) :** Les réponses de l'élève doivent être rassemblées en une seule liste Maxima dans les `<feedbackvariables>` du PRT principal (ex: `student_ans : [ans0, ans1, ans2, ...];`).
+*   **OBLIGATOIRE (Comparaison Globale) :** La réponse modèle (`ta`) doit être un tableau de la même dimension. L'évaluation globale se fait en un seul nœud utilisant le test `AlgEquiv` comparant la liste élève à la liste professeur.
+*   **OBLIGATOIRE (Pièges d'erreur calculés) :** Les erreurs classiques de tableaux (ex: inversion de l'ordre des lignes, calcul de la négation `1 - valeur`) doivent être pré-calculées dans les `<questionvariables>` sous forme de tableaux parallèles (ex: `ta_inverse`, `ta_negation`) et testées dans les nœuds suivants du PRT pour offrir un feedback différencié partiel.
+
+### 4.7. Modélisation des Intégrales et Mesures Géométriques (Aires, Longueurs)
+*   **OBLIGATOIRE (Anticipation du signe) :** Le calcul d'une mesure (aire sous une courbe, longueur d'arc) implique une intégrale qui peut s'avérer négative selon le sens d'intégration ou la position des courbes. Il est **OBLIGATOIRE** de pré-calculer une variable d'erreur de signe (ex: `ta_err_sign: -ta_aire`) dans les `<questionvariables>`.
+*   **STRUCTURE PRT :** Le nœud testant la réponse finale doit diriger vers un nœud sibling (même niveau) testant spécifiquement `ta_err_sign` pour accorder un score partiel (ex: 25%) avec un feedback explicite sur l'oubli de la valeur absolue.
+*   **OBLIGATOIRE (Séparation de la condition d'affichage) :** Si le feedback général nécessite d'afficher quelles courbes sont au-dessus/en-dessous des autres (ex: "Sur [a,b], on a f > g"), cette condition logique ne doit **JAMAIS** être évaluée en HTML. Elle doit être figée dans une variable string dans les `<questionvariables>` via un `if` Maxima (ex: `cond_sup: if g > f then ">" else "<"$`).
+*   **OBLIGATOIRE (Anticipation "Primitive Non Évaluée") :** Il est **OBLIGATOIRE** de pré-calculer la variable de la primitive brute (ex: `ta_err_prim: F(x)$`) et de la tester dans un nœud dédié de la Cascade Diagnostique. Si l'élève donne une expression contenant encore la variable $x$, le feedback doit expliciter : *"Vous avez donné la primitive F(x), il faut calculer F(b) - F(a)"*.
+*   **OBLIGATOIRE (Anticipation "Oubli de termes multiples") :** Dans les intégrales de fonctions sommes (ex: $ce^{dx} + f$), il est **OBLIGATOIRE** de pré-calculer les erreurs de primitive partielle (ex: intégration de l'exponentielle seule sans la constante) pour accorder un micro-score partiel (ex: 0.25) avec un feedback ciblé sur le terme manquant.
+
+### 4.8. Anti-Pattern : Le piège du test contre `false`
+*   **INTERDIT (Faux diagnostique) :** Utiliser le test `AlgEquiv` avec `<tans>false</tans>` pour tenter de détecter une erreur de formule algébrique spécifique (ex: pour détecter qu'il manque un terme comme $(x-a)$).
+*   **RAISON :** Si un élève tape une expression algébrique incorrecte mais syntaxiquement valide (ex: `y = 2*a*x + f(a)`), Maxima l'évalue comme une expression algébrique. `AlgEquiv(expression_valide, false)` renverra systématiquement `false`. La branche "Vrai" du nœud (contenant le feedback ciblé) **ne se déclenchera jamais**. Le test `var = false` ne renvoie `true` que si l'élève tape une contradiction logique explicite (ex: `1=2`).
+*   **OBLIGATOIRE (Anticipation Algébrique) :** Pour cibler une erreur de formule précise, il est **OBLIGATOIRE** de pré-calculer la fausse formule attendue dans les `<questionvariables>` (ex: `ta_err_missing_a: fp*x + ev(f, x=a)$`) et de tester `AlgEquiv(ans, ta_err_missing_a)` dans le nœud de diagnostic.
+
+### 4.9. Modélisation Expert : La Cascade Diagnostique (Sans score partiel)
+*   **CONTEXTE :** S'applique aux questions à une seule réponse où la notation est binaire (Tout ou Rien, ex: 1 point), mais où l'on souhaite fournir un feedback hyper-ciblé sur l'erreur exacte commise (ex: erreurs de formules de dérivation).
+*   **OBLIGATOIRE (Dictionnaire des erreurs) :** Toutes les erreurs classiques doivent être modélisées mathématiquement sous forme de variables distinctes dans les `<questionvariables>` (ex: `err_oublie_exp`, `err_produit`), en respectant scrupuleusement la règle du Pôle 4.8 (Anti-pattern `false`).
+*   **OBLIGATOIRE (Convention lexicale des erreurs) :** Dans le cadre d'une Cascade Diagnostique, toutes les variables pré-calculées dans les `<questionvariables>` représentant une erreur classique doivent **OBLIGATOIREMENT** être préfixées par `err_` suivi d'un nom sémantique court (ex: `err_trace`, `err_plus`, `err_signe`). Les variables de réponse correcte doivent utiliser le préfixe `ta_` ou des noms explicites (ex: `det_correct`). Aucune variable intermédiaire ne doit utiliser de noms génériques (ex: `var1`, `calc1`).
+*   **STRUCTURE PRT (Arbre binaire de routage) :** 
+    *   Nœud 0 : Test `AlgEquiv` contre la réponse correcte. Si Vrai -> Score = Points max, Fin.
+    *   Si Faux -> Nœud 1 : Test `AlgEquiv` contre l'erreur A. Si Vrai -> Score = 0, Feedback Erreur A, Fin.
+    *   Si Faux -> Nœud 2 : Test `AlgEquiv` contre l'erreur B. Si Vrai -> Score = 0, Feedback Erreur B, Fin.
+    *   ...
+    *   Dernier Nœud : Score = 0, Feedback Générique "Incorrect", Fin.
+*   **ALERT FATAL (Terminaison de la Cascade) :** La structure arborescente de la Cascade Diagnostique doit **OBLIGATOIREMENT** se terminer par un nœud "Fallback" (Nœud N). Ce dernier nœud ne doit tester aucune erreur spécifique. Sa branche Fausse n'existe pas, et sa branche Vraie (atteinte parce que toutes les erreurs précédentes ont renvoyé Faux) doit **IMPERATIVEMENT** avoir un score de 0 et un `<truenextnode>-1</truenextnode>`. 
+*   **INTERDIT (Score de rattrapage fantôme) :** Il est formellement **INTERDIT** d'accorder un score supérieur à 0 dans la branche Fausse d'un nœud de diagnostic intermédiaire, sous peine de valider des réponses aléatoires.
+*   **VÉRIFICATION CROISÉE (Anti-variable morte) :** Toute variable d'erreur préfixée `err_` dans les `<questionvariables>` **DOIT** impérativement être appelée dans un nœud de PRT en tant que `<tans>`. Si une erreur est modélisée mais non testée dans le PRT, le code est rejeté.
+*   **DIFFÉRENCE avec le Pôle 4.4 :** Dans la Cascade Diagnostique standard, les nœuds d'erreur accordent **généralement 0 point** (ex: erreurs de formules pures). 
+*   **VARIANTE (Cascade Récompensée) :** Pour les calculs longs (dérivées complexes, intégrales de sommes), il est autorisé d'accorder des micro-scores d'effort (ex: `0.25`) sur les nœuds aval de la cascade si l'erreur démontre que l'élève a partiellement réussi une sous-tâche complexe (ex: a intégré l'exponentielle mais a oublié le polynôme), tout en maintenant le score à 0 pour les erreurs de compréhension fondamentales (ex: donner la primitive au lieu de l'intégrale).
+
+### 4.10. Modélisation des Encadrements et Intervalles de Confiance (TVI, Dichotomie)
+*   **CONTEXTE :** S'applique lorsqu'on demande à l'élève de fournir un intervalle $[a ; b]$ encadrant une valeur exacte $\alpha$ avec une amplitude maximale donnée (ex: à $10^{-2}$ près).
+*   **OBLIGATOIRE (Tolérance Machine) :** Les calculs dans les `<feedbackvariables>` utilisant `float()` sont soumis aux imprécisions de l'ordinateur. Il est **OBLIGATOIRE** de définir une micro-tolérance (ex: `tol: 0.001$`) et de l'ajouter aux inégalités strictes pour ne pas pénaliser l'élève injustement (ex: `ans_inf <= alpha + tol`).
+*   **OBLIGATOIRE (Structure de validation en 3 temps) :** Le PRT doit valider séparément :
+    1.  `test_inf` : La borne inférieure est bien inférieure à $\alpha$ ET respecte la distance maximale autorisée.
+    2.  `test_sup` : La borne supérieure est bien supérieure à $\alpha$ ET respecte la distance maximale.
+    3.  `test_amplitude` : L'écart entre la borne supérieure et inférieure ne dépasse pas l'amplitude totale autorisée (ex: $0.02$ pour $10^{-2}$).
+*   **OBLIGATOIRE (Gestion du Score - Malus) :** Si les bornes sont justes individuellement (Nœuds 0 et 1 accordant par exemple 0.5 pts chacun), mais que l'amplitude globale est trop grande, il est **OBLIGATOIRE** d'utiliser l'opérateur de soustraction de score : `<truescoremode>-</truescoremode>` combiné à `<falsescore>0.25</falsescore>` sur le nœud de l'amplitude pour retirer des points sans remettre à zéro.
+
+### 4.11. Modélisation des Primitives
+*   **OBLIGATOIRE (Validation par dérivation) :** Il est **INTERDIT** d'utiliser `AlgEquiv(ans_F, ta_F)` pour évaluer une primitive (l'élève pourrait utiliser une constante $C$, $k$, ou aucune constante, rendant le test impossible). La seule méthode valide est le test par dérivation : `<sans>diff(ans_F, x)</sans>`, `<tans>f</tans>`, `<answertest>AlgEquiv</answertest>`.
+*   **ALERT PARADOXE (Le mythe du "oubli de + k") :** Si la validation par dérivation est utilisée, un élève qui tape la primitive exacte mais **oublie le + k** verra sa réponse validée avec le score maximal. En effet, mathématiquement, `diff(primitive_sans_k, x)` donne exactement `f(x)` (la constante $k=0$ est valide).
+*   **INTERDIT (Nœud de détection "Dead Code") :** Il est formellement **INTERDIT** de créer un nœud PRT destiné à pénaliser l'oubli du `+ k` *après* un nœud de validation par dérivation réussi. Ce nœud serait du code mort (inatteignable).
+*   **EXCEPTION (Forçage absolu du + k) :** Si le cahier des charges exige *impérativement* de refuser une réponse sans `+ k`, il est **OBLIGATOIRE** de ne pas utiliser la validation par dérivation comme nœud principal. Il faut utiliser le test `SubstEquiv` ou une expression régulière (`RegExp`) pour vérifier la présence de la constante, bien que cela soit complexe et fragile. En règle générale, on privilégie la validation par dérivation et on accepte l'absence de constante.
+
+### 4.12. Modélisation Statistique (Moyenne, Variance, Écart-Type)
+*   **CONTEXTE :** S'applique aux calculs de statistiques descriptives où l'élève est soumis à 3 erreurs de formule massives et simultanées.
+*   **OBLIGATOIRE (Cascade de la Trinité) :** Le PRT doit impérativement contenir une cascade diagnostique (Pôle 4.9) testant dans l'ordre les 3 erreurs fondamentales :
+    1.  **L'Erreur de Racine :** L'élève a calculé l'écart-type ($\sqrt{V}$) au lieu de la variance ($V$).
+    2.  **L'Oubli de l'Effectif :** L'élève a calculé la somme des carrés des écarts ($\sum (x_i - \bar{x})^2$) au lieu de diviser par $n$.
+    3.  **L'Erreur d'Échantillon :** L'élève a utilisé la formule biaisée de l'échantillon (division par $n-1$) au lieu de la population (division par $n$).
+*   **OBLIGATOIRE (Calcul des variables d'erreur) :** Les variables `ta_err_...` de ces erreurs doivent être calculées en réutilisant la fonction locale redéfinie (Pôle 2.9) pour éviter de dupliquer du code mathématique (ex: `ta_err_n1: round(float(var(L) * 5 / 4) * 100) / 100$`).
+
+### 4.13. Modélisation Expert : Déterminant de Matrice 2×2
+*   **CONTEXTE :** Le calcul du déterminant d'une matrice 2×2 ($ad - bc$) génère systématiquement les mêmes erreurs cognitives chez les élèves, rendant une Cascade Diagnostique (Pôle 4.9) indispensable.
+*   **OBLIGATOIRE (Génération) :** Utiliser la fonction de redéfinition locale (Pôle 2.9) pour générer les 4 coefficients entiers (ex: `a11: ri(-4,4)$`). Construire la matrice via `matrix()`.
+*   **OBLIGATOIRE (Dictionnaire des erreurs) :** Les `<questionvariables>` doivent obligatoirement contenir les 3 variables d'erreur suivantes pour alimenter la cascade :
+    1.  `err_trace : a11 + a22$` (Confusion avec la trace de la matrice).
+    2.  `err_plus : a11*a22 + a12*a21$` (Erreur de signe : addition au lieu de la soustraction des produits croisés).
+    3.  `err_oppose : a12*a21 - a11*a22$` (Inversion complète du signe du déterminant).
+*   **OBLIGATOIRE (Configuration Input) :** L'input doit être de type `numerical` avec `<forbidfloat>0</forbidfloat>` et le "Quartet" désactivé (Pôle 3.2 Exception). Le PRT doit utiliser `AlgEquiv` (Pôle 3.3 Exception).
+*   **STRUCTURE PRT :** Arbre binaire de routage standard :
+    *   Nœud 0 : `AlgEquiv` vs réponse correcte. (Si Vrai -> 1 pt).
+    *   Nœud 1 : `AlgEquiv` vs `err_trace`. (Feedback : "Confusion trace / déterminant, vous avez fait une somme au lieu d'un produit croisé").
+    *   Nœud 2 : `AlgEquiv` vs `err_plus`. (Feedback : "Erreur de signe, il faut soustraire la diagonale secondaire").
+    *   Nœud 3 : `AlgEquiv` vs `err_oppose`. (Feedback : "Signe inversé, c'est la diagonale principale moins la secondaire").
+    *   Nœud 4 (Faux final) : Feedback générique rappelant la formule $ad - bc$.
+
+### 4.14. Modélisation Expert : Réponse Textuelle Multiple avec Tolérance Orthographique (Levenshtein)
+*   **CONTEXTE :** S'applique lorsqu'une question accepte plusieurs mots valides et qu'on souhaite tolérer des fautes de frappe mineures tout en pénalisant les erreurs graves ou les erreurs grammaticales spécifiques (comme le pluriel).
+*   **OBLIGATOIRE (Pipeline de normalisation) :** Le traitement de la variable `ans1` ne peut pas se faire dans les `<questionvariables>` (où `ans1` n'existe pas encore). Il doit être effectué dans les `<feedbackvariables>` du PRT selon un ordre strict :
+    1.  `sdowncase(ans1)` (Passage en minuscules pour ignorer la casse).
+    2.  `strim(" ", ...)` (Suppression des espaces parasites en début et fin de chaîne).
+    3.  Fonction de nettoyage sémantique (ex: `supprimer_articles` pour ignorer "le ", "la ", "l'").
+*   **OBLIGATOIRE (Heuristique du Pluriel) :** La détection d'un "s" final parasite ne doit **JAMAIS** se baser sur un dictionnaire durcodé, mais sur une règle algorithmique stricte : détection d'un "s" final sur un mot de plus d'une lettre. Il faut soustraire ce "s", recalculer la distance avec le meilleur mot, et isoler les variables booléennes `plu_seul` (mot sans "s" est exact, distance=0) et `plu_f1` (mot sans "s" a une distance d'1).
+*   **OBLIGATOIRE (Structure PRT de routage par paliers) :** L'arbre de validation doit suivre cet ordre strict pour éviter les conflits de scores (car "miels" a une distance globale de 1 par rapport à "miel") :
+    *   Nœud 0 : Réponse vide (après nettoyage).
+    *   Nœud 1 : Mot exact (distance 0) -> Score max.
+    *   Nœud 2 : Pluriel seul (`plu_seul`) -> Score partiel (ex: 0.5).
+    *   Nœud 3 : Pluriel + 1 faute (`plu_f1`) -> Score plus faible (ex: 0.25).
+    *   Nœud 4 : Distance globale = 1 -> Score partiel (ex: 0.5).
+    *   Nœud 5 : Distance globale = 2 -> Score plus faible (ex: 0.25).
+    *   Nœud 6 : Fallback (distance > 2) -> Score 0.
+*   **OBLIGATOIRE (Génération dynamique du Feedback Enrichi) :** Lorsqu'un PRT de ce type contient de nombreux nœuds avec des feedbacks textuels complexes (mise en forme, couleurs, liste des réponses acceptées), il est **OBLIGATOIRE** de générer les blocs HTML complets (avec styles inline) dans les `<feedbackvariables>` via `sconcat` (ex: `fb1: sconcat("<div style='...'>✅ <b>", best, "</b></div>")$`), puis de les injecter via `{@fb1@}` dans les nœuds. Cela évite de surcharger la structure XML du PRT et centralise la logique d'affichage.
+*   **OBLIGATOIRE (Liste de mots pour le Feedback) :** L'affichage de la liste des réponses acceptées dans le feedback ne doit **JAMAIS** utiliser l'affichage natif d'une liste Maxima (qui génère des crochets `[` et `]`). Il est **OBLIGATOIRE** de construire une chaîne de caractères via une boucle `for` utilisant `sconcat` et des séparateurs typographiques (ex: `", "`).
+
+---
+
+## PÔLE 5 : Front-End, Affichage et Interactivité (HTML/JS/CSS)
+
+### 5.1. Intégration HTML dynamique (Tableaux)
+*   **OBLIGATOIRE (Positionnement DOM) :** Une variable de lignes de tableau générée par `sconcat()` (ex: `{@table_rows@}`) **DOIT** être injectée strictement à l'intérieur de la balise `<tbody>`.
+*   **OBLIGATOIRE (Isolation des balises parentes) :** Lors de la génération dynamique de lignes de tableau via `sconcat()`, seules les balises de lignes (`<tr>`) ou de cellules (`<td>`, `<th>`) peuvent être générées dans la variable. Il est **FORMELLEMENT INTERDIT** de générer les balises parentes du tableau (`<table>`, `<tbody>`, `<thead>`) dans cette variable. Ces balises structurantes doivent obligatoirement rester en dur dans le `<questiontext>` pour garantir la validité du DOM.
+*   **OBLIGATOIRE (Séparation stricte des instructions) :** Chaque instruction d'affectation dans les `<questionvariables>` (qu'elle génère du HTML ou non) **DOIT** être sur sa propre ligne, terminée par `$`. L'empilement sur une seule ligne (ex: `a:1$ b:2$`) est formellement **INTERDIT** pour garantir la lisibilité, faciliter le débogage, et éviter les erreurs d'évaluation parsers CAS.
+
+### 5.2. Spécificités JSXGraph (Oscilloscope)
+*   **OBLIGATOIRE (Performance) :** Dans `functiongraph`, ajouter `numberPoints: 150` et `doAdvancedPlot: false`.
+*   **INTERDIT (Anti-boucle infinie) :** Utiliser `moveTo()`, `setPosition()`, ou modifier `.X()` / `.Y()` dans `bd.update()`.
+*   **OBLIGATOIRE :** `bd.update()` est exclusivement réservé à la mise à jour textuelle (`textContent`). Les curseurs utilisent l'attribut `drag` à la création.
+*   **OBLIGATOIRE (Injection de variables) :** Utiliser exclusivement la syntaxe `{#variable#}` (avec des dièses) pour faire passer une variable Maxima dans le code JavaScript (jamais `{@var@}`).
+*   **OBLIGATOIRE (Typage JS) :** Encapsuler les valeurs numériques dans `parseFloat("{#var#}")` et les chaînes dans des guillemets.
+
+### 5.3. Claviers Virtuels et Scripts : ⚡ PIÈGES CONTEXTUELS
+
+> **⚠️ ALERTE CONFLIT CONTEXTUEL :** Les règles d'intégration JS/CSS s'inversent totalement selon que le code est dans le DOM principal de Moodle ou isolé dans une Iframe STACK.
+
+#### A. Contexte DOM Principal (Hors Iframe - Additif L)
+*Le filtre de sécurité de Moodle est très agressif ici.*
+*   **INTERDIT :** Balise `<style>...</style>` (provoque une erreur fatale DB `array given`).
+*   **INTERDIT :** Attributs inline JS (`onclick`, `onmouseover`).
+*   **OBLIGATOIRE (CSS) :** Utiliser exclusivement du style inline (`style="..."` sur les balises).
+*   **OBLIGATOIRE (JS) :** Minifier le code JavaScript sur une **seule et unique ligne** continue dans une balise `<script>`. Aucun saut de ligne, aucun commentaire `//`.
+*   **OBLIGATOIRE (API JS) :** Utiliser `stackjs.getInput('nom_input')` et l'accrocher sur `window.addEventListener('load', function(){...})`. (Jamais `DOMContentLoaded`).
+
+#### B. Contexte DOM Isolé (Dans Iframe - Additif Q)
+*L'Iframe contourne les filtres de Moodle, mais crée une isolation de sécurité.*
+*   **OBLIGATOIRE (Isolation) :** Envelopper le clavier dans `[[iframe width="100%" height="Xpx"]] ... [[/iframe]]`.
+*   **OBLIGATOIRE (CSS) :** Utiliser les balises propres à l'iframe : `[[style]]...[[/style]]`. (Le formatage multi-lignes est autorisé).
+*   **OBLIGATOIRE (JS) :** Utiliser `[[script type="module"]]...[[/script]]`. (Le formatage multi-lignes et les commentaires sont autorisés).
+*   **INTERDIT (API JS principale) :** Il est strictement interdit d'utiliser `window.addEventListener('load')` ou `stackjs.getInput()` (erreur Cross-Origin).
+*   **OBLIGATOIRE (API Iframe) :** Utiliser l'importation de module officielle :
+    ```javascript
+    import {stack_js} from '[[cors src="stackjsiframe.js"/]]';
+    stack_js.request_access_to_input("nom_input", true).then(function(input_id) { ... });
+    ```
+*   **OBLIGATOIRE (Multiplication implicite) :** Le script de l'iframe doit détecter le caractère précédent pour insérer automatiquement un `*` si nécessaire (ex: `2` + `sqrt(` donne `2*sqrt(`).
+
+---
+
+## ANNEXES : Gabarits XML de Référence
+
+### ANNEXE 1 : Question Classique / Numération
+*(Le code XML complet respectant les règles de hiérarchie, de CDATA et du Quartet Algébrique vu dans les Pôles 1 et 3)*
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>NOM_DE_LA_QUESTION</text></name>
+    <questiontext format="html">
+      <text><![CDATA[ <!-- INSERER HTML ET [[input:ans1]] [[validation:ans1]] ICI --> ]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[ <!-- INSERER LE FEEDBACK GENERAL ICI --> ]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[ /* INSERER LE CODE MAXIMA ICI (Règles du Pôle 2) */ ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <!-- ... autres balises générales ... -->
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>VARIABLE_MAXIMA_ATTENDUE</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Noeud 0</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>VARIABLE_PROF</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[ <!-- OK --> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[ <!-- NOK --> ]]></text></falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>
+```
+
+### ANNEXE 2 : Question Parsons Puzzle
+*(Le code XML complet respectant les règles spécifiques du Pôle 4.3)*
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>Parsons - NOM</text></name>
+    <questiontext format="moodle_auto_format">
+      <text><![CDATA[
+        [[parsons input="ans1"]]
+        {# parsons_encode(proof_steps) #}
+        [[/parsons ]]
+        <p>[[input:ans1]] [[validation:ans1]]</p>
+      ]]></text>
+    </questiontext>
+    <generalfeedback format="moodle_auto_format">
+      <text><![CDATA[ <!-- FEEDBACK GENERAL --> ]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+stack_include_contrib("prooflib.mac");
+
+proof_steps: [
+    ["L1", "Ligne de code 1"],
+    ["L2", "Ligne de code 2"]
+];
+
+ta: proof("L1", "L2");
+proof_steps: random_permutation(proof_steps);
+
+tal: proof_alternatives(ta);
+tas: setify(map(proof_flatten, tal));
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html"><text>[[feedback:prt1]]</text></specificfeedback>
+    <questionnote format="html"><text>{@map(first, proof_steps)@}</text></questionnote>
+    <!-- ... autres balises générales ... -->
+    <input>
+      <name>ans1</name>
+      <type>parsons</type>
+      <tans>[ta, proof_steps]</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[sa: parsons_decode(ans1);
+check: elementp(sa,tas);]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>check</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html"><text></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html"><text></text></falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>
+```
+
+**Fin du document de référence.**

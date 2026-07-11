@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CammCode" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+dim oCammForm as Object
+
+Sub Main
+	oCammForm=LoadDialog(&quot;OOoGdmath&quot;, &quot;CammForm&quot;)
+	ChangeTitreDialog(oCammForm)
+&apos;    ChargeCouleurDefaut oArcDCForm.Model.ImageControl1
+&apos;    ChargeCouleurDefaut oArcDCForm.Model.ImageControl2
+&apos;	RestaureForm(oCammForm)
+	oCammForm.Execute()
+End Sub
+
+Private Sub CammCode_BoutonAnnuler_Click()
+    oCammForm.EndExecute()
+End Sub
+
+Private Sub CammCode_BoutonOk_Click()
+Dim posx, posy
+Dim nombrepart, rayon, angletotal, deltaangle, nn, i
+Dim Shapes,unePart,depart as long,arrivee as long
+Dim Group
+
+    oCammForm.EndExecute()
+	sauveForm(oCammForm)
+    Shapes=InitialiseGroupe()
+    InitialiseDessin(False)
+    PointInsertion posx, posy
+    nombrepart = Int(Val(oCammForm.Model.TextBox1.Text))
+    rayon = oCammForm.Model.TextBox2.Text
+    RemplaceVirgulePoint rayon
+    rayon = Val(rayon)*1000
+    angletotal = oCammForm.Model.TextBox3.Text
+    RemplaceVirgulePoint angletotal
+    angletotal = Val(angletotal)
+    deltaangle = angletotal / nombrepart
+    nn = 0
+    For i = 0 To nombrepart-1
+    	depart=deltaangle * i*100
+    	arrivee=deltaangle*(i+1)*100
+        If nn &lt; Val(oCammForm.Model.TextBox4.Text) Then
+	    	unePart=InsereArcDeCerclePlein(posx,posy,depart,arrivee,rayon,Shapes,oCammForm.Model.Image9)
+        	unePart.FillStyle = com.sun.star.drawing.FillStyle.SOLID
+            unePart.FillColor = oCammForm.Model.Image7.BackgroundColor
+            nn = nn + 1
+         else
+	    	unePart=InsereArcDeCerclePlein(posx,posy,depart,arrivee,rayon,Shapes,oCammForm.Model.Image6)
+        	unePart.FillStyle = com.sun.star.drawing.FillStyle.SOLID
+            unePart.FillColor = oCammForm.Model.Image8.BackgroundColor
+        End If
+    Next i
+	Dim aPoint As New com.sun.star.awt.Point
+	aPoint.x=posx
+	aPoint.y=posy
+	Group = GroupeObjet(Shapes)
+	Group.Position=aPoint
+	TermineDessin()
+End Sub
+
+Private Sub CammCode_Image6_Click()
+    ChangeCouleur oCammForm.Model.Image6
+End Sub
+
+Private Sub CammCode_Image7_Click()
+    ChangeCouleur oCammForm.Model.Image7
+End Sub
+
+Private Sub CammCode_Image8_Click()
+    ChangeCouleur oCammForm.Model.Image8
+End Sub
+
+Private Sub CammCode_Image9_Click()
+    ChangeCouleur oCammForm.Model.Image9
+End Sub
+
+Private Sub CammCode_TextBox4_Change()
+    If Val(oCammForm.Model.TextBox4.Text) &gt;= Val(oCammForm.Model.TextBox1.Text) Then
+        MsgBoxP &quot;message2&quot;
+    End If
+End Sub
+
+</script:module>

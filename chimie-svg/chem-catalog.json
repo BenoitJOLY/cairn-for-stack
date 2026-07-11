@@ -1,0 +1,278 @@
+﻿[
+    {
+        "id":  "chem-agitateur-chauffant",
+        "file":  "agitateur_chauffant.svg"
+    },
+    {
+        "id":  "chem-agitateur-magnetique",
+        "file":  "agitateur_magnetique.svg"
+    },
+    {
+        "id":  "chem-ampoule-a-decanter",
+        "file":  "ampoule_a_decanter.svg"
+    },
+    {
+        "id":  "chem-ampoule-coulee",
+        "file":  "ampoule_coulee.svg"
+    },
+    {
+        "id":  "chem-aspi-pipette",
+        "file":  "aspi_pipette.svg"
+    },
+    {
+        "id":  "chem-balance",
+        "file":  "balance.svg"
+    },
+    {
+        "id":  "chem-ballon",
+        "file":  "ballon.svg"
+    },
+    {
+        "id":  "chem-ballon-bicol",
+        "file":  "ballon_bicol.svg"
+    },
+    {
+        "id":  "chem-ballon-bicol2",
+        "file":  "ballon_bicol2.svg"
+    },
+    {
+        "id":  "chem-ballon-bouchon",
+        "file":  "ballon_bouchon.svg"
+    },
+    {
+        "id":  "chem-ballon-distiller",
+        "file":  "ballon_distiller.svg"
+    },
+    {
+        "id":  "chem-ballon-plat",
+        "file":  "ballon_plat.svg"
+    },
+    {
+        "id":  "chem-ballon-plat-bouchon",
+        "file":  "ballon_plat_bouchon.svg"
+    },
+    {
+        "id":  "chem-ballon-tricol",
+        "file":  "ballon_tricol.svg"
+    },
+    {
+        "id":  "chem-bec-bunsen",
+        "file":  "bec_bunsen.svg"
+    },
+    {
+        "id":  "chem-becher",
+        "file":  "becher.svg"
+    },
+    {
+        "id":  "chem-becher-rempli",
+        "file":  "becher_rempli.svg"
+    },
+    {
+        "id":  "chem-bouchon",
+        "file":  "bouchon.svg"
+    },
+    {
+        "id":  "chem-bouchon-troue",
+        "file":  "bouchon_troue.svg"
+    },
+    {
+        "id":  "chem-bouchon-troue",
+        "file":  "bouchon_troué.svg"
+    },
+    {
+        "id":  "chem-bouchon-troue2",
+        "file":  "bouchon_troué2.svg"
+    },
+    {
+        "id":  "chem-bouchon2",
+        "file":  "bouchon2.svg"
+    },
+    {
+        "id":  "chem-buchner",
+        "file":  "buchner.svg"
+    },
+    {
+        "id":  "chem-burette",
+        "file":  "Burette.svg"
+    },
+    {
+        "id":  "chem-ccm",
+        "file":  "CCM.svg"
+    },
+    {
+        "id":  "chem-chauffage-air",
+        "file":  "chauffage_air.svg"
+    },
+    {
+        "id":  "chem-chauffage-bec-bunsen",
+        "file":  "chauffage_bec_bunsen.svg"
+    },
+    {
+        "id":  "chem-chauffe-ballon",
+        "file":  "Chauffe_ballon.svg"
+    },
+    {
+        "id":  "chem-cloche",
+        "file":  "cloche.svg"
+    },
+    {
+        "id":  "chem-col-distillation",
+        "file":  "col_distillation.svg"
+    },
+    {
+        "id":  "chem-colonne-vigreux",
+        "file":  "colonne_vigreux.svg"
+    },
+    {
+        "id":  "chem-coupelle",
+        "file":  "coupelle.svg"
+    },
+    {
+        "id":  "chem-cristalisoir",
+        "file":  "cristalisoir.svg"
+    },
+    {
+        "id":  "chem-dean-stark",
+        "file":  "Dean-Stark.svg"
+    },
+    {
+        "id":  "chem-dessicateur",
+        "file":  "dessicateur.svg"
+    },
+    {
+        "id":  "chem-electrolyseur",
+        "file":  "electrolyseur.svg"
+    },
+    {
+        "id":  "chem-elevateur",
+        "file":  "elevateur.svg"
+    },
+    {
+        "id":  "chem-entonnoir",
+        "file":  "entonnoir.svg"
+    },
+    {
+        "id":  "chem-eprouvette",
+        "file":  "eprouvette.svg"
+    },
+    {
+        "id":  "chem-erlen-bouchon",
+        "file":  "erlen_bouchon.svg"
+    },
+    {
+        "id":  "chem-erlenmeyer",
+        "file":  "erlenmeyer.svg"
+    },
+    {
+        "id":  "chem-fiole-a-vide",
+        "file":  "fiole_a_vide.svg"
+    },
+    {
+        "id":  "chem-fiole-bouchon",
+        "file":  "fiole_bouchon.svg"
+    },
+    {
+        "id":  "chem-fiole-jaugee",
+        "file":  "fiole_jaugée.svg"
+    },
+    {
+        "id":  "chem-pince-3-doigts",
+        "file":  "pince_3_doigts.svg"
+    },
+    {
+        "id":  "chem-pipette",
+        "file":  "pipette.svg"
+    },
+    {
+        "id":  "chem-pipette-gradue",
+        "file":  "pipette_gradue.svg"
+    },
+    {
+        "id":  "chem-pipette-jaugee",
+        "file":  "pipette_jaugée.svg"
+    },
+    {
+        "id":  "chem-pissette",
+        "file":  "pissette.svg"
+    },
+    {
+        "id":  "chem-plaque-test",
+        "file":  "plaque_test.svg"
+    },
+    {
+        "id":  "chem-poire-aspi",
+        "file":  "poire_aspi.svg"
+    },
+    {
+        "id":  "chem-porte-filtre",
+        "file":  "porte_filtre.svg"
+    },
+    {
+        "id":  "chem-potence",
+        "file":  "potence.svg"
+    },
+    {
+        "id":  "chem-refrigerant-boule",
+        "file":  "refrigerant_boule.svg"
+    },
+    {
+        "id":  "chem-refrigerant-droit",
+        "file":  "refrigerant_droit.svg"
+    },
+    {
+        "id":  "chem-serringue",
+        "file":  "serringue.svg"
+    },
+    {
+        "id":  "chem-sonde-thermometre",
+        "file":  "sonde_thermomètre.svg"
+    },
+    {
+        "id":  "chem-spatule",
+        "file":  "spatule.svg"
+    },
+    {
+        "id":  "chem-support-ballon",
+        "file":  "support_ballon.svg"
+    },
+    {
+        "id":  "chem-thermometre",
+        "file":  "thermometre.svg"
+    },
+    {
+        "id":  "chem-thermometre-numerique",
+        "file":  "thermometre-numerique.svg"
+    },
+    {
+        "id":  "chem-thermometre-numerique2",
+        "file":  "thermometre-numerique2.svg"
+    },
+    {
+        "id":  "chem-trompe-a-vide",
+        "file":  "trompe_a_vide.svg"
+    },
+    {
+        "id":  "chem-tube-a-essais",
+        "file":  "tube_a_essais.svg"
+    },
+    {
+        "id":  "chem-tube-essais",
+        "file":  "tube_essais.svg"
+    },
+    {
+        "id":  "chem-tuyau",
+        "file":  "tuyau.svg"
+    },
+    {
+        "id":  "chem-tuyau2",
+        "file":  "tuyau2.svg"
+    },
+    {
+        "id":  "chem-verre-a-pied",
+        "file":  "Verre_a_pied.svg"
+    },
+    {
+        "id":  "chem-verre-de-montre",
+        "file":  "verre_de_montre.svg"
+    }
+]

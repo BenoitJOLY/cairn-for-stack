@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="ChangerPoliceForm" dlg:left="128" dlg:top="102" dlg:width="160" dlg:height="138" dlg:help-text="&amp;2148.ChangerPoliceForm.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;2149.ChangerPoliceForm.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:background-color="0xfdffe8" dlg:border="simple"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="6" dlg:top="8" dlg:width="40" dlg:height="10" dlg:help-text="&amp;2150.ChangerPoliceForm.Label1.HelpText" dlg:value="&amp;2151.ChangerPoliceForm.Label1.Label"/>
+  <dlg:scrollbar dlg:id="ScrollBar1" dlg:tab-index="2" dlg:left="47" dlg:top="31" dlg:width="12" dlg:height="38" dlg:help-text="&amp;2154.ChangerPoliceForm.ScrollBar1.HelpText" dlg:align="vertical" dlg:curpos="12" dlg:maxpos="20" dlg:minpos="1">
+   <script:event script:event-name="on-adjustmentvaluechange" script:macro-name="vnd.sun.star.script:OOoGdmath.ChangerPoliceCode.ChangePoliceForm_Scroll1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:scrollbar>
+  <dlg:text dlg:id="Label2" dlg:tab-index="3" dlg:left="6" dlg:top="31" dlg:width="40" dlg:height="10" dlg:help-text="&amp;2155.ChangerPoliceForm.Label2.HelpText" dlg:value="&amp;2156.ChangerPoliceForm.Label2.Label"/>
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="4" dlg:left="87" dlg:top="30" dlg:width="67" dlg:height="10" dlg:help-text="&amp;2157.ChangerPoliceForm.CheckBox1.HelpText" dlg:value="&amp;2158.ChangerPoliceForm.CheckBox1.Label" dlg:checked="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoGdmath.ChangerPoliceCode.ChangePoliceForm_CheckBox1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="5" dlg:left="87" dlg:top="41" dlg:width="67" dlg:height="10" dlg:help-text="&amp;2159.ChangerPoliceForm.CheckBox2.HelpText" dlg:value="&amp;2160.ChangerPoliceForm.CheckBox2.Label" dlg:checked="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoGdmath.ChangerPoliceCode.ChangePoliceForm_CheckBox2?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:checkbox dlg:id="CheckBox3" dlg:tab-index="6" dlg:left="87" dlg:top="53" dlg:width="67" dlg:height="10" dlg:help-text="&amp;2161.ChangerPoliceForm.CheckBox3.HelpText" dlg:value="&amp;2162.ChangerPoliceForm.CheckBox3.Label" dlg:checked="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoGdmath.ChangerPoliceCode.ChangePoliceForm_CheckBox3?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:text dlg:style-id="0" dlg:id="Label3" dlg:tab-index="7" dlg:left="6" dlg:top="77" dlg:width="148" dlg:height="30" dlg:help-text="&amp;2163.ChangerPoliceForm.Label3.HelpText" dlg:value="&amp;2164.ChangerPoliceForm.Label3.Label" dlg:align="center"/>
+  <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="1" dlg:left="47" dlg:top="7" dlg:width="107" dlg:height="13" dlg:help-text="&amp;2167.ChangerPoliceForm.ComboBox2.HelpText" dlg:value="&amp;2168.ChangerPoliceForm.ComboBox2.Text" dlg:spin="true" dlg:linecount="10">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoGdmath.ChangerPoliceCode.ChangePoliceForm_ComboBox2?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:combobox>
+  <dlg:textfield dlg:id="TextBox1" dlg:tab-index="8" dlg:left="16" dlg:top="42" dlg:width="30" dlg:height="13" dlg:help-text="&amp;2169.ChangerPoliceForm.TextBox1.HelpText" dlg:value="&amp;2170.ChangerPoliceForm.TextBox1.Text">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoGdmath.ChangerPoliceCode.ChangePoliceForm_TextBox1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="9" dlg:left="64" dlg:top="116" dlg:width="42" dlg:height="16" dlg:help-text="&amp;2171.ChangerPoliceForm.CommandButton1.HelpText" dlg:default="true" dlg:value="&amp;2172.ChangerPoliceForm.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoGdmath.ChangerPoliceCode.ChangePoliceForm_CommandButton1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="10" dlg:left="112" dlg:top="116" dlg:width="42" dlg:height="16" dlg:help-text="&amp;2173.ChangerPoliceForm.CommandButton2.HelpText" dlg:default="true" dlg:value="&amp;2174.ChangerPoliceForm.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoGdmath.ChangerPoliceCode.ChangePoliceForm_CommandButton2?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

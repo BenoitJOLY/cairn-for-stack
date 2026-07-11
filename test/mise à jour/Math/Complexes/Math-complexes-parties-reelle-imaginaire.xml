@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396123  -->
+  <question type="stack">
+    <name>
+      <text>Complexes : Parties réelle et imaginaire</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#06b6d4;border-left:5px solid #0891b2;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q8 — Nombres complexes</strong>
+        <span style="background:#0891b2;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#0891b2;border:1px solid #0891b2;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">#️⃣ Parties Ré & Im</span>
+      </div>
+      
+      Déterminer la partie réelle et la partie imaginaire du nombre complexe suivant : <br/><br/>
+      \( z = {@z@} \)
+      <br/><br/>
+      <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
+        <div><strong>Re(z)</strong> = [[input:ans_re]] [[validation:ans_re]]</div>
+        <div><strong>Im(z)</strong> = [[input:ans_im]] [[validation:ans_im]]</div>
+      </div>
+
+[[iframe width="100%" height="200px" scrolling="false"]]
+[[style]]
+  body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+  .stack-keyboard-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; max-width: 600px; box-sizing: border-box; margin-top: 10px; }
+  .stack-keyboard-title { font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stack-keyboard-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+  .stack-keyboard-row:last-child { margin-bottom: 0; }
+  .btn-ins { background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; color: #334155 !important; padding: 6px 12px !important; font-size: 0.9rem !important; font-weight: 600 !important; cursor: pointer !important; transition: all 0.15s ease !important; min-width: 38px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; user-select: none; }
+  .btn-ins:hover { background: #ecfeff !important; border-color: #67e8f9 !important; color: #0891b2 !important; }
+  .btn-ins:active { background: #cffafe !important; }
+  .btn-i { background: #ecfeff !important; border-color: #a5f3fc !important; color: #0e7490 !important; font-style: italic; font-weight: 800 !important; }
+  .target-btn { background: #fff !important; border: 2px solid #cbd5e1 !important; border-radius: 6px !important; padding: 4px 10px !important; font-size: 0.8rem !important; font-weight: 700 !important; color: #64748b !important; cursor: pointer !important; transition: all 0.2s ease !important; }
+  .active-target { background: #06b6d4 !important; color: #ffffff !important; border-color: #06b6d4 !important; box-shadow: 0 2px 4px rgba(6, 182, 212, 0.3) !important; }
+  .sep { width: 1px; height: 28px; background: #e2e8f0; margin: 0 4px; }
+[[/style]]
+
+<div class="stack-keyboard-container">
+  <div class="stack-keyboard-title">🧮 Clavier cible</div>
+  
+  <div class="stack-keyboard-row">
+    <button id="target_re" class="target-btn active-target" type="button">Saisir pour Re(z)</button>
+    <button id="target_im" class="target-btn" type="button">Saisir pour Im(z)</button>
+  </div>
+
+  <div class="stack-keyboard-row">
+    <button class="btn-ins btn-i" type="button" data-val="%i">i</button>
+    <div class="sep"></div>
+    <button class="btn-ins" type="button" data-val="+">+</button>
+    <button class="btn-ins" type="button" data-val="-">-</button>
+    <button class="btn-ins" type="button" data-val="*">×</button>
+    <button class="btn-ins" type="button" data-val="/">/</button>
+    <div class="sep"></div>
+    <button class="btn-ins" type="button" data-val="(">(</button>
+    <button class="btn-ins" type="button" data-val=")">)</button>
+  </div>
+</div>
+
+[[script type="module"]]
+import {stack_js} from '[[cors src="stackjsiframe.js"/]]';
+
+let currentTarget = null;
+
+function setupInput(name, btnId) {
+    stack_js.request_access_to_input(name, true).then(function(input_id) {
+        var input = document.getElementById(input_id);
+        document.getElementById(btnId).addEventListener('click', function(e) {
+            e.preventDefault();
+            currentTarget = input;
+            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active-target'));
+            this.classList.add('active-target');
+        });
+        if(!currentTarget) {
+            currentTarget = input;
+        }
+    });
+}
+
+setupInput("ans_re", "target_re");
+setupInput("ans_im", "target_im");
+
+document.querySelectorAll('.btn-ins').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+        e.preventDefault();
+        if(!currentTarget) return;
+        var val = this.getAttribute('data-val');
+        var actuel = currentTarget.value || '';
+        var texteAvant = actuel.trimEnd();
+        var charPrecedent = texteAvant.length > 0 ? texteAvant.slice(-1) : null;
+        var excl = [null, '=', '+', '-', '*', '/', '^', '('];
+        var estOp = /^[+\-*\/^)]/.test(val);
+        var pref = '';
+        if (!excl.includes(charPrecedent) && !estOp && actuel.length > 0) { pref = '*'; }
+        currentTarget.value = actuel + pref + val;
+        currentTarget.dispatchEvent(new Event('change'));
+    });
+});
+[[/script]]
+[[/iframe]]]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;"><div style="font-weight:bold; margin-bottom:10px;">🔑 Correction détaillée</div><div style="font-size:.9rem;">On multiplie par le conjugué du dénominateur :<br/>\( z = \frac{3 + 2i}{1 - i} \times \frac{1 + i}{1 + i} = \frac{1 + 5i}{2} \)<br/><br/>En séparant la fraction, on identifie clairement les parties :<br/>\( z = \frac{1}{2} + \frac{5}{2}i \)<br/><br/>Donc :<br/>• <strong>Re(z) = \frac{1}{2}</strong><br/>• <strong>Im(z) = \frac{5}{2}</strong></div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. Calcul caché pour générer les réponses */
+z_calc: (3+2*%i)/(1-%i);
+
+/* 2. Extraction automatique des parties réelle et imaginaire par Maxima */
+ta_re: realpart(z_calc);
+ta_im: imagpart(z_calc);
+
+/* 3. Affichage forcé de z sans simplification */
+texput(z, "\\dfrac{3 + 2i}{1 - i}");]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol><li>[[feedback:prt1]]</li></ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Parties Re et Im de (3+2i)/(1-i)</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:complex</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_im</name>
+      <type>algebraic</type>
+      <tans>ta_im</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_re</name>
+      <type>algebraic</type>
+      <tans>ta_re</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérifie si Re(z) est correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_re</sans>
+        <tans>ta_re</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT-RE-OK</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-RE-WRONG</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Re bon, vérifie Im(z)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_im</sans>
+        <tans>ta_im</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-IM-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Parfait !</strong> La partie réelle et la partie imaginaire sont toutes les deux correctes.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0.5</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-IM-WRONG</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #eab308;padding:10px 14px;background:#fefce8;border-radius:4px;">⚠️ <strong>Partiellement correct.</strong> La partie réelle est bonne, mais vous avez fait une erreur dans le calcul de la <strong>partie imaginaire</strong>. Vérifiez votre développement au numérateur (rappel : \( i^2 = -1 \)).</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Re faux, vérifie Im(z) pour le feedback</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_im</sans>
+        <tans>ta_im</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-RE-WRONG-IM-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #eab308;padding:10px 14px;background:#fefce8;border-radius:4px;">⚠️ <strong>Partiellement correct.</strong> La partie imaginaire est bonne, mais vous avez fait une erreur dans le calcul de la <strong>partie réelle</strong>. N'oubliez pas de diviser par le dénominateur !</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ALL-WRONG</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>Incorrect.</strong> Ni la partie réelle ni la partie imaginaire ne sont justes. Pensez à multiplier par le conjugué du dénominateur et à bien séparer les termes sans <em>i</em> de ceux avec <em>i</em>.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ParalleloCode" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Dim oParalleloForm as Object
+
+Sub Main
+	oParalleloForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;ParalleloForm&quot;)
+	ChangeTitreDialog(oParalleloForm)
+&apos;	RestaureForm(oParalleloForm)
+    oParalleloForm.Model.OptionButton1.ImageURL=fCheminImages &amp; &quot;par1.gif&quot;
+    oParalleloForm.Model.OptionButton2.ImageURL=fCheminImages &amp; &quot;par6.gif&quot;
+    oParalleloForm.Model.OptionButton3.ImageURL=fCheminImages &amp; &quot;par2.gif&quot;
+    oParalleloForm.Model.OptionButton4.ImageURL=fCheminImages &amp; &quot;par3.gif&quot;
+    oParalleloForm.Model.OptionButton5.ImageURL=fCheminImages &amp; &quot;par7.gif&quot;
+    oParalleloForm.Model.OptionButton6.ImageURL=fCheminImages &amp; &quot;par8.gif&quot;
+    oParalleloForm.Model.OptionButton7.ImageURL=fCheminImages &amp; &quot;par5.gif&quot;
+    oParalleloForm.Model.OptionButton8.ImageURL=fCheminImages &amp; &quot;par9.gif&quot;
+    oParalleloForm.Model.OptionButton9.ImageURL=fCheminImages &amp; &quot;par10.gif&quot;
+    oParalleloForm.Model.OptionButton10.ImageURL=fCheminImages &amp; &quot;par4.gif&quot;
+    oParalleloForm.Model.Image11.ImageURL=fCheminImages &amp; &quot;par11.gif&quot;
+	oParalleloForm.Execute()
+End Sub
+
+Private Sub ParalleloForm_AnnulerBouton_Click()
+    oParalleloForm.EndExecute()
+End Sub
+
+Private Sub ParalleloForm_CheckBox1_Click()
+    oParalleloForm.Model.CheckBox5.Enabled = oParalleloForm.Model.CheckBox1.State Or oParalleloForm.Model.CheckBox2.State
+End Sub
+
+Private Sub ParalleloForm_CheckBox10_Click()
+    oParalleloForm.Model.TextBox9.Enabled = oParalleloForm.Model.CheckBox10.State
+End Sub
+
+Private Sub ParalleloForm_CheckBox2_Click()
+    oParalleloForm.Model.CheckBox5.Enabled = oParalleloForm.Model.CheckBox1.State Or oParalleloForm.Model.CheckBox2.State
+End Sub
+
+Private Sub ParalleloForm_CheckBox3_Click()
+    oParalleloForm.Model.CheckBox40.Enabled = oParalleloForm.Model.CheckBox3.State
+End Sub
+
+Private Sub ParalleloForm_Couleur_Click()
+    ChangeCouleur Couleur
+End Sub
+
+Private Sub ParalleloForm_ActiveLabel(et1, et2, et3)
+    If (et1) Then oParalleloForm.Model.Label4.Label = &quot;cm&quot; Else oParalleloForm.Model.Label4.Label = &quot;°&quot;
+    If (et2) Then oParalleloForm.Model.Label5.Label = &quot;cm&quot; Else oParalleloForm.Model.Label5.Label = &quot;°&quot;
+    If (et3) Then oParalleloForm.Model.Label6.Label = &quot;cm&quot; Else oParalleloForm.Model.Label6.Label = &quot;°&quot;
+End Sub
+
+Private Sub ParalleloForm_Image12_Click()
+    ChangeCouleur oParalleloForm.Model.Image12
+End Sub
+
+Private Sub ParalleloForm_Image13_Click()
+    ChangeCouleur oParalleloForm.Model.Image13
+End Sub
+
+Private Sub ParalleloForm_OkBouton_Click()
+Dim uneLigne As Object
+Dim posx, posy, afmesure, t1, t2, t3, a, b, c, x0, y0, ga, gb, ang1
+Dim UnParallelo, x1, y1, x3, y3, x2, y2, xi, yi, NombreArc, ro
+Dim xt, yt, mm1, mm2, xm, ym, xn, yn
+
+&apos; On Error GoTo erreur
+    oParalleloForm.EndExecute()
+    sauveForm(oParalleloForm)
+	InitialiseDessin(false)
+    Shapes=InitialiseGroupe
+    PointInsertion posx, posy
+    afmesure = oParalleloForm.Model.CheckBox3.State
+    t1 = oParalleloForm.Model.TextBox1.Text
+    t2 = oParalleloForm.Model.TextBox2.Text
+    t3 = oParalleloForm.Model.TextBox3.Text
+    RemplaceVirgulePoint t1
+    RemplaceVirgulePoint t2
+    RemplaceVirgulePoint t3
+    a = Val(t1)
+    b = Val(t2)
+    c = Val(t3)
+    t1 = oParalleloForm.Model.TextBox1.Text
+    t2 = oParalleloForm.Model.TextBox2.Text
+    t3 = oParalleloForm.Model.TextBox3.Text
+    x0 = 0
+    y0 = 0
+    ga = 20
+    gb = ga - 2
+    ang1 = 0
+    If (oParalleloForm.Model.OptionButton1.State) Then
+        a = a * 1000
+        b = b * 1000
+        c = c * 1000
+        x1 = a
+        y1 = 0
+        x3 = (a * a + b * b - c * c) / (2 * a)
+        y3 = Sqr(b * b - x3 * x3)
+        y2 = y3
+        x2 = x1 + x3
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, 0)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x3) / 2, (y0 + y3) / 2, Shapes, 0)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x1 + x3) / 2, (y1 + y3) / 2, Shapes, 0)
+        End If
+    End If
+    If (oParalleloForm.Model.OptionButton2.State) Then
+        a = a * 1000
+        b = b * 1000
+        c = c * 1000
+        x1 = a
+        y1 = 0
+        xi = (a * a + b * b - c * c) / (2 * a)
+        yi = Sqr(b * b - xi * xi)
+        x2 = 2 * xi
+        y2 = 2 * yi
+        y3 = y2
+        x3 = x2 - x1
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, 0)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (3 * x0 + x2) / 4, (3 * y0 + y2) / 4, Shapes, 0)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (3 * x1 + x3) / 4, (3 * y1 + y3) / 4, Shapes, 0)
+        End If
+    End If
+    If (oParalleloForm.Model.OptionButton3.State) Then
+        a = a * 1000
+        b = b * 1000
+        c = c * Pi / 180
+        x1 = a
+        y1 = 0
+        x3 = b * Cos(c)
+        y3 = b * Sin(c)
+        y2 = y3
+        x2 = x1 + x3
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, 0)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x3) / 2, (y0 + y3) / 2, Shapes, 0)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (6 * x0 + x1 + x3) / 8, (6 * y0 + y1 + y3) / 8, Shapes, 0)
+        End If
+        If oParalleloForm.Model.CheckBox41.State Then
+            If t3 = &quot;90&quot; Then
+                MarqueAngleDroit x0, y0, x3, y3, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x1, y1, x0, y0, x3, y3, (Val(t3) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+                NombreArc = 1
+            End If
+        End If
+    End If
+    If (oParalleloForm.Model.OptionButton4.State) Then
+        a = a * 1000
+        b = b * 1000
+        c = c * Pi / 180
+        x1 = a
+        y1 = 0
+        x2 = b * Cos(c)
+        y2 = b * Sin(c)
+        y3 = y2
+        x3 = x2 - x1
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, 0)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x2) / 2, (y0 + y2) / 2, Shapes, 0)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (6 * x0 + x1 + x2) / 8, (6 * y0 + y1 + y2) / 8, Shapes, 0)
+        End If
+        If oParalleloForm.Model.CheckBox41.State Then
+            If Val(t3) = 90 Then
+                MarqueAngleDroit x0, y0, x1, y1, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x1, y1, x0, y0, x2, y2, (Val(t3) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+                NombreArc = 1
+            End If
+        End If
+    End If
+    If (oParalleloForm.Model.OptionButton5.State) Then
+        a = a * 1000
+        b = b  * 1000
+        c = c * Pi / 180
+        x0 = -b * Cos(c)
+        y0 = -b * Sin(c)
+        x1 = a
+        y1 = 0
+        x2 = -x0
+        y2 = -y0
+        x3 = -a
+        y3 = 0
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        ang1 = Int(Abs(CalculeAngle(x3, y3, x2, y2) * 180 / Pi))
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (3 * x3 + x1) / 4, (3 * y3 + y1) / 4, Shapes, -ang1)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (3 * x0 + x2) / 4, (3 * y0 + y2) / 4, Shapes, -ang1)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (3 * x0 + 3 * x2 + x0 + x3) / 8, (3 * y0 + 3 * y2 + y0 + y3) / 8, Shapes, -ang1)
+        End If
+        If oParalleloForm.Model.CheckBox41.State Then
+            If Val(t3) = 90 Then
+                MarqueAngleDroit((x0 + x2) / 2, (y0 + y2) / 2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+            Else
+                MarqueAngle x0, y0, (x0 + x2) / 2, (y0 + y2) / 2, x3, y3, (Val(t3) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+                NombreArc = 1
+            End If
+        End If
+    End If
+    If (oParalleloForm.Model.OptionButton6.State) Then
+        a = a * 1000
+        b = b * 1000
+        c = c * Pi / 180
+        x3 = Cos(c) * (a * Cos(c) + Sqr(b * b - a * a * Sin(c) * Sin(c)))
+        y3 = x3 * Tan(c)
+        x1 = a
+        y1 = 0
+        y2 = y3
+        x2 = x1 + x3
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, 0)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x3 + x1) / 2, (y3 + y1) / 2, Shapes, 0)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (6 * x0 + x1 + x3) / 8, (6 * y0 + y1 + y3) / 8, Shapes, 0)
+        End If
+        If oParalleloForm.Model.CheckBox41.State Then
+            If Val(t3) = 90 Then
+                MarqueAngleDroit x0, y0, x1, y1, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x1, y1, x0, y0, x3, y3, (Val(t3) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+                NombreArc = 1
+            End If
+        End If
+    End If
+    If (oParalleloForm.Model.OptionButton7.State) Then
+        a = a * 1000
+        b = b * 1000
+        c = c * Pi / 180
+        ro = b * Cos(c) + Sqr(a * a - b * b * Sin(c) * Sin(c))
+        x1 = Cos(c) * ro
+        y1 = -Sin(c) * ro
+        x2 = b
+        y2 = 0
+        y3 = y2 - y1
+        x3 = x2 - x1
+        xt = x3
+        yt = y3
+        x3 = x0
+        y3 = y0
+        x0 = x1
+        y0 = y1
+        x1 = x2
+        y1 = y2
+        x2 = xt
+        y2 = yt
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        ang1 = Int(Abs(CalculeAngle(x3, y3, x2, y2) * 180 / Pi))
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, -ang1)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x1 + x3) / 2, (y1 + y3) / 2, Shapes, -ang1)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (6 * x3 + x0 + x1) / 8, (6 * y3 + y0 + y1) / 8, Shapes, -ang1)
+        End If
+        If oParalleloForm.Model.CheckBox41.State Then
+            If Val(t3) = 90 Then
+                MarqueAngleDroit x3, y3, x0, y0, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x1, y1, x3, y3, x0, y0, (Val(t3) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+                NombreArc = 1
+            End If
+        End If
+    End If
+    If (oParalleloForm.Model.OptionButton8.State) Then
+        b = b * 1000
+        a = a * Pi / 180
+        c = c * Pi / 180
+        x2 = b * Cos(c)
+        y2 = b * Sin(c)
+        y3 = y2
+        x3 = y3 / Tan(a + c)
+        y1 = 0
+        x1 = x2 - x3
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (6 * x0 + x3 + x2) / 8, (6 * y0 + y3 + y2) / 8, Shapes, 0)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x2) / 2, (y0 + y2) / 2, Shapes, 0)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (6 * x0 + x1 + x2) / 8, (6 * y0 + y1 + y2) / 8, Shapes, 0)
+        End If
+        If oParalleloForm.Model.CheckBox41.State Then
+            If Val(t1) = 90 Then
+                MarqueAngleDroit x0, y0, x2, y2, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x3, y3, x0, y0, x2, y2, (Val(t1) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+            End If
+            If Val(t3) = 90 Then
+                MarqueAngleDroit x0, y0, x1, y1, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x1, y1, x0, y0, x2, y2, (Val(t3) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+            End If
+        End If
+        NombreArc = 2
+    End If
+    If (oParalleloForm.Model.OptionButton9.State) Then
+        a = a * 1000
+        b = b * 1000
+        c = c * Pi / 180
+        x1 = a
+        y1 = 0
+        x2 = Cos(c) * (a * Cos(c) + Sqr(b * b - a * a * Sin(c) * Sin(c)))
+        y2 = x2 * Tan(c)
+        y3 = y2
+        x3 = x2 - x1
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, 0)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x1 + x2) / 2, (y1 + y2) / 2, Shapes, 0)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (6 * x0 + x1 + x2) / 8, (6 * y0 + y1 + y2) / 8, Shapes, 0)
+        End If
+        If oParalleloForm.Model.CheckBox41.State Then
+            If Val(t3) = 90 Then
+                MarqueAngleDroit x0, y0, x1, y1, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x1, y1, x0, y0, x2, y2, (Val(t1) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+            End If
+        End If
+        NombreArc = 1
+    End If
+    If (oParalleloForm.Model.OptionButton10.State) Then
+        a = a * Pi / 180
+        c = c * Pi / 180
+        b = b * 1000
+        x1 = b
+        y1 = 0
+        x2 = 2 * b * Tan(c) / (Tan(a) + Tan(c))
+        y2 = x2 * Tan(a)
+        x3 = x2 - b
+        y3 = y2
+        x0 = x0 + posx
+        y0 = y0 + posy
+        x1 = x1 + posx
+        y1 = y1 + posy
+        x2 = x2 + posx
+        y2 = y2 + posy
+        x3 = x3 + posx
+        y3 = y3 + posy
+        unParallelo=InsereQuadrilatere(x0, y0, x1, y1, x2, y2, x3, y3, Shapes, oParalleloForm.Model.Image13)
+        If afmesure Then
+            InsereTexte(t1 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (6 * x0 + x1 + x2) / 8, (6 * y0 + y1 + y2) / 8, Shapes, 0)
+            InsereTexte(t2 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot; cm&quot;, &quot;&quot;), (x0 + x1) / 2, (y0 + y1) / 2, Shapes, 0)
+            InsereTexte(t3 &amp; MIif(oParalleloForm.Model.CheckBox40.State = 0, &quot;°&quot;, &quot;&quot;), (x0 + 6 * x1 + x3) / 8, (y0 + 6 * y1 + y3) / 8, Shapes, 0)
+        End If
+        If oParalleloForm.Model.CheckBox41.State Then
+            If Val(t1) = 90 Then
+                MarqueAngleDroit x0, y0, x1, y1, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x1, y1, x0, y0, x2, y2, (Val(t1) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+            End If
+            If Val(t3) = 90 Then
+                MarqueAngleDroit x1, y1, x3, y3, Shapes, oParalleloForm.Model.Image13
+            Else
+                MarqueAngle x0, y0, x1, y1, x3, y3, (Val(t3) &gt; 180), 1, 0, Shapes, oParalleloForm.Model.Image13
+            End If
+        End If
+        NombreArc = 2
+    End If
+    If oParalleloForm.Model.CheckBox7.State Then
+    	NormaliseCoordonnees xn, yn, x1, y1, x0, y0, x3, y3
+        InsereTexte(oParalleloForm.Model.TextBox4.Text, xn, yn, Shapes, 0, 0, 0)
+    	NormaliseCoordonnees xn, yn, x0, y0, x1, y1, x2, y2
+        InsereTexte(oParalleloForm.Model.TextBox7.Text, xn, yn, Shapes, 0, 0, 0)
+    	NormaliseCoordonnees xn, yn, x1, y1, x2, y2, x3, y3
+        InsereTexte(oParalleloForm.Model.TextBox5.Text, xn, yn, Shapes, 0, 0, 0)
+    	NormaliseCoordonnees xn, yn, x0, y0, x3, y3, x2, y2
+        InsereTexte(oParalleloForm.Model.TextBox6.Text, xn, yn, Shapes, 0, 0, 0)
+    End If
+    mm1 = False
+    mm2 = False
+    If oParalleloForm.Model.CheckBox1.State Then
+        uneLigne=InsereLigne(x0, y0, x2, y2, Shapes, oParalleloForm.Model.Image12)
+        If oParalleloForm.Model.CheckBox5.Enabled And oParalleloForm.Model.CheckBox5.State Then
+             CodeLongueur x0, y0, (x0 + x2) / 2, (y0 + y2) / 2, 3, Shapes, oParalleloForm.Model.Image12
+            CodeLongueur x2, y2, (x0 + x2) / 2, (y0 + y2) / 2, 3, Shapes, oParalleloForm.Model.Image12
+            If Not oParalleloForm.Model.CheckBox2.State Then
+                MarqueMilieu x0, y0, x2, y2, Shapes, oParalleloForm.Model.Image12
+                mm1 = True
+            End If
+        End If
+    End If
+    If oParalleloForm.Model.CheckBox2.State Then
+        uneLigne=InsereLigne(x1, y1, x3, y3, Shapes, oParalleloForm.Model.Image12)
+        If oParalleloForm.Model.CheckBox5.Enabled And oParalleloForm.Model.CheckBox5.State Then
+            CodeLongueur x1, y1, (x1 + x3) / 2, (y1 + y3) / 2, 4, Shapes, oParalleloForm.Model.Image12
+            CodeLongueur x3, y3, (x1 + x3) / 2, (y1 + y3) / 2, 4, Shapes, oParalleloForm.Model.Image12
+            If Not oParalleloForm.Model.CheckBox1.State Then
+                MarqueMilieu x1, y1, x3, y3, Shapes, oParalleloForm.Model.Image12
+                mm2 = True
+            End If
+        End If
+    End If
+    If oParalleloForm.Model.CheckBox6.State Then
+        CodeLongueur x0, y0, x1, y1, 1, Shapes, oParalleloForm.Model.Image13
+        CodeLongueur x2, y2, x3, y3, 1, Shapes, oParalleloForm.Model.Image13
+        CodeLongueur x2, y2, x1, y1, 2, Shapes, oParalleloForm.Model.Image13
+        CodeLongueur x0, y0, x3, y3, 2, Shapes, oParalleloForm.Model.Image13
+    End If
+    If oParalleloForm.Model.CheckBox10.State Then
+        xm = (x0 + x2) / 2
+        ym = (y0 + y2) / 2
+        
+        If oParalleloForm.Model.CheckBox1.State And Not mm1 Then 
+        	MarqueMilieu x0, y0, x2, y2, Shapes, oParalleloForm.Model.Image12
+        	mm1=True
+        End if
+        If oParalleloForm.Model.CheckBox2.State And Not mm2 Then 
+        	MarqueMilieu x1, y1, x3, y3, Shapes, oParalleloForm.Model.Image12
+        	mm2=True
+        End if
+        AjoutePoint xm, ym, oParalleloForm.Model.TextBox9.Text, InsereTexte(oParalleloForm.Model.TextBox9.Text,xm-200, ym-200, Shapes), not (mm1 or mm2), 0, Shapes
+    End If
+	Dim aPoint As New com.sun.star.awt.Point
+    Dim TheSize as new com.sun.star.awt.Size
+    Dim Group as Object
+    Dim Coeff
+    
+	aPoint.x=3000
+	aPoint.y=3000
+	Group = GroupeObjet(Shapes)
+	Group.Position=aPoint
+	TheSize=Group.Size
+	coeff=oParalleloForm.Model.Echelle.Text
+	RemplaceVirgulePoint(coeff)
+	TheSize.width = TheSize.Width*val(coeff)/100
+	TheSize.height= TheSize.Height*val(coeff)/100
+	Group.Size=TheSize
+	TermineDessin()
+Exit Sub
+erreur:
+    MsgBoxP &quot;message7&quot;
+End Sub
+
+Private Sub ParalleloForm_OptionButton1_Click()
+    ParalleloForm_ActiveLabel 1, 1, 1
+    oParalleloForm.Model.CheckBox1.State = 0
+    oParalleloForm.Model.CheckBox2.State = 1
+    oParalleloForm.Model.CheckBox41.Enabled = False
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_OptionButton2_Click()
+    ParalleloForm_ActiveLabel 1, 1, 1
+    oParalleloForm.Model.CheckBox1.State = 1
+    oParalleloForm.Model.CheckBox2.State = 1
+    oParalleloForm.Model.CheckBox41.Enabled = False
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_OptionButton3_Click()
+    ParalleloForm_ActiveLabel 1, 1, 0
+    oParalleloForm.Model.CheckBox1.State = 0
+    oParalleloForm.Model.CheckBox2.State = 0
+    oParalleloForm.Model.CheckBox41.Enabled = True
+    oParalleloForm.Model.CheckBox5.Enabled = False
+End Sub
+
+Private Sub ParalleloForm_OptionButton4_Click()
+    ParalleloForm_ActiveLabel 1, 1, 0
+    oParalleloForm.Model.CheckBox1.State = 1
+    oParalleloForm.Model.CheckBox2.State = 0
+    oParalleloForm.Model.CheckBox41.Enabled = True
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_OptionButton5_Click()
+    ParalleloForm_ActiveLabel 1, 1, 0
+    oParalleloForm.Model.CheckBox1.State = 1
+    oParalleloForm.Model.CheckBox2.State = 1
+    oParalleloForm.Model.CheckBox41.Enabled = True
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_OptionButton6_Click()
+    ParalleloForm_ActiveLabel 1, 1, 0
+    oParalleloForm.Model.CheckBox1.State = 0
+    oParalleloForm.Model.CheckBox2.State = 1
+    oParalleloForm.Model.CheckBox41.Enabled = True
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_OptionButton7_Click()
+    ParalleloForm_ActiveLabel 1, 1, 0
+    oParalleloForm.Model.CheckBox1.State = 0
+    oParalleloForm.Model.CheckBox2.State = 1
+    oParalleloForm.Model.CheckBox41.Enabled = True
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_OptionButton8_Click()
+    ParalleloForm_ActiveLabel 0, 1, 0
+    oParalleloForm.Model.CheckBox1.State = 1
+    oParalleloForm.Model.CheckBox2.State = 0
+    oParalleloForm.Model.CheckBox41.Enabled = True
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_OptionButton9_Click()
+    ParalleloForm_ActiveLabel 1, 1, 0
+    oParalleloForm.Model.CheckBox1.State = 1
+    oParalleloForm.Model.CheckBox2.State = 0
+    oParalleloForm.Model.CheckBox41.Enabled = True
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_OptionButton10_Click()
+    ParalleloForm_ActiveLabel 0, 1, 0
+    oParalleloForm.Model.CheckBox1.State = 1
+    oParalleloForm.Model.CheckBox2.State = 1
+    oParalleloForm.Model.CheckBox41.Enabled = True
+    oParalleloForm.Model.CheckBox5.Enabled = True
+End Sub
+
+Private Sub ParalleloForm_TextBox4_Change()
+    oParalleloForm.Model.CheckBox1.Label = &quot;[&quot; &amp; oParalleloForm.Model.TextBox4.Text &amp; oParalleloForm.Model.TextBox5.Text &amp; &quot;]&quot;
+End Sub
+
+Private Sub ParalleloForm_TextBox5_Change()
+    oParalleloForm.Model.CheckBox1.Label = &quot;[&quot; &amp; oParalleloForm.Model.TextBox4.Text &amp; oParalleloForm.Model.TextBox5.Text &amp; &quot;]&quot;
+End Sub
+
+Private Sub ParalleloForm_TextBox6_Change()
+    oParalleloForm.Model.CheckBox2.Label = &quot;[&quot; &amp; oParalleloForm.Model.TextBox7.Text &amp; oParalleloForm.Model.TextBox6.Text &amp; &quot;]&quot;
+End Sub
+
+Private Sub ParalleloForm_TextBox7_Change()
+    oParalleloForm.Model.CheckBox2.Label = &quot;[&quot; &amp; oParalleloForm.Model.TextBox7.Text &amp; oParalleloForm.Model.TextBox6.Text &amp; &quot;]&quot;
+End Sub
+
+
+Private Sub Renomme(evt as Object)
+	GRenomme evt, oParalleloForm, Array(&quot;TextBox4&quot;, &quot;TextBox5&quot;, &quot;TextBox6&quot;, &quot;TextBox7&quot;)
+End Sub
+
+</script:module>

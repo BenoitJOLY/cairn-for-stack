@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 418263  -->
+  <question type="stack">
+    <name>
+      <text>JSXGraph 3 Carrés Séquentiels</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Retrouvez les carrés demandés le plus vite possible !</p>
+        
+        <div style="display: none;" aria-hidden="true" tabindex="-1">
+            [[input:ans1]] [[validation:ans1]]
+        </div>
+
+        [[jsxgraph input-ref-ans1="refAns1" width="500px" height="400px"]]
+        var board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-8, 6, 8, -6], axis: false, showNavigation: false, showCopyright: false});
+        
+        var cibles = [
+            { id: 'bleu', txt: 'bleu', color: '#3498db', coords: [[-7,-5], [-3,-5], [-3,-1], [-7,-1]] },
+            { id: 'vert', txt: 'vert', color: '#2ecc71', coords: [[-1,-5], [3,-5], [3,-1], [-1,-1]] },
+            { id: 'rouge', txt: 'rouge', color: '#e74c3c', coords: [[5,-5], [7,-5], [7,-1], [5,-1]] }
+        ];
+        
+        var polys = [];
+        for (var i = 0; i < cibles.length; i++) {
+            polys.push(board.create('polygon', cibles[i].coords, {
+                fillOpacity: 0.6,
+                fillColor: cibles[i].color,
+                strokeColor: cibles[i].color,
+                strokeWidth: 2,
+                hasInnerPoints: true,
+                highlight: false
+            }));
+        }
+
+        var consigne = board.create('text', [0, 5.5, 'Trouvez le carré ' + cibles[0].txt], {fontSize: 18, cssStyle: 'font-weight:bold; text-align:center;', anchorX: 'middle', anchorY: 'top'});
+        var timerTxt = board.create('text', [7.5, 5.5, '5'], {fontSize: 18, cssStyle: 'color:red; font-weight:bold;', anchorX: 'right', anchorY: 'top'});
+
+        var etatActuel = 0;
+        var tempsRestant = 5;
+        var estFini = false;
+        var compteur;
+
+        function lancerTimer() {
+            clearInterval(compteur);
+            tempsRestant = 5;
+            timerTxt.setText(tempsRestant);
+            compteur = setInterval(function() {
+                tempsRestant--;
+                timerTxt.setText(tempsRestant);
+                if (tempsRestant <= 0) {
+                    finJeu("echec");
+                }
+            }, 1000);
+        }
+
+        function finJeu(statut) {
+            if (estFini) return;
+            estFini = true;
+            clearInterval(compteur);
+            
+            var inputEl = document.getElementById(refAns1);
+            
+            if (statut === "reussi") {
+                consigne.setText('Bravo !');
+                consigne.setAttribute({cssStyle: 'font-weight:bold; color:green; text-align:center;'});
+            } else {
+                consigne.setText('Temps écoulé !');
+                consigne.setAttribute({cssStyle: 'font-weight:bold; color:red; text-align:center;'});
+            }
+            
+            inputEl.value = statut;
+            inputEl.dispatchEvent(new Event('change'));
+        }
+
+        for (var j = 0; j < polys.length; j++) {
+            (function(index) {
+                polys[index].on('down', function() {
+                    if (estFini) return;
+                    if (cibles[index].id === cibles[etatActuel].id) {
+                        etatActuel++;
+                        if (etatActuel >= cibles.length) {
+                            finJeu("reussi");
+                        } else {
+                            consigne.setText('Trouvez le carré ' + cibles[etatActuel].txt);
+                            lancerTimer();
+                        }
+                    }
+                });
+            })(j);
+        }
+
+        lancerTimer();
+        [[/jsxgraph]]]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>string</type>
+      <tans><![CDATA["reussi"]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA["reussi"]]></tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1.0000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<span style="color:green; font-weight:bold;">Parfait, vous avez trouvé les trois carrés dans le temps imparti !</span>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0.0000000</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<span style="color:red; font-weight:bold;">Échec. Vous n'avez pas été assez rapide pour trouver tous les carrés.</span>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

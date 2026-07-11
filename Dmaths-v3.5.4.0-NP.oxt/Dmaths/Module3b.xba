@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module3b" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) 2010-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye  
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.com
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+Private LaBoite as Object
+Private Const LesOptionsParDefaut = &quot;1:0:0:0:1:15:10:15:12:10:25:0:0:0:0:0:0:0:0:0:0:0:O:i:j:10:1:0:0:0:0:0:1:0:0:0:0:0:&quot;
+Global oDocGraphPlotter as Object
+
+
+Function MemoriseCourbe(LaCourbe as Object) as String Rem cette macro memorise les parametres de la courbe
+	Dim LeTexte as String
+	LaBoite = oRepFonctions
+	LeTexte = CStr(Nbrecourbes) &amp; &quot;::&quot;
+	For I = 1 To 10
+	LeTexte = LeTexte &amp; CC(I) &amp; &quot;:&quot;
+	Next I
+	LeTexte = LeTexte &amp; CT(2) &amp; &quot;:&quot;
+	LeTexte = LeTexte &amp; CT(3) &amp; &quot;:&quot;
+	For I = 6 To 16
+	LeTexte = LeTexte &amp; CT(I) &amp; &quot;:&quot;
+	Next I
+	LeTexte = LeTexte &amp; CT(18) &amp; &quot;:&quot;
+	LeTexte = LeTexte &amp; CT(19) &amp; &quot;:&quot;
+	For I = 1 To 6
+	LeTexte = LeTexte &amp; CO(I) &amp; &quot;:&quot;
+	Next I
+	For I = 0 To Nbrecourbes
+	LeTexte = LeTexte &amp; &quot;:&quot; &amp; sNomFonction(I) &amp; &quot;:&quot; &amp; sFormul(I) &amp; &quot;:&quot; &amp; Xmin(I) &amp; &quot;:&quot; &amp; Xmax(I) &amp; &quot;:&quot;
+	Next I
+	LeTexte = LeTexte  &amp; MemoriseOptions
+	MemoriseCourbe = LeTexte
+End Function
+
+
+
+Function MemoriseOptions as String Rem cette macro memorise les parametres de la courbe
+	Dim LeTexte as String
+	LaBoite = oOptions
+	LeTexte = &quot;:&quot;
+	For I = 1 To 5
+	LeTexte = LeTexte &amp; CC(I) &amp; &quot;:&quot;
+	Next I
+	For I = 1 To 21
+	LeTexte = LeTexte &amp; CT(I) &amp; &quot;:&quot;
+	Next I	
+	For I = 1 To 12
+	LeTexte = LeTexte &amp; CO(I) &amp; &quot;:&quot;
+	Next I
+	MemoriseOptions = LeTexte
+End Function
+
+Sub SauveOptionsTrace Rem cette macro sauvegarde dans les options de tracer dans celle de Dmaths ecrite le 26 f�vrier 2010
+	Dim sOptionsCourbe, sSrce as String
+	Dim oLib as Object
+	Dim iIndex, iIndex2 as Integer
+    oLib = GlobalScope.BasicLibraries.Standard
+	If oLib.hasByName(&quot;DmOptions&quot;) Then
+		sSrce = oLib.getByName(&quot;DmOptions&quot;)
+		oLib.removeByName(&quot;DmOptions&quot;)
+		iIndex = InsTr(sSrce,&quot;Public const sOptionsTraceCourbe = &quot;)
+		sOptionsCourbe = MemoriseOptions
+		sOptionsCourbe = Mid(sOptionsCourbe,2,Len(sOptionsCourbe)-1)		
+		If iIndex &gt; 0 Then  Rem les options de tracer existent
+			iIndex2 = InsTr(iIndex,sSrce,chr(13))
+			sSrce = Mid(sSrce,1,iIndex+34) &amp; &quot;&quot;&quot;&quot; &amp; sOptionsCourbe &amp; &quot;&quot;&quot;&quot; &amp; Mid(sSrce,iIndex2,Len(sSrce)-iIndex2+1)
+		Else Rem les options n&apos;existent pas
+			iIndex2 = InsTr(sSrce,&quot;Sub MyTest2&quot;)
+			sSrce = Mid(sSrce,1,iIndex2-1) &amp; &quot;Public const sOptionsTraceCourbe = &quot;&quot;&quot; &amp; sOptionsCourbe &amp; &quot;&quot;&quot;&quot; _
+			&amp; Chr(13) &amp; Mid(sSrce,iIndex2,Len(sSrce)-iIndex2+1)
+		Endif
+		oLib.InsertByName(&quot;DmOptions&quot;,sSrce)
+		msgbox(sVocab(iLang,1),64,&quot;Dmaths&quot;)
+	Endif
+End sub
+
+Sub ChargeOptionsParDefaut Rem macro permettant de reinitialiser les options d etracer par defaut ecrite le 27 fevrier 2010 modifiee le 14 mars 2010
+	Dim sDefaut as String
+	sDefaut = LesOptionsParDefaut
+	RecupereOptions(sDefaut)
+End Sub
+
+Sub RecupereCourbe (sDescription As String) rem modifi�e le 13 d�cembre 2009
+rem on charge la boite avec les parametres transmis
+	If Len(sDescription)&gt;0  Then
+	  ChargeCourbe (sDescription)
+	Else
+rem on recupere les parametres dune courbe selectionnee
+		If Not IsEmpty(ThisComponent.CurrentSelection) Then
+			If ThisComponent.CurrentSelection.ImplementationName = &quot;com.sun.star.drawing.SvxShapeCollection&quot; Then
+				If Len(ThisComponent.CurrentSelection.getByIndex(0).Description) &gt; 0 Then
+					If Len(ThisComponent.CurrentSelection.getByIndex(0).Description) &gt; 2 Then
+						If (Mid(ThisComponent.CurrentSelection.getByIndex(0).Description,2,2) = &quot;::&quot;) Then
+							Call ChargeCourbe(ThisComponent.CurrentSelection.getByIndex(0).Description)
+						Else
+rem on charge seulement les options m�moris�es	
+							RecupereOptions(sOptionsTraceCourbe)			 
+						Endif
+					Else
+						RecupereOptions(sOptionsTraceCourbe)			 
+					Endif
+				Else
+					RecupereOptions(sOptionsTraceCourbe)
+				Endif
+			Else
+				RecupereOptions(sOptionsTraceCourbe)			 
+			Endif
+		Else
+			RecupereOptions(sOptionsTraceCourbe)
+		Endif
+	Endif
+End Sub
+
+
+Sub ChargeCourbe(LT as String) rem recupere la courbe selectionnee
+	Nbrecourbes = Cint(Mid(LT,1,1)
+	LaBoite = oRepFonctions
+	Dim Index,NewIndex as Integer
+	
+	For I = 1 To 10
+		LaBoite.getControl(&quot;CheckBox&quot;&amp;Cstr(I)).State = Cint(Mid(LT,2+2*I,1)
+	Next I
+	Index = 23
+	NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+	LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(2)).Text = Mid(LT,Index+1,NewIndex-Index-1)
+	Index = NewIndex
+	NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+	LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(3)).Text = Mid(LT,Index+1,NewIndex-Index-1)
+	For I = 6 To 16
+		Index = NewIndex
+		NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+		LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(I)).Text = Mid(LT,Index+1,NewIndex-Index-1)
+	Next I
+	Index = NewIndex
+	NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+	LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(18)).Text = Mid(LT,Index+1,NewIndex-Index-1)
+	Index = NewIndex
+	NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+	LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(19)).Text = Mid(LT,Index+1,NewIndex-Index-1)
+	For I = 1 To 6
+		Index = NewIndex
+		NewIndex = Index + 2	
+		If  Mid(LT,Index+1,1) = &quot;0&quot; Then
+			LaBoite.getControl(&quot;OptionButton&quot;&amp;Cstr(I)).State = False
+		Else
+			LaBoite.getControl(&quot;OptionButton&quot;&amp;Cstr(I)).State = True
+		Endif
+	Next I
+	For I = 0 To Nbrecourbes rem recupere les fonctions
+		Index = NewIndex + 1 rem on tient compte du ::
+		NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+		sNomFonction(I) = Mid(LT,Index+1,NewIndex-Index-1)
+		If I = 0 Then LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(17)).Text = sNomFonction(I)
+		Index = NewIndex
+		NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+		sFormul(I) = Mid(LT,Index+1,NewIndex-Index-1)
+		If I = 0 Then LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(1)).Text = sFormul(I)
+		Index = NewIndex
+		NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+		Xmin(I) = CSngPlus(Mid(LT,Index+1,NewIndex-Index-1))
+		If I = 0 Then LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(4)).Text = Mid(LT,Index+1,NewIndex-Index-1)
+		Index = NewIndex
+		NewIndex = InStr(Index+1,LT,&quot;:&quot;)
+		Xmax(I) = CSngPlus(Mid(LT,Index+1,NewIndex-Index-1))
+		If I = 0 Then LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(5)).Text = Mid(LT,Index+1,NewIndex-Index-1)
+	Next I
+	RecupereOptions(Mid(LT,NewIndex+2,Len(LT)-NewIndex-1)
+	NbreMaxcourbes = Nbrecourbes rem reinitialise le nbremax de courbes
+	Nbrecourbes = 0 rem reinitialise le nbre de courbes 
+	bRecup = True
+End Sub
+
+
+Sub RecupereOptions(LTO As String)	Rem permet de charger les options dans la boite de dialogue oOptions
+	If Len(LTO) = 0 Then
+		LTO = LesOptionsParDefaut
+		SauveOptionsTrace
+	Endif
+	LaBoite = oOptions
+	Dim Index,NewIndex as Integer
+	For I = 1 To 5 rem les CheckBoxs
+		LaBoite.getControl(&quot;CheckBox&quot;&amp;Cstr(I)).State = Mid(LTO,1+2*(I-1),1)
+	Next I 	
+	NewIndex = 10
+	For I = 1 To 21 rem les TextFields
+		Index = NewIndex
+		NewIndex = InStr(Index+1,LTO,&quot;:&quot;)
+		LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(I)).Text = Mid(LTO,Index+1,NewIndex-Index-1)
+	Next I
+	For I = 1 To 12 rem les OptionButtons
+		If  Mid(LTO,NewIndex+1+2*(I-1),1) = &quot;0&quot; Then
+			LaBoite.getControl(&quot;OptionButton&quot;&amp;Cstr(I)).State = False
+		Else
+			LaBoite.getControl(&quot;OptionButton&quot;&amp;Cstr(I)).State = True
+		Endif
+	Next I
+End Sub
+
+REM Open
+Sub ChoixDesOptions					rem mis au point le 3 janvier 2003 modifiee le 11 avril 2009
+	&apos;oRepfonctions.Visible=False
+	If bDiagBox=True or bGrille=True Then
+		oOptions.GetControl(&quot;FrameControl7&quot;).Visible = False
+		oOptions.GetControl(&quot;CheckBox4&quot;).Visible = False
+		oOptions.GetControl(&quot;Label14&quot;).Visible = False
+		oOptions.GetControl(&quot;Label15&quot;).Visible = False
+		oOptions.GetControl(&quot;TextField13&quot;).Visible = False
+		oOptions.GetControl(&quot;TextField14&quot;).Visible = False
+	Endif
+	If oRepfonctions.Model.CheckBox5.State=1 or bGrille=True Then
+		oOptions.Model.TextField8.Text = oOptions.GetControl(&quot;TextField7&quot;).Peer.Text
+		oOptions.Model.TextField8.Enabled = False
+		oOptions.Model.TextField9.Text = oOptions.GetControl(&quot;TextField7&quot;).Peer.Text
+		oOptions.Model.TextField9.Enabled = False
+		oOptions.Model.TextField10.Text = oOptions.GetControl(&quot;TextField7&quot;).Peer.Text
+		oOptions.Model.TextField10.Enabled = False
+		oOptions.Model.TextField11.Text = oOptions.GetControl(&quot;TextField7&quot;).Peer.Text
+		oOptions.Model.TextField11.Enabled = False
+		oOptions.Model.TextField12.Text = oOptions.GetControl(&quot;TextField7&quot;).Peer.Text
+		oOptions.Model.TextField12.Enabled = False
+		oOptions.Model.TextField15.Text = oOptions.GetControl(&quot;TextField7&quot;).Peer.Text
+		oOptions.Model.TextField15.Enabled = False
+		oOptions.Model.TextField16.Text = oOptions.GetControl(&quot;TextField7&quot;).Peer.Text
+		oOptions.Model.TextField16.Enabled = False
+		oOptions.Model.TextField17.Text = oOptions.GetControl(&quot;TextField7&quot;).Peer.Text
+		oOptions.Model.TextField17.Enabled = False
+	Else
+		oOptions.Model.TextField8.Enabled=True
+		oOptions.Model.TextField9.Enabled=True
+		oOptions.Model.TextField10.Enabled=True
+		oOptions.Model.TextField11.Enabled=True
+		oOptions.Model.TextField12.Enabled=True
+		oOptions.Model.TextField15.Enabled=True
+		oOptions.Model.TextField16.Enabled=True
+		oOptions.Model.TextField17.Enabled=True
+	Endif
+		RecupereOptions(sOptionsTraceCourbe)
+		oOptions.Execute()
+End Sub
+
+Rem Close
+Sub ValiderOptions							rem mis au point le 3 janvier 2003
+	oOptions.EndExecute()
+End Sub
+
+
+Function CT(Entier as Integer) as String rem code le TextField numero Entier
+	CT = LaBoite.getControl(&quot;TextField&quot;&amp;Cstr(Entier)).Peer.Text
+End Function
+
+Function CC(Entier as Integer) as String rem code le CheckBox numero Entier
+	CC = LaBoite.getControl(&quot;CheckBox&quot;&amp;Cstr(Entier)).State	
+End Function
+
+Function CO(Entier as Integer) as String rem code le CheckBox numero Entier
+	If LaBoite.getControl(&quot;OptionButton&quot;&amp;Cstr(Entier)).State = True	Then
+	CO = &quot;1&quot;
+	Else
+	CO = &quot;0&quot;
+	Endif
+End Function
+
+rem diverses macro
+&apos;--------------------------------------------------------------------------------------------------------------------------------
+&apos;--------------------------------------------------------------------------------------------------------------------------------
+
+Sub LanceGraphPlotter rem ouvre le fichier du module GraphPlotter ecrit le 24 janvier 2004 modifiee le 11 avril 2009
+	rem corrigee le 21 mars 2010 puis le 23 novembre 2014
+	Call VerifOperationnel
+	Dim oPage as Object
+	oDocumentCourant = ThisComponent	
+	sGraphPlotter = fChemindmaths + &quot;GraphPlotter.otg&quot;
+	oDocGraphPlotter = ChargeModele(sGraphPlotter)
+	oPage = oDocGraphPlotter.Drawpages(0)
+	If OOoName() = &quot;LibreOffice&quot; Then oPage.Forms(0).GetByName(&quot;PushButton1&quot;).EnableVisible = False
+	Select Case iLang
+	Case 0
+		oPage.Forms(0).GetByName(&quot;PushButton1&quot;).Label = &quot;Tracer Axes &quot;
+		oPage.Forms(0).GetByName(&quot;PushButton2&quot;).Label = &quot;Terminer&quot;
+		oPage.Forms(0).GetByName(&quot;PushButton3&quot;).Label = &quot;Tracer Courbes&quot;
+	Case 1
+		oPage.Forms(0).GetByName(&quot;PushButton1&quot;).Label = &quot;Draw Axes&quot;
+		oPage.Forms(0).GetByName(&quot;PushButton2&quot;).Label = &quot;End&quot;
+		oPage.Forms(0).GetByName(&quot;PushButton3&quot;).Label = &quot;Draw Graphs&quot;
+	Case 2
+		oPage.Forms(0).GetByName(&quot;PushButton1&quot;).Label = &quot;Zeichne Achsen&quot;
+		oPage.Forms(0).GetByName(&quot;PushButton2&quot;).Label = &quot;Beenden&quot;
+		oPage.Forms(0).GetByName(&quot;PushButton3&quot;).Label = &quot;Zeichne Graphen&quot;
+	End Select		
+End Sub
+
+
+Sub Axeencm							rem mis au point le 3 janvier 2003 modifiee le 11 avril 2009
+If oRepfonctions.Model.OptionButton6.State = 0 Then
+	If oRepfonctions.Model.OptionButton2.State = 1 Then
+		oRepfonctions.Model.TextField6.Text = CsngPlus(oRepfonctions.GetControl(&quot;TextField2&quot;).Peer.Text)*0.5
+		oRepfonctions.Model.TextField9.Text = CsngPlus(oRepfonctions.GetControl(&quot;TextField3&quot;).Peer.Text)*0.5
+		oRepfonctions.Model.CheckBox6.State=1
+		oRepfonctions.Model.CheckBox6.Enabled=True
+		oRepfonctions.Model.CheckBox7.State=1
+		oRepfonctions.Model.CheckBox7.Enabled=True
+	Elseif oRepfonctions.Model.OptionButton1.State=1 or oRepfonctions.Model.OptionButton5.State=1 Then
+		oRepfonctions.Model.TextField6.Text = oRepfonctions.GetControl(&quot;TextField2&quot;).Peer.Text
+		oRepfonctions.Model.TextField9.Text = oRepfonctions.GetControl(&quot;TextField3&quot;).Peer.Text
+		oRepfonctions.Model.CheckBox6.State=1
+		oRepfonctions.Model.CheckBox6.Enabled=True
+		oRepfonctions.Model.CheckBox7.State=1
+		oRepfonctions.Model.CheckBox7.Enabled=True
+	Elseif  oRepfonctions.Model.OptionButton3.State=1 Then
+		oRepfonctions.Model.TextField6.Text = CsngPlus(oRepfonctions.GetControl(&quot;TextField2&quot;).Peer.Text)*0.1		
+		oRepfonctions.Model.TextField9.Text = CsngPlus(oRepfonctions.GetControl(&quot;TextField3&quot;).Peer.Text)*0.1
+	Elseif  oRepfonctions.Model.OptionButton4.State=1 Then
+		oRepfonctions.Model.TextField6.Text = CsngPlus(oRepfonctions.GetControl(&quot;TextField2&quot;).Peer.Text)*0.2
+		oRepfonctions.Model.TextField9.Text = CsngPlus(oRepfonctions.GetControl(&quot;TextField3&quot;).Peer.Text)*0.2
+	Endif
+		oRepfonctions.Model.TextField6.Enabled=False
+		oRepfonctions.Model.TextField9.Enabled=False
+	Endif
+&apos;	oOptions.Model.OptionButton8.State=1
+End Sub
+
+Sub Axeenunite									rem mis au point le 3 janvier 2003
+	If (oRepfonctions.Model.OptionButton6.State=1 or oRepfonctions.Model.OptionButton2.State=1) Then
+		oRepfonctions.Model.TextField6.Enabled = True
+		oRepfonctions.Model.TextField9.Enabled = True
+		oRepfonctions.Model.TextField6.Text = 1
+		oRepfonctions.Model.TextField9.Text = 1
+		oRepfonctions.Model.CheckBox6.State = 1
+		oRepfonctions.Model.CheckBox6.Enabled = True
+		oRepfonctions.Model.CheckBox7.State = 1
+		oRepfonctions.Model.CheckBox7.Enabled = True
+	Endif
+&apos;	oOptions.Model.OptionButton8.State=1
+End Sub
+
+Function DetermineColor								rem mis au point le 3 janvier 2003
+Dim iColorNumber as Long
+	If oOptions.Model.OptionButton7.State=1 Then
+		iColorNumber=oOptions.Model.ImageControl7.BackGroundColor
+	Elseif oOptions.Model.OptionButton8.State=1 Then
+		iColorNumber=oOptions.Model.ImageControl8.BackGroundColor
+	Elseif oOptions.Model.OptionButton9.State=1 Then
+		iColorNumber=oOptions.Model.ImageControl9.BackGroundColor
+	Elseif oOptions.Model.OptionButton10.State=1 Then
+		iColorNumber=oOptions.Model.ImageControl10.BackGroundColor
+	Elseif oOptions.Model.OptionButton11.State=1 Then
+		iColorNumber=oOptions.Model.ImageControl11.BackGroundColor
+	Elseif oOptions.Model.OptionButton12.State=1 Then
+		iColorNumber=oOptions.Model.ImageControl12.BackGroundColor
+	Elseif oRepfonctions.Model.OptionButton3.State=1 or oRepfonctions.Model.OptionButton4.State=1  Then
+		iColorNumber=oOptions.Model.ImageControl8.BackGroundColor
+	Else
+		iColorNumber=oOptions.Model.ImageControl7.BackGroundColor
+	Endif
+		DetermineColor=iColorNumber
+End Function
+
+Function createLine (oDocument,oPage,x1,y1,x2,y2,iNumero) As Object			rem mis au point le 3 janvier 2003
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	Dim oLine as Object
+	oLine = oDocument.createInstance(&quot;com.sun.star.drawing.LineShape&quot;)
+&apos;	Xray oLine
+	rem: on trace une graduation
+	If oRepfonctions.Model.OptionButton3.State=1 or oRepfonctions.Model.OptionButton4.State=1 Then
+		If (iNumero mod 10)=0 Then
+		oLine.LineWidth=Csng(oOptions.getControl(&quot;TextField4&quot;).Peer.Text)*3
+		Elseif (iNumero mod 5)=0 Then
+		oLine.LineWidth=Csng(oOptions.getControl(&quot;TextField4&quot;).Peer.Text)*2
+		Else
+		oLine.LineWidth=Csng(oOptions.getControl(&quot;TextField4&quot;).Peer.Text)
+		Endif
+	Else
+		If (iNumero mod 5)=0 Then
+		oLine.LineWidth=Csng(oOptions.getControl(&quot;TextField3&quot;).Peer.Text)
+		Else
+		oLine.LineWidth=Csng(oOptions.getControl(&quot;TextField2&quot;).Peer.Text)
+		Endif
+	Endif
+
+	oLine.LineColor = DetermineColor
+	rem: ligne pointill�e
+	If (oRepfonctions.Model.OptionButton1.State=1 or oRepfonctions.Model.OptionButton2.State=1) and oRepfonctions.Model.CheckBox10.State=0 Then
+	 Dim aLineDash As New com.sun.star.drawing.LineDash
+	 with aLineDash
+	  .Style = com.sun.star.drawing.DashStyle.ROUND
+	 &apos; .Dots = 1
+	  .Dashes = 2 &apos;number of lines
+	 &apos; .DotLen = 5 &apos;dimension of lines
+	  .Distance = 40 &apos;distance
+	 end With
+	 If OOoNumVersion &lt; 400 Then
+	 	aLineDash.Dots = 1
+	 	aLineDash.DotLen = 5	 
+	 Endif
+	Endif
+	oPage.add(oLine)
+&apos;	Xray oLine
+	If (oRepfonctions.Model.OptionButton1.State=1 or oRepfonctions.Model.OptionButton2.State=1) and  oRepfonctions.Model.CheckBox10.State=0 Then
+	 with oLine
+	  .LineStyle = com.sun.star.drawing.LineStyle.DASH
+	  .LineDash = aLineDash
+	 end with
+	Endif
+	
+	Dim points(1) As New com.sun.star.awt.Point
+	points(0).x = x1
+	points(0).y = y1
+	points(1).x = x2
+	points(1).y = y2
+	aLineShape = oLine.PolyPolygon
+	aLineShape = Array(points())
+	oLine.PolyPolygon = aLineShape
+	createLine = oLine
+End Function
+
+Function Createmarque (oDocument,oPage,x1,y1,x2,y2,iColor, Optional bAnchorATPage ) As Object			rem mis au point le 3 janvier 2003
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim aSize As New com.sun.star.awt.Size
+	Dim oLine as Object
+	oLine = oDocument.createInstance(&quot;com.sun.star.drawing.LineShape&quot;)
+	rem: on trace une graduation
+	oLine.LineWidth=Csng(oOptions.getControl(&quot;TextField1&quot;).Peer.Text)
+&apos;	Print Csng(oOptions.getControl(&quot;TextField1&quot;).Peer.Text)
+	oLine.LineColor=iColor	
+	If bAnchorATPage = True Then oLine.AnchorType = com.sun.star.text.TextContentAnchorType.AT_PAGE
+	oPage.add(oLine)
+	Dim points(1) As New com.sun.star.awt.Point
+	points(0).x = x1
+	points(0).y = y1
+	points(1).x = x2
+	points(1).y = y2
+	aLineShape = oLine.PolyPolygon
+	aLineShape = Array(points())
+	oLine.PolyPolygon = aLineShape
+&apos;	oLine.LineWidth = 80
+	Createmarque = oLine
+End Function
+
+Sub FdeX(sFormul as String,Numero as Integer)	rem mis au point le 3 janvier 2003
+	Dim Longueur,N,I1,I2,P as Integer	
+	rem Si Plott alors N=nombre de points
+	Dim Plott as Boolean rem Plott=True si Plott	
+	bParam(Numero)=False
+	N=0
+	Plott=False
+	Longueur=Len(sFormul)
+&apos;	Print sFormul
+	rem Determine si Plott
+	NiveauParenthese=0
+	LastSC=0
+	For I=1 To Longueur
+	    CurChar=Mid(sFormul,I,1)
+	    if instr(&quot;({[&quot;,CurChar) then NiveauParenthese=NiveauParenthese+1
+	    if instr(&quot;)}]&quot;,CurChar) then NiveauParenthese=NiveauParenthese-1
+		If Mid(sFormul,I,1)=&quot;;&quot; and NiveauParenthese=0 Then
+			N=N+1
+			LastSC=I
+		Endif
+	Next I
+	Rem si N=1 alors la courbe est parametrique
+	
+	If N&gt;=2 Then
+		Plott=True 
+		If Instr(sFormul,&quot;;;;&quot;)&gt;0  Then
+			Dmaths.Module5.Avertir(14) 
+			bError=True
+			rem marque l&apos;erreur
+			Goto Fin
+		ElseIf Instr(sFormul,&quot;;;&quot;)&gt;0 Then
+			I1 = 1
+			I2 = Instr(sFormul,&quot;;;&quot;)
+			Do Until I2 &gt; Longueur		
+				If Instr(I2,sFormul,&quot;;;&quot;)&gt;0 Then I2 = Instr(I2,sFormul,&quot;;;&quot;) Else I2 = Longueur
+						CompteurPV = 0
+				For I = I1 To I2-1
+					If Mid(sFormul,I,1) = &quot;;&quot; Then CompteurPV = CompteurPV + 1
+				Next I
+				If (CompteurPV &gt;=3 or CompteurPV=0) Then
+					Dmaths.Module5.Avertir(14) 
+					bError=True
+					Goto Fin
+				Endif
+				I1 = I2 + 2
+				I2 = I2	+ 2		
+			Loop 
+		ElseIf N&gt;39 Then
+			Dmaths.Module5.Avertir(15)
+			bError=True
+			Goto Fin
+		ElseIf 2*Int(N/2)=N Then
+			Dmaths.Module5.Avertir(14) 
+			bError=True
+			rem marque l&apos;erreur
+			Goto Fin				
+		EndIf
+	Endif
+
+	
+
+If Plott=True Then
+		Dim oSheet,oCell as Object
+		If bNewcalc = False Then
+			rem chargement du fichier tableur
+			oDesktop=createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+			Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+			mFileProperties(0).Name = &quot;Hidden&quot;
+			rem fichier cache
+			mFileProperties(0).Value = True									
+			sCalc = fCheminduFichierDmathsODS
+			oNewCalc = oDesktop.LoadComponentFromURL(sCalc,&quot;_blank&quot;,0,mFileProperties())
+			bNewCalc=True
+		Endif
+		oSheet=oNewCalc.Sheets(0)
+		oCell=GetCell(oSheet,1,0)		
+	P=0 rem num�ro du point trait�
+	I2=0
+		If Instr(sFormul,&quot;;;&quot;)&gt;0 Then			
+			Dim Valeur(1 to 3) as String
+			Dim NombrePV,NombreDPV as Integer rem compte les pointvirgule et les doubles
+			I1=1
+			NombreDPV = 1
+			NombrePV = 0
+			Do While I1&lt;Longueur
+				For I=1 To 3
+					Valeur(I)=&quot;nondef&quot;
+				Next I				
+				Do While (Mid(sFormul,I1,1)&lt;&gt;&quot;;&quot; and I1&lt;=Longueur)				
+					Do While (Mid(sFormul,I1+I2,1)&lt;&gt;&quot;;&quot; and I1+I2&lt;=Longueur)				
+					I2 = I2+1	
+					Loop
+					NombrePV = NombrePV + 1						
+					Valeur(NombrePV) = Mid(sFormul,I1,I2)						
+					I1 = I1+I2+1
+					I2 = 0
+				Loop
+				If NombreDPV = 1 Then 
+					For I=1 To 3
+					&apos;Print Valeur(1)
+					oCell=GetCell(oSheet,I,3)
+					oCell.SetValue(Csng(Valeur(1))^I)
+					oCell=GetCell(oSheet,I,4)					
+					oCell.SetValue(I*Csng(Valeur(1))^(I-1))	
+					Next I
+					oCell=GetCell(oSheet,40,3)					
+					oCell.SetValue(Csng(Valeur(2))
+					oCell=GetCell(oSheet,40,4)
+					If Valeur(3)=&quot;nondef&quot; Then oCell.SetValue(0) Else oCell.SetValue(Csng(Valeur(3))
+				Elseif I1&lt;Longueur Then
+					For I=0 To 3
+					oCell=GetCell(oSheet,I+(NombreDPV-2)*4,5+(NombreDPV-2)*4)
+					oCell.SetValue(Csng(Valeur(1))^I)					
+					oCell=GetCell(oSheet,I+(NombreDPV-2)*4,6+(NombreDPV-2)*4)
+					If I=0 Then oCell.SetValue(0) Else oCell.SetValue(I*Csng(Valeur(1))^(I-1))	
+					Next I			
+					oCell=GetCell(oSheet,40,5+(NombreDPV-2)*4)
+					oCell.SetValue(Csng(Valeur(2))
+															
+					If Valeur(3)=&quot;nondef&quot; Then
+						For I=0 To 3
+						oCell=GetCell(oSheet,I+(NombreDPV-1)*4,6+(NombreDPV-2)*4)
+						If I=0 Then oCell.SetValue(0) Else oCell.SetValue(-1*I*Csng(Valeur(1))^(I-1))
+						oCell=GetCell(oSheet,I+(NombreDPV-2)*4,7+(NombreDPV-2)*4)
+						If (I=0 or I=1) Then oCell.SetValue(0) Else oCell.SetValue(0.5*I*(I-1)*Csng(Valeur(1))^(I-2))	
+						oCell=GetCell(oSheet,I+(NombreDPV-1)*4,7+(NombreDPV-2)*4)
+						If (I=0 or I=1) Then oCell.SetValue(0) Else oCell.SetValue(-0.5*I*(I-1)*Csng(Valeur(1))^(I-2))
+						oCell=GetCell(oSheet,I+(NombreDPV-1)*4,8+(NombreDPV-2)*4)
+						oCell.SetValue(Csng(Valeur(1))^(I))
+						Next I
+						oCell=GetCell(oSheet,40,6+(NombreDPV-2)*4) 
+						oCell.SetValue(0)
+						oCell=GetCell(oSheet,40,7+(NombreDPV-2)*4) 
+						oCell.SetValue(0)
+						oCell=GetCell(oSheet,40,8+(NombreDPV-2)*4) 
+						oCell.SetValue(Csng(Valeur(2))								
+					Else
+						oCell=GetCell(oSheet,40,6+(NombreDPV-2)*4)
+						oCell.SetValue(Csng(Valeur(3))
+						oCell=GetCell(oSheet,40,7+(NombreDPV-2)*4)			
+						oCell.SetValue(Csng(Valeur(2))
+						oCell=GetCell(oSheet,40,8+(NombreDPV-2)*4) 
+						oCell.SetValue(Csng(Valeur(3))						
+						For I=0 To 3
+						oCell=GetCell(oSheet,I+(NombreDPV-1)*4,3+(NombreDPV-1)*4)
+						oCell.SetValue(Csng(Valeur(1))^I)
+						oCell=GetCell(oSheet,I+(NombreDPV-1)*4,4+(NombreDPV-1)*4)
+						If I=0 Then oCell.SetValue(0) Else oCell.SetValue(I*Csng(Valeur(1))^(I-1))								
+						Next I
+					Endif
+				Else
+					For I=0 To 3
+					oCell=GetCell(oSheet,I+(NombreDPV-2)*4,5+(NombreDPV-2)*4)
+					oCell.SetValue(Csng(Valeur(1))^I)
+					oCell=GetCell(oSheet,I+(NombreDPV-2)*4,6+(NombreDPV-2)*4)
+					If I=0 Then oCell.SetValue(0) Else oCell.SetValue(I*Csng(Valeur(1))^(I-1))
+					Next I
+					oCell=GetCell(oSheet,40,5+(NombreDPV-2)*4)
+					oCell.SetValue(Csng(Valeur(2))
+					oCell=GetCell(oSheet,40,6+(NombreDPV-2)*4)
+					If Valeur(3)=&quot;nondef&quot; Then oCell.SetValue(0) Else oCell.SetValue(Csng(Valeur(3))
+				Endif
+							
+				sNewFormulSpline(Numero,NombreDPV-1,1) = Valeur(1)
+				
+				NombrePV = 0
+				I1 = I1 + 1
+				NombreDPV = NombreDPV + 1
+												
+			Loop
+			rem ecriture des formules trouv�es
+			For J = 0 To NombreDPV-3
+				oCell=GetCell(oSheet,41,3+4*J)								
+				sNewFormulSpline(Numero,J,0) = TransfDecimal(cStr(oCell.GetValue()))
+				For I=1 To 3
+					oCell=GetCell(oSheet,41,3+4*J+I)
+					sNewFormulSpline(Numero,J,0) = sNewFormulSpline(Numero,J,0)&amp;&quot;+&quot;&amp;TransfDecimal(cStr(oCell.GetValue()))&amp;&quot;*x^&quot;&amp;cStr(I)
+				Next I
+				sNewFormulSpline(Numero,J,0) = RemplaceVirgule(sNewFormulSpline(Numero,J,0))
+			rem nettoie la feuille oSheet
+				If (oRepfonctions.Model.CheckBox9.State=1 and bOntrace=False) Then
+					Print &quot;Fonction &quot;&amp;CStr(Numero+1) &amp; &quot; Intervalle [&quot;&amp; sNewFormulSpline(Numero,J,1)&amp;&quot; ; &quot; &amp; sNewFormulSpline(Numero,J+1,1) &amp; &quot;] : f(x)=&quot; &amp; sNewFormulSpline(Numero,J,0)	
+				Endif 
+			Next J			
+			sNewFormul(Numero,1)=&quot;Spline cubique&quot;
+			&apos;Print &quot;stop&quot;
+			FormaTableau(oSheet,4*(NombreDPV-2))
+			
+		
+		Else
+			N=Int(N/2)+1
+			I1=1
+			Do While P&lt;&gt;N
+				oCell=GetCell(oSheet,0,P+3)
+				oCell.SetValue(1)
+				Do While Mid(sFormul,I1+I2,1)&lt;&gt;&quot;;&quot;
+				I2=I2+1
+				Loop
+				For I=1 To N-1
+					oCell=GetCell(oSheet,I,P+3)
+					oCell.SetValue(Csng(Mid(sFormul,I1,I2))^I)
+				Next I
+				I1=I1+I2+1
+				I2=0
+				Do While (Mid(sFormul,I1+I2,1)&lt;&gt;&quot;;&quot; and I1+I2&lt;&gt;Longueur)
+					I2=I2+1
+				Loop
+				If I1+I2=Longueur Then I2=I2+1
+				oCell=GetCell(oSheet,40,3+P)
+				oCell.SetValue(Csng(Mid(sFormul,I1,I2)))
+				I1=I1+I2+1
+				I2=0
+				P=P+1
+			Loop
+			rem calcule l&apos;expression du polynome			
+			oCell=GetCell(oSheet,41,3)
+			Print oCell.Value
+			sNewFormul(Numero,1) = TransfDecimal(cStr(oCell.GetValue()))
+			For I=1 To N-1
+			oCell=GetCell(oSheet,41,3+I)
+			sNewFormul(Numero,1) = sNewFormul(Numero,1)&amp;&quot;+&quot;&amp;TransfDecimal(cStr(oCell.GetValue()))&amp;&quot;*x^&quot;&amp;cStr(I)
+			Next I
+			sNewFormul(Numero,1) = RemplaceVirgule(sNewFormul(Numero,1))						
+			rem nettoie la feuille oSheet
+			FormaTableau(oSheet,N)	
+			rem affiche les coefficients
+			If (oRepfonctions.Model.CheckBox9.State=1 and bOntrace=False) Then		
+			Endif 
+	
+		Endif
+
+
+Else
+	sNewFormul(Numero,1)=RemplaceVirgule(sFormul)
+	&apos;Print sFormul
+	If Mid(sFormul,1,2)=&quot;x=&quot; Then
+		bParalleleOrdonnees(Numero)=True
+	Endif
+	If N=1 Then
+		NiveauParenthese=0
+		For I=1 To Longueur
+		    CurChar=Mid(sNewFormul(Numero,1),I,1)
+		    if instr(&quot;({[&quot;,CurChar) then NiveauParenthese=NiveauParenthese+1
+		    if instr(&quot;)}]&quot;,CurChar) then NiveauParenthese=NiveauParenthese-1
+			If CurChar=&quot;;&quot; and NiveauParenthese=0 Then
+				N=I
+			Endif
+		Next I
+		bParam(Numero)=True
+		If N=Longueur-1 and Mid(sNewFormul(Numero,1),N+1,1)=&quot;P&quot; Then
+		sNewFormul(Numero,0)=&quot;(&quot;+Mid(sNewFormul(Numero,1),1,N-1)+&quot;)*cos(x)&quot;
+		sNewFormul(Numero,1)=&quot;(&quot;+Mid(sNewFormul(Numero,1),1,N-1)+&quot;)*sin(x)&quot;
+		Else
+		sNewFormul(Numero,0)=Mid(sNewFormul(Numero,1),1,N-1)	
+		sNewFormul(Numero,1)=Mid(sNewFormul(Numero,1),N+1,Longueur-N)
+		Endif
+	Endif
+		
+EndIf
+
+	Fin:
+	If bError = True Then oRepfonctions.Visible = True
+End Sub
+
+
+Sub Plottfonctions
+	Dim K,I1,I2,K1 as integer
+	Dim thechaine as string
+	oRepFonctions.Visible = False
+	oPlott = LoadDialog(&quot;Dmaths&quot;,&quot;RepFoncPlott&quot;)	
+		thechaine = oRepFonctions.getControl(&quot;TextField1&quot;).Peer.Text
+		If Instr(thechaine,&quot;;;&quot;)&gt;0 Then
+			I1=1
+			K = 0 : K1 = 1
+				Do While I1&lt;Len(thechaine)						
+					Do While (Mid(thechaine,I1,1)&lt;&gt;&quot;;&quot; and I1&lt;=Len(thechaine))			
+						Do While (Mid(thechaine,I1+I2,1)&lt;&gt;&quot;;&quot; and I1+I2&lt;=Len(thechaine))
+						I2 = I2+1				
+						Loop
+						K = K + 1	
+						Select Case K
+						Case 1:
+						oPlott.getControl(&quot;vx&quot;&amp;Cstr(K1)).Text = Mid(thechaine,I1,I2)
+						Case 2:
+						oPlott.getControl(&quot;vf&quot;&amp;Cstr(K1)).Text = Mid(thechaine,I1,I2)
+						Case 3:
+						oPlott.getControl(&quot;vfp&quot;&amp;Cstr(K1)).Text = Mid(thechaine,I1,I2)
+						End Select			
+						I1 = I1+I2+1
+						I2 = 0			
+					Loop
+					K = 0
+					K1 = K1 + 1
+					I1 = I1 + 1
+				Loop					
+		Endif
+	
+	exitOK = com.sun.star.ui.dialogs.ExecutableDialogResults.OK
+	If oPlott.Execute = ExitOK Then
+	&apos;	Xray oPlott.getControl(&quot;vx1&quot;)
+		If (Len(oPlott.getControl(&quot;vx1&quot;).Peer.Text)&gt;0 and Len(oPlott.getControl(&quot;vf1&quot;).Peer.Text)&gt;0) Then
+			thechaine = oPlott.getControl(&quot;vx1&quot;).Peer.Text &amp; &quot;;&quot; &amp; oPlott.getControl(&quot;vf1&quot;).Peer.Text
+			If Len(oPlott.getControl(&quot;vfp1&quot;).Text)&gt;0 Then thechaine = thechaine &amp; &quot;;&quot; &amp; oPlott.getControl(&quot;vfp1&quot;).Text
+			K = 2
+			Do while (Len(oPlott.getControl(&quot;vx&quot;&amp;Cstr(K)).Peer.Text)&gt;0 and Len(oPlott.getControl(&quot;vf&quot;&amp;Cstr(K)).Peer.Text)&gt;0 and K&lt;=11)
+			thechaine = thechaine &amp; &quot;;;&quot;
+			thechaine = thechaine &amp; oPlott.getControl(&quot;vx&quot;&amp;Cstr(K)).Peer.Text &amp; &quot;;&quot; &amp; oPlott.getControl(&quot;vf&quot;&amp;Cstr(K)).Peer.Text
+			If Len(oPlott.getControl(&quot;vfp&quot;&amp;Cstr(K)).Peer.Text)&gt;0 Then thechaine = thechaine &amp; &quot;;&quot; &amp; oPlott.getControl(&quot;vfp&quot;&amp;Cstr(K)).Peer.Text
+			K = K+1			
+			Loop
+			oRepFonctions.getControl(&quot;TextField1&quot;).Text = thechaine
+			oRepFonctions.Visible = True
+		Endif	
+	Endif
+	oRepFonctions.Visible = True
+End Sub
+
+
+</script:module>

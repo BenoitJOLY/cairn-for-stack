@@ -1,0 +1,2179 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="Addons" oor:package="org.openoffice.Office">
+<node oor:name="AddonUI">
+	<node oor:name="Images">
+		<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image1" oor:op="replace">
+			<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.Prisme.PrismeMacroPrincipale</value>
+			</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL" oor:type="xs:string">
+					<value>%origin%/icons/image14_16.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL" oor:type="xs:string">
+					<value>%origin%/icons/image14_26.png</value>
+				</prop>
+			</node>
+		</node>
+		<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image2" oor:op="replace">
+			<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.Cylindre.CylindreMacroPrincipale</value>
+			</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL" oor:type="xs:string">
+					<value>%origin%/icons/image15_16.png</value>
+				</prop>
+			<prop oor:name="ImageBigURL" oor:type="xs:string">
+					<value>%origin%/icons/image15_26.png</value>
+			</prop>
+			</node>
+		</node>
+		<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image3" oor:op="replace">
+			<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.Pyramide.PyramideMacroPrincipale</value>
+			</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL" oor:type="xs:string">
+					<value>%origin%/icons/image16_16.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL" oor:type="xs:string">
+					<value>%origin%/icons/image16_26.png</value>
+				</prop>
+			</node>
+		</node>
+		<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image4" oor:op="replace">
+			<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.Cone.ConeMacroPrincipale</value>
+			</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL" oor:type="xs:string">
+					<value>%origin%/icons/image17_16.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL" oor:type="xs:string">
+					<value>%origin%/icons/image17_26.png</value>
+				</prop>
+			</node>
+		</node>
+		<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image5" oor:op="replace">
+			<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.Sphere.SphereMacroPrincipale</value>
+			</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL" oor:type="xs:string">
+					<value>%origin%/icons/image18_16.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL" oor:type="xs:string">
+				<value>%origin%/icons/image18_26.png</value>
+				</prop>
+			</node>
+		</node>
+		<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image6" oor:op="replace">
+			<prop oor:name="URL" oor:type="xs:string">
+				<value>macro:///OOoAHmath3D.CubePc.CubePcMacroPrincipale</value>
+			</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL" oor:type="xs:string">
+					<value>%origin%/icons/image19_16.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL" oor:type="xs:string">
+					<value>%origin%/icons/image19_26.png</value>
+				</prop>
+			</node>
+		</node>
+		<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image7" oor:op="replace">
+			<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.PyrRectPc.PyrRectPcMacroPrincipale</value>
+			</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL" oor:type="xs:string">
+					<value>%origin%/icons/image20_16.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL" oor:type="xs:string">
+					<value>%origin%/icons/image20_26.png</value>
+				</prop>
+			</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image8" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.TroncPyrPc.TroncPyrPcMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image21_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image21_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image9" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.PyrOrthPc.PyrOrthPcMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image22_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image22_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image10" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.PyrOrthPc2.PyrOrthPc2MacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image23_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image23_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image11" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.PatPrisme.PatPrismeMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image25_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image25_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image12" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.PatCyl.PatCylMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image26_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image26_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image13" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.PatPyr.PatPyrMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image27_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image27_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image14" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.PatCone.PatConeMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image28_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image28_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image15" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.PatCube.PatCubeMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image30_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image30_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image16" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.Polyedre.PolyedreMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image31_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image31_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image17" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.NomPointDroite.MacroPrincipaleNomPointDroite</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image24_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image24_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image18" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.FonctionsOffice.Grouper3D</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image32_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image32_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image19" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.FonctionsOffice.Degrouper3D</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image33_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image33_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image20" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.ah0.MonSite</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image29_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image29_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image21" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.PrismePc.PrismePcMacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image35_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image35_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image22" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+					<value>macro:///OOoAHmath3D.ChangerStyleAretes.ChangeStyleArete</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image34_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image34_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image23" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.Patron.MacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image36_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image36_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image24" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.ah2d.MacroPrincipale</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image37_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image37_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image25" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.Calotte.CalotteMP</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image38_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image38_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image26" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.FonctionsOffice.SymetrieHoriz</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image39_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image39_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image27" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.FonctionsOffice.SymetrieVert</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image41_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image41_26.png</value>
+					</prop>
+				</node>
+			</node>
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.image28" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+						<value>macro:///OOoAHmath3D.ConeTronc.ConeTroncMP</value>
+				</prop>
+				<node oor:name="UserDefinedImages">
+					<prop oor:name="ImageSmallURL" oor:type="xs:string">
+						<value>%origin%/icons/image40_16.png</value>
+					</prop>
+					<prop oor:name="ImageBigURL" oor:type="xs:string">
+						<value>%origin%/icons/image40_26.png</value>
+					</prop>
+				</node>
+			</node>
+	</node>
+	<node oor:name="OfficeMenuBar">
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.OfficeMenuBar" oor:op="replace">
+				<prop oor:name="Context" oor:type="xs:string">
+					<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+				</prop>
+				<prop oor:name="Title" oor:type="xs:string">
+					<value>AHmath3D</value>
+				</prop>
+					<node oor:name="Submenu">
+						<node oor:name="m01" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère un prisme droit en 3D</value>
+								<value xml:lang="pt">Inserir um prisma reto em 3D</value>
+								<value xml:lang="de">Prisma</value>
+								<value xml:lang="en">3D-prism</value>
+								<value xml:lang="et">3D-prism</value>
+								<value xml:lang="it">Prisma in 3D</value>
+								<value xml:lang="es">Prisma en 3D</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.Prisme.PrismeMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+							</prop>
+						</node>
+						<node oor:name="m02" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère un cylindre de révolution en 3D</value>
+								<value xml:lang="pt">Inserir um cilindro de revolução em 3D</value>
+								<value xml:lang="de">Zylinder</value>
+								<value xml:lang="en">3D-cylinder</value>
+								<value xml:lang="et">3D-cylinder</value>
+								<value xml:lang="it">Cilindro in 3D</value>
+								<value xml:lang="es">Cilindro en 3D</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.Cylindre.CylindreMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+							</node>
+						<node oor:name="m03" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère une pyramide régulière en 3D</value>
+								<value xml:lang="pt">Inserir uma pirâmide regular em 3D</value>
+								<value xml:lang="de">Pyramide</value>
+								<value xml:lang="en">3D-pyramid</value>
+								<value xml:lang="et">3D-pyramid</value>
+								<value xml:lang="it">Piramide in 3D</value>
+								<value xml:lang="es">Pirámide en 3D</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.Pyramide.PyramideMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+							</prop>
+						</node>
+						<node oor:name="m04" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère un cône de révolution en 3D</value>
+								<value xml:lang="pt">Inserir um cone de revolução em 3D</value>
+								<value xml:lang="de">Kegel</value>
+								<value xml:lang="en">3D-cone</value>
+								<value xml:lang="et">3D-cone</value>
+								<value xml:lang="it">Cono in 3D</value>
+								<value xml:lang="es">Cono en 3D</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.Cone.ConeMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m05" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère un tronc de cône en 3D</value>
+								<value xml:lang="pt">Inserir um cone troncado em 3D</value>
+								<value xml:lang="de">Kegelstumpf</value>
+								<value xml:lang="en">3D-truncated cone</value>
+								<value xml:lang="et">3D-truncated cone</value>
+								<value xml:lang="it">Tronco di cono in 3D</value>
+								<value xml:lang="es">Tronco de cono en 3D</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.Cone.ConeMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m06" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère une sphère en 3D</value>
+								<value xml:lang="pt">Inserir uma esfera em 3D</value>
+								<value xml:lang="de">Kugel</value>
+								<value xml:lang="en">3D-sphere</value>
+								<value xml:lang="et">3D-sphere</value>
+								<value xml:lang="it">Sfera in 3D</value>
+								<value xml:lang="es">Esfera en 3D</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.Sphere.SphereMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m07" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère une calotte sphérique en 3D</value>
+								<value xml:lang="pt">Inserir uma calota esférica em 3D</value>
+								<value xml:lang="de">kugelkalotte</value>
+								<value xml:lang="en">3D-spherical cap</value>
+								<value xml:lang="et">3D-spherical cap</value>
+								<value xml:lang="it">Calotta sferica in 3D</value>
+								<value xml:lang="es">Casquete esférico en 3D</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.Calotte.CalotteMP</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m08" oor:op="replace">
+							<prop oor:name="URL">
+								<value>private:separator</value>
+							</prop>
+						</node>
+						<node oor:name="m09" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère un pavé droit en perspective cavalière</value>
+								<value xml:lang="pt">Inserir um cubo em perspectiva cavaleira</value>
+								<value xml:lang="de">Quader (Kavalierperspektive)</value>
+								<value xml:lang="en">3D-cuboid (cavalier perspective)</value>
+								<value xml:lang="et">3D-cuboid (cavalier perspective)</value>
+								<value xml:lang="it">Parallelepipedo in 3D (prospettiva)</value>
+								<value xml:lang="es">Paralelepípedo rectangular en perspectiva caballera</value>								
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.CubePc.CubePcMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m10" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère un prisme droit ou un cylindre en perspective cavalière</value>
+								<value xml:lang="pt">Inserir um prisma reto ou um cilindro em perspectiva cavaleira</value>
+								<value xml:lang="de">Prisma+Zylinder (Kavalierperspektive)</value>
+								<value xml:lang="en">3D-Prism or cylinder(cavalier perspective)</value>
+								<value xml:lang="et">3D-Prism or cylinder(cavalier perspective)</value>
+								<value xml:lang="it">Prisma o cilindro in 3D (prospettiva)</value>
+								<value xml:lang="es">Prisma o cilindro en perspectiva caballera</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PrismePc.PrismePcMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m11" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">	
+								<value xml:lang="fr">Insère une pyramide régulière à base carrée (ou une pyramide à base rectangulaire) en perspective cavalière</value>
+								<value xml:lang="de">Pyramide: rechteckige Grundfläche (Kavalierperspektive)</value>
+								<value xml:lang="pt">Inserir pirâmide regular de base quadrada/rectangular em perspectiva cavaleira</value>
+								<value xml:lang="en">3D-pyramid: rectangular base (cavalier perspective)</value>
+								<value xml:lang="et">3D-pyramid: rectangular base (cavalier perspective)</value>
+								<value xml:lang="it">Piramide in 3D (prospettiva): base rettangolare</value>
+							<value xml:lang="es">Pirámide en perspectiva caballera: base rectangular</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PyrRectPc.PyrRectPcMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m12" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère un tronc de pyramide régulière à base carrée (ou à base rectangulaire) en perspective cavalière</value>
+								<value xml:lang="pt">Inserir um tronco de pirâmide regular de base quadrada/rectangular em perspectiva cavaleira</value>
+								<value xml:lang="de">Pyramidenstumpf: rechteckige Grundfläche (Kavalierperspektive)</value>
+								<value xml:lang="en">3D-truncated pyramid: rectangular base (cavalier perspective)</value>
+								<value xml:lang="et">3D-truncated pyramid: rectangular base (cavalier perspective)</value>
+								<value xml:lang="it">Piramide tronca in 3D (prospettiva): base rettangolare</value>
+								<value xml:lang="es">Pirámide truncada en perspectiva caballera: base rectangular</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.TroncPyrPc.TroncPyrPcMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m13" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère une pyramide "coin de pavé droit" à base rectangulaire en perspective cavalière</value>
+								<value xml:lang="pt">Inserir pirâmide de canto quadrado, base rectangular em perspectiva cavaleira</value>
+								<value xml:lang="de">Pyramide: Quaderecke, rechteckige Grundfläche (Kavalierperspektive)</value>
+								<value xml:lang="en">3D-pyramid: cuboid-corner, rectangular base (cavalier perspective)</value>
+								<value xml:lang="et">3D-pyramid: cuboid-corner, rectangular base (cavalier perspective)</value>
+								<value xml:lang="it">Piramide in 3D (prospettiva): retta a base rettangolare</value>
+								<value xml:lang="es">Pirámide "esquina de un paralelepípedo rectangular" en perspectiva caballera: base rectangular</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PyrOrthPc.PyrOrthPcMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m14" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère une pyramide "coin de pavé droit" à base triangulaire en perspective cavalière</value>
+								<value xml:lang="pt">Inserir pirâmide de canto quadrado, base triangular em perspectiva cavaleira</value>
+								<value xml:lang="de">Pyramide: Quaderecke, dreieckige Grundfläche (Kavalierperspektive)</value>
+								<value xml:lang="en">3D-pyramid: cuboid-corner, triangular base (cavalier perspective)</value>
+								<value xml:lang="et">3D-pyramid: cuboid-corner, triangular base (cavalier perspective)</value>
+								<value xml:lang="it">Piramide in 3D (prospettiva): retta a base triangolare</value>
+								<value xml:lang="es">Pirámide "esquina de un paralelepípedo rectangular" en perspectiva caballera: base triangular</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PyrOrthPc2.PyrOrthPc2MacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m15" oor:op="replace">
+							<prop oor:name="URL">
+								<value>private:separator</value>
+							</prop>
+						</node>
+						<node oor:name="m16" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère un polyèdre en 3D</value>
+								<value xml:lang="pt">Inserir un poliedro em 3D</value>
+								<value xml:lang="de">Polyeder</value>
+								<value xml:lang="en">3D-Polyedron</value>
+								<value xml:lang="et">3D-Polyedron</value>
+								<value xml:lang="it">Poliedro in 3D</value>
+								<value xml:lang="es">Poliedro en 3D</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.Polyedre.PolyedreMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m17" oor:op="replace">
+							<prop oor:name="URL">
+								<value>private:separator</value>
+							</prop>
+						</node>
+						<node oor:name="m18" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère le patron d'un prisme droit</value>
+								<value xml:lang="pt">Inserir o padrão de um prisma reto</value>
+								<value xml:lang="de">Netz eines Prismas</value>
+								<value xml:lang="en">Pattern of a prism</value>
+								<value xml:lang="et">Pattern of a prism</value>
+								<value xml:lang="it">Modello di prisma</value>
+								<value xml:lang="es">Patrón de un prisma</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PatPrisme.PatPrismeMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m19" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère le patron d'un cylindre de révolution</value>
+								<value xml:lang="pt">Inserir o padrão de um cilindro de revolução</value>
+								<value xml:lang="de">Netz eines Zylinders</value>
+								<value xml:lang="en">Pattern of a cylinder</value>
+								<value xml:lang="et">Pattern of a cylinder</value>
+								<value xml:lang="it">Modello di cilindro</value>
+								<value xml:lang="es">Patrón de un cilindro</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PatCyl.PatCylMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m20" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère le patron d'une pyramide régulière</value>
+								<value xml:lang="pt">Inserir o padrão de uma pirâmide regular</value>
+								<value xml:lang="de">Netz einer Pyramide</value>
+								<value xml:lang="en">Pattern of a pyramid</value>
+								<value xml:lang="et">Pattern of a pyramid</value>
+								<value xml:lang="it">Modello di piramide regolare</value>
+								<value xml:lang="es">Patrón de un Pirámide regular</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PatPyr.PatPyrMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m21" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère le patron d'un cône de révolution</value>
+								<value xml:lang="pt">Inserir o padrão de um cone de revolução</value>
+								<value xml:lang="de">Netz eines Kegels</value>
+								<value xml:lang="en">Pattern of a cone</value>
+								<value xml:lang="et">Pattern of a cone</value>
+								<value xml:lang="it">Modello di cono</value>
+								<value xml:lang="es">Patrón de un cono</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PatCone.PatConeMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m22" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère le patron d'un cube</value>
+								<value xml:lang="pt">Inserir o padrão de um cubo</value>
+								<value xml:lang="de">Netz eines Würfels</value>
+								<value xml:lang="en">Pattern of a cube</value>
+								<value xml:lang="et">Pattern of a cube</value>
+								<value xml:lang="it">Modello di cubo</value>
+								<value xml:lang="es">Patrón de un cubo (11)</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.PatCube.PatCubeMacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m23" oor:op="replace">
+							<prop oor:name="URL">
+								<value>private:separator</value>
+							</prop>
+						</node>
+						<node oor:name="m24" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Modifie et complète une figure déjà crée</value>
+								<value xml:lang="pt">Modifica um desenho já criado</value>
+								<value xml:lang="de">Veränderungen einer vorhandenen Zeichnung</value>
+								<value xml:lang="en">Modifications of an existing drawing</value>
+								<value xml:lang="et">Modifications of an existing drawing</value>
+								<value xml:lang="it">Modifica un disegno già creato</value>
+								<value xml:lang="es">Modifica un dibujo ya creado</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.ah2d.MacroPrincipale</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m25" oor:op="replace">
+							<prop oor:name="URL">
+								<value>private:separator</value>
+							</prop>
+						</node>
+						<node oor:name="m26" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Insère des zones de texte contenant le nom de points ou de droites</value>
+								<value xml:lang="pt">Inserir zonas de texto contendo nomes de pontos ou retas</value>
+								<value xml:lang="de">Textfelder für die Beschriftung erzeugen</value>
+								<value xml:lang="en">Labelling of points and edges</value>
+								<value xml:lang="et">Labelling of points and edges</value>
+								<value xml:lang="it">Etichette dei nomi di punti e spigoli</value>
+								<value xml:lang="es">Etiquetado de puntos y bordes</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.NomPointDroite.MacroPrincipaleNomPointDroite</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m27" oor:op="replace">
+							<prop oor:name="URL">
+								<value>private:separator</value>
+							</prop>
+						</node>
+						<node oor:name="m28" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">changer le style des arêtes : continue ou pointillé</value>
+								<value xml:lang="pt">Estilo das arestas: contìnua ou tracejada</value>
+								<value xml:lang="de">Kantendarstellung wechseln</value>
+								<value xml:lang="en">Change the style of the edges : Continuous or dashed</value>
+								<value xml:lang="et">Change the style of the edges : Continuous or dashed</value>
+								<value xml:lang="it">Stile di spigoli : piena o tratti finissimi</value>
+								<value xml:lang="es">Cambiar el estilo de los bordes: continuo o discontinuo</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.ChangerStyleAretes.ChangeStyleArete</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m29" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Grouper</value>
+								<value xml:lang="pt">Agrupar</value>
+								<value xml:lang="de">Gruppieren</value>
+								<value xml:lang="en">Group</value>
+								<value xml:lang="et">Group</value>
+								<value xml:lang="it">Raggruppa</value>
+								<value xml:lang="es">Agrupar</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.FonctionsOffice.Grouper3D</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m30" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Degrouper</value>
+								<value xml:lang="pt">Desagrupar</value>
+								<value xml:lang="de">Gruppierung aufheben</value>
+								<value xml:lang="en">Ungroup</value>
+								<value xml:lang="et">Ungroup</value>
+								<value xml:lang="it">Separa</value>
+								<value xml:lang="es">Disgregar</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.FonctionsOffice.Degrouper3D</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m31" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Symétrie horizontale</value>
+								<value xml:lang="pt">Simetria horizontal</value>
+								<value xml:lang="de">Horizontalen Symmetrie</value>
+								<value xml:lang="en">Horizontal symmetry</value>
+								<value xml:lang="et">Horizontal symmetry</value>
+								<value xml:lang="it">Simmetria orizzontale</value>
+								<value xml:lang="es">Simetría horizontal</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.FonctionsOffice.SymetrieHoriz</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m32" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Symétrie verticale</value>
+								<value xml:lang="pt">Simetria horizontal</value>
+								<value xml:lang="de">Horizontalen Symmetrie</value>
+								<value xml:lang="en">Horizontal symmetry</value>
+								<value xml:lang="et">Horizontal symmetry</value>
+								<value xml:lang="it">Simmetria orizzontale</value>
+								<value xml:lang="es">Simetría horizontal</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.FonctionsOffice.SymetrieVert</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+						<node oor:name="m33" oor:op="replace">
+							<prop oor:name="URL">
+								<value>private:separator</value>
+							</prop>
+						</node>
+						<node oor:name="m34" oor:op="replace">
+							<prop oor:name="Context" oor:type="xs:string">
+								<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+							</prop>
+							<prop oor:name="Title" oor:type="xs:string">
+								<value xml:lang="fr">Aide</value>
+								<value xml:lang="pt">Ajuda</value>
+								<value xml:lang="de">Hilfe</value>
+								<value xml:lang="en">Help</value>
+								<value xml:lang="et">Help</value>
+								<value xml:lang="it">Aiuto</value>
+								<value xml:lang="es">Ayuda</value>
+							</prop>
+							<prop oor:name="URL" oor:type="xs:string">
+								<value>macro:///OOoAHmath3D.ah0.MonSite</value>
+							</prop>
+							<prop oor:name="Target" oor:type="xs:string">
+								<value>_self</value>
+							</prop>
+							<prop oor:name="ImageIdentifier" oor:type="xs:string">
+								<value></value>
+							</prop>
+						</node>
+					</node>
+			</node>
+	</node>
+	<node oor:name="OfficeToolBar">
+			<node oor:name="org.openoffice.Office.addon.OOoAHmath3D.OfficeToolBar" oor:op="replace">
+				<prop oor:name="Title" oor:type="xs:string">
+					<value>AHmath3D</value>
+				</prop>
+				<!--noeud "ToolBarItems" pour openoffice-->
+				<node oor:name="ToolBarItems">
+					<node oor:name="bo01" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un prisme droit en 3D</value>
+							<value xml:lang="pt">Inserir um prisma reto em 3D</value>
+							<value xml:lang="de">Prisma</value>
+							<value xml:lang="en">3D-prism</value>
+							<value xml:lang="et">3D-prism</value>
+							<value xml:lang="it">Prisma in 3D</value>
+							<value xml:lang="es">Prisma en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Prisme.PrismeMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo02" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+						<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un cylindre de révolution en 3D</value>
+							<value xml:lang="pt">Inserir um cilindro de revolução em 3D</value>
+							<value xml:lang="de">Zylinder</value>
+							<value xml:lang="en">3D-cylinder</value>
+							<value xml:lang="et">3D-cylinder</value>
+							<value xml:lang="it">Cilindro in 3D</value>
+							<value xml:lang="es">Cilindro en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Cylindre.CylindreMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo03" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une pyramide régulière en 3D</value>
+							<value xml:lang="pt">Inserir uma pirâmide regular em 3D</value>
+							<value xml:lang="de">Pyramide</value>
+							<value xml:lang="en">3D-pyramid</value>
+							<value xml:lang="et">3D-pyramid</value>
+							<value xml:lang="it">Piramide in 3D</value>
+							<value xml:lang="es">Pirámide en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Pyramide.PyramideMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo04" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un cône de révolution en 3D</value>
+							<value xml:lang="pt">Inserir um cone de revolução em 3D</value>
+							<value xml:lang="de">Kegel</value>
+							<value xml:lang="en">3D-cone</value>
+							<value xml:lang="et">3D-cone</value>
+							<value xml:lang="it">Cono in 3D</value>
+							<value xml:lang="es">Cono en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Cone.ConeMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo05" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un tronc de cône en 3D</value>
+							<value xml:lang="pt">Inserir um cone troncado em 3D</value>
+							<value xml:lang="de">Kegelstumpf</value>
+							<value xml:lang="en">3D-truncated cone</value>
+							<value xml:lang="et">3D-truncated cone</value>
+							<value xml:lang="it">Tronco di cono in 3D</value>
+							<value xml:lang="es">Tronco de cono en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.ConeTronc.ConeTroncMP</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo06" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une sphère en 3D</value>
+							<value xml:lang="pt">Inserir uma esfera em 3D</value>
+							<value xml:lang="de">Kugel</value>
+							<value xml:lang="en">3D-sphere</value>
+							<value xml:lang="et">3D-sphere</value>
+							<value xml:lang="it">Sfera in 3D</value>
+							<value xml:lang="es">Esfera en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Sphere.SphereMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo07" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une calotte sphérique en 3D</value>
+							<value xml:lang="pt">Inserir uma calota esférica em 3D</value>
+							<value xml:lang="de">kugelkalotte</value>
+							<value xml:lang="en">3D-spherical cap</value>
+							<value xml:lang="et">3D-spherical cap</value>
+							<value xml:lang="it">Calotta sferica in 3D</value>
+							<value xml:lang="es">Casquete esférico en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Calotte.CalotteMP</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo08" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo09" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un pavé droit en perspective cavalière</value>
+							<value xml:lang="pt">Inserir um cubo em perspectiva cavaleira</value>
+							<value xml:lang="de">Quader (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-cuboid (cavalier perspective)</value>
+							<value xml:lang="et">3D-cuboid (cavalier perspective)</value>
+							<value xml:lang="it">Parallelepipedo in 3D (prospettiva)</value>
+							<value xml:lang="es">Paralelepípedo rectangular en perspectiva caballera</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.CubePc.CubePcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo10" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un prisme droit ou un cylindre en perspective cavalière</value>
+							<value xml:lang="pt">Inserir um prisma reto ou um cilindro em perspectiva cavaleira</value>
+							<value xml:lang="de">Prisma + Zylinder (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-Prism or cylinder (cavalier perspective)</value>
+							<value xml:lang="et">3D-Prism or cylinder cavalier perspective)</value>
+							<value xml:lang="it">Prisma o cilindro in 3D (prospettiva)</value>
+							<value xml:lang="es">Prisma o cilindro en perspectiva caballera</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.PrismePc.PrismePcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo11" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une pyramide régulière à base carrée (ou une pyramide à base rectangulaire) en perspective cavalière</value>
+							<value xml:lang="pt">Inserir uma pirâmide regular de base quadrada/rectangular em perspectiva cavaleira</value>
+							<value xml:lang="de">Pyramide: rechteckige Grundfläche (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-pyramid: rectangular base (cavalier perspective)</value>
+						<value xml:lang="et">3D-pyramid: rectangular base (cavalier perspective)</value>
+						<value xml:lang="it">Piramide in 3D (prospettiva): base rettangolare</value>
+						<value xml:lang="es">Pirámide en perspectiva caballera: base rectangular</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.PyrRectPc.PyrRectPcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo12" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un tronc de pyramide régulière à base carrée (ou à base rectangulaire) en perspective cavalière</value>
+							<value xml:lang="pt">Inserir um tronco de pirâmide regular de base quadrada/rectangular em perspectiva cavaleira</value>
+							<value xml:lang="de">Pyramidenstumpf: rechteckige Grundfläche (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-truncated pyramid: rectangular base (cavalier perspective)</value>
+							<value xml:lang="et">3D-truncated pyramid: rectangular base (cavalier perspective)</value>
+							<value xml:lang="it">Piramide tronca in 3D (prospettiva): base rettangolare</value>
+							<value xml:lang="es">Pirámide truncada en perspectiva caballera: base rectangular</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.TroncPyrPc.TroncPyrPcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo13" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une pyramide "coin de pavé droit" à base rectangulaire en perspective cavalière</value>
+							<value xml:lang="pt">Inserir pirâmide de canto quadrado, base rectangular em perspectiva cavaleira</value>
+							<value xml:lang="de">Pyramide: Quaderecke, rechteckige Grundfläche (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-pyramid: cuboid-corner, rectangular base (cavalier perspective)</value>
+							<value xml:lang="et">3D-pyramid: cuboid-corner, rectangular base (cavalier perspective)</value>
+							<value xml:lang="it">Piramide in 3D (prospettiva): retta a base triangolare</value>
+							<value xml:lang="es">Pirámide "esquina de un paralelepípedo rectangular" en perspectiva caballera: base rectangular</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.PyrOrthPc.PyrOrthPcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo14" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une pyramide "coin de pavé droit" à base triangulaire en perspective cavalière</value>
+							<value xml:lang="pt">Inserir pirâmide de canto quadrado, base rectangular em perspectiva cavaleira</value>
+							<value xml:lang="de">Pyramide: Quaderecke, dreieckige Grundfläche (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-pyramid: cuboid-corner, triangular base (cavalier perspective)</value>
+							<value xml:lang="et">3D-pyramid: cuboid-corner, triangular base (cavalier perspective)</value>
+							<value xml:lang="it">Piramide in 3D (prospettiva): retta a base triangolare</value>
+							<value xml:lang="es">Pirámide "esquina de un paralelepípedo rectangular" en perspectiva caballera: base triangular</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.PyrOrthPc2.PyrOrthPc2MacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo15" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo16" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un polyèdre en 3D</value>
+							<value xml:lang="pt">Inserir um poliedro em 3D</value>
+							<value xml:lang="de">Polyeder</value>
+							<value xml:lang="en">3D-Polyedron</value>
+							<value xml:lang="et">3D-Polyedron</value>
+							<value xml:lang="it">Poliedro in 3D</value>
+							<value xml:lang="es">Poliedro en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Polyedre.PolyedreMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo17" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo18" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère le patron d'un solide 3D</value>
+							<value xml:lang="pt">Inserir o padrão de um sólido 3D</value>
+							<value xml:lang="de">Netze verschiedener Körper...</value>
+							<value xml:lang="en">Inserts the pattern of a 3D solid</value>
+							<value xml:lang="et">Inserts the pattern of a 3D solid</value>
+							<value xml:lang="it">Inserisce il modello di un solido 3D</value>
+							<value xml:lang="es">Inserte el patrón de un sólido</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Patron.MacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo19" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo20" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Modifie et complète une figure déjà crée</value>
+							<value xml:lang="pt">Modifica um desenho já criado</value>
+							<value xml:lang="de">Veränderungen einer vorhandenen Zeichnung</value>
+							<value xml:lang="en">Modifications of an existing drawing</value>
+							<value xml:lang="et">Modifications of an existing drawing</value>
+							<value xml:lang="it">Modifica un disegno già creato</value>
+							<value xml:lang="es">Modifica un dibujo ya creado</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.ah2d.MacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo21" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo22" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère des zones de texte contenant le nom de points ou de droites</value>
+							<value xml:lang="pt">Inserir zonas de texto contendo nomes de pontos ou retas</value>
+							<value xml:lang="de">Textfelder für die Beschriftung erzeugen</value>
+							<value xml:lang="en">Labelling of points and edges</value>
+							<value xml:lang="et">Labelling of points and edges</value>
+							<value xml:lang="it">Etichette dei nomi di punti e spigoli</value>
+							<value xml:lang="es">Etiquetado de puntos y bordes</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.NomPointDroite.MacroPrincipaleNomPointDroite</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+						<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo23" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo24" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">changer le style des arêtes : continue ou pointillé</value>
+							<value xml:lang="pt">Estilo das arestas: contìnua ou tracejada</value>
+							<value xml:lang="de">Kantendarstellung wechseln</value>
+							<value xml:lang="en">Change the style of the edges : Continuous or dashed</value>
+							<value xml:lang="et">Change the style of the edges : Continuous or dashed</value>
+							<value xml:lang="it">Stile di spigoli : piena o tratti finissimi</value>
+							<value xml:lang="es">Cambiar el estilo de los bordes: continuo o discontinuo</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.ChangerStyleAretes.ChangeStyleArete</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo25" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Grouper</value>
+							<value xml:lang="pt">Agrupar</value>
+							<value xml:lang="de">Gruppieren</value>
+							<value xml:lang="en">Group</value>
+							<value xml:lang="et">Group</value>
+							<value xml:lang="it">Raggruppa</value>
+							<value xml:lang="es">Agrupar</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.FonctionsOffice.Grouper3D</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo26" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Degrouper</value>
+							<value xml:lang="pt">Desagrupar</value>
+							<value xml:lang="de">Gruppierung aufheben</value>
+							<value xml:lang="en">Ungroup</value>
+							<value xml:lang="et">Ungroup</value>
+							<value xml:lang="it">Separa</value>
+							<value xml:lang="es">Disgregar</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.FonctionsOffice.Degrouper3D</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo27" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Symétrie horizontale</value>
+							<value xml:lang="pt">Simetria horizontal</value>
+							<value xml:lang="de">Horizontalen Symmetrie</value>
+							<value xml:lang="en">Horizontal symmetry</value>
+							<value xml:lang="et">Horizontal symmetry</value>
+							<value xml:lang="it">Simmetria orizzontale</value>
+							<value xml:lang="es">Simetría horizontal</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.FonctionsOffice.SymetrieHoriz</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo28" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Symétrie horizontale</value>
+							<value xml:lang="pt">simetria vertical</value>
+							<value xml:lang="de">vertikale Symmetrie</value>
+							<value xml:lang="en">Vertical symmetry</value>
+							<value xml:lang="et">Vertical symmetry</value>
+							<value xml:lang="it">simmetria verticale</value>
+							<value xml:lang="es">Simetría vertical</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.FonctionsOffice.SymetrieVert</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo29" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo30" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Aide</value>
+							<value xml:lang="pt">Ajuda</value>
+							<value xml:lang="de">Hilfe</value>
+							<value xml:lang="en">Help</value>
+							<value xml:lang="et">Help</value>
+							<value xml:lang="it">Aiuto</value>
+                            <value xml:lang="es">Ayuda</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.ah0.MonSite</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+				</node>
+				<!-- -->
+					<node oor:name="bo01" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un prisme droit en 3D</value>
+							<value xml:lang="pt">Inserir um prisma reto em 3D</value>
+							<value xml:lang="de">Prisma</value>
+							<value xml:lang="en">3D-prism</value>
+							<value xml:lang="et">3D-prism</value>
+							<value xml:lang="it">Prisma in 3D</value>
+							<value xml:lang="es">Prisma en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Prisme.PrismeMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo02" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+						<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un cylindre de révolution en 3D</value>
+							<value xml:lang="pt">Inserir um cilindro de revolução em 3D</value>
+							<value xml:lang="de">Zylinder</value>
+							<value xml:lang="en">3D-cylinder</value>
+							<value xml:lang="et">3D-cylinder</value>
+							<value xml:lang="it">Cilindro in 3D</value>
+							<value xml:lang="es">Cilindro en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Cylindre.CylindreMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo03" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une pyramide régulière en 3D</value>
+							<value xml:lang="pt">Inserir uma pirâmide regular em 3D</value>
+							<value xml:lang="de">Pyramide</value>
+							<value xml:lang="en">3D-pyramid</value>
+							<value xml:lang="et">3D-pyramid</value>
+							<value xml:lang="it">Piramide in 3D</value>
+							<value xml:lang="es">Pirámide en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Pyramide.PyramideMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo04" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un cône de révolution en 3D</value>
+							<value xml:lang="pt">Inserir um cone de revolução em 3D</value>
+							<value xml:lang="de">Kegel</value>
+							<value xml:lang="en">3D-cone</value>
+							<value xml:lang="et">3D-cone</value>
+							<value xml:lang="it">Cono in 3D</value>
+							<value xml:lang="es">Cono en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Cone.ConeMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo05" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un tronc de cône en 3D</value>
+							<value xml:lang="pt">Inserir um cone troncado em 3D</value>
+							<value xml:lang="de">Kegelstumpf</value>
+							<value xml:lang="en">3D-truncated cone</value>
+							<value xml:lang="et">3D-truncated cone</value>
+							<value xml:lang="it">Tronco di cono in 3D</value>
+							<value xml:lang="es">Tronco de cono en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.ConeTronc.ConeTroncMP</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo06" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une sphère en 3D</value>
+							<value xml:lang="pt">Inserir uma esfera em 3D</value>
+							<value xml:lang="de">Kugel</value>
+							<value xml:lang="en">3D-sphere</value>
+							<value xml:lang="et">3D-sphere</value>
+							<value xml:lang="it">Sfera in 3D</value>
+							<value xml:lang="es">Esfera en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Sphere.SphereMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo07" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une calotte sphérique en 3D</value>
+							<value xml:lang="pt">Inserir uma calota esférica em 3D</value>
+							<value xml:lang="de">kugelkalotte</value>
+							<value xml:lang="en">3D-spherical cap</value>
+							<value xml:lang="et">3D-spherical cap</value>
+							<value xml:lang="it">Calotta sferica in 3D</value>
+							<value xml:lang="es">Casquete esférico en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Calotte.CalotteMP</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo08" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo09" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un pavé droit en perspective cavalière</value>
+							<value xml:lang="pt">Inserir um cubo em perspectiva cavaleira</value>
+							<value xml:lang="de">Quader (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-cuboid (cavalier perspective)</value>
+							<value xml:lang="et">3D-cuboid (cavalier perspective)</value>
+							<value xml:lang="it">Parallelepipedo in 3D (prospettiva)</value>
+							<value xml:lang="es">Paralelepípedo rectangular en perspectiva caballera</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.CubePc.CubePcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo10" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un prisme droit ou un cylindre en perspective cavalière</value>
+							<value xml:lang="pt">Inserir um prisma reto ou um cilindro em perspectiva cavaleira</value>
+							<value xml:lang="de">Prisma + Zylinder (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-Prism or cylinder (cavalier perspective)</value>
+							<value xml:lang="et">3D-Prism or cylinder cavalier perspective)</value>
+							<value xml:lang="it">Prisma o cilindro in 3D (prospettiva)</value>
+							<value xml:lang="es">Prisma o cilindro en perspectiva caballera</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.PrismePc.PrismePcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo11" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une pyramide régulière à base carrée (ou une pyramide à base rectangulaire) en perspective cavalière</value>
+							<value xml:lang="pt">Inserir uma pirâmide regular de base quadrada/rectangular em perspectiva cavaleira</value>
+							<value xml:lang="de">Pyramide: rechteckige Grundfläche (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-pyramid: rectangular base (cavalier perspective)</value>
+						<value xml:lang="et">3D-pyramid: rectangular base (cavalier perspective)</value>
+						<value xml:lang="it">Piramide in 3D (prospettiva): base rettangolare</value>
+						<value xml:lang="es">Pirámide en perspectiva caballera: base rectangular</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.PyrRectPc.PyrRectPcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo12" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un tronc de pyramide régulière à base carrée (ou à base rectangulaire) en perspective cavalière</value>
+							<value xml:lang="pt">Inserir um tronco de pirâmide regular de base quadrada/rectangular em perspectiva cavaleira</value>
+							<value xml:lang="de">Pyramidenstumpf: rechteckige Grundfläche (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-truncated pyramid: rectangular base (cavalier perspective)</value>
+							<value xml:lang="et">3D-truncated pyramid: rectangular base (cavalier perspective)</value>
+							<value xml:lang="it">Piramide tronca in 3D (prospettiva): base rettangolare</value>
+							<value xml:lang="es">Pirámide truncada en perspectiva caballera: base rectangular</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.TroncPyrPc.TroncPyrPcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo13" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une pyramide "coin de pavé droit" à base rectangulaire en perspective cavalière</value>
+							<value xml:lang="pt">Inserir pirâmide de canto quadrado, base rectangular em perspectiva cavaleira</value>
+							<value xml:lang="de">Pyramide: Quaderecke, rechteckige Grundfläche (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-pyramid: cuboid-corner, rectangular base (cavalier perspective)</value>
+							<value xml:lang="et">3D-pyramid: cuboid-corner, rectangular base (cavalier perspective)</value>
+							<value xml:lang="it">Piramide in 3D (prospettiva): retta a base triangolare</value>
+							<value xml:lang="es">Pirámide "esquina de un paralelepípedo rectangular" en perspectiva caballera: base rectangular</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.PyrOrthPc.PyrOrthPcMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo14" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère une pyramide "coin de pavé droit" à base triangulaire en perspective cavalière</value>
+							<value xml:lang="pt">Inserir pirâmide de canto quadrado, base rectangular em perspectiva cavaleira</value>
+							<value xml:lang="de">Pyramide: Quaderecke, dreieckige Grundfläche (Kavalierperspektive)</value>
+							<value xml:lang="en">3D-pyramid: cuboid-corner, triangular base (cavalier perspective)</value>
+							<value xml:lang="et">3D-pyramid: cuboid-corner, triangular base (cavalier perspective)</value>
+							<value xml:lang="it">Piramide in 3D (prospettiva): retta a base triangolare</value>
+							<value xml:lang="es">Pirámide "esquina de un paralelepípedo rectangular" en perspectiva caballera: base triangular</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.PyrOrthPc2.PyrOrthPc2MacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo15" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo16" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère un polyèdre en 3D</value>
+							<value xml:lang="pt">Inserir um poliedro em 3D</value>
+							<value xml:lang="de">Polyeder</value>
+							<value xml:lang="en">3D-Polyedron</value>
+							<value xml:lang="et">3D-Polyedron</value>
+							<value xml:lang="it">Poliedro in 3D</value>
+							<value xml:lang="es">Poliedro en 3D</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Polyedre.PolyedreMacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo17" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo18" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère le patron d'un solide 3D</value>
+							<value xml:lang="pt">Inserir o padrão de um sólido 3D</value>
+							<value xml:lang="de">Netze verschiedener Körper...</value>
+							<value xml:lang="en">Inserts the pattern of a 3D solid</value>
+							<value xml:lang="et">Inserts the pattern of a 3D solid</value>
+							<value xml:lang="it">Inserisce il modello di un solido 3D</value>
+							<value xml:lang="es">Inserte el patrón de un sólido</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.Patron.MacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo19" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo20" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Modifie et complète une figure déjà crée</value>
+							<value xml:lang="pt">Modifica um desenho já criado</value>
+							<value xml:lang="de">Veränderungen einer vorhandenen Zeichnung</value>
+							<value xml:lang="en">Modifications of an existing drawing</value>
+							<value xml:lang="et">Modifications of an existing drawing</value>
+							<value xml:lang="it">Modifica un disegno già creato</value>
+							<value xml:lang="es">Modifica un dibujo ya creado</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.ah2d.MacroPrincipale</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo21" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo22" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Insère des zones de texte contenant le nom de points ou de droites</value>
+							<value xml:lang="pt">Inserir zonas de texto contendo nomes de pontos ou retas</value>
+							<value xml:lang="de">Textfelder für die Beschriftung erzeugen</value>
+							<value xml:lang="en">Labelling of points and edges</value>
+							<value xml:lang="et">Labelling of points and edges</value>
+							<value xml:lang="it">Etichette dei nomi di punti e spigoli</value>
+							<value xml:lang="es">Etiquetado de puntos y bordes</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.NomPointDroite.MacroPrincipaleNomPointDroite</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+						<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo23" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo24" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">changer le style des arêtes : continue ou pointillé</value>
+							<value xml:lang="pt">Estilo das arestas: contìnua ou tracejada</value>
+							<value xml:lang="de">Kantendarstellung wechseln</value>
+							<value xml:lang="en">Change the style of the edges : Continuous or dashed</value>
+							<value xml:lang="et">Change the style of the edges : Continuous or dashed</value>
+							<value xml:lang="it">Stile di spigoli : piena o tratti finissimi</value>
+							<value xml:lang="es">Cambiar el estilo de los bordes: continuo o discontinuo</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.ChangerStyleAretes.ChangeStyleArete</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo25" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Grouper</value>
+							<value xml:lang="pt">Agrupar</value>
+							<value xml:lang="de">Gruppieren</value>
+							<value xml:lang="en">Group</value>
+							<value xml:lang="et">Group</value>
+							<value xml:lang="it">Raggruppa</value>
+							<value xml:lang="es">Agrupar</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.FonctionsOffice.Grouper3D</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo26" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Degrouper</value>
+							<value xml:lang="pt">Desagrupar</value>
+							<value xml:lang="de">Gruppierung aufheben</value>
+							<value xml:lang="en">Ungroup</value>
+							<value xml:lang="et">Ungroup</value>
+							<value xml:lang="it">Separa</value>
+							<value xml:lang="es">Disgregar</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.FonctionsOffice.Degrouper3D</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo27" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Symétrie horizontale</value>
+							<value xml:lang="pt">simetria vertical</value>
+							<value xml:lang="de">vertikale Symmetrie</value>
+							<value xml:lang="en">Vertical symmetry</value>
+							<value xml:lang="et">Vertical symmetry</value>
+							<value xml:lang="it">simmetria verticale</value>
+							<value xml:lang="es">Simetría vertical</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.FonctionsOffice.SymetrieHoriz</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo28" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Symétrie verticale</value>
+							<value xml:lang="pt">Simetria horizontal</value>
+							<value xml:lang="de">Horizontalen Symmetrie</value>
+							<value xml:lang="en">Horizontal symmetry</value>
+							<value xml:lang="et">Horizontal symmetry</value>
+							<value xml:lang="it">Simmetria orizzontale</value>
+							<value xml:lang="es">Simetría horizontal</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.FonctionsOffice.SymetrieVert</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+					<node oor:name="bo29" oor:op="replace">
+						<prop oor:name="URL">
+							<value>private:separator</value>
+						</prop>
+					</node>
+					<node oor:name="bo30" oor:op="replace">
+						<prop oor:name="Context" oor:type="xs:string">
+							<value>com.sun.star.text.TextDocument,com.sun.star.drawing.DrawingDocument</value>
+						</prop>
+						<prop oor:name="Title" oor:type="xs:string">
+							<value xml:lang="fr">Aide</value>
+							<value xml:lang="pt">Ajuda</value>
+							<value xml:lang="de">Hilfe</value>
+							<value xml:lang="en">Help</value>
+							<value xml:lang="et">Help</value>
+							<value xml:lang="it">Aiuto</value>
+                            <value xml:lang="es">Ayuda</value>
+						</prop>
+						<prop oor:name="URL" oor:type="xs:string">
+							<value>macro:///OOoAHmath3D.ah0.MonSite</value>
+						</prop>
+						<prop oor:name="Target" oor:type="xs:string">
+							<value>_self</value>
+						</prop>
+						<prop oor:name="ImageIdentifier" oor:type="xs:string">
+							<value></value>
+						</prop>
+					</node>
+			</node>
+		</node>
+
+</node>
+</oor:component-data>

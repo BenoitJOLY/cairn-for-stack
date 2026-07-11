@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE library:library PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "library.dtd">
+<library:library xmlns:library="http://openoffice.org/2000/library" library:name="CmathOOo" library:readonly="false" library:passwordprotected="false">
+ <library:element library:name="mTextToClipboard"/>
+ <library:element library:name="mDocumentEnumeration"/>
+ <library:element library:name="mFormuleLaTeX2OOo"/>
+ <library:element library:name="mCopy2Spip"/>
+ <library:element library:name="mCmathOOo"/>
+ <library:element library:name="mFormuleOOo2Tex"/>
+ <library:element library:name="mImportFromLaTeX"/>
+ <library:element library:name="mParametresFormules"/>
+</library:library>

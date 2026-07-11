@@ -1,0 +1,742 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module4" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) 2008-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye 
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.com
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+Public  sPoints(8) as String
+Public sCoordPoints(8,1) as Single 
+Public oPoints as Object
+Public bPoints as Boolean rem bPoints=True si on trace des points
+Public NbrePoints as Integer
+Public monComp as Object rem contient le classeur sélectionné
+
+
+Sub Repoints
+	oPoints = LoadDialog(&quot;Dmaths&quot;,&quot;Points&quot;)
+	If bCalcul=true Then 
+	oValeurs.Visible=False
+	If bParam(Nbrecourbes) = False Then
+	oPoints.Model.TextField2.Text = oValeurs.GetControl(&quot;TextField1&quot;).Peer.Text
+	oPoints.Model.TextField3.Text = oValeurs.GetControl(&quot;TextField2&quot;).Peer.Text
+	Else
+	oPoints.Model.TextField2.Text = oValeurs.GetControl(&quot;TextField2&quot;).Peer.Text
+	oPoints.Model.TextField3.Text = oValeurs.GetControl(&quot;TextField3&quot;).Peer.Text
+	Endif
+	ElseIf bGrille=True Then
+	oGrille.Visible=False
+	Else
+	oRepFonctions.Visible=False
+	Endif	
+	NbrePoints=0
+	oPoints.Execute()
+	End Sub
+	
+Sub PointSupplementaire
+	If NbrePoints=8 Then 
+	Dmaths.Module5.Avertir(24)
+	bError=True
+	Goto Fin
+	Endif
+	sPoints(NbrePoints) = oPoints.getControl(&quot;TextField1&quot;).Peer.Text
+	sCoordPoints(NbrePoints,0)=CsngPlus(oPoints.GetControl(&quot;TextField2&quot;).Peer.Text)
+	sCoordPoints(NbrePoints,1)=CsngPlus(oPoints.GetControl(&quot;TextField3&quot;).Peer.Text)
+	NbrePoints=NbrePoints+1
+	oPoints.Model.TextField1.Text=&quot; &quot;
+	oPoints.GetControl(&quot;TextField1&quot;).SetFocus
+	Fin:
+End Sub
+
+Sub TracePoints
+	bPoints=True
+	sPoints(NbrePoints) = oPoints.getControl(&quot;TextField1&quot;).Peer.Text
+	sCoordPoints(NbrePoints,0)=CsngPlus(oPoints.GetControl(&quot;TextField2&quot;).Peer.Text)
+	sCoordPoints(NbrePoints,1)=CsngPlus(oPoints.GetControl(&quot;TextField3&quot;).Peer.Text)
+	oPoints.Endexecute()
+	If bCalcul=True Then	
+	oValeurs.Visible=True
+	Elseif bGrille=True then
+	oGrille.Visible=True
+	Else oRepFonctions.Visible=True
+	Endif
+End Sub
+
+Sub FinRepoints
+	oPoints.EndExecute()
+	If bCalcul=True Then
+	oValeurs.Visible=True
+	Elseif bGrille=True Then 
+	oGrille.Visible=True
+	Else
+	oRepfonctions.Visible=True 
+	End If
+End Sub
+
+rem lance le logiciel
+
+Sub LanceAppli(sChemin as String)
+	On Error Goto ImpLancer
+	If Len(sChemin) &gt; 0 Then  
+		If DetermineOS = 4 Then	
+		&apos;	Print sChemin
+			Shell(sChemin,2)
+		Else
+			Dim sys As Object
+			Dim iFlags As Integer
+		&apos;	If DetermineOS = 3 Then sChemin = ConvertToUrl(sChemin)
+			sys = CreateUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+			iFlags = com.sun.star.system.SystemShellExecuteFlags.NO_SYSTEM_ERROR_MESSAGE &apos; = 0
+			sys.execute(ConvertToUrl(sChemin),&quot; &quot;, iFlags)
+		End if		
+	Else 
+		Avertir(236)		
+	Endif
+	Exit Sub
+	
+	ImpLancer:
+	MsgBox(sMessag,48,&quot;Dmaths&quot;)
+End Sub
+
+Sub Launchsoftware1
+	Call VerifOperationnel	
+	LanceAppli(sCheminSoftware1)
+End Sub
+
+Sub Launchsoftware2
+	Call VerifOperationnel
+	LanceAppli(sCheminSoftware2)
+End Sub
+
+Sub Launchsoftware3
+	Call VerifOperationnel
+	LanceAppli(sCheminSoftware3)
+End Sub
+
+
+Rem Corrige le bug de Csng sus linux
+Function CsngPlus(sMot as String)
+	On Error Goto Fin
+	Dim resultat as Single
+	Dim I,N as Integer
+	I=1
+	N=0
+	Do While (Mid(sMot,I,1)&lt;&gt;&quot;,&quot; and I&lt;&gt;Len(sMot))
+	I=I+1
+	Loop
+	If Mid(sMot,I,1)=&quot;,&quot; Then
+	If I=1 Then
+	sMot=Mid(sMot,2,Len(sMot)-1)
+	Elseif I=Len(sMot) Then
+	sMot=Mid(sMot,1,Len(sMot)-1)
+	Else
+	sMot=Mid(sMot,1,I-1)+Mid(sMot,I+1,Len(sMot)-I)
+	EndIf
+	N=Len(sMot)-I+1
+	EndIf
+	rem Print &quot;sMot   &quot;,sMot
+	resultat=Csng(sMot)/(10^N)
+	CsngPlus=resultat
+	Fin:
+	End Function
+
+rem ecrit l&apos;adresse à la norme linux
+Function NormFile(sString as String)
+	For I=1 To Len(sString)
+	If Mid(sString,I,1)=&quot;\&quot; Then
+		If I=0 Then
+		sString=&quot;/&quot;+Mid(sString,2,Len(sString)-1)
+		ElseIf I=Len(sString) Then
+		sString=Mid(sString,1,Len(sString)-1)+&quot;/&quot;
+		Else sString=Mid(sString,1,I-1)+&quot;/&quot;+Mid(sString,I+1,Len(sString)-I)
+		Endif
+	Endif
+	Next I
+	For I=1 To Len(sString)
+	If Mid(sString,I,1)=&quot;:&quot; Then
+		If I=0 Then
+		sString=&quot;|&quot;+Mid(sString,2,Len(sString)-1)
+		ElseIf I=Len(sString) Then
+		sString=Mid(sString,1,Len(sString)-1)+&quot;|&quot;
+		Else sString=Mid(sString,1,I-1)+&quot;|&quot;+Mid(sString,I+1,Len(sString)-I)
+		Endif
+	Endif
+	Next I
+	NormFile=sString
+End Function
+
+Sub CalcDiagBox     				rem mise au point le 2/01/03
+	Dim Numero as integer &apos;numéro de courbe
+	oRepfonctions.Model.CheckBox5.State=1
+	oRepfonctions.Model.CheckBox4.State=0
+	If oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text=&quot;&quot; or  oRepboites.GetControl(&quot;TextField2&quot;).Peer.Text=&quot;&quot; or  oRepboites.GetControl(&quot;TextField3&quot;).Peer.Text=&quot;&quot; or  oRepboites.GetControl(&quot;TextField4&quot;).Peer.Text=&quot;&quot; or  oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text=&quot;&quot; Then
+	Dmaths.Module5.Avertir(18)
+	Goto Fin
+	EndIf
+	&apos;Numero=0
+	sFormul(0)=&quot;x=&quot;+oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text
+	Xmin(0)=CsngPlus(oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text)
+	Xmax(0)=CsngPlus(oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text)
+	Ymin(0)=1-CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)*0.1
+	Ymax(0)=1+CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)*0.1
+	&apos;Numero=1
+	sFormul(1)=&quot;1&quot;
+	Xmin(1)=CsngPlus(oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text)
+	Xmax(1)=CsngPlus(oRepboites.GetControl(&quot;TextField2&quot;).Peer.Text)
+	&apos;Numero=2
+	sFormul(2)=&quot;x=&quot;+oRepboites.GetControl(&quot;TextField2&quot;).Peer.Text
+	Xmin(2)=CsngPlus(oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text)
+	Xmax(2)=CsngPlus(oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text)
+	Ymin(2)=1-CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)/2
+	Ymax(2)=1+CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)/2
+	&apos;Numero=3
+	sFormul(3)=&quot;1+&quot;+oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text+&quot;/2&quot;
+	Xmin(3)=CsngPlus(oRepboites.GetControl(&quot;TextField2&quot;).Peer.Text)
+	Xmax(3)=CsngPlus(oRepboites.GetControl(&quot;TextField4&quot;).Peer.Text)
+	&apos;Numero=4
+	sFormul(4)=&quot;1-&quot;+oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text+&quot;/2&quot;
+	Xmin(4)=CsngPlus(oRepboites.GetControl(&quot;TextField2&quot;).Peer.Text)
+	Xmax(4)=CsngPlus(oRepboites.GetControl(&quot;TextField4&quot;).Peer.Text)
+	&apos;Numero=5
+	sFormul(5)=&quot;x=&quot;+oRepboites.GetControl(&quot;TextField3&quot;).Peer.Text
+	Xmin(5)=CsngPlus(oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text)
+	Xmax(5)=CsngPlus(oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text)
+	Ymin(5)=1-CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)/2
+	Ymax(5)=1+CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)/2
+	&apos;Numero=6
+	sFormul(6)=&quot;x=&quot;+oRepboites.GetControl(&quot;TextField4&quot;).Peer.Text
+	Xmin(6)=CsngPlus(oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text)
+	Xmax(6)=CsngPlus(oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text)
+	Ymin(6)=1-CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)/2
+	Ymax(6)=1+CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)/2
+	&apos;Numero=7
+	sFormul(7)=&quot;1&quot;
+	Xmin(7)=CsngPlus(oRepboites.GetControl(&quot;TextField4&quot;).Peer.Text)
+	Xmax(7)=CsngPlus(oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text)
+	&apos;Numero=8
+	sFormul(8)=&quot;x=&quot;+oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text
+	Xmin(8)=CsngPlus(oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text)
+	Xmax(8)=CsngPlus(oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text)
+	Ymin(8)=1-CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)*0.1
+	Ymax(8)=1+CsngPlus(oRepboites.GetControl(&quot;TextField8&quot;).Peer.Text)*0.1
+	oRepfonctions.Model.TextField1.Text=&quot;x=&quot;+oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text
+	oRepfonctions.Model.TextField13.Text=oRepboites.GetControl(&quot;TextField1&quot;).Peer.Text
+	oRepfonctions.Model.TextField14.Text=oRepboites.GetControl(&quot;TextField5&quot;).Peer.Text
+	oRepfonctions.getControl(&quot;CheckBox1&quot;).visible = False
+	oRepfonctions.getControl(&quot;CheckBox5&quot;).visible = False
+	oRepfonctions.getControl(&quot;CheckBox9&quot;).visible = False
+	oRepfonctions.getControl(&quot;CommandButton4&quot;).visible = False
+	oRepfonctions.getControl(&quot;CommandButton5&quot;).visible = False
+	oRepfonctions.getControl(&quot;CommandButton7&quot;).visible = False
+	oRepfonctions.getControl(&quot;TextField17&quot;).visible = False
+	oRepfonctions.getControl(&quot;TextField4&quot;).visible = False
+	oRepfonctions.getControl(&quot;TextField5&quot;).visible = False
+	oRepfonctions.getControl(&quot;CheckBox9&quot;).visible = False
+	oRepfonctions.getControl(&quot;CheckBox10&quot;).visible = False
+	oRepfonctions.getControl(&quot;TextField1&quot;).visible = False
+	oRepfonctions.getControl(&quot;OptionButton1&quot;).visible = False
+	oRepfonctions.getControl(&quot;OptionButton2&quot;).visible = False
+	oRepfonctions.getControl(&quot;FrameControl3&quot;).visible = False
+	oRepfonctions.getControl(&quot;FrameControl4&quot;).visible = False
+	oRepfonctions.getControl(&quot;Label6&quot;).visible = False
+	oRepfonctions.getControl(&quot;Label7&quot;).visible = False
+	oRepboites.Visible=False
+	oRepfonctions.setPosSize(1000,0,0,0,com.sun.star.awt.PosSize.POS) 
+	oRepfonctions.Execute()
+	Fin:
+End Sub
+
+Sub CalculValeurs                              				rem: mise au point le 2/01/03
+	Dim sFormule,sCalc as String
+	Dim oDeskTop as Object
+	Dim oSheets as Object
+	oDesktop=createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+	mFileProperties(0).Name=&quot;Hidden&quot;
+	mFileProperties(0).Value=True
+	BasicLibraries.LoadLibrary(&quot;Standard&quot;)
+	sCalc = fCheminduFichierDmathsODS
+&apos;	Print sChemindmaths
+	oNewCalcVal = oDesktop.LoadComponentFromURL(sCalc,&quot;_blank&quot;,0,mFileProperties())
+	oSheetVal=oNewCalcVal.Sheets(0)
+	sFormule=oRepfonctions.GetControl(&quot;TextField1&quot;).Peer.Text
+	FdeX(sFormule,NbreCourbes)
+	bCalcul=True
+	oRepfonctions.Visible=False
+	oValeurs = LoadDialog(&quot;Dmaths&quot;,&quot;Valeurs&quot;)
+	If bParam(NbreCourbes)=False Then 
+	oValeurs.GetControl(&quot;TextField3&quot;).Visible=False
+	oValeurs.GetControl(&quot;Label3&quot;).Visible=False
+	Else
+	oValeurs.GetControl(&quot;Label2&quot;).Text=Mid(oValeurs.GetControl(&quot;Label2&quot;).Peer.Text,1,Len(oValeurs.GetControl(&quot;Label2&quot;).Peer.Text)-4)+&quot;x(t)&quot;
+	oValeurs.GetControl(&quot;Label1&quot;).Text=Mid(oValeurs.GetControl(&quot;Label1&quot;).Peer.Text,1,Len(oValeurs.GetControl(&quot;Label1&quot;).Peer.Text)-1)+&quot;t&quot;
+	Endif
+	oValeurs.Execute()
+End Sub
+
+Sub DonneValeurs               									rem: mis au point le 2/01/03
+	Dim Variable as Single
+	Variable = CsngPlus(oValeurs.GetControl(&quot;TextField1&quot;).Peer.Text)
+	Dim NbreA as integer
+	NbreA = Cint(oValeurs.GetControl(&quot;TextField4&quot;).Peer.Text)
+	If bParam(NbrePoints)=False Then
+		If sNewFormul(NbreCourbes,1)&lt;&gt;&quot;Spline cubique&quot; Then
+			parse(sNewFormul(NbreCourbes,1),erflag)
+			oValeurs.Model.TextField2.Text = Cstr(Arrondir(f(Variable),NbreA))
+		Else
+			NumInter = 1			
+			Do while (Variable&gt;=Csng(sNewFormulSpline(NbreCourbes,NumInter,1)) and Len(sNewFormulSpline(NbreCourbes,NumInter-1,0))&gt;0 and NumInter&lt;8)
+				NumInter = NumInter+1
+			Loop				
+			If (Len(sNewFormulSpline(NbreCourbes,NumInter-1,0))&gt;0 or NumInter = 1) Then
+				parse(sNewFormulSpline(NbreCourbes,NumInter-1,0),erflag)
+			Else
+				parse(sNewFormulSpline(NbreCourbes,NumInter-2,0),erflag)
+			Endif			
+			oValeurs.Model.TextField2.Text = Cstr(Arrondir(f(Variable),NbreA))
+		Endif	
+	Else
+			parse0(sNewFormul(NbreCourbes,0),erflag)		
+			oValeurs.Model.TextField2.Text = Cstr(Arrondir(f0(Variable),NbreA))
+			parse(sNewFormul(NbreCourbes,1),erflag)
+			oValeurs.Model.TextField3.Text = Cstr(Arrondir(f(Variable),NbreA))
+	Endif
+	oValeurs.GetControl(&quot;TextField1&quot;).SetFocus
+End Sub
+
+Sub FinCalculValeurs									rem: mis au point le 2/01/03
+	bCalcul = False
+	oValeurs.EndExecute()
+	oRepfonctions.Visible=True
+	oNewCalcVal.Dispose()
+End Sub
+
+rem ------------------------------------------------------------------------------------------------------------------
+Sub CalculStat												rem: mis au point le 2/01/03
+	Dim sValeurs,sCalc,sToto,sLettre,sRange as String
+	rem valeurs contient les valeurs, sLettre la lettre de plage de cellule
+	Dim oSheet,oCell,oDocument1 as Object
+	Dim oDonneesRange,oSheets as Object
+	Dim nDonnee as Single
+	rem le classeur de données 
+	Dim iNbre,K,iMed,iMed1,iMed2,nSheet,nRow,nCol,iNbreValeurs as Integer
+	bError=False
+	rem chargement du fichier tableur
+	sUrl = &quot;private:factory/sdraw&quot;
+	oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+	mFileProperties(0).Name = &quot;Hidden&quot;
+	mFileProperties(0).Value = True
+	sCalc = fCheminduFichierDmathsODS
+	oNewCalc = oDesktop.LoadComponentFromURL(sCalc,&quot;_blank&quot;,0,mFileProperties())
+	bNewCalc = True
+	oSheet = oNewCalc.Sheets(1)
+	oCell = GetCell(oSheet,0,0)
+	oCell.Setvalue(1)
+	
+	
+	sValeurs = oRepboites.Getcontrol(&quot;TextField9&quot;).Peer.Text
+
+	If sValeurs&lt;&gt;&quot;&quot; Then
+	rem: cas où la série est saisie dans la fenêtre de la boîte de dialogue.
+	rem remplissage des cellules
+	RempliCellules(sValeurs,iNbreValeurs,0,oSheet)
+		If (Int(iNbreValeurs/2)&lt;&gt;(iNbreValeurs/2) and oRepboites.Model.CheckBox2.State=1)  Then
+		Dmaths.Module5.Avertir(19)
+		Goto FindesHaricots
+	EndIf
+	
+	Else
+		rem: la série est dans une feuille de calcul.
+		Rem: on choisit le classeur
+		If oRepboites.Getcontrol(&quot;TextField12&quot;).Peer.Text = &quot;&quot; Then rem message d&apos;erreur si pas de classeur sélectionné
+		Dmaths.Module5.Avertir(20)
+		Goto FindesHaricots	
+		Endif
+		oDocument1 = monComp
+	
+	&apos;	If oRepboites.Model.FileControl1.Text=&quot;&quot; Then
+	&apos;	oDocument1=oDeskTop.GetCurrentComponent()
+	&apos;	Else
+	&apos;	Dim mFileProperties1(0) As New com.sun.star.beans.PropertyValue
+	&apos;	mFileProperties1(0).Value=True
+	&apos;	sCalc=&quot;file:///&quot;+NormFile(oRepboites.Model.FileControl1.Text)
+	&apos;	oDocument1 = oDesktop.LoadComponentFromURL(sCalc,&quot;_blank&quot;,0,mFileProperties1())
+	&apos;	Endif
+	
+		rem le classeur est choisi
+		nSheet=Int(Csng(oRepboites.Getcontrol(&quot;TextField11&quot;).Peer.Text))-1
+		oSheet1=oDocument1.Sheets(nSheet)
+		sRange = oRepboites.GetControl(&quot;TextField12&quot;).Peer.Text
+		oDonneesRange=oSheet1.GetCellRangeByName(sRange)
+		nRow=oDonneesRange.Rows.Count
+		nCol=oDonneesRange.Columns.Count
+		If nCol=1 Then
+		iNbreValeurs=nRow
+		For I=0 To nRow-1
+		oCell=oDonneesRange.GetCellByPosition(0,I)
+		nDonnee=oCell.GetValue()
+		oCell=GetCell(oSheet,0,I)
+		oCell.Value=nDonnee
+		Next I
+		ElseIf nCol=2 Then
+		iNbreValeurs=nRow*2
+		oRepboites.Model.Checkbox2.State=1
+		For I=0 To nRow-1
+		oCell=oDonneesRange.GetCellByPosition(0,I)
+		nDonnee=oCell.Value
+		oCell=GetCell(oSheet,0,2*I)
+		oCell.Value=nDonnee
+		oCell=oDonneesRange.GetCellByPosition(1,I)
+		nDonnee=oCell.Value
+		oCell=GetCell(oSheet,0,2*I+1)
+		oCell.Value=nDonnee
+		Next I
+		Else
+		Dmaths.Module5.Avertir(21)
+		Goto FindesHaricots
+		Endif
+	Endif
+	
+	If oRepboites.Model.CheckBox2.State=1 Then 
+	iNbreValeurs=iNbreValeurs/2
+	EcriSerie(iNbreValeurs,oSheet)
+	EndIf
+	If bError=True Then Goto FindesHaricots
+	If oRepboites.Model.CheckBox2.State=1 Then
+	iNbre=iEfftotal
+	rem variable public qui contient l&apos;effectif total de la série à coefficients
+	sLettre=&quot;B&quot;
+	Else
+	iNbre=iNbreValeurs
+	sLettre=&quot;A&quot;
+	EndIf
+	rem calcule le minimum
+	oCell=GetCell(oSheet,3,0)
+	sToto=Str(iNbre)
+	sToto=Mid(sToto,2,Len(sToto)-1)
+	oCell.Formula=&quot;=ROUND(MIN(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	oRepboites.Model.TextField1.Text=oCell.Value
+	rem calcule le maximum
+	oCell=GetCell(oSheet,3,4)
+	oCell.Formula=&quot;=ROUND(MAX(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	oRepboites.Model.TextField5.Text=oCell.Value
+	rem calcule la moyenne
+	oCell=GetCell(oSheet,3,7)
+	oCell.Formula=&quot;=ROUND(AVERAGE(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	oRepboites.Model.TextField6.Text=oCell.Value
+	rem calcule l&apos;écart-type
+	oCell=GetCell(oSheet,3,8)
+	oCell.Formula=&quot;=ROUND(STDEVP(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	oRepboites.Model.TextField7.Text=oCell.Value
+	rem calcule la médiane tableur
+	oCell=GetCell(oSheet,3,9)
+	oCell.Formula=&quot;=ROUND(MEDIAN(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=0 Then oRepboites.Model.TextField3.Text=oCell.Value
+	rem calcule le Q1
+	oCell=GetCell(oSheet,3,10)
+	oCell.Formula=&quot;=ROUND(PERCENTILE(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;; 0.25 );&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=0 Then oRepboites.Model.TextField2.Text=oCell.Value
+	rem calcule le Q3
+	oCell=GetCell(oSheet,3,11)
+	oCell.Formula=&quot;=ROUND(PERCENTILE(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;; 0.75 );&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=0 Then oRepboites.Model.TextField4.Text=oCell.Value
+	rem calcule le D1
+	oCell=GetCell(oSheet,3,12)
+	oCell.Formula=&quot;=ROUND(PERCENTILE(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;; 0.1 );&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=0 Then oRepboites.Model.TextField10.Text=oCell.Value
+	rem calcule le D9
+	oCell=GetCell(oSheet,3,13)
+	oCell.Formula=&quot;=ROUND(PERCENTILE(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;; 0.9 );&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=0 Then oRepboites.Model.TextField14.Text=oCell.Value
+	rem Calcule le Q1 programme
+	If Int(iNbre/4)=iNbre/4 Then K=iNbre/4 Else K=Int(iNbre/4)+1
+	oCell=GetCell(oSheet,3,1)
+	oCell.Formula=&quot;=ROUND(SMALL(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;;&quot;+K+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=1 Then oRepboites.Model.TextField2.Text=oCell.Value
+	rem Calcule le Q3 programme
+	If Int(3*iNbre/4)=3*iNbre/4 Then K=3*iNbre/4 Else K=Int(3*iNbre/4)+1
+	oCell=GetCell(oSheet,3,3)
+	oCell.Formula=&quot;=ROUND(SMALL(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;;&quot;+K+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=1 Then oRepboites.Model.TextField4.Text=oCell.Value
+	rem Calcule le D1 programme
+	If Int(iNbre/10)=iNbre/10 Then K=iNbre/10 Else K=Int(iNbre/10)+1
+	oCell=GetCell(oSheet,3,5)
+	oCell.Formula=&quot;=ROUND(SMALL(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;;&quot;+K+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=1 Then oRepboites.Model.TextField10.Text=oCell.Value
+	rem Calcule le D9 programme
+	If Int(9*iNbre/10)=9*iNbre/10 Then K=9*iNbre/10 Else K=Int(9*iNbre/10)+1
+	oCell=GetCell(oSheet,3,6)
+	oCell.Formula=&quot;=ROUND(SMALL(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;;&quot;+K+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=1 Then oRepboites.Model.TextField14.Text=oCell.Value
+	rem Calcule le médiane programme
+	If Int((iNbre+1)/2)=(iNbre+1)/2 Then 
+	K=(iNbre+1)/2
+	oCell=GetCell(oSheet,3,2)
+	oCell.Formula=&quot;=ROUND(SMALL(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;;&quot;+K+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	If oRepboites.Model.CheckBox1.State=1 Then oRepboites.Model.TextField3.Text=oCell.Value
+	Else 
+	K=Int(iNbre/2)
+	oCell=GetCell(oSheet,3,14)
+	oCell.Formula=&quot;=ROUND(SMALL(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;;&quot;+K+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	iMed1=oCell.GetValue
+	oCell=GetCell(oSheet,3,15)
+	K=K+1
+	oCell.Formula=&quot;=ROUND(SMALL(&quot;+sLettre+&quot;1:&quot;+sLettre+sToto+&quot;;&quot;+K+&quot;);&quot;+oRepboites.GetControl(&quot;TextField15&quot;).Peer.Text+&quot;)&quot;
+	iMed2=oCell.GetValue
+	iMed=(iMed1+iMed2)/2
+	oCell=GetCell(oSheet,3,2)
+	oCell.Value=iMed
+	If oRepboites.Model.CheckBox1.State=1 Then oRepboites.Model.TextField3.Text=oCell.Value
+	Endif
+	iNbreValeurs1=iNbreValeurs
+	oRepBoites.getControl(&quot;CommandButton4&quot;).Enable = True
+	
+	Exit Sub
+	
+	FindesHaricots:
+	If bNewCalc=True Then
+		oNewCalc.Dispose()
+		bNewCalc=False
+	Endif
+End Sub
+
+Sub SauvStat									rem: mis au point le 2/01/03
+	Dim nRow,nCol as Integer
+	Dim sValeurs,sCalc,sRange,sUrl as String
+	Dim nDonnee as Single
+	Dim sDonnee as String
+	rem valeurs contient les valeurs, sLettre la lettre de plage de cellule
+	Dim oSheet,oSheet2,oCell,oDonneesRange as Object
+	rem le classeur de données 
+	bError=False
+	rem chargement du fichier tableur
+	
+	oDesktop=createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+&apos;	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+&apos;	mFileProperties(0).Name=&quot;Hidden&quot;
+&apos;	mFileProperties(0).Value=True
+&apos;	sCalc = fCheminduFichierDmathsODS
+&apos;	oNewCalc = oDesktop.LoadComponentFromURL(sCalc,&quot;_blank&quot;,0,mFileProperties())
+	bNewCalc = True
+	oSheet = oNewCalc.Sheets(1)
+	oCell = GetCell(oSheet,0,0)
+	oCell.Setvalue(1)
+	
+	sValeurs = oRepboites.getControl(&quot;TextField9&quot;).Peer.Text
+&apos;	Print sValeurs
+	If sValeurs &lt;&gt; &quot;&quot; Then
+		rem: on ouvre un nouveau classeur
+		Dim noArgs(0) As New com.sun.star.beans.PropertyValue
+		sUrl = &quot;private:factory/scalc&quot;
+		oDocument2 = oDesktop.LoadComponentFromURL(sUrl,&quot;_blank&quot;,0,noArgs())
+		oSheet2 = oDocument2.Sheets(0)
+		If oRepboites.Model.CheckBox2.State=0 Then
+			For I=0 To iNbreValeurs1-1
+			oCell=GetCell(oSheet,0,I)
+			nDonnee=oCell.GetValue()
+			oCell=GetCell(oSheet2,0,I)
+			oCell.Value=nDonnee
+			Next I
+		Else
+			For I=0 To iNbreValeurs1-1
+			oCell=GetCell(oSheet,0,2*I)
+			nDonnee=oCell.GetValue()
+			oCell=GetCell(oSheet2,0,I)
+			oCell.Value=nDonnee
+			oCell=GetCell(oSheet,0,2*I+1)
+			nDonnee=oCell.GetValue()
+			oCell=GetCell(oSheet2,1,I)
+			oCell.Value=nDonnee
+			Next I
+		Endif
+	Else
+
+	oSheet2 = oSheet1
+	Endif
+	sRange = oRepboites.Getcontrol(&quot;TextField13&quot;).Peer.Text
+	If sRange=&quot;&quot; Then 
+	Dmaths.Module5.Avertir(22)
+	bError=True
+	rem marque l&apos;erreur
+	Goto Fin
+	Endif
+	oDonneesRange=oSheet2.GetCellRangeByName(sRange)
+	nRow=oDonneesRange.Rows.Count
+	nCol=oDonneesRange.Columns.Count
+	If nRow&lt;&gt;16 or nCol&lt;&gt;2 Then
+	Dmaths.Module5.Avertir(22)
+	bError=True
+	rem marque l&apos;erreur
+	Goto Fin
+	Else
+	For I=0 To nRow-1
+	oCell=GetCell(oSheet,2,I)
+	sDonnee=oCell.String
+	oCell=GetCell(oSheet,3,I)
+	nDonnee=oCell.GetValue()
+	oCell=oDonneesRange.GetCellByPosition(0,I)
+	oCell.String=sDonnee
+	oCell=oDonneesRange.GetCellByPosition(1,I)
+	oCell.String=nDonnee
+	Next I
+	Endif
+	oRepBoites.getControl(&quot;CommandButton4&quot;).Enable = False
+	If Not IsEmpty(oNewCalc) Then oNewCalc.Dispose()
+	
+	
+	Fin:
+	If bNewCalc=True Then
+	&apos;oNewCalc.Store()
+		If Not IsEmpty(oNewCalc) Then oNewCalc.Close(True)
+		bNewCalc=False
+	Endif
+End Sub
+rem: sauvegarde les résultats obtenus.
+
+
+
+Rem iNombre contiendra le nombre de données.
+Sub RempliCellules(sString as String,iNombre,iColonne as Integer,oSheet as Object)
+	Dim N1,N2 as Integer
+	Dim oCell as Object
+	iNombre=0
+	N1=1
+	N2=1
+	Do while N1+N2&lt;=Len(sString)+1
+	Do while (Mid(sString,N1+N2,1)&lt;&gt;&quot;;&quot; and N1+N2&lt;=Len(sString)) 
+	N2=N2+1
+	Loop
+	oCell=GetCell(oSheet,iColonne,iNombre)
+	oCell.SetValue(CsngPlus(Mid(sString,N1,N2)
+	N1=N1+N2+1
+	N2=1
+	iNombre=iNombre+1
+	Loop
+	For I=iNombre To 100
+	oCell=GetCell(oSheet,iColonne,I)
+	oCell.Setvalue(&quot;&quot;)
+	rem iNombre est le nombre de données saisies
+	Next I
+End Sub
+
+Sub EcriSerie(iNombre as Integer, oSheet as Object)
+	Dim oCellule as Object
+	Dim iValPro,iDonnee,iEff as Integer
+	rem iNombre est le nombre de valeurs prise par la série, iEff contiendra le nombre total de valeurs de la série
+	iEff=0
+	For I=0 To iNombre-1
+	oCellule=GetCell(oSheet,0,2*I)
+	iDonnee=oCellule.GetValue()
+	oCellule=GetCell(oSheet,0,2*I+1)
+	iValPro=oCellule.GetValue()
+	If (iValPro&lt;0 or Int(iValPro)&lt;&gt;iValPro)  Then
+	Dmaths.Module5.Avertir(23)
+	bError=True
+	rem marque l&apos;erreur
+	Goto Fin
+	EndIf
+	For J=1 To iValPro
+	oCellule=GetCell(oSheet,1,iEff)
+	oCellule.SetValue(iDonnee)
+	iEff=1+iEff
+	Next J
+	Next I
+	iEfftotal=iEff
+	For I=iEff To 100
+	oCellule=GetCell(oSheet,1,I)
+	oCellule.Setvalue(&quot;&quot;)
+	Next I
+	Fin:
+End Sub
+
+rem macro ecrite le 28  avril 2011 par DDP
+rem elle permet de recuperer une plage de cellule selectionnée.
+Sub RecuperePlageSelectionnee
+	Dim monEnum,sel as Object
+		rem trouve le classeur
+		If Not IsEmpty(oNewCalc) Then oNewCalc.Close(True)
+		rem ferme dmaths.ods
+		monEnum = StarDeskTop.Components.CreateEnumeration		
+		Do while monEnum.hasMoreElements 
+			monComp = monEnum.NextElement
+			If monComp.supportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then Exit Do		
+		Loop
+		
+		rem verifie la conformite du resultat 
+		If IsNull(monComp) Then goto Lafin
+		sel = monComp.CurrentSelection		
+		If Not sel.supportsService(&quot;com.sun.star.table.CellRange&quot;) Then goto LaFin		
+		If (sel.RangeAddress.EndRow-sel.RangeAddress.StartRow=0 or sel.RangeAddress.EndColumn -sel.RangeAddress.StartColumn&gt;1) Then goto LaFin
+	
+		rem complete la boite de dialogue
+		If monComp.hasLocation Then
+			oRepboites.GetControl(&quot;TextField16&quot;).Text = ConvertFromURL(monComp.Location)
+		Else
+			Dmaths.Module5.Avertir(27)
+		Endif
+		oRepboites.GetControl(&quot;TextField11&quot;).Text = FindSheetByNumber(monComp, monComp.Sheets(sel.RangeAddress.Sheet).Name)
+		oRepboites.GetControl(&quot;TextField12&quot;).Text = adrZoneString(monComp,sel.RangeAddress)
+		
+		oRepBoites.getControl(&quot;CommandButton4&quot;).Enable = False
+		
+		Exit Sub
+		
+		LaFin:		
+		Dmaths.Module5.Avertir(26)
+End Sub
+
+rem macro ecrite le 30 avril 2011 par DDP
+Rem recupere le numero de la feuille a partir de son nom
+Function FindSheetByNumber(monCalc As Object, monSheet as String) as Integer
+	Dim LeNum as Integer
+	For I = 0 To monCalc.Sheets.Count-1
+		If monCalc.Sheets.getByIndex(i).Name = monSheet Then LeNum = i
+	Next I
+	FindSheetByNumber = LeNum + 1
+End Function
+
+rem ecrite le 30 avril 2011 par DDP
+rem trouve l&apos;adresse de la zone selectionnee
+Function adrZoneString(monCalc As Object, adrZone As Object) As String
+	Dim z As Object
+	Dim LaChaine as String
+	On Error GoTo horsLimite
+	z = monCalc.Sheets(adrZone.Sheet).getCellRangeByPosition(adrZone.StartColumn, adrZone.StartRow,adrZone.EndColumn, adrZone.EndRow)
+	LaChaine = Mid(z.AbsoluteName,Instr(2,z.AbsoluteName,&quot;$&quot;))
+	adrZoneString = join(split(LaChaine, &quot;$&quot;), &quot;&quot;)
+	On Error GoTo 0
+	Exit Function
+	horsLimite:
+	  Resume horsLimite2
+	horsLimite2:
+	  On Error GoTo 0
+	  err = 14 &apos; adrZone contient une valeur hors limites
+End Function
+
+
+
+
+
+
+ 
+
+</script:module>

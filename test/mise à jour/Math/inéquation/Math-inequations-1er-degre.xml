@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396416  -->
+  <question type="stack">
+    <name>
+      <text>Équations et Inéquations : Résoudre une inéquation du 1er degré (V3 Native)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Algèbre — Inéquation linéaire</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Résoudre dans \(\mathbb{R}\) l'inéquation suivante :</p>
+<div style="text-align: center; font-size: 1.2rem; margin: 25px 0;">
+    \[ {@eq@} \]
+</div>
+<p>Donner l'ensemble des solutions sous la forme d'une inégalité.</p>
+<p><em>Par exemple, si la solution est \(x\) strictement plus grand que 3, on tapera <strong>x > 3</strong>. Si \(x\) est inférieur ou égal à -1/2, on tapera <strong>x <= -1/2</strong>.</em></p>
+<div style="margin: 15px 0 10px 0;">Solution : \( [[input:ans_ineq]] [[validation:ans_ineq]] \)</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour résoudre cette inéquation, on isole \(x\) :<br><br>
+\[ {@eq@} \iff {@eq_step1@} \]
+<div style="margin: 10px 0; padding: 10px; background: #fff1f2; border-radius: 4px; border-left: 3px solid #e11d48;">
+<strong>ATTENTION :</strong> On divise par {@a@}. Comme {@a@} est {@signe_a_txt@}, le sens de l'inégalité {@changement_txt@} !
+</div>
+La solution est donc :
+\[ {@ans_correct@} \]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. GÉNÉRATION ALÉATOIRE */
+a: rand([2, -2, 3, -3, 4, -4])$
+b: rand([-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6])$
+
+/* 2. DÉFINITION DE L'INÉQUATION */
+/* On évite la construction manuelle avec des chaînes */
+ineqs: [a*x + b > 0, a*x + b >= 0, a*x + b < 0, a*x + b <= 0]$
+eq: rand(ineqs)$
+
+/* 3. CALCUL DE LA RÉPONSE CORRECTE */
+/* Au lieu de 'solve', on utilise 'stack_ineq_solve' si disponible ou on isole x */
+/* La méthode la plus fiable sans erreur : */
+ans_correct: solve(a*x + b = 0, x)[1]$ /* Résout l'équation associée */
+valeur_critique: rhs(ans_correct)$
+
+/* On définit la bonne réponse en fonction de l'opérateur de l'inéquation */
+op_ineq: op(eq)$
+if a > 0 then (
+    if op_ineq = ">" then ans_correct: x > valeur_critique,
+    if op_ineq = ">=" then ans_correct: x >= valeur_critique,
+    if op_ineq = "<" then ans_correct: x < valeur_critique,
+    if op_ineq = "<=" then ans_correct: x <= valeur_critique
+) else (
+    /* Si a est négatif, on inverse l'opérateur */
+    if op_ineq = ">" then ans_correct: x < valeur_critique,
+    if op_ineq = ">=" then ans_correct: x <= valeur_critique,
+    if op_ineq = "<" then ans_correct: x > valeur_critique,
+    if op_ineq = "<=" then ans_correct: x >= valeur_critique
+)$
+
+/* 4. TEXTES POUR LA CORRECTION (sans risque d'erreur) */
+signe_a_txt: if a > 0 then "positif" else "négatif"$
+changement_txt: if a > 0 then "ne change pas" else "CHANGE"$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>{@eq@} -> Solution : {@ans_correct@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | Approche Mathématique Native</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_ineq</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> L'inéquation est correctement résolue.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : Oubli du changement de sens</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>err_sign</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe lors de la division !</strong> La valeur critique \({@c@}\) est correcte, mais l'inégalité est inversée. Le coefficient de \(x\) est \({@a@}\) (qui est {@signe_a_txt@}). Lorsqu'on divise ou multiplie par un nombre négatif, <strong>le sens de l'inégalité change obligatoirement</strong>.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SIGN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Mauvaise valeur frontière</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>err_val</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-VAL</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de calcul !</strong> Le sens de l'inégalité est bon, mais la valeur frontière est fausse. Vérifiez votre calcul : \(\frac{{@-b@}}{{@a@}} = {@c@}\). Attention aux règles de signes.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Méthode pour résoudre \(ax + b \ge 0\) :<br>1. Passer \(b\) de l'autre côté en changeant son signe : \(ax \ge -b\)<br>2. Diviser par \(a\) le nombre qui multiplie \(x\).<br>3. <strong>SI \(a < 0\) : CHANGER LE SENS DE L'INÉGALITÉ !</strong><br>4. Simplifier la fraction pour obtenir la valeur critique.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

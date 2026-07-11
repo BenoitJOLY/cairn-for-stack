@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="DeplacePointForm" dlg:left="271" dlg:top="119" dlg:width="99" dlg:height="62" dlg:help-text="&amp;2874.DeplacePointForm.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;2875.DeplacePointForm.Title">
+ <dlg:bulletinboard>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="0" dlg:left="25" dlg:top="37" dlg:width="42" dlg:height="16" dlg:help-text="&amp;3415.DeplacePointForm.CommandButton1.HelpText" dlg:value="&amp;3416.DeplacePointForm.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoGdmath.DeplacePointForm.DeplacePointForm_CommandButton1_Click?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:text dlg:id="Label1" dlg:tab-index="1" dlg:left="-1" dlg:top="77" dlg:width="31" dlg:height="10" dlg:help-text="&amp;3429.DeplacePointForm.Label1.HelpText" dlg:value="&amp;3430.DeplacePointForm.Label1.Label"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="2" dlg:left="39" dlg:top="75" dlg:width="28" dlg:height="10" dlg:help-text="&amp;3431.DeplacePointForm.Label2.HelpText" dlg:value="&amp;3432.DeplacePointForm.Label2.Label"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="3" dlg:left="73" dlg:top="73" dlg:width="31" dlg:height="13" dlg:help-text="&amp;3433.DeplacePointForm.Label3.HelpText" dlg:value="&amp;3434.DeplacePointForm.Label3.Label"/>
+  <dlg:text dlg:id="Label4" dlg:tab-index="4" dlg:left="-1" dlg:top="94" dlg:width="28" dlg:height="10" dlg:help-text="&amp;3435.DeplacePointForm.Label4.HelpText" dlg:value="&amp;3436.DeplacePointForm.Label4.Label"/>
+  <dlg:text dlg:id="Label5" dlg:tab-index="5" dlg:left="41" dlg:top="90" dlg:width="24" dlg:height="15" dlg:help-text="&amp;3437.DeplacePointForm.Label5.HelpText" dlg:value="&amp;3438.DeplacePointForm.Label5.Label"/>
+  <dlg:text dlg:id="Label6" dlg:tab-index="6" dlg:left="77" dlg:top="92" dlg:width="26" dlg:height="8" dlg:help-text="&amp;3439.DeplacePointForm.Label6.HelpText" dlg:value="&amp;3440.DeplacePointForm.Label6.Label"/>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="7" dlg:left="33" dlg:top="21" dlg:width="26" dlg:height="12" dlg:help-text="&amp;3443.DeplacePointForm.TextField1.HelpText" dlg:align="center" dlg:value="&amp;3444.DeplacePointForm.TextField1.Text">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoGdmath.DeplacePointForm.DeplacePointForm_TextBox1_Change?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:scrollbar dlg:id="ScrollBar1" dlg:tab-index="8" dlg:left="6" dlg:top="7" dlg:width="81" dlg:height="12" dlg:help-text="&amp;3815.DeplacePointForm.ScrollBar1.HelpText" dlg:curpos="1800" dlg:maxpos="3600" dlg:visible-size="1">
+   <script:event script:event-name="on-adjustmentvaluechange" script:macro-name="vnd.sun.star.script:OOoGdmath.DeplacePointForm.DeplacePointForm_ScrollBar1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:scrollbar>
+ </dlg:bulletinboard>
+</dlg:window>

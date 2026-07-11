@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Isotope" dlg:left="106" dlg:top="97" dlg:width="393" dlg:height="198" dlg:help-text="&amp;622.Isotope.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;623.Isotope.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:font-height="12" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="1" dlg:font-height="16" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="2" dlg:font-name="OpenSymbol" dlg:font-height="14" dlg:font-stylename="Fett" dlg:font-charset="symbol" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="3" dlg:font-name="OpenSymbol" dlg:font-height="14" dlg:font-stylename="Kursiv" dlg:font-charset="symbol" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="4" dlg:font-name="OpenSymbol" dlg:font-height="14" dlg:font-stylename="Kursiv" dlg:font-charset="symbol" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="5" dlg:font-name="Lucida Sans" dlg:font-height="14" dlg:font-stylename="Halbfett" dlg:font-family="swiss" dlg:font-weight="110"/>
+  <dlg:style dlg:style-id="6" dlg:font-name="Lucida Sans" dlg:font-height="10" dlg:font-stylename="Halbfett Kursiv" dlg:font-family="swiss" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="7" dlg:font-name="Lucida Sans" dlg:font-height="12" dlg:font-stylename="Halbfett" dlg:font-family="swiss" dlg:font-weight="110"/>
+  <dlg:style dlg:style-id="8" dlg:font-name="OpenSymbol" dlg:font-height="14" dlg:font-stylename="Fett" dlg:font-charset="symbol" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="9" dlg:font-name="OpenSymbol" dlg:font-height="12" dlg:font-stylename="Fett" dlg:font-charset="symbol" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="10" dlg:font-name="Bitstream Vera Sans" dlg:font-height="12" dlg:font-stylename="Fett" dlg:font-family="swiss" dlg:font-weight="150"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="26" dlg:left="227" dlg:top="174" dlg:width="44" dlg:height="16" dlg:help-text="&amp;624.Isotope.CommandButton1.HelpText" dlg:value="&amp;625.Isotope.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module2b.InsereIsotope?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:textfield dlg:style-id="0" dlg:id="TextField1" dlg:tab-index="5" dlg:left="73" dlg:top="28" dlg:width="22" dlg:height="16" dlg:help-text="&amp;626.Isotope.TextField1.HelpText" dlg:align="center" dlg:value="&amp;627.Isotope.TextField1.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:style-id="0" dlg:id="TextField2" dlg:tab-index="6" dlg:left="73" dlg:top="52" dlg:width="22" dlg:height="16" dlg:help-text="&amp;628.Isotope.TextField2.HelpText" dlg:align="center" dlg:value="&amp;629.Isotope.TextField2.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:style-id="1" dlg:id="TextField3" dlg:tab-index="7" dlg:left="102" dlg:top="35" dlg:width="40" dlg:height="30" dlg:help-text="&amp;630.Isotope.TextField3.HelpText" dlg:align="center" dlg:value="&amp;631.Isotope.TextField3.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:radiogroup>
+   <dlg:radio dlg:style-id="2" dlg:id="OptionButton1" dlg:tab-index="9" dlg:left="149" dlg:top="92" dlg:width="22" dlg:height="12" dlg:help-text="&amp;632.Isotope.OptionButton1.HelpText" dlg:value="&amp;633.Isotope.OptionButton1.Label" dlg:checked="true">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module2b.IsotopeExp?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:style-id="3" dlg:id="OptionButton2" dlg:tab-index="10" dlg:left="149" dlg:top="105" dlg:width="22" dlg:height="12" dlg:tag="`+`" dlg:help-text="&amp;634.Isotope.OptionButton2.HelpText" dlg:tabstop="true" dlg:value="&amp;635.Isotope.OptionButton2.Label">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module2b.IsotopeExp?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:style-id="4" dlg:id="OptionButton3" dlg:tab-index="11" dlg:left="149" dlg:top="116" dlg:width="22" dlg:height="12" dlg:tag="`-`" dlg:help-text="&amp;636.Isotope.OptionButton3.HelpText" dlg:tabstop="false" dlg:value="&amp;637.Isotope.OptionButton3.Label">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module2b.IsotopeExp?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:style-id="5" dlg:id="OptionButton5" dlg:tab-index="2" dlg:left="52" dlg:top="92" dlg:width="20" dlg:height="12" dlg:help-text="&amp;638.Isotope.OptionButton5.HelpText" dlg:value="&amp;639.Isotope.OptionButton5.Label" dlg:checked="true">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module2b.IsotopeFact?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:style-id="5" dlg:id="OptionButton6" dlg:tab-index="3" dlg:left="52" dlg:top="104" dlg:width="20" dlg:height="12" dlg:tag="⋅" dlg:help-text="&amp;640.Isotope.OptionButton6.HelpText" dlg:tabstop="false" dlg:value="&amp;641.Isotope.OptionButton6.Label">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module2b.IsotopeFact?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+  </dlg:radiogroup>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="27" dlg:left="278" dlg:top="174" dlg:width="44" dlg:height="16" dlg:help-text="&amp;642.Isotope.CommandButton2.HelpText" dlg:value="&amp;643.Isotope.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module2.FinFormuleGraphique" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:textfield dlg:style-id="6" dlg:id="TextField4" dlg:tab-index="14" dlg:left="186" dlg:top="40" dlg:width="177" dlg:height="18" dlg:help-text="&amp;644.Isotope.TextField4.HelpText" dlg:value="&amp;645.Isotope.TextField4.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton3" dlg:tab-index="15" dlg:left="216" dlg:top="92" dlg:width="16" dlg:height="20" dlg:tag="Zusatzinfo" dlg:help-text="&amp;646.Isotope.CommandButton3.HelpText" dlg:value="&amp;647.Isotope.CommandButton3.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:radiogroup>
+   <dlg:radio dlg:style-id="8" dlg:id="OptionButton4" dlg:tab-index="12" dlg:left="149" dlg:top="129" dlg:width="22" dlg:height="12" dlg:tag="∗" dlg:help-text="&amp;648.Isotope.OptionButton4.HelpText" dlg:tabstop="false" dlg:value="&amp;649.Isotope.OptionButton4.Label">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module2b.IsotopeExp?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:style-id="5" dlg:id="OptionButton7" dlg:tab-index="4" dlg:left="52" dlg:top="116" dlg:width="20" dlg:height="12" dlg:tag="x" dlg:help-text="&amp;650.Isotope.OptionButton7.HelpText" dlg:tabstop="false" dlg:value="&amp;651.Isotope.OptionButton7.Label">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:Dmaths.Module2b.IsotopeFact?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+  </dlg:radiogroup>
+  <dlg:textfield dlg:style-id="0" dlg:id="TfFact" dlg:tab-index="0" dlg:left="28" dlg:top="40" dlg:width="25" dlg:height="20" dlg:help-text="&amp;652.Isotope.TfFact.HelpText" dlg:align="center" dlg:value="&amp;653.Isotope.TfFact.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:style-id="9" dlg:id="TfExp" dlg:tab-index="28" dlg:left="150" dlg:top="28" dlg:width="28" dlg:height="16" dlg:help-text="&amp;654.Isotope.TfExp.HelpText" dlg:tabstop="false" dlg:align="center" dlg:value="&amp;655.Isotope.TfExp.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:text dlg:style-id="10" dlg:id="LbOp" dlg:tab-index="24" dlg:left="59" dlg:top="44" dlg:width="6" dlg:height="14" dlg:help-text="&amp;656.Isotope.LbOp.HelpText" dlg:value="&amp;657.Isotope.LbOp.Label" dlg:align="center"/>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="13" dlg:left="12" dlg:top="15" dlg:width="364" dlg:height="148" dlg:help-text="&amp;658.Isotope.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;659.Isotope.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="25" dlg:left="210" dlg:top="76" dlg:width="130" dlg:height="70" dlg:help-text="&amp;660.Isotope.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;661.Isotope.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="FrameControl3" dlg:tab-index="1" dlg:left="45" dlg:top="78" dlg:width="36" dlg:height="60" dlg:help-text="&amp;662.Isotope.FrameControl3.HelpText">
+   <dlg:title dlg:value="&amp;663.Isotope.FrameControl3.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="FrameControl4" dlg:tab-index="8" dlg:left="142" dlg:top="78" dlg:width="41" dlg:height="70" dlg:help-text="&amp;664.Isotope.FrameControl4.HelpText">
+   <dlg:title dlg:value="&amp;665.Isotope.FrameControl4.Label"/>
+  </dlg:titledbox>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton12" dlg:tab-index="17" dlg:left="270" dlg:top="92" dlg:width="16" dlg:height="20" dlg:help-text="&amp;666.Isotope.CommandButton12.HelpText" dlg:value="&amp;667.Isotope.CommandButton12.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton13" dlg:tab-index="18" dlg:left="292" dlg:top="92" dlg:width="16" dlg:height="20" dlg:help-text="&amp;668.Isotope.CommandButton13.HelpText" dlg:value="&amp;669.Isotope.CommandButton13.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton14" dlg:tab-index="19" dlg:left="314" dlg:top="92" dlg:width="16" dlg:height="20" dlg:help-text="&amp;670.Isotope.CommandButton14.HelpText" dlg:value="&amp;671.Isotope.CommandButton14.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton7" dlg:tab-index="22" dlg:left="292" dlg:top="119" dlg:width="16" dlg:height="20" dlg:help-text="&amp;672.Isotope.CommandButton7.HelpText" dlg:value="&amp;673.Isotope.CommandButton7.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton8" dlg:tab-index="23" dlg:left="314" dlg:top="119" dlg:width="16" dlg:height="20" dlg:help-text="&amp;674.Isotope.CommandButton8.HelpText" dlg:value="&amp;675.Isotope.CommandButton8.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton9" dlg:tab-index="20" dlg:left="248" dlg:top="119" dlg:width="16" dlg:height="20" dlg:help-text="&amp;676.Isotope.CommandButton9.HelpText" dlg:value="&amp;677.Isotope.CommandButton9.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton5" dlg:tab-index="21" dlg:left="270" dlg:top="119" dlg:width="16" dlg:height="20" dlg:help-text="&amp;678.Isotope.CommandButton5.HelpText" dlg:value="&amp;679.Isotope.CommandButton5.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton6" dlg:tab-index="16" dlg:left="215" dlg:top="119" dlg:width="16" dlg:height="20" dlg:help-text="&amp;680.Isotope.CommandButton6.HelpText" dlg:value="&amp;681.Isotope.CommandButton6.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetHelptext?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

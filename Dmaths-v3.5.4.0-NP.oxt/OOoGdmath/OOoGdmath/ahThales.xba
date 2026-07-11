@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ahThales" script:language="StarBasic">&apos;OOoGdmath 
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
+&apos;**********************************************************************************
+&apos;                    A HAGUET   07/2014
+&apos;***********************************************************************************
+
+
+Option Explicit
+
+Dim oThalesForm as Object
+
+
+Sub Main
+	oThalesForm=LoadDialog(&quot;OOoGdmath&quot;,&quot;ahThalesForm&quot;)
+	ChangeTitreDialog(oThalesForm)
+    oThalesForm.Model.ImageControl1.ImageURL=fCheminImages &amp; &quot;thales1.png&quot;
+    oThalesForm.Model.ImageControl2.ImageURL=fCheminImages &amp; &quot;thales2.png&quot;
+    oThalesForm.Model.ImageControl3.ImageURL=fCheminImages &amp; &quot;thales1.gif&quot;
+    TexteAide(oThalesForm,&quot;TextField1&quot;,&quot;0&lt;...&lt;=20&quot;)
+    TexteAide(oThalesForm,&quot;TextField2&quot;,&quot;0&lt;...&lt;=20&quot;)
+    TexteAide(oThalesForm,&quot;TextField3&quot;,&quot;0&lt;...&lt;=20&quot;)
+    TexteAide(oThalesForm,&quot;TextField4&quot;,&quot;-1000&lt;...&lt;=1000&quot;)
+    TexteAide(oThalesForm,&quot;TextField5&quot;,&quot;0&lt;...&lt;=1000&quot;)
+    TexteAide(oThalesForm,&quot;TextField11&quot;,&quot;-180&lt;=...&lt;=180&quot;)
+    
+	oThalesForm.Execute()
+    if oThalesForm.Model.Tag= &quot;OK&quot; then
+    ahConstructionThales
+    end if
+    oThalesForm.dispose
+End Sub
+
+Private Sub oThalesForm_TextField4_Change()
+    if CDbl(oThalesForm.Model.TextField4.text) &lt; 0 then
+    oThalesForm.Model.ImageControl3.ImageURL=fCheminImages &amp; &quot;thales2.gif&quot;
+    else
+    oThalesForm.Model.ImageControl3.ImageURL=fCheminImages &amp; &quot;thales1.gif&quot;
+    end if 
+End Sub
+
+Private Sub oThalesForm_TextField123_Change()
+    Dim TypeTriangle as integer, A as double, B as double, C as double
+    
+    On Error GoTo ProblemeSaisie
+    A = CDbl(oThalesForm.Model.TextField1.text) * 100  &apos;* 100 pour avoir des longueurs entières
+    B = CDbl(oThalesForm.Model.TextField2.text) * 100
+    C = CDbl(oThalesForm.Model.TextField3.text) * 100
+    
+    TypeTriangle = ahTestTriangleRect(A,B,C)
+
+    if TypeTriangle = 1 or TypeTriangle = 2 or TypeTriangle = 3 then
+    oThalesForm.Model.Label17.Enabled = 1
+    oThalesForm.Model.CheckBox10.Enabled = 1
+    oThalesForm.Model.CheckBox11.Enabled = 1
+    else 
+    oThalesForm.Model.Label17.Enabled = 0
+    oThalesForm.Model.CheckBox10.Enabled = 0
+    oThalesForm.Model.CheckBox11.Enabled = 0
+    end if    
+    On Error GoTo 0
+    
+    ProblemeSaisie:
+    Exit sub
+        
+End Sub
+
+
+Private Sub oThalesForm_CheckBox1_Click()
+    oThalesForm.Model.TextField6.Enabled = oThalesForm.Model.CheckBox1.State
+    oThalesForm.Model.TextField7.Enabled = oThalesForm.Model.CheckBox1.State
+    oThalesForm.Model.TextField8.Enabled = oThalesForm.Model.CheckBox1.State
+    oThalesForm.Model.TextField9.Enabled = oThalesForm.Model.CheckBox1.State            
+    oThalesForm.Model.TextField10.Enabled = oThalesForm.Model.CheckBox1.State   
+End Sub
+
+Private Sub oThalesForm_CheckBox2_Click()
+    oThalesForm.Model.CheckBox3.Enabled = oThalesForm.Model.CheckBox2.State
+    oThalesForm.Model.CheckBox4.Enabled = oThalesForm.Model.CheckBox2.State
+    oThalesForm.Model.CheckBox5.Enabled = oThalesForm.Model.CheckBox2.State
+    oThalesForm.Model.CheckBox6.Enabled = oThalesForm.Model.CheckBox2.State
+    oThalesForm.Model.CheckBox7.Enabled = oThalesForm.Model.CheckBox2.State
+    oThalesForm.Model.CheckBox8.Enabled = oThalesForm.Model.CheckBox2.State
+    oThalesForm.Model.CheckBox9.Enabled = oThalesForm.Model.CheckBox2.State
+End Sub
+
+Private Sub ahThalesForm_OkBouton_Click()
+Dim test(7) as integer
+
+&apos;-----------------------Gestion des erreurs de saisie
+
+test(1) = ZT_Nbre(oThalesForm,  &quot;TextField1&quot;, 0 , 20 , 5 ,  oThalesForm.Model.Label5.Label,) 
+test(2) = ZT_Nbre(oThalesForm,  &quot;TextField2&quot;, 0 , 20 , 5 ,  oThalesForm.Model.Label6.Label,) 
+test(3) = ZT_Nbre(oThalesForm,  &quot;TextField3&quot;, 0 , 20 , 5 ,  oThalesForm.Model.Label7.Label,) 
+test(4) = ZT_Nbre(oThalesForm,  &quot;TextField4&quot;, -1000 , 1000 , 1 ,  oThalesForm.Model.Label8.Label,true) 
+test(5) = ZT_Nbre(oThalesForm,  &quot;TextField5&quot;, 1 , 1000 , 2 ,  oThalesForm.Model.Label9.Label,true) 
+test(6) = ZT_Nbre(oThalesForm,  &quot;TextField11&quot;, -180 , 180 , 0 ,  oThalesForm.Model.Label15.Label,) 
+test(7) = ahTestTriangle(CDbl(oThalesForm.Model.TextField1.text),CDbl(oThalesForm.Model.TextField2.text),CDbl(oThalesForm.Model.TextField3.text)) 
+test(0) = test(1)*test(2)*test(3)*test(4)*test(5)*test(6)*test(7)   
+&apos;---------------------- (test(0) contient 1 si tout est ok 0 sinon)
+
+if test(0) = 1 then
+    oThalesForm.Model.Tag= &quot;OK&quot; 
+    oThalesForm.endExecute
+end if
+
+End Sub
+
+function ahTestTriangle(La as double, Lb as double, Lc as double) as integer
+Dim monTest as integer
+&apos;inégalité triangulaire
+
+   If La + Lb &lt;= Lc Or La + Lc &lt;= Lb Or Lb + Lc &lt;= La Then
+   MsgBox(oThalesForm.Model.Label10.Label)
+   monTest = 0
+   else
+   monTest = 1
+   End If
+   &apos; fin de l&apos;inégalité triangulaire
+     
+   ahTestTriangle = monTest
+end function
+
+function ahTestTriangleRect(La as double, Lb as double, Lc as double) as integer
+Dim monTest as integer
+   
+   if Lb*Lb = La*La + Lc*Lc then &apos;rect en A
+   monTest = 1
+   elseif La*La = Lb*Lb + Lc*Lc then   &apos;rect an B
+   monTest = 2
+   elseif Lc*Lc = La*La + Lb*Lb then &apos;rect en O
+   monTest = 3
+   else
+   monTest = 0
+   end if
+   
+   ahTestTriangleRect = monTest
+end function
+
+
+function ahCoordTriangle(La as double, Lb as double, Lc as double) as variant
+Dim cosC as double, angleC as Double, xb as double, yb as double, xc as double, yc as double
+  
+   cosC = (Lb * Lb + La * La - Lc * Lc) / (2 * Lb * La)
+   angleC = Atn(-cosC / Sqr(-cosC * cosC + 1)) + Pi / 2
+   
+   &apos;coordonnées des sommets du triangle
+   xb = La
+   yb = 0
+   xc = Lb * Cos(angleC)
+   yc = - Lb * Sin(angleC)
+   
+   ahCoordTriangle = Array(0,0,xb*1000,yb*1000,xc*1000,yc*1000)
+   
+end function
+
+
+private sub ahConstructionThales()
+dim mescoord as variant, coeff as double, mescoord2 as variant, i as integer, SgnCoeff as integer, angle3 as double
+dim vectOA(1) as variant, vectOB(1) as variant, vectAB(1) as variant
+dim k1(6) as integer, k2(6) as integer, cste as integer
+dim ahUnite as string
+dim ahConfigThales as object
+
+Shapes=InitialiseGroupe()
+InitialiseDessin(false)
+
+coeff = CDbl(oThalesForm.Model.TextField4.Text)/CDbl(oThalesForm.Model.TextField5.Text)
+mescoord = ahCoordTriangle(CDbl(oThalesForm.Model.TextField1.Text), CDbl(oThalesForm.Model.TextField2.Text), CDbl(oThalesForm.Model.TextField3.Text))
+mescoord2 = Array(mescoord(0)*coeff,mescoord(1)*coeff,mescoord(2)*coeff,mescoord(3)*coeff,mescoord(4)*coeff,mescoord(5)*coeff)
+
+vectOA(0) = ((mescoord(2) - mescoord(0))/CDbl(oThalesForm.Model.TextField1.Text))
+vectOA(1) = ((mescoord(3) - mescoord(1))/CDbl(oThalesForm.Model.TextField1.Text))
+vectOB(0) = ((mescoord(4) - mescoord(0))/CDbl(oThalesForm.Model.TextField2.Text))
+vectOB(1) = ((mescoord(5) - mescoord(1))/CDbl(oThalesForm.Model.TextField2.Text))
+vectAB(0) = ((mescoord(4) - mescoord(2))/CDbl(oThalesForm.Model.TextField3.Text))
+vectAB(1) = ((mescoord(5) - mescoord(3))/CDbl(oThalesForm.Model.TextField3.Text))
+
+for i = 1 to 6
+if oThalesForm.getControl(&quot;ListBox&quot;&amp;i).selectedItemPos = 1 then
+k1(i) = 0
+k2(i) = 1
+elseif oThalesForm.getControl(&quot;ListBox&quot;&amp;i).selectedItemPos = 2 then
+k1(i)=-1
+k2(i)=1
+elseif oThalesForm.getControl(&quot;ListBox&quot;&amp;i).selectedItemPos = 3 then
+k1(i)=-1
+k2(i)=0
+end if
+next
+
+InsereLigne(mescoord(0) + k1(1)*vectOA(0),mescoord(1)+k1(1)*vectOA(1),mescoord(2)+k2(1)*vectOA(0),mescoord(3)+k2(1)*vectOA(1),Shapes)
+InsereLigne(mescoord(2)+ k1(3)*vectAB(0),mescoord(3)+ k1(3)*vectAB(1),mescoord(4)+ k2(3)*vectAB(0),mescoord(5)+ k2(3)*vectAB(1),Shapes)
+InsereLigne(mescoord(0)+ k1(2)*vectOB(0),mescoord(1)+ k1(2)*vectOB(1),mescoord(4)+ k2(2)*vectOB(0),mescoord(5)+k2(2)*vectOB(1),Shapes)
+
+if CDbl(oThalesForm.Model.TextField4.Text)&lt;0 then
+cste = -1
+else
+cste = 1
+end if
+
+InsereLigne(mescoord2(0) + cste* k1(4)*vectOA(0),mescoord2(1)+  cste* k1(4)*vectOA(1),mescoord2(2)+ cste* k2(4)*vectOA(0),mescoord2(3)+  cste* k2(4)*vectOA(1),Shapes)
+InsereLigne(mescoord2(2)+  cste* k1(6)*vectAB(0),mescoord2(3)+  cste* k1(6)*vectAB(1),mescoord2(4)+  cste* k2(6)*vectAB(0),mescoord2(5)+  cste* k2(6)*vectAB(1),Shapes)
+InsereLigne(mescoord2(0)+  cste* k1(5)*vectOB(0),mescoord2(1)+  cste* k1(5)*vectOB(1),mescoord2(4)+  cste* k2(5)*vectOB(0),mescoord2(5)+  cste* k2(5)*vectOB(1),Shapes)
+
+if oThalesForm.Model.CheckBox1.state then
+SgnCoeff = Sgn(CDbl(oThalesForm.Model.TextField4.Text))
+InsereTexte(oThalesForm.getControl(&quot;TextField6&quot;).Peer.Text, mescoord(0)-600, mescoord(1)- 800, Shapes)
+InsereTexte(oThalesForm.getControl(&quot;TextField7&quot;).Peer.Text, mescoord(2)-400, mescoord(3), Shapes)
+InsereTexte(oThalesForm.getControl(&quot;TextField8&quot;).Peer.Text,  mescoord(4)-400,  mescoord(5)- 800, Shapes)
+InsereTexte(oThalesForm.getControl(&quot;TextField9&quot;).Peer.Text,  mescoord2(2)-400,  mescoord2(3)+ min(0,SgnCoeff*800), Shapes)
+InsereTexte(oThalesForm.getControl(&quot;TextField10&quot;).Peer.Text,  mescoord2(4)-400,  mescoord2(5)- max(0,SgnCoeff*800), Shapes)
+end if
+
+if oThalesForm.Model.CheckBox2.state then
+  
+  if -CalculeAngle(mescoord(2),mescoord(3),mescoord(4),mescoord(5)) &gt; pi/2 then
+  angle3 = 18000 - CalculeAngle(mescoord(2),mescoord(3),mescoord(4),mescoord(5))*18000/Pi
+  else
+  angle3 = - CalculeAngle(mescoord(2),mescoord(3),mescoord(4),mescoord(5))*18000/Pi
+  end if
+
+  ahUnite = IIf(oThalesForm.Model.CheckBox9.state , &quot;cm&quot; , &quot;&quot;)
+   
+  if oThalesForm.Model.CheckBox3.state then
+  InsereTexte(oThalesForm.getControl(&quot;TextField1&quot;).Peer.Text &amp; ahUnite, (mescoord(0)+mescoord(2))/2-600, (mescoord(1)+mescoord(3))/2 , Shapes,-CalculeAngle(0,0,mescoord(2),mescoord(3))*18000/Pi )
+  end if
+  if oThalesForm.Model.CheckBox4.state then
+  InsereTexte(oThalesForm.getControl(&quot;TextField2&quot;).Peer.Text &amp; ahUnite, (mescoord(0)+mescoord(4))/2-1500, (mescoord(1)+mescoord(5))/2 - 1000, Shapes,-CalculeAngle(0,0,mescoord(4),mescoord(5))*18000/Pi )
+  end if
+  if oThalesForm.Model.CheckBox5.state then
+  InsereTexte(oThalesForm.getControl(&quot;TextField3&quot;).Peer.Text &amp; ahUnite, (mescoord(2)+mescoord(4))/2-400, (mescoord(3)+mescoord(5))/2 , Shapes, angle3)
+  end if
+  if oThalesForm.Model.CheckBox6.state then
+  InsereTexte(CDbl(oThalesForm.getControl(&quot;TextField1&quot;).Peer.Text)*abs(coeff) &amp; ahUnite, (mescoord2(0)+mescoord2(2))/2-600, (mescoord2(1)+mescoord2(3))/2 + min(0,SgnCoeff*800), Shapes, -CalculeAngle(0,0,mescoord(2),mescoord(3))*18000/Pi)
+  end if
+  if oThalesForm.Model.CheckBox7.state then
+  InsereTexte(CDbl(oThalesForm.getControl(&quot;TextField2&quot;).Peer.Text)*abs(coeff) &amp; ahUnite, (mescoord2(0)+mescoord2(4))/2-1200-min(0,SgnCoeff*600), (mescoord2(1)+mescoord2(5))/2 - max(0,SgnCoeff*800), Shapes,-CalculeAngle(0,0,mescoord(4),mescoord(5))*18000/Pi)
+  end if
+  if oThalesForm.Model.CheckBox8.state then
+  InsereTexte(CDbl(oThalesForm.getControl(&quot;TextField3&quot;).Peer.Text)*abs(coeff) &amp; ahUnite, (mescoord2(2)+mescoord2(4))/2-1000+min(0,SgnCoeff*800), (mescoord2(3)+mescoord2(5))/2 - 600, Shapes,angle3)
+  end if
+
+end if
+
+i = ahTestTriangleRect( CDbl(oThalesForm.Model.TextField1.text), CDbl(oThalesForm.Model.TextField2.text), CDbl(oThalesForm.Model.TextField3.text))
+if oThalesForm.Model.Checkbox10.State then
+   if i = 1 then
+    InsereLigne(mesCoord(2),mesCoord(3)-200, mescoord(2)-200, mesCoord(3)-200,Shapes)
+    InsereLigne(mesCoord(2)-200 ,mesCoord(3), mescoord(2)-200, mesCoord(3)-200,Shapes)
+    elseif i=2 then 
+    InsereLigne(mesCoord(4)-VectOB(0)*0.2 ,mesCoord(5)-VectOB(1)*0.2, mesCoord(4)-(VectOB(0)+VectAB(0))*0.2,mesCoord(5)-(VectOB(1)+VectAB(1))*0.2,Shapes)
+    InsereLigne(mesCoord(4)-(VectOB(0)+VectAB(0))*0.2,mesCoord(5)-(VectOB(1)+VectAB(1))*0.2, mesCoord(4)-VectAB(0)*0.2,mesCoord(5)-VectAB(1)*0.2,Shapes)
+    elseif i = 3 then
+    InsereLigne(0,-200, 200, -200,Shapes)
+    InsereLigne(200 , 0, 200, -200,Shapes)
+   end if
+end if
+if oThalesForm.Model.Checkbox11.State then
+   if i = 1 then
+    InsereLigne(mesCoord2(2),mesCoord2(3)-sgn(Coeff)*200, mescoord2(2)-sgn(Coeff)*200, mesCoord2(3)-sgn(Coeff)*200,Shapes)
+    InsereLigne(mesCoord2(2)-sgn(Coeff)*200 ,mesCoord2(3), mescoord2(2)-sgn(Coeff)*200, mesCoord2(3)-sgn(Coeff)*200,Shapes)
+    elseif i=2 then 
+    InsereLigne(mesCoord2(4)- sgn(Coeff)*VectOB(0)*0.2 ,mesCoord2(5)-sgn(Coeff)*VectOB(1)*0.2, mesCoord2(4)-sgn(Coeff)*(VectOB(0)+VectAB(0))*0.2,mesCoord2(5)-sgn(Coeff)*(VectOB(1)+VectAB(1))*0.2,Shapes)
+    InsereLigne(mesCoord2(4)-sgn(Coeff)*(VectOB(0)+VectAB(0))*0.2,mesCoord2(5)-sgn(Coeff)*(VectOB(1)+VectAB(1))*0.2, mesCoord2(4)-sgn(Coeff)*VectAB(0)*0.2,mesCoord2(5)-sgn(Coeff)*VectAB(1)*0.2,Shapes)
+    elseif i = 3 then
+    InsereLigne(0,-sgn(Coeff)*200, sgn(Coeff)*200, -sgn(Coeff)*200,Shapes)
+    InsereLigne(sgn(Coeff)*200 , 0, sgn(Coeff)*200, -sgn(Coeff)*200,Shapes)
+   end if
+end if
+
+
+ahConfigThales = GroupeObjet(Shapes)
+ahConfigThales.RotateAngle = CDbl(oThalesForm.getControl(&quot;TextField11&quot;).Peer.Text)*100
+TermineDessin()
+
+end sub
+</script:module>

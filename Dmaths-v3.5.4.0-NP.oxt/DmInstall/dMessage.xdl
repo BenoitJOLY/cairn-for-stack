@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="dMessage" dlg:left="203" dlg:top="167" dlg:width="267" dlg:height="213" dlg:help-text="&amp;376.dMessage.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;377.dMessage.Title">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label4" dlg:tab-index="0" dlg:left="8" dlg:top="79" dlg:width="252" dlg:height="16" dlg:help-text="&amp;386.dMessage.Label4.HelpText" dlg:value="&amp;387.dMessage.Label4.Label"/>
+  <dlg:text dlg:id="Label5" dlg:tab-index="1" dlg:left="8" dlg:top="102" dlg:width="252" dlg:height="16" dlg:help-text="&amp;388.dMessage.Label5.HelpText" dlg:value="&amp;389.dMessage.Label5.Label"/>
+  <dlg:text dlg:id="Label6" dlg:tab-index="2" dlg:left="8" dlg:top="125" dlg:width="252" dlg:height="16" dlg:help-text="&amp;390.dMessage.Label6.HelpText" dlg:value="&amp;391.dMessage.Label6.Label"/>
+ </dlg:bulletinboard>
+</dlg:window>

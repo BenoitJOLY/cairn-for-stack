@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="AdditionCodeB" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Sub Main
+Dim unTableau
+dim l,h
+	InitialiseDessin(False)
+	DimensionTexte(&quot;8&quot;, 12,l ,h)
+	unTableau=InsereTableau(l,10,8)
+	AfficheTexteTableau(unTableau,1,1,&quot;1&quot;)
+	AfficheTexteTableau(unTableau,3,2,&quot;2&quot;)
+End Sub
+
+Function InsereTableau(x,l,h) as Object
+Dim monCurseur
+dim monTableau as Object
+Dim i,j
+Dim unBord as New com.sun.star.table.BorderLine
+Dim uneCellule as Object
+
+	unBord.OuterLineWidth=0
+	monCurseur=oDocumentTexte.Text.CreateTextCursor
+	monTableau=oDocumentTexte.CreateInstance(&quot;com.sun.star.text.TextTable&quot;)
+	monTableau.initialize(h,l)
+	monTableau.HoriOrient=com.sun.star.text.HoriOrientation.LEFT
+	monTableau.IsWidthRelative=False
+	monTableau.Width=x*l*8000/14110
+	oDocumentTexte.Text.insertTextContent(monCurseur, monTableau, false)
+	for i=0 to l-1
+		for j=0 to h-1
+			uneCellule=monTableau.getCellByPosition(i,j)
+			uneCellule.LeftBorder=unBord
+			uneCellule.TopBorder=unBord
+			uneCellule.BottomBorder=unBord
+			uneCellule.RightBorder=unBord
+			monCurseur=uneCellule.createTextCursor
+			monCurseur.ParaAdjust=com.sun.star.style.ParagraphAdjust.CENTER
+		next j
+	next i
+	
+	InsereTableau()=monTableau
+End Function
+
+Sub AfficheTexteTableau(unTableau,x,y,texte)
+Dim uneCellule as Object
+Dim unCurseur as Object
+
+	uneCellule=unTableau.getCellByPosition(x,y)
+	uneCellule.String = texte
+End Sub
+
+
+
+</script:module>

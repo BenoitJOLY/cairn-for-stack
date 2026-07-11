@@ -1,0 +1,5 @@
+﻿Copyright (c) 2011 Alain HAGUET
+
+Übersetzungen und Hilfe : Gisbert FRIEGE - Hélio GUILHERME - Andrea GATTO - Didier DORANGE-PATTORET
+
+Mit dieser Extension für WRITER und DRAW können Sie einfach und schnell verschiedene Körper mit gegebenen Maßen (auch in Kavalierperspektive) und Netze (auch mit Klebelaschen) zeichnen - und auf verblüffende Weise nachträglich bearbeiten.

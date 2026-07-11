@@ -1,0 +1,202 @@
+Matière	Classe	Chapitre	Mots-clefs
+Allemand	2nde	Axes	Representation_De_Soi, Vivre_Entre_Generations, Univers_Professionnel, Le_Village_Le_Monde
+Allemand	2nde	A_Definir	A_Definir
+Allemand	1ère	Axes	Identites_Echanges, Espace_Prive_Public, Art_Pouvoir, Citoyennete_Mondes_Virtuels, Fictions_Realites, Innovations_Scientifiques
+Allemand	1ère	A_Definir	A_Definir
+Allemand	Term	Axes	Identites_Echanges, Espace_Prive_Public, Art_Pouvoir, Citoyennete_Mondes_Virtuels, Fictions_Realites, Diversite_Inclusion
+Allemand	Term	A_Definir	A_Definir
+Anglais	2nde	Axes	Representation_De_Soi, Vivre_Entre_Generations, Passe_Dans_Present, Defis_Transitions, Creer_Recreer, Pays_Commonwealth
+Anglais	2nde	A_Definir	A_Definir
+Anglais	1ère	Axes	Identites_Echanges, Diversite_Inclusion, Art_Pouvoir, Innovations_Scientifiques, Etre_Humain_Nature, Aires_Anglophones_Americaines
+Anglais	1ère	A_Definir	A_Definir
+Anglais	Term	Axes	Espace_Prive_Public, Territoire_Memoire, Fictions_Realites, Enjeux_Communication, Citoyennete_Mondes_Virtuels, Royaume_Uni_Nations
+Anglais	Term	A_Definir	A_Definir
+EMC	2nde	Themes	Liberte, Egalite, Laicite, Engagement_Citoyen
+EMC	2nde	A_Definir	A_Definir
+EMC	1ère	Themes	Fondements_Republique, Lien_Social, Republique_Democratie
+EMC	1ère	A_Definir	A_Definir
+EMC	Term	Themes	Democratie, Citoyennete_Numerique, Defense_Securite, Bioethique
+EMC	Term	A_Definir	A_Definir
+Enseignement_Scientifique	1ère	Themes	Histoire_De_La_Matiere, Soleil_Source_Energie, Terre_Astre_Singulier, Son_Et_Musique
+Enseignement_Scientifique	1ère	Projet	Projet_Experimental_Numerique
+Enseignement_Scientifique	1ère	A_Definir	A_Definir
+Enseignement_Scientifique	Term	Themes	Science_Climat_Societe, Futur_Des_Energies, Une_Histoire_Du_Vivant
+Enseignement_Scientifique	Term	Projet	Projet_Experimental_Numerique
+Enseignement_Scientifique	Term	A_Definir	A_Definir
+EPS	2nde	Themes	Connaissances_Theoriques, Sante_Effort, Reglements
+EPS	2nde	A_Definir	A_Definir
+EPS	1ère	Themes	Connaissances_Theoriques, Sante_Effort, Reglements
+EPS	1ère	A_Definir	A_Definir
+EPS	Term	Themes	Connaissances_Theoriques, Sante_Effort, Reglements
+EPS	Term	A_Definir	A_Definir
+Espagnol	2nde	Axes	Representation_De_Soi, Vivre_Entre_Generations, Univers_Professionnel, Le_Village_Le_Monde
+Espagnol	2nde	A_Definir	A_Definir
+Espagnol	1ère	Axes	Identites_Echanges, Espace_Prive_Public, Art_Pouvoir, Citoyennete_Mondes_Virtuels, Fictions_Realites, Innovations_Scientifiques
+Espagnol	1ère	A_Definir	A_Definir
+Espagnol	Term	Axes	Identites_Echanges, Espace_Prive_Public, Art_Pouvoir, Citoyennete_Mondes_Virtuels, Fictions_Realites, Diversite_Inclusion
+Espagnol	Term	A_Definir	A_Definir
+Francais	2nde	Objets_Etude	Poesie, Roman_Recit, Theatre, Litterature_Idees_Presse
+Francais	2nde	A_Definir	A_Definir
+Francais	1ère	Objets_Etude	La_Poesie, Le_Roman, Le_Theatre, La_Litterature_Idees
+Francais	1ère	Epreuves	Commentaire, Dissertation, Oral_Bac
+Francais	1ère	A_Definir	A_Definir
+HGGSP	1ère	Themes	Democratie, Puissances_Internationales, Frontieres, Information, Etats_Religions
+HGGSP	1ère	A_Definir	A_Definir
+HGGSP	Term	Themes	Patrimoine, Guerre_Paix, Environnement, Connaissance, Histoire_Memoire
+HGGSP	Term	A_Definir	A_Definir
+Histoire-Geographie	2nde	Histoire	Mediterranee_Antique, Mediterranee_Medievale, Humanisme_Renaissance_Reforme, Ouverture_Atlantique
+Histoire-Geographie	2nde	Geographie	Societes_Environnements, Territoires_Population, Mobilites_Mondiales
+Histoire-Geographie	2nde	A_Definir	A_Definir
+Histoire-Geographie	1ère	Histoire	Europe_Lumiere_Nations, Industrialisation_France, Premiere_Guerre_Mondiale, Entre_Deux_Guerres
+Histoire-Geographie	1ère	Geographie	Metropolisation, Espaces_Productifs, Ruraux_Mutations, Chine_Developpement
+Histoire-Geographie	1ère	A_Definir	A_Definir
+Histoire-Geographie	Term	Histoire	Impact_Memoires_Guerre, Monde_Bipolaire, Nouvelles_Puissances, Histoire_Immigration
+Histoire-Geographie	Term	Geographie	Mondialisation_Flux, Territoires_Inegalites, France_Dans_Le_Monde, Espaces_Maritimes
+Histoire-Geographie	Term	A_Definir	A_Definir
+HLP	1ère	Semestres	Pouvoirs_De_La_Parole, Representations_Du_Monde
+HLP	1ère	A_Definir	A_Definir
+HLP	Term	Semestres	Recherche_De_Soi, Humanite_En_Question
+HLP	Term	A_Definir	A_Definir
+LCA	2nde	Langues	Latin, Grec_Ancien
+LCA	2nde	A_Definir	A_Definir
+LCA	1ère	Langues	Latin, Grec_Ancien
+LCA	1ère	A_Definir	A_Definir
+LCA	Term	Langues	Latin, Grec_Ancien
+LCA	Term	A_Definir	A_Definir
+Lettres_Philo	2nde	Francais	Poesie, Roman_Recit, Theatre, Litterature_Idees_Presse
+Lettres_Philo	2nde	A_Definir	A_Definir
+Lettres_Philo	1ère	Francais	Le_Theatre, La_Poesie, Le_Roman, La_Litterature_Idees, Oral_Bac, Ecrit_Commentaire_Dissert
+Lettres_Philo	1ère	A_Definir	A_Definir
+Lettres_Philo	Term	Philosophie	Le_Sujet, La_Culture, La_Raison_Science, La_Politique, La_Morale, Explication_Texte, Dissertation
+Lettres_Philo	Term	A_Definir	A_Definir
+LLCER	1ère	Thematiques	Imaginaires, Rencontres, Echanges_Transmissions
+LLCER	1ère	A_Definir	A_Definir
+LLCER	Term	Thematiques	Expression_Sensibilites, Relation_Au_Monde, Initiatives_Citoyennetes
+LLCER	Term	A_Definir	A_Definir
+Maths	2nde	Algebre	Nombres, Calcul_Litteral, Equations, Inequations, Arithmetique
+Maths	2nde	Fonctions	Variations, Images_Antecedents, Affines, Second_Degre
+Maths	2nde	Geometrie	Vecteurs, Coordonnees, Configurations_Plan
+Maths	2nde	Stat_Probabilites	Moyenne_Mediane, Fluctuation, Probabilites
+Maths	2nde	A_Definir	A_Definir
+Maths	1ère	Analyse	Derivation, Exponentielle, Trigonometrie
+Maths	1ère	Suites	Arithmetiques, Geometriques, Sommes
+Maths	1ère	Probabilites	Loi_Binomiale, Variables_Aleatoires
+Maths	1ère	A_Definir	A_Definir
+Maths	Term	Analyse	Limites, Logarithme, Integrales, Equa_Diff
+Maths	Term	Geometrie	Espace_Points, Espace_Vecteurs
+Maths	Term	Probabilites	Denombrement, Lois_Continues
+Maths	Term	A_Definir	A_Definir
+NSI	1ère	Histoire_Informatique	Repères_Historiques
+NSI	1ère	Donnees	Binaire, Hexadecimal, Entiers, Flottants, Chaines_Caracteres
+NSI	1ère	Algorithmique	Tri_Selection, Tri_Insertion, K_Plus_Proches_Voisins, Recherche_Dichotomique
+NSI	1ère	Langages_Programmation	Variables, Boucles, Fonctions, Listes_Dictionnaires
+NSI	1ère	A_Definir	A_Definir
+NSI	Term	Structures_Donnees	Piles, Files, Arbres, Graphes, Listes_Chainees
+NSI	Term	Algorithmique	Diviser_Pour_Regner, Programmation_Dynamique, Recherche_Textuelle
+NSI	Term	Bases_Donnees	Modele_Relationnel, SQL, Cles_Primales_Etrangeres
+NSI	Term	Architectures_Reseaux	Protocoles_Routage, Architecture_OS, Systemes_Exploitation
+NSI	Term	A_Definir	A_Definir
+Philosophie	Term	Notions	Le_Sujet, La_Conscience, Le_Temps, La_Nature, La_Culture, Le_Langage, La_Technique, La_Raison_Le_Reel, La_Verite, La_Liberte, Le_Devoir, Le_Bonheur, La_Justice, Letat, La_Religion, Lart
+Philosophie	Term	Methodes	Explication_Texte, Dissertation
+Philosophie	Term	A_Definir	A_Definir
+Physique-Chimie	2nde	Chimie	Atomes, Ions, Molecules, Quantite_Matiere, Masse_Volumique, Concentrations
+Physique-Chimie	2nde	Mecanique	Vitesse, Forces, Inertie, Gravitation
+Physique-Chimie	2nde	Ondes_Signaux	Son, Lumiere, Refraction, Lentilles, Spectres
+Physique-Chimie	2nde	Electricite	Tension, Intensite, Resistances
+Physique-Chimie	2nde	A_Definir	A_Definir
+Physique-Chimie	1ère	Chimie_Orga	Synthese, Nomenclature, Groupes_Caracteristiques
+Physique-Chimie	1ère	Chimie_Physique	Oxydoreduction, Titrage, Spectroscopie
+Physique-Chimie	1ère	Physique	Champ_Electrique, Energie_Mecanique, Photons
+Physique-Chimie	1ère	A_Definir	A_Definir
+Physique-Chimie	Term	Chimie	Cinetique_Chimique, Equilibre_Chimique, Acido_Basicite, Force_Des_Acides, Loi_De_Beer_Lambert
+Physique-Chimie	Term	Mecanique	Lois_De_Newton, Kepler, Fluides, Systemes_Oscillants
+Physique-Chimie	Term	Thermodynamique	Transferts_Thermiques, Energie_Interne
+Physique-Chimie	Term	Ondes_Physique	Interferences, Diffraction, Effet_Doppler, Lunette_Astronomique
+Physique-Chimie	Term	A_Definir	A_Definir
+S2TMD	1ère	Themes	Culture_Musicale_Choregraphique, Techniques_Pratiques, Economie_Droit
+S2TMD	1ère	A_Definir	A_Definir
+S2TMD	Term	Themes	Culture_Musicale_Choregraphique, Techniques_Pratiques, Economie_Droit
+S2TMD	Term	A_Definir	A_Definir
+Sciences_Ingenieur	1ère	Themes	Analyse_Systemes, Modelisation_Mecanique, Chaine_Information, Chaine_Energie, Programmation
+Sciences_Ingenieur	1ère	A_Definir	A_Definir
+Sciences_Ingenieur	Term	Themes	Comportement_Systemes, Modelisation_Multiphysique, Asservissement, Projet
+Sciences_Ingenieur	Term	A_Definir	A_Definir
+SES	2nde	Science_Economique	Creation_Mesure_Richesses, Marche, Marche_Travail, Monnaie_Financement, Ressources_Croissance
+SES	2nde	Sociologie	Socialisation, Liens_Sociaux
+SES	2nde	Science_Politique	Organisation_Vie_Politique
+SES	2nde	A_Definir	A_Definir
+SES	1ère	Science_Economique	Marches_Concurrentiels, Marches_Imparfaits, Monnaie_Creation, Financement_Economie, Risques_Assurance
+SES	1ère	Sociologie	Socialisation, Liens_Sociaux, Controle_Deviance
+SES	1ère	Science_Politique	Opinion_Publique, Vote
+SES	1ère	Regards_Croises	Organisation_Gouvernance_Entreprises, Gestion_Risques
+SES	1ère	A_Definir	A_Definir
+SES	Term	Science_Economique	Sources_Croissance, Commerce_International, Imperfections_Marche, Chomage, Crises_Financieres, Politiques_Economiques_UE
+SES	Term	Sociologie	Structure_Sociale, Mobilite_Sociale, Mutations_Travail_Emploi
+SES	Term	Science_Politique	Engagement_Politique
+SES	Term	Regards_Croises	Justice_Sociale, Action_Publique_Environnement
+SES	Term	A_Definir	A_Definir
+SNT	2nde	Internet	Protocole_TCP_IP, Adresse_IP, Routage, Paquets
+SNT	2nde	Le_Web	HTML_CSS, URL, Hyperlien, Moteur_Recherche, Referencement
+SNT	2nde	Reseaux_Sociaux	Graphe_Relations, Notoriete, Modeles_Economiques, Cyberviolence
+SNT	2nde	Donnees_Structurees	Tableur, Donnees_Ouvertes, Metadonnees, Format_CSV
+SNT	2nde	Cartographie_Mobilite	GPS, Geolocalisation, GeoJSON, Itineraires
+SNT	2nde	Informatique_Embarquee	Capteurs, Actionneurs, Objets_Connectes, Programme_Embarque
+SNT	2nde	Photographie_Numerique	Pixel, Capteur_Photosite, Metadonnees_EXIF, Traitement_Image
+SNT	2nde	A_Definir	A_Definir
+ST2S	1ère	Themes	Sciences_Sanitaires_Sociales, Biologie_Physiopathologie, Etat_Sante_Population
+ST2S	1ère	A_Definir	A_Definir
+ST2S	Term	Themes	Chimie_Biologie_Physiopathologie, Sciences_Sanitaires_Sociales, Protection_Sociale
+ST2S	Term	A_Definir	A_Definir
+STAV	1ère	Themes	Gestion_Ressources_Alimentation, Territoires_Societe, Agroecologie, Sciences_Economiques_Sociales
+STAV	1ère	A_Definir	A_Definir
+STAV	Term	Themes	Gestion_Ressources_Alimentation, Territoires_Technologie, Agroecologie, Monde_Actuel
+STAV	Term	A_Definir	A_Definir
+STD2A	1ère	Themes	Design_Objet, Design_Espace, Design_Communication, Outils_Expression
+STD2A	1ère	A_Definir	A_Definir
+STD2A	Term	Themes	Analyse_Methodes_Design, Conception_Projet, Pratiques_Design
+STD2A	Term	A_Definir	A_Definir
+STHR	1ère	Themes	Sciences_Technologies_Culinaires, Sciences_Technologies_Services, Economie_Gestion_Hoteliere, Sciences_Alimentation_Environnement
+STHR	1ère	A_Definir	A_Definir
+STHR	Term	Themes	Sciences_Technologies_Culinaires, Sciences_Technologies_Services, Economie_Gestion_Hoteliere, Sciences_Alimentation_Environnement
+STHR	Term	A_Definir	A_Definir
+STI2D	1ère	Tronc_Commun	Innovation_Technologique, Developpement_Durable, Outils_Numeriques, Energie_Matiere_Information
+STI2D	1ère	A_Definir	A_Definir
+STI2D	Term	Specialites	Architecture_Construction, Energies_Environnement, Innovation_Technologique, Systemes_Information_Numerique
+STI2D	Term	A_Definir	A_Definir
+STL-Biochimie	1ère	A_Definir	A_Definir
+STL-Biochimie	Term	A_Definir	A_Definir
+STL-SPCL	1STL	Image	Oeil_Reduit, Defauts_Oeil, RVB, Incertitude_Type_A, Chiffres_Significatifs, Rayon_Lumineux, Lentille, APN
+STL-SPCL	1STL	Instrumentation	Incertitude_Type_A, Resolution, Temps_Reponse, Etendue_Mesure, Calibre, Courbe_Etalonnage, Gamme_Etalonnage, CNA, CAN, Grandeur_Entree_Sortie, Caracteristique, Sensibilite, Loi_Circuits, Saturation, Quantum, Resolution_Numerique, Regulation
+STL-SPCL	TSTL	Chimie	Solubilités,Acides et bases,Conductivité,Oxydo-réduction,Synthèses chimiques,Mécanismes réactionnels,
+STL-SPCL	1STL	CBSV	La nutrition,risques au laboratoire,
+STL-SPCL	1STL	PCM	Constitution de la matière,Solvants et solutés,Réactions acido-basiques,Cinétique,Mouvements,Interactions,Aspects énergétiques,Ondes mécaniques,Ondes électromagnétiques,Trigonométrie,Produit scalaire,Dérivées,Primitives
+STL-SPCL	1STL	A_Definir	A_Definir
+STL-SPCL	TSTL	Ondes	Oscillateur, Facteur_Qualite, Bilan_Energetique, Type_Onde, Retard, Celerite, Frequence, Periode, Longueur_Onde, Amplitude, Fondamentales_Harmoniques, Diffraction, Interferences, Hauteur, Timbre, Niveau_Intensite_Sonore, Decibel, Ondes_Stationnaires, Spectre_EM, Flux_Energetique, Eclairement, Loi_Wien, Loi_Stefan, Refraction, Polarisation, Activite_Optique, Debit, Fibre_Optique
+STL-SPCL	TSTL	Systèmes et procédés	Analyse et contrôle des flux d’informations,Contrôle des systèmes,Système de régulation,ransferts thermiques,thermodynamique,flux de matière,hydrauliques ,Distillation,Évaporation et cristallisation
+STL-SPCL	1STL	Chimie	Sécurité et environnement,Synthèses chimiques,Analyses physico-chimiques
+STL-SPCL	TSTL	PCM	Structure spatiale,Réactions acido-basiques,Réactions d’oxydo-réduction,Cinétique,Radioactivité,Mouvements,Interactions,Énergie_conversion,Énergie mécanique,Énergie chimique,Énergie électrique,Énergie et ondes,Intégration,exponentielle,logarithme népérien,Équations différentielles,composition de fonctions
+STL-SPCL	TSTL	A_Definir	A_Definir
+STMG	1ère	Droit	Quest_Ce_Que_Le_Droit, Regler_Un_Litige, Faire_Valoir_Ses_Droits, Droits_Reconnus_Personnes
+STMG	1ère	Economie	Grandes_Questions_Economiques, Creation_Repartition_Richesse, Affectation_Revenu_Menages, Modes_Financement, Marches_Concurrentiels
+STMG	1ère	Management	Rencontre_Management, Management_Strategique_Diagnostic, Choix_Strategiques
+STMG	1ère	Sciences_Gestion_Numerique	Individu_Acteur, Numerique_Intelligence_Collective, Creation_Valeur_Performance, Temps_Risque
+STMG	1ère	A_Definir	A_Definir
+STMG	Term	Droit	Role_Du_Contrat, Etre_Responsable, Encadrement_Travail_Salarie, Cadre_Entreprendre
+STMG	Term	Economie	Intervention_Etat, Influence_Etat_Emploi_Chomage, Commerce_International, Croissance_Developpement_Durable
+STMG	Term	Management_SGN	Organisations_Production, Organisations_Acteurs, Organisations_Societe
+STMG	Term	Gestion_Finance	Regles_Comptables, Analyse_Situation_Entreprise, Accompagner_Prise_Decision
+STMG	Term	Mercatique	Definition_Offre, Distribution_Offre, Communication_Offre
+STMG	Term	RH_Communication	Competences_Organisation, Motivation_Satisfaction_QVT, Cohesion_Climat_Social
+STMG	Term	A_Definir	A_Definir
+SVT	2nde	Cellule	ADN, Division, Organites
+SVT	2nde	Ecosystemes	Cycle_Carbone, Biodiversite, Photosynthese
+SVT	2nde	Geologie	Erosion, Sedimentation, Paysages
+SVT	2nde	A_Definir	A_Definir
+SVT	1ère	Genetique	Mitose, Meiose, Replication_ADN, Mutations
+SVT	1ère	Corps_Humain	Systeme_Immunitaire, Systeme_Nerveux, Glycemie
+SVT	1ère	Dynamique_Terre	Structure_Interne, Plaques_Tectoniques, Magmatisme
+SVT	1ère	A_Definir	A_Definir
+SVT	Term	Genetique_Evolution	Origine_Diversite, Complexification_Genomes, Passé_Geologique
+SVT	Term	Climat_Energie	Atmosphere, Hydrosphere, Paleoclimats, Sols
+SVT	Term	Organisme_Sante	Comportement_Mouvement, Stress, Systeme_Musculaire
+SVT	Term	A_Definir	A_Definir

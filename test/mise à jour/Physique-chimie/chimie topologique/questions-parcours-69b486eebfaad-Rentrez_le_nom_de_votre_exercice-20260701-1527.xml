@@ -1,0 +1,707 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 397545  -->
+  <question type="stack">
+    <name>
+      <text>Rentrez_le_nom_de_votre_exercice</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Chimie Topologique</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ 2 pt</span></div>
+<!-- ENONCE-START -->
+<div style="margin-bottom:12px;"><div>ecrire la réaction entre le chloro ethane et l'ion hydroxyde</div><div><br></div></div>
+<!-- ENONCE-END -->
+<div id="inst_{#qid#}" style="font-family: sans-serif; background: #fff; border: 1px solid #d1d8dd; border-radius: 8px; padding: 15px;">
+<div id="jsme_modal_{#qid#}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.55); z-index: 9999; align-items: center; justify-content: center;">
+<div style="background: #fff; border-radius: 10px; padding: 20px; max-width: 480px; width: 95%; box-shadow: 0 8px 30px rgba(0,0,0,.3);">
+<h3 style="margin-bottom: 10px; color: #2c3e50;">Dessiner une molécule</h3>
+<div id="jsme_{#qid#}" style="width: 420px; height: 300px; margin: 0 auto;"></div>
+<div style="display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end;"><button class="btn-stk" type="button" onclick="window['insertJsme_{#qid#}']()">Insérer</button> <button class="btn-stk" style="background: #95a5a6;" type="button" onclick="document.getElementById('jsme_modal_{#qid#}').style.display='none'">Annuler</button></div>
+</div>
+</div>
+<div class="toolbar" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('->')">→ Total</button>
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('<=>')">⇌ Équilibre</button>
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('+')">+ Ajouter</button>
+<button class="btn-stk" style="background: #8e44ad;" type="button" onclick="window['openJsme_{#qid#}']()">🔬 Molécule</button>
+</div>
+<div id="ed_{#qid#}" style="border: 2px solid #3498db; min-height: 45px; font-size: 1.15rem; padding: 12px; outline: none; border-radius: 5px; margin-bottom: 15px; font-family: monospace; background: #fdfdfd;" contenteditable="true"></div>
+<div id="viz_{#qid#}" style="background: #fcfcfc; border: 1px solid #eee; border-radius: 5px; padding: 12px; min-height: 100px; overflow-x: auto;">
+<div id="render_area_{#qid#}" style="display: flex; align-items: center; justify-content: flex-start; gap: 8px; flex-wrap: nowrap; min-width: min-content;"></div>
+</div>
+<div style="display: none;">
+<span class="stk-reaf">[[input:ans_reaformul1]] [[validation:ans_reaformul1]]</span>
+<span class="stk-reac">[[input:ans_reacharge1]] [[validation:ans_reacharge1]]</span>
+<span class="stk-reas">[[input:ans_reacoef1]] [[validation:ans_reacoef1]]</span>
+<span class="stk-prof">[[input:ans_proformul1]] [[validation:ans_proformul1]]</span>
+<span class="stk-proc">[[input:ans_procharge1]] [[validation:ans_procharge1]]</span>
+<span class="stk-pros">[[input:ans_procoef1]] [[validation:ans_procoef1]]</span>
+<span class="stk-rea">[[input:ans_fct_rea1]] [[validation:ans_fct_rea1]]</span>
+<span class="stk-pro">[[input:ans_fct_pro1]] [[validation:ans_fct_pro1]]</span>
+<span class="stk-atbal">[[input:ans_atombalance1]] [[validation:ans_atombalance1]]</span>
+[[input:ans_raw1]] [[validation:ans_raw1]]
+</div>
+</div>
+<p>
+<script src="https://unpkg.com/smiles-drawer@2.0.1/dist/smiles-drawer.min.js"></script>
+<script type="text/javascript" src="https://jsme-editor.github.io/dist/jsme/jsme.nocache.js"></script>
+<script>
+(function() {
+    var qId = "{#qid#}";
+    var sfx = "1";
+    var sd = null;
+    var jsmeInst = null;
+    var lastRange = null;
+
+    window["openJsme_" + qId] = function() {
+        document.getElementById("jsme_modal_" + qId).style.display = "flex";
+        if (!jsmeInst && typeof JSApplet !== "undefined") {
+            jsmeInst = new JSApplet.JSME("jsme_" + qId, "420px", "300px", {options:"query,hydrogens"});
+        } else if (jsmeInst) { jsmeInst.reset(); }
+    };
+
+    window["insertJsme_" + qId] = function() {
+        if (!jsmeInst) return;
+        var smi = jsmeInst.smiles();
+        if (smi) window["api_" + qId].ins(smi);
+        document.getElementById("jsme_modal_" + qId).style.display = "none";
+    };
+
+    window["api_" + qId] = {
+        ins: function(t) {
+            var e = document.getElementById("ed_" + qId);
+            e.focus();
+            var sel = window.getSelection();
+            var range = lastRange || document.createRange();
+            if (!e.contains(range.commonAncestorContainer)) {
+                range.selectNodeContents(e); range.collapse(false);
+            }
+            range.deleteContents();
+            var node = document.createTextNode(t + " ");
+            range.insertNode(node);
+            range.setStartAfter(node); range.collapse(true);
+            sel.removeAllRanges(); sel.addRange(range);
+            lastRange = range;
+            e.dispatchEvent(new Event("input", {bubbles:true}));
+        }
+    };
+
+    function parseSide(txt) {
+        if (!txt || txt.trim() === "") return {f:"[]",c:"[]",s:"[]"};
+        var mols = txt.split("+"), f=[], c=[], s=[];
+        mols.forEach(function(v) {
+            v = v.trim(); if (!v) return;
+            var parts = v.split(" ");
+            var coef = parseInt(parts[0]);
+            var smi = isNaN(coef) ? v : v.substring(parts[0].length).trim();
+            f.push('"' + smi + '"');
+            s.push(isNaN(coef) ? 1 : coef);
+            c.push(smi.includes("-]") ? -1 : (smi.includes("+]") ? 1 : 0));
+        });
+        return {f:"["+f.join(",")+"]", c:"["+c.join(",")+"]", s:"["+s.join(",")+"]"};
+    }
+
+    function countHeavyAtoms(smi) {
+        var counts={}, i=0;
+        while (i < smi.length) {
+            var ch = smi.charAt(i);
+            if (ch === "[") {
+                var j = i+1; while (j < smi.length && smi.charAt(j) !== "]") j++;
+                var inner = smi.substring(i+1, j);
+                var eMatch = inner.match(/^([A-Z][a-z]?)/);
+                if (eMatch && eMatch[1] !== "H") counts[eMatch[1]] = (counts[eMatch[1]]||0)+1;
+                i = j+1;
+            } else if (ch >= "A" && ch <= "Z") {
+                var sym = ch;
+                if (i+1 < smi.length && smi.charAt(i+1) >= "a" && smi.charAt(i+1) <= "z") { sym += smi.charAt(i+1); i++; }
+                counts[sym] = (counts[sym]||0)+1; i++;
+            } else if ("cnos".indexOf(ch) !== -1) {
+                counts[ch.toUpperCase()] = (counts[ch.toUpperCase()]||0)+1; i++;
+            } else i++;
+        }
+        return counts;
+    }
+
+    function checkAtomBalance(val) {
+        var sep = val.indexOf("<=>") !== -1 ? "<=>" : "->";
+        var sides = val.split(sep);
+        if (sides.length < 2) return "unknown";
+        function sideCounts(side) {
+            var total={};
+            side.split("+").forEach(function(m) {
+                m = m.trim(); if (!m) return;
+                var parts = m.split(" "); var coef = parseInt(parts[0]);
+                var smi = isNaN(coef) ? m : m.substring(parts[0].length).trim();
+                var c = countHeavyAtoms(smi); var n = isNaN(coef) ? 1 : coef;
+                for (var k in c) total[k] = (total[k]||0) + c[k]*n;
+            });
+            return total;
+        }
+        var rea=sideCounts(sides[0]), pro=sideCounts(sides[1]), allK={};
+        for (var k in rea) allK[k]=1; for (var k in pro) allK[k]=1;
+        for (var k in allK) { if ((rea[k]||0) !== (pro[k]||0)) return "false"; }
+        return "true";
+    }
+
+    function core() {
+        var ed = document.getElementById("ed_" + qId);
+        var ct = document.getElementById("inst_" + qId);
+        var ra = document.getElementById("render_area_" + qId);
+        var rawInp = ct.querySelector("[name*=ans_raw]");
+        function getI(cls) { return ct.querySelector("." + cls + " input"); }
+
+        ed.addEventListener("blur", function() {
+            var sel = window.getSelection();
+            if (sel.rangeCount > 0) lastRange = sel.getRangeAt(0);
+        });
+
+        ed.addEventListener("input", function() {
+            var val = ed.innerText.replace(/ /g," ").replace(/s+/g," ").trim();
+            if (rawInp) {
+                rawInp.value = val || " ";
+                rawInp.dispatchEvent(new Event("input",{bubbles:true}));
+                rawInp.dispatchEvent(new Event("change",{bubbles:true}));
+            }
+            var sep2 = val.indexOf("<=>") !== -1 ? "<=>" : "->";
+            var parts = val.split(sep2);
+            var rD = parseSide(parts[0]||""), pD = parseSide(parts[1]||"");
+            var mapping = {
+                "stk-reaf": rD.f, "stk-reac": rD.c, "stk-reas": rD.s,
+                "stk-prof": pD.f, "stk-proc": pD.c, "stk-pros": pD.s
+            };
+            for (var cls in mapping) { var inp=getI(cls); if (inp) inp.value=mapping[cls]; }
+            var abInp = getI("stk-atbal"); if (abInp) abInp.value = checkAtomBalance(val);
+            var fctReaInp = getI("stk-rea"); if (fctReaInp) fctReaInp.value = "";
+            var fctProInp = getI("stk-pro"); if (fctProInp) fctProInp.value = "aucune";
+
+            ra.innerHTML = "";
+            if (!val) return;
+            if (!sd && typeof SmilesDrawer !== "undefined") sd = new SmilesDrawer.Drawer({width:110,height:80,compactDrawing:true});
+            val.split(" ").forEach(function(t, idx) {
+                t = t.trim(); if (!t) return;
+                var el = document.createElement("div");
+                el.style.flexShrink="0"; el.style.display="flex"; el.style.alignItems="center";
+                if (t==="->"||t==="→") {
+                    el.innerHTML='<span style="font-size:1.5rem;font-weight:bold;padding:0 8px;">→</span>';
+                } else if (t==="<=>"||t==="⇌") {
+                    el.innerHTML='<span style="font-size:1.5rem;font-weight:bold;padding:0 8px;">⇌</span>';
+                } else if (t==="+") {
+                    el.innerHTML='<span style="font-size:1.2rem;font-weight:bold;padding:0 10px;color:#666;">+</span>';
+                } else if (!isNaN(t)) {
+                    el.innerHTML='<span style="font-size:1.4rem;font-weight:bold;padding:0 5px;">'+t+'</span>';
+                } else {
+                    var cid="c_"+qId+"_"+idx;
+                    el.innerHTML="<canvas id='"+cid+"' width='110' height='80' style='border:1px solid #eee;background:#fff;border-radius:4px;'></canvas>";
+                    setTimeout(function(token,canvasId){
+                        return function(){
+                            if (typeof SmilesDrawer!=="undefined") {
+                                SmilesDrawer.parse(token,function(tree){sd.draw(tree,canvasId,"light",false);},function(){
+                                    var cv=document.getElementById(canvasId);
+                                    if(cv) cv.parentElement.innerHTML='<span style="padding:10px;font-family:monospace;">'+token+'</span>';
+                                });
+                            }
+                        };
+                    }(t,cid),50);
+                }
+                ra.appendChild(el);
+            });
+        });
+
+        if (rawInp && rawInp.value.trim() !== "") {
+            ed.innerText = rawInp.value; ed.dispatchEvent(new Event("input"));
+        }
+    } // fin core()
+
+    var wait = setInterval(function(){ if (document.getElementById("ed_"+qId)) { clearInterval(wait); core(); } }, 200);
+})();
+</script>
+</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);"><div style="font-weight:bold; color:var(--navy2); margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div><div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;"><span style="font-weight:bold;color:var(--navy2);">Q1 Chimie Topologique</span><span style="color:#64748b;font-size:.85rem;margin-left:6px;">La réaction attendue était</span><div style="margin-top:10px;padding:10px;background:#f8f8f8;border:1px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;"><div style="display: inline-flex; align-items: center; margin-right: 5px; vertical-align: middle;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABQCAYAAADvCdDvAAAFRUlEQVR4Xu3YW2wUZRTA8XN2thvlklSSbqJSubQg2ISmNoIPBoxGoy8GjBg0GhZRgZRgwq2EllqgpYog9gG1RqQK+lLUEIUHFKyJRGPcqiSyMjvbBKIBWiNVKZbu980x03YmayMyW7rt2eX8XtrMfG1359+ZOTsIghVk9WqEBOFGzhBmJAgzEoQZCcKMBGFGgjAjQZiRIMxIEGYkCDMShBkJwowEYUaCMCNBmJEgzEgQZiQIMxKEGQnCTE4FmTFjxuRkMvkRADyeSCQsZsfal5wIMmvWrLEXdXITJFUlaPssEN0MAK/m5eXVnjp16i/v3WaBrA5CRDhldtliTKptqOyLYMOK9pMnjxYXF8+zbftNAJiAiNWWZb2NiJQFPbI3yOR77p6DKrkbNE0DW2+ZNP6mxtbWVuUe9IULFxptbW0VRLQZAE4jYkUikTjOPUrWnSHFD987UV3u3U7KXoRKN4dC9nqzNfrblQ50SUnJhJ6engYiehYRPwyFQutisdhpbwEzWRNkciRyg91xphKVXg+2jgU1LEt88VXU7/GcPn16qVKqCQBKEXFHfn5+QzQaveQtYCIrghQ+9tAiTNrbwbaDhtIb2g8f2zfUe8LUqVOfQMTtzkCDiBvi8fj7Q/1dmcA6yJSnFpQqpZtQqzKw9a78MbT1xL4j3d6rH6Ly8vIxXV1dG4loDSL+BADLEomE77Mtk1gGKVr+dLj38t8vkdaRgNKHAPQLZz441O696mEyc+bMSb29vbuIaD4i7g+FQpWxWOyst2AUsApS3vR83vkTl1aT0lWo1LkA0Iozew4czfRxSRmTCxGxwbnHWJZ12VswgtgEKVyzdD4ptQO0LkBbbykK397YWlvrjbGZNmhM7goEAussyzrgLRghox7ktk0VJTqZ3E1azwWt947DUKW5860rjrGZNmhM/hoRl1mW5dxnRsSoBpm4ddU0nVQx1PYPqGjpry83/Tgi79qHlDH5LkTcYxjGRtM0M/6PMqpBHLduXnX/LzWNxziNnqncMZmIxiPi1sLCwn89ERhuQwoSbq5bSwBPImDZwKZuIvgOA9TYsbj644FtfQqa69qcdR2RqiH9LQ5SxuS1zmMYwzDWxOPxTzPx2tI6SOPeqw3faOcdR4BiArAQ4Bsi+nNgOrkPAMYC0LqOSPUO92dyIYhrYEx+zRmTAeBoMBhcaZrmz96CYZBWkILm+nhfDKJtnUuqq7wdg2IB0qPumZJLQVzumIyIxQDwOhHVtLe3/+EtuAa+gziXKQB8hYg+6VxS/Yi3I0X43boFYOMbBLTHDZaLQRzOmByNRlcCQC0iakSsKSsra2ppadH9R2NofAdxD6yyseT3Zzae9HZcRa4GcaWOyQBgBgKB5ZZlfektSJPvIOHmeucBXHdHpGqct9GHXA/iShmT5yDiQcMwVpummfbjnrSCEND3nZHqO72NPlwvQVxFRUWLAGAnEd0SDAYfME3zc2+nDxIkA5wx+cKFC88ZhnEkHo/HvB0+pBPkovNVLlmZ5TtIwd76VkSYd7Wbenhv/TkC+tadxK63S9a18h3E19j7H2skSHp8B3H83wfDgua6uQh42Ple2TjbPYskSHrSCjLhnW13GAE62PdpnOA8IHzW/+gES5zLWf+q3H10MhLSCuLoe0Sigy8C4oN9Yfp1E9ExTYENg+8vcoakJ+0gIrMkCDMShBkJwowEYUaCMCNBmJEgzEgQZiQIMxKEGQnCjARhRoIwI0GYkSDMSBBmJAgzEoQZCcKMBGFGgjAjQZiRIMxIEGYkCDMShBkJwowEYeYf7GZYb6Nkhv4AAAAASUVORK5CYII=" width="100" height="80"></div><div style="display: inline-flex; align-items: center; margin-right: 5px; vertical-align: middle;"><span style="font-size:1.2rem; font-weight:bold; padding:0 5px;">+</span></div><div style="display: inline-flex; align-items: center; margin-right: 5px; vertical-align: middle;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABQCAYAAADvCdDvAAADPUlEQVR4Xu3av2sTcRjH8c+TlqK0uIjYdHESHXTyB7SNi13E3OA/IOLQrO3g4KbiP9AiOLRLEVxV8AIiVgTTCtJuIlQddGkq/hi00tKGPHKXu/SaJmnvEukj+bymu0tLy/ed7/fuchGQKWLqvyEGsYYzxBgGMYZBjGEQYxjEGAYxhkGMYRBjGMQYBjGGQYxhEGMYxBgGMYZBjGEQYxjEGAYxhkGMYRBjGMQYBjGGQYxhEGMYxBgGMWbfg3x1hgbLKjmFnBbBmcj4rKpiSQRu79rGvUOzb39UX2mD0dHRBREJ/54zNTWVD7abyuVyWQCut62qi9PT02fD19ph34J8uzR8YrNLHtZEaEhRnuxbK91tFKboZLS6U4f3+wPu/Hi4zyARy5czVyWF+wD6gkOrCrxIAa9Uy5/8I5I6B+gFQC4GPwMFPvatbQzWi8IgCRWzQ1lIyp/yPtWZ3vXNG/UG2ePPpG55KsBxb79ZlDg4QwD8Gjl/+M/Bns/hzBBgvN8tTAZj1FTRGZ7dmi36Mu3OjVS2k2EQb6lyhiYEqTF/RFRn0vm565Xh2V1tTGjZSefn93QirodBKuv873BAu0t68sizuaVgfPak6GRuA7hV2WttlnR8kOBE/sAbDFUsDuQLsS8Xg1nyPdxPu4XEV4kMElmuai9B41h2Mh/CE3wry1bHB4melOOczGttP7njTtoteMtYbDVBEvmvbwyXs5mF6k1gC+/sds00BrEd5ImqfqnWakJEjgG44m1zhlTOIY8lGJA2Llmd91lWu5aads00Bolc9ia9h+Blb5u1emO44mTGFJio7CWLGur4GeLZ9tFJzAH1Z8eBnncQ9PsHWliuPAxSZ1Dj3I9E7z+S3ulHMUjAf0KI1POtDwnjffwOxUrv+sapRj+/VwwSsSNK8IAKZTwSKf/0jzR4QNWF8rWj7vyb8FhSDFLDe+eXur2nhlsD3sxuj3DjYpAG/DBduLnjSw6KFYi+B+Q1v+RA+ybx8wT6NxjEGAYxhkGMYRBjGMQYBjGGQYxhEGMYxBgGMYZBjGEQYxjEGAYxhkGMYRBjGMQYBjGGQYxhEGMYxBgGMYZBjGEQYxjEGAYxhkGM+QuTAVdv53irdgAAAABJRU5ErkJggg==" width="100" height="80"></div><div style="display: inline-flex; align-items: center; margin-right: 5px; vertical-align: middle;"><span style="font-size:1.5rem; font-weight:bold; padding:0 5px;">→</span></div><div style="display: inline-flex; align-items: center; margin-right: 5px; vertical-align: middle;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABQCAYAAADvCdDvAAAE8klEQVR4Xu3Yb0gbdxjA8eeXZGpwfVNaVmX6QnJxIeDKVibTsGYrhQ2DuD9ubycT61akjrXaDWbtaO3onFM2qVUYDAZ7IbSDKm0Ha9PNOvYnWhxRl8TAhqtlA9/YRpO7+z0jpR72j120nj5Jn8+73O8gl+ebu0tOACNFkDoaxkGo4TOEGA5CDAchhoMQw0GI4SDEcBBiOAgxHIQYDkIMByGGgxDDQYjhIMRwEGI4CDEchBgOQgwHIYaDEMNBiOEgxGR8ELfDUTkvZY/Vaj0WDoc/Jzb/u2RskFKXS0noapcqcWcC4IyO8AIATANAw9TU1GVjAsRkXJDK8uJN12fF4bjU96oI39hy7E3DY2P/lJSU5MZisQ+llI1CiFNZWVnvTUxMzBDrkTlBEFG8UuKqjSMeVXXxl4aw5+LkZODOgTudziJd1zsQcbcQ4uOCgoJP/H7/grHDBsuIM+St7e7yBcTuBOJWVcLB07+Pfy2EwPvN1uFw7JRS9gCA3WKxHIhEIv3G4gZK6yBNpSWPz6myPSGxKgHYYbfaj/QGArFU51ldXW0dGRl5BxEPCyHGhRB7IpFI0NhhA6RlkFavNycRm22OS2hWpTyn4yPvdo+O/rna+bnd7s3z8/NHhBC1APBlTk7OB8FgcNbYYR2lXZDj5U+9saDL46ouYxpY64/9OnppreblcDjciHgSEd0A0FpYWNjt9/s1Y4d1kDZBejzPPJlAtTsh0aVJaCkqVHpe7+/XzZiRoiiv6rreDgAqALwdjUa/NxZNRj7IGa93y6w+15ZAfFMF6M3KzW6pPf+T6ZcTh8ORjYgHEPEgAFyw2WyNoVAoakzOJGSDXGz12uYuxRriKA8lJFxJWLC+xh+YNI58nbhcrrx4PN4uhHgNADpzc3M/Ghsbu2HW25MM8sPuZ3fFUT8Rl2jVQOyvuvDLaeOIN4iiKKW6rp8EgMeEEO9HIpGv/u+n9WqQCjLue065oaqfxZOPOyS2FWRt7lDOno0bR7vBkn8+FUWpkVK2CSGmLRbL3nA4/PNaHlZKQerq6mYQ8e++vr4dxsYl6urqEBED91q/6vOcFgBVxoYklL68weFB4/UtwZfKvotLuCbB2rzj/I/kHmssKi4u3qRpWgsiNgBAf3Z2dtNaPYYxNciMz3PzlM4bGDLeZ6airAKEZQARAvmDQ7ftH6z2Puru9183NhCXfAyjaVoXADxvsVjaAODTSCTyQGe0aUFmKjw3vzF5g0N5i9sW/ftiebFmE5MI8G3+wNDLxkKaKioq2gUAJwDABgD7o9HoqdV+FFOCXPN59iFApwBo3DYwlPwG3WXxUmbT8Imt5y7/YSykKa/Xa5uenm6QUh4SQlyxWq31oVBoxb8KTQmSyrBTiZaOnE7nFl3XjwJADSL22u32lpU8hkk5CABsMzbcw21BKjy/CQFPL7133Mm4l4Dsyh8YbjQWMoSiKNullF8g4mw0Gq1M9WMtO7ClVnyGcJBVMyfIrUvW/c6QTL1kPahlB7bUSoOkMuxU7jMPI1OCJD1MP3vXkmlBklb6x5CZHCTpqq+sU4Bln7EhaZlHJyzFIGz9cBBiOAgxHIQYDkIMByGGgxDDQYjhIMRwEGI4CDEchBgOQgwHIYaDEMNBiOEgxHAQYjgIMRyEGA5CDAchhoMQw0GI4SDEcBBiOAgxHIQYDkIMByHmP8JPq295nXtKAAAAAElFTkSuQmCC" width="100" height="80"></div><div style="display: inline-flex; align-items: center; margin-right: 5px; vertical-align: middle;"><span style="font-size:1.2rem; font-weight:bold; padding:0 5px;">+</span></div><div style="display: inline-flex; align-items: center; margin-right: 5px; vertical-align: middle;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABQCAYAAADvCdDvAAADCElEQVR4Xu3ZPW/TUBTG8XNuy4BgqhQXMQILDEh8gRYxARJCZW6hhQEBAwsTyVBE3G8ACxVxgYmhCCYGBkBCMCCYgAE+AE0lFpp26MtB19ipa9V9sSP0SDy/yU4yRPefe31jqxAUhfo2xCBoOEPAMAgYBgHDIGAYBAyDgGEQMAwChkHAMAgYBgHDIGAYBAyDgGEQMAwChkHAMAgYBgHDIGAYBAyDgGEQMAwChkHAMAgY6CC16O4VMT0vqkdV5Eg6dibyQ8y+qZNW+1LjWdGYBjPNETGd9cdmdn9+onEjfQ8VZBAfQs2FojK43cCZ2OfVNTf66/Ltr90XE1sFCaLQ0uPN5D//r8AFqbWaL1T1XDoAfsDF5L06eRWfmw2ouJMiMiIi+5KPdUzs7Px4421yHmOQinIxOqI2VrQk7X80Gexd7Z/uft5kbrFv+fjCxcl28pEtg6CCmSHxMiVuOhmozqJbPpQd3CK1KPyeXl/yg84gFQSt8Gf3mqF2oWhm5GUHPR+SQUraMDtM5toT9QPJWzviZ4mI/fbXmqW+lTsMUlEQhY9FZNQf55edKjhDSqpFzU8qeiI+2cVytR0GKSmIwoV0C2tiw/nta1kMUlL2T1p7vN6znR+DlMQg63r2a6yi7JZ3O5whJfGivg5ihtRazXuqej35Tk/a4/Wx5HhHgqh5y0SvqsgHE3uQbgo4Q0qqRc0hFX0Tn5T5Y9gKX6vKsD82s6n5iUbdHzNIBdl7Uru5jgw8nDrW7+xLer7olgf5T70Hsr/m/D2pIvEd37U97zIPrzYsd5whFW24/W4yJ86uFc0UPzP6nD3vxuDt9977+4vvf9m9jRKPc/y49qk6+Zi8cNhMhlT1VJUHVKggdll5uV3XlvwTxSW3cnqz5Y1Beih5InhTVM6o6cHs83U/a/wWV9Rmi5Y0j0GoMsgl63/GIGAYBAyDgGEQMAwChkHAMAgYBgHDIGAYBAyDgGEQMAwChkHAMAgYBgHDIGAYBAyDgGEQMAwChkHAMAgYBgHDIGAYBAyDgPkDYN/ZYMcejAYAAAAASUVORK5CYII=" width="100" height="80"></div></div></div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>2</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Q1 Chimie Topo (2pt) */
+tans_arrow1: "->";
+is_arrow_any1: false;
+tans_reaformul1: ["CCCl","[OH-]"];
+tans_reacoef1: [1,1];
+tans_reacharge1: [0,-1];
+tans_proformul1: ["CCO","[Cl-]"];
+tans_procoef1: [1,1];
+tans_procharge1: [0,-1];
+tans_fct_rea1: "";
+tans_fct_pro1: "aucune";
+type_reaction1: "";
+nom_fct_attendue1: "aucune";
+has_fct_pro1: is(tans_fct_pro1 # "");
+charge_rea_teacher1: sum(tans_reacoef1[i]*tans_reacharge1[i],i,1,length(tans_reacoef1));
+charge_pro_teacher1: sum(tans_procoef1[i]*tans_procharge1[i],i,1,length(tans_procoef1));
+arrow_expl_fwd1: "une reaction TOTALE (irreversible)";
+arrow_expl_eq1: "une reaction D EQUILIBRE (reversible)";
+tans_arrow_expl1: if is(tans_arrow1="->") then arrow_expl_fwd1 else arrow_expl_eq1;
+tans_arrow_other_expl1: if is(tans_arrow1="->") then arrow_expl_eq1 else arrow_expl_fwd1;
+tans_arrow_symbol1: if is(tans_arrow1="->") then "->" else "<=>";
+tans_arrow_wrong_symbol1: if is(tans_arrow1="->") then "<=>" else "->";]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[Topo Q1: CCCl + [OH-] -> CCO + [Cl-]]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec l'aide de Héstack V1.0</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_atombalance1</name>
+      <type>string</type>
+      <tans><![CDATA["true"]]></tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_fct_pro1</name>
+      <type>string</type>
+      <tans>tans_fct_pro1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_fct_rea1</name>
+      <type>string</type>
+      <tans><![CDATA["" ]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_procharge1</name>
+      <type>algebraic</type>
+      <tans>tans_procharge1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_procoef1</name>
+      <type>algebraic</type>
+      <tans>tans_procoef1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_proformul1</name>
+      <type>algebraic</type>
+      <tans>tans_proformul1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_raw1</name>
+      <type>string</type>
+      <tans><![CDATA["" ]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_reacharge1</name>
+      <type>algebraic</type>
+      <tans>tans_reacharge1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_reacoef1</name>
+      <type>algebraic</type>
+      <tans>tans_reacoef1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_reaformul1</name>
+      <type>algebraic</type>
+      <tans>tans_reaformul1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[local_raw1: sconcat(ans_raw1);
+longueur_avant1: slength(local_raw1);
+longueur_apres1: slength(sremove("<",local_raw1));
+is_equi1: is(longueur_avant1 > longueur_apres1);
+is_tot1: false;
+if (not is_equi1) then (
+    if slength(local_raw1) > slength(sremove(">",local_raw1)) then is_tot1: true
+);
+ans_arrow_det1: "absente";
+if is_equi1 then ans_arrow_det1: "<=>" else if is_tot1 then ans_arrow_det1: "->";
+is_arrow_ok1: is(ans_arrow_det1 = tans_arrow1);
+arrow_s_label1: if is_equi1 then "la fleche d equilibre (<=>)" else if is_tot1 then "la fleche totale (->)" else "aucune fleche";
+arrow_t_label1: if is(tans_arrow1="->") then "la fleche totale (->)" else "la fleche d equilibre (<=)";
+L_reac1: if listp(ans_reacharge1) then ans_reacharge1 else [];
+L_reac_n1: if listp(ans_reacoef1) then ans_reacoef1 else [];
+L_prod1: if listp(ans_procharge1) then ans_procharge1 else [];
+L_prod_n1: if listp(ans_procoef1) then ans_procoef1 else [];
+is_atoms_ok1: sequal(ans_atombalance1,"true");
+charge_rea_s1: if length(L_reac1)>0 and length(L_reac1)=length(L_reac_n1) then sum(L_reac1[i]*L_reac_n1[i],i,1,length(L_reac1)) else 0;
+charge_pro_s1: if length(L_prod1)>0 and length(L_prod1)=length(L_prod_n1) then sum(L_prod1[i]*L_prod_n1[i],i,1,length(L_prod1)) else 0;
+charges_conserved1: is(charge_rea_s1=charge_pro_s1);
+nb_rea_s1: if listp(ans_reaformul1) then length(ans_reaformul1) else 0;
+nb_pro_s1: if listp(ans_proformul1) then length(ans_proformul1) else 0;
+nb_rea_t1: length(tans_reaformul1); nb_pro_t1: length(tans_proformul1);
+rea_ok1: is(sort(if listp(ans_reaformul1) then ans_reaformul1 else [])=sort(tans_reaformul1));
+pro_ok1: is(sort(if listp(ans_proformul1) then ans_proformul1 else [])=sort(tans_proformul1));
+formulas_ok1: rea_ok1 and pro_ok1;
+fct_pro_ok1: sequal(ans_fct_pro1,tans_fct_pro1);
+list_rea_s1: if listp(ans_reaformul1) and listp(ans_reacoef1) then map(lambda([f,c],[f,c]),ans_reaformul1,ans_reacoef1) else [];
+list_pro_s1: if listp(ans_proformul1) and listp(ans_procoef1) then map(lambda([f,c],[f,c]),ans_proformul1,ans_procoef1) else [];
+full_ans_map1: append(list_rea_s1,list_pro_s1);
+list_rea_t1: map(lambda([f,c],[f,c]),tans_reaformul1,tans_reacoef1);
+list_pro_t1: map(lambda([f,c],[f,c]),tans_proformul1,tans_procoef1);
+full_tans_map1: append(list_rea_t1,list_pro_t1);
+_common1: sublist(full_ans_map1,lambda([pp],not is(assoc(pp[1],full_tans_map1,"nf")="nf")));
+k_ratio1: if length(_common1)>0 then _common1[1][2]/assoc(_common1[1][1],full_tans_map1,1) else 1;
+coefs_ok1: is(sort(full_ans_map1)=sort(full_tans_map1));
+is_proportional1: if length(full_ans_map1)=0 then false else is(length(sublist(full_ans_map1,lambda([pp],is(pp[2]=assoc(pp[1],full_tans_map1,0)*k_ratio1))))=length(full_ans_map1));]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Fleche</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>is_arrow_ok1</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.0500000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><span style="color: green; font-weight: bold;">✓ Bonne flèche de réaction !</span></p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p><span style="color: red; font-weight: bold;">✗ Mauvaise flèche.</span> Détectée : {@ans_arrow_det1@}, attendue : {@tans_arrow1@}</p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Bilan atomes</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>is_atoms_ok1</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.2000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>2</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><span style="color: green; font-weight: bold;">✓ Votre réaction est équilibrée du point de vue des éléments chimiques !</span></p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p><span style="color: #cc2222; font-weight: bold;">✗ Votre réaction n'est pas équilibrée du point des éléments chimiques !</span></p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Charges</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>charges_conserved1</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.1000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>3</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><span style="color: green;">✓ Votre équation est équilibrée électriquement.</span></p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p><span style="color: red;">✗ Les charges ne sont pas conservées dans votre réaction.</span> Réactifs : {@charge_rea_s1@}, Produits : {@charge_pro_s1@}</p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Formules</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>formulas_ok1</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.4000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>5</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><span style="color: green;">✓ Vos formules sont correctes !</span></p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p><span style="color: red;">✗ Vos formules sont incorrectes.</span> Réactifs : {@nb_rea_s1@}/2, Produits : {@nb_pro_s1@}/2</p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Groupes</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>fct_pro_ok1</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>5</truenextnode>
+        <trueanswernote>prt1-4-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><span style="color: orange;">⚠ Bonne compréhension du type de réaction.</span></p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>5</falsenextnode>
+        <falseanswernote>prt1-4-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p><span style="color: red;">✗ Groupes fonctionnels non reconnus.</span></p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>5</name>
+        <description>Coefficients</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>coefs_ok1</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.2500000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-5-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><span style="color: green;">✓ Vos coefficients stœchiométriques sont corrects !</span></p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>6</falsenextnode>
+        <falseanswernote>prt1-5-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p><span style="color: #cc2222;">✗ Vos coefficients stœchiométriques sont incorrects !</span></p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>6</name>
+        <description>Coefs prop</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>is_proportional1</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-6-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><span style="color: orange;">⚠ Coefficients proportionnels (k={@k_ratio1@}) mais non réduits.</span></p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-6-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p><span style="color: red;">✗ Coefficients non proportionnels.</span></p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <tags>
+      <tag><text>stack</text>
+</tag>
+      <tag><text>qtype:eq-topologique</text>
+</tag>
+      <tag><text>Allemand</text>
+</tag>
+      <tag><text>2nde</text>
+</tag>
+      <tag><text>chapitre:axes</text>
+</tag>
+      <tag><text>chapitre:representationdesoi</text>
+</tag>
+      <tag><text>bloom:memoriser</text>
+</tag>
+      <tag><text>difficulte:simple</text>
+</tag>
+    </tags>
+  </question>
+
+</quiz>

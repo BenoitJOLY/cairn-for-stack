@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HéStack V4 — Guide enseignant</title>
+<style>
+/* ─── Palette ─── */
+:root {
+  --navy:   #1e293b;
+  --blue:   #1d4ed8;
+  --bluel:  #eff6ff;
+  --bluem:  #bfdbfe;
+  --green:  #15803d;
+  --greenl: #f0fdf4;
+  --amber:  #b45309;
+  --amberl: #fffbeb;
+  --red:    #991b1b;
+  --redl:   #fef2f2;
+  --purple: #7c3aed;
+  --purplel:#f5f3ff;
+  --slate:  #475569;
+  --border: #e2e8f0;
+  --bg:     #f8fafc;
+  --sidebar-w: 250px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family: system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:15px; line-height:1.7;
+  color:#1e293b; background:var(--bg);
+}
+
+/* ─── Layout avec sidebar ─── */
+.layout{ display:flex; min-height:100vh; }
+
+/* ─── Sidebar ─── */
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0;
+  background:#fff; border-right:1px solid var(--border);
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  padding:20px 0 40px;
+}
+.sidebar-logo{
+  padding:10px 18px 18px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:12px;
+}
+.sidebar-logo strong{ display:block; font-size:.95rem; color:var(--navy); }
+.sidebar-logo span{ font-size:.75rem; color:var(--slate); }
+.sidebar nav a{
+  display:block; padding:5px 18px;
+  font-size:.82rem; color:var(--slate); text-decoration:none;
+  border-left:3px solid transparent;
+  transition:all .15s;
+}
+.sidebar nav a:hover{ color:var(--blue); background:var(--bluel); border-left-color:var(--bluem); }
+.sidebar nav a.active{ color:var(--blue); font-weight:600; border-left-color:var(--blue); background:var(--bluel); }
+.sidebar-section-label{
+  padding:12px 18px 4px; font-size:.7rem; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; color:#94a3b8;
+}
+.sidebar nav a.sub{ padding-left:30px; font-size:.8rem; }
+
+/* ─── Content ─── */
+.content{ flex:1; min-width:0; padding:40px 48px 100px; max-width:860px; }
+
+/* ─── Header ─── */
+.doc-header{
+  background:linear-gradient(135deg,var(--navy) 0%,#1e40af 100%);
+  color:#fff; padding:36px 32px; border-radius:16px; margin-bottom:40px;
+}
+.doc-header h1{ font-size:1.8rem; margin-bottom:6px; font-weight:800; }
+.doc-header p{ color:#93c5fd; font-size:.97rem; margin-bottom:12px; }
+.header-badges{ display:flex; gap:8px; flex-wrap:wrap; }
+.badge{
+  display:inline-block; padding:3px 12px; border-radius:20px;
+  font-size:.72rem; font-weight:700;
+}
+.badge-navy{ background:#334155; color:#cbd5e1; }
+.badge-blue{ background:#1d4ed8; color:#bfdbfe; }
+.badge-green{ background:#166534; color:#bbf7d0; }
+
+/* ─── Section ─── */
+.section{ margin-bottom:52px; }
+h2.sec-title{
+  font-size:1.25rem; color:var(--navy);
+  border-left:4px solid var(--blue);
+  padding:6px 0 6px 14px; margin-bottom:22px;
+  scroll-margin-top:24px;
+}
+h3{ font-size:1rem; color:var(--navy); margin:24px 0 10px; font-weight:700; }
+h4{ font-size:.9rem; color:var(--slate); margin:16px 0 8px; font-weight:600; }
+p{ margin-bottom:10px; }
+ul,ol{ padding-left:22px; margin-bottom:10px; }
+li{ margin:4px 0; }
+
+/* ─── Type cards ─── */
+.type-group-title{
+  font-size:.72rem; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--slate);
+  border-bottom:1px solid var(--border); padding-bottom:6px;
+  margin:22px 0 12px;
+}
+.type-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:10px; margin-bottom:16px;
+}
+.type-card{
+  background:#fff; border:1px solid var(--border); border-radius:10px;
+  padding:12px 14px; display:flex; flex-direction:column; gap:4px;
+}
+.type-card-head{ display:flex; align-items:center; gap:8px; }
+.type-cat{ font-size:.68rem; font-weight:700; padding:1px 7px; border-radius:10px; }
+.cat-qcm  { background:#e0e7ff; color:#3730a3; }
+.cat-math { background:#dcfce7; color:#166534; }
+.cat-sci  { background:#fce7f3; color:#9d174d; }
+.cat-lang { background:#fef3c7; color:#92400e; }
+.cat-media{ background:#e0f2fe; color:#0c4a6e; }
+.cat-exp  { background:#f3e8ff; color:#6b21a8; }
+.type-name{ font-weight:700; font-size:.9rem; }
+.type-desc{ font-size:.8rem; color:var(--slate); }
+
+/* ─── Steps ─── */
+.steps{ counter-reset:step; display:flex; flex-direction:column; gap:12px; }
+.step{ display:flex; gap:14px; }
+.step::before{
+  counter-increment:step; content:counter(step);
+  flex-shrink:0; width:28px; height:28px;
+  background:var(--blue); color:#fff; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.82rem; font-weight:700; margin-top:3px;
+}
+.step-body{ flex:1; }
+
+/* ─── Boxes ─── */
+.info-box,.tip-box,.warn-box,.err-box,.new-box{
+  padding:12px 16px; border-radius:0 8px 8px 0; margin:14px 0; font-size:.88rem;
+}
+.info-box { background:var(--bluel);  border-left:4px solid var(--blue);  }
+.tip-box  { background:var(--greenl); border-left:4px solid var(--green); }
+.warn-box { background:var(--amberl); border-left:4px solid var(--amber); }
+.err-box  { background:var(--redl);   border-left:4px solid var(--red);   }
+.new-box  { background:var(--purplel);border-left:4px solid var(--purple);}
+.box-title{ font-weight:700; margin-bottom:5px; }
+
+/* ─── Code ─── */
+code{
+  background:#f1f5f9; border:1px solid var(--border);
+  padding:1px 5px; border-radius:4px;
+  font-family:'Courier New',monospace; font-size:.85em;
+}
+pre{
+  background:var(--navy); color:#e2e8f0;
+  padding:14px 18px; border-radius:10px;
+  font-family:'Courier New',monospace; font-size:.83rem;
+  overflow-x:auto; margin:12px 0;
+}
+pre .cm { color:#94a3b8; } /* comment */
+pre .kw { color:#93c5fd; } /* keyword */
+pre .vl { color:#86efac; } /* value */
+pre .fn { color:#fde68a; } /* function */
+
+/* ─── Table ─── */
+table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:.88rem; }
+th{ background:var(--navy); color:#fff; padding:9px 12px; text-align:left; font-size:.83rem; }
+td{ padding:8px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td{ background:#f8fafc; }
+
+/* ─── FAQ ─── */
+details{ border:1px solid var(--border); border-radius:8px; margin:8px 0; background:#fff; }
+summary{
+  padding:12px 16px; font-weight:600; cursor:pointer; font-size:.9rem;
+  list-style:none; display:flex; justify-content:space-between; align-items:center;
+}
+summary::-webkit-details-marker{ display:none; }
+summary::after{ content:'›'; font-size:1.1rem; color:var(--slate); transition:transform .2s; }
+details[open] summary::after{ transform:rotate(90deg); }
+.faq-body{ padding:4px 16px 14px; font-size:.9rem; }
+
+/* ─── Kbd shortcuts ─── */
+.shortcut-grid{ display:grid; grid-template-columns:auto 1fr; gap:6px 18px; align-items:center; margin:10px 0; }
+kbd{
+  display:inline-block; background:#f1f5f9; border:1px solid #cbd5e1;
+  border-bottom:2px solid #94a3b8; border-radius:5px;
+  padding:2px 8px; font-family:'Courier New',monospace; font-size:.8rem;
+  color:var(--navy); white-space:nowrap;
+}
+.shortcut-desc{ font-size:.88rem; color:var(--slate); }
+
+/* ─── PRT diagram placeholder ─── */
+.prt-diagram{
+  background:#0f172a; border-radius:12px; padding:24px;
+  margin:16px 0; font-family:'Courier New',monospace; font-size:.82rem;
+  color:#e2e8f0; line-height:1.8; overflow-x:auto;
+}
+.prt-true { color:#4ade80; }
+.prt-false{ color:#f87171; }
+.prt-node { color:#60a5fa; font-weight:700; }
+.prt-score{ color:#fbbf24; }
+.prt-fin  { color:#a78bfa; }
+
+/* ─── Back to top ─── */
+#back-top{
+  position:fixed; bottom:28px; right:28px;
+  background:var(--blue); color:#fff;
+  width:40px; height:40px; border-radius:50%;
+  border:none; cursor:pointer; font-size:1.1rem;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+  display:none; align-items:center; justify-content:center;
+  z-index:999; transition:opacity .2s;
+}
+#back-top.show{ display:flex; }
+#back-top:hover{ background:#1e40af; }
+
+/* ─── New tag ─── */
+.tag-new{
+  display:inline-block; background:#7c3aed; color:#fff;
+  font-size:.65rem; font-weight:800; padding:1px 6px; border-radius:10px;
+  margin-left:6px; vertical-align:middle; letter-spacing:.04em;
+}
+
+/* ─── Footer ─── */
+.doc-footer{
+  text-align:center; font-size:.82rem; color:var(--slate);
+  border-top:1px solid var(--border); padding-top:20px; margin-top:60px;
+}
+.doc-footer a{ color:var(--blue); }
+
+/* ─── Responsive ─── */
+@media(max-width:900px){
+  .sidebar{ display:none; }
+  .content{ padding:24px 18px 80px; }
+}
+@media print{
+  .sidebar,#back-top{ display:none!important; }
+  .content{ max-width:100%; padding:16px; }
+  .section{ break-inside:avoid; }
+  h2.sec-title{ break-before:page; }
+  h2.sec-title:first-of-type{ break-before:avoid; }
+}
+</style>
+</head>
+<body>
+
+<button id="back-top" title="Retour en haut" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<div class="layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <strong>HéStack V4</strong>
+    <span>Guide enseignant · v4.1</span>
+  </div>
+  <nav>
+    <div class="sidebar-section-label">Démarrage</div>
+    <a href="#intro">Introduction</a>
+    <a href="#demarrage">Démarrage rapide</a>
+    <a href="#interface">Interface V4</a>
+    <a href="#projets">Gestion des projets</a>
+
+    <div class="sidebar-section-label">Questions</div>
+    <a href="#types">Types disponibles</a>
+    <a href="#qcm" class="sub">QCM</a>
+    <a href="#algebrique" class="sub">Algébrique</a>
+    <a href="#numerique" class="sub">Numérique</a>
+    <a href="#unites" class="sub">Unités</a>
+    <a href="#texte" class="sub">Texte / String</a>
+    <a href="#relier" class="sub">Relier</a>
+    <a href="#mots-croises" class="sub">Mots croisés</a>
+    <a href="#ordonnancement" class="sub">Ordonnancement</a>
+    <a href="#image" class="sub">Clic sur image</a>
+    <a href="#chimie" class="sub">Chimie</a>
+    <a href="#specialises" class="sub">Modules spécialisés</a>
+
+    <div class="sidebar-section-label">Avancé</div>
+    <a href="#variables">Variables partagées</a>
+    <a href="#maxima">Syntaxe Maxima</a>
+    <a href="#prt">Arbre de réponse (PRT)</a>
+    <a href="#expert">Mode Expert STACK</a>
+    <a href="#import-xml">Import XML STACK</a>
+
+    <div class="sidebar-section-label">Export & aide</div>
+    <a href="#export">Exporter vers Moodle</a>
+    <a href="#raccourcis">Raccourcis clavier</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+</aside>
+
+<!-- ═══ CONTENT ═══ -->
+<main class="content">
+
+<!-- HEADER -->
+<div class="doc-header">
+  <h1>HéStack V4 — Guide enseignant</h1>
+  <p>Créer, personnaliser et exporter des questions STACK pour Moodle — sans écrire de code</p>
+  <div class="header-badges">
+    <span class="badge badge-navy">Version 4.1 · 2026</span>
+    <span class="badge badge-blue">40+ types de questions</span>
+  </div>
+</div>
+
+<!-- ═══ 1. INTRODUCTION ═══ -->
+<div class="section" id="intro">
+  <h2 class="sec-title">1. Introduction</h2>
+
+  <p><strong>HéStack V4</strong> est un outil de création de questions <strong>STACK</strong> pour Moodle. STACK (<em>System for Teaching and Assessment using a Computer algebra system</em>) évalue automatiquement des réponses mathématiques et scientifiques grâce au moteur de calcul formel <strong>Maxima</strong>.</p>
+
+  <p>Avec HéStack, vous concevez vos questions dans une interface visuelle et vous exportez un fichier XML prêt à importer dans Moodle — <strong>sans écrire une seule ligne de code STACK</strong>.</p>
+
+  <div class="info-box">
+    <div class="box-title">Ce qu'HéStack fait pour vous</div>
+    <ul>
+      <li>Génère les variables Maxima (<code>ta1</code>, <code>ta2</code>…) et les randomise</li>
+      <li>Construit l'arbre de réponse (PRT) adapté à chaque type</li>
+      <li>Produit le XML STACK importable directement dans Moodle</li>
+      <li>Sauvegarde automatiquement votre travail dans le navigateur</li>
+      <li>Permet de créer plusieurs questions dans un même quiz</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══ 2. DÉMARRAGE RAPIDE ═══ -->
+<div class="section" id="demarrage">
+  <h2 class="sec-title">2. Démarrage rapide</h2>
+
+  <div class="steps">
+    <div class="step"><div class="step-body">Ouvrez <strong>index.html</strong> dans votre navigateur (Chrome ou Firefox recommandé). Aucune installation requise.</div></div>
+    <div class="step"><div class="step-body">Donnez un nom à votre exercice dans le champ <strong>Nom de l'exercice</strong> en haut de page.</div></div>
+    <div class="step"><div class="step-body">Cliquez sur <strong>+ Ajouter une question</strong>. Une palette de types apparaît — choisissez celui qui correspond à votre objectif pédagogique.</div></div>
+    <div class="step"><div class="step-body">Remplissez le panneau de configuration à droite : énoncé, réponse, feedback.</div></div>
+    <div class="step"><div class="step-body">Cliquez sur <strong>Enregistrer</strong> (le chip de la question passe au vert).</div></div>
+    <div class="step"><div class="step-body">Répétez pour chaque question, puis cliquez sur <strong>Exporter XML</strong> pour télécharger le fichier à importer dans Moodle.</div></div>
+  </div>
+
+  <div class="tip-box">
+    <div class="box-title">Sauvegarde automatique</div>
+    Votre travail est enregistré automatiquement dans le navigateur après chaque modification. L'indicateur en bas de page confirme la sauvegarde. Pour transférer votre travail sur un autre poste, utilisez <strong>Exporter projet (.hestack)</strong>.
+  </div>
+</div>
+
+<!-- ═══ 3. INTERFACE ═══ -->
+<div class="section" id="interface">
+  <h2 class="sec-title">3. L'interface V4</h2>
+
+  <h3>Zone d'édition (centre)</h3>
+  <p>L'éditeur principal contient vos questions sous forme de <strong>chips</strong> (pastilles colorées). Chaque chip représente une question :</p>
+  <ul>
+    <li>Chip <strong>grise</strong> — non configurée (brouillon)</li>
+    <li>Chip <strong>verte</strong> — configurée et valide</li>
+    <li>Chip <strong>orange</strong> — modifiée mais non enregistrée</li>
+  </ul>
+  <p>Cliquez sur une chip pour ouvrir son panneau de configuration. Faites glisser les chips pour réordonner les questions dans le quiz.</p>
+
+  <h3>Barre d'en-tête</h3>
+  <ul>
+    <li><strong>Nom de l'exercice</strong> — apparaîtra dans Moodle comme catégorie</li>
+    <li><strong>Variables partagées</strong> — définir des variables Maxima communes à toutes les questions</li>
+    <li><strong>Exporter XML</strong> — générer le fichier Moodle</li>
+    <li><strong>Exporter projet / Importer projet</strong> — sauvegarder/charger au format <code>.hestack</code></li>
+  </ul>
+
+  <h3>Panneau de configuration (droite)</h3>
+  <p>S'affiche au clic sur une chip. Contient tous les réglages de la question sélectionnée. Le bouton <strong>Enregistrer</strong> valide la configuration et met à jour le XML interne.</p>
+
+  <div class="warn-box">
+    <div class="box-title">Important</div>
+    Le bouton <strong>Enregistrer</strong> du panneau et l'autosauvegarde locale sont deux mécanismes distincts. L'autosauvegarde préserve l'état de l'interface ; <em>Enregistrer</em> valide la question et génère son XML.
+  </div>
+
+  <h3>Mode sombre</h3>
+  <p>Un bouton de basculement clair/sombre est disponible dans le pied de page. La préférence est mémorisée entre les sessions.</p>
+</div>
+
+<!-- ═══ 4. PROJETS ═══ -->
+<div class="section" id="projets">
+  <h2 class="sec-title">4. Gestion des projets</h2>
+
+  <p>HéStack V4 dispose d'un gestionnaire de projets permettant de travailler sur plusieurs exercices indépendants.</p>
+
+  <h3>Slots de sauvegarde</h3>
+  <p>Cliquez sur l'icône <strong>dossier</strong> dans la barre pour ouvrir le gestionnaire. Vous disposez de <strong>5 emplacements nommés</strong> dans le localStorage :</p>
+  <ul>
+    <li><strong>Sauvegarder</strong> — enregistre l'exercice courant dans un slot</li>
+    <li><strong>Charger</strong> — restaure un exercice depuis un slot</li>
+    <li><strong>Supprimer</strong> — vide un slot</li>
+  </ul>
+
+  <h3>Export / Import portable</h3>
+  <p>Pour transférer un projet entre ordinateurs ou le partager :</p>
+  <ul>
+    <li><strong>Exporter projet (.hestack)</strong> — télécharge un fichier JSON complet</li>
+    <li><strong>Importer projet (.hestack)</strong> — restaure depuis ce fichier</li>
+  </ul>
+
+  <div class="info-box">
+    Le format <code>.hestack</code> contient l'intégralité de l'exercice (questions, configurations, feedback, PRT) et peut être réimporté même après une vidange du cache du navigateur.
+  </div>
+</div>
+
+<!-- ═══ 5. TYPES ═══ -->
+<div class="section" id="types">
+  <h2 class="sec-title">5. Les types de questions disponibles</h2>
+
+  <p>HéStack propose <strong>40+ types</strong> organisés en catégories. Choisissez celui qui correspond le mieux à la compétence évaluée.</p>
+
+  <!-- QCM -->
+  <div class="type-group-title">Questionnaire à choix</div>
+  <div class="type-grid">
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-qcm">QCM</span><span class="type-name">Cases à cocher</span></div>
+      <div class="type-desc">Réponses multiples possibles. L'élève coche une ou plusieurs propositions correctes.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-qcm">QCM</span><span class="type-name">Bouton radio</span></div>
+      <div class="type-desc">Réponse unique. Une seule proposition sélectionnable parmi les choix affichés.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-qcm">QCM</span><span class="type-name">Menu déroulant</span></div>
+      <div class="type-desc">Réponse unique sous forme compacte. Idéal pour compléter une phrase lacunaire.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-qcm">QCM</span><span class="type-name">Vrai / Faux</span></div>
+      <div class="type-desc">Affirmation à valider ou invalider. Simplifie la saisie pour des questions binaires.</div>
+    </div>
+  </div>
+
+  <!-- Maths -->
+  <div class="type-group-title">Mathématiques — Saisie libre</div>
+  <div class="type-grid">
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Algébrique</span></div>
+      <div class="type-desc">Expression Maxima quelconque — polynôme, fraction, équation, inéquation, matrice…</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Numérique</span></div>
+      <div class="type-desc">Nombre avec tolérance relative (%). Accepte les fractions et constantes Maxima.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Unités physiques</span></div>
+      <div class="type-desc">Valeur ET unité. STACK vérifie la dimension physique et la valeur avec tolérance.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Matrice</span></div>
+      <div class="type-desc">Saisie d'une matrice dans un tableau interactif. Vérification terme à terme.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Complexes</span></div>
+      <div class="type-desc">Nombres complexes sous toutes leurs formes (algébrique, polaire, exponentielle).</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Inéquation</span></div>
+      <div class="type-desc">Résoudre ou vérifier une inéquation. Supporte les ensembles de solutions.</div>
+    </div>
+  </div>
+
+  <!-- Maths spécialisés -->
+  <div class="type-group-title">Mathématiques — Modules spécialisés</div>
+  <div class="type-grid">
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Calcul / Dérivée</span></div>
+      <div class="type-desc">Calcul différentiel et intégral. Vérifie dérivées et primitives avec AlgEquiv.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Limites</span></div>
+      <div class="type-desc">Calcul de limites finies ou infinies. Supporte les formes indéterminées.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Suites</span></div>
+      <div class="type-desc">Terme général, raison, somme. Adapté aux suites arithmétiques et géométriques.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Polynômes</span></div>
+      <div class="type-desc">Factorisation, racines, développement. Paramètres aléatoires intégrés.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Trigonométrie</span></div>
+      <div class="type-desc">Identités, équations et valeurs trigonométriques sur le cercle.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Statistiques</span></div>
+      <div class="type-desc">Moyenne, médiane, écart-type, corrélation sur jeux de données paramétrés.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Probabilités</span></div>
+      <div class="type-desc">Calcul de probabilités, loi binomiale, espérance, variance.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Géométrie</span></div>
+      <div class="type-desc">Vecteurs, distances, produits scalaires, équations de droites et plans.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Logique / Circuits</span></div>
+      <div class="type-desc">Algèbre de Boole, tables de vérité, portes logiques.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Bases numériques</span></div>
+      <div class="type-desc">Conversions entre bases 2, 8, 10, 16 avec paramètres aléatoires.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Composition de fonctions</span></div>
+      <div class="type-desc">Trouver f∘g ou décomposer une fonction composite.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">DOI (Domaine de définition)</span></div>
+      <div class="type-desc">Déterminer le domaine d'une fonction (intervalle, union…).</div>
+    </div>
+  </div>
+
+  <!-- Sciences -->
+  <div class="type-group-title">Sciences physiques et naturelles</div>
+  <div class="type-grid">
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Physique / Mécanique</span></div>
+      <div class="type-desc">Lois de Newton, cinématique, énergie. Formules paramétrées avec unités.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Thermodynamique</span></div>
+      <div class="type-desc">Gaz parfaits, premier et second principe, cycles thermiques.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Diffraction / Optique</span></div>
+      <div class="type-desc">Interfères, réseau de diffraction, longueur d'onde.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Optique (simulateur)</span></div>
+      <div class="type-desc">Tracé de rayons, lentilles, miroirs dans un simulateur interactif.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Oscilloscope</span></div>
+      <div class="type-desc">Lire et paramétrer un oscilloscope virtuel (période, amplitude, déphasage).</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Chimie (équation)</span></div>
+      <div class="type-desc">Équilibrer ou compléter une équation chimique en syntaxe Maxima.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Topologie moléculaire</span></div>
+      <div class="type-desc">Dessiner une molécule dans l'éditeur JSME intégré (SMILES).</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Nucléaire</span></div>
+      <div class="type-desc">Équation de désintégration radioactive (numéros atomique et de masse).</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Acide-Base</span></div>
+      <div class="type-desc">pH, Ka, Kb, réactions acide-base avec couples paramétrés.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Oxydoréduction</span></div>
+      <div class="type-desc">Couples Ox/Red, demi-équations, potentiel de Nernst.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">RVB / CMJN</span></div>
+      <div class="type-desc">Synthèse additive et soustractive des couleurs (optique).</div>
+    </div>
+  </div>
+
+  <!-- Interactif -->
+  <div class="type-group-title">Interactif et visuel</div>
+  <div class="type-grid">
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-media">Interactif</span><span class="type-name">Relier (Matching)</span></div>
+      <div class="type-desc">Associer deux colonnes. Items mélangés + distracteurs possibles.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-media">Interactif</span><span class="type-name">Ordonnancement (Parsons)</span></div>
+      <div class="type-desc">Remettre des blocs dans l'ordre par glisser-déposer.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-media">Interactif</span><span class="type-name">Mots croisés</span></div>
+      <div class="type-desc">Grille générée automatiquement depuis une liste de mots + définitions.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-media">Interactif</span><span class="type-name">Clic sur image</span></div>
+      <div class="type-desc">Identifier une zone (cercle ou rectangle) sur un schéma. Zone invisible.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-media">Interactif</span><span class="type-name">Lecture graphique (JSXGraph)</span></div>
+      <div class="type-desc">Cliquer sur une courbe ou déplacer un point sur un graphe interactif.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-media">Interactif</span><span class="type-name">Géométrie dynamique</span></div>
+      <div class="type-desc">Placer des points, tracer des droites dans un repère JSXGraph.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-media">Interactif</span><span class="type-name">Image-mesure</span></div>
+      <div class="type-desc">Mesurer une grandeur sur une image (avec calibration d'échelle).</div>
+    </div>
+  </div>
+
+  <!-- Langage -->
+  <div class="type-group-title">Texte et langage</div>
+  <div class="type-grid">
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-lang">Texte</span><span class="type-name">String (chaîne)</span></div>
+      <div class="type-desc">Réponse textuelle courte. Comparaison exacte ou insensible à la casse.</div>
+    </div>
+  </div>
+
+  <!-- Expert -->
+  <div class="type-group-title">STACK avancé</div>
+  <div class="type-grid">
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-exp">Expert</span><span class="type-name">Mode Expert STACK <span class="tag-new">Avancé</span></span></div>
+      <div class="type-desc">Accès complet à tous les paramètres STACK, plusieurs inputs, PRT inline éditable.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-exp">Expert</span><span class="type-name">Import XML STACK</span></div>
+      <div class="type-desc">Importer une question STACK existante depuis Moodle et modifier son PRT.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAS À PAS ═══ -->
+<div class="section" id="qcm">
+  <h2 class="sec-title">6. Créer une question — Pas à pas</h2>
+
+  <h3>6.1 QCM (Cases / Radio / Menu)</h3>
+  <p>Les trois types QCM partagent le même principe : définir des propositions et marquer lesquelles sont correctes.</p>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>Cases à cocher</strong>, <strong>Bouton radio</strong> ou <strong>Menu déroulant</strong>.</div></div>
+    <div class="step"><div class="step-body">Rédigez l'<strong>Énoncé</strong> (l'éditeur riche permet les formules LaTeX et le HTML).</div></div>
+    <div class="step"><div class="step-body">Cliquez <strong>+ Ajouter une proposition</strong>. Saisissez le texte. Cochez <strong>Correcte</strong> si c'est la bonne réponse.</div></div>
+    <div class="step"><div class="step-body">Ajoutez autant de propositions que nécessaire. Réordonnez avec les flèches.</div></div>
+    <div class="step"><div class="step-body">Pour radio/menu : assurez-vous qu'<strong>une seule</strong> proposition est cochée.</div></div>
+    <div class="step"><div class="step-body">Cliquez <strong>Enregistrer</strong>. La chip passe au vert.</div></div>
+  </div>
+  <div class="tip-box">
+    <div class="box-title">Mélange automatique</div>
+    Les propositions sont mélangées aléatoirement pour chaque élève. L'option "Mélanger les choix" est activée par défaut.
+  </div>
+</div>
+
+<div class="section" id="algebrique">
+  <h3>6.2 Expression algébrique</h3>
+  <p>L'élève saisit une expression mathématique vérifiée par Maxima via <code>AlgEquiv</code>.</p>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>Algébrique</strong>.</div></div>
+    <div class="step"><div class="step-body">Remplissez les <strong>paramètres aléatoires</strong> si besoin. Ex : <code>rand_with_prohib(-5,5,[0])</code> pour un entier non nul.</div></div>
+    <div class="step"><div class="step-body">Rédigez l'<strong>Énoncé</strong> avec les variables : <code>{@ta1@}</code> affiche la valeur, <code>\({@ta1*x^2@}\)</code> en LaTeX.</div></div>
+    <div class="step"><div class="step-body">Saisissez la <strong>Réponse modèle</strong> en syntaxe Maxima. Ex : <code>ta1*x^2 + 2*x - 1</code>.</div></div>
+    <div class="step"><div class="step-body">Ajoutez les <strong>feedbacks</strong> correct et incorrect.</div></div>
+  </div>
+  <div class="warn-box">
+    <div class="box-title">Syntaxe Maxima obligatoire</div>
+    Multiplication : <code>2*x</code> (pas <code>2x</code>). Puissance : <code>x^2</code>. Pi : <code>%pi</code>. Voir la section <a href="#maxima">Aide-mémoire Maxima</a>.
+  </div>
+</div>
+
+<div class="section" id="numerique">
+  <h3>6.3 Réponse numérique</h3>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>Numérique</strong>.</div></div>
+    <div class="step"><div class="step-body">Entrez la <strong>valeur exacte</strong> en Maxima : <code>sqrt(2)/2</code>, <code>%pi/4</code>, ou un nombre décimal.</div></div>
+    <div class="step"><div class="step-body">Réglez la <strong>tolérance</strong> : <code>0.05</code> = 5 % d'erreur acceptable. Mettez <code>0</code> pour une égalité stricte.</div></div>
+    <div class="step"><div class="step-body">Si besoin, précisez les <strong>chiffres significatifs</strong> attendus (min/max).</div></div>
+  </div>
+</div>
+
+<div class="section" id="unites">
+  <h3>6.4 Valeur avec unité</h3>
+  <p>L'élève doit donner <em>la valeur ET l'unité</em>. STACK vérifie la dimension physique.</p>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>Unités physiques</strong>.</div></div>
+    <div class="step"><div class="step-body">Saisissez la valeur (ex : <code>9.81</code>) et l'unité SI (ex : <code>m/s^2</code>).</div></div>
+    <div class="step"><div class="step-body">Réglez la tolérance numérique et les chiffres significatifs si nécessaire.</div></div>
+  </div>
+  <div class="tip-box">
+    STACK accepte les multiples SI (<code>km/h</code>, <code>kJ</code>…) et vérifie la <strong>dimension physique</strong> : <code>9.81 N/kg</code> est accepté pour <code>9.81 m/s^2</code> car dimensionnellement équivalent.
+  </div>
+</div>
+
+<div class="section" id="texte">
+  <h3>6.5 Réponse textuelle (String)</h3>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>String</strong>.</div></div>
+    <div class="step"><div class="step-body">Entrez la réponse correcte (ex : <code>Newton</code>, <code>Acide chlorhydrique</code>).</div></div>
+    <div class="step"><div class="step-body">Choisissez <strong>Insensible à la casse</strong> (recommandé) ou <strong>Exact</strong>.</div></div>
+  </div>
+</div>
+
+<div class="section" id="relier">
+  <h3>6.6 Relier (Matching)</h3>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>Relier</strong>.</div></div>
+    <div class="step"><div class="step-body">Cliquez <strong>+ Ajouter une paire</strong>. Entrez le terme gauche (question) et le terme droit (réponse).</div></div>
+    <div class="step"><div class="step-body">Répétez pour toutes les paires. Ajoutez des <strong>distracteurs</strong> (termes droits sans correspondance) pour augmenter la difficulté.</div></div>
+  </div>
+</div>
+
+<div class="section" id="mots-croises">
+  <h3>6.7 Mots croisés</h3>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>Mots croisés</strong>.</div></div>
+    <div class="step"><div class="step-body">Cliquez <strong>+ Ajouter un mot</strong>. Entrez le mot (sans accent de préférence) et sa définition.</div></div>
+    <div class="step"><div class="step-body">Ajoutez 6 à 15 mots. La grille est générée automatiquement dans Moodle.</div></div>
+  </div>
+  <div class="warn-box">
+    Les mots doivent partager des lettres communes pour former une grille. Privilégiez des mots de 4 à 12 lettres. Une liste de moins de 4 mots peut produire une grille vide.
+  </div>
+</div>
+
+<div class="section" id="ordonnancement">
+  <h3>6.8 Ordonnancement (Parsons)</h3>
+  <p>L'élève remet des blocs dans le bon ordre par glisser-déposer. Idéal pour les algorithmes, étapes de raisonnement, chronologies.</p>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>Ordonnancement</strong>.</div></div>
+    <div class="step"><div class="step-body">Saisissez chaque élément <em>dans l'ordre correct</em> — l'ordre de saisie est l'ordre attendu.</div></div>
+    <div class="step"><div class="step-body">Cochez <strong>Éléments réutilisables</strong> si un bloc peut apparaître plusieurs fois.</div></div>
+  </div>
+</div>
+
+<div class="section" id="image">
+  <h3>6.9 Clic sur image</h3>
+  <p>L'élève clique sur la zone correcte d'un schéma. La zone cible reste invisible.</p>
+  <div class="steps">
+    <div class="step"><div class="step-body">Choisissez <strong>Clic sur image</strong>.</div></div>
+    <div class="step"><div class="step-body">Entrez l'URL de l'image hébergée en ligne.</div></div>
+    <div class="step"><div class="step-body">Définissez la zone : <strong>Cercle</strong> (X centre, Y centre, Rayon) ou <strong>Rectangle</strong> (X1, Y1, X2, Y2). Valeurs en % de la taille de l'image.</div></div>
+  </div>
+  <div class="info-box">
+    <strong>Trouver les coordonnées :</strong> ouvrez l'image dans Paint ou GIMP, relevez les pixels du centre et du rayon, divisez par la largeur/hauteur × 100.
+  </div>
+</div>
+
+<div class="section" id="chimie">
+  <h3>6.10 Questions de chimie</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Saisie élève</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Chimie (équation)</strong></td><td>Expression chimique Maxima</td><td>Équilibrer ou compléter une équation</td></tr>
+      <tr><td><strong>Topologie moléculaire</strong></td><td>Dessin interactif (éditeur JSME)</td><td>Dessiner ou identifier une molécule</td></tr>
+      <tr><td><strong>Nucléaire</strong></td><td>Numéros atomique et de masse</td><td>Équation de désintégration radioactive</td></tr>
+      <tr><td><strong>Acide-Base</strong></td><td>Expression Maxima (pH, Ka…)</td><td>Calculs de pH, équilibres acide-base</td></tr>
+      <tr><td><strong>Oxydoréduction</strong></td><td>Expression Maxima</td><td>Couples Ox/Red, potentiel de Nernst</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="specialises">
+  <h3>6.11 Modules spécialisés (physique et simulation)</h3>
+  <table>
+    <thead><tr><th>Module</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Optique</strong></td><td>Simulateur de tracé de rayons (lentilles, miroirs, dioptre). L'élève lit les paramètres sur un schéma interactif.</td></tr>
+      <tr><td><strong>Oscilloscope</strong></td><td>Lire période, amplitude et déphasage sur un oscilloscope virtuel paramétré aléatoirement.</td></tr>
+      <tr><td><strong>Diffraction</strong></td><td>Réseau de diffraction, double fente — l'élève calcule la longueur d'onde ou l'interfrange.</td></tr>
+      <tr><td><strong>Géométrie dynamique</strong></td><td>Placer des points, construire des figures dans JSXGraph. Correction par coordonnées.</td></tr>
+      <tr><td><strong>Lecture graphique</strong></td><td>Cliquer sur la valeur d'une courbe JSXGraph en un point donné.</td></tr>
+      <tr><td><strong>Image-mesure</strong></td><td>Mesurer une distance ou un angle sur une image avec une règle virtuelle calibrée.</td></tr>
+      <tr><td><strong>RVB/CMJN</strong></td><td>Identifier une couleur visible à travers des filtres colorés (synthèse additive et soustractive).</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══ VARIABLES ═══ -->
+<div class="section" id="variables">
+  <h2 class="sec-title">7. Variables partagées entre questions</h2>
+
+  <p>Les <strong>variables partagées</strong> permettent de définir des paramètres Maxima utilisables dans <em>toutes</em> les questions du quiz. Idéal pour un contexte commun (un même circuit électrique, une même molécule, un même jeu de données).</p>
+
+  <h3>Définir des variables partagées</h3>
+  <p>Cliquez sur le bouton <strong>Variables partagées</strong> dans la barre d'en-tête. La syntaxe est la même que pour les variables locales :</p>
+  <pre><span class="cm">/* Variables communes à tout le quiz */</span>
+<span class="vl">masse</span> : <span class="fn">rand_with_prohib</span>(1, 10, [0]);
+<span class="vl">vitesse</span> : <span class="fn">rand</span>(5) + 3;
+<span class="vl">energie</span> : <span class="vl">masse</span> * <span class="vl">vitesse</span>^2 / 2;</pre>
+
+  <div class="info-box">
+    Les variables partagées sont injectées <em>avant</em> les variables locales de chaque question. Si une question redéfinit une variable partagée, la valeur locale prend le dessus pour cette question seulement.
+  </div>
+</div>
+
+<!-- ═══ MAXIMA ═══ -->
+<div class="section" id="maxima">
+  <h2 class="sec-title">8. Aide-mémoire syntaxe Maxima</h2>
+
+  <table>
+    <thead><tr><th>Notation mathématique</th><th>Syntaxe Maxima</th><th>Exemple</th></tr></thead>
+    <tbody>
+      <tr><td>Multiplication</td><td><code>*</code> (obligatoire)</td><td><code>2*x</code>, <code>ta1*x^2</code></td></tr>
+      <tr><td>Puissance</td><td><code>^</code></td><td><code>x^2</code>, <code>(x+1)^3</code></td></tr>
+      <tr><td>Fraction</td><td><code>/</code></td><td><code>1/2</code>, <code>(x+1)/(x-1)</code></td></tr>
+      <tr><td>Racine carrée</td><td><code>sqrt()</code></td><td><code>sqrt(2)</code>, <code>sqrt(x^2+1)</code></td></tr>
+      <tr><td>Valeur absolue</td><td><code>abs()</code></td><td><code>abs(x-3)</code></td></tr>
+      <tr><td>π</td><td><code>%pi</code></td><td><code>%pi/6</code>, <code>2*%pi</code></td></tr>
+      <tr><td>e (nombre d'Euler)</td><td><code>%e</code></td><td><code>%e^x</code>, <code>exp(x)</code></td></tr>
+      <tr><td>i (imaginaire)</td><td><code>%i</code></td><td><code>3 + 2*%i</code></td></tr>
+      <tr><td>+∞</td><td><code>inf</code></td><td><code>inf</code></td></tr>
+      <tr><td>−∞</td><td><code>minf</code></td><td><code>minf</code></td></tr>
+      <tr><td>Sinus, cosinus, tangente</td><td><code>sin()</code>, <code>cos()</code>, <code>tan()</code></td><td><code>sin(%pi/6)</code></td></tr>
+      <tr><td>Arcsin, arccos, arctan</td><td><code>asin()</code>, <code>acos()</code>, <code>atan()</code></td><td><code>asin(1/2)</code></td></tr>
+      <tr><td>Logarithme naturel</td><td><code>log()</code></td><td><code>log(x)</code></td></tr>
+      <tr><td>Logarithme base 10</td><td><code>log(x)/log(10)</code></td><td><code>log(100)/log(10)</code></td></tr>
+      <tr><td>Exponentielle</td><td><code>exp()</code></td><td><code>exp(2*x)</code></td></tr>
+      <tr><td>Factorielle</td><td><code>n!</code> ou <code>factorial(n)</code></td><td><code>5!</code></td></tr>
+      <tr><td>Dérivée</td><td><code>diff(f,x)</code></td><td><code>diff(x^3,x)</code></td></tr>
+      <tr><td>Intégrale</td><td><code>integrate(f,x)</code></td><td><code>integrate(x^2,x)</code></td></tr>
+      <tr><td>Matrice 2×2</td><td><code>matrix([a,b],[c,d])</code></td><td><code>matrix([1,2],[3,4])</code></td></tr>
+      <tr><td>Entier aléatoire (plage, exclusions)</td><td><code>rand_with_prohib(min,max,liste)</code></td><td><code>rand_with_prohib(-5,5,[0])</code></td></tr>
+      <tr><td>Entier aléatoire simple</td><td><code>rand(n)</code> → 0 à n−1</td><td><code>rand(10)+1</code> → 1 à 10</td></tr>
+      <tr><td>Élément aléatoire dans une liste</td><td><code>rand([a,b,c])</code></td><td><code>rand([2,3,5,7])</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Variables dans l'énoncé</h3>
+  <table>
+    <thead><tr><th>Syntaxe</th><th>Rendu</th></tr></thead>
+    <tbody>
+      <tr><td><code>{@ta1@}</code></td><td>Valeur calculée en notation standard</td></tr>
+      <tr><td><code>\({@ta1@}\)</code></td><td>Valeur en LaTeX inline</td></tr>
+      <tr><td><code>\[{@ta1*x^2 + ta2*x@}\]</code></td><td>Expression en LaTeX centré</td></tr>
+      <tr><td><code>{#ta1#}</code></td><td>Valeur numérique brute (pas de simplification)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Tests de réponse STACK courants</h3>
+  <table>
+    <thead><tr><th>Test</th><th>Signification</th><th>Usage typique</th></tr></thead>
+    <tbody>
+      <tr><td><code>AlgEquiv</code></td><td>Équivalence algébrique complète</td><td>Expressions, polynômes, fractions (test par défaut)</td></tr>
+      <tr><td><code>NumRelative</code></td><td>Égalité numérique avec % de tolérance</td><td>Calculs numériques</td></tr>
+      <tr><td><code>NumAbsolute</code></td><td>Égalité numérique à ε près</td><td>Mesures physiques avec incertitude fixe</td></tr>
+      <tr><td><code>NumSigFigs</code></td><td>Chiffres significatifs corrects</td><td>Sciences expérimentales</td></tr>
+      <tr><td><code>EqualComAss</code></td><td>Égalité commutative+associative</td><td>Sommes et produits (a+b=b+a)</td></tr>
+      <tr><td><code>FacForm</code></td><td>Forme factorisée correcte</td><td>Factorisation d'expressions</td></tr>
+      <tr><td><code>Diff</code></td><td>Vérifie si réponse = dérivée de tans</td><td>Exercices de dérivation</td></tr>
+      <tr><td><code>Int</code></td><td>Vérifie si réponse = primitive de tans</td><td>Exercices d'intégration</td></tr>
+      <tr><td><code>LowestTerms</code></td><td>Fraction irréductible</td><td>Simplification de fractions</td></tr>
+      <tr><td><code>String</code></td><td>Comparaison de chaîne exacte</td><td>Réponses textuelles (casse ignorée)</td></tr>
+      <tr><td><code>SubstEquiv</code></td><td>Équivalence par substitution numérique</td><td>Équations implicites, formes complexes</td></tr>
+      <tr><td><code>UnitsAbsolute</code> / <code>UnitsRelative</code></td><td>Valeur avec unité physique</td><td>Grandeurs physiques avec dimension</td></tr>
+      <tr><td><code>Sets</code></td><td>Égalité d'ensembles</td><td>Ensembles de solutions {a, b, c}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══ PRT ═══ -->
+<div class="section" id="prt">
+  <h2 class="sec-title">9. L'arbre de réponse (PRT)</h2>
+
+  <p>Le <strong>PRT (Potential Response Tree)</strong> est la logique de correction STACK. Il décrit comment la réponse de l'élève est évaluée, note attribuée et feedback délivré.</p>
+
+  <div class="info-box">
+    <div class="box-title">PRT généré automatiquement</div>
+    Pour tous les types simples, HéStack crée un PRT de base : réponse correcte → 100%, incorrecte → 0%. C'est suffisant dans la plupart des cas.
+  </div>
+
+  <h3>Structure d'un nœud PRT</h3>
+  <p>Chaque nœud effectue un <strong>test</strong> entre la réponse de l'élève (<code>sans</code>) et une valeur de référence (<code>tans</code>) :</p>
+  <div class="prt-diagram">
+<span class="prt-node">Nœud 0</span> — AlgEquiv(<span class="kw">sans1</span>, <span class="kw">ta1</span>)
+  <span class="prt-true">✓ Vrai</span>  → score <span class="prt-score">=1</span>  → <span class="prt-fin">FIN</span>  (feedback "Bravo !")
+  <span class="prt-false">✗ Faux</span> → score <span class="prt-score">=0</span>  → <span class="prt-node">Nœud 1</span>
+
+<span class="prt-node">Nœud 1</span> — SameType(<span class="kw">sans1</span>, <span class="kw">ta1</span>)
+  <span class="prt-true">✓ Vrai</span>  → score <span class="prt-score">=0.5</span> → <span class="prt-fin">FIN</span>  (bonne forme, mauvais coeff.)
+  <span class="prt-false">✗ Faux</span> → score <span class="prt-score">=0</span>  → <span class="prt-fin">FIN</span>  (type de réponse incorrect)
+  </div>
+
+  <h3>Ouvrir l'éditeur PRT</h3>
+  <p>Cliquez sur <strong>PRT</strong> dans le panneau de configuration. L'éditeur s'ouvre avec :</p>
+  <ul>
+    <li><strong>Zone de l'arbre</strong> — vue graphique des nœuds et flèches (verte = vraie, rouge pointillé = fausse)</li>
+    <li><strong>Panneau d'édition</strong> (droite) — modifier le nœud sélectionné</li>
+    <li><strong>Barre d'outils</strong> — Tidy, Reset, + Nœud, Appliquer</li>
+  </ul>
+
+  <h3>Navigation dans l'arbre</h3>
+  <ul>
+    <li><strong>Clic sur un nœud</strong> → ouvre son formulaire d'édition</li>
+    <li><strong>Glisser un nœud</strong> → repositionner</li>
+    <li><strong>Glisser le fond</strong> → sélection par zone (rectangle)</li>
+    <li><strong>Molette de la souris</strong> → zoom avant/arrière</li>
+    <li><strong>Boutons −/+/⊙</strong> dans la légende → zoom manuel et réinitialisation</li>
+    <li><strong>Tidy</strong> → renuméroter les nœuds séquentiellement</li>
+    <li><strong>Reset</strong> → repositionner les nœuds automatiquement (centré)</li>
+  </ul>
+
+  <h3>PRT à score partiel — exemple</h3>
+  <p>Pour donner 50% si l'élève a la bonne forme mais pas les bons coefficients :</p>
+  <ol>
+    <li>Nœud 0 : <code>AlgEquiv</code>(réponse, bonne réponse) → Vrai : <code>=1</code> / Faux : Nœud 1</li>
+    <li>Nœud 1 : <code>SameType</code>(réponse, modèle) → Vrai : <code>=0.5</code> / Faux : <code>=0</code></li>
+  </ol>
+
+  <div class="warn-box">
+    <div class="box-title">Règle du chemin vrai = 1</div>
+    La somme des scores sur le chemin des branches <em>vraies</em> successives doit atteindre exactement <strong>1</strong>. HéStack affiche un bandeau d'avertissement si ce n'est pas le cas.
+  </div>
+</div>
+
+<!-- ═══ EXPERT ═══ -->
+<div class="section" id="expert">
+  <h2 class="sec-title">10. Mode Expert STACK <span class="tag-new">Avancé</span></h2>
+
+  <p>Le mode Expert donne accès à <strong>tous les paramètres STACK</strong> : plusieurs champs de saisie (inputs), variables de feedback, PRT inline, barre de formatage riche.</p>
+
+  <h3>Quand utiliser le mode Expert ?</h3>
+  <ul>
+    <li>Question avec <strong>plusieurs champs de saisie indépendants</strong> (ex : réel + imaginaire d'un nombre complexe)</li>
+    <li>Besoin de <strong>variables de feedback</strong> calculées dans le PRT (ex : calculer l'erreur relative pour un message personnalisé)</li>
+    <li>Paramétrage fin d'un input : interdire les décimaux, exiger la fraction irréductible, contrôle de la validation visuelle…</li>
+    <li>Réutilisation d'une question STACK existante avec modifications</li>
+  </ul>
+
+  <h3>Onglets disponibles</h3>
+  <table>
+    <thead><tr><th>Onglet</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Énoncé</strong></td><td>Texte de la question, variables Maxima, options générales</td></tr>
+      <tr><td><strong>Inputs</strong></td><td>Champs de saisie élève — type, réponse modèle, options avancées</td></tr>
+      <tr><td><strong>PRT</strong></td><td>Éditeur d'arbre de réponse inline (sans quitter la modale)</td></tr>
+      <tr><td><strong>Aperçu</strong></td><td>Rendu approximatif de la question</td></tr>
+      <tr><td><strong>Attributs</strong></td><td>Export/import JSON de la question, note de l'auteur</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Options avancées des inputs</h3>
+  <p>Dans l'onglet Inputs, chaque champ dispose d'un panneau d'options adapté à son type :</p>
+  <table>
+    <thead><tr><th>Option</th><th>Effet</th></tr></thead>
+    <tbody>
+      <tr><td>Multiplications implicites</td><td>8 modes — détermine si <code>2x</code> est accepté à la place de <code>2*x</code></td></tr>
+      <tr><td>Syntaxe stricte</td><td>Oblige l'élève à écrire <code>*</code> et les parenthèses</td></tr>
+      <tr><td>Interdire décimaux</td><td>Rejette <code>0.5</code> — force <code>1/2</code></td></tr>
+      <tr><td>Fraction irréductible</td><td>Rejette <code>2/4</code>, exige <code>1/2</code></td></tr>
+      <tr><td>Vérifier le type</td><td>Rejette une expression si attendue une équation</td></tr>
+      <tr><td>Afficher la validation</td><td>4 niveaux de retour visuel après saisie (recommandé : niveau 1)</td></tr>
+      <tr><td>Étudiant confirme</td><td>L'élève doit cliquer "Confirmer" avant l'envoi</td></tr>
+      <tr><td>Vide autorisé</td><td>Réponse vide → <code>EMPTYANSWER</code> (valide)</td></tr>
+      <tr><td>Décimales min/max</td><td>Contrôle le nombre de décimales (types numérique et unités)</td></tr>
+      <tr><td>Chiffres sig. min/max</td><td>Contrôle les chiffres significatifs</td></tr>
+      <tr><td>Mélanger les choix</td><td>Ordre aléatoire pour radio/checkbox/dropdown</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══ IMPORT XML ═══ -->
+<div class="section" id="import-xml">
+  <h2 class="sec-title">11. Import d'une question STACK existante</h2>
+
+  <p>HéStack peut importer une question STACK déjà exportée depuis Moodle pour en modifier le PRT.</p>
+
+  <div class="steps">
+    <div class="step"><div class="step-body">Dans Moodle, allez dans la banque de questions, sélectionnez la question STACK et exportez-la au format <strong>Moodle XML</strong>.</div></div>
+    <div class="step"><div class="step-body">Dans HéStack, cliquez sur <strong>Import XML STACK</strong> (type de question).</div></div>
+    <div class="step"><div class="step-body">Sélectionnez le fichier XML. La question est importée avec tous ses PRT.</div></div>
+    <div class="step"><div class="step-body">Cliquez sur <strong>PRT — nom</strong> pour ouvrir et modifier chaque arbre.</div></div>
+    <div class="step"><div class="step-body">Cliquez sur <strong>Télécharger XML modifié</strong> pour exporter la version corrigée.</div></div>
+  </div>
+
+  <div class="info-box">
+    Si le fichier XML provient d'HéStack (il contient une signature <code>hestack::v1::</code>), le projet complet est restauré automatiquement avec tous les modules.
+  </div>
+</div>
+
+<!-- ═══ EXPORT ═══ -->
+<div class="section" id="export">
+  <h2 class="sec-title">12. Exporter vers Moodle</h2>
+
+  <div class="steps">
+    <div class="step"><div class="step-body">Assurez-vous que toutes les questions ont leur chip <strong>verte</strong> (Enregistrer appliqué).</div></div>
+    <div class="step"><div class="step-body">Cliquez sur <strong>Exporter XML</strong> dans la barre d'en-tête. Un fichier <code>hestack-export.xml</code> est téléchargé.</div></div>
+    <div class="step"><div class="step-body">Dans Moodle : <strong>Banque de questions → Importer → Moodle XML</strong>.</div></div>
+    <div class="step"><div class="step-body">Sélectionnez la catégorie cible, importez le fichier.</div></div>
+    <div class="step"><div class="step-body">Testez avec <strong>Aperçu</strong> dans Moodle avant d'ajouter la question à un quiz.</div></div>
+  </div>
+
+  <div class="warn-box">
+    <div class="box-title">Prérequis Moodle</div>
+    <ul>
+      <li>Plugin <strong>STACK</strong> installé et configuré (connexion à Maxima ou Goemaxima)</li>
+      <li>Version Moodle ≥ 3.9, STACK ≥ 4.4</li>
+      <li>Droits "Créer des questions" dans la catégorie cible</li>
+      <li>Filtre <strong>MathJax</strong> activé pour le rendu LaTeX</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══ RACCOURCIS ═══ -->
+<div class="section" id="raccourcis">
+  <h2 class="sec-title">13. Raccourcis clavier</h2>
+
+  <h3>Éditeur principal</h3>
+  <div class="shortcut-grid">
+    <kbd>Entrée</kbd><span class="shortcut-desc">Créer un saut de ligne après le chip sélectionné</span>
+    <kbd>Retour arrière</kbd><span class="shortcut-desc">Supprimer un chip vide (position curseur)</span>
+    <kbd>Ctrl</kbd>+<kbd>Z</kbd><span class="shortcut-desc">Annuler la dernière action dans l'éditeur</span>
+  </div>
+
+  <h3>Gestionnaire PRT</h3>
+  <div class="shortcut-grid">
+    <kbd>Clic</kbd><span class="shortcut-desc">Sélectionner un nœud et ouvrir son formulaire</span>
+    <kbd>Glisser (nœud)</kbd><span class="shortcut-desc">Déplacer un ou plusieurs nœuds</span>
+    <kbd>Glisser (fond)</kbd><span class="shortcut-desc">Sélectionner plusieurs nœuds par zone</span>
+    <kbd>Molette</kbd><span class="shortcut-desc">Zoom avant/arrière sur l'arbre</span>
+    <kbd>Échap</kbd><span class="shortcut-desc">Fermer la modale PRT sans appliquer</span>
+  </div>
+
+  <h3>Éditeur riche (texte)</h3>
+  <div class="shortcut-grid">
+    <kbd>Ctrl</kbd>+<kbd>B</kbd><span class="shortcut-desc">Gras</span>
+    <kbd>Ctrl</kbd>+<kbd>I</kbd><span class="shortcut-desc">Italique</span>
+    <kbd>Ctrl</kbd>+<kbd>U</kbd><span class="shortcut-desc">Souligné</span>
+  </div>
+</div>
+
+<!-- ═══ FAQ ═══ -->
+<div class="section" id="faq">
+  <h2 class="sec-title">14. FAQ — Erreurs courantes</h2>
+
+  <details>
+    <summary>Mon export XML est rejeté par Moodle avec "format invalide"</summary>
+    <div class="faq-body">
+      <p>Vérifiez que vous avez sélectionné <strong>Moodle XML</strong> (et non GIFT ou Aiken) lors de l'import. Si l'erreur persiste, ouvrez le fichier dans un éditeur de texte et vérifiez qu'il commence par <code>&lt;?xml version="1.0"</code> et qu'il n'y a pas de caractères parasites avant.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>STACK affiche "CAS returned an error" après import</summary>
+    <div class="faq-body">
+      <p>La syntaxe Maxima est incorrecte dans un champ. Causes fréquentes :</p>
+      <ul>
+        <li><code>2x</code> au lieu de <code>2*x</code> (multiplication implicite)</li>
+        <li><code>e^x</code> au lieu de <code>%e^x</code> ou <code>exp(x)</code></li>
+        <li><code>pi</code> au lieu de <code>%pi</code></li>
+        <li>Parenthèses non fermées ou mal balancées</li>
+        <li>Division par zéro possible dans une expression paramétrée</li>
+        <li>Virgule décimale (<code>3,14</code>) au lieu du point (<code>3.14</code>)</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Les formules LaTeX n'apparaissent pas dans Moodle</summary>
+    <div class="faq-body">
+      <p>Moodle doit avoir un filtre mathématiques actif. Vérifiez dans <strong>Administration → Plugins → Filtres</strong> que <strong>MathJax</strong> est activé et en position "Actif". Les formules doivent être entre <code>\(…\)</code> (inline) ou <code>\[…\]</code> (bloc centré).</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>L'élève répond juste mais STACK dit faux</summary>
+    <div class="faq-body">
+      <p>Causes possibles selon le type de question :</p>
+      <ul>
+        <li>Pour un décimal : utilisez <code>NumRelative</code> au lieu d'<code>AlgEquiv</code></li>
+        <li>Pour des formes trigonométriques équivalentes : utilisez <code>SubstEquiv</code></li>
+        <li>Pour une fraction : vérifiez que la réponse modèle est aussi réduite</li>
+        <li>Pour une unité physique : vérifiez que les unités SI de la réponse modèle sont correctes</li>
+        <li>Si vous utilisez <code>String</code>, vérifiez la gestion de la casse et des espaces</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Les paramètres aléatoires donnent toujours la même valeur dans HéStack</summary>
+    <div class="faq-body">
+      <p>L'aperçu dans HéStack affiche toujours la même valeur initiale (pour la cohérence de l'interface). Dans Moodle, chaque tentative génère de nouvelles valeurs. Pour tester plusieurs variantes, utilisez <strong>Aperçu → Commencer une nouvelle tentative</strong> dans Moodle.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>La grille de mots croisés ne s'affiche pas dans Moodle</summary>
+    <div class="faq-body">
+      <ul>
+        <li>Plugin STACK ≥ 4.4 requis</li>
+        <li>JavaScript doit être activé (pas de bloqueur de scripts)</li>
+        <li>Si la grille est vide : ajoutez plus de mots (minimum recommandé : 6)</li>
+        <li>Les mots doivent partager des lettres pour se croiser</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>L'image du "Clic sur image" ne s'affiche pas</summary>
+    <div class="faq-body">
+      <p>L'URL doit être accessible depuis le serveur Moodle :</p>
+      <ul>
+        <li>Vérifiez que l'image est en ligne (pas un fichier local)</li>
+        <li>Le serveur hébergeant l'image doit autoriser les requêtes cross-origin (CORS)</li>
+        <li>Recommandé : hébergez l'image dans les fichiers du cours Moodle et utilisez l'URL interne</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Comment créer une question avec plusieurs zones de saisie indépendantes ?</summary>
+    <div class="faq-body">
+      <p>Utilisez le <strong>Mode Expert STACK</strong> (onglet Inputs) pour ajouter plusieurs champs (<code>ans1</code>, <code>ans2</code>…). Chaque input peut avoir son propre type et sa propre réponse modèle. Le PRT peut ensuite évaluer chaque champ séparément ou de manière combinée.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Comment écrire une inéquation comme réponse attendue ?</summary>
+    <div class="faq-body">
+      <p>En Maxima : <code>x > 2</code>, <code>x &lt;= 5</code>, <code>-1 &lt; x and x &lt;= 3</code>. Le test <code>AlgEquiv</code> gère les inéquations. Pour des ensembles de solutions, utilisez <code>Sets</code>. HéStack propose également un type dédié <strong>Inéquation</strong>.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Comment le chemin vrai du PRT doit-il totaliser 1 ?</summary>
+    <div class="faq-body">
+      <p>En suivant uniquement les branches vraies depuis la racine jusqu'à un FIN, la somme des scores doit valoir 1. Exemples :</p>
+      <ul>
+        <li>Nœud 0 : vrai <code>=1</code> → FIN (chemin = 1) ✓</li>
+        <li>Nœud 0 : vrai <code>=0.5</code> → Nœud 1 : vrai <code>+0.5</code> → FIN (chemin = 0.5+0.5=1) ✓</li>
+        <li>Nœud 0 : vrai <code>=0.7</code> → FIN (chemin = 0.7) ✗ — bandeau d'avertissement</li>
+      </ul>
+      <p>Les branches fausses peuvent avoir n'importe quel score.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Mon travail a disparu après une vidange du cache du navigateur</summary>
+    <div class="faq-body">
+      <p>L'autosauvegarde utilise le localStorage du navigateur, qui est effacé lors d'une vidange de cache. Pour éviter toute perte :</p>
+      <ul>
+        <li>Exportez régulièrement votre projet avec <strong>Exporter projet (.hestack)</strong></li>
+        <li>Exportez également le XML Moodle comme sauvegarde de secours</li>
+        <li>En cas de perte, le fichier <code>.hestack</code> permet une restauration complète</li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="doc-footer">
+  <p>HéStack V4 — Guide enseignant — Version 4.1 — 2026</p>
+  <p style="margin-top:5px;">Contact : <a href="mailto:b_joly@orange.fr">b_joly@orange.fr</a></p>
+</div>
+
+</main><!-- /content -->
+</div><!-- /layout -->
+
+<script>
+/* Sidebar active link au scroll */
+(function(){
+  var links = document.querySelectorAll('.sidebar nav a');
+  var sections = [];
+  links.forEach(function(a){
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if(el) sections.push({el:el, a:a});
+  });
+  function onScroll(){
+    var y = window.scrollY + 100;
+    var active = sections[0];
+    sections.forEach(function(s){ if(s.el.offsetTop <= y) active = s; });
+    links.forEach(function(a){ a.classList.remove('active'); });
+    if(active) active.a.classList.add('active');
+    var btn = document.getElementById('back-top');
+    if(btn) btn.classList.toggle('show', window.scrollY > 300);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+Voici un mémo structuré (Memento) pour créer des exercices Parsons dans STACK, basé sur la syntaxe exacte de votre version (2024092500). 
+
+### 🧠 Le concept fondamental de STACK
+Contrairement aux autres types de questions STACK où l'on compare du texte ou des nombres, le type `parsons` compare des **structures arborescentes**. 
+Même pour un code Python séquentiel, vous devez déclarer la bonne réponse comme une "preuve" logique.
+
+---
+
+### 🛠️ Étape 1 : Les Variables de question (`questionvariables`)
+
+C'est ici que toute la magie opère. Vous devez suivre cet ordre précis :
+
+```maxima
+/* 1. OBLIGATOIRE : Inclure la librairie de preuves de STACK */
+stack_include_contrib("prooflib.mac");
+
+/* 2. Déclarer TOUS les blocs (bons et distracteurs) au format [ID, Texte] */
+proof_steps: [
+    ["L1", "def ma_fonction(x):"],
+    ["L2", "    if x > 0:"],
+    ["L3", "        return True"],
+    ["D1", "    return x == 0"],  /* Distracteur */
+    ["D2", "print(x)"]           /* Distracteur */
+];
+
+/* 3. Définir la BONNE RÉPONSE sous forme de structure (pas une liste !) */
+ta: proof("L1", "L2", "L3");
+
+/* 4. Mélanger les blocs pour l'affichage élève */
+proof_steps: random_permutation(proof_steps);
+
+/* 5. Préparer l'évaluation (aplatissement et mise en ensemble) */
+tal: proof_alternatives(ta);
+tas: setify(map(proof_flatten, tal));
+```
+
+💡 **Astuce pour `ta`** : La fonction `proof()` crée un ordre strict. Si deux blocs peuvent être intervertis sans fausser le code, utilisez `proof_iff()` : `ta: proof("L1", proof_iff(proof("L2", "L3"), proof("L3", "L2")));`
+
+---
+
+### 🖥️ Étape 2 : Le Texte de la question (`questiontext`)
+
+Il faut utiliser la balise spécifique `[[parsons]]` qui génère l'interface JS, **ET** conserver les balises `[[input]]` cachées pour transmettre les données.
+
+```html
+[[parsons input="ans1" height="400px"]]
+{# parsons_encode(proof_steps) #}
+[[/parsons ]]
+
+[[input:ans1]] [[validation:ans1]]
+```
+*Note : `height="400px"` est optionnel mais très utile pour les longs codes.*
+
+---
+
+### ⚙️ Étape 3 : La configuration de l'Input (`input`)
+
+Dans l'onglet "Input" de STACK, deux champs sont critiques :
+*   **Type** : `parsons`
+*   **Model answer (tans)** : `[ta, proof_steps]` *(Attention aux crochets, c'est une liste contenant votre arbre `ta` et la liste mélangée `proof_steps`)*.
+
+---
+
+### ✅ Étape 4 : L'Arbre de réponse - PRT (`prt`)
+
+Le PRT ne compare jamais les chaînes de caractères directement. Il decode la réponse JS de l'élève et vérifie si elle appartient à l'ensemble des bonnes réponses aplaties (`tas`).
+
+**Dans "Feedback variables" :**
+```maxima
+sa: parsons_decode(ans1);
+check: elementp(sa, tas);
+```
+*(`sa` devient la liste des ID sélectionnés par l'élève, ex: `["L1", "L2", "L3"]`)*
+
+**Dans le Nœud (Node) :**
+*   **Answer test** : `AlgEquiv`
+*   **SAns** : `check`
+*   **TAns** : `true`
+
+---
+
+### 🧪 Étape 5 : Les Tests unitaires (`QTest`) - TRÈS IMPORTANT
+
+Comme le Parsons fait communiquer du JS avec du Maxima, il faut *toujours* valider la question avec un QTest pour s'assurer que la connexion fonctionne.
+
+Allez dans "Question tests" et ajoutez ce test :
+*   **Test case** : `apply(parsons_answer,[ta, proof_steps])`
+*   **Expected score** : `1`
+
+Si ce test échoue, votre question plantera aussi pour les élèves (souvent à cause d'un oubli de `stack_include_contrib("prooflib.mac");`).
+
+---
+
+### 🚨 Pièges à éviter (Débugs fréquents)
+
+1.  **Oublier les guillemets autour des ID dans `proof()`** : 
+    *   ❌ Faux : `ta: proof(L1, L2);` (Maxima cherchera des variables L1 et L2)
+    *   ✅ Vrai : `ta: proof("L1", "L2");`
+2.  **Mettre autre chose que des paires dans `proof_steps`** : 
+    *   ❌ Faux : `"L1", "def ma_fonction"`
+    *   ✅ Vrai : `["L1", "def ma_fonction"]`
+3.  **Comparer du texte dans le PRT** : Ne faites jamais `AlgEquiv(ans1, ta)`. Passez toujours par `parsons_decode` et `elementp`.
+4.  **Problèmes d'indentation Python** : Les espaces au début des textes sont interprétés littéralement. Assurez-vous d'en mettre suffisamment (ex: `"    if x > 0:"`) pour que le rendu visuel soit correct.

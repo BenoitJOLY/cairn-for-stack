@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:install="http://openoffice.org/2004/installation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" oor:name="Accelerators" oor:package="org.openoffice.Office">
+  <node oor:name="PrimaryKeys">    
+    <node oor:name="Modules">
+      <node oor:name="com.sun.star.presentation.PresentationDocument">
+	  <node oor:name="F10" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Tools.InsereObjetWriterdsPresentation?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+      </node>
+      <node oor:name="com.sun.star.text.TextDocument">
+	  <node oor:name="T_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		  <value xml:lang="en-US">vnd.sun.star.script:Dmaths.Tableau.LanceCreationTableau?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="F10" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenFormule?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="V_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenVecteur?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="W_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Tools.ChangebExecOptionMajusculesItalic?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="E_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenMesureAlgebrique?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="C_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Tools.ChangebExecCoordColonne?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="A_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenAngle?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="L_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenLimite?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="I_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenIntegrale?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="S_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenSomme?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="R_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenRacine?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="X_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenSysteme?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="M_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetenMatrice?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="F9" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetentreAccolades?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="F9_SHIFT" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetentreParentheses?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="F9_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetentreCrochets1?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>	  
+	  <node oor:name="F9_MOD2" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetentreAccolades2?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="I_MOD1_MOD2" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetEnPartieEntiere?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="I_MOD1_MOD2" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.MetEnPartieEntiere?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>	  
+	  <node oor:name="F3" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.RaccAutotextes.SuperAutotexte?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="F3_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Tools.MetenSurligne?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="F3_SHIFT" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Tools.MetenItalic?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="F4_SHIFT" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Tools.MetenAtalante?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="Z_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:Dmaths.Module1.LoadParCro?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+	  <node oor:name="O_SHIFT_MOD1" oor:op="replace">
+	      <prop oor:name="Command">
+		<value xml:lang="en-US">vnd.sun.star.script:DmInstall.Options.ChoixOptionsDmaths?language=Basic&amp;location=application</value>
+	      </prop>
+	  </node>
+      </node>
+    </node>
+  </node>
+  <node oor:name="SecondaryKeys">    
+  </node>
+</oor:component-data>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396143  -->
+  <question type="stack">
+    <name>
+      <text>Aire entre deux courbes (Polynômes)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#475569;border-left:5px solid #334155;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Intégrales — Aire entre deux courbes</strong>
+        <span style="background:#334155;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+      </div>
+      
+      Dans un repère orthonormé, on considère les courbes représentatives des fonctions \(f\) et \(g\) définies sur \(\mathbb{R}\) par :<br />
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:15px; text-align:center; font-size:1.1rem; margin-bottom:15px;">
+        \( f(x) = {@f@} \) &nbsp;&nbsp;&nbsp; et &nbsp;&nbsp;&nbsp; \( g(x) = {@g@} \)
+      </div>
+      
+      <strong>1.</strong> Déterminer les abscisses des points d'intersection des deux courbes. On les notera sous la forme d'un ensemble \(\{a ; b\}\) avec \(a < b\).<br />
+      <div style="margin-top:5px; margin-bottom:15px;">Abscisses = [[input:ans_ab]] [[validation:ans_ab]]</div>
+
+      <strong>2.</strong> Calculer l'aire exacte (en unités d'aire) de la zone comprise entre les deux courbes.<br />
+      <div style="margin-top:5px;">Aire = [[input:ans_aire]] [[validation:ans_aire]] u.a.</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">
+        <div style="font-weight:bold; margin-bottom:10px;">🔑 Correction détaillée</div>
+        <div style="font-size:.9rem;">
+          <strong>1. Points d'intersection :</strong><br />
+          On résout \(f(x) = g(x) \iff {@f@} = {@g@}\).<br />
+          Cela donne {@ev(f-g, x)} = 0, soit \(({@a@})(x - {@b@}) = 0\).<br />
+          Les abscisses sont bien \(S = \{{@a@} ; {@b@}\}\).<br /><br />
+          <strong>2. Calcul de l'aire :</strong><br />
+          Sur \([{@a@} ; {@b@}]\), on a {@g@} {@cond_sup@} {@f@}.<br />
+          L'aire est donc \( A = \int_{{@a@}}^{{@b@}} \left( |g(x) - f(x)| \right) dx \)<br />
+          \( A = -\int_{{@a@}}^{{@b@}} ({@ev(f-g,x)}) dx = {@ta_aire@} \) u.a.
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[a: rand([-3,-2,-1,1,2])$ b: a + rand([2,3,4])$ k: rand([1,2,3])$ f: x^2$ g: f - k*(x-a)*(x-b)$ ta_ab: {a, b}$ ta_aire: ratsimp(-int(k*(x-a)*(x-b), x, a, b))$ ta_err_sign: ratsimp(int(k*(x-a)*(x-b), x, a, b))$ cond_sup: if g > f then ">" else "<";]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>f={@f@}, g={@g@}, Intersections={@a@},{@b@}, Aire={@ta_aire@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:integral-area</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_ab</name>
+      <type>algebraic</type>
+      <tans>ta_ab</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>{a, b}</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_aire</name>
+      <type>algebraic</type>
+      <tans>ta_aire</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification des abscisses d'intersection</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ab</sans>
+        <tans>ta_ab</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT-AB-OK</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-AB-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>Abscisses incorrectes.</strong> Résolvez l'équation \(f(x) = g(x)\). Pensez à factoriser l'expression obtenue pour trouver les racines.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Vérification de l'aire finale</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_aire</sans>
+        <tans>ta_aire</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-AIRE-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Parfait !</strong> Les abscisses et l'aire sont correctes. Vous avez bien pensé à prendre la valeur absolue de l'intégrale pour obtenir une aire positive.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-AIRE-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Détection erreur de signe (Aire négative)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_aire</sans>
+        <tans>ta_err_sign</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>Erreur de signe !</strong> Votre calcul intégral est bon, mais une aire doit être <strong>positive</strong>. Si votre intégrale \(\int_a^b (f-g)\) est négative, l'aire est \(-\int_a^b (f-g)\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>Aire incorrecte.</strong> Les abscisses étaient bonnes. Revoyez le calcul de votre intégrale. N'oubliez pas la formule : \( A = \int_a^b |f(x) - g(x)| dx \).</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

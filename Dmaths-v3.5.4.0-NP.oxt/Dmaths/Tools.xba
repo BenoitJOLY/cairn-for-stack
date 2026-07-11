@@ -1,0 +1,1225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Tools" script:language="StarBasic">&apos;Copyright (C) 2003-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye  
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.com
+&apos;module créé le 25 novembre 2003
+&apos;********************************************************************************
+Public Const listeCar = &quot;Ç ü é â ä à å ç ê ë è ï î ì Ä Å É æ Æ ô ö ò û ù ÿ Ö Ü ø £ Ø × ƒ á í ó ú ñ Ñ ª º ¿ ® ¬ ½ ¼ ¡ « »   Á Â À ©   ¢ ¥   ã Ã   Ê Ë È ı Í Î Ï   Ì   Ó ß Ô Ò õ Õ µ   Ú Û Ù ý Ý   § &quot;
+Public Const CarUTF8  = &quot;Ã‡Ã¼Ã©Ã¢Ã¤Ã Ã¥Ã§ÃªÃ«Ã¨Ã¯Ã®Ã¬Ã„Ã…Ã‰Ã¦Ã†Ã´Ã¶Ã²Ã»Ã¹Ã¿Ã–ÃœÃ¸Â£Ã˜Ã—Æ’Ã¡Ã­Ã³ÃºÃ±Ã‘ÂªÂºÂ¿Â®Â¬Â½Â¼Â¡Â«Â»  ÃÃ‚Ã€Â©  Â¢Â¥  Ã£Ãƒ  ÃŠÃ‹ÃˆÄ±ÃÃŽÃ  ÃŒ  Ã“ÃŸÃ”Ã’ÃµÃ•Âµ  ÃšÃ›Ã™Ã½Ã  Â§&quot;
+
+Public Const iNumVersionDmathsNew = 3540
+Global iNombreInstallDmOptions as Integer rem compte le nombre de fois ou les options sont reinstallees à partir de celle sauvegardee dans Dmoptions.txt
+Global MonDocumentImpress as Object
+
+Private oAverto as Object
+
+
+Sub Avertir(iNumero as integer) rem affiche un avertissement
+	Dim sAvertissement as String
+	Dim iParaMsgBox as Integer
+	Dim oAverto As Object
+	iParaMsgBox = 0
+	sAvertissement = sVocab(iLang,iNumero)
+	msgbox(sAvertissement,256+48+iParaMsgBox,&quot;Dmaths&quot;)
+End Sub
+
+rem cette macro donne un message d&apos;avertissement avec une tempo.
+rem ancienne version 3522
+rem ajout le 16 fevrier 2014 par Michael Bussow
+Sub AvertirTemp(sLabelNr as string, optional delay as integer) rem affiche un avertissement
+	if ismissing(delay) then delay=800
+	oAverto = LoadDialog(&quot;Dmaths&quot;,&quot;OptionMajuscules&quot;)
+	oAverto.getControl(&quot;Label1&quot;).Text = oAverto.getControl(sLabelNr).Text
+	oAverto.SetVisible(True)
+	Wait delay
+	oAverto.endexecute()
+	oAverto.Dispose()
+End Sub
+
+Sub CloseAvertirTemp
+	oAverto.Dispose()
+End Sub
+
+Function IndexChaine(Mot as String,iNbreOver as Integer,maChaine as String) as Integer
+&apos; fournit la position du premier caractere de la iNbreOver ieme occurence de maChaine dans Mot
+&apos; renvoie 0 si maChaine n&apos;est pas trouvee, 1 si NbreOver = 0.
+	Dim iPointVar, iCompteur as Integer &apos; Tant que maChaine n&apos;a pas ete trouvee, renvoit 0.
+	iPointVar = 0
+	iCompteur=0
+	If iNbreOver &gt; 0 Then
+	&apos; Renvoit 1 si iNbreOver=0.
+		If InStr(Mot,maChaine)&gt; 0 Then
+		&apos; iPointVar reste a 0 si maChaine n&apos;est pas trouvee.
+		Do Until (iPointVar=0 And iCompteur &gt;0) Or iCompteur=iNbreOver
+				&apos; Compte le nombre de fois ou on trouve maChaine jusqu&apos;a ce qu&apos;on atteigne iNbreOver ou qu&apos;on
+				&apos; ne trouve plus d&apos;occurence de maChaine.
+				iPointVar=InStr(iPointVar+Len(maChaine),Mot,maChaine)
+				&apos; iPointVar prend la valeur de la position de la prochaine occurence de maChaine dans Mot
+				&apos; (0 si on ne le trouve plus).
+				iCompteur=iCompteur+1
+		Loop
+		EndIf
+	Else
+	iPointVar=1
+	EndIf
+	IndexChaine = iPointVar
+End Function
+
+
+Function RemplaceChaine(ByVal chaine As String, src As String, dest As String, casse As Boolean)        
+&apos; fournit une chaine dont toutes les occurences de src ont été remplacées par dest      
+&apos;casse = true pour distinguer majuscules/minuscules, = false sinon
+Dim lsrc As Integer, i As Integer, kas As Integer
+dim limite as string
+  limite=&quot;&quot;
+  kas = iif(casse, 0, 1)
+  lsrc = len(src)
+  i = instr(1, chaine, src, kas)
+  while i&lt;&gt;0
+    while i&lt;0
+      limite=limite+left(chaine,32000)
+      chaine=mid(chaine,32001)
+      i=instr(1, chaine, src, kas)
+    wend
+    &apos; ici i est toujours positif non nul
+    if i&gt;1 then
+       limite = limite + Left(chaine, i-1) +dest
+    else &apos; ici i vaut toujours 1
+       limite = limite +dest
+    endif   
+    &apos; raccourcir en deux temps car risque : i+src &gt; 32767
+    chaine = Mid(chaine, i)   
+    chaine = Mid(chaine, 1+lsrc)
+    i = instr(1, chaine, src, kas)
+  wend
+  RemplaceChaine = limite + chaine
+End Function
+
+
+
+rem cree le 3 decembre 2003
+sub HideUserDefBar
+dim document   as object
+dim dispatcher as object
+document   = ThisComponent.CurrentController.Frame
+dim Array(0) as new com.sun.star.beans.PropertyValue 
+dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+dispatcher.executeDispatch(document, &quot;.uno:ConfigureDialog&quot;, &quot;&quot;, 0, Array())
+end sub
+
+Sub MultipleTextSelectionExample
+	Dim oSelections As Object, oSel As Object, oText As Object
+	Dim lSelCount As Long, lWhichSelection As Long
+	&apos;  La sélection courante dans le contrôleur courant. 
+	&apos;S&apos;il n&apos;y a pas de contrôleur courant, retourne null.
+	oSelections = ThisComponent.getCurrentSelection()
+	If Not IsNull(oSelections) Then
+		oText = ThisComponent.Text
+		lSelCount = oSelections.getCount()
+		For lWhichSelection = 0 To lSelCount - 1
+			oSel = oSelections.getByIndex(lWhichSelection)
+			MsgBox oSel.getString()
+		Next
+	End If
+End Sub
+
+
+Sub Bordure_Selection rem macro initiée par Agnès Simonet et complétée le 25 novembre 2006 et le 28 décembre 2013 par Didier Dorange-Pattoret 
+	Call VerifOperationnel
+
+	Dim MonDocument As Object, MonTexte As Object
+	Dim MonCurseur,Moncurseur2 As Object
+	Dim CurseurVisible As Object
+	Dim CurseurFormat As Object
+	Dim MonRectangle, TexteRectangle As Object
+	Dim TailleRectangle As New com.sun.star.awt.Size
+	Dim TexteDeLaSelection As String
+	Dim iLongueurdeSelection as Integer
+	Dim Hmax, InitH, iBorder as integer
+
+	Dim CurseurRectangle As Object
+	Dim CurseurDebut As Object
+	Dim CurseurFin As Object
+
+	&apos;récupère la sélection (4 lignes)
+	MonDocument = StarDeskTop.CurrentComponent
+	&apos;controle si la selection est un texte
+	If MonDocument.CurrentSelection.ImplementationName &lt;&gt; &quot;SwXTextRanges&quot; Then
+    		MsgBox(sVocab(iLang,376),48,&quot;Dmaths&quot;)
+     		Goto End_Of_Bordure_Selection
+    Endif
+	
+	CurseurVisible = MonDocument.currentcontroller.ViewCursor
+	MonTexte = CurseurVisible.Text
+	MonCurseur2 = MonTexte.createTextCursorByRange(CurseurVisible)
+
+	If OOoNumVersion &gt;= 420 and OOoName()=&quot;LibreOffice&quot; Then
+	rem on utilise l&apos;api de libreOffice.
+	
+		Dim mCharProperties As New com.sun.star.table.BorderLine2
+		mCharProperties.LineWidth = 2
+		mCharProperties.OuterLineWidth = 2
+		MaSelection = MonDocument.CurrentSelection.getByIndex(0)
+		MaSelection.CharBorderDistance = 49
+		MaSelection.SetPropertyValue(&quot;CharBottomBorderDistance&quot;,50)
+		MaSelection.SetPropertyValue(&quot;CharBottomBorder&quot;,mCharProperties)
+		MaSelection.SetPropertyValue(&quot;CharTopBorderDistance&quot;,50)
+		MaSelection.SetPropertyValue(&quot;CharTopBorder&quot;,mCharProperties)
+		MaSelection.SetPropertyValue(&quot;CharLeftBorderDistance&quot;,49)
+		MaSelection.SetPropertyValue(&quot;CharLeftBorder&quot;,mCharProperties)
+		MaSelection.SetPropertyValue(&quot;CharRightBorderDistance&quot;,49)
+		MaSelection.SetPropertyValue(&quot;CharRightBorder&quot;,mCharProperties)
+	
+	
+		rem encadrement des formules incluses
+		rem avec plusieurs formules la taille maximale est détectée
+		Hmax = Cint(MaSelection.CharHeight * 50)
+		If MaSelection.CharHeight &lt;= 10 Then Hmax = Hmax + 50
+	
+		Objets = MonCurseur2.createContentEnumeration(&quot;com.sun.star.text.TextContent&quot;)				
+    	Do while Objets.HasMoreElements
+			obj = Objets.NextElement
+				if obj.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+						obj.SetPropertyValue(&quot;BottomBorder&quot;,mCharProperties)
+						obj.SetPropertyValue(&quot;TopBorder&quot;,mCharProperties)
+						rem InitH est la hauteur initiale de l&apos;objet
+						If Cint(obj.Description) = 0 Then
+							obj.Description = Cstr(obj.Size.Height-obj.BottomBorderDistance-obj.TopBorderDistance)
+						Endif					
+						InitH = Cint(obj.Description)
+						If InitH &gt; Hmax Then Hmax = InitH
+				Endif		
+		Loop
+		
+		Objets = MonCurseur2.createContentEnumeration(&quot;com.sun.star.text.TextContent&quot;)
+			Do while Objets.HasMoreElements
+				obj = Objets.NextElement
+					if obj.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+						iBorder = 10 + (Hmax - Cint(obj.Description))/2
+						obj.SetPropertyValue(&quot;BottomBorderDistance&quot;,iBorder)						
+						obj.SetPropertyValue(&quot;TopBorderDistance&quot;,iBorder)
+						TailleRectangle.height = Hmax
+						TailleRectangle.width = obj.size.width				
+						obj.Size = TailleRectangle
+					Endif
+			Loop	
+			
+		CurseurVisible.CollapseToEnd
+		mCharProperties.LineWidth = 0
+		mCharProperties.OuterLineWidth = 0
+		MaSelection = MonDocument.CurrentSelection.getByIndex(0)
+		MaSelection.CharBorderDistance = 0
+		MaSelection.SetPropertyValue(&quot;CharBottomBorderDistance&quot;,0)
+		MaSelection.SetPropertyValue(&quot;CharBottomBorder&quot;,mCharProperties)
+		MaSelection.SetPropertyValue(&quot;CharTopBorderDistance&quot;,0)
+		MaSelection.SetPropertyValue(&quot;CharTopBorder&quot;,mCharProperties)
+		MaSelection.SetPropertyValue(&quot;CharLeftBorderDistance&quot;,0)
+		MaSelection.SetPropertyValue(&quot;CharLeftBorder&quot;,mCharProperties)
+		MaSelection.SetPropertyValue(&quot;CharRightBorderDistance&quot;,0)
+		MaSelection.SetPropertyValue(&quot;CharRightBorder&quot;,mCharProperties)
+		CurseurVisible.getText().insertString(CurseurVisible.getStart(),&quot; &quot;,false)
+		On error goto 0
+			
+	Else			
+	rem on bricole avec une fram text.
+		&apos;crée et positionne le curseur permettant de récupérer le format (1 ligne)
+		CurseurFormat = MonTexte.createTextCursorByRange(CurseurVisible.Start)
+		&apos; cree et positionne le curseur d&apos;insertion de blanc en debut de paragraphe
+		&apos;cela regle le bug qui se produit lorsque la selection comprend le premier caractère du paragraphe
+
+		TexteDeLaSelection = CurseurVisible.String
+		iLongueurdeSelection = Len(TexteDeLaSelection)
+	
+	
+		&apos;cas où rien n&apos;est séctionné (sélection supposée &lt; à 64 ko !) (4 lignes)
+		If iLongueurdeSelection = 0 Then 
+				MsgBox(sVocab(iLang,376),48,&quot;Dmaths&quot;)
+	 			Goto End_Of_Bordure_Selection
+		Else
+			&apos; cree un blanc en debut de paragraphe si la selection comprend le premier caractere du paragraphe
+			If Not MonCurseur2.IsStartofParaGraph Then Moncurseur2.Goleft(Len(TexteDeLaSelection),False)
+			If MonCurseur2.IsStartofParaGraph Then
+			Montexte.InsertString(MonCurseur2,&quot; &quot;,False)
+			Moncurseur2.Goleft(1,False)
+			Endif
+		
+			Dim police(1 to iLongueurdeSelection) as String
+			Dim taille(1 to iLongueurdeSelection) as Single
+			Dim gras(1 to iLongueurdeSelection) as Single
+			Dim italique(1 to iLongueurdeSelection) as Integer
+			Dim souligne(1 to iLongueurdeSelection) as Integer
+			Dim lcouleur(1 to iLongueurdeSelection) as Long
+			Dim ombre(1 to iLongueurdeSelection) as Boolean
+			Dim contour(1 to iLongueurdeSelection) as Boolean
+			Dim relief(1 to iLongueurdeSelection) as Integer		
+			
+			rem recupere le format de chaque caractere
+			For I = 1 To iLongueurdeSelection
+			CurseurFormat.goRight(1,true)
+			police(I) = CurseurFormat.CharFontName
+			taille(I) =  CurseurFormat.CharHeight
+			gras(I) = CurseurFormat.CharWeight
+			italique(I) = CurseurFormat.CharPosture
+			souligne(I) = CurseurFormat.CharUnderLine
+			lcouleur(I) = CurseurFormat.CharColor
+			ombre(I) = CurseurFormat.CharShadowed
+			contour(I) = CurseurFormat.CharContoured
+			relief(I) = CurseurFormat.CharRelief
+			CurseurFormat.goRight(0,false)
+			Next I
+					
+			&apos;crée et positionne le curseur d&apos;écriture (1 ligne)
+			MonCurseur = MonTexte.createTextCursorByRange(CurseurVisible)
+			
+			&apos;crée un mini rectangle (5 lignes hors commentaires)
+			TailleRectangle.Width = 1
+			TailleRectangle.Height = 1
+		
+			MonRectangle=MonDocument.createInstance(&quot;com.sun.star.drawing.TextShape&quot;)
+			
+			MonTexte.insertTextContent( MonCurseur,MonRectangle,true)
+			MonRectangle.Size = TailleRectangle
+			
+			&apos;ancrage comme caractère (1 ligne)
+			MonRectangle.AnchorType = com.sun.star.text.TextContentAnchorType.AS_CHARACTER
+			
+			&apos;contour (1 ligne)
+			MonRectangle.LineStyle = com.sun.star.drawing.LineStyle.SOLID
+			
+			&apos;centre le rectangle (1 ligne)
+			MonRectangle.VertOrient = com.sun.star.text.VertOrientation.CHAR_CENTER
+			
+			&apos;centre verticalement le texte du rectangle (1 ligne)
+			MonRectangle.TextVerticalAdjust = com.sun.star.drawing.TextVerticalAdjust.CENTER
+			&apos; regle la couleur de la bordure
+			MonRectangle.LineColor = 0
+			&apos;adapte la taille du rectangle à celle du texte (2 lignes)
+			MonRectangle.TextAutoGrowWidth = true
+			MonRectangle.TextAutoGrowHeight = true
+			&apos; place le rectangle au premier plan
+			MonRectangle.LayerId = 1
+			&apos;place un curseur dans le rectangle (2 lignes)
+			TexteRectangle = MonRectangle.Text
+			CurseurRectangle = TexteRectangle.createTextCursor
+			TexteRectangle.insertString(CurseurRectangle,TexteDeLaSelection,true)
+			CurseurRectangle.goleft(iLongueurdeSelection,false)
+			
+			rem écrit le format de chaque caractere
+			For I = 1 To iLongueurdeSelection
+			CurseurRectangle.goright(1,true)		
+			CurseurRectangle.CharFontName = police(I)
+			CurseurRectangle.CharHeight = taille(I)
+			CurseurRectangle.CharWeight = gras(I)
+			CurseurRectangle.CharPosture = italique(I)
+			CurseurRectangle.CharUnderLine = souligne(I)
+			CurseurRectangle.CharColor = lcouleur(I)
+			CurseurRectangle.CharShadowed = ombre(I)
+			CurseurRectangle.CharContoured = contour(I)
+			CurseurRectangle.CharRelief = relief(I)
+			CurseurRectangle.goright(0,false)		
+			Next I
+			
+			&apos;supprime le blanc cree en debut de paragraphe
+			If MonCurseur2.IsStartofParaGraph Then
+				MonCurseur2.Goright(1,True)
+				Montexte.InsertString(MonCurseur2,&quot;&quot;,True) 
+			Endif
+		Endif
+	Endif
+	End_Of_Bordure_Selection:
+End sub
+
+
+
+
+Sub MetenItalic rem cette macro met en italique le caractère précédent le curseur visible ou la selection.
+	Dim Mondocument, CurseurVisible, CurseurFormat as Object
+	Call VerifOperationnel
+	MonDocument = StarDeskTop.CurrentComponent
+	CurseurVisible = MonDocument.currentcontroller.ViewCursor
+	MonTexte = CurseurVisible.Text
+	If CurseurVisible.IsCollapsed Then
+		&apos;crée et positionne le curseur permettant de récupérer le format (1 ligne)
+		CurseurFormat = MonTexte.createTextCursorByRange(CurseurVisible)
+		CurseurFormat.GoLeft(1,TRUE)
+		If CurseurFormat.CharPosture = com.sun.star.awt.FontSlant.NONE Then
+			CurseurFormat.CharPosture = com.sun.star.awt.FontSlant.ITALIC
+		Else 
+			CurseurFormat.CharPosture = com.sun.star.awt.FontSlant.NONE
+		End If
+		CurseurFormat.GoRight(1,False)
+	Else &apos;met en italique la partie sélectionnée
+		If CurseurVisible.CharPosture = com.sun.star.awt.FontSlant.NONE Then
+				CurseurVisible.CharPosture = com.sun.star.awt.FontSlant.ITALIC
+		Else 
+				CurseurVisible.CharPosture = com.sun.star.awt.FontSlant.NONE
+		End If
+		CurseurVisible.CollapseToEnd
+	Endif
+	If CurseurVisible.IsAtEndOfLine Then CurseurVisible.CharPosture = com.sun.star.awt.FontSlant.NONE
+End Sub
+
+
+Sub Metensurligne rem cette macro met en surligné le caractère précédent le curseur visible ou la selection.
+	Dim Mondocument, CurseurVisible, CurseurFormat as Object
+	Call VerifOperationnel
+	MonDocument = StarDeskTop.CurrentComponent
+	CurseurVisible = MonDocument.currentcontroller.ViewCursor
+	MonTexte = CurseurVisible.Text
+	If CurseurVisible.IsCollapsed Then
+		&apos;crée et positionne le curseur permettant de récupérer le format (1 ligne)
+		CurseurFormat = MonTexte.createTextCursorByRange(CurseurVisible)
+		CurseurFormat.GoLeft(1,TRUE)
+		If CurseurFormat.CharOverline = com.sun.star.awt.FontUnderline.NONE Then
+			CurseurFormat.CharOverline = com.sun.star.awt.FontUnderline.SINGLE
+		Elseif CurseurFormat.CharOverline = com.sun.star.awt.FontUnderline.SINGLE Then
+			CurseurFormat.CharOverline = com.sun.star.awt.FontUnderline.DOUBLE
+		Else
+			CurseurFormat.CharOverline = com.sun.star.awt.FontUnderline.NONE
+		End If
+		CurseurFormat.GoRight(1,False)
+	Else &apos;met en italique la partie sélectionnée
+		If CurseurVisible.CharOverline = com.sun.star.awt.FontUnderline.NONE Then
+				CurseurVisible.CharOverline = com.sun.star.awt.FontUnderline.SINGLE
+		Elseif CurseurVisible.CharOverline = com.sun.star.awt.FontUnderline.SINGLE Then
+				CurseurVisible.CharOverline = com.sun.star.awt.FontUnderline.DOUBLE
+		Else
+			CurseurVisible.CharOverline = com.sun.star.awt.FontUnderline.NONE
+		End If
+		CurseurVisible.CollapseToEnd		
+	Endif
+	If CurseurVisible.IsAtEndOfLine Then CurseurVisible.CharOverline = com.sun.star.awt.FontUnderline.NONE
+End Sub
+
+
+Sub MetenAtalante rem cette macro met en caractère arrondi ATALANTE le caractère précédent le curseur visible ou la selection.
+	Dim Mondocument, CurseurVisible, CurseurFormat as Object
+	Dim PoliceDefaut, CheminAtalanteUser, CheminAtalanteRezo, CheminAtalante as String
+	Dim AtalanteTelechargee, DroitsAdmin as Boolean
+	Call VerifOperationnel
+rem ce qui suit teste la presence de la police Atalante et propose de la telecharger si besoin
+	CheminAtalanteUser = GetRepertoirePath(&quot;user&quot;) &amp; GetPathSeparator &amp; &quot;fonts&quot;  &amp; GetPathSeparator &amp; &quot;Atalante.ttf&quot;
+	CheminAtalanteRezo = GetRepertoirePath(&quot;inst&quot;) &amp; GetPathSeparator &amp; &quot;share&quot; &amp; GetPathSeparator &amp; &quot;fonts&quot; &amp; GetPathSeparator &amp; &quot;truetype&quot; &amp;  GetPathSeparator &amp; &quot;Atalante.ttf&quot;
+	DroitsAdmin = ControleDroits(GetRepertoirePath(&quot;inst&quot;) &amp; GetPathSeparator &amp; &quot;share&quot; &amp; GetPathSeparator &amp; &quot;fonts&quot;)
+	
+	If Len(sNomPoliceCursive) = 0 Then
+		Monmessage = sVocab(iLang,421)
+		MsgBox(Monmessage , 64 + 0 , &quot;Dmaths installation&quot;)	
+		Exit Sub
+	Endif 
+	If Not PoliceScriptTrouvee(sNomPoliceCursive) Then
+		If sNomPoliceCursive = &quot;Atalante&quot; Then
+			Monmessage = sVocab(iLang,422) &amp;&quot;.&quot; + Chr(13)
+			Monmessage = Monmessage &amp; sVocab(iLang,423) + Chr(13)+ Chr(13)
+			Monmessage = Monmessage &amp; sVocab(iLang,424) + Chr(13)
+			Monmessage = Monmessage &amp; sVocab(iLang,425) + Chr(13)
+			If MsgBox(Monmessage , 48 + 4 , &quot;Dmaths installation&quot;) = 6 Then
+				If DroitsAdmin or GetGuiType &lt;&gt; 1 Then
+						Monmessage = sVocab(iLang,426) + Chr(13)
+						If MsgBox(Monmessage , 32 + 4 , &quot;Dmaths installation&quot;) = 6 Then
+							If DroitsAdmin then CheminAtalante = CheminAtalanteRezo Else CheminAtalante = CheminAtalanteUser
+							If  FileExistsLG(&quot;http://www.cdprof.com/telecharger/At______.ttf&quot;) Then 
+								FileCopyLG(&quot;http://www.cdprof.com/telecharger/At______.ttf&quot;, CheminAtalante)				
+								AtalanteTelechargee = True				
+							Elseif FileExistsLG(&quot;http://colleges.ac-rouen.fr/7epis/telechargements/police_atalante.ttf&quot;) Then
+								FileCopyLG(&quot;http://colleges.ac-rouen.fr/7epis/telechargements/police_atalante.ttf&quot;, CheminAtalante)
+								AtalanteTelechargee = True			
+							Else
+							Print sVocab(iLang,428)
+							Exit Sub
+							Endif
+						Endif
+				Else 
+						MonMessage = sVocab(iLang,427)
+						MsgBox(Monmessage , 64 + 1 , &quot;Dmaths installation&quot;) = 6
+						Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+						oDesktop=createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+						sGraphPlotter=fChemindmaths+&quot;install_atalante.odt&quot;
+						mFileProperties(0).Name=&quot;MacroExecutionMode&quot;
+						mFileProperties(0).Value=com.sun.star.document.MacroExecMode.ALWAYS_EXECUTE_NO_WARN
+						oDocument = oDesktop.LoadComponentFromURL(sGraphPlotter,&quot;_blank&quot;,0,mFileProperties())				
+				Endif		
+			Endif
+			If AtalanteTelechargee Then
+				BasicLibraries.loadLibrary(&quot;DmInstall&quot;)
+				If (GetGuiType = 1 or Not FileExists(&quot;/Users&quot;))  Then Call DmInstall.CloseAndLaunchOOo.RelanceOOo
+			Endif
+		Else
+			Monmessage =  sNomPoliceCursive &amp; &quot; : &quot; &amp; sVocab(iLang,428)
+			MsgBox(Monmessage , 64 + 0 , &quot;Dmaths installation&quot;)	
+			Exit Sub
+		Endif
+	Endif
+	
+	MonDocument = StarDeskTop.CurrentComponent
+	CurseurVisible = MonDocument.currentcontroller.ViewCursor
+	PoliceDefaut = CurseurVisible.CharFontName
+	MonTexte = CurseurVisible.Text
+	If CurseurVisible.IsCollapsed Then
+	&apos;crée et positionne le curseur permettant de récupérer le format (1 ligne)
+	CurseurFormat = MonTexte.createTextCursorByRange(CurseurVisible)
+	CurseurFormat.GoLeft(1,TRUE)
+	CurseurFormat.CharFontName = sNomPoliceCursive
+	CurseurFormat.GoRight(1,False)
+	Else &apos;met en italique la partie sélectionnée
+	CurseurVisible.CharFontName = sNomPoliceCursive
+	CurseurVisible.CollapseToEnd
+	Endif
+	If CurseurVisible.IsAtEndOfLine Then CurseurVisible.CharFontName = PoliceDefaut
+End Sub
+
+Function PoliceScriptTrouvee(sLeNomPoliceScript as String) as Boolean rem Détecte la présence de Atalante
+	Dim oWindow    &apos;The container window supports the awt XDevice interface.
+	Dim oDescript  &apos;Array of awt FontDescriptor structures
+  	Dim s$         &apos;Temporary string variable to hold all of the string names.
+  	Dim i%         &apos;General index variable
+  	Dim Presente as Boolean
+
+	Presente = False
+	oWindow = ThisComponent.getCurrentController().getFrame().getContainerWindow()
+  	oDescript = oWindow.getFontDescriptors()
+ 	s = &quot;&quot;
+
+	For i = LBound(oDescript) to UBound(oDescript)
+    	s = s &amp; oDescript(i).Name &amp; &quot;, &quot;
+    	If oDescript(i).Name = sLeNomPoliceScript Then Presente = True  
+  	Next
+  	PoliceScriptTrouvee = Presente
+End Function
+
+Sub Aide
+	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+	mFileProperties(0).Name=&quot;MacroExecutionMode&quot;
+	mFileProperties(0).Value=com.sun.star.document.MacroExecMode.ALWAYS_EXECUTE_NO_WARN
+	Dim oDesktop,oDocument as object
+	Dim mNoArgs()
+		Call VerifOperationnel
+		oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+		sUrl=fChemindmaths+&quot;userguides/&quot;+sVocab(iLang,216)
+		oDocument=oDesktop.loadComponentFromUrl(sUrl,&quot;_blank&quot;,0, mFileProperties())
+End Sub
+
+Sub FAQ
+&apos;Macro enregistrée : jeudi 23 fevrier 2006
+	Dim oDesktop,oDocument as object
+	Dim mNoArgs()
+	Call VerifOperationnel
+	oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	sUrl=fChemindmaths+&quot;Faq/&quot;+sVocab(iLang,404)
+	oDocument=oDesktop.loadComponentFromUrl(sUrl,&quot;_blank&quot;,0, mNoArgs())
+End Sub
+
+
+Sub FormulaReference
+&apos;Macro écrite le vendredi 17 mars 2006, , modifiee le 30 septembre 2012
+	Call VerifOperationnel
+	Dim oDesktop,oDocument as object
+	Dim mNoArgs()
+	Call VerifOperationnel
+	oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	If iLang = 0 Then
+	sUrl = fChemindmaths+&quot;userguides/MG35FR-MathGuide.odt&quot;
+	Else
+	sUrl = fChemindmaths+&quot;userguides/MG35-MathGuide_LO.odt&quot;
+	Endif
+	oDocument=oDesktop.loadComponentFromUrl(sUrl,&quot;_blank&quot;,0, mNoArgs())
+End Sub
+	
+Sub ReglesTypoGraphiques rem macro ecrite le 14 decembre 2008 permet d ouvrir les fichiers sur les regles typographiques
+	Dim sUrl as String
+	dim sFilePickerArgs as Variant
+	dim oFilePicker as Object
+	Call VerifOperationnel
+	sUrl = fChemindmaths + &quot;userguides&quot; &amp; getPathseparator &amp; &quot;reglestypo&quot;
+	If FileExists(sUrl) Then
+		sFilePickerArgs = Array(com.sun.star.ui.dialogs.TemplateDescription.FILEOPEN_SIMPLE )
+		oFilePicker = CreateUnoService( &quot;com.sun.star.ui.dialogs.FilePicker&quot; )
+		oFilePicker.setTitle( &quot;Regles typographiques&quot; )	
+		oFilePicker.setDisplayDirectory(ConvertToUrl(sUrl))
+		If oFilePicker.execute() Then
+			On Error Goto ImpLancer 
+			Dim sys As Object
+			Dim iFlags As Integer
+			sys = CreateUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+			iFlags = com.sun.star.system.SystemShellExecuteFlags.NO_SYSTEM_ERROR_MESSAGE &apos; = 0
+			sys.execute(ConvertToUrl(oFilePicker.Files(0)),&quot; &quot;, iFlags)
+			Exit Sub
+			ImpLancer:
+			MsgBox(&quot;  Dmaths n&apos;a pas pu ouvrir le fichier  &quot;,48,&quot;Dmaths&quot;)
+		Endif 
+	Else
+		MsgBox(&quot;  Répertoire des règles typographiques non trouvé  &quot;,48,&quot;Dmaths&quot;)
+	Endif
+End Sub
+
+rem cette fonction charge un modele avec ses macros actives
+Function ChargeModele(SonChemin As String) As Object
+		Dim mFileProperties(1) As New com.sun.star.beans.PropertyValue
+		oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+		mFileProperties(0).Name = &quot;MacroExecutionMode&quot;
+		mFileProperties(0).Value = com.sun.star.document.MacroExecMode.ALWAYS_EXECUTE_NO_WARN
+		mFileProperties(1).Name = &quot;AsTemplate&quot;
+		mFileProperties(1).Value = True
+		ChargeModele = oDesktop.LoadComponentFromURL(SonChemin,&quot;_blank&quot;,0,mFileProperties())
+End Function
+
+Sub LanceMiliFred
+	Dim oDocument as Object
+	Call VerifOperationnel
+	oDocumentCourant = ThisComponent	
+	sGraphPlotter = fChemindmaths + &quot;milifred.otg&quot;
+	oDocument = ChargeModele(sGraphPlotter)
+End Sub
+
+Sub FermeMilifred
+	Dim oMaGrille, goDoc as Object
+	On error resume Next
+
+	For I = 0 To ThisComponent.Drawpages(0).Count-1
+		If ThisComponent.Drawpages(0).getByIndex(I).getImplementationName = &quot;SvxShape&quot; Then	
+			oMaGrille = ThisComponent.Drawpages(0).getByIndex(I)
+		End if
+	Next I
+	goDoc = ThisComponent 
+	If Not IsEmpty(oMaGrille) Then 
+	goDoc.CurrentController.Select(oMaGrille)
+	ClipboardCopy(goDoc)	
+	ClipboardPaste(oDocumentCourant)
+	End if
+	goDoc.Dispose()
+	On error Goto 0 
+
+End Sub
+
+Sub LanceBPH
+	Call VerifOperationnel
+	Dim oDocument as Object
+	sGraphPlotter=fChemindmaths+&quot;BPH.ots&quot;
+	oDocument = ChargeModele(sGraphPlotter)
+End Sub
+
+Sub Lancefitoo
+	Call VerifOperationnel
+	Dim oDocument as Object
+	sGraphPlotter=fChemindmaths+&quot;fitoo.ots&quot;
+	oDocument = ChargeModele(sGraphPlotter)
+End Sub
+
+Sub LanceBackup
+	BasicLibraries.loadLibrary(&quot;DmathsBup&quot;)
+	Call DmathsBup.Module3.Initialisation
+End Sub
+
+
+sub InsereObjetWriterdsPresentation rem cette macro permet linsertion du objet writer dans une presentation
+									rem ajoutee le 16 mai 2010
+									rem macro modifiee le 15 mars 2014 pour la version 3.5.2.4	
+	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+	Dim oWriterDocument, oDesktop as Object
+	Dim sWriterDocument as String
+	Call VerifOperationnel
+	MonDocumentImpress = ThisComponent
+	oDesktop = createUnoService(&quot;com.sun.star.frame.Desktop&quot;)
+	sWriterDocument = fChemindmaths+&quot;Writer2Impress.odt&quot;
+	oWriterDocument = oDesktop.LoadComponentFromURL(sWriterDocument,&quot;_blank&quot;,0,mFileProperties())
+End sub
+
+
+
+rem switch le mode coordonnees ligne ou colonne
+rem ancienne version release 3522
+rem modifiee le 27 decembre 2012
+&apos;Sub ChangebExecCoordColonne
+&apos;	If bOptionCoordColonneChanged = FALSE Then bExecCoordColonne = bCoordColonne Rem Initialise ce boolean 
+&apos;	bOptionCoordColonneChanged = TRUE
+&apos;	bExecCoordColonne = Not bExecCoordColonne
+&apos;	oOptionMajuscules = LoadDialog(&quot;Dmaths&quot;,&quot;OptionMajuscules&quot;)
+&apos;	If bExecCoordColonne = True Then
+&apos;		oOptionMajuscules.GetControl(&quot;Label1&quot;).Text = sVocab(iLang,234)
+&apos;	Else
+&apos;		oOptionMajuscules.GetControl(&quot;Label1&quot;).Text = sVocab(iLang,235)
+&apos;	Endif
+&apos;	oOptionMajuscules.Visible = True
+&apos;	Wait 800
+&apos;	oOptionMajuscules.Visible = False
+&apos;	oOptionMajuscules.EndExecute()
+&apos; End Sub
+
+
+Sub ChangebExecCoordColonne
+	Dim oOptionMajuscules as Object
+	If bOptionCoordColonneChanged = FALSE Then bExecCoordColonne = bCoordColonne Rem Initialise ce boolean 
+	bOptionCoordColonneChanged = TRUE
+	bExecCoordColonne = Not bExecCoordColonne
+	If  bExecCoordColonne = True Then AvertirTemp(&quot;Label4&quot;) Else AvertirTemp(&quot;Label5&quot;)
+End Sub
+
+
+rem ancienne version release 3522
+&apos;Sub ChangebExecOptionMajusculesItalic
+&apos;	Dim oOptionMajuscules as Object
+&apos;	If bOptionMajusculesItalicChanged = FALSE Then bMajusculesItalic = bOptionMajusculesItalic Rem Initialise ce boolean 
+&apos;	bOptionMajusculesItalicChanged = TRUE
+&apos;	bMajusculesItalic = Not bMajusculesItalic
+&apos;	oOptionMajuscules = LoadDialog(&quot;Dmaths&quot;,&quot;OptionMajuscules&quot;)
+&apos;	If bMajusculesItalic = True Then
+&apos;		oOptionMajuscules.GetControl(&quot;Label1&quot;).Text = sVocab(iLang,232)
+&apos;	Else
+&apos;		oOptionMajuscules.GetControl(&quot;Label1&quot;).Text = sVocab(iLang,233)
+&apos;	Endif
+&apos;	oOptionMajuscules.Visible = True
+&apos;	Wait 800
+&apos;	oOptionMajuscules.Visible = False
+&apos;	oOptionMajuscules.EndExecute()
+&apos;End Sub
+
+rem version proposee par Michael Bussow le 16 fevrier 2014
+Sub ChangebExecOptionMajusculesItalic
+	Dim oOptionMajuscules as Object
+	If bOptionMajusculesItalicChanged = FALSE Then bMajusculesItalic = bOptionMajusculesItalic Rem Initialise ce boolean 
+	bOptionMajusculesItalicChanged = TRUE
+	bMajusculesItalic = Not bMajusculesItalic
+	If bMajusculesItalic = True Then AvertirTemp(&quot;Label2&quot;) Else AvertirTemp(&quot;Label3&quot;)
+End Sub
+
+
+&apos; cette fonction convertit la plupart des caractères nationaux ( en, fr, d, es, it notamment )
+&apos; utilise deux tables dépendant du jeu de caractères en cours : listeCar et CarUTF8
+&apos; arg2 : conversion de certains caractères en entités caractères xml prédéfinies
+Function convertToUTF8(unTexte As String, entites As Boolean) As String
+	Dim x1 As Integer, y2 As Integer
+	Dim Texte8 As String, c1 As String
+	Dim xmlEntites()
+	Const listeEntites = &quot;&amp;&apos;&gt;&lt;&quot;&quot;&quot; &apos; caractères en conflit avec des délimiteurs de balisage
+	
+	xmlEntites = Array(&quot;&amp;amp;&quot;, &quot;&amp;apos;&quot;, &quot;&amp;gt;&quot;, &quot;&amp;lt;&quot;, &quot;&amp;quot;&quot;)
+	Texte8 = &quot;&quot;
+	for x1 = 1 to Len(unTexte)
+	  c1 = Mid(unTexte, x1, 1)
+	  if entites then
+	    y2 = InStr(1, listeEntites, c1, 0)
+	    if y2 &gt; 0 then
+	      Texte8 = Texte8 &amp; xmlEntites(y2 -1)
+	    else &apos; conversion éventuelle en UTF-8
+	      if ASC(c1) &lt; 128 then
+	        Texte8 = Texte8 &amp; c1 &apos; code UTF-8 identique au code ASCII
+	      else
+	        y2 = Instr(1, listeCar, c1, 0)
+	        if y2 &gt; 0 then
+	          Texte8 = Texte8 &amp; Mid(CarUTF8, y2, 2) &apos; equivalent UTF-8 ( deux octets )
+	        else
+	          Texte8 = Texte8 &amp; &quot;?&quot; &apos; caractère non traduit en UTF-8
+	        end if
+	      end if
+	    end if
+	  end if
+	next
+	convertToUTF8 = Texte8
+End Function
+
+
+Function GetRepertoirePath(sInstPath as String) as String &apos;donne le répertoire correspondant
+	Dim  oPathSubstSrv as Object
+	Dim sPath as String
+		sInstPath = &quot;$(&quot;+sInstPath+&quot;)&quot;
+		oPathSubstSrv = createUnoService(&quot;com.sun.star.comp.framework.PathSubstitution&quot;)
+		sPath = ConvertFromUrl(oPathSubstSrv.getSubstituteVariableValue(sInstPath))
+		GetRepertoirePath = sPath
+End Function
+
+&apos;--------------------------------------------------------------------------------------------------
+
+Function ControleDroits(byVal optional LeChemin as string) as boolean
+	on error goto PasDroit
+		leChemin=convertToURL(leChemin)+&quot;/&quot;
+	open  leChemin+&quot;temp&quot; for output as #1
+		Print #1,cstr(now)
+	close #1
+	Kill LeChemin+&quot;temp&quot;
+	ControleDroits=True
+	Exit function
+	PasDroit:
+	ControleDroits=false
+end function
+
+Function GetConfigAccess( ByVal cNodePath As String,ByVal bWriteAccess As Boolean,Optional bEnableSync,Optional bLazyWrite) As Object
+	If IsMissing(bEnableSync) Then 	bEnableSync = True 
+	If IsMissing( bLazyWrite ) Then bLazyWrite = False
+	Dim oConfigProvider, oConfigAccess as Object
+	oConfigProvider = GetProcessServiceManager.createInstanceWithArguments(&quot;com.sun.star.configuration.ConfigurationProvider&quot;,Array( MakePropertyValue( &quot;enableasync&quot;, bEnableSync)))
+	If bWriteAccess Then
+		cServiceName = &quot;com.sun.star.configuration.ConfigurationUpdateAccess&quot;
+	Else
+		cServiceName = &quot;com.sun.star.configuration.ConfigurationAccess&quot;
+	EndIf
+	oConfigAccess = oConfigProvider.createInstanceWithArguments( cServiceName, Array( MakePropertyValue( &quot;nodepath&quot;, cNodePath ), MakePropertyValue( &quot;lazywrite&quot;, bLazyWrite )))
+	GetConfigAccess() = oConfigAccess
+End Function
+
+&apos;----------
+&apos;	Create and return a new com.sun.star.beans.PropertyValue.
+&apos;
+Function MakePropertyValue( Optional cName As String, Optional uValue ) As com.sun.star.beans.PropertyValue
+	Dim oPropertyValue As New com.sun.star.beans.PropertyValue
+	If Not IsMissing( cName ) Then
+		oPropertyValue.Name = cName
+	EndIf
+	If Not IsMissing( uValue ) Then
+		oPropertyValue.Value = uValue
+	EndIf
+	MakePropertyValue() = oPropertyValue
+End Function
+
+
+
+Rem ces macros permettent de convertir une zone en adresse textuelle 
+Function adrZoneString(maDoc As Object, adrZone As Object) As String
+	Dim resu As String
+	resu = alphaXY(adrZone.StartColumn, adrZone.StartRow)&amp;&quot;:&quot;&amp; alphaXY(adrZone.EndColumn, adrZone.EndRow)
+	adrZoneString = resu
+End Function
+
+
+&apos; convertit une adresse de cellule en adresse textuelle
+Function adresseString(maDoc As Object, adrCellule As Object) As String
+	adresseString = maDoc.Sheets(adrCellule.Sheet).Name &amp; &quot;.&quot; &amp; alphaXY(adrCellule.Column, adrCellule.Row)
+End Function
+
+
+&apos; convertit une coordonnée XY en coordonnée alphanumérique
+Function alphaXY(X As Long, Y As Long) As String
+	if (Y&gt;=0) and (Y&lt;32000) then
+	  alphaXY = lettreColonne(X) &amp; CStr(Y +1)
+	else
+	  alphaXY = lettreColonne(X) &amp; &quot;??&quot;
+	end if
+End Function
+
+
+&apos; convertit numéro de colonne 0...255 en lettres A...IV
+Function lettreColonne(n As Long) As String
+	Select Case n
+	Case &gt; 255
+	  lettreColonne = &quot;??&quot;
+	Case &lt; 0
+	  lettreColonne = &quot;??&quot;
+	Case &lt; 26
+	  lettreColonne = _Lettre(n)
+	Case Else
+	  lettreColonne = _Lettre((n \ 26) -1) &amp; _Lettre(n Mod 26)
+	End Select
+End Function
+
+&apos; fonction interne
+Function _Lettre(p As Long) As String
+_Lettre = chr(Asc(&quot;A&quot;) +p)
+End Function
+
+Sub Display_Dmaths_barre
+	Dim sUrl as String
+	oFrame = ThisComponent.CurrentController.Frame
+	layout = oFrame.LayoutManager
+	oConfigAccess = GetConfigAccess(&quot;/org.openoffice.Office.UI.WriterWindowState/UIElements/States&quot;, True )	
+	If oConfigAccess.HasByName( &quot;private:resource/toolbar/addon_org.openoffice.Office.addon.DMathsBarre&quot;) Then
+		sUrl=&quot;private:resource/toolbar/addon_org.openoffice.Office.addon.DMathsBarre&quot;
+	Endif
+	If layout.IsElementVisible(sUrl) Then
+	layout.hideElement(sUrl)
+	Else
+	layout.showElement(sUrl)
+	Endif 
+End Sub
+
+Sub Display_Gdmath_barre
+	Dim sUrl, sUrl1 as String
+	oFrame = ThisComponent.CurrentController.Frame
+	layout = oFrame.LayoutManager
+	oConfigAccess = GetConfigAccess(&quot;/org.openoffice.Office.UI.WriterWindowState/UIElements/States&quot;, True )	
+	If oConfigAccess.HasByName( &quot;private:resource/toolbar/addon_org.openoffice.Office.addon.OOoGdmathBarre1&quot;) Then
+		sUrl=&quot;private:resource/toolbar/addon_org.openoffice.Office.addon.OOoGdmathBarre1&quot;
+	EndIf
+	If oConfigAccess.HasByName( &quot;private:resource/toolbar/addon_org.openoffice.Office.addon.OOoTep-Gdmath&quot;) Then
+		sUrl1=&quot;private:resource/toolbar/addon_org.openoffice.Office.addon.OOoTep-Gdmath&quot;
+	Endif
+	If layout.IsElementVisible(sUrl) Then
+	layout.hideElement(sUrl)
+	layout.hideElement(sUrl1)
+	Else
+	layout.showElement(sUrl)
+	layout.showElement(sUrl1)
+	Endif 
+End Sub
+
+Sub Display_AHmath3D_barre
+	Dim sUrl as String
+	oFrame = ThisComponent.CurrentController.Frame
+	layout = oFrame.LayoutManager
+	oConfigAccess = GetConfigAccess(&quot;/org.openoffice.Office.UI.WriterWindowState/UIElements/States&quot;, True )	
+	If oConfigAccess.HasByName( &quot;private:resource/toolbar/addon_org.openoffice.Office.addon.OOoAHmath3D.OfficeToolBar&quot;) Then
+		sUrl=&quot;private:resource/toolbar/addon_org.openoffice.Office.addon.OOoAHmath3D.OfficeToolBar&quot;
+	Endif
+	If layout.IsElementVisible(sUrl) Then
+	layout.hideElement(sUrl)
+	Else
+	layout.showElement(sUrl)
+	Endif 
+End Sub
+
+Sub VerifOperationnel
+	
+	If bOptionCoordColonneChanged = FALSE Then bExecCoordColonne = bCoordColonne Rem Initialise ce boolean 
+	If bOptionMajusculesItalicChanged = FALSE Then bMajusculesItalic = bOptionMajusculesItalic Rem Initialise ce boolean 
+	
+	If DictionnaireCharge = False Then Call ChargementDuDictionnaire rem on charge le dictionnaire si pas encore fait
+	Dim MyLibStandard as Object
+	On error resume next
+	MyLibStandard = Globalscope.BasicLibraries.Standard
+	BasicLibraries.LoadLibrary(MyLibStandard)
+	
+&apos;	Print iNumVersionDmathsNew
+&apos;	Print iNumVersionDmathsCourante
+	
+	If (MyLibStandard.hasByName(&quot;DmOptions&quot;) and iNombreInstallDmOptions = 0) Then
+	
+		If 	iNumVersionDmathsNew &lt;&gt; iNumVersionDmathsCourante Then 
+			BasicLibraries.loadLibrary(&quot;DmInstall&quot;)
+			Call DmInstall.Install_Addon.LanceFinInstallation(TRUE)  rem le parametre est True si on met à jour	
+		Endif			
+	Else	
+		BasicLibraries.loadLibrary(&quot;DmInstall&quot;)	
+		Call DmInstall.Install_Addon.LanceFinInstallation(FALSE) rem le parametre est False si ne met pas à jour		
+	Endif
+
+	If ((Len(MyLibStandard.getByName(&quot;DmOptions&quot;)) &lt; 10) or (Len(cstr(iTailleFormules)) = 0)) Then rem installe dmoptions si module Dmoptions vide
+		BasicLibraries.loadLibrary(&quot;DmInstall&quot;)
+		&apos;Print &quot;passe&quot;
+		iNombreInstallDmOptions = iNombreInstallDmOptions + 1 rem ce parametre compte le nombre dinstalation des options faites a partir de options.txt
+		CloseAndLaunchOOo.InstallDmOptions
+	Else
+		iNombreInstallDmOptions = 0 rem on remet les compteurs à 0 si pas doptions reinstallee
+	Endif
+	On error goto 0
+End Sub
+
+
+
+Function OOoNumVersion() As Integer
+  &apos;Retreives the running OOO version
+  Dim aSettings, aConfigProvider
+  Dim aParams2(0) As new com.sun.star.beans.PropertyValue
+  Dim sProvider$, sAccess$
+  sProvider = &quot;com.sun.star.configuration.ConfigurationProvider&quot;
+  sAccess   = &quot;com.sun.star.configuration.ConfigurationAccess&quot;
+  aConfigProvider = createUnoService(sProvider)
+  aParams2(0).Name = &quot;nodepath&quot;
+  aParams2(0).Value = &quot;/org.openoffice.Setup/Product&quot;
+  aSettings = aConfigProvider.createInstanceWithArguments(sAccess, aParams2())
+  If aSettings.hasbyname(&quot;ooSetupVersionAboutBox&quot;) Then
+  sOOOVersion = aSettings.getbyname(&quot;ooSetupVersionAboutBox&quot;)
+  Else
+  sOOOVersion = aSettings.getbyname(&quot;ooSetupVersion&quot;)
+  EndIf
+  If Len(sOOOVersion) = 3 Then sOOOVersion = sOOOVersion &amp; &quot;.0&quot;
+  OOoNumVersion = Cint(Mid(sOOOVersion,1,1))*100 + Cint(Mid(sOOOVersion,3,1))*10 + Cint(Mid(sOOOVersion,5,1))  
+End Function
+
+Function OOoName As String
+  &apos;Retreives the running OOO version
+  Dim aSettings, aConfigProvider
+  Dim aParams2(0) As new com.sun.star.beans.PropertyValue
+  Dim sProvider$, sAccess$
+  sProvider = &quot;com.sun.star.configuration.ConfigurationProvider&quot;
+  sAccess   = &quot;com.sun.star.configuration.ConfigurationAccess&quot;
+  aConfigProvider = createUnoService(sProvider)
+  aParams2(0).Name = &quot;nodepath&quot;
+  aParams2(0).Value = &quot;/org.openoffice.Setup/Product&quot;
+  aSettings = aConfigProvider.createInstanceWithArguments(sAccess, aParams2())
+&apos;  Print aSettings.getbyname(&quot;ooName&quot;)
+  OOoName = aSettings.getbyname(&quot;ooName&quot;)
+End Function
+
+
+
+
+rem cette fonction convertit un entier dans son ecriture en base 100
+
+function ConvertEntier(iEntier as integer) as String
+	ConvertEntier = cStr(iEntier)
+	If iEntier &lt; 10 Then ConvertEntier = &quot;0&quot;&amp;ConvertEntier
+end function
+
+Function Arrondir(x as Double, nbre as integer) rem cette fonction arrondi les singles
+	Dim y as Double
+	y = Int(x*10^nbre+0.5)/(10^nbre)
+	Arrondir = y
+End Function
+
+
+Function FileExistsLG(myURL) as boolean
+	on error goto outWithError
+	oFileRead = createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	FichInput = oFileRead.openfileread(convertToURL(myURL))
+	FileExistsLG = true
+	exit function
+	outWithError:
+	FileExistsLG = false
+End Function
+
+Sub FileCopyLG(src as string, dst as string, optional pgb)
+
+	dim oFileRead, FichInput
+	dim oFileWrite, FichOut
+	dim unTab(), unTab2()
+	dim BlockRead as long
+	dim MajPgb as boolean
+	
+	BlockRead=10240
+	MajPgb= Not IsMissing(pgb)
+	
+		oFileRead = createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+		FichInput = oFileRead.openfileread(convertToURL(src))
+		oFileWrite=createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+		FichOut=oFileWrite.openfilewrite(convertToURL(dst))
+		
+	retour=BlockRead
+	
+	while retour=BlockRead
+		&apos;redim untab()
+		retour=fichInput.readbytes(unTab,BlockRead)
+		if retour=BlockRead then
+			FichOut.writebytes(unTab())
+		else
+			redim untab2(0 to retour-1)
+			for i=0 to retour-1
+				untab2(i)=untab(i)
+			next i
+			FichOut.writebytes(unTab2())
+		endif
+		if MajPgb then
+			pgb.setvalue(pgb.value+retour)	
+		endif
+	wend
+	
+	fichInput.closeinput
+	fichout.closeoutput
+end sub
+
+
+Function DetermineOS as Integer rem renvoie 1 si win, 3 si Mac, 4 si Linux
+	If GetGuiType = 1 Then
+		DetermineOS = 1
+	ElseIf GetGuiType = 3 or (GetGuiType = 4 and FileExists(&quot;/Users&quot;)) Then
+		DetermineOS = 3
+	Else
+		DetermineOS = 4
+	Endif
+End Function
+
+Function IsMacOS as Boolean	
+	If GetGuiType = 3 or (GetGuiType = 4 and FileExists(&quot;/Users&quot;)) Then IsMacOS = True Else IsMacOS = False
+End Function
+
+Function GetDocumentFrame( oDoc As Object ) As Object
+   Dim oFrame As Object
+   Dim oCtrl As Object
+   
+   &apos; If the caller gave us the document model...
+   If oDoc.supportsService( &quot;com.sun.star.document.OfficeDocument&quot; ) Then
+      &apos; ...then get the controller from that.
+      oCtrl = oDoc.getCurrentController()
+      &apos; ...then get the frame from the controller.
+      oFrame = oCtrl.getFrame()
+
+   &apos; If the caller gave us a document controller...
+   ElseIf HasUnoInterfaces( oDoc, &quot;com.sun.star.frame.XController&quot; ) Then
+      oCtrl = oDoc
+      &apos; ...then get the frame from the controller.
+      oFrame = oCtrl.getFrame()
+   
+   &apos; If the caller gave us the document frame...
+   ElseIf HasUnoInterfaces( oDoc, &quot;com.sun.star.frame.XFrame&quot; ) Then
+      &apos; ...thanks!  That&apos;s just what we wanted!
+      oFrame = oDoc
+   
+   Else
+      &apos; The caller did not give us what we expected!
+      MsgBox( &quot;GetDocumentFrame called with incorrect parameter.&quot; )
+   EndIf
+   
+   GetDocumentFrame() = oFrame
+End Function
+
+
+
+&apos;----------
+&apos; An easy to use Dispatch on an office document.
+&apos; Arguments are similar to the args for the com.sun.star.frame.XDispatchHelper
+&apos;  interface of com.sun.star.frame.DispatchHelper.
+&apos; What makes this so easy to use are two things:
+&apos;   1. The fact that the oDocumentFrame parameter can actually accept
+&apos;      either the document model or one of its controllers.
+&apos;   2. The optional parameters.
+&apos; For an example of how simple this routine is to use, see
+&apos;  routines such as ClipboardCopy().
+&apos;
+&apos; Parameters:
+&apos;      oDocumentFrame      -   An office document frame.
+&apos;                        But wait!  It could be the document controller
+&apos;                         or the document model.  This routine will find
+&apos;                         the document frame from either of these.
+&apos;      cURL            -   The dispatch URL.
+&apos; Optional:
+&apos;      cTargetFrameName   -   Defaults to blank.
+&apos;      nSearchFlags      -   Defaults to zero.
+&apos;      aDispatchArgs      -   Defaults an an empty sequence.
+&apos;
+Sub DocumentDispatch( ByVal oDocumentFrame As Object,_
+                  ByVal cURL As String,_
+                  Optional cTargetFrameName,_
+                  Optional nSearchFlags,_
+                  Optional aDispatchArgs )
+
+   dim oDispatchHelper   
+
+   &apos; If they gave us the wrong parameter...
+   If Not HasUnoInterfaces( oDocumentFrame, &quot;com.sun.star.frame.XFrame&quot; ) Then
+      &apos; Be sure that we&apos;ve got the document frame.
+      &apos; Someone might have passed us the document model or one of
+      &apos;  its controller&apos;s.
+      oDocumentFrame = GetDocumentFrame( oDocumentFrame )
+   EndIf
+   
+   If IsMissing( cTargetFrameName ) Then
+      cTargetFrameName = &quot;&quot;
+   EndIf
+   If IsMissing( nSearchFlags ) Then
+      nSearchFlags = 0
+   EndIf
+   If IsMissing( aDispatchArgs ) Then
+      aDispatchArgs = Array()
+   EndIf
+   
+   oDispatchHelper = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+   oDispatchHelper.executeDispatch( oDocumentFrame, cURL, cTargetFrameName, nSearchFlags, aDispatchArgs )
+End Sub
+
+&apos;############################################################
+&apos;   Clipboard manipulation
+&apos;############################################################
+
+Sub ClipboardPaste( oDocumentFrame )
+   DocumentDispatch( oDocumentFrame, &quot;.uno:Paste&quot; )
+End Sub
+
+Sub ClipboardPasteSpecial( oDocumentFrame )
+	dim args1(0) as new com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;SelectedFormat&quot;
+	args1(0).Value = 3
+   DocumentDispatch( oDocumentFrame,&quot;.uno:ClipboardFormatItems&quot;, &quot;&quot;, 0, args1() )
+End Sub
+
+Sub ClipboardCopy( oDocumentFrame )
+   DocumentDispatch( oDocumentFrame, &quot;.uno:Copy&quot; )
+End Sub
+
+Sub ClipboardCut( oDocumentFrame )
+   DocumentDispatch( oDocumentFrame, &quot;.uno:Cut&quot; )
+End Sub
+	
+Sub ToucheEchap ( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:Escape&quot; )
+End Sub 
+
+Sub ToucheSuppr ( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:Delete&quot; )
+End Sub 
+
+Sub ToucheUndo ( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:Undo&quot; )
+End Sub 
+
+Sub GrouperDansWriter ( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:FormatGroup&quot; )
+End Sub
+
+Sub SelectionnerDansWriter ( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:SelectObject&quot; )
+End Sub
+
+Sub AttributsParDefaut(oDocumentFrame)
+	DocumentDispatch( oDocumentFrame, &quot;.uno:ResetAttributes&quot; )
+End Sub
+
+Sub InsereLigneDansTableau( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:InsertRows&quot;)
+End Sub
+
+Sub LanceMacroDansDocument ( oDocumentFrame, sLaMacro )
+	DocumentDispatch( oDocumentFrame, &quot;macro://&quot; &amp; sLaMacro )
+End Sub
+
+Rem -----------------------------------------------------------------------------------------------------
+Sub DispatchSimple(Commande As String, Optional fenetre As Variant)
+Dim disp as object, noArgs()
+
+if IsMissing(fenetre)  then
+  fenetre = StarDesktop.CurrentFrame
+end if
+disp = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+On Error GoTo dispErr1
+disp.executeDispatch(fenetre, &quot;.uno:&quot; &amp; Commande, &quot;&quot;, 0, noArgs)
+Suite:
+On Error GoTo 0
+Exit Sub
+
+dispErr1:
+  MsgBox(&quot;Commande inconnue : &quot; &amp; Commande, 16)
+  Resume Suite
+End Sub
+
+Rem -----------------------------------------------------------------------------------------------------
+
+Function fCheminAddonDmaths() as String rem écrite par Didier Dorange-Pattoret modifiée le 17 novembre 2014
+		Dim GetPIP as Object
+	  	GetPIP = GetDefaultContext.getValueByName(&quot;/singletons/com.sun.star.deployment.PackageInformationProvider&quot;) 
+	  	fCheminAddonDmaths = GetPIP.getPackageLocation(&quot;Dmaths&quot;) &amp;&quot;/&quot;		
+End Function
+
+
+Function fCheminDmaths() as String rem écrite par Didier Dorange-Pattoret modifiée le 25 février 2013
+		Dim GetPIP as Object, repExt as String
+	  	GetPIP = GetDefaultContext.getValueByName(&quot;/singletons/com.sun.star.deployment.PackageInformationProvider&quot;) 
+	  &apos;	MRI GetPIP
+	  	repExt = GetPIP.getPackageLocation(&quot;Dmaths&quot;)
+		fCheminDmaths = repExt &amp; &quot;/Fichiers/&quot;	
+End Function
+
+Function fCheminduFichierDmathsODS as String rem cette fonction donne le chemin du fichier dmaths.ods utilise pour les tracer point par point
+	If  TestInstallRezo   Then
+		fCheminduFichierDmathsODS = ConvertToURL(GetRepertoirePath(&quot;user&quot;)+&quot;/dmaths/dmaths.ods&quot;)
+	Else
+		fCheminduFichierDmathsODS = fCheminDmaths &amp; &quot;dmaths.ods&quot;
+	EndIf
+End function
+
+rem cette fonction retourne True pour les installation multi-utilisateurs.
+Function TestInstallRezo as Boolean
+		Dim LeTest As Boolean
+		Dim oAC As Object
+		LeTest = False 
+ 		oCmdEnv = CreateUnoListener( &quot;CmdEnv_&quot;, _
+    		&quot;com.sun.star.deployment.XCommandEnvironment&quot; )
+ 		GetPMF = GetDefaultContext.getValueByName( _
+    		&quot;/singletons/com.sun.star.deployment.thePackageManagerFactory&quot;)    
+    	oPackages = GetPMF.getPackageManager(&quot;shared&quot;).getDeployedPackages(oAc,oCmdEnv)  
+	   	For I = LBound(oPackages) To UBound(oPackages)
+   			If oPackages(I).Name = &quot;DmathsAddon.oxt&quot; Then 
+   				LeTest = True
+   			Endif
+   		Next I
+   		TestInstallRezo = LeTest	
+End Function
+</script:module>

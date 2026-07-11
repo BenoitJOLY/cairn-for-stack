@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="DivisionCode" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Option Explicit
+
+Global oDivisionForm as object
+
+Sub Main
+	oDivisionForm = LoadDialog(&quot;OOoGdmath&quot;,&quot;DivisionForm&quot;)
+	ChangeTitreDialog(oDivisionForm)
+&apos;	RestaureForm(oDivisionForm)
+	oDivisionForm.Execute()
+End Sub
+
+Private Sub DivisionCode_CheckBox1_Click()
+    oDivisionForm.Model.TextBox4.Enabled = oDivisionForm.Model.CheckBox1.State
+End Sub
+
+Private Sub DivisionCode_CommandButton1_Click()
+Dim quot, DD, d, param() as string
+
+    oDivisionForm.EndExecute
+	sauveForm(oDivisionForm)
+	quot=oDivisionForm.Model.TextBox1.Text
+	if val(quot)&lt;&gt;0 and instr(1,quot,&quot;/&quot;)&gt;0 then
+		ChargeParametre quot, param(), &quot;/&quot;
+		DD=param(0)
+		d=param(1)
+	    RemplaceVirgulePoint DD
+	    DD=trim(str(val(DD)))	&apos;Ignorieren unzulässiger Zeichen
+	    RemplaceVirgulePoint d
+	    d=trim(str(val(d)))	&apos;Ignorieren unzulässiger Zeichen
+	    if val(d)&lt;&gt;0 then InsereDivisionEntiere DD, d, MIif(oDivisionForm.Model.CheckBox1.State, MIif(oDivisionForm.Model.TextBox4.Text = &quot;&quot;, &quot;.&quot;, oDivisionForm.Model.TextBox4.Text), &quot;&quot;)
+	end if
+End Sub
+
+Private Sub DivisionCode_CommandButton2_Click()
+    oDivisionForm.EndExecute
+End Sub
+
+Private Sub DivisionCode_Image1_Click()
+    ChangeCouleur oDivisionForm.Model.Image1
+End Sub
+
+Private Sub DivisionCode_TextBox4_Change()
+    oDivisionForm.Model.TextBox4.Text = Left$(oDivisionForm.Model.TextBox4.Text, 1)
+End Sub
+
+Private Sub DivisionForm_ScrollBar1()
+dim dez as string
+
+	dez=oDivisionForm.Model.ScrollBar1.ScrollValue
+	oDivisionForm.Model.TextBox3.Text=dez
+
+End Sub
+
+Private Sub DivisionForm_ScrollBar1_Mouse()
+    oDivisionForm.Model.ScrollBar1.Scrollvalue= oDivisionForm.Model.TextBox3.Text
+End Sub
+
+
+Sub InsereDivisionEntiere(DD, d, OperationTrou)
+Dim l,h, nchiffre, nchiffred, nchiffreq, nDD, zz, Q, qq$, Debut, DD1, nchiffred_ori 
+Dim restei, qqTempo$, i, DD2, qi, di$, j, v, vz
+Dim Shapes as Object
+DIM vert as boolean
+DIM DD_ori,DD_ohne, d_ori, DDTemp$, dTemp$ as string
+
+	InitialiseDessin(False)
+    Shapes=InitialiseGroupe
+    DimensionTexte &quot;8&quot;,12,l,h
+    vert= oDivisionForm.Model.OptionButton1.State
+	vz=&quot;&quot; &apos;Vorzeichen des Ergebnisses
+	v=0 &apos; Versatz für ursprüngliche Aufgabe
+    nchiffre = Val(oDivisionForm.Model.TextBox3.Text)
+    sci2dec DD &apos;Umwandeln wissenschaftliche Zahldarstellung in dezimal
+    nchiffred = InStr(1, DD, &quot;.&quot;)
+    If nchiffred &lt;&gt; 0 Then nchiffred = Len(DD) - nchiffred	&apos;Dezimalstellen Dividend
+    sci2dec d
+    nchiffreq = InStr(1, d, &quot;.&quot;)
+    If nchiffreq &lt;&gt; 0 Then nchiffreq = Len(d) - nchiffreq	&apos;Dezimalstellen Divisor
+	DD_ori=MIif(nchiffred=0,DD,left(DD,len(DD)-nchiffred-1)) &amp; right(DD,nchiffred)
+	d_ori=MIif(nchiffreq=0,d,left(d,len(d)-nchiffreq-1)) &amp; right(d,nchiffreq)
+	nchiffred_ori=nchiffred
+    If nchiffreq &gt; 0 Then	&apos;Erweitern auf ganzzahligen Divisor
+        DD = Trim(Val(DD) * 10 ^ nchiffreq)
+        RemplaceVirgulePoint DD
+        sci2dec DD
+        d = Trim(Val(d) * 10 ^ nchiffreq)
+        nchiffred = InStr(1, DD, &quot;.&quot;)
+        If nchiffred &lt;&gt; 0 Then nchiffred = Len(DD) - nchiffred
+    End If
+    if val(DD)&lt;0 then
+    	DD=mid(DD,2)
+    	vz=&quot;-&quot;
+    end if
+    if val(d)&lt;0 then
+    	d=mid(d,2)
+    	vz=MIif(vz=&quot;&quot;,&quot;-&quot;,&quot;&quot;)
+    end if
+    
+    If nchiffre &lt; nchiffred Then nchiffre = nchiffred &apos; mindestens Genauigkeit der Operanden
+    If nchiffred&gt;0 then DD=left(DD,len(DD)-nchiffred-1) &amp; right(DD,nchiffred)
+	DD_ohne=DD
+	For i=1 to nchiffre-nchiffred
+		DD=DD &amp; &quot;0&quot;
+	Next i
+    qq$ = Trim(Str(Int(Val(DD) / Val(d))))
+    do while len(qq$)&lt;=nchiffre
+    	qq$ = &quot;0&quot; &amp; qq$
+    loop  
+    Debut = Len(DD) - Len(qq$)
+    DD1 = Left$(DD, Debut)
+	if not vert and (nchiffreq&gt;0 or val(d_ori)&lt;0) then &apos;ursprüngliche Aufgabe
+	    AfficheTexte Len(DD_ori)+2-Debut, 1, DD_ori &amp; &quot;:&quot;, nchiffred_ori &gt; 0, nchiffred_ori+1, Shapes,l,h
+	    if val(d_ori)&gt;0 then 
+		    AfficheTexte Len(DD_ori) +3-Debut+  Len(d_ori), 1,  d_ori &amp; &quot;=&quot;, nchiffreq &gt; 0, nchiffreq+1, Shapes,l,h
+		    else	&apos;mathematisch korrekt mit Klammern
+		    AfficheTexte Len(DD_ori) +5-Debut+  Len(d_ori), 1,  &quot;(&quot; &amp; d_ori &amp; &quot;)&quot; &amp; &quot;=&quot;, nchiffreq &gt; 0, nchiffreq+2, Shapes,l,h
+		end if
+		v=1
+	end if
+	DDTemp$=DD_ohne
+	dTemp$=d
+    if vert then
+		InsereLigne 2*l * (Len(vz &amp; DD)  - Debut+1.2), h*(1+0.2), 2*l * (Len(vz &amp; DD)  - Debut+1.2), h*(3), Shapes, oDivisionForm.Model.Image1
+	    InsereLigne 2*l * (Len(vz &amp; DD)  - Debut+1.2), h*(2), 2*l * (Len(vz &amp; DD)  - Debut + Len(d)+1.5), h*(2), Shapes, oDivisionForm.Model.Image1
+	    AfficheTexte Len(vz &amp; DD) + 1 - Debut, 1, vz &amp; DD, nchiffre &gt; 0, nchiffre, Shapes,l,h
+	    AfficheTexte Len(vz &amp; DD) + 2 - Debut + Len(d), 1, d, False, 0, Shapes,l,h
+	else
+	    if v=1 and OperationTrou &lt;&gt; &quot;&quot; then &apos;
+	    	RemplaceChiffreCaractere DDTemp$, OperationTrou
+	    	RemplaceChiffreCaractere dTemp$, OperationTrou
+	    end if
+	    AfficheTexte Len(vz &amp; DD_ohne) + 2 - Debut, 1+v, vz &amp; DDTemp$ &amp; &quot;:&quot;, nchiffred &gt; 0, nchiffred+1, Shapes,l,h
+	    AfficheTexte Len(vz &amp; DD_ohne) + 3 - Debut + Len(d), 1+v, dTemp$ &amp; &quot;=&quot;, False, 0, Shapes,l,h
+    end if
+    qqTempo$ = qq$
+    If OperationTrou &lt;&gt; &quot;&quot; Then
+       RemplaceChiffreCaractere qq$, OperationTrou
+    end if
+    &apos;Ergebnisanzeige
+    if vert then
+       AfficheTexte Len(vz &amp; DD) + 2 - Debut + Len(vz &amp; qq$), 2, vz &amp; qq$, nchiffre &gt; 0, nchiffre, Shapes,l,h
+	else
+	   &apos;AfficheTexte Len(DD_ohne) + 3 - Debut + len(d) + Len(qq$), 1, qq$, nchiffre &gt; 0, nchiffre, Shapes,l,h
+	   AfficheTexte Len(vz &amp; DD_ohne) + 3 - Debut + len(d) + Len(vz &amp; qq$), 1+v, vz &amp; qq$, nchiffre &gt; 0, nchiffre, Shapes,l,h
+	end if
+    qq$ = qqTempo$
+    For i = 1 To Len(qq)
+       DD2 = DD1 &amp; Mid$(DD, Debut + i, 1)
+       qi = Mid$(qq$, i, 1)
+       di$ = Str(Val(qi) * Val(d))
+       di$ = Right$(di, Len(di$) - 1)
+       restei = Str(Val(DD2) - Val(di$))
+       DD1 = Right$(restei, Len(restei) - 1)
+       For j = 1 To Len(DD2) - Len(di$)
+           di$ = &quot; &quot; &amp; di$
+       Next j
+       If i = Len(qq$) Then
+           AfficheDivisionP i + 1, 2 * i+v, di$, DD1 &amp; &quot; &quot;, OperationTrou,Shapes,l,h
+       Else
+           AfficheDivisionP i + 1, 2 * i+v, di$, DD1 &amp; Mid$(DD, Debut + i + 1, 1), OperationTrou,Shapes,l,h
+       End If
+    Next i
+
+	Dim aPoint As New com.sun.star.awt.Point
+	Dim TheSize as new com.sun.star.awt.Size
+	Dim Group as Object
+    
+	aPoint.x=3000
+	aPoint.y=3000
+	Group = GroupeObjet(Shapes)
+	Group.Position=aPoint
+	TermineDessin()
+
+End Sub
+
+Sub AfficheDivisionP(x, y, d$, r$, OperationTrou,Shapes,l,h)
+    
+    If oDivisionForm.Model.CheckBox2.State Then
+        If OperationTrou &lt;&gt; &quot;&quot; Then RemplaceChiffreCaractere d$, OperationTrou
+        AfficheTexte x, y, &quot;-&quot; &amp; d$, False, 0, Shapes,l,h
+        if right(r$,1)=&quot; &quot; then        
+	        InsereLigne 2*l * (x - 1 - Len(d$)),  h * (y + 1), 2*l * (x),  h * (y + 1), Shapes, oDivisionForm.Model.Image1
+	    else
+	        InsereLigne 2*l * (x - 1 - Len(d$)),  h * (y + 1), 2*l * (x+1),  h * (y + 1), Shapes, oDivisionForm.Model.Image1	       
+	    end if
+    End If
+    If OperationTrou &lt;&gt; &quot;&quot; Then RemplaceChiffreCaractere r$, OperationTrou
+    If oDivisionForm.Model.CheckBox2.State Then
+        AfficheTexte x + 1, y+1, r$, False, 0, Shapes,l,h
+    Else
+        AfficheTexte x + 1, Int((y) / 2+0.5)+1, r$, False, 0, Shapes,l,h
+    End If
+End Sub
+
+Sub sci2dec(nombre)
+DIM n as integer
+DIM x,y
+DIM vz
+	vz=&quot;&quot;
+	nombre=trim(nombre)
+	n= instr(nombre,&quot;E&quot;)
+	if n&gt;0 then
+		x=left(nombre,n-1)
+		y=val(mid(nombre,n+1))
+		if left(x,1)=&quot;-&quot; then 
+			vz=&quot;-&quot;
+			x=mid(x,2)
+		end if
+		n=len(x)-instr(x,&quot;.&quot;)
+		if n&gt;0 then
+			x=left(x,1) &amp; mid(x,3)
+		end if
+		if y&lt;0 then
+			x=&quot;0.&quot; &amp; string(-1-y,&quot;0&quot;) &amp; x
+		  else
+		  	if n&gt;y then
+		  		n=n-y
+		  		x=left(x,len(x)-n) &amp; &quot;.&quot; &amp; right(x,n)
+		  		else
+		  		x=x &amp; string(y-n,&quot;0&quot;)
+		  	end if
+		end if
+		nombre=vz &amp; x
+	end if
+End Sub
+
+
+</script:module>

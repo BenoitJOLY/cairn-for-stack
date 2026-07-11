@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396296  -->
+  <question type="stack">
+    <name>
+      <text>Suites : Terme général d'une suite arithmétique</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Suites numériques — Terme général</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit \((U_n)\) une suite arithmétique de raison \(r\) telle que :</p>
+<div style="display: flex; gap: 30px; justify-content: center; margin: 15px 0; flex-wrap: wrap;">
+<div>\(U_0 = {@U0@}\)</div>
+<div>\(U_{@k@} = {@Uk@}\)</div>
+</div>
+<p><strong>1.</strong> Déterminer l'expression du terme général \(U_n\) en fonction de \(n\).</p>
+<div style="margin: 10px 0;">\(U_n = \) [[input:ans_un]] [[validation:ans_un]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour une suite arithmétique, le terme général est donné par la formule :<br><br>
+\[
+U_n = U_0 + n \times r
+\]<br>
+<strong>1. Calcul de la raison \(r\) :</strong><br>
+On sait que \(U_{@k@} = U_0 + {@k@} \times r\), donc :<br>
+\[
+{@Uk@} = {@U0@} + {@k@}r \iff {@k@}r = {@Uk@} - ({@U0@}) \iff {@k@}r = {@Uk_m_U0@}
+\]
+\[
+r = \frac{@Uk_m_U0@}{@k@} = {@r@}
+\]<br>
+<strong>2. Expression de \(U_n\) :</strong><br>
+En remplaçant dans la formule générale, on obtient :<br>
+\[
+U_n = {@U0@} + n \times {@r@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>/* Fonction utilitaire */
+ri(a,b) := a + floor(rand((b-a+1)));
+
+/* Génération des paramètres */
+U0: ri(-5,5);
+k: ri(2,5);
+r: ri(-5,5);
+
+/* Sécurité : on s'assure que la raison n'est pas nulle */
+while r = 0 do (
+    r: ri(-5,5)
+);
+
+/* Calcul des valeurs */
+Uk: U0 + k*r;
+Uk_m_U0: Uk - U0;
+
+/* Réponses attendues et erreurs classiques */
+ans_correct: U0 + n*r;
+/* Erreur 1 : A inversé la différence lors du calcul de r (U0 - Uk au lieu de Uk - U0) */
+err_inv: U0 - n*r;
+/* Erreur 2 : A écrit la constante Uk au lieu de l'expression en fonction de n */
+err_const: Uk;
+/* Erreur 3 : A inversé le premier terme et la raison dans la formule */
+err_swap: r + n*U0;
+/* Erreur 4 : A oublié de multiplier la raison par n */
+err_nok: U0 + r;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>U0={@U0@}, k={@k@}, Uk={@Uk@}, r={@r@}, Un={@U0@}+{@r@}n</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:suites-arithmetique-un</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_un</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>U0 + n*r</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_un</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Le terme général de la suite est correct.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : Différence inversée dans le calcul de r</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_un</sans>
+        <tans>err_inv</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-INV</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Signe de la raison inversé !</strong> Vous avez probablement calculé \(r = \frac{U_0 - U_{@k@}}{@k@}\) au lieu de \(r = \frac{U_{@k@} - U_0}{@k@}\). Vérifiez le sens de votre soustraction.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-INV</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : A donné une constante (Uk) au lieu de l'expression</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_un</sans>
+        <tans>err_const</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-CONST</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Pas de variable \(n\) !</strong> Votre réponse est une constante (en l'occurrence \(U_{@k@}\)). On vous demande le terme <strong>général</strong> \(U_n\), qui doit être une expression contenant la lettre \(n\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-CONST</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : A inversé U0 et r dans la formule</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_un</sans>
+        <tans>err_swap</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SWAP</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Rôle inversé !</strong> Dans la formule \(U_n = U_0 + n \times r\), le premier terme \(U_0\) ne multiplie pas \(n\). Vous avez inversé le premier terme et la raison.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SWAP</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur : A oublié de multiplier r par n</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_un</sans>
+        <tans>err_nok</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-NOK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli du facteur \(n\) !</strong> Vous avez écrit \(U_n = U_0 + r\). La raison doit être multipliée par le rang \(n\) : \(U_n = U_0 + n \times r\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la méthode :<br>1. Calculez la raison : \(r = \frac{U_{@k@} - U_0}{@k@}\)<br>2. Appliquez la formule : \(U_n = U_0 + n \times r\)<br><em>(Attention à bien saisir le signe " * " pour la multiplication si nécessaire).</em></div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

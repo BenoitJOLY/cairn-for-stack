@@ -1,0 +1,336 @@
+// ── XML GENERATORS: changement de base ──
+// Logique et PRT alignes sur les exports reels valides Moodle
+// (test/mise a jour/Informatique/Conversion base N/*.xml) : conversion
+// via liste de chiffres + methode de Horner (base -> decimal) et divisions
+// successives (decimal -> base), generalisees a une base source et une
+// base cible quelconques (2 a 36), avec diagnostics d'erreurs frequentes.
+
+function genBasen(X) {
+    var gv = function(id) { var el = document.getElementById(id); return el ? el.value : ''; };
+
+    var format     = gv('bn-format')   || 'S';
+    var fromBase   = parseInt(gv('bn-from-base')) || 10;
+    var toBase     = parseInt(gv('bn-to-base'))   || 2;
+    var valueMode  = gv('bn-value-mode') || 'fixe';
+    var valueBase  = gv('bn-value-base') || 'depart';
+    var bareme     = parseFloat(gv('bn-bareme'))   || 1;
+    var fbOk       = gv('bn-fb-ok');
+    var fbWrong    = gv('bn-fb-wrong');
+    var text       = richVal('bn-text');
+
+    // Largeur fixe (nombre de chiffres imposé, complete de zeros devant) : n'a de sens
+    // que si la reponse attendue est dans une autre base que 10 (sinon ignoree).
+    var fixedWidthRaw = parseInt(gv('bn-fixed-width'));
+    var fixedWidth = (toBase !== 10 && fixedWidthRaw > 0) ? fixedWidthRaw : 0;
+
+    var baseName = function(b) {
+        return b===2?'binaire':b===8?'octal':b===10?'décimal':b===16?'hexadécimal':'base '+b;
+    };
+
+    // La notation ne concerne que la base d'arrivee (c'est la reponse attendue de l'eleve) :
+    // la valeur de depart est toujours affichee en notation suffixe simple.
+    var toBaseFormat = (format === 'C' && (toBase === 2 || toBase === 8 || toBase === 16)) ? 'C' : 'S';
+    var prefix = (toBaseFormat === 'C') ? (toBase === 2 ? '0b' : toBase === 8 ? '0o' : '0x') : '';
+
+    var vVal  = 'q' + X + '_val';
+    var vSym  = 'q' + X + '_sym';
+    var vDigitFn  = 'q' + X + '_digitlist';
+    var vListFn   = 'q' + X + '_liststr';
+    var vHornerFn = 'q' + X + '_horner';
+    var vSrcDigits = 'q' + X + '_srcdigits';
+    var vSrcStr    = 'q' + X + '_srcstr';
+    var vDstDigits = 'q' + X + '_dstdigits';
+    var vDstRaw    = 'q' + X + '_dstraw';
+    var vDstStr    = 'q' + X + '_dststr';
+    var vDstStrRev = 'q' + X + '_dststrrev';
+    var vLower     = 'q' + X + '_lower';
+    var vHasSpace  = 'q' + X + '_hasspace';
+    var vHasPrefix = 'q' + X + '_hasprefix';
+    var vHasLetters= 'q' + X + '_hasletters';
+    var vLeadZero  = 'q' + X + '_leadzero';
+    var vValidChars= 'q' + X + '_validchars';
+
+    var vMisread10 = 'q' + X + '_misread10';
+    var vSrcRevVal = 'q' + X + '_srcrevval';
+
+    // Expression Maxima de la valeur decimale de base (vVal) : litteral fixe ou tirage aleatoire.
+    var valExpr;
+    if (valueMode === 'aleatoire') {
+        var bnMin = parseInt(gv('bn-value-min'));
+        var bnMax = parseInt(gv('bn-value-max'));
+        if (isNaN(bnMin)) bnMin = 0;
+        if (isNaN(bnMax)) bnMax = bnMin + 1;
+        if (bnMax < bnMin) { var bnTmp = bnMin; bnMin = bnMax; bnMax = bnTmp; }
+        valExpr = bnMin + '+rand(' + (bnMax - bnMin + 1) + ')';
+    } else {
+        var chosenBase = (valueBase === 'arrivee') ? toBase : fromBase;
+        var parsedVal = bnStrictParse(gv('bn-value'), chosenBase);
+        valExpr = String(parsedVal === null ? 42 : parsedVal);
+    }
+
+    var qvars = vSym + ': charlist("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");\n'
+        + vDigitFn + '(qval, qbase) := block([q: qval, res: []],\n'
+        + '    if q = 0 then return([0]),\n'
+        + '    while q > 0 do (\n'
+        + '        res: cons(mod(q, qbase), res),\n'
+        + '        q: quotient(q, qbase)\n'
+        + '    ),\n'
+        + '    res\n'
+        + ');\n'
+        + vListFn + '(lst) := simplode(map(lambda([d], ' + vSym + '[d+1]), lst));\n'
+        + vHornerFn + '(lst, qbase) := block([res: 0], for d in lst do res: res*qbase + d, res);\n'
+        + vVal + ': ' + valExpr + ';\n';
+
+    // ── Representation de la valeur de depart (affichee a l eleve) ──
+    if (fromBase === 10) {
+        qvars += vSrcStr + ': string(' + vVal + ');\n';
+    } else {
+        qvars += vSrcDigits + ': ' + vDigitFn + '(' + vVal + ', ' + fromBase + ');\n'
+            + vSrcStr + ': ' + vListFn + '(' + vSrcDigits + ');\n';
+    }
+
+    // ── Representation de la reponse attendue (base d arrivee) ──
+    // Charset des caracteres valides, calcule cote JS (base connue a la generation) :
+    // utilise plus bas pour construire les diagnostics (feedbackvariables), sans jamais
+    // passer par une regex Maxima reconstruite au runtime (charlist/makelist/sconcat
+    // produisait une classe de caracteres avec doublons -- source du bug ou une reponse
+    // valide, ex. "101011" en base 2, etait signalee comme "caracteres invalides").
+    var charsetList = (toBase !== 10)
+        ? ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, toBase) + '0123456789abcdefghijklmnopqrstuvwxyz'.slice(0, toBase))
+        : '';
+    var charsetListLiteral = '[' + charsetList.split('').map(function(c){ return '"' + c + '"'; }).join(',') + ']';
+
+    if (toBase === 10) {
+        qvars += vDstStr + ': string(' + vVal + ');\n';
+    } else {
+        qvars += vDstDigits + ': ' + vDigitFn + '(' + vVal + ', ' + toBase + ');\n'
+            + vDstRaw + ': ' + vListFn + '(' + vDstDigits + ');\n';
+        if (fixedWidth > 0) {
+            // Complete la reponse attendue avec des zeros devant pour atteindre la largeur imposee.
+            qvars += vDstRaw + ': sconcat(smake(max(0, ' + fixedWidth + ' - slength(' + vDstRaw + ')), "0"), ' + vDstRaw + ');\n';
+        }
+        qvars += vDstStr + ': sconcat("' + prefix + '", ' + vDstRaw + ');\n'
+            + vDstStrRev + ': sconcat("' + prefix + '", sreverse(' + vDstRaw + '));\n'
+            + vLower + ': sdowncase(' + vDstStr + ');\n';
+    }
+
+    // ── Pieges classiques utilises seulement quand la base d arrivee est 10 ──
+    if (toBase === 10 && fromBase !== 10) {
+        qvars += vMisread10 + ': ' + vHornerFn + '(' + vSrcDigits + ', 10);\n'
+            + vSrcRevVal + ': ' + vHornerFn + '(reverse(' + vSrcDigits + '), ' + fromBase + ');\n';
+    }
+
+    // ── Rappel du format de saisie attendu (toujours affiche a l eleve) ──
+    // Reutilise bnSyntaxHint (basen-ui.js) : source unique du texte, partagee avec
+    // l'apercu de l'onglet Config pour eviter que les deux textes divergent.
+    var syntaxHint = (typeof bnSyntaxHint === 'function')
+        ? bnSyntaxHint(format, toBase, fixedWidth)
+        : 'Notation attendue : voir les consignes ci-dessus.';
+    // Affiche en texte simple juste AVANT la zone de saisie (qui doit rester la
+    // toute derniere chose avant le feedback) : le champ <syntaxhint> du STACK
+    // <input> reste vide (sinon STACK pre-remplit la zone de reponse avec ce
+    // texte, que l'eleve doit effacer avant de taper sa reponse).
+    var conseilsHTML = '<p style="font-size:.85em;color:#374151;">' + syntaxHint + '</p>';
+
+    var HDR = '<div style="background:#1e3a8a;border-left:5px solid #1d4ed8;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Numération — Conversion en ' + baseName(toBase) + '</strong>'
+        + ' <span style="background:#1d4ed8;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
+        + ' <span style="background:#ffffff;color:#1d4ed8;border:1px solid #1d4ed8;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🔢 Base ' + toBase + '</span></div>';
+
+    var widthUnit = (toBase === 2) ? 'bit' : 'chiffre';
+    var instrText = HDR + (text || ('<p>Convertir <strong>{@' + vSrcStr + '@}</strong>'
+        + (fromBase !== 10 ? ' (base ' + fromBase + ')' : '')
+        + ' en <strong>' + baseName(toBase) + '</strong> (base ' + toBase + ')'
+        + (fixedWidth > 0 ? ' sur ' + fixedWidth + ' ' + widthUnit + (fixedWidth > 1 ? 's' : '') : '')
+        + '.</p>'));
+
+    // ── Feedback general automatique, mirroring des exports reels ──
+    var autoFb;
+    if (toBase === 10) {
+        autoFb = '<p>Pour convertir {@' + vSrcStr + '@} (base ' + fromBase + ') vers le décimal, on multiplie chaque chiffre '
+            + 'par la puissance de ' + fromBase + ' correspondant a son rang, puis on additionne le tout.</p>'
+            + '<p>{@' + vSrcStr + '@}<sub>' + fromBase + '</sub> = {@' + vVal + '@}<sub>10</sub></p>';
+    } else {
+        autoFb = '<p>Pour convertir {@' + vSrcStr + '@} en base ' + toBase + ', on effectue des divisions successives par ' + toBase + '. '
+            + 'Le résultat se lit en remontant les restes (du dernier au premier).</p>'
+            + '<p>{@' + vSrcStr + '@}<sub>' + fromBase + '</sub> = {@' + vDstStr + '@}<sub>' + toBase + '</sub></p>';
+    }
+
+    // ── Type et tans de l input ──
+    var inputType, tansMaxima;
+    if (toBase === 10) {
+        inputType = 'algebraic';
+        tansMaxima = vVal;
+    } else {
+        inputType = 'string';
+        tansMaxima = vDstStr;
+    }
+
+    var inputXML = '<input><name>ans' + X + '</name>'
+        + '<type>' + inputType + '</type><tans>' + tansMaxima + '</tans>'
+        + '<boxsize>15</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars>'
+        + '<syntaxhint></syntaxhint><syntaxattribute>0</syntaxattribute>'
+        + '<forbidwords></forbidwords><allowwords></allowwords>'
+        + '<forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms>'
+        + '<checkanswertype>0</checkanswertype><mustverify>0</mustverify>'
+        + '<showvalidation>1</showvalidation><options></options></input>';
+
+    // ── Construction des noeuds du PRT ──
+    var nodes = [];
+    var fbVars = '';
+    var fbOkFinal = fbOk || '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Correct !</strong> La conversion est bonne.</div>';
+    var fbWrongFinal = fbWrong || ('<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Le resultat attendu etait <code>{@'
+        + (toBase === 10 ? vVal : vDstStr) + '@}</code>.</div>');
+
+    if (toBase === 10) {
+        nodes.push({ desc: 'Reponse exacte', test: 'EqualComAss', tans: vVal, fb: fbOkFinal, isCorrect: true });
+        if (fromBase !== 10) {
+            nodes.push({
+                desc: 'Lecture comme un nombre decimal', test: 'EqualComAss', tans: vMisread10,
+                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de base.</strong> Vous avez calcule comme si le nombre etait en base 10. C\'est un nombre en <strong>base ' + fromBase + '</strong>, il faut utiliser des puissances de ' + fromBase + ' !</div>'
+            });
+            nodes.push({
+                desc: 'Poids des chiffres inverses', test: 'EqualComAss', tans: vSrcRevVal,
+                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de sens de lecture.</strong> Le chiffre le plus a droite vaut toujours ' + fromBase + '<sup>0</sup>, le suivant vers la gauche ' + fromBase + '<sup>1</sup>, etc.</div>'
+            });
+        }
+        // Noeud "attrape-tout" toujours vrai (EqualComAss 1=1) : pas besoin de regex ici,
+        // ce noeud ne sert qu'a afficher le feedback generique quand aucun autre noeud
+        // au-dessus n'a matche.
+        nodes.push({ desc: 'Erreur de calcul generique', test: 'EqualComAss', sans: '1', tans: '1', fb: fbWrongFinal, isFinal: true });
+    } else {
+        // ── Diagnostics de format calcules en Maxima (feedbackvariables), pas en RegExp ──
+        // Chaque diagnostic est un booleen precalcule via des fonctions de chaine simples
+        // (ssearch/charlist/member/sublist), teste ensuite par un noeud EqualComAss contre
+        // "true". On evite ainsi toute regex reconstruite au runtime (source du bug ou une
+        // reponse valide, ex. "101011" en base 2, etait signalee comme invalide).
+        var ansVar = 'ans' + X;
+        fbVars += vHasSpace + ': is(ssearch(" ", ' + ansVar + ') # false);\n';
+        if (toBaseFormat === 'S') {
+            fbVars += vHasPrefix + ': is(ssearch("0b", sdowncase(' + ansVar + ')) = 1 or ssearch("0x", sdowncase(' + ansVar + ')) = 1 or ssearch("0o", sdowncase(' + ansVar + ')) = 1);\n';
+            if (toBase <= 10) {
+                fbVars += vHasLetters + ': is(sublist(charlist(' + ansVar + '), lambda([c], member(c, append(charlist("abcdefghijklmnopqrstuvwxyz"), charlist("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))))) # []);\n';
+            }
+            // Zeros inutiles au debut : diagnostic desactive quand une largeur fixe est imposee,
+            // puisque les zeros de tete sont alors exiges (et non plus une erreur).
+            if (!fixedWidth) {
+                fbVars += vLeadZero + ': if slength(' + ansVar + ') > 1 then is(first(charlist(' + ansVar + ')) = "0") else false;\n';
+            }
+        }
+        fbVars += vValidChars + ': is(sublist(charlist(' + ansVar + '), lambda([c], not member(c, ' + charsetListLiteral + '))) = []);\n';
+
+        nodes.push({ desc: 'Reponse exacte', test: 'String', tans: vDstStr, fb: fbOkFinal, isCorrect: true });
+        nodes.push({
+            desc: 'Espaces detectes', test: 'EqualComAss', sans: vHasSpace, tans: 'true',
+            fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Format incorrect.</strong> Votre reponse contient des espaces. Tapez la reponse sans aucun espace.</div>'
+        });
+        if (toBaseFormat === 'S') {
+            nodes.push({
+                desc: 'Prefixe interdit detecte', test: 'EqualComAss', sans: vHasPrefix, tans: 'true',
+                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Format incorrect.</strong> Ne mettez pas de prefixe. Tapez uniquement la suite de caracteres.</div>'
+            });
+            if (toBase <= 10) {
+                nodes.push({
+                    desc: 'Lettres interdites detectees', test: 'EqualComAss', sans: vHasLetters, tans: 'true',
+                    fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Format incorrect.</strong> La base ' + toBase + ' ne contient pas de lettres. Tapez uniquement des chiffres.</div>'
+                });
+            } else {
+                nodes.push({
+                    desc: 'Minuscules utilisees', test: 'String', tans: vLower,
+                    fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Presque correct.</strong> Le resultat semble bon, mais les lettres doivent etre en <strong>majuscules</strong>.</div>'
+                });
+            }
+            if (!fixedWidth) {
+                nodes.push({
+                    desc: 'Zeros inutiles au debut', test: 'EqualComAss', sans: vLeadZero, tans: 'true',
+                    fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Presque correct.</strong> En notation standard, on ne met pas de zero au debut. Enlevez le(s) zero(s) inutile(s).</div>'
+                });
+            }
+        }
+        nodes.push({
+            desc: 'Recopie de la valeur de depart', test: 'String', tans: vSrcStr,
+            fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Vous avez recopie la valeur de depart. La consigne demande de la convertir en base ' + toBase + '.</div>'
+        });
+        nodes.push({
+            desc: 'Restes lus a l\'envers', test: 'String', tans: vDstStrRev,
+            fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de lecture.</strong> Vous avez lu les restes dans le mauvais sens ! Il faut lire les restes de la <b>derniere</b> division jusqu\'a la <b>premiere</b>.</div>'
+        });
+        nodes.push({
+            desc: 'Caracteres valides pour la base ' + toBase, test: 'EqualComAss', sans: vValidChars, tans: 'true',
+            fb: fbWrongFinal,
+            isFinal: true,
+            falseFb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Caracteres invalides.</strong> Un nombre en base ' + toBase + ' ne doit contenir que les symboles autorises dans cette base.</div>'
+        });
+    }
+
+    // ── Noeuds PRT au format JSON canonique (meme schema que prt-manager.js) ──
+    // Le PRT manager edite un objet {meta, nodes} en memoire, jamais du XML brut ;
+    // buildPrtXml() (prt-manager.js) est le SEUL serialiseur XML, partage par tous
+    // les types migres. Ainsi la structure editee et la structure exportee sont
+    // toujours la meme representation, sans aller-retour XML fragile.
+    var canonicalNodes = nodes.map(function(nd, i) {
+        var isLast = (i === nodes.length - 1);
+        var trueScoreMode = nd.isCorrect ? '+' : '-';
+        var trueScore = nd.isCorrect ? String(bareme) : '0';
+        return {
+            name: String(i),
+            description: nd.desc,
+            answertest: nd.test,
+            sans: nd.sans || ('ans' + X),
+            tans: nd.tans,
+            testoptions: '',
+            quiet: '0',
+            truescoremode: trueScoreMode,
+            truescore: trueScore,
+            truepenalty: '',
+            truenextnode: '-1',
+            trueanswernote: 'PRT' + X + '-' + i + '-T',
+            truefeedback: nd.fb,
+            falsescoremode: '-',
+            falsescore: '0',
+            falsepenalty: '',
+            falsenextnode: isLast ? '-1' : String(i + 1),
+            falseanswernote: 'PRT' + X + '-' + i + '-F',
+            falsefeedback: nd.falseFb || ''
+        };
+    });
+    var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
+    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+
+    var questionText = instrText
+        + conseilsHTML
+        + '[[input:ans' + X + ']][[validation:ans' + X + ']]';
+
+    // ── Diagnostics intermediaires (tous les noeuds sauf le 1er "reponse exacte") ──
+    // Expose pour l'apercu : le PRT reel enchaine plusieurs noeuds de diagnostic
+    // (espaces, prefixe interdit, minuscules, zeros inutiles, recopie, ordre inverse...)
+    // qui ne rentrent pas dans le gabarit generique "2 boites Ok/Faux" utilise par les
+    // autres types (eux n'ont qu'un seul noeud PRT). Sans cette liste, ces feedbacks
+    // resteraient invisibles dans l'apercu de l'onglet Config.
+    var diagNodes = [];
+    for (var di = 1; di < nodes.length; di++) {
+        var dn = nodes[di];
+        var isLastDiag = (di === nodes.length - 1);
+        // Le dernier noeud avant fin reutilise fbWrongFinal (= la boite "Feedback si FAUX"
+        // standard) : on ne le reaffiche pas ici pour eviter un doublon dans l'apercu.
+        if (dn.fb && !(isLastDiag && dn.fb === fbWrongFinal)) diagNodes.push({ desc: dn.desc, fb: dn.fb });
+        if (dn.falseFb) diagNodes.push({ desc: dn.desc + ' (caracteres invalides)', fb: dn.falseFb });
+    }
+
+    return {
+        type:            'basen',
+        bareme:          bareme,
+        vars:            qvars,
+        qnote:           'BaseN Q' + X + ' val={@' + vVal + '@} ' + baseName(fromBase) + '->' + baseName(toBase),
+        textFrag:        questionText,
+        inputXML:        inputXML,
+        prtXML:          prtXML,
+        prt:             { meta: prtMeta, nodes: canonicalNodes },
+        generalFeedback: _mkFbGen(autoFb, gv('bn-fbgen')),
+        feedbackRef:     '[[feedback:prt' + X + ']]',
+        diagNodes:       diagNodes
+    };
+}
+// ==============================================================
+//  genCircuit -- Circuits electriques (loi d Ohm, serie, parallele)
+// ==============================================================

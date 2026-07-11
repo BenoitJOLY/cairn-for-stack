@@ -1,0 +1,1214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="mParametresFormules" script:language="StarBasic">&apos;*****  BASIC  *****
+&apos;CmathOOo
+&apos;Copyright (C) 2006  Christophe devalland
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+&apos;--------------------------------------------------------------------------------------
+
+&apos; paramètres des formules
+global bParametresInitialises as boolean
+global iMargeGauche as integer &apos; LeftMargin
+global iMargeDroite as integer &apos; RightMargin
+global iMargeHaute as integer &apos; TopMargin
+global iMargeBasse as integer &apos; BottomMargin
+global iEspacement as integer &apos; RelativeSpacing
+global iInterligne as integer &apos; RelativeLineSpacing
+global iEspRacine as integer &apos; RelativeRootSpacing
+global iIndexSub as integer &apos; RelativeIndexSubscript
+global iIndexSup as integer &apos; RelativeIndexSuperscript
+global iHauteurNumerateur as integer &apos; RelativeFractionNumeratorHeight
+global iProfondeurDenominateur as integer &apos; RelativeFractionDenominatorDepth
+global iLongueurExcessive as integer &apos; RelativeFractionBarExcessLength
+global iEpaisseurTrait as integer &apos; RelativeFractionBarLineWeight
+global iHauteurMini as integer &apos; RelativeLowerLimitDistance
+global iHauteurMaxi as integer &apos; RelativeUpperLimitDistance
+global iDepassementLateral as integer &apos; RelativeBracketExcessSize
+global iEspacementParentheses as integer &apos; RelativeBracketDistance
+global bAjusterParentheses as boolean &apos; IsScaleAllBrackets
+global iDepassement as integer &apos; RelativeScaleBracketExcessSize
+global iHauteurPrimaire as integer &apos; RelativeSymbolPrimaryHeight
+global iEspaceMinimum as integer &apos; RelativeSymbolMinimumHeight
+global iDepassementOperateur as integer &apos; RelativeOperatorExcessSize
+global iEspacementOperateur as integer &apos; RelativeOperatorSpacing
+global iInterligneMatrice as integer &apos; RelativeMatrixLineSpacing
+global iEspacementMatrice as integer &apos; RelativeMatrixColumnSpacing
+global sSymbolMultiplication as string
+global sPolice as string
+global bGras as boolean
+global iTaille as integer
+global bModeTexte as boolean
+global sTexteFormule as string
+global bBornesIntegralesVerticales as boolean
+global bMajDroite as boolean
+global biComplexe as boolean
+global beExpo as boolean
+
+
+private oLaFormule as object
+private bFormuleSelectionnee as boolean
+private sTexteFormule as string
+private oDialogParametresFormules as object
+private oImage as object
+private sCheminCmathOOo as string
+
+sub test
+ dim obj as object, oLesObjets as object, oLaFormule as object
+ dim nbOjets as integer, i as integer, iTopMargin as integer
+
+ oLesObjets=ThisComponent.getEmbeddedObjects
+ a=oLesObjets.hasByName(&quot;Objet5&quot;)
+ oLaFormule=oLesObjets.getByName(&quot;Objet5&quot;)
+ resultgetElementNames=oLesObjets.getElementNames() 
+ nbObjets=oLesObjets.count-1
+ for i=0 to nbObjets
+	oLaFormule=oLesObjets(i)
+
+	if oLaFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+		if oLaFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+	        &apos;sTexteFormule =  oLaFormule.Model.Formula
+	        iTopMargin=oLaFormule.Model.TopMargin
+	        oLaFormule.Model.TopMargin=iTopMargin+1
+	        oLaFormule.Model.TopMargin=0
+	        oLaFormule.Model.BottomMargin=5
+		endif
+	endif
+ next i	
+
+end sub
+
+Sub forceAlignement
+ dim obj as object, oLesObjets as object, oLaFormule as object
+ dim nbOjets as integer, i as integer, iTopMargin as integer
+ if OOoVersion()&lt;3.4 then
+	msgbox(&quot;Possible uniquement à partir de OOo version 3.4&quot;)
+ 	exit sub
+ endif
+ obj=ThisComponent.createInstance(&quot;com.sun.star.document.Settings&quot;)
+ obj.MathBaselineAlignment=true
+ oLesObjets=ThisComponent.getEmbeddedObjects
+ nbObjets=oLesObjets.count-1
+ for i=0 to nbObjets
+	oLaFormule=oLesObjets(i)
+	if oLaFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+		a=oLaFormule.Model &apos; ne sert à rien mais contourne un bug : la propriété  embeddedObject vaut Null au premier appel si bcp d&apos;équations à la suite
+		if oLaFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+	        &apos;sTexteFormule =  oLaFormule.Model.Formula
+	        iTopMargin=oLaFormule.Model.TopMargin
+	        oLaFormule.Model.TopMargin=iTopMargin+1
+	        oLaFormule.Model.TopMargin=0
+	        oLaFormule.Model.BottomMargin=5
+			oLaFormule.ExtendedControlOverEmbeddedObject.update()
+		endif
+	endif
+ next i	
+End sub
+
+sub forceAlignement2 &apos; gardée au cas où
+ dim obj as object, oLesObjets as object, oLaFormule as object, oTextCursor as object, oFormuleAlignee as object
+ dim nbOjets as integer, i as integer, indexFormule as integer
+ if OOoVersion()&lt;3.4 then
+	msgbox(&quot;Possible uniquement à partir de OOo version 3.4&quot;)
+ 	exit sub
+ endif
+ obj=ThisComponent.createInstance(&quot;com.sun.star.document.Settings&quot;)
+ obj.MathBaselineAlignment=true
+ oTextCursor=thisComponent.Text.createTextCursor
+ &apos;LitParametresFormules
+ oLesObjets=ThisComponent.getEmbeddedObjects
+ nbObjets=oLesObjets.count-1
+ indexFormule=0
+ for i=0 to nbObjets
+	oLaFormule=oLesObjets(indexFormule)
+	if oLaFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+		if oLaFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+       		LitParametresFormule(oCurFormule)
+			oPosFormule=oLaFormule.getAnchor().getEnd()
+			oTextCursor = oLaFormule.getAnchor().getText().createTextCursorByRange(oPosFormule)
+			oLaFormule.dispose
+			indexFormule=indexFormule-1
+			&apos;thisComponent.Text.insertString(oTextCursor,&quot;Formule alignée :&quot;,false)
+			oFormuleAlignee=InsereFormule(oTextCursor, sPolice, iTaille, bGras, sTexteFormule, bModeTexte)
+			&apos; todo : voir si encadrement
+		endif
+	endif
+	indexFormule=indexFormule+1
+ next i	
+ bParametresInitialises=false
+end sub
+
+
+Sub AffecteFormule
+	dim oPgb as object, oLesObjets as object
+	dim oViewCursor as object, oTextCursor as object
+	dim sSymbole as string, sMonEnum() as string
+	dim iNombreMax as integer, iCas as integer, i as integer, compte as integer
+	dim sDescriptionsPolices() as variant, sNomsPolices() as string
+	&apos;dim exitOK as integer
+	
+	&apos;exitOK=com.sun.star.ui.dialogs.ExecutableDialogResults.OK
+	oLaFormule=ThisComponent.getCurrentSelection()
+	if oLaFormule.getImplementationName = &quot;SwXTextEmbeddedObject&quot; then
+		&apos; une seule formule sélectionnée
+		litParametresFormule(oLaFormule.Model)
+		&apos;sPolice=oLaFormule.Model.FontNameVariables
+		&apos;iTaille=oLaFormule.Model.BaseFontHeight
+	  	&apos;bModeTexte=oLaFormule.Model.IsTextMode
+	  	&apos;bGras=oLaFormule.Model.FontFunctionsIsBold
+		&apos;sTexteFormule=oLaFormule.Model.formula
+		bFormuleSelectionnee=true
+	else
+		&apos; prendre les paramètres utilisateur
+	    oViewCursor = ThisComponent.getCurrentController().getViewCursor()
+		oTextCursor=oViewCursor.Text.createTextCursorByRange(oViewCursor)
+		sPolice=oTextCursor.CharFontName
+		iTaille=oTextCursor.CharHeight
+		bGras=False
+		LitParametresFormules
+	end if
+	DialogLibraries.LoadLibrary(&quot;CmathOOo&quot;)
+	oDialogParametresFormules = CreateUnoDialog( DialogLibraries.CmathOOo.DialogParametresFormules)
+	oDialogParametresFormules.Model.Step=1
+	sDescriptionsPolices=SortedFontDescriptors(ThisComponent,false)
+	redim sNomsPolices(ubound(sDescriptionsPolices)) as string
+	for i=0 to ubound(sDescriptionsPolices)
+		sNomsPolices(i)=sDescriptionsPolices(i).Name
+	next i
+	oDialogParametresFormules.Model.ComboBoxPolices.StringItemList=sNomsPolices
+	oDialogParametresFormules.Model.ComboBoxPolices.Text=sPolice
+
+	BasicLibraries.LoadLibrary(&quot;CmInstall&quot;)
+	sCheminCmathOOo=CmInstall.AboutCmathOOo.fCheminCmathOOo()
+	oImage = oDialogParametresFormules.Model.ImageControlParam
+	oImage.ScaleImage=false
+	oImage.ImageUrl=sCheminCmathOOo+&quot;Images/espacement.1.png&quot;
+	
+	oDialogParametresFormules.Model.TextFieldTaille.Text=iTaille
+	oDialogParametresFormules.Model.ScrollBarTaille.ScrollValueMin=1
+	oDialogParametresFormules.Model.ScrollBarTaille.ScrollValueMax=30
+	oDialogParametresFormules.Model.ScrollBarTaille.ScrollValue=iTaille
+		
+	oDialogParametresFormules.Model.ScrollBarEspacement.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarEspacement.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarEspacement.ScrollValue=iEspacement
+	oDialogParametresFormules.Model.TextFieldEspacement.Text=ltrim(str(iEspacement))
+
+	oDialogParametresFormules.Model.ScrollBarInterligne.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarInterligne.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarInterligne.ScrollValue=iInterligne
+	oDialogParametresFormules.Model.TextFieldInterligne.Text=ltrim(str(iInterligne))
+
+	oDialogParametresFormules.Model.ScrollBarEspRacine.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarEspRacine.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarEspRacine.ScrollValue=iEspRacine
+	oDialogParametresFormules.Model.TextFieldEspRacine.Text=ltrim(str(iEspRacine))
+
+	oDialogParametresFormules.Model.ScrollBarMargeDroite.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarMargeDroite.ScrollValueMax=200
+	oDialogParametresFormules.Model.ScrollBarMargeDroite.ScrollValue=iMargeDroite
+	oDialogParametresFormules.Model.TextFieldMargeDroite.Text=ltrim(str(iMargeDroite))
+		
+	oDialogParametresFormules.Model.ScrollBarMargeGauche.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarMargeGauche.ScrollValueMax=200
+	oDialogParametresFormules.Model.ScrollBarMargeGauche.ScrollValue=iMargeGauche
+	oDialogParametresFormules.Model.TextFieldMargeGauche.Text=ltrim(str(iMargeGauche))
+
+	oDialogParametresFormules.Model.ScrollBarMargeHaute.ScrollValueMax=200
+	oDialogParametresFormules.Model.ScrollBarMargeHaute.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarMargeHaute.ScrollValue=iMargeHaute
+	oDialogParametresFormules.Model.TextFieldMargeHaute.Text=ltrim(str(iMargeHaute))
+
+	oDialogParametresFormules.Model.ScrollBarMargeBasse.ScrollValueMax=200
+	oDialogParametresFormules.Model.ScrollBarMargeBasse.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarMargeBasse.ScrollValue=iMargeBasse
+	oDialogParametresFormules.Model.TextFieldMargeBasse.Text=ltrim(str(iMargeBasse))
+
+	oDialogParametresFormules.Model.ScrollBarIndexSup.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarIndexSup.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarIndexSup.ScrollValue=iIndexSup
+	oDialogParametresFormules.Model.TextFieldIndexSup.Text=ltrim(str(iIndexSup))
+
+	oDialogParametresFormules.Model.ScrollBarIndexSub.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarIndexSub.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarIndexSub.ScrollValue=iIndexSub
+	oDialogParametresFormules.Model.TextFieldIndexSub.Text=ltrim(str(iIndexSub))
+
+	oDialogParametresFormules.Model.ScrollBarHauteurNumerateur.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarHauteurNumerateur.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarHauteurNumerateur.ScrollValue=iHauteurNumerateur
+	oDialogParametresFormules.Model.TextFieldHauteurNumerateur.Text=ltrim(str(iHauteurNumerateur))
+
+	oDialogParametresFormules.Model.ScrollBarProfondeurDenominateur.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarProfondeurDenominateur.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarProfondeurDenominateur.ScrollValue=iProfondeurDenominateur
+	oDialogParametresFormules.Model.TextFieldProfondeurDenominateur.Text=ltrim(str(iProfondeurDenominateur))
+
+	oDialogParametresFormules.Model.ScrollBarLongueurExcessive.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarLongueurExcessive.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarLongueurExcessive.ScrollValue=iLongueurExcessive
+	oDialogParametresFormules.Model.TextFieldLongueurExcessive.Text=ltrim(str(iLongueurExcessive))
+
+	oDialogParametresFormules.Model.ScrollBarEpaisseurTrait.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarEpaisseurTrait.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarEpaisseurTrait.ScrollValue=iEpaisseurTrait
+	oDialogParametresFormules.Model.TextFieldEpaisseurTrait.Text=ltrim(str(iEpaisseurTrait))
+
+	oDialogParametresFormules.Model.ScrollBarHauteurMaxi.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarHauteurMaxi.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarHauteurMaxi.ScrollValue=iHauteurMaxi
+	oDialogParametresFormules.Model.TextFieldHauteurMaxi.Text=ltrim(str(iHauteurMaxi))
+
+	oDialogParametresFormules.Model.ScrollBarHauteurMini.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarHauteurMini.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarHauteurMini.ScrollValue=iHauteurMini
+	oDialogParametresFormules.Model.TextFieldHauteurMini.Text=ltrim(str(iHauteurMini))
+
+	oDialogParametresFormules.Model.ScrollBarDepassementLateral.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarDepassementLateral.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarDepassementLateral.ScrollValue=iDepassementLateral
+	oDialogParametresFormules.Model.TextFieldDepassementLateral.Text=ltrim(str(iDepassementLateral))
+
+	oDialogParametresFormules.Model.ScrollBarEspacementParentheses.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarEspacementParentheses.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarEspacementParentheses.ScrollValue=iEspacementParentheses
+	oDialogParametresFormules.Model.TextFieldEspacementParentheses.Text=ltrim(str(iEspacementParentheses))
+
+	if bAjusterParentheses=false then
+		oDialogParametresFormules.Model.CheckBoxAjusterParentheses.State=0
+	else
+		oDialogParametresFormules.Model.CheckBoxAjusterParentheses.State=1
+	endif
+
+	oDialogParametresFormules.Model.ScrollBarDepassement.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarDepassement.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarDepassement.ScrollValue=iDepassement
+	oDialogParametresFormules.Model.TextFieldDepassement.Text=ltrim(str(iDepassement))
+
+	oDialogParametresFormules.Model.ScrollBarHauteurPrimaire.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarHauteurPrimaire.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarHauteurPrimaire.ScrollValue=iHauteurPrimaire
+	oDialogParametresFormules.Model.TextFieldHauteurPrimaire.Text=ltrim(str(iHauteurPrimaire))
+
+	oDialogParametresFormules.Model.ScrollBarEspaceMinimum.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarEspaceMinimum.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarEspaceMinimum.ScrollValue=iEspaceMinimum
+	oDialogParametresFormules.Model.TextFieldEspaceMinimum.Text=ltrim(str(iEspaceMinimum))
+
+	oDialogParametresFormules.Model.ScrollBarDepassementOperateur.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarDepassementOperateur.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarDepassementOperateur.ScrollValue=iDepassementOperateur
+	oDialogParametresFormules.Model.TextFieldDepassementOperateur.Text=ltrim(str(iDepassementOperateur))
+
+	oDialogParametresFormules.Model.ScrollBarEspacementOperateur.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarEspacementOperateur.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarEspacementOperateur.ScrollValue=iEspacementOperateur
+	oDialogParametresFormules.Model.TextFieldEspacementOperateur.Text=ltrim(str(iEspacementOperateur))
+
+	oDialogParametresFormules.Model.ScrollBarInterligneMatrice.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarInterligneMatrice.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarInterligneMatrice.ScrollValue=iInterligneMatrice
+	oDialogParametresFormules.Model.TextFieldInterligneMatrice.Text=ltrim(str(iInterligneMatrice))
+
+	oDialogParametresFormules.Model.ScrollBarEspacementMatrice.ScrollValueMax=100
+	oDialogParametresFormules.Model.ScrollBarEspacementMatrice.ScrollValueMin=0
+	oDialogParametresFormules.Model.ScrollBarEspacementMatrice.ScrollValue=iEspacementMatrice
+	oDialogParametresFormules.Model.TextFieldEspacementMatrice.Text=ltrim(str(iEspacementMatrice))
+	
+	select case sSymbolMultiplication
+	case &quot; &quot;
+		oDialogParametresFormules.Model.OptionButtonAucun.State=1
+	case &quot; cdot &quot;
+		oDialogParametresFormules.Model.OptionButtonPoint.State=1
+	case &quot; times &quot;
+		oDialogParametresFormules.Model.OptionButtonCroix.State=1	
+	end select
+	
+	if bGras=false then
+		oDialogParametresFormules.Model.CheckBoxGras.State=0
+	else
+		oDialogParametresFormules.Model.CheckBoxGras.State=1
+	endif
+	
+	if bBornesIntegralesVerticales=true then
+		oDialogParametresFormules.Model.OptionButtonVerticale.State=1
+	else
+		oDialogParametresFormules.Model.OptionButtonDroite.State=1	
+	endif
+
+
+	if bMajDroite=true then
+		oDialogParametresFormules.Model.OptionButtonDroit.State=1
+	else
+		oDialogParametresFormules.Model.OptionButtonItalique.State=1	
+	endif
+
+	if biComplexe=true then
+		oDialogParametresFormules.Model.OptionButtonComplexe.State=1
+	else
+		oDialogParametresFormules.Model.OptionButtonIVariable.State=1	
+	endif
+	
+	if beExpo=true then
+		oDialogParametresFormules.Model.OptionButtoneExpo.State=1
+	else
+		oDialogParametresFormules.Model.OptionButtoneVariable.State=1	
+	endif
+	
+
+	
+	&apos;if bFormuleSelectionnee=true then
+	&apos;	oDialogParametresFormules.Model.LabelIntro.Label=&quot;Choisissez les paramètres de la formule sélectionnée. &quot; &amp; chr(13) &amp;_
+	&apos;		&quot;Après chaque modification de l&apos;une des valeurs, la formule se modifie dans le document.&quot;
+	&apos;else
+	&apos;	oDialogParametresFormules.Model.LabelIntro.Label=&quot;Choisissez les paramètres des formules. &quot; &amp; chr(13) &amp;_
+	&apos;		&quot;Les modifications seront appliquées après la fermeture de cette boîte de dialogue.&quot;	
+	&apos;end if
+	if not(IsNull(StarDesktop.CurrentFrame)) then
+		parentSize=StarDesktop.CurrentFrame.ComponentWindow.Size
+		Xpos=(parentSize.Width)-(oDialogParametresFormules.Size.Width)
+		Ypos=0
+	else
+		Xpos=0
+		Ypos=0
+	end if
+	oDialogParametresFormules.setPosSize(Xpos,Ypos,0,0,com.sun.star.awt.PosSize.POS)
+	oDialogParametresFormules.Execute()
+end sub
+	
+
+
+sub applique_params
+	dim iCas as integer
+	dim sTagArbre as string 
+	dim sTagFormule as string
+	iTaille=val(oDialogParametresFormules.Model.TextFieldTaille.Text)
+	sPolice=oDialogParametresFormules.Model.ComboBoxPolices.Text
+	if IsNumeric(iTaille) then
+		if IsNull(oLaFormule) then
+			Message=&quot;Le redimensionnement ne fonctionne pas sur un nouveau document&quot;+chr(10)
+			message=message+&quot;Veuillez enregistrer, quitter et réouvrir votre document&quot;+chr(10)
+			message=message+chr(10)+&quot;Désolé&quot;
+			msgbox message,64,&quot;problème ...&quot;
+			exit sub
+		endif
+		if oLaFormule.getImplementationName = &quot;SwXTextEmbeddedObject&quot; then
+		&apos;	un objet seul est selectionné
+			iCas=1
+			&apos; appliquer sur tout le document
+			oLaFormule=Thiscomponent
+		else
+			if thiscomponent.getcurrentcontroller.viewcursor.iscollapsed then
+				iCas=2 &apos;rien selectionné on applique à tout
+				oLaFormule=Thiscomponent
+			else
+				iCas=3 &apos;portion selectionnée
+				oLaFormule=oLaFormule.getbyIndex(0)
+				sMonEnum=oLaFormule.getAvailableServiceNames
+				oLesObjets=oLaFormule.createContentEnumeration(sMonEnum(0))
+			endif
+		endif
+		&apos;mise en place barre de progression
+		iNombreMax=Thiscomponent.drawpage.count
+		oPgb=Thiscomponent.currentcontroller.statusIndicator
+		oPgb.Start (&quot;Paramétrage en cours ...&quot;,iNombreMax)
+		oPgb.value=0
+		
+		select case iCas
+		
+			&apos;case 1:
+				&apos; ne rien faire, les modifs ont été appliquées en temps réel
+			
+				&apos;if oLaFormule.embeddedObject.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then 
+				&apos;	sTexteFormule=oLaFormule.embeddedobject.formula
+				&apos;	&apos;oLaFormule.embeddedobject.formula=&quot;&quot;
+				&apos;	oLaFormule.embeddedobject.BaseFontHeight=iTaille
+				 &apos; 	oLaFormule.EmbeddedObject.FontNameVariables=sPolice
+				 &apos; 	oLaFormule.EmbeddedObject.FontVariablesIsItalic=true
+				 &apos; 	oLaFormule.EmbeddedObject.FontNameNumbers=sPolice
+				 &apos; 	oLaFormule.EmbeddedObject.FontNameText=sPolice
+				 &apos; 	oLaFormule.EmbeddedObject.FontNameFunctions=sPolice
+				 &apos; 	oLaFormule.embeddedobject.RelativeSpacing=iEspacement
+				&apos;	oLaFormule.embeddedobject.LeftMargin=iMargeGauche
+				&apos;	oLaFormule.embeddedobject.RightMargin=iMargeDroite	  	
+				&apos;	oLaFormule.embeddedobject.formula=sTexteFormule
+				&apos;	oLaFormule.embeddedObject.setmodified(true)
+				&apos;endif	
+			case 1,2:
+				oLesObjets=oLaFormule.getEmbeddedObjects
+				for i=0 to oLesObjets.count-1
+					oPgb.value=i
+					oLaFormule=oLesObjets(i)
+					if oLaFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+						a=oLaFormule.Model &apos; ne sert à rien mais contourne un bug : la propriété Model vaut Null au premier appel si bcp d&apos;équations à la suite
+						if oLaFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+							&apos;EncadrerFormule(oLaFormule)
+							&apos; voir si le tag arbre est présent pour affecter le symboleMultiplié
+				       		sTagArbre=lireTagArbre(oLaFormule.Model)
+				       		&apos;sTagFormule=lireTagFormule(oLaFormule.Model)
+				       		if sTagArbre=&quot;&quot; then
+				       			sTexteFormule=oLaFormule.Model.formula
+				       		else
+				       			sTexteFormule=arbre2OOo(chaine2arbre(sTagArbre))
+				       		endif							
+							AffecteParametresFormule(oLaFormule.Model, oDialogParametresFormules.Model.ComboBoxPolices.Text,_
+								val(oDialogParametresFormules.Model.TextFieldTaille.Text), oDialogParametresFormules.Model.CheckBoxGras.State, sTexteFormule, oLaFormule.Model.IsTextMode)
+							&apos; préserver les tags arbre et formules
+							if sTagArbre&lt;&gt;&quot;&quot; then ecrireTagArbre(oLaFormule.Model,sTagArbre)
+							&apos;if sTagFormule&lt;&gt;&quot;&quot; then ecrireTagFormule(oLaFormule.Model,sTagFormule)
+							oLaFormule.ExtendedControlOverEmbeddedObject.update()
+							&apos;oLaFormule.Model.setmodified(true)
+							&apos;EncadrerFormule(oLaFormule)
+						endif
+					endif
+				next i	
+				oPgb.end
+			case 3:
+				compte=0
+				while oLesObjets.HasMoreElements
+					oPgb.value=clng(compte+1)
+					oLaFormule=oLesObjets.NextElement
+					if oLaFormule.getImplementationName=&quot;SwXTextEmbeddedObject&quot; then
+						a=oLaFormule.Model &apos; ne sert à rien mais contourne un bug : la propriété Model vaut Null au premier appel si bcp d&apos;équations à la suite
+						if oLaFormule.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+							&apos;EncadrerFormule(oLaFormule)
+							&apos; voir si le tag arbre est présent pour affecter le symboleMultiplié
+				       		sTagArbre=lireTagArbre(oLaFormule.Model)
+				       		&apos;sTagFormule=lireTagFormule(oLaFormule.Model)
+				       		if sTagArbre=&quot;&quot; then
+				       			sTexteFormule=oLaFormule.Model.formula
+				       		else
+				       			sTexteFormule=arbre2OOo(chaine2arbre(sTagArbre))
+				       		endif							
+							AffecteParametresFormule(oLaFormule.Model, oDialogParametresFormules.Model.ComboBoxPolices.Text,_
+								val(oDialogParametresFormules.Model.TextFieldTaille.Text), oDialogParametresFormules.Model.CheckBoxGras.State, sTexteFormule, oLaFormule.Model.IsTextMode)
+							&apos; préserver les tags arbre et formules
+							if sTagArbre&lt;&gt;&quot;&quot; then ecrireTagArbre(oLaFormule.Model,sTagArbre)
+							&apos;if sTagFormule&lt;&gt;&quot;&quot; then ecrireTagFormule(oLaFormule.Model,sTagFormule)
+							oLaFormule.ExtendedControlOverEmbeddedObject.update()
+							&apos;oLaFormule.Model.setmodified(true)
+							&apos;EncadrerFormule(oLaFormule)
+						endif
+						&apos;if oLaFormule.embeddedObject.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+						&apos;	AffecteParametresFormule(oLaFormule.EmbeddedObject, oDialogParametresFormules.Model.ComboBoxPolices.Text,_
+						&apos;		val(oDialogParametresFormules.Model.TextFieldTaille.Text), oLaFormule.embeddedobject.formula, oLaFormule.embeddedobject.IsTextMode)
+						&apos;	oLaFormule.embeddedObject.setmodified(true)
+						&apos;endif
+					endif
+				wend
+				oPgb.end
+		end select
+	endif
+	bParametresInitialises=false
+	oDialogParametresFormules.Endexecute()
+end sub
+
+sub fin_dialog
+	&apos; rétablir les paramètres utilisateur
+	bParametresInitialises=false
+	oDialogParametresFormules.Endexecute()
+end sub
+
+sub boutonEspacement
+	oDialogParametresFormules.Model.Step=1
+end sub
+sub boutonBordures
+	oDialogParametresFormules.Model.Step=2
+end sub
+sub boutonIndex
+	oDialogParametresFormules.Model.Step=3
+end sub
+sub boutonFractions
+	oDialogParametresFormules.Model.Step=4
+end sub
+sub boutonLimites
+	oDialogParametresFormules.Model.Step=5
+end sub
+sub boutonParentheses
+	oDialogParametresFormules.Model.Step=6
+end sub
+sub boutonSymboles
+	oDialogParametresFormules.Model.Step=7
+end sub
+sub boutonOperateurs
+	oDialogParametresFormules.Model.Step=8
+end sub
+sub boutonMatrices
+	oDialogParametresFormules.Model.Step=9
+end sub
+
+
+function maj_image(oEvt as variant) as boolean
+	dim oControl as object
+   	dim sControl as string
+   	oControl=oEvt.source.Model
+   	sControl=oControl.Name
+   	select case sControl
+   	case &quot;TextFieldEspacement&quot;, &quot;ScrollBarEspacement&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/espacement.1.png&quot;
+   	case &quot;TextFieldInterligne&quot;, &quot;ScrollBarInterligne&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/espacement.2.png&quot;   	
+   	case &quot;TextFieldEspRacine&quot;, &quot;ScrollBarEspRacine&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/espacement.3.png&quot;   	
+
+   	case &quot;TextFieldMargeGauche&quot;, &quot;ScrollBarMargeGauche&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/bordures.1.png&quot;   	
+   	case &quot;TextFieldMargeDroite&quot;, &quot;ScrollBarMargeDroite&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/bordures.2.png&quot;   	
+   	case &quot;TextFieldMargeHaute&quot;, &quot;ScrollBarMargeHaute&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/bordures.3.png&quot;   	
+   	case &quot;TextFieldMargeBasse&quot;, &quot;ScrollBarMargeBasse&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/bordures.4.png&quot;   	
+
+   	case &quot;TextFieldIndexSup&quot;, &quot;ScrollBarIndexSup&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/index.1.png&quot;
+   	case &quot;TextFieldIndexSub&quot;, &quot;ScrollBarIndexSub&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/index.2.png&quot;   	
+
+   	case &quot;TextFieldHauteurNumerateur&quot;, &quot;ScrollBarHauteurNumerateur&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/fractions.1.png&quot;
+   	case &quot;TextFieldProfondeurDenominateur&quot;, &quot;ScrollBarProfondeurDenominateur&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/fractions.2.png&quot;
+   	case &quot;TextFieldLongueurExcessive&quot;, &quot;ScrollBarLongueurExcessive&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/fractions.3.png&quot;
+   	case &quot;TextFieldEpaisseurTrait&quot;, &quot;ScrollBarEpaisseurTrait&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/fractions.4.png&quot;
+
+   	case &quot;TextFieldHauteurMaxi&quot;, &quot;ScrollBarHauteurMaxi&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/limites.1.png&quot;
+   	case &quot;TextFieldHauteurMini&quot;, &quot;ScrollBarHauteurMini&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/limites.2.png&quot;
+
+   	case &quot;TextFieldDepassementLateral&quot;, &quot;ScrollBarDepassementLateral&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/parentheses.1.png&quot;
+   	case &quot;TextFieldEspacementParentheses&quot;, &quot;ScrollBarEspacementParentheses&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/parentheses.2.png&quot;
+   	case &quot;CheckBoxAjusterParentheses&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/parentheses.1.png&quot;
+   	case &quot;TextFieldDepassement&quot;, &quot;ScrollBarDepassement&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/parentheses.1.png&quot;
+
+   	case &quot;TextFieldHauteurPrimaire&quot;, &quot;ScrollBarHauteurPrimaire&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/symboles.1.png&quot;
+   	case &quot;TextFieldEspaceMinimum&quot;, &quot;ScrollBarEspaceMinimum&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/symboles.2.png&quot;
+		
+   	case &quot;TextFieldDepassementOperateur&quot;, &quot;ScrollBarDepassementOperateur&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/operateurs.1.png&quot;
+   	case &quot;TextFieldEspacementOperateur&quot;, &quot;ScrollBarEspacementOperateur&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/operateurs.2.png&quot;
+		
+   	case &quot;TextFieldInterligneMatrice&quot;, &quot;ScrollBarInterligneMatrice&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/matrices.1.png&quot;
+   	case &quot;TextFieldEspacementMatrice&quot;, &quot;ScrollBarEspacementMatrice&quot;
+		oImage.ImageUrl=sCheminCmathOOo+&quot;Images/matrices.2.png&quot;
+
+   	end select
+	maj_image=true
+end function
+
+
+
+
+sub ModifParamUneFormule(oEvt as object)
+	rem gestionnaire de tous les scrollbar et des TextField
+	&apos;affecte les variables publiques et modifie la formule si 1 formule sélectionnée
+	
+	dim oDialog as object
+	dim sName as string
+	&apos;dim sPolice as string
+	&apos;dim iTaille as integer
+	dim sTagArbre as string, sTagFormule as string
+	
+	oDialog=oEvt.Source.Context
+	sName=oEvt.Source.Model.Name
+	select case sName
+	case &quot;ComboBoxPolices&quot;
+		sPolice=oDialog.Model.ComboBoxPolices.Text
+	case &quot;ScrollBarTaille&quot;
+		iTaille=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldTaille.Text=ltrim(str(iTaille))	
+	case &quot;TextFieldTaille&quot;
+		if val(oDialog.Model.TextFieldTaille.Text)&lt;&gt;0 then iTaille=val(oDialog.Model.TextFieldTaille.Text)
+	case &quot;CheckBoxGras&quot;
+		if oDialog.Model.CheckBoxGras.State=0 then
+			bGras=false
+		else
+			bGras=true
+		endif
+   	case &quot;TextFieldEspacement&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iEspacement=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarEspacement.ScrollValue=iEspacement
+   	case &quot;ScrollBarEspacement&quot;
+	   	iEspacement=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldEspacement.Text=ltrim(str(iEspacement))
+
+   	case &quot;TextFieldInterligne&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iInterligne=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarInterligne.ScrollValue=iInterligne
+   	case &quot;ScrollBarInterligne&quot;
+	   	iInterligne=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldInterligne.Text=ltrim(str(iInterligne))
+
+  
+   	case &quot;TextFieldEspRacine&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iEspRacine=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarEspRacine.ScrollValue=iEspRacine
+   	case &quot;ScrollBarEspRacine&quot;
+	   	iEspRacine=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldEspRacine.Text=ltrim(str(iEspRacine))
+
+   	case &quot;TextFieldMargeDroite&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iMargeDroite=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarMargeDroite.ScrollValue=iMargeDroite
+   	case &quot;ScrollBarMargeDroite&quot;
+	   	iMargeDroite=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldMargeDroite.Text=ltrim(str(iMargeDroite))
+
+   	case &quot;TextFieldMargeGauche&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iMargeGauche=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarMargeGauche.ScrollValue=iMargeGauche
+   	case &quot;ScrollBarMargeGauche&quot;
+	   	iMargeGauche=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldMargeGauche.Text=ltrim(str(iMargeGauche))
+
+   	case &quot;TextFieldMargeHaute&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iMargeHaute=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarMargeHaute.ScrollValue=iMargeHaute
+   	case &quot;ScrollBarMargeHaute&quot;
+	   	iMargeHaute=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldMargeHaute.Text=ltrim(str(iMargeHaute))
+
+   	case &quot;TextFieldMargeBasse&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iMargeBasse=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarMargeBasse.ScrollValue=iMargeBasse
+   	case &quot;ScrollBarMargeBasse&quot;
+	   	iMargeBasse=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldMargeBasse.Text=ltrim(str(iMargeBasse))
+
+   	case &quot;TextFieldIndexSup&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iIndexSup=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarIndexSup.ScrollValue=iIndexSup
+   	case &quot;ScrollBarIndexSup&quot;
+	   	iIndexSup=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldIndexSup.Text=ltrim(str(iIndexSup))
+
+   	case &quot;TextFieldIndexSub&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iIndexSub=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarIndexSub.ScrollValue=iIndexSub
+   	case &quot;ScrollBarIndexSub&quot;
+	   	iIndexSub=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldIndexSub.Text=ltrim(str(iIndexSub))
+
+   	case &quot;TextFieldHauteurNumerateur&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iHauteurNumerateur=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarHauteurNumerateur.ScrollValue=iHauteurNumerateur
+   	case &quot;ScrollBarHauteurNumerateur&quot;
+	   	iHauteurNumerateur=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldHauteurNumerateur.Text=ltrim(str(iHauteurNumerateur))
+
+   	case &quot;TextFieldProfondeurDenominateur&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iProfondeurDenominateur=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarProfondeurDenominateur.ScrollValue=iProfondeurDenominateur
+   	case &quot;ScrollBarProfondeurDenominateur&quot;
+	   	iProfondeurDenominateur=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldProfondeurDenominateur.Text=ltrim(str(iProfondeurDenominateur))
+
+   	case &quot;TextFieldLongueurExcessive&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iLongueurExcessive=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarLongueurExcessive.ScrollValue=iLongueurExcessive
+   	case &quot;ScrollBarLongueurExcessive&quot;
+	   	iLongueurExcessive=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldLongueurExcessive.Text=ltrim(str(iLongueurExcessive))
+
+   	case &quot;TextFieldEpaisseurTrait&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iEpaisseurTrait=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarEpaisseurTrait.ScrollValue=iEpaisseurTrait
+   	case &quot;ScrollBarEpaisseurTrait&quot;
+	   	iEpaisseurTrait=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldEpaisseurTrait.Text=ltrim(str(iEpaisseurTrait))
+
+   	case &quot;TextFieldHauteurMaxi&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iHauteurMaxi=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarHauteurMaxi.ScrollValue=iHauteurMaxi
+   	case &quot;ScrollBarHauteurMaxi&quot;
+	   	iHauteurMaxi=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldHauteurMaxi.Text=ltrim(str(iHauteurMaxi))
+
+   	case &quot;TextFieldHauteurMini&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iHauteurMini=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarHauteurMini.ScrollValue=iHauteurMini
+   	case &quot;ScrollBarHauteurMini&quot;
+	   	iHauteurMini=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldHauteurMini.Text=ltrim(str(iHauteurMini))
+
+   	case &quot;TextFieldDepassementLateral&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iDepassementLateral=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarDepassementLateral.ScrollValue=iDepassementLateral
+   	case &quot;ScrollBarDepassementLateral&quot;
+	   	iDepassementLateral=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldDepassementLateral.Text=ltrim(str(iDepassementLateral))
+
+   	case &quot;TextFieldEspacementParentheses&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iEspacementParentheses=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarEspacementParentheses.ScrollValue=iEspacementParentheses
+   	case &quot;ScrollBarEspacementParentheses&quot;
+	   	iEspacementParentheses=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldEspacementParentheses.Text=ltrim(str(iEspacementParentheses))
+
+   	case &quot;CheckBoxAjusterParentheses&quot;
+		if oEvt.Source.Model.State=0 then 
+			bAjusterParentheses=false
+		else
+			bAjusterParentheses=true		
+		endif
+		
+   	case &quot;TextFieldDepassement&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iDepassement=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarDepassement.ScrollValue=iDepassement
+   	case &quot;ScrollBarDepassement&quot;
+	   	iDepassement=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldDepassement.Text=ltrim(str(iDepassement))
+
+   	case &quot;TextFieldHauteurPrimaire&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iHauteurPrimaire=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarHauteurPrimaire.ScrollValue=iHauteurPrimaire
+   	case &quot;ScrollBarHauteurPrimaire&quot;
+	   	iHauteurPrimaire=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldHauteurPrimaire.Text=ltrim(str(iHauteurPrimaire))
+
+   	case &quot;TextFieldEspaceMinimum&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iEspaceMinimum=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarEspaceMinimum.ScrollValue=iEspaceMinimum
+   	case &quot;ScrollBarEspaceMinimum&quot;
+	   	iEspaceMinimum=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldEspaceMinimum.Text=ltrim(str(iEspaceMinimum))
+
+   	case &quot;TextFieldDepassementOperateur&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iDepassementOperateur=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarDepassementOperateur.ScrollValue=iDepassementOperateur
+   	case &quot;ScrollBarDepassementOperateur&quot;
+	   	iDepassementOperateur=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldDepassementOperateur.Text=ltrim(str(iDepassementOperateur))
+
+   	case &quot;TextFieldEspacementOperateur&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iEspacementOperateur=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarEspacementOperateur.ScrollValue=iEspacementOperateur
+   	case &quot;ScrollBarEspacementOperateur&quot;
+	   	iEspacementOperateur=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldEspacementOperateur.Text=ltrim(str(iEspacementOperateur))
+
+   	case &quot;TextFieldInterligneMatrice&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iInterligneMatrice=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarInterligneMatrice.ScrollValue=iInterligneMatrice
+   	case &quot;ScrollBarInterligneMatrice&quot;
+	   	iInterligneMatrice=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldInterligneMatrice.Text=ltrim(str(iInterligneMatrice))
+
+   	case &quot;TextFieldEspacementMatrice&quot;
+		if val(oEvt.Source.Model.Text)&lt;&gt;0 then iEspacementMatrice=val(oEvt.Source.Model.Text)
+		oDialog.Model.ScrollBarEspacementMatrice.ScrollValue=iEspacementMatrice
+   	case &quot;ScrollBarEspacementMatrice&quot;
+	   	iEspacementMatrice=oEvt.Source.Model.ScrollValue
+		oDialog.Model.TextFieldEspacementMatrice.Text=ltrim(str(iEspacementMatrice))
+	case &quot;OptionButtonPoint&quot;
+		sSymbolMultiplication=&quot; cdot &quot;		
+	case &quot;OptionButtonAucun&quot;
+		sSymbolMultiplication=&quot; &quot;
+	case &quot;OptionButtonCroix&quot;
+		sSymbolMultiplication=&quot; times &quot;
+	case &quot;OptionButtonVerticale&quot;
+		bBornesIntegralesVerticales=true
+	case &quot;OptionButtonDroite&quot;
+		bBornesIntegralesVerticales=false
+	case &quot;OptionButtonDroit&quot;
+		bMajDroite=true
+	case &quot;OptionButtonItalique&quot;
+		bMajDroite=false
+	case &quot;OptionButtonComplexe&quot;
+		biComplexe=true
+	case &quot;OptionButtonIVariable&quot;
+		biComplexe=false
+	case &quot;OptionButtoneExpo&quot;
+		beExpo=true
+	case &quot;OptionButtoneVariable&quot;
+		beExpo=false
+		
+	end select
+	
+	&apos; si une seule formule est sélectionnée, appliquer tout de suite pour voir en temps réel
+	&apos; les modifications
+	if bFormuleSelectionnee=true then
+		sTagArbre=lireTagArbre(oLaFormule.Model)
+		&apos;sTagFormule=lireTagFormule(oLaFormule.Model)
+		if sTagArbre&lt;&gt;&quot;&quot; then
+			dim vArbre as variant
+			vArbre=chaine2arbre(sTagArbre)
+			sTexteFormule=arbre2OOo(chaine2arbre(sTagArbre))
+		endif							
+		AffecteParametresFormule(oLaFormule.Model, oDialog.Model.ComboBoxPolices.Text,_
+			val(oDialog.Model.TextFieldTaille.Text), bGras, sTexteFormule, oLaFormule.Model.IsTextMode)
+		&apos; préserver les tags arbre et formule
+		if sTagArbre&lt;&gt;&quot;&quot; then ecrireTagArbre(oLaFormule.Model,sTagArbre)
+		&apos;if sTagFormule&lt;&gt;&quot;&quot; then ecrireTagFormule(oLaFormule.Model,sTagFormule)
+	end if	
+end sub
+
+sub EcritParametresFormules
+			mParams.InsertParametre(&quot;sSymbolMultiplication&quot;,sSymbolMultiplication)
+			mParams.InsertParametre(&quot;iMargeGauche&quot;,iMargeGauche)
+			mParams.InsertParametre(&quot;iMargeDroite&quot;,iMargeDroite)
+			mParams.InsertParametre(&quot;iMargeHaute&quot;,iMargeHaute)
+			mParams.InsertParametre(&quot;iMargeBasse&quot;,iMargeBasse)
+			mParams.InsertParametre(&quot;iEspacement&quot;,iEspacement)
+			mParams.InsertParametre(&quot;iInterligne&quot;,iInterligne)
+			mParams.InsertParametre(&quot;iEspRacine&quot;,iEspRacine)
+			mParams.InsertParametre(&quot;iIndexSub&quot;,iIndexSub)
+			mParams.InsertParametre(&quot;iIndexSup&quot;,iIndexSup)
+			mParams.InsertParametre(&quot;iHauteurNumerateur&quot;,iHauteurNumerateur)
+			mParams.InsertParametre(&quot;iProfondeurDenominateur&quot;,iProfondeurDenominateur)
+			mParams.InsertParametre(&quot;iLongueurExcessive&quot;,iLongueurExcessive)
+			mParams.InsertParametre(&quot;iEpaisseurTrait&quot;,iEpaisseurTrait)
+			mParams.InsertParametre(&quot;iHauteurMaxi&quot;,iHauteurMaxi)
+			mParams.InsertParametre(&quot;iHauteurMini&quot;,iHauteurMini)
+			mParams.InsertParametre(&quot;iDepassementLateral&quot;,iDepassementLateral)
+			mParams.InsertParametre(&quot;iEspacementParentheses&quot;,iEspacementParentheses)
+			if bAjusterParentheses=false then
+				mParams.InsertParametre(&quot;bAjusterParentheses&quot;,&quot;false&quot;)
+			else
+				mParams.InsertParametre(&quot;bAjusterParentheses&quot;,&quot;true&quot;)			
+			endif
+			mParams.InsertParametre(&quot;iDepassement&quot;,iDepassement)
+			mParams.InsertParametre(&quot;iHauteurPrimaire&quot;,iHauteurPrimaire)
+			mParams.InsertParametre(&quot;iEspaceMinimum&quot;,iEspaceMinimum)
+			mParams.InsertParametre(&quot;iDepassementOperateur&quot;,iDepassementOperateur)
+			mParams.InsertParametre(&quot;iEspacementOperateur&quot;,iEspacementOperateur)
+			mParams.InsertParametre(&quot;iInterligneMatrice&quot;,iInterligneMatrice)
+			mParams.InsertParametre(&quot;iEspacementMatrice&quot;,iEspacementMatrice)
+			if bBornesIntegralesVerticales=false then
+				mParams.InsertParametre(&quot;bBornesIntegralesVerticales&quot;,&quot;false&quot;)
+			else
+				mParams.InsertParametre(&quot;bBornesIntegralesVerticales&quot;,&quot;true&quot;)			
+			endif
+			if bMajDroite=false then
+				mParams.InsertParametre(&quot;bMajDroite&quot;,&quot;false&quot;)
+			else
+				mParams.InsertParametre(&quot;bMajDroite&quot;,&quot;true&quot;)			
+			endif
+			if biComplexe=false then
+				mParams.InsertParametre(&quot;biComplexe&quot;,&quot;false&quot;)
+			else
+				mParams.InsertParametre(&quot;biComplexe&quot;,&quot;true&quot;)			
+			endif
+			if beExpo=false then
+				mParams.InsertParametre(&quot;beExpo&quot;,&quot;false&quot;)
+			else
+				mParams.InsertParametre(&quot;beExpo&quot;,&quot;true&quot;)			
+			endif
+					
+end sub
+
+sub ParametresFormulesParDefaut
+			mParams.InsertParametre(&quot;sSymbolMultiplication&quot;,&quot; &quot;)
+			sSymbolMultiplication=&quot; &quot;
+			iMargeGauche=100
+			mParams.InsertParametre(&quot;iMargeGauche&quot;,&quot;100&quot;)
+			iMargeDroite=100
+			mParams.InsertParametre(&quot;iMargeDroite&quot;,&quot;100&quot;)
+			iMargeHaute=0
+			mParams.InsertParametre(&quot;iMargeHaute&quot;,&quot;0&quot;)
+			iMargeBasse=5
+			mParams.InsertParametre(&quot;iMargeBasse&quot;,&quot;5&quot;)
+			iEspacement=10
+			mParams.InsertParametre(&quot;iEspacement&quot;,&quot;10&quot;)
+			iInterligne=5
+			mParams.InsertParametre(&quot;iInterligne&quot;,&quot;5&quot;)
+			iEspRacine=0
+			mParams.InsertParametre(&quot;iEspRacine&quot;,&quot;0&quot;)
+			iIndexSub=20
+			mParams.InsertParametre(&quot;iIndexSub&quot;,&quot;20&quot;)
+			iIndexSup=20
+			mParams.InsertParametre(&quot;iIndexSup&quot;,&quot;20&quot;)
+			iHauteurNumerateur=5
+			mParams.InsertParametre(&quot;iHauteurNumerateur&quot;,&quot;5&quot;)
+			iProfondeurDenominateur=5
+			mParams.InsertParametre(&quot;iProfondeurDenominateur&quot;,&quot;5&quot;)
+			iLongueurExcessive=20
+			mParams.InsertParametre(&quot;iLongueurExcessive&quot;,&quot;20&quot;)
+			iEpaisseurTrait=3
+			mParams.InsertParametre(&quot;iEpaisseurTrait&quot;,&quot;3&quot;)
+			iHauteurMaxi=0
+			mParams.InsertParametre(&quot;iHauteurMaxi&quot;,&quot;0&quot;)
+			iHauteurMini=0
+			mParams.InsertParametre(&quot;iHauteurMini&quot;,&quot;0&quot;)
+			iDepassementLateral=5
+			mParams.InsertParametre(&quot;iDepassementLateral&quot;,&quot;5&quot;)
+			iEspacementParentheses=5
+			mParams.InsertParametre(&quot;iEspacementParentheses&quot;,&quot;5&quot;)
+			bAjusterParentheses=true
+			mParams.InsertParametre(&quot;bAjusterParentheses&quot;,&quot;true&quot;)
+			iDepassement=0
+			mParams.InsertParametre(&quot;iDepassement&quot;,&quot;0&quot;)
+			iHauteurPrimaire=0
+			mParams.InsertParametre(&quot;iHauteurPrimaire&quot;,&quot;0&quot;)
+			iEspaceMinimum=0
+			mParams.InsertParametre(&quot;iEspaceMinimum&quot;,&quot;0&quot;)
+			iDepassementOperateur=50
+			mParams.InsertParametre(&quot;iDepassementOperateur&quot;,&quot;50&quot;)
+			iEspacementOperateur=20
+			mParams.InsertParametre(&quot;iEspacementOperateur&quot;,&quot;20&quot;)
+			iInterligneMatrice=3
+			mParams.InsertParametre(&quot;iInterligneMatrice&quot;,&quot;3&quot;)
+			iEspacementMatrice=30
+			mParams.InsertParametre(&quot;iEspacementMatrice&quot;,&quot;30&quot;)
+			bBornesIntegralesVerticales=false
+			mParams.InsertParametre(&quot;bBornesIntegralesVerticales&quot;,&quot;false&quot;)
+			mParams.InsertParametre(&quot;bMajDroite&quot;,&quot;true&quot;)			
+			mParams.InsertParametre(&quot;biComplexe&quot;,&quot;false&quot;)
+			mParams.InsertParametre(&quot;beExpo&quot;,&quot;true&quot;)
+end sub
+
+
+sub LitParametresFormule(oFormule as object)
+&apos; lit les paramètres de la formule sélectionnée
+  	bAjusterParentheses=oFormule.IsScaleAllBrackets
+   	iMargeGauche=oFormule.LeftMargin
+ 	iMargeDroite=oFormule.RightMargin
+ 	iMargeBasse=oFormule.BottomMargin
+ 	iMargeHaute=oFormule.TopMargin
+	iEspacement=oFormule.RelativeSpacing
+	iInterligne=oFormule.RelativeLineSpacing
+	iEspRacine=oFormule.RelativeRootSpacing
+	iIndexSub=oFormule.RelativeIndexSubscript
+	iIndexSup=oFormule.RelativeIndexSuperscript
+	iHauteurNumerateur=oFormule.RelativeFractionNumeratorHeight
+	iProfondeurDenominateur=oFormule.RelativeFractionDenominatorDepth
+	iLongueurExcessive=oFormule.RelativeFractionBarExcessLength
+	iEpaisseurTrait=oFormule.RelativeFractionBarLineWeight
+	iHauteurMaxi=oFormule.RelativeUpperLimitDistance
+	iHauteurMini=oFormule.RelativeLowerLimitDistance
+	iDepassementLateral=oFormule.RelativeBracketExcessSize
+	iEspacementParentheses=oFormule.RelativeBracketDistance
+	iDepassement=oFormule.RelativeScaleBracketExcessSize
+	iHauteurPrimaire=oFormule.RelativeSymbolPrimaryHeight
+	iEspaceMinimum=oFormule.RelativeSymbolMinimumHeight
+	iDepassementOperateur=oFormule.RelativeOperatorExcessSize
+	iEspacementOperateur=oFormule.RelativeOperatorSpacing
+	iInterligneMatrice=oFormule.RelativeMatrixLineSpacing
+	iEspacementMatrice=oFormule.RelativeMatrixColumnSpacing
+  	sPolice=oFormule.FontNameVariables    
+   	iTaille=oFormule.BaseFontHeight
+  	bGras=oFormule.FontVariablesIsBold
+  	bModeTexte=oFormule.IsTextMode
+  	sTexteFormule=oFormule.formula
+end sub
+
+
+sub LitParametresFormules
+	&apos; lit les paramètres des formules définis par l&apos;utilisateur
+	Dim sChemin as String, sUrl as string, Resultat as object
+	Dim mgr as Object, AddinCAS as Object
+    if bParametresInitialises=false then
+    	&apos; recharger les paramètres de l&apos;utilisateur
+		sSymbolMultiplication=mParams.LitParametre(&quot;sSymbolMultiplication&quot;)
+		if sSymbolMultiplication=&quot;&quot; then
+			&apos; jamais défini, les initialiser par défaut
+			ParametresFormulesParDefaut
+		else
+			iMargeGauche=val(mParams.LitParametre(&quot;iMargeGauche&quot;))
+			iMargeDroite=val(mParams.LitParametre(&quot;iMargeDroite&quot;))
+			iMargeHaute=val(mParams.LitParametre(&quot;iMargeHaute&quot;))
+			iMargeBasse=val(mParams.LitParametre(&quot;iMargeBasse&quot;))
+			iEspacement=val(mParams.LitParametre(&quot;iEspacement&quot;))
+			iInterligne=val(mParams.LitParametre(&quot;iInterligne&quot;))
+			iEspRacine=val(mParams.LitParametre(&quot;iEspRacine&quot;))
+			iIndexSub=val(mParams.LitParametre(&quot;iIndexSub&quot;))
+			iIndexSup=val(mParams.LitParametre(&quot;iIndexSup&quot;))
+			iHauteurNumerateur=val(mParams.LitParametre(&quot;iHauteurNumerateur&quot;))
+			iProfondeurDenominateur=val(mParams.LitParametre(&quot;iProfondeurDenominateur&quot;))
+			iLongueurExcessive=val(mParams.LitParametre(&quot;iLongueurExcessive&quot;))
+			iEpaisseurTrait=val(mParams.LitParametre(&quot;iEpaisseurTrait&quot;))
+			iHauteurMaxi=val(mParams.LitParametre(&quot;iHauteurMaxi&quot;))
+			iHauteurMini=val(mParams.LitParametre(&quot;iHauteurMini&quot;))
+			iDepassementLateral=val(mParams.LitParametre(&quot;iDepassementLateral&quot;))
+			iEspacementParentheses=val(mParams.LitParametre(&quot;iEspacementParentheses&quot;))
+			if mParams.LitParametre(&quot;bAjusterParentheses&quot;)=&quot;false&quot; then
+				bAjusterParentheses=false
+			else
+				bAjusterParentheses=true
+			endif
+			iDepassement=val(mParams.LitParametre(&quot;iDepassement&quot;))
+			iHauteurPrimaire=val(mParams.LitParametre(&quot;iHauteurPrimaire&quot;))
+			iEspaceMinimum=val(mParams.LitParametre(&quot;iEspaceMinimum&quot;))
+			iDepassementOperateur=val(mParams.LitParametre(&quot;iDepassementOperateur&quot;))
+			iEspacementOperateur=val(mParams.LitParametre(&quot;iEspacementOperateur&quot;))
+			iInterligneMatrice=val(mParams.LitParametre(&quot;iInterligneMatrice&quot;))
+			iEspacementMatrice=val(mParams.LitParametre(&quot;iEspacementMatrice&quot;))
+			if mParams.LitParametre(&quot;bBornesIntegralesVerticales&quot;)=&quot;true&quot; then
+				bBornesIntegralesVerticales=true
+			else
+				bBornesIntegralesVerticales=false
+			endif		
+			if mParams.LitParametre(&quot;bMajDroite&quot;)=&quot;false&quot; then
+				bMajDroite=false
+			else
+				bMajDroite=true
+			endif
+			if mParams.LitParametre(&quot;biComplexe&quot;)=&quot;false&quot; then
+				biComplexe=false
+			else
+				biComplexe=true
+			endif			
+			if mParams.LitParametre(&quot;beExpo&quot;)=&quot;false&quot; then
+				beExpo=false
+			else
+				beExpo=true
+			endif			
+
+		endif
+		&apos; chargement de l&apos;aide Giac, nécessaire pour reconnaitre les commandes Giac
+		&apos; et les synonymes
+		on error goto PasCmathOOoCAS
+		BasicLibraries.LoadLibrary(&quot;CmathOOoCAS&quot;)
+		&apos;wait 500
+		sUrl=mCalc.fCheminCmathOOoCAS()+&quot;Giac/&quot;
+		sChemin=convertFromUrl(sUrl)
+		mgr=getProcessServiceManager()
+		AddinCAS=mgr.createInstance(&quot;CmathOOo.CAS&quot;)
+		langue=thisComponent.CharLocale.Language
+		&apos; english par défaut
+		if langue=&quot;&quot; then langue=&quot;en&quot;
+		Resultat=AddinCAS.cas1(Array(sChemin,langue))
+		PasCmathOOoCAS:
+		on error goto 0
+		bParametresInitialises=true
+	endif    
+end sub
+
+
+sub AffecteParametresFormule(oFormule as object, sPolice as string, iTaille as integer, bGras as boolean, sFormule as string, bModeTexte as boolean)
+	dim sTags as string
+	dim i as integer
+	&apos; sauvegarder les Tags
+	i=instr(oFormule.formula,&quot;%%&quot;)
+	if i&gt;0 then
+		sTags=mid(oFormule.formula,i)
+	endif
+  	oFormule.FontNameVariables=sPolice    
+   	oFormule.FontNameNumbers=sPolice
+  	oFormule.FontNameText=sPolice
+  	oFormule.FontNameFunctions=sPolice
+  	oFormule.FontVariablesIsItalic=true
+   	oFormule.BaseFontHeight=iTaille
+	if GetGuiType()=3 then &apos;Mac
+		oFormule.CustomFontNameSans=&quot;Cmath Calligraphique&quot;
+	   	oFormule.CustomFontNameSerif=&quot;Cmath Script&quot;
+	   	oFormule.CustomFontNameFixed=&quot;Courier New&quot;
+  	else
+		oFormule.CustomFontNameSans=&quot;Cmathcal&quot;
+	   	oFormule.CustomFontNameSerif=&quot;Cmathscr&quot;
+	   	oFormule.CustomFontNameFixed=&quot;Courier New&quot;	   	
+  	end if
+  	oFormule.IsScaleAllBrackets=bAjusterParentheses
+  	oFormule.IsTextMode=bModeTexte
+   	oFormule.LeftMargin=iMargeGauche
+ 	oFormule.RightMargin=iMargeDroite
+ 	oFormule.BottomMargin=iMargeBasse
+ 	oFormule.TopMargin=iMargeHaute
+	oFormule.RelativeSpacing=iEspacement
+	oFormule.RelativeLineSpacing=iInterligne
+	oFormule.RelativeRootSpacing=iEspRacine
+	oFormule.RelativeIndexSubscript=iIndexSub
+	oFormule.RelativeIndexSuperscript=iIndexSup
+	oFormule.RelativeFractionNumeratorHeight=iHauteurNumerateur
+	oFormule.RelativeFractionDenominatorDepth=iProfondeurDenominateur
+	oFormule.RelativeFractionBarExcessLength=iLongueurExcessive
+	oFormule.RelativeFractionBarLineWeight=iEpaisseurTrait
+	oFormule.RelativeLowerLimitDistance=iHauteurMini
+	oFormule.RelativeUpperLimitDistance=iHauteurMaxi
+	oFormule.RelativeBracketExcessSize=iDepassementLateral
+	oFormule.RelativeBracketDistance=iEspacementParentheses
+	oFormule.RelativeScaleBracketExcessSize=iDepassement
+	oFormule.RelativeSymbolPrimaryHeight=iHauteurPrimaire
+	oFormule.RelativeSymbolMinimumHeight=iEspaceMinimum
+	oFormule.RelativeOperatorExcessSize=iDepassementOperateur
+	oFormule.RelativeOperatorSpacing=iEspacementOperateur
+	oFormule.RelativeMatrixLineSpacing=iInterligneMatrice
+	oFormule.RelativeMatrixColumnSpacing=iEspacementMatrice
+  	oFormule.FontFixedIsBold=bGras
+  	oFormule.FontSansIsBold=bGras
+  	oFormule.FontSerifIsBold=bGras
+  	oFormule.FontFunctionsIsBold=bGras
+  	oFormule.FontNumbersIsBold=bGras
+  	oFormule.FontTextIsBold=bGras
+  	oFormule.FontVariablesIsBold=bGras 
+  	if i&gt;0 then sFormule=sFormule+sTags
+  	oFormule.formula=sFormule
+  	oFormule.setmodified(TRUE)	
+end sub
+
+
+Function SortedFontDescriptors(oDoc, bDuplicates As Boolean)
+  Dim oWindow          &apos;Container window AWT XDevice interface.
+  Dim oFonts()         &apos;Array of awt FontDescriptor structures.
+  Dim oFinalFonts()    &apos;Font descriptors to return.
+  Dim nIndex() As Long &apos;Indirect sorted index into.
+  Dim sName$           &apos;Font name.
+  Dim i&amp;               &apos;General index variable.
+  Dim j&amp;               &apos;General index variable.
+  Dim n&amp;               &apos;General utility variable.
+  Dim k&amp;               &apos;General utility variable.
+  Dim bChanged As Boolean
+
+  oWindow  = oDoc.getCurrentController().getFrame().getContainerWindow()
+  oFonts() = oWindow.getFontDescriptors()
+  ReDim nIndex(UBound(oFonts()))
+  n = UBound(oFonts())
+  REM First, obtain an index into the unique values.
+  For i = 0 to n
+    nIndex(i) = i
+  Next
+
+  REM Sort the data!
+  For i = 0 To n-1
+    bChanged = False
+    For j = 1 To n-i
+      If oFonts(nIndex(j-1)).Name &gt; oFonts(nIndex(j)).Name Then
+        k = nIndex(j-1)
+        nIndex(j-1) = nIndex(j)
+        nIndex(j) = k
+        bChanged = True
+      End If
+    Next
+    If NOT bChanged Then Exit For
+  Next
+
+  REM Copy the font descriptor.
+  sName = &quot;&quot;
+  oFinalFonts() = DimArray(n)
+  j = -1
+  For i = 0 To n
+    If bDuplicates OR (sName &lt;&gt; oFonts(nIndex(i)).Name) Then
+      j = j + 1
+      oFinalFonts(j) = oFonts(nIndex(i))
+      sName = oFinalFonts(j).Name
+    End If
+  Next
+  REM Bug alert, if I do NOT perform a ReDim Preserve, then the returned 
+  REM value is Empty; even if the array does not change in size.
+  ReDim Preserve oFinalFonts(j)
+  SortedFontDescriptors = oFinalFonts()
+End Function
+</script:module>

@@ -1,0 +1,4 @@
+﻿Copyright (c) 2011 Alain HAGUET
+Traduzioni e aiuto: Gisbert FRIEGE - Hélio Guilherme - Andrea Gatto - Didier DORANGE-PATTORET
+
+Questa estensione è posto in WRITER e DRAW e permette di creare facilmente in dimensioni desiderate solido in 3D o in prospettiva, e modelli può essere tagliato e incollato.

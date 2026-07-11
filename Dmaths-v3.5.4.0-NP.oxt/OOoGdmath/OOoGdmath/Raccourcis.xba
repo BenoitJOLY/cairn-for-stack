@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Raccourcis" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+&apos; auteur : Paolo Mantovani 
+&apos; modifications : avril 2006
+
+Option Explicit
+
+Sub Main
+	DefinitRaccourcis
+End Sub
+
+Sub DefinitRaccourcis()
+	SetUpKeyBinding GD_CTRL + GD_MAJ, GD_M, &quot;InsereExpression&quot;
+End Sub
+
+Sub SetUpKeyBinding(ctrl as integer, touche as integer, uneMacro as String)
+
+Dim oModuleCfgMgrSupplier As Object
+Dim oModuleCfgMgr As Object
+Dim oWriterShortCutMgr As Object
+
+Dim sCommand As String
+Dim sLocCommand As String
+Dim sMsg As String
+Dim iMsgResult As Integer
+Dim combi as String
+
+	 &apos; Initialize strings
+	 sCommand = &quot;vnd.sun.star.script:OOoGdmath.&quot; &amp; uneMacro &amp; &quot;.Main?language=Basic&amp;location=application&quot;
+ 
+	&apos; Retrieve the module configuration manager from central module configuration manager supplier
+	oModuleCfgMgrSupplier = createUnoService(&quot;com.sun.star.ui.ModuleUIConfigurationManagerSupplier&quot;)
+
+	&apos; Retrieve the module configuration manager with module identifier
+	oModuleCfgMgr = oModuleCfgMgrSupplier.getUIConfigurationManager(&quot;com.sun.star.text.TextDocument&quot;)
+	oWriterShortCutMgr = oModuleCfgMgr.getShortCutManager
+	
+	Dim aKeyEvent As New com.sun.star.awt.KeyEvent
+	With aKeyEvent
+		.Modifiers = ctrl
+		.KeyCode = touche
+	End With
+
+	combi = Miif((ctrl and GD_CTRL)&lt;&gt;0, &quot;CTRL+&quot;, &quot;&quot;) &amp; Miif((ctrl and GD_MAJ)&lt;&gt;0, &quot;MAJ+&quot;, &quot;&quot;)	&amp; Miif((ctrl and GD_ALT)&lt;&gt;0, &quot;ALT+&quot;, &quot;&quot;) &amp; CaractereTouche(touche)
+	On Error Resume Next
+	sLocCommand = oWriterShortCutMgr.getCommandByKeyEvent(aKeyEvent)
+	On Error GoTo 0 &apos;restore the error handler
+
+	Select Case sLocCommand
+	
+		Case = &quot;&quot; &apos;no previous bindings
+			oWriterShortCutMgr.setKeyEvent( aKeyEvent, sCommand )
+			oWriterShortCutMgr.store
+			
+		Case = sCommand &apos;ok the key event is already used by our command
+			&apos;nothing to do
+			
+		Case Else &apos;the key event is already used by another command
+		
+			sMsg = &quot;La combinaison de touche &quot; &amp; combi &amp; &quot; est déjà utilisée par la commande :&quot; &amp; Chr(10)
+			sMsg = sMsg &amp; sLocCommand &amp; &quot;.&quot; &amp; Chr(10) &amp; Chr(10)
+			sMsg = sMsg &amp; &quot;Voulez-vous la remplacer par la commande : &quot; &amp; uneMacro
+					   
+			iMsgResult = MsgBox(sMsg, 1)
+			If iMsgResult = 1 Then
+				oWriterShortCutMgr.removeKeyEvent( aKeyEvent)
+				oWriterShortCutMgr.setKeyEvent( aKeyEvent, sCommand )
+				oWriterShortCutMgr.store
+			End If
+			
+	End Select
+	
+End Sub
+
+Private Function GD_MAJ() as integer
+	GD_MAJ() = 1
+End Function
+
+Private Function GD_CTRL() as integer
+	GD_CTRL() = 2
+End Function
+
+Private Function GD_ALT() as integer
+	GD_ALT() = 4
+End Function
+
+Private Function GD_A() as integer
+	GD_A() = com.sun.star.awt.Key.A
+End Function
+
+Private Function GD_B() as integer
+	GD_B() = com.sun.star.awt.Key.B
+End Function
+
+Private Function GD_C() as integer
+	GD_C() = com.sun.star.awt.Key.C
+End Function
+
+Private Function GD_D() as integer
+	GD_D() = com.sun.star.awt.Key.D
+End Function
+
+Private Function GD_E() as integer
+	GD_E() = com.sun.star.awt.Key.E
+End Function
+
+Private Function GD_F() as integer
+	GD_F() = com.sun.star.awt.Key.F
+End Function
+
+Private Function GD_G() as integer
+	GD_G() = com.sun.star.awt.Key.G
+End Function
+
+Private Function GD_H() as integer
+	GD_H() = com.sun.star.awt.Key.H
+End Function
+
+Private Function GD_I() as integer
+	GD_I() = com.sun.star.awt.Key.I
+End Function
+
+Private Function GD_J() as integer
+	GD_J() = com.sun.star.awt.Key.J
+End Function
+
+Private Function GD_K() as integer
+	GD_K() = com.sun.star.awt.Key.K
+End Function
+
+Private Function GD_L() as integer
+	GD_L() = com.sun.star.awt.Key.L
+End Function
+
+Private Function GD_M() as integer
+	GD_M() = com.sun.star.awt.Key.M
+End Function
+
+Private Function GD_N() as integer
+	GD_N() = com.sun.star.awt.Key.N
+End Function
+
+Private Function GD_O() as integer
+	GD_O() = com.sun.star.awt.Key.O
+End Function
+
+Private Function GD_P() as integer
+	GD_P() = com.sun.star.awt.Key.P
+End Function
+
+Private Function GD_Q() as integer
+	GD_Q() = com.sun.star.awt.Key.Q
+End Function
+
+Private Function GD_R() as integer
+	GD_R() = com.sun.star.awt.Key.R
+End Function
+
+Private Function GD_S() as integer
+	GD_S() = com.sun.star.awt.Key.S
+End Function
+
+Private Function GD_T() as integer
+	GD_T() = com.sun.star.awt.Key.T
+End Function
+
+Private Function GD_U() as integer
+	GD_U() = com.sun.star.awt.Key.U
+End Function
+
+Private Function GD_V() as integer
+	GD_V() = com.sun.star.awt.Key.V
+End Function
+
+Private Function GD_W() as integer
+	GD_W() = com.sun.star.awt.Key.W
+End Function
+
+Private Function GD_X() as integer
+	GD_X() = com.sun.star.awt.Key.X
+End Function
+
+Private Function GD_Y() as integer
+	GD_Y() = com.sun.star.awt.Key.Y
+End Function
+
+Private Function GD_Z() as integer
+	GD_Z() = com.sun.star.awt.Key.Z
+End Function
+
+Private Function CaractereTouche(touche as integer) as String
+	Select case touche
+	case GD_A
+		CaractereTouche() = &quot;A&quot;
+	case GD_B
+		CaractereTouche() = &quot;B&quot;
+	case GD_C
+		CaractereTouche() = &quot;C&quot;
+	case GD_D
+		CaractereTouche() = &quot;D&quot;
+	case GD_E
+		CaractereTouche() = &quot;E&quot;
+	case GD_F
+		CaractereTouche() = &quot;F&quot;
+	case GD_G
+		CaractereTouche() = &quot;G&quot;
+	case GD_H
+		CaractereTouche() = &quot;H&quot;
+	case GD_I
+		CaractereTouche() = &quot;I&quot;
+	case GD_J
+		CaractereTouche() = &quot;J&quot;
+	case GD_K
+		CaractereTouche() = &quot;K&quot;
+	case GD_L
+		CaractereTouche() = &quot;L&quot;
+	case GD_M
+		CaractereTouche() = &quot;M&quot;
+	case GD_N
+		CaractereTouche() = &quot;N&quot;
+	case GD_O
+		CaractereTouche() = &quot;O&quot;
+	case GD_P
+		CaractereTouche() = &quot;P&quot;
+	case GD_Q
+		CaractereTouche() = &quot;Q&quot;
+	case GD_R
+		CaractereTouche() = &quot;R&quot;
+	case GD_S
+		CaractereTouche() = &quot;S&quot;
+	case GD_T
+		CaractereTouche() = &quot;T&quot;
+	case GD_U
+		CaractereTouche() = &quot;U&quot;
+	case GD_V
+		CaractereTouche() = &quot;V&quot;
+	case GD_W
+		CaractereTouche() = &quot;W&quot;
+	case GD_X
+		CaractereTouche() = &quot;X&quot;
+	case GD_Y
+		CaractereTouche() = &quot;Y&quot;
+	case GD_Z
+		CaractereTouche() = &quot;Z&quot;
+	End Select
+End Function
+
+</script:module>

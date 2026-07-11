@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="PatPyrDlg" dlg:left="199" dlg:top="153" dlg:width="267" dlg:height="115" dlg:help-text="&amp;1156.PatPyrDlg.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1157.PatPyrDlg.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:text-color="0xff0000" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="1" dlg:text-color="0xff950e" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="2" dlg:background-color="0xff" dlg:text-color="0xffffff" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="3" dlg:background-color="0xff00"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:titledbox dlg:style-id="0" dlg:id="FrameControl1" dlg:tab-index="1" dlg:left="5" dlg:top="3" dlg:width="159" dlg:height="53" dlg:help-text="&amp;1159.PatPyrDlg.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;1160.PatPyrDlg.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label1" dlg:tab-index="2" dlg:left="10" dlg:top="20" dlg:width="56" dlg:height="8" dlg:help-text="&amp;1161.PatPyrDlg.Label1.HelpText" dlg:value="&amp;1162.PatPyrDlg.Label1.Label" dlg:align="center"/>
+  <dlg:textfield dlg:id="RepPatPyr1" dlg:tab-index="0" dlg:left="27" dlg:top="31" dlg:width="20" dlg:height="15" dlg:help-text="&amp;1166.PatPyrDlg.RepPatPyr1.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="&amp;1167.PatPyrDlg.RepPatPyr1.Text"/>
+  <dlg:textfield dlg:id="RepPatPyr2" dlg:tab-index="3" dlg:left="93" dlg:top="36" dlg:width="20" dlg:height="15" dlg:help-text="&amp;1173.PatPyrDlg.RepPatPyr2.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="&amp;1174.PatPyrDlg.RepPatPyr2.Text"/>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="8" dlg:left="75" dlg:top="62" dlg:width="89" dlg:height="50" dlg:help-text="&amp;1192.PatPyrDlg.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;1193.PatPyrDlg.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:style-id="0" dlg:id="FrameControl3" dlg:tab-index="10" dlg:left="7" dlg:top="58" dlg:width="40" dlg:height="32" dlg:help-text="&amp;1196.PatPyrDlg.FrameControl3.HelpText">
+   <dlg:title dlg:value="&amp;1197.PatPyrDlg.FrameControl3.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label3" dlg:tab-index="12" dlg:left="115" dlg:top="40" dlg:width="10" dlg:height="8" dlg:help-text="&amp;1207.PatPyrDlg.Label3.HelpText" dlg:value="&amp;1208.PatPyrDlg.Label3.Label"/>
+  <dlg:text dlg:id="Label5" dlg:tab-index="13" dlg:left="32" dlg:top="74" dlg:width="10" dlg:height="8" dlg:help-text="&amp;1211.PatPyrDlg.Label5.HelpText" dlg:value="&amp;1212.PatPyrDlg.Label5.Label"/>
+  <dlg:titledbox dlg:style-id="1" dlg:id="FrameControl4" dlg:tab-index="14" dlg:left="173" dlg:top="65" dlg:width="88" dlg:height="23" dlg:help-text="&amp;1213.PatPyrDlg.FrameControl4.HelpText">
+   <dlg:title dlg:value="&amp;1214.PatPyrDlg.FrameControl4.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:style-id="1" dlg:id="FrameControl5" dlg:tab-index="17" dlg:left="173" dlg:top="3" dlg:width="88" dlg:height="60" dlg:help-text="&amp;1219.PatPyrDlg.FrameControl5.HelpText">
+   <dlg:title dlg:value="&amp;1220.PatPyrDlg.FrameControl5.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:style-id="2" dlg:id="BoutonSite" dlg:tab-index="9" dlg:left="78" dlg:top="98" dlg:width="81" dlg:height="8" dlg:help-text="&amp;2767.PatPyrDlg.BoutonSite.HelpText" dlg:value="&amp;2768.PatPyrDlg.BoutonSite.Label" dlg:align="center">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Aide.MonSite?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:text>
+  <dlg:button dlg:id="BoutonOK" dlg:tab-index="6" dlg:left="78" dlg:top="68" dlg:width="40" dlg:height="25" dlg:help-text="&amp;2769.PatPyrDlg.BoutonOK.HelpText" dlg:default="true" dlg:value="&amp;2770.PatPyrDlg.BoutonOK.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatPyr.GestionBoutonOK?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="BoutonAnnuler" dlg:tab-index="7" dlg:left="120" dlg:top="68" dlg:width="40" dlg:height="25" dlg:help-text="&amp;2771.PatPyrDlg.BoutonAnnuler.HelpText" dlg:value="&amp;2772.PatPyrDlg.BoutonAnnuler.Label" dlg:button-type="cancel"/>
+  <dlg:img dlg:id="ImagePrincipale" dlg:tab-index="20" dlg:left="179" dlg:top="26" dlg:width="30" dlg:height="30" dlg:help-text="&amp;2773.PatPyrDlg.ImagePrincipale.HelpText"/>
+  <dlg:img dlg:id="ImageSecondaire1" dlg:tab-index="21" dlg:left="226" dlg:top="26" dlg:width="30" dlg:height="30" dlg:help-text="&amp;2774.PatPyrDlg.ImageSecondaire1.HelpText"/>
+  <dlg:textfield dlg:id="RepPatPyr3" dlg:tab-index="11" dlg:left="9" dlg:top="70" dlg:width="20" dlg:height="15" dlg:help-text="&amp;2775.PatPyrDlg.RepPatPyr3.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="&amp;2776.PatPyrDlg.RepPatPyr3.Text"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="RepPatPyr4" dlg:tab-index="4" dlg:left="71" dlg:top="16" dlg:width="74" dlg:height="8" dlg:help-text="&amp;2781.PatPyrDlg.RepPatPyr4.HelpText" dlg:value="&amp;2782.PatPyrDlg.RepPatPyr4.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="RepPatPyr5" dlg:tab-index="5" dlg:left="71" dlg:top="26" dlg:width="89" dlg:height="8" dlg:help-text="&amp;2783.PatPyrDlg.RepPatPyr5.HelpText" dlg:value="&amp;2784.PatPyrDlg.RepPatPyr5.Label"/>
+   <dlg:radio dlg:id="RepPatPyr6" dlg:tab-index="15" dlg:left="180" dlg:top="75" dlg:width="30" dlg:height="8" dlg:help-text="&amp;2785.PatPyrDlg.RepPatPyr6.HelpText" dlg:value="&amp;2786.PatPyrDlg.RepPatPyr6.Label"/>
+   <dlg:radio dlg:id="RepPatPyr7" dlg:tab-index="16" dlg:left="229" dlg:top="75" dlg:width="30" dlg:height="8" dlg:help-text="&amp;2787.PatPyrDlg.RepPatPyr7.HelpText" dlg:value="&amp;2788.PatPyrDlg.RepPatPyr7.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="RepPatPyr8" dlg:tab-index="18" dlg:left="177" dlg:top="15" dlg:width="40" dlg:height="8" dlg:help-text="&amp;2789.PatPyrDlg.RepPatPyr8.HelpText" dlg:value="&amp;2790.PatPyrDlg.RepPatPyr8.Label" dlg:checked="true"/>
+   <dlg:radio dlg:id="RepPatPyr9" dlg:tab-index="19" dlg:left="225" dlg:top="15" dlg:width="35" dlg:height="8" dlg:help-text="&amp;2791.PatPyrDlg.RepPatPyr9.HelpText" dlg:value="&amp;2792.PatPyrDlg.RepPatPyr9.Label"/>
+  </dlg:radiogroup>
+  <dlg:text dlg:style-id="3" dlg:id="Message1" dlg:tab-index="22" dlg:visible="false" dlg:left="-167" dlg:top="-16" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2795.PatPyrDlg.Message1.HelpText" dlg:value="&amp;2796.PatPyrDlg.Message1.Label"/>
+  <dlg:text dlg:style-id="3" dlg:id="Message2" dlg:tab-index="23" dlg:visible="false" dlg:left="-167" dlg:top="6" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2799.PatPyrDlg.Message2.HelpText" dlg:value="&amp;2800.PatPyrDlg.Message2.Label"/>
+  <dlg:text dlg:style-id="3" dlg:id="Message3" dlg:tab-index="24" dlg:visible="false" dlg:left="-167" dlg:top="28" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2803.PatPyrDlg.Message3.HelpText" dlg:value="&amp;2804.PatPyrDlg.Message3.Label"/>
+ </dlg:bulletinboard>
+</dlg:window>

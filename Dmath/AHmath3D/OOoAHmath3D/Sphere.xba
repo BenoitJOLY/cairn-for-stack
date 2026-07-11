@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Sphere" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+
+
+REM  *****  BASIC  *****
+
+Option Explicit
+
+
+
+sub SphereMacroPrincipale &apos;macro principale
+
+Dim i As Integer, test As String, decalage As Long, NombreElements as variant
+Dim NomSolide As String, nbre1 as variant, nbre2 as variant, nbre3 as variant, nbre4 as variant
+
+appelerBoiteDialogueSphere()
+
+if oReponseDlg(99) = true then
+Deselection 
+DRAWversDocActif(&quot;Sphere.ConstructionSphere()&quot;)
+TailleObjetFinal(LastForme)
+PosObjetFinal(LastForme)
+end if
+
+end Sub
+
+&apos;------------------------------------------------------------------------------------------------------
+Sub appelerBoiteDialogueSphere()
+Dim i As Integer
+
+monDlg = CreerDialogue(&quot;OOoAHmath3D&quot;, &quot;SphereDlg&quot;)
+PositionDlg(monDlg,120,150)
+&apos;------------------------initialisation de la boite de dialogue-----------------------
+Initialisation_Unites(1,3)		
+Initialisation(monDlg,CheminDessin(&quot;Dessins/Sphere/sphere1.gif/&quot;),4)
+GestionInfoBulle
+&apos;------------------------ récupération des messages d&apos;erreurs-------------------------
+for i = 1 to 5
+oReponseDlg(i + 90) = monDlg.getControl(&quot;Message&quot;&amp;i).Peer.Text
+Next
+&apos;--------------------------------------------------------------------------------------	
+
+monDlg.execute
+if monDlg.Model.Tag= &quot;OK&quot; then
+monDlg.dispose
+end if
+    
+End Sub
+
+
+
+sub ConstructionSphere()
+
+&apos;-------------------------------------------------variables générales
+Dim Abscentre as Double, Ordcentre as  Double
+Dim AngleRayon as double, AngleDiam as double
+Dim a as double, b as double
+Dim oAngInclRad as double, oAngInclDeg as Double
+&apos;-------------------------------------------------variables intervenant pour les parallèles
+Dim oRayonSect as double
+Dim oLong as double, oStyle as string
+Dim oAngSectRad as double, oAngSectDeg as double, oAngDebRad as double, oAngDebDeg as double, oAngDebRad2 as double, oAngDebDeg2 as double
+Dim a1 as double, b1 as double
+Dim j  as integer
+&apos;-------------------------------------------------variables intervenant pour les méridiens
+Dim oVar1 as double, oVar2 as double, oVar3 as double
+Dim oAngMerRad as double,oAngMerDeg as double,  oXvis as double, oYvis as double, oYvis2 as double, oAngRot as double, oAngRotDeg as double
+Dim gdAxe as double, ptAxe as double, oAngPNord as double, oAngPNordDeg as double
+Dim oCoeffReduct as double
+Dim oMeridien as object
+Dim k  as integer
+
+
+
+
+oAngInclRad = abs(oReponseDlg(1)*pi/180)
+oAngInclDeg = oReponseDlg(1)
+
+AbsCentre = 0
+OrdCentre = 10000
+
+
+AngleDiam = oReponseDlg(3)* pi/180
+AngleRayon = oReponseDlg(2)* pi/180
+
+a = oReponseDlg(0)*1000
+
+
+&apos;le 3ème argument de ArcEllipse est la largeur de l&apos;ellipse entière
+&apos;le 4ème argument de ArcEllipse est la hauteur de l&apos;ellipse entière
+ArcEllipseDraw(Abscentre - a, Ordcentre -a   ,2*a,2*a,&quot;plein&quot;,0,180)
+ArcEllipseDraw(Abscentre - a , Ordcentre - a  ,2*a,2*a,&quot;plein&quot;,180,0)
+
+&apos;----------------------tracé du grand cercle équateur
+b = oReponseDlg(0)*1000 * sin(oAngInclRad)
+if oReponseDlg(34) = 1 then
+  if oAngInclDeg &gt; 0 then
+  if oReponseDlg(11) = 0 then ArcEllipseDraw(Abscentre - a, Ordcentre -b  ,2*a,2*b,&quot;pointillé&quot;,0,180)
+  ArcEllipseDraw(Abscentre - a, Ordcentre -b  ,2*a,2*b,&quot;plein&quot;,180,0)
+  end if
+  if oAngInclDeg &lt; 0 then
+  ArcEllipseDraw(Abscentre - a, Ordcentre -b  ,2*a,2*b,&quot;plein&quot;,0,180)
+  if oReponseDlg(11) = 0 then ArcEllipseDraw(Abscentre - a, Ordcentre -b ,2*a,2*b,&quot;pointillé&quot;,180,0)
+  end if
+  if oAngInclDeg = 0 then
+  SegmentDraw(AbsCentre-a, OrdCentre  ,  AbsCentre+a , OrdCentre  ,30,&quot;plein&quot;)
+  end if
+end if
+&apos;----------------------tracer le centre de la sphère
+if oReponseDlg(4) = 1 then PointDraw(AbsCentre,OrdCentre,oAngInclRad)
+&apos;-----------------------tracé de le diamètre Nord-Sud
+if oReponseDlg(5) = 1 then SegmentDraw(AbsCentre, OrdCentre -a ,  AbsCentre , OrdCentre+a , 30,oReponseDlg(8))
+&apos;---------------------tracer un rayon
+if oReponseDlg(6) = 1 then SegmentDraw(AbsCentre, OrdCentre ,  AbsCentre + a* cos(AngleRayon) , OrdCentre - a * sin(AngleRayon)*sin(oAngInclRad) , 30,oReponseDlg(9))
+&apos;--------------------tracer un diamètre
+if oReponseDlg(7) = 1 then SegmentDraw(AbsCentre - a* cos(AngleDiam), OrdCentre+ a * sin(AngleDiam)*sin(oAngInclRad) ,  AbsCentre + a* cos(AngleDiam) , OrdCentre- a* sin(AngleDiam	)*sin(oAngInclRad) , 30,oReponseDlg(10))
+
+
+&apos;-----------------------Tracer des les parallèles
+
+For j = 1 to 5
+
+ if oReponseDlg(12+j) &gt;= 0 then
+ 
+ oRayonSect = a * cos(oReponseDlg(12+j)*pi/180)
+ oAngSectRad = oReponseDlg(12+j)*pi/180
+ oAngSectDeg = oReponseDlg(12+j)
+ a1 = oRayonSect  &apos;gde 1/2 diagonale de l&apos;ellipse
+ b1 = oRayonSect * sin(oAngInclRad) &apos;pte 1/2 diagonale de l&apos;ellipse
+ oLong = a*sin(oAngSectRad)/cos(oAngInclRad)
+
+ if  abs(oLong) &lt;  a then &apos;ellipse tangente au cercle
+   oAngDebRad = Atn(oLong/sqr(a*a-oLong*oLong))  
+   oAngDebDeg = oAngDebRad*180/pi  &apos;angle  centre sphère - pt de tangence
+
+   oAngDebRad2 = Atn(sqr(oRayonSect*oRayonSect-a*a*cos(oAngDebRad)*cos(oAngDebRad))/(a*cos(oAngDebRad))) 
+   oAngDebDeg2 = Sgn(oRayonSect)*oAngDebRad2*180/pi  &apos;angle  centre section - pt de tangence
+   
+   if oReponseDlg(28) = 1 or oReponseDlg(30) = 1 then
+   if oReponseDlg(11) = 0 then ArcEllipseDraw(Abscentre - a1, Ordcentre - a * sin(oAngSectRad)*cos(oAngInclRad) -b1,2*a1,2*b1,&quot;pointillé&quot;,oAngDebDeg2,180-oAngDebDeg2)
+   ArcEllipseDraw(Abscentre - a1, Ordcentre - a * sin(oAngSectRad)*cos(oAngInclRad) -b1,2*a1,2*b1,&quot;plein&quot;,180-oAngDebDeg2,oAngDebDeg2)
+   end if
+   
+   if oReponseDlg(29) = 1 or oReponseDlg(30) = 1 then
+   if oReponseDlg(11) = 0 then ArcEllipseDraw(Abscentre - a1, Ordcentre + a * sin(oAngSectRad)*cos(oAngInclRad) -b1,2*a1,2*b1,&quot;pointillé&quot;,-oAngDebDeg2,180+oAngDebDeg2)
+   ArcEllipseDraw(Abscentre - a1, Ordcentre + a * sin(oAngSectRad)*cos(oAngInclRad) -b1,2*a1,2*b1,&quot;plein&quot;,180+oAngDebDeg2,-oAngDebDeg2)
+   end if
+   
+ else 
+   if oReponseDlg(28) = 1 or oReponseDlg(30) = 1 then ArcEllipseDraw(Abscentre - a1, Ordcentre - a * sin(oAngSectRad)*cos(oAngInclRad) -b1,2*a1,2*b1,&quot;plein&quot;,-179.99,180)
+   if oReponseDlg(11) = 0 then
+   if oReponseDlg(28) = 1 or oReponseDlg(30) = 1 then ArcEllipseDraw(Abscentre - a1, Ordcentre + a * sin(oAngSectRad)*cos(oAngInclRad) -b1,2*a1,2*b1,&quot;pointillé&quot;,-179.99,180)
+   end if
+ end if
+ 
+ end if
+Next
+
+
+&apos;-----------------------------------Tracé des Meridiens
+rem PoleN(r*cos ;0)
+for k = 1 to 10
+
+oAngMerDeg = oReponseDlg(17+k)
+oAngMerRad = oReponseDlg(17+k)*pi/180
+
+if oAngMerDeg &gt; 0 and oAngMerDeg &lt;180 then
+
+  oVar1 = sin(oAngMerRad)*sin(oAngMerRad)
+  oVar2 = cos(oAngInclRad)*cos(oAngInclRad)
+  oVar3 = 1-1/(oVar1*oVar2)
+  oXvis = a*sqr((1-1/oVar2)/oVar3)
+  oYvis = a*sqr((1-1/oVar1)/oVar3)
+  oYvis2 = sqr(a*a - oXvis*oXvis)
+
+
+if oAngMerDeg &gt; 0 and oAngMerDeg &lt; 90 then oAngRot = Atn(oXvis/oYvis2)
+if oAngMerDeg = 90 then oAngRot = pi/2
+if oAngMerDeg &gt; 90 and oAngMerDeg &lt; 180 then oAngRot = -Atn(oXvis/oYvis2)
+
+oAngRotDeg = oAngRot*180/pi
+oCoeffReduct = cos(oAngInclRad)*sin(oAngRot)/sqr(1-cos(oAngInclRad)*cos(oAngInclRad)*cos(oAngRot)*cos(oAngRot))
+ptAxe = 2*a*oCoeffReduct
+gdAxe = 2*a 
+oAngPNord = Atn(cos(oAngInclRad)*cos(oAngRot)/sqr(1-cos(oAngInclRad)*cos(oAngInclRad)*cos(oAngRot)*cos(oAngRot)))
+oAngPNordDeg = oAngPNord*180/pi
+
+if oReponseDlg(31) = 1 or oReponseDlg(33)=1 then
+if oAngMerDeg &lt;= 90 then
+ArcEllipseDraw(Abscentre - ptAxe/2, Ordcentre - a ,ptAxe,gdAxe,&quot;plein&quot;, -179.99 , 180)
+oMeridien = LastForme(oDocTemp)
+oMeridien.RotateAngle = oAngRotDeg*100
+oMeridien.CircleStartAngle = -9000
+oMeridien.CircleEndAngle = oAngPNordDeg*100    rem partie 1 du méridien
+  if oReponseDlg(12) = 0 then
+    ArcEllipseDraw(Abscentre - ptAxe/2, Ordcentre - a ,ptAxe,gdAxe,&quot;pointillé&quot;, -179.99 , 180)
+    oMeridien = LastForme(oDocTemp)
+    oMeridien.RotateAngle = oAngRotDeg*100
+    oMeridien.CircleStartAngle = 18000 + oAngPNordDeg*100
+    oMeridien.CircleEndAngle = -9000  rem partie 2 du méridien
+  end if
+end if
+
+if oAngMerDeg &gt; 90 then
+ArcEllipseDraw(Abscentre - ptAxe/2, Ordcentre - a ,ptAxe,gdAxe,&quot;plein&quot;, -179.99 , 180)
+oMeridien = LastForme(oDocTemp)
+oMeridien.RotateAngle = oAngRotDeg*100
+oMeridien.CircleStartAngle = 9000
+oMeridien.CircleEndAngle = 18000 - oAngPNordDeg*100    rem partie 1 du méridien
+  if oReponseDlg(12) = 0 then
+    ArcEllipseDraw(Abscentre - ptAxe/2, Ordcentre - a ,ptAxe,gdAxe,&quot;pointillé&quot;, -179.99 , 180)
+    oMeridien = LastForme(oDocTemp)
+    oMeridien.RotateAngle = oAngRotDeg*100
+    oMeridien.CircleStartAngle = -oAngPNordDeg*100
+    oMeridien.CircleEndAngle = 9000  rem partie 2 du méridien
+  end if
+end if
+
+end if
+
+if oReponseDlg(32) = 1 or oReponseDlg(33)=1 then
+if oAngMerDeg &lt;= 90 then
+  if oReponseDlg(12) = 0 then
+    ArcEllipseDraw(Abscentre - ptAxe/2, Ordcentre - a ,ptAxe,gdAxe,&quot;pointillé&quot;, -179.99 , 180)
+    oMeridien = LastForme(oDocTemp)
+    oMeridien.RotateAngle = -oAngRotDeg*100
+    oMeridien.CircleStartAngle = -9000
+    oMeridien.CircleEndAngle = -oAngPNordDeg*100    rem partie 1 du méridien
+  end if
+  
+ArcEllipseDraw(Abscentre - ptAxe/2, Ordcentre - a ,ptAxe,gdAxe,&quot;plein&quot;, -179.99 , 180)
+oMeridien = LastForme(oDocTemp)
+oMeridien.RotateAngle = -oAngRotDeg*100
+oMeridien.CircleStartAngle = 18000 - oAngPNordDeg*100
+oMeridien.CircleEndAngle = -9000  rem partie 2 du méridien
+end if
+
+if oAngMerDeg &gt; 90 then
+  if oReponseDlg(12) = 0 then
+    ArcEllipseDraw(Abscentre - ptAxe/2, Ordcentre - a ,ptAxe,gdAxe,&quot;pointillé&quot;, -179.99 , 180)
+    oMeridien = LastForme(oDocTemp)
+    oMeridien.RotateAngle = -oAngRotDeg*100
+    oMeridien.CircleStartAngle = 9000
+    oMeridien.CircleEndAngle = 18000 +oAngPNordDeg*100    rem partie 1 du méridien
+  end if
+  
+ArcEllipseDraw(Abscentre - ptAxe/2, Ordcentre - a ,ptAxe,gdAxe,&quot;plein&quot;, -179.99 , 180)
+oMeridien = LastForme(oDocTemp)
+oMeridien.RotateAngle = -oAngRotDeg*100
+oMeridien.CircleStartAngle = oAngPNordDeg*100
+oMeridien.CircleEndAngle = 9000  rem partie 2 du méridien
+end if
+
+end if
+end if
+
+if oAngMerDeg = 0 then SegmentDraw(Abscentre,Ordcentre - a*cos(oAngInclRad),Abscentre,Ordcentre + a,30, &quot;plein&quot;)
+if oAngMerDeg = 180 then 
+   SegmentDraw(Abscentre,Ordcentre - a*cos(oAngInclRad),Abscentre,Ordcentre - a,30, &quot;plein&quot;)
+   SegmentDraw(Abscentre,Ordcentre - a,Abscentre,Ordcentre + a*cos(oAngInclRad),30, &quot;pointillé&quot;)
+end if
+Next
+
+
+&apos;-----------------------------------Tracé des poles
+if oReponseDlg(35) = 1 then 
+  if oReponseDlg(37) = 1 then CercleDraw(Abscentre,Ordcentre - a*cos(oAngInclRad),20)
+  if oReponseDlg(37) = 0 then PointDraw(Abscentre,Ordcentre - a*cos(oAngInclRad),oAngInclRad)
+end if
+if oReponseDlg(36) = 1 then 
+  if oReponseDlg(37) = 1 then CercleDraw(Abscentre,Ordcentre + a*cos(oAngInclRad),20)
+  if oReponseDlg(37) = 0 then PointDraw(Abscentre,Ordcentre + a*cos(oAngInclRad),oAngInclRad)
+end if
+if oReponseDlg(39) = 1 then 
+  if oReponseDlg(38) = 1 then SegmentDraw(Abscentre,Ordcentre - a*cos(oAngInclRad),Abscentre,Ordcentre + a*cos(oAngInclRad),30,&quot;plein&quot;)
+  if oReponseDlg(38) = 0 then SegmentDraw(Abscentre,Ordcentre - a*cos(oAngInclRad),Abscentre,Ordcentre + a*cos(oAngInclRad),30,&quot;pointillé&quot;)
+end if
+
+
+end sub
+
+
+&apos;-------------------------------------------------------------------------------------------------------
+&apos;gestion des boutons de la boite de dialogue
+
+Sub GestionInfoBulle
+Dim i as integer
+TexteAide(monDlg,&quot;RepSph1&quot;, &quot;0&lt; ... &lt;= 10&quot;)
+TexteAide(monDlg,&quot;RepSph2&quot;, &quot;-90&lt;= ... &lt;= 90&quot;)
+TexteAide(monDlg,&quot;RepSph3&quot;, &quot;0&lt;= ... &lt;= 360&quot;)
+TexteAide(monDlg,&quot;RepSph4&quot;, &quot;0&lt;= ... &lt;= 180&quot;)
+for i = 1 to 5
+TexteAide(monDlg,&quot;TextField&quot;&amp;i, &quot;0&lt;= ... &lt;= 90&quot;)
+Next
+for i = 1 to 10
+TexteAide(monDlg,&quot;TextField&quot;&amp;5+i, &quot;0&lt;= ... &lt;= 180&quot;)
+Next
+end sub
+
+sub GestionCase1
+Aspect2BoutonsRadio(monDlg,&quot;RepSph6&quot;,&quot;StyleA1&quot;,&quot;StyleB1&quot;)
+end sub
+
+sub GestionCase3
+Aspect2BoutonsRadio(monDlg,&quot;RepSph7&quot;,&quot;StyleA2&quot;,&quot;StyleB2&quot;)
+AspectLabel(monDlg,&quot;RepSph7&quot;,&quot;UA2&quot;)
+AspectLabel(monDlg,&quot;RepSph7&quot;,&quot;RepSph3&quot;)
+end sub
+
+sub GestionCase4
+Aspect2BoutonsRadio(monDlg,&quot;RepSph8&quot;,&quot;StyleA3&quot;,&quot;StyleB3&quot;)
+AspectLabel(monDlg,&quot;RepSph8&quot;,&quot;UA3&quot;)
+AspectLabel(monDlg,&quot;RepSph8&quot;,&quot;RepSph4&quot;)
+end sub
+
+sub GestionCase5
+Dim i as integer
+for i = 1 to 5
+AspectLabel(monDlg,&quot;CheckBox1&quot;,&quot;TextField&quot; &amp; i)
+AspectLabel(monDlg,&quot;CheckBox2&quot;,&quot;TextField&quot; &amp; i+5)
+Next
+end sub
+
+sub GestionImage
+ChangerImagePrincipalex2(monDlg , &quot;RepSph2&quot;, CheminDessin(&quot;Dessins/Sphere/sphere1.gif/&quot;),CheminDessin(&quot;Dessins/Sphere/sphere2.gif/&quot;), CheminDessin(&quot;Dessins/erreur.gif/&quot;))
+end sub
+
+
+
+sub GestionBoutonOK  
+Dim i as integer, test(6) as integer
+
+&apos;-----------------------Gestion des erreurs de saisie
+test(1) = ZT_Nbre(monDlg,  &quot;RepSph1&quot;, 0.001 , 10 , 3 , oReponseDlg(91),)
+test(2) = ZT_Nbre(monDlg,  &quot;RepSph2&quot;, -90 , 90 , 10 , oReponseDlg(92),) 
+test(3) = ZT_Nbre(monDlg,  &quot;RepSph3&quot;, 0 , 360 , 0 , oReponseDlg(93),)
+test(4) = ZT_Nbre(monDlg,  &quot;RepSph4&quot;, 0 , 180 , 0 , oReponseDlg(94),) 
+
+test(5) = 1
+for i = 1 to 5
+if monDlg.getControl(&quot;TextField&quot; &amp; i).Peer.Text &lt;&gt; &quot;&quot; then test(5) = test(5) * ZT_Nbre(monDlg,  &quot;TextField&quot; &amp; i, 0 , 90 , 0 , oReponseDlg(95),) 
+if monDlg.getControl(&quot;TextField&quot; &amp; i+5).Peer.Text &lt;&gt; &quot;&quot; then test(5) = test(5) * ZT_Nbre(monDlg,  &quot;TextField&quot; &amp; i+5, 0 , 180 , 0 , oReponseDlg(94),) 
+if monDlg.getControl(&quot;TextField&quot; &amp; i+10).Peer.Text &lt;&gt; &quot;&quot; then test(5) = test(5) * ZT_Nbre(monDlg,  &quot;TextField&quot; &amp; i+10, 0 , 180 , 0 , oReponseDlg(94),) 
+next
+
+     
+test(0) = test(1)*test(2)*test(3)*test(4)*test(5) &apos;test(0) contient 1 si tout est ok 0 sinon
+
+if test(0) = 1 then
+&apos;---------------------- recupere toute les données saisie dans une variable globale
+    for i = 1 to 4
+    oReponseDlg(i - 1) = CDbl(monDlg.getControl(&quot;RepSph&quot;&amp;i).Peer.Text)
+    Next
+    for i = 5 to 8
+    oReponseDlg(i - 1) = monDlg.getControl(&quot;RepSph&quot;&amp;i).state  
+    Next
+    for i = 1 to 3
+    oReponseDlg(7+i) = monDlg.getControl(&quot;StyleA&quot;&amp;i).Model.state  
+    Next 
+    
+    oReponseDlg(11) = monDlg.getControl(&quot;CheckBox1&quot;).state  
+    oReponseDlg(12) = monDlg.getControl(&quot;CheckBox2&quot;).state
+        
+    for i = 1 to 15
+    oReponseDlg(12+i) = IIf(monDlg.getControl(&quot;TextField&quot;&amp;i).Peer.Text&lt;&gt; &quot;&quot; , CDbl(monDlg.getControl(&quot;TextField&quot;&amp;i).Peer.Text) , -1)
+    Next
+    
+    for i = 1 to 6
+    oReponseDlg(27+i) = monDlg.getControl(&quot;OptionButton&quot;&amp;i).Model.state   
+    Next
+    
+    for i = 1 to 3
+    oReponseDlg(33+i) = monDlg.getControl(&quot;CheckBox&quot;&amp;2+i).state
+    Next
+    oReponseDlg(37) = monDlg.getControl(&quot;OptionButton9&quot;).Model.state
+    oReponseDlg(38) = monDlg.getControl(&quot;StyleA4&quot;).Model.state    
+    oReponseDlg(39) = monDlg.getControl(&quot;CheckBox6&quot;).Model.state    
+        
+    oReponseDlg(99) = true  &apos;renvoie true si la boite de dialogue est fermée par le bouton OK
+    monDlg.Model.Tag= &quot;OK&quot;   &apos;met OK au tag du dialogue quand tout est validé
+    monDlg.endExecute
+end if
+
+End Sub
+
+
+&apos;----------------------------------------------------------------------------
+&apos;gestion des unités Cm/Inch
+&apos;-------------------------------------------------------------------------
+
+sub OptionUnite_click
+OptionUnite(1,3)
+end sub
+
+
+</script:module>

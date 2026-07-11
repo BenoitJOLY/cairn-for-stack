@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Mod_Crayon" script:language="StarBasic" script:moduleType="normal">
+&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+
+sub Couleur_Click
+Dim monObjet as object
+Dim oInfo as variant, i as integer, nvCouleur as Long
+Dim oTestRep as boolean
+
+
+
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox30&quot;,&quot;ListBox&quot;)(1)
+	oTestRep = ValideReponseListbox(monDlg,&quot;ListBox39&quot;, mesMessages1(4))
+	oReponseDlg(2) = RepControl(monDlg,&quot;ListBox39&quot;,&quot;ListBox&quot;)(1)
+	
+	For i = 41 to 80
+		if RepControl(monDlg,&quot;Couleur&quot;+i,&quot;OptionButton&quot;) = true then nvCouleur = monDlg.getControl(&quot;Couleur&quot;+i).Model.BackgroundColor
+	Next
+	
+	if 	oReponseDlg(1) = 0 and oTestRep = true then
+		if RepControl(monDlg,&quot;OptionButton25&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionPointsMarques(oReponseDlg(2))
+		if RepControl(monDlg,&quot;OptionButton26&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionSegments(oReponseDlg(2))	
+		if RepControl(monDlg,&quot;OptionButton27&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionCercles(oReponseDlg(2))		
+		if RepControl(monDlg,&quot;OptionButton28&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionArcs(oReponseDlg(2))
+		oInfo = InfoForme(monObjet)
+		AspectForme(monObjet, oInfo(8), 0, array(nvCouleur,oInfo(6)(1)),oInfo(7))
+	End if
+	
+	if 	oReponseDlg(1) = 1 and oTestRep = true then
+		monObjet = oCollectionSurfaces(oReponseDlg(2))
+		oInfo = InfoForme(monObjet)
+		AspectForme(monObjet, oInfo(8), 100, array(oInfo(6)(0),nvCouleur) ,oInfo(7))
+	End if
+
+End sub
+
+
+
+
+&apos;--- récupère la couleur et le style de ligne de monObjet et vérifie si elle est dans le choix des couleurs proposées
+
+sub TestCouleur
+Dim oInfo as variant, i as integer, maCouleur as Long
+Dim monObjet as object, oTestRep as boolean
+
+
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox30&quot;,&quot;ListBox&quot;)(1)
+	oTestRep = ValideReponseListbox(monDlg,&quot;ListBox39&quot;, )
+	oReponseDlg(2) = RepControl(monDlg,&quot;ListBox39&quot;,&quot;ListBox&quot;)(1)
+
+	if 	oReponseDlg(1) = 0 and oTestRep = true then
+		if RepControl(monDlg,&quot;OptionButton25&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionPointsMarques(oReponseDlg(2))
+		if RepControl(monDlg,&quot;OptionButton26&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionSegments(oReponseDlg(2))	
+		if RepControl(monDlg,&quot;OptionButton27&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionCercles(oReponseDlg(2))		
+		if RepControl(monDlg,&quot;OptionButton28&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionArcs(oReponseDlg(2))
+		oInfo = InfoForme(monObjet)
+		if oInfo(7)(0) = 1 then AttributControl(monDlg, &quot;OptionButton&quot;, &quot;Etat&quot;, ,array(34) )
+		if oInfo(7)(0) = 2 then AttributControl(monDlg, &quot;OptionButton&quot;, &quot;Etat&quot;, ,array(35) )
+		maCouleur = oInfo(6)(0)
+	End if
+	if 	oReponseDlg(1) = 1 and oTestRep = true then
+		monObjet = oCollectionSurfaces(oReponseDlg(2))
+		oInfo = InfoForme(monObjet)
+		maCouleur = oInfo(6)(1)
+	End if
+
+if oTestRep = true then
+For i = 41 to 80
+	if monDlg.getControl(&quot;Couleur&quot;+i).Model.BackgroundColor = maCouleur then
+  	AttributControl(monDlg, &quot;Couleur&quot;, &quot;Etat&quot;, ,array(i) )
+  	else
+  	AttributControl(monDlg, &quot;Couleur&quot;, &quot;Etat&quot;,array(i) , )
+  	end if
+Next
+End if
+if oTestRep = false then
+For i = 41 to 80
+  	AttributControl(monDlg, &quot;Couleur&quot;, &quot;Etat&quot;,array(i) , )
+Next
+End if
+End Sub
+
+
+sub ModifStyleTrait_Click
+
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox30&quot;,&quot;ListBox&quot;)(1)
+	oTestRep = ValideReponseListbox(monDlg,&quot;ListBox39&quot;, mesMessages1(4))
+	oReponseDlg(2) = RepControl(monDlg,&quot;ListBox39&quot;,&quot;ListBox&quot;)(1)
+	
+	if 	oReponseDlg(1) = 0 and oTestRep = true then
+
+		if RepControl(monDlg,&quot;OptionButton25&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionPointsMarques(oReponseDlg(2))
+		if RepControl(monDlg,&quot;OptionButton26&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionSegments(oReponseDlg(2))	
+		if RepControl(monDlg,&quot;OptionButton27&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionCercles(oReponseDlg(2))		
+		if RepControl(monDlg,&quot;OptionButton28&quot;, &quot;OptionButton&quot;)= true then monObjet = oCollectionArcs(oReponseDlg(2))
+
+		if RepControl(monDlg,&quot;OptionButton25&quot;, &quot;OptionButton&quot;)= false then
+			if RepControl(monDlg,&quot;OptionButton34&quot;, &quot;OptionButton&quot;)= true then monObjet.LineStyle = 1
+			if RepControl(monDlg,&quot;OptionButton35&quot;, &quot;OptionButton&quot;)= true then
+				monObjet.LineStyle = 2
+				monObjet.LineDash = oTiret
+		 	End if
+		End if
+		if RepControl(monDlg,&quot;OptionButton25&quot;, &quot;OptionButton&quot;)= true then AttributControl(monDlg, &quot;OptionButton&quot;, &quot;Etat&quot;, ,array(34) )
+	End if
+End sub
+
+</script:module>

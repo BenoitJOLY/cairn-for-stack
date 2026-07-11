@@ -1,0 +1,4 @@
+﻿Copyright (c) 2011 Alain HAGUET
+Translations and help : Gisbert FRIEGE - Hélio GUILHERME - Andrea GATTO - Didier DORANGE-PATTORET
+
+This extension integrates WRITER and DRAW and allow to create in the desired dimensions solid in 3D or in cavalier perspective, and patterns that can be cut and pasted.

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="PatConeDlg" dlg:left="210" dlg:top="151" dlg:width="220" dlg:height="132" dlg:help-text="&amp;1091.PatConeDlg.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1092.PatConeDlg.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="1" dlg:text-color="0xff0000" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="2" dlg:text-color="0xff950e" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="3" dlg:background-color="0xff" dlg:text-color="0xffffff" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="4" dlg:background-color="0xff00"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:text dlg:style-id="0" dlg:id="Label4" dlg:tab-index="4" dlg:left="8" dlg:top="37" dlg:width="30" dlg:height="8" dlg:help-text="&amp;1108.PatConeDlg.Label4.HelpText" dlg:value="&amp;1109.PatConeDlg.Label4.Label" dlg:align="center"/>
+  <dlg:titledbox dlg:style-id="1" dlg:id="FrameControl1" dlg:tab-index="5" dlg:left="5" dlg:top="19" dlg:width="112" dlg:height="49" dlg:help-text="&amp;1114.PatConeDlg.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;1115.PatConeDlg.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="11" dlg:left="127" dlg:top="79" dlg:width="89" dlg:height="49" dlg:help-text="&amp;1127.PatConeDlg.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;1128.PatConeDlg.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:style-id="2" dlg:id="FrameControl3" dlg:tab-index="12" dlg:left="126" dlg:top="19" dlg:width="88" dlg:height="28" dlg:help-text="&amp;1129.PatConeDlg.FrameControl3.HelpText">
+   <dlg:title dlg:value="&amp;1130.PatConeDlg.FrameControl3.Label"/>
+  </dlg:titledbox>
+  <dlg:textfield dlg:id="PatConeDlg1" dlg:tab-index="0" dlg:left="12" dlg:top="48" dlg:width="20" dlg:height="15" dlg:help-text="&amp;1135.PatConeDlg.PatConeDlg1.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="&amp;1136.PatConeDlg.PatConeDlg1.Text"/>
+  <dlg:textfield dlg:id="PatConeDlg2" dlg:tab-index="2" dlg:left="59" dlg:top="48" dlg:width="20" dlg:height="15" dlg:help-text="&amp;1137.PatConeDlg.PatConeDlg2.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="&amp;1138.PatConeDlg.PatConeDlg2.Text"/>
+  <dlg:text dlg:style-id="3" dlg:id="BoutonSite" dlg:tab-index="10" dlg:left="131" dlg:top="115" dlg:width="83" dlg:height="8" dlg:help-text="&amp;2932.PatConeDlg.BoutonSite.HelpText" dlg:value="&amp;2933.PatConeDlg.BoutonSite.Label" dlg:align="center">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Aide.MonSite?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:text>
+  <dlg:button dlg:id="BoutonAnnuler" dlg:tab-index="9" dlg:left="173" dlg:top="84" dlg:width="40" dlg:height="26" dlg:help-text="&amp;2934.PatConeDlg.BoutonAnnuler.HelpText" dlg:value="&amp;2935.PatConeDlg.BoutonAnnuler.Label" dlg:button-type="cancel"/>
+  <dlg:button dlg:id="BoutonOK" dlg:tab-index="8" dlg:left="131" dlg:top="84" dlg:width="40" dlg:height="26" dlg:help-text="&amp;2936.PatConeDlg.BoutonOK.HelpText" dlg:default="true" dlg:value="&amp;2937.PatConeDlg.BoutonOK.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCone.GestionBoutonOK?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:img dlg:id="ImagePrincipale" dlg:tab-index="15" dlg:left="32" dlg:top="77" dlg:width="50" dlg:height="50" dlg:help-text="&amp;2946.PatConeDlg.ImagePrincipale.HelpText"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="PatConeDlg6" dlg:tab-index="14" dlg:left="175" dlg:top="31" dlg:width="30" dlg:height="10" dlg:help-text="&amp;2947.PatConeDlg.PatConeDlg6.HelpText" dlg:value="&amp;2948.PatConeDlg.PatConeDlg6.Label" dlg:checked="true"/>
+  </dlg:radiogroup>
+  <dlg:text dlg:style-id="4" dlg:id="Message1" dlg:tab-index="16" dlg:visible="false" dlg:left="-139" dlg:top="-12" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2951.PatConeDlg.Message1.HelpText" dlg:value="&amp;2952.PatConeDlg.Message1.Label"/>
+  <dlg:text dlg:style-id="4" dlg:id="Message2" dlg:tab-index="17" dlg:visible="false" dlg:left="-139" dlg:top="11" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2955.PatConeDlg.Message2.HelpText" dlg:value="&amp;2956.PatConeDlg.Message2.Label"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:style-id="0" dlg:id="PatConeDlg3" dlg:tab-index="6" dlg:left="48" dlg:top="29" dlg:width="54" dlg:height="8" dlg:help-text="&amp;2959.PatConeDlg.PatConeDlg3.HelpText" dlg:value="&amp;2960.PatConeDlg.PatConeDlg3.Label" dlg:checked="true"/>
+   <dlg:radio dlg:style-id="0" dlg:id="PatConeDlg4" dlg:tab-index="7" dlg:left="48" dlg:top="37" dlg:width="62" dlg:height="8" dlg:help-text="&amp;2961.PatConeDlg.PatConeDlg4.HelpText" dlg:value="&amp;2962.PatConeDlg.PatConeDlg4.Label"/>
+   <dlg:radio dlg:id="PatConeDlg5" dlg:tab-index="13" dlg:left="137" dlg:top="31" dlg:width="30" dlg:height="10" dlg:help-text="&amp;2963.PatConeDlg.PatConeDlg5.HelpText" dlg:value="&amp;2964.PatConeDlg.PatConeDlg5.Label"/>
+  </dlg:radiogroup>
+  <dlg:text dlg:style-id="4" dlg:id="Message3" dlg:tab-index="18" dlg:visible="false" dlg:left="-139" dlg:top="34" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2967.PatConeDlg.Message3.HelpText" dlg:value="&amp;2968.PatConeDlg.Message3.Label"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="optionCm" dlg:tab-index="19" dlg:left="174" dlg:top="3" dlg:width="20" dlg:height="8" dlg:help-text="&amp;4799.PatConeDlg.optionCm.HelpText" dlg:value="&amp;4800.PatConeDlg.optionCm.Label">
+    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCone.OptionUnite_click?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:id="optionInch" dlg:tab-index="20" dlg:left="198" dlg:top="3" dlg:width="20" dlg:height="8" dlg:help-text="&amp;4803.PatConeDlg.optionInch.HelpText" dlg:value="&amp;4804.PatConeDlg.optionInch.Label">
+    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCone.OptionUnite_click?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+  </dlg:radiogroup>
+  <dlg:text dlg:id="UL1" dlg:tab-index="1" dlg:left="32" dlg:top="54" dlg:width="17" dlg:height="8" dlg:help-text="&amp;4815.PatConeDlg.UL1.HelpText" dlg:value="&amp;4816.PatConeDlg.UL1.Label"/>
+  <dlg:text dlg:id="UL2" dlg:tab-index="3" dlg:left="79" dlg:top="54" dlg:width="17" dlg:height="8" dlg:help-text="&amp;4817.PatConeDlg.UL2.HelpText" dlg:value="&amp;4818.PatConeDlg.UL2.Label"/>
+ </dlg:bulletinboard>
+</dlg:window>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="TextesForm" dlg:left="221" dlg:top="172" dlg:width="204" dlg:height="129" dlg:closeable="true" dlg:moveable="true">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:font-name="Wingdings 3" dlg:font-height="7" dlg:font-stylename="Normal" dlg:font-family="roman" dlg:font-charset="symbol" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="1" dlg:font-name="Wingdings 3" dlg:font-height="7" dlg:font-stylename="Normal" dlg:font-family="roman" dlg:font-charset="symbol" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="2" dlg:font-name="Wingdings 3" dlg:font-height="7" dlg:font-stylename="Normal" dlg:font-family="roman" dlg:font-charset="symbol" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="3" dlg:font-name="Wingdings 3" dlg:font-height="7" dlg:font-stylename="Normal" dlg:font-family="roman" dlg:font-charset="symbol" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="4" dlg:font-name="Wingdings 3" dlg:font-height="7" dlg:font-stylename="Normal" dlg:font-family="roman" dlg:font-charset="symbol" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="5" dlg:font-name="Wingdings 3" dlg:font-height="7" dlg:font-stylename="Normal" dlg:font-family="roman" dlg:font-charset="symbol" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="6" dlg:font-name="Wingdings 3" dlg:font-height="7" dlg:font-stylename="Normal" dlg:font-family="roman" dlg:font-charset="symbol" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="7" dlg:font-name="Wingdings 3" dlg:font-height="7" dlg:font-stylename="Normal" dlg:font-family="roman" dlg:font-charset="symbol" dlg:font-weight="100"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="17" dlg:top="90" dlg:width="85" dlg:height="28" dlg:value="Exemple" dlg:align="center"/>
+  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="1" dlg:left="34" dlg:top="2" dlg:width="74" dlg:height="16" dlg:spin="true" dlg:linecount="10">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_ComboBox1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:combobox>
+  <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="2" dlg:left="34" dlg:top="33" dlg:width="74" dlg:height="16" dlg:spin="true" dlg:linecount="10">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_ComboBox2?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_ComboBox2?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:combobox>
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="3" dlg:left="69" dlg:top="55" dlg:width="39" dlg:height="9" dlg:value="Gras" dlg:checked="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_CheckBox1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="4" dlg:left="69" dlg:top="63" dlg:width="38" dlg:height="9" dlg:value="Italique" dlg:checked="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_CheckBox2?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:checkbox dlg:id="CheckBox3" dlg:tab-index="5" dlg:left="69" dlg:top="73" dlg:width="38" dlg:height="9" dlg:value="Souligné" dlg:checked="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_CheckBox3?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
+  <dlg:text dlg:id="Label2" dlg:tab-index="7" dlg:left="12" dlg:top="58" dlg:width="17" dlg:height="9" dlg:value="Taille"/>
+  <dlg:scrollbar dlg:id="ScrollBar1" dlg:tab-index="8" dlg:left="56" dlg:top="55" dlg:width="8" dlg:height="16" dlg:align="vertical" dlg:curpos="12" dlg:maxpos="20" dlg:minpos="1">
+   <script:event script:event-name="on-adjustmentvaluechange" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_Scroll1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:scrollbar>
+  <dlg:text dlg:id="Label3" dlg:tab-index="9" dlg:left="12" dlg:top="5" dlg:width="17" dlg:height="9" dlg:value="Objet"/>
+  <dlg:text dlg:id="Label4" dlg:tab-index="10" dlg:left="12" dlg:top="34" dlg:width="17" dlg:height="9" dlg:value="Nom"/>
+  <dlg:checkbox dlg:id="CheckBox4" dlg:tab-index="11" dlg:left="111" dlg:top="5" dlg:width="23" dlg:height="9" dlg:help-text="Cocher pour changer la police de caractère pour tous les textes de la sélection." dlg:value="Tous" dlg:checked="false"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="12" dlg:left="134" dlg:top="105" dlg:width="41" dlg:height="18" dlg:default="true" dlg:value="Terminer">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_CommandButton1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="13" dlg:left="34" dlg:top="138" dlg:width="74" dlg:height="16" dlg:spin="true" dlg:linecount="10"/>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="14" dlg:left="113" dlg:top="21" dlg:width="80" dlg:height="75">
+   <dlg:title dlg:value="Déplacements"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label5" dlg:tab-index="15" dlg:left="116" dlg:top="34" dlg:width="20" dlg:height="8" dlg:value="Angle"/>
+  <dlg:scrollbar dlg:id="ScrollBar2" dlg:tab-index="17" dlg:left="135" dlg:top="44" dlg:width="8" dlg:height="15" dlg:align="vertical" dlg:curpos="12" dlg:maxpos="360"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="18" dlg:left="124" dlg:top="61" dlg:width="7" dlg:height="8" dlg:value="OptionButton1" dlg:checked="true"/>
+   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="19" dlg:left="132" dlg:top="69" dlg:width="7" dlg:height="8" dlg:value="OptionButton1"/>
+   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="20" dlg:left="124" dlg:top="74" dlg:width="7" dlg:height="8" dlg:value="OptionButton1"/>
+   <dlg:radio dlg:id="OptionButton4" dlg:tab-index="21" dlg:left="116" dlg:top="69" dlg:width="7" dlg:height="8" dlg:value="OptionButton1"/>
+  </dlg:radiogroup>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="22" dlg:left="8" dlg:top="21" dlg:width="103" dlg:height="102">
+   <dlg:title dlg:value="Police"/>
+  </dlg:titledbox>
+  <dlg:button dlg:style-id="0" dlg:id="CommandButton2" dlg:tab-index="23" dlg:left="156" dlg:top="62" dlg:width="10" dlg:height="10" dlg:value="v" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChangeTexteForm_DeplaceObjet?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="1" dlg:id="CommandButton4" dlg:tab-index="25" dlg:left="167" dlg:top="62" dlg:width="10" dlg:height="10" dlg:value="w" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChangeTexteForm_DeplaceObjet?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="2" dlg:id="CommandButton7" dlg:tab-index="28" dlg:left="156" dlg:top="42" dlg:width="21" dlg:height="10" dlg:value="p" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChangeTexteForm_DeplaceObjet?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:textfield dlg:id="TextBox1" dlg:tab-index="6" dlg:left="34" dlg:top="55" dlg:width="23" dlg:height="16" dlg:align="center" dlg:value="12">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChargeTexteForm_TextBox1?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:id="TextBox2" dlg:tab-index="16" dlg:left="116" dlg:top="42" dlg:width="19" dlg:height="15" dlg:align="center" dlg:value="12"/>
+  <dlg:button dlg:style-id="3" dlg:id="CommandButton3" dlg:tab-index="27" dlg:left="156" dlg:top="52" dlg:width="21" dlg:height="10" dlg:value="r" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChangeTexteForm_DeplaceObjet?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="4" dlg:id="CommandButton6" dlg:tab-index="24" dlg:left="146" dlg:top="52" dlg:width="10" dlg:height="30" dlg:value="t" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChangeTexteForm_DeplaceObjet?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="5" dlg:id="CommandButton5" dlg:tab-index="30" dlg:left="156" dlg:top="72" dlg:width="21" dlg:height="10" dlg:value="s" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChangeTexteForm_DeplaceObjet?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="6" dlg:id="CommandButton8" dlg:tab-index="26" dlg:left="177" dlg:top="52" dlg:width="10" dlg:height="30" dlg:value="u" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChangeTexteForm_DeplaceObjet?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="7" dlg:id="CommandButton9" dlg:tab-index="29" dlg:left="156" dlg:top="82" dlg:width="21" dlg:height="10" dlg:value="q" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoTep.Textes.ChangeTexteForm_DeplaceObjet?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

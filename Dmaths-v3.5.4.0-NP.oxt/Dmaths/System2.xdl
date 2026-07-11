@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="System2" dlg:left="101" dlg:top="84" dlg:width="362" dlg:height="135" dlg:help-text="&amp;1480.System2.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1481.System2.Title">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="32" dlg:top="21" dlg:width="89" dlg:height="10" dlg:help-text="&amp;1482.System2.Label1.HelpText" dlg:value="&amp;1483.System2.Label1.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="15" dlg:left="57" dlg:top="39" dlg:width="37" dlg:height="9" dlg:help-text="&amp;1484.System2.Label2.HelpText" dlg:value="&amp;1485.System2.Label2.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="16" dlg:left="163" dlg:top="39" dlg:width="29" dlg:height="9" dlg:help-text="&amp;1486.System2.Label3.HelpText" dlg:value="&amp;1487.System2.Label3.Label" dlg:align="center"/>
+  <dlg:text dlg:id="Label4" dlg:tab-index="17" dlg:left="248" dlg:top="39" dlg:width="33" dlg:height="9" dlg:help-text="&amp;1488.System2.Label4.HelpText" dlg:value="&amp;1489.System2.Label4.Label" dlg:align="center"/>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="1" dlg:left="24" dlg:top="54" dlg:width="132" dlg:height="18" dlg:help-text="&amp;1490.System2.TextField1.HelpText" dlg:value="&amp;1491.System2.TextField1.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:id="TextField3" dlg:tab-index="2" dlg:left="159" dlg:top="54" dlg:width="37" dlg:height="18" dlg:help-text="&amp;1492.System2.TextField3.HelpText" dlg:align="center" dlg:value="&amp;1493.System2.TextField3.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:id="TextField4" dlg:tab-index="3" dlg:left="201" dlg:top="54" dlg:width="135" dlg:height="18" dlg:help-text="&amp;1494.System2.TextField4.HelpText" dlg:value="&amp;1495.System2.TextField4.Text">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:Dmaths.Module2.TextIndexSet_any?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="18" dlg:left="12" dlg:top="5" dlg:width="337" dlg:height="77" dlg:help-text="&amp;1496.System2.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;1497.System2.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="4" dlg:left="13" dlg:top="101" dlg:width="40" dlg:height="16" dlg:help-text="&amp;1498.System2.CommandButton1.HelpText" dlg:value="&amp;1499.System2.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module2.ValideEquation" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="5" dlg:left="61" dlg:top="101" dlg:width="55" dlg:height="16" dlg:help-text="&amp;1500.System2.CommandButton2.HelpText" dlg:value="&amp;1501.System2.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module2.InsereSysteme" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="6" dlg:left="124" dlg:top="101" dlg:width="40" dlg:height="16" dlg:help-text="&amp;1502.System2.CommandButton3.HelpText" dlg:value="&amp;1503.System2.CommandButton3.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module2.FinFormuleGraphique" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:textfield dlg:id="TextField6" dlg:tab-index="14" dlg:left="124" dlg:top="17" dlg:width="29" dlg:height="16" dlg:help-text="&amp;1504.System2.TextField6.HelpText" dlg:tabstop="false" dlg:align="center" dlg:readonly="true" dlg:value="&amp;1505.System2.TextField6.Text"/>
+  <dlg:button dlg:id="CommandButton4" dlg:tab-index="7" dlg:left="199" dlg:top="101" dlg:width="16" dlg:height="16" dlg:help-text="&amp;1506.System2.CommandButton4.HelpText" dlg:value="&amp;1507.System2.CommandButton4.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetentreParentheses" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton5" dlg:tab-index="8" dlg:left="219" dlg:top="101" dlg:width="16" dlg:height="16" dlg:help-text="&amp;1508.System2.CommandButton5.HelpText" dlg:value="&amp;1509.System2.CommandButton5.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetentreAccolades2" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton6" dlg:tab-index="10" dlg:left="259" dlg:top="101" dlg:width="16" dlg:height="16" dlg:help-text="&amp;1510.System2.CommandButton6.HelpText" dlg:value="&amp;1511.System2.CommandButton6.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetenRacineBleue" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="19" dlg:left="172" dlg:top="90" dlg:width="178" dlg:height="34" dlg:help-text="&amp;1512.System2.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;1513.System2.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:button dlg:id="CommandButton7" dlg:tab-index="11" dlg:left="279" dlg:top="101" dlg:width="16" dlg:height="16" dlg:help-text="&amp;1514.System2.CommandButton7.HelpText" dlg:value="&amp;1515.System2.CommandButton7.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetLPi" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton8" dlg:tab-index="9" dlg:left="239" dlg:top="101" dlg:width="16" dlg:height="16" dlg:help-text="&amp;1516.System2.CommandButton8.HelpText" dlg:value="&amp;1517.System2.CommandButton8.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="Dmaths.Module1.MetLcdot" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton9" dlg:tab-index="12" dlg:left="300" dlg:top="101" dlg:width="20" dlg:height="16" dlg:help-text="&amp;1518.System2.CommandButton9.HelpText" dlg:value="&amp;1519.System2.CommandButton9.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetentreIndex?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton10" dlg:tab-index="13" dlg:left="323" dlg:top="101" dlg:width="20" dlg:height="16" dlg:help-text="&amp;1520.System2.CommandButton10.HelpText" dlg:value="&amp;1521.System2.CommandButton10.Label" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetentreExp?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton11" dlg:tab-index="20" dlg:left="179" dlg:top="101" dlg:width="16" dlg:height="16" dlg:help-text="F9" dlg:value="{ }" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module1.MetentreAccolades?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

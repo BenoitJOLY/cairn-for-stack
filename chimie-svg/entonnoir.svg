@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="62.130264mm"
+   height="91.628838mm"
+   viewBox="0 0 62.13026 91.628837"
+   version="1.1"
+   id="svg973"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="entonnoir.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview975"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.74564394"
+     inkscape:cx="114.66599"
+     inkscape:cy="168.98146"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer3" />
+  <defs
+     id="defs970">
+    <rect
+       x="378.47"
+       y="610.24103"
+       width="119.90466"
+       height="37.51207"
+       id="rect11217" />
+  </defs>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-35.779788,-103.97825)">
+    <g
+       inkscape:groupmode="layer"
+       id="layer3"
+       inkscape:label="entonnoir"
+       style="display:inline"
+       sodipodi:insensitive="true"
+       transform="translate(18.449105,33.118203)">
+      <path
+         id="path3383"
+         style="display:inline;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.7;stroke-dasharray:none"
+         d="m 22.242277,71.035071 7.266569,12.583569 5.848702,10.988468 7.089333,12.583572 h 10.811238 l 6.025933,-10.456771 5.848701,-9.925068 6.025936,-9.925069 3.544665,-5.671468 m 4.454065,0.08644 -26.762234,46.612376 -0.177231,44.48557 M 17.634212,71.389538 44.39645,118.00191 l 0.177231,44.48558" />
+    </g>
+  </g>
+</svg>

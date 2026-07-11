@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396602  -->
+  <question type="stack">
+    <name>
+      <text>Conversion Base N (Aléatoire) vers Base 10</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#7c2d12;border-left:5px solid #ea580c;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Numération — Conversion vers Base 10</strong>
+        <span style="background:#ea580c;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#ea580c;border:1px solid #ea580c;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🧠 Difficile</span>
+      </div>
+      
+      <p><strong>Consigne :</strong> Convertissez le nombre suivant (en base <strong>{@N@}</strong>) en base 10 (décimal) :</p>
+      <p style="text-align: center; font-size: 1.5em; font-weight: bold; margin: 15px 0;">
+        \( {@n_str@} _{@N@} \) = [[input:ans1]] \( _{10} \)
+      </p>
+      <div style="margin-bottom: 15px;">[[validation:ans1]]</div>
+      
+      <div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin:15px 0;">
+        <strong>Conseils pour la saisie :</strong>
+        <ul style="margin:8px 0 0 20px;line-height:1.7">
+          <li>Saisissez uniquement le nombre entier résultat (sans unité).</li>
+          <li>Rappel : A=10, B=11, C=12, D=13, E=14, F=15.</li>
+        </ul>
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:#7c2d12; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponse attendue
+        </div>
+        <div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">
+          <span style="font-weight:bold;color:#7c2d12;">Conversion :</span>
+          <p>Pour convertir vers la base 10, on multiplie chaque chiffre par la puissance de {@N@} correspondant à son rang, puis on additionne.</p>
+          <p>{@n_str@}<sub>{@N@}</sub> = {@ta_dec@}<sub>10</sub></p>
+        </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. Choisir une base aléatoire (2 à 16) SANS la base 10 */
+all_bases: makelist(i, i, 2, 16);
+allowed_bases: delete(10, all_bases);
+N: allowed_bases[rand(length(allowed_bases)) + 1];
+
+/* 2. Générer une liste d'entiers aléatoires (longueur 2 ou 3 chiffres) */
+len_N: rand(2) + 2;
+/* Le premier chiffre ne doit pas être 0 pour éviter la confusion */
+digits_list: cons(rand(N-1) + 1, makelist(rand(N), i, 1, len_N - 1));
+
+/* 3. Convertir la liste en chaîne pour l'affichage (map ultra rapide) */
+sym: ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+n_str: simplode(map(lambda([x], sym[x+1]), digits_list));
+
+/* 4. Calcule la vraie réponse décimale (Méthode de Horner : zéro timeout) */
+ta_dec: block([res: 0],
+    for d in digits_list do (
+        res: res * N + d
+    ),
+    res
+);
+
+/* 5. Erreur classique : l'élève a lu de droite à gauche */
+ta_err_rev: block([res: 0],
+    for d in reverse(digits_list) do (
+        res: res * N + d
+    ),
+    res
+);
+
+/* 6. Erreur classique : l'élève a lu la chaîne comme si c'était de la base 10 */
+piege_recopie: block([res: 0],
+    for d in digits_list do (
+        res: res * 10 + d
+    ),
+    res
+);]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Base: {@N@} | Nombre: {@n_str@} | Décimal: {@ta_dec@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec format strict STACK</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>ta_dec</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>1</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse exacte</description>
+        <answertest>EqualComAss</answertest>
+        <sans>ans1</sans>
+        <tans>ta_dec</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1.0000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Correct !</strong> La conversion en base 10 est parfaite.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Lecture comme un nombre décimal</description>
+        <answertest>EqualComAss</answertest>
+        <sans>ans1</sans>
+        <tans>piege_recopie</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de base.</strong> Vous avez lu ce nombre comme s'il était en base 10 (dizaines, centaines...). C'est un nombre en <strong>base {@N@}</strong>, vous devez utiliser des puissances de {@N@} !</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Poids des chiffres inversés</description>
+        <answertest>EqualComAss</answertest>
+        <sans>ans1</sans>
+        <tans>ta_err_rev</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de sens de lecture.</strong> Vous avez attribué le poids le plus fort au chiffre de droite. Le chiffre le plus à droite vaut toujours \( {@N@}^0 \), le suivant vers la gauche \( {@N@}^1 \), etc.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur de calcul générique</description>
+        <answertest>RegExp</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA[".*"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Votre résultat est faux. Vérifiez la valeur des lettres (A=10, B=11...) et vos calculs de puissances de {@N@}.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

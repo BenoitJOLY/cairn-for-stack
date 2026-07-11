@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="NommageCode" script:language="StarBasic">&apos;OOoGdmath
+&apos;Copyright (C) 2005-2011  Gilles Daurat
+&apos;Amélioration et corrections de bugs 2012-  Didier Dorange-Pattoret/Gisbert Friege
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+option Explicit
+
+Public oNommageForm as object
+
+Sub Main
+	AfficheNommageForm
+End Sub
+
+Sub AfficheNommageForm()
+&apos;on error resume next
+	oNommageForm = LoadDialog(&quot;OOoGdmath&quot;,&quot;NommageForm&quot;)
+	ChangeTitreDialog(oNommageForm)
+	oNommageForm.Model.OptionButton1.State = (OOoGdmath_TypeNommage = 0)
+	oNommageForm.Model.OptionButton2.State = (OOoGdmath_TypeNommage = 1)
+	oNommageForm.Model.OptionButton3.State = (OOoGdmath_SensNommage = 0)
+	oNommageForm.Model.OptionButton4.State = (OOoGdmath_SensNommage = 1)
+	oNommageForm.Execute()
+End Sub
+
+Sub NommageForm_CommandButton3()
+	if (oNommageForm.Model.OptionButton3.State) Then
+		RemplaceConstante &quot;n_OOoGdmath_SensNommage&quot;, 0
+	else
+		RemplaceConstante &quot;n_OOoGdmath_SensNommage&quot;, 1
+	End if
+	if (oNommageForm.Model.OptionButton1.State) Then
+		RemplaceConstante &quot;n_OOoGdmath_TypeNommage&quot;, 0
+	else
+		RemplaceConstante &quot;n_OOoGdmath_TypeNommage&quot;, 1
+	End if
+	oNommageForm.EndExecute()
+End sub
+
+Sub ORenomme()
+	AfficheNommageForm
+End Sub
+
+Sub GRenomme(evt as Object, uneBoite as Object, zone())
+Dim indice as String
+Dim texte as String
+Dim i, di, ni as integer 
+
+	if (evt.Buttons=1) and (evt.ClickCount=2) Then
+		ni = ubound(zone()) - lbound(zone()) + 1
+		for i=lbound(zone()) to ubound(zone())
+			if zone(i)= evt.Source.Model.Name then di = i
+		next i
+		texte = uneBoite.GetControl(zone(di)).Text
+		i = di
+		indice = &quot;1&quot;
+		while(ni&gt;0)
+			uneBoite.GetControl(zone(i)).Text = miif(OOoGdmath_TypeNommage, texte &amp; indice, texte)
+			if OOoGdmath_TypeNommage = 0 then
+				texte = chr(asc(texte) + 1)
+			Else
+				indice = chr(asc(indice) + 1)
+			End if
+			if OOoGdmath_SensNommage = 0 then
+				if i = ubound(zone()) then 
+					i = lbound(zone())
+				Else
+					i = i + 1
+				End If
+			else
+				if i = lbound(zone()) then
+					i=ubound(zone())
+				Else
+					i = i - 1
+				End if
+			End If
+			ni = ni - 1
+		wEnd
+	End if
+End Sub
+
+</script:module>

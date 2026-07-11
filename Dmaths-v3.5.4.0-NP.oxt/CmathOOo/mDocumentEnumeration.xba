@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="mDocumentEnumeration" script:language="StarBasic">&apos; +-------------------------------------------------------------------------+
+&apos; | This source file is part of MaXOpenInfo.com and MaXForms.com projects   |
+&apos; |                                                                         |
+&apos; +-------------------------------------------------------------------------+
+&apos; | Copyright © 2003-2004 - Robert DARGAUD - BOBICIEL. All rights reserved. |
+&apos; +-------------------------------------------------------------------------+
+&apos; | This source file is free software; you can redistribute it and/or       |
+&apos; | modify it under the terms of the GNU Lesser General Public              |
+&apos; | License as published by the Free Software Foundation; either            |
+&apos; | version 2.1 of the License, or (at your option) any later version.      |
+&apos; |                                                                         |
+&apos; | This source file is distributed in the hope that it will be useful,     |
+&apos; | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
+&apos; | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU        |
+&apos; | Lesser General Public License for more details.                         |
+&apos; | http://www.opensource.org/licenses/lgpl-license.php                     |
+&apos; |                                                                         |
+&apos; | You should have received a copy of the GNU General Public License       |
+&apos; | along with this  source file; if not, write to the Free Software        |
+&apos; | Foundation Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA  |
+&apos; +-------------------------------------------------------------------------+
+&apos; | Author: Robert DARGAUD &lt;rdargaud@bobiciel.com&gt;                          |
+&apos; +-------------------------------------------------------------------------+
+&apos; | Download new version : www.maxopeninfo.com / www.maxopeninfo.org        |
+&apos; +-------------------------------------------------------------------------+
+&apos; |                                                                         |
+&apos; | WriterEnumeration : Robert DARGAUD - BOBICIEL - FRANCE - July 2004      |
+&apos; | CalcEnumeration   : ................................................... |
+&apos; | DrawEnumeration   : ................................................... |
+&apos; |                                                                         |
+&apos; | C/C++ version     : ................................................... |
+&apos; |                                                                         |
+&apos; +-------------------------------------------------------------------------+
+&apos; | AddOn OpenOffice.org / Sun StarOffice                                   |
+&apos; +-------------------------------------------------------------------------+
+&apos; | History :                                                               |
+&apos; +-------------------------------------------------------------------------+
+&apos; | beta 0.1 : 2004/08/02                                                   |
+&apos; | beta 0.2 : 2004/08/09 support des cellules fusionnées                   |
+&apos; |                                                                         |
+&apos; | novembre 2005 : code modifé par C. Devalland pour repérer les formules 	|
+&apos; | mathématiques        													|
+&apos; +-------------------------------------------------------------------------+
+
+&apos; &lt;en&gt;
+REM  *****  BASIC (currently ;-) *****
+&apos;
+&apos; This module is doing a complete or partial enumeration against an OpenOffice.org document (currently for Writer).
+&apos;
+&apos; For Calc, Draw and Impress it is just a matter of pizza, cups of coffee, pizza, coca, pop corn, ...
+&apos; and additional nigthly hours. So, if you like pizzas, ... by night, it&apos;s your turn ...
+&apos;
+&apos; This enumeration is working on OOo document in the same way as a sax parser on an xml document.
+&apos; This way allows to develop macros fastly just coding event controlers using basic language.
+&apos; For instance refer to mCopyWikiWiki in this doc which translate document content to WikiWiki tags
+&apos; (as www.WikiPedia.org, www.wikini.net, www.Spip.net, ...).
+&apos;
+&apos; Currently the document components are systematically enumerated in paragraphs order, but the &quot;OrderBy&quot; parameter
+&apos; will allow to optimize the algorithm.
+&apos;
+&apos; This enumeration are running in background letting the user free to work (or not :-), this required a FIFO stack.
+&apos;
+&apos; This is a draft to validate the enumeration algorithm.
+&apos; The basic version is currently usable and fast enought to use it with complex and 10 pages long documents.
+&apos;
+&apos; The real implementation should be writen in C/C++ to package it and boost up the process :-)
+&apos; But, in order to let the end user able to customize his own applications, the events controls must stay in OOoBasic
+&apos; language.
+&apos; Is it possible and easy to code ? ...
+&apos; Any participation (coding, remarques, suggestions, tests, ...) is welcom !
+&apos;
+&apos; &lt;/en&gt;
+
+&apos; &lt;fr&gt;
+REM  *****  BASIC (pour le moment ;-) *****
+&apos;
+&apos; Ce module effectue une énumération complète ou partielle d&apos;un document OpenOffice.org (pour le moment Writer).
+&apos; Pour Calc, Draw et Impress ce n&apos;est qu&apos;une question de quelques pizza, bière, saucisson, p&apos;tit coup de rouge, fromage, ... 
+&apos; et heures de nuit supplémentaires. Si vous aimer manger des pizzas, ... la nuit, à vous de jouer ...
+&apos;
+&apos; Cette énumération déclenche des évènements sur un document OOo à la manière d&apos;un parseur sax sur un document xml.
+&apos; Cette technique permet de développer rapidement des macros en enrichissant simplement les gestionnaires d&apos;évènement 
+&apos; en basic. Voir par exemple le module mCopyWikiWiki dans ce même doc qui traduit le contenu d&apos;un document en balisage
+&apos; de type WikiWiki (comme www.WikiPedia.org, www.Spip.net, ...).
+&apos;
+&apos; Actuellement les composants du document sont systématiquement énumérés dans l&apos;ordre des paragraphes, mais le paramètre
+&apos; &quot;OrderBy&quot; permettra d&apos;effectuer des optimisations lorsque l&apos;ordre d&apos;énumération n&apos;a pas d&apos;importance.
+&apos; 
+&apos; Ces énumérations s&apos;exécutent en tâche de fond en laissant la main à l&apos;utilisateur, ce qui nécessite une pile FIFO pour
+&apos; mémoriser les requêtes d&apos;énumération.
+&apos;
+&apos; Ce code peut être considéré comme une première approche pour valider l&apos;algorithme d&apos;énumération.
+&apos; Cette version OOoBasic est actuellement utilisable et suffisament performante pour être utilisée sur des documents
+&apos; à l&apos;architecture complexe et d&apos;une dizaine de pages (comme par exemple des formulaires ;-)
+&apos;
+&apos; La vraie implémentation de ce code doit être écrite en C/C++ pour le &quot;packager&quot; et augmenter ses performances :-)
+&apos; Mais, pour laisser à l&apos;utilisateur la possibilité de créer ses propres applications macros, les gestionnaires
+&apos; d&apos;évènements doivent rester en OOoBasic.
+&apos; Est-ce possible et simple à réaliser ? ...
+&apos; Toute participation (pour l&apos;écriture, des remarques, des suggestions, des tests, ...) est la bienvenue !
+&apos; 
+&apos; &lt;/fr&gt;
+
+option explicit
+
+&apos;&lt;fr&gt; RMQ: à passer en paramètres, pour qu&apos;ils ne puissent pas être modifiés par les gestionaires d&apos;évènement
+&apos; car bien qu&apos;en private, les autres modules y on accès !!??!!
+private oEventsModule as object
+private iOrderBy as integer
+private EnumerationIsEnabled as boolean
+private EnumerationInProgress as boolean
+
+&apos;&lt;fr&gt;  variables indiquant si un gestionnaire d&apos;évènement est implémenté
+&apos;&lt;fr&gt; RMQ: actuellement, ça ne fonctionne pas (voir sub DetectImplementedEnumerationEvents)
+private onStartOfEnumeration_isImplemented as boolean
+private onEndOfEnumeration_isImplemented as boolean
+private onStartOfParagraph_isImplemented as boolean
+private onEndOfParagraph_isImplemented as boolean
+private onStartOfTextTable_isImplemented as boolean
+private onEndOfTextTable_isImplemented as boolean
+private onStartOfRow_isImplemented as boolean
+private onEndOfRow_isImplemented as boolean
+private onStartOfCell_isImplemented as boolean
+private onEndOfCell_isImplemented as boolean
+private onStartOfTextSection_isImplemented as boolean
+private onEndOfTextSection_isImplemented as boolean
+private onStartOfTextFrame_isImplemented as boolean
+private onEndOfTextFrame_isImplemented as boolean
+private onStartOfTextEmbeddedObject_isImplemented as boolean
+private onEndOfTextEmbeddedObject_isImplemented as boolean
+private onTextPortion_isImplemented as boolean
+private onTextField_isImplemented as boolean
+private onFootnote_isImplemented as boolean
+private onControlCharacter_isImplemented as boolean
+private onReferenceMark_isImplemented as boolean
+private onDocumentIndexMark_isImplemented as boolean
+private onBookmark_isImplemented as boolean
+private onRedline_isImplemented as boolean
+private onRuby_isImplemented as boolean
+private onTextGraphicObject_isImplemented as boolean
+private onTextShape_isImplemented as boolean
+private onDrawingShape_isImplemented as boolean
+private onFormControl_isImplemented as boolean
+
+&apos;&lt;fr&gt; RMQ: voir pourquoi on doit les déclarer en global pour que la valeur soit conservée
+global sFifoComponentType(10) as string
+global oFifoComponent(ubound(sFifoComponentType()))
+global oFifoEventsModule(ubound(sFifoComponentType()))
+global iFifoOrderBy(ubound(sFifoComponentType()))
+global iLoadFifoCursor as integer
+global iUnLoadFifoCursor as integer
+
+&apos; *********************************************************************************
+&apos; &lt;fr&gt; critère d&apos;ordre pour l&apos;énumération des composants
+&apos; RMQ: actuellement seul &quot;ParagraphsOrder&quot; est implémenté.
+&apos; ultérieurement, ce critère permettra d&apos;effectuer des optimisations lorsque l&apos;ordre d&apos;énumération n&apos;a pas d&apos;importance.
+private const ParagraphsOrder = 0	&apos; les composants sont énumérés selon leur ordre d&apos;apparition dans le document
+private const FormControlsOrder = 1	&apos; les controles de formulaires sont énumérés selon leur attribut &quot;ordre&quot;
+private const CreationOrder = 2		&apos; les composants sont énumérés selon leur ordre de création
+private const AsIsOrder = 4			&apos; les composants peuvent être énumérés dans n&apos;importe quel ordre
+
+&apos; *********************************************************************************
+&apos; &lt;fr&gt; désactivation de l&apos;énumération
+&apos; ce qui permet une optimisation de l&apos;analyse du document en plaçant judicieusement des appels à &quot;DisableEnumeration&quot;
+&apos; dans les gestionnaires d&apos;évènements.
+sub DisableEnumeration
+	EnumerationIsEnabled = false
+end sub
+
+&apos; *********************************************************************************
+&apos; &lt;fr&gt; version AVEC pile FIFO (non entièrement opérationnelle, mais peut être testée ;-)
+sub DocumentEnumeration(sTheComponentType as string, oTheComponent as object, oTheEventsModule as object, optional iTheOrderBy as integer)
+
+&apos;&lt;fr&gt; RMQ: contrôler le type des objets passés en paramètres
+	EnumerationIsEnabled = true
+	&apos;&lt;fr&gt; empilage de la requête d&apos;énumération
+	if IsMissing(iTheOrderBy) then
+		LoadFifoEnumerations(sTheComponentType, oTheComponent, oTheEventsModule, 0)
+	else
+		LoadFifoEnumerations(sTheComponentType, oTheComponent, oTheEventsModule, iTheOrderBy)
+	end if
+
+end sub
+
+&apos; *********************************************************************************
+&apos; &lt;fr&gt; version SANS pile FIFO
+sub _DocumentEnumeration(sTheComponentType as string, oTheComponent as object, oTheEventsModule as object, optional iTheOrderBy as integer)
+
+&apos;&lt;fr&gt; RMQ: contrôler le type des objets passés en paramètres
+
+	&apos; &lt;fr&gt; si une énumération est déja en cours, la nouvelle requête est tout simplement ignorée (d&apos;ou l&apos;intéret d&apos;une pile FIFO :-)
+	if EnumerationInProgress then
+		exit sub
+	end if
+	
+	oEventsModule = oTheEventsModule
+	if IsMissing(iTheOrderBy) then
+		iOrderBy = 0
+	else
+		iOrderBy = iTheOrderBy
+	end if
+
+&apos; &lt;fr&gt; RMQ: non opérationnel (voir DetectImplementedEnumerationEvents en fin de module)
+&apos;	DetectImplementedEnumerationEvents
+
+	EnumerationInProgress = true
+	EnumerationIsEnabled = true
+&apos; &lt;fr&gt; RMQ: l&apos;idéal serait que le type soit détecté automatiquement
+&apos; avec .supportsService ?
+	oEventsModule.onStartOfEnumeration(oTheComponent)
+	select case lcase(sTheComponentType)
+	case &quot;writer&quot;
+		WriterEnumeration(oTheComponent)
+	case &quot;calc&quot;
+		CalcEnumeration(oTheComponent)
+	case &quot;draw&quot;
+		DrawEnumeration(oTheComponent)
+	end select
+	oEventsModule.onEndOfEnumeration(oTheComponent)
+	&apos; &lt;fr&gt; délai minimum entre 2 énumérations (RMQ: à ajuster)
+	wait 500
+	EnumerationInProgress = false
+
+end sub
+
+&apos; *********************************************************************************
+&apos; &lt;fr&gt; empilage des requêtes d&apos;énumération
+sub LoadFifoEnumerations(sTheComponentType as string, oTheComponent as object, oTheEventsModule as object, iTheOrderBy as integer)
+
+	dim i as integer
+	dim ok as boolean
+
+&apos;&lt;fr&gt; RMQ: contrôler le type des objets passés en paramètres
+
+	&apos; &lt;fr&gt; Contrôle des limtes du curseur sur la pile FIFO circulaire
+	if (iLoadFifoCursor &lt; 0) or (iLoadFifoCursor &gt;= ubound(sFifoComponentType())) then
+		iLoadFifoCursor = 0
+	end if
+
+	&apos; &lt;fr&gt; Contrôle qu&apos;il n&apos;y ai rien à cet emplacement dans la pile FIFO
+	if (sFifoComponentType(iLoadFifoCursor) &lt;&gt; &quot;&quot;) then
+		print &quot;La pile FIFO est pleine, Impossible d&apos;empiler !!!&quot; &amp; &quot; curseur load =&quot; + iLoadFifoCursor &amp; &quot; curseur unLoad =&quot; + iUnLoadFifoCursor
+		&apos; &lt;fr&gt; vidage de la pile (pour debug)
+		iLoadFifoCursor = 0
+		iUnLoadFifoCursor = 0
+		for i = 0 to ubound(sFifoComponentType())
+			sFifoComponentType(i) = &quot;&quot;
+		next i
+		exit sub
+	end if
+	
+	&apos; &lt;fr&gt; si cette requête est déja dans la pile FIFO, on ne l&apos;empile pas une nouvelle fois
+	ok = true
+	for i = 0 to ubound(sFifoComponentType())
+		if (sFifoComponentType(i) = sTheComponentType) then
+			if EqualUnoObjects(oFifoComponent(i), oTheComponent) then
+				if (oFifoEventsModule(i).Name = oTheEventsModule.Name) then
+&apos; debug
+&apos; print &quot;déja dans la pile (&quot; &amp; i &amp; &quot;) &quot; &amp; sTheComponentType &amp; &quot; &quot; &amp; oTheEventsModule.Name
+					ok = false
+				end if
+			end if
+		end if
+	next i
+
+	if ok then
+		&apos; &lt;fr&gt; empilage de la requête
+		sFifoComponentType(iLoadFifoCursor) = sTheComponentType
+		oFifoComponent(iLoadFifoCursor) = oTheComponent
+		oFifoEventsModule(iLoadFifoCursor) = oTheEventsModule
+		iFifoOrderBy(iLoadFifoCursor) = iTheOrderBy
+		&apos; incrémentation du curseur d&apos;empilage
+		iLoadFifoCursor = iLoadFifoCursor + 1
+	end if
+
+	&apos; &lt;fr&gt; si aucune énumération n&apos;est en cours, on exécute un dépilage
+	if not EnumerationInProgress then
+		UnLoadFifoEnumerations
+	end if
+
+end sub
+
+&apos; *********************************************************************************
+&apos; &lt;fr&gt; dépilage des requêtes d&apos;énumération
+sub UnLoadFifoEnumerations
+	dim i as integer
+
+	&apos; &lt;fr&gt; le dépilage ne peut s&apos;effectuer que si aucune énumération n&apos;est en cours
+	if EnumerationInProgress then
+		exit sub
+	end if
+
+	do
+		&apos; &lt;fr&gt; Contrôle des limtes du curseur sur le FIFO circulaire
+		if (iUnLoadFifoCursor &lt; 0) or (iUnLoadFifoCursor &gt;= ubound(sFifoComponentType())) then
+			iUnLoadFifoCursor = 0
+		end if
+
+		&apos; &lt;fr&gt; Contrôle du contenu de la pile FIFO pour le curseur de dépilage
+		&apos; &lt;fr&gt; RMQ: revoir isempty() car il ne va pas permettre de détecter si le composant a été supprimé depuis l&apos;empilage
+		if (instr(&quot;writer,calc,draw&quot;, lcase(sFifoComponentType(iUnLoadFifoCursor))) &gt; 0) _
+		and not isempty(oFifoComponent(iUnLoadFifoCursor)) _
+		and not isempty(oFifoEventsModule(iUnLoadFifoCursor)) then
+			oEventsModule = oFifoEventsModule(iUnLoadFifoCursor)
+			iOrderBy = iFifoOrderBy(iUnLoadFifoCursor)
+			EnumerationInProgress = true
+			EnumerationIsEnabled = true
+&apos; &lt;fr&gt; RMQ: non opérationnel (voir DetectImplementedEnumerationEvents en fin de module)
+&apos;			DetectImplementedEnumerationEvents
+
+&apos; &lt;fr&gt; RMQ: l&apos;idéal serait que le type soit détecté automatiquement
+&apos; avec .supportsService ?
+			oEventsModule.onStartOfEnumeration(oFifoComponent(iUnLoadFifoCursor))
+			select case lcase(sFifoComponentType(iUnLoadFifoCursor))
+			case &quot;writer&quot;
+				WriterEnumeration(oFifoComponent(iUnLoadFifoCursor))
+			case &quot;calc&quot;
+				CalcEnumeration(oFifoComponent(iUnLoadFifoCursor))
+			case &quot;draw&quot;
+				DrawEnumeration(oFifoComponent(iUnLoadFifoCursor))
+			end select
+			oEventsModule.onEndOfEnumeration(oFifoComponent(iUnLoadFifoCursor))
+		else
+			print &quot;Impossible de dépiler la pile FIFO !!!&quot; &amp; &quot; curseur load =&quot; + iLoadFifoCursor &amp; &quot; curseur unLoad =&quot; + iUnLoadFifoCursor
+		end if
+
+		&apos; &lt;fr&gt; effacement de l&apos;emplacement dans la pile FIFO
+		sFifoComponentType(iUnLoadFifoCursor) = &quot;&quot;
+		&apos; &lt;fr&gt; incrémentation du curseur de dépilage
+		iUnLoadFifoCursor = iUnLoadFifoCursor + 1
+
+		&apos; &lt;fr&gt; délai minimum entre 2 énumérations (RMQ: à ajuster)
+		wait 500
+
+	&apos; &lt;fr&gt; boucle jusqu&apos;à ce que la pile FIFO soit vide
+	loop until (iUnLoadFifoCursor = iLoadFifoCursor)
+	
+	&apos; &lt;fr&gt; raz du drapeau &quot;Enumération en cours&quot;
+	EnumerationInProgress = false
+
+end sub
+
+&apos; *********************************************************************************
+sub WriterEnumeration(oTheTextComponent as object, optional oTheCurrentTextSection)
+
+	dim oParagraphEnum     
+	dim oParagraph         
+	dim oPortionEnum 
+	dim oPortion     
+	dim oRows
+	dim iRowIndex as integer
+	dim oCols
+	dim iColIndex as integer
+	dim oCell
+	dim oCurrentTextSection
+	dim i as integer
+	dim nombreMax as integer, compteur as integer
+	dim oPgb as Object
+
+	&apos; &lt;fr&gt; RMQ: actuellement, oTheTextComponent ne peut être qu&apos;un document texte ou un cadre texte.
+	&apos; &lt;fr&gt; Il est également prévu de pouvoir lancer le traitement sur une section texte et un groupe de paragraphes (pas forcément contigues)
+
+	&apos; &lt;fr&gt; RMQ: tester on&lt;&lt;event&gt;&gt;_isImplemented avant d&apos;appeler la sub correspondante
+	&apos; &lt;fr&gt; RMQ: voir si on gagne réellement du temps en n&apos;implémentant pas tous les gestionnaires d&apos;évènements
+  
+	&apos; &lt;fr&gt; RMQ: OPTIMISATIONS A PREVOIR : ajouter des UserFields aux composants pour mémoriser s&apos;il est nécessaire d&apos;analyser leur contenu.
+	&apos; Ces UserFields seront renseignés au premier traitement (ou en tâche de fond). L&apos;énumération tiendra compte de leur contenu
+	&apos; pour optimiser le traitement.
+	&apos; Ce mécanisme permettra par exemple :
+	&apos; - d&apos;analyser uniquement les champs de formulaire contenus dans une section ou un cadre en lecture seule
+	&apos; - ...
+
+	&apos; &lt;fr&gt; si l&apos;énumération a été désactivée pour ce composant, on n&apos;effectue pas le traitement
+	&apos; (cette fonctionnalité permet d&apos;optimiser l&apos;analyse du document)
+
+	if not EnumerationIsEnabled then
+		EnumerationIsEnabled = true
+		exit sub
+	end if
+
+	&apos; &lt;fr&gt; si aucune section texte courante n&apos;a été passée en paramètre, elle est initialisée à null
+	if IsMissing(oTheCurrentTextSection) then
+		oCurrentTextSection = null
+	else
+		oCurrentTextSection = oTheCurrentTextSection
+	end if
+
+	&apos; &lt;fr&gt; énumération de tous les paragraphes inclus
+	&apos; (rmq: les tableaux sont vus comme des paragraphes particuliers (depuis OOo 1.1.0)
+	oParagraphEnum = oTheTextComponent.getText().createEnumeration()
+	nombreMax=Thiscomponent.ParagraphCount
+	oPgb=Thiscomponent.currentcontroller.statusIndicator
+	oPgb.Start (&quot;Conversion vers SPIP en cours ...&quot;,nombreMax)
+	compteur=0
+	do while oParagraphEnum.hasMoreElements()
+		oParagraph = oParagraphEnum.nextElement()
+		oPgb.value=compteur
+		compteur=compteur+1
+&apos;		if onStartOfTextSection_isImplemented or onEndOfTextSection_isImplemented then
+			&apos; &lt;fr&gt; merci à Bernard Marcelly pour l&apos;idée du parcourt des paragraphes pour analyser la structure des sections
+			&apos; déclenchement des évènements liés aux début et fin de &quot;section texte&quot;
+			if not isempty(oParagraph.TextSection) then
+				AncestorsTextSections(oParagraph.TextSection, oCurrentTextSection)
+				oCurrentTextSection = oParagraph.TextSection
+			elseif not isempty(oCurrentTextSection) then
+				AncestorsTextSections(null, oCurrentTextSection)
+				oCurrentTextSection = null
+			end if
+&apos;		end if
+		
+		&apos; &lt;fr&gt; paragraphe texte
+
+
+		if oParagraph.supportsService(&quot;com.sun.star.text.Paragraph&quot;) then
+
+			oEventsModule.onStartOfParagraph(oParagraph)
+
+			&apos; &lt;fr&gt; énumération des composants ancrés au paragraphe
+			ContentEnumeration(oParagraph, &quot;com.sun.star.text.TextContent&quot;)
+			
+			&apos; &lt;fr&gt; énumération des portions de texte et des composants ancrés &quot;au caractère&quot; ou &quot;comme caractère&quot;
+			oPortionEnum = oParagraph.createEnumeration()
+			do while oPortionEnum.hasMoreElements()
+				oPortion = oPortionEnum.nextElement()
+&apos;				a=oPortion.TextPortionType
+				with oPortion
+					select case .TextPortionType
+					&apos; portion de texte pur
+					case &quot;Text&quot;
+						oEventsModule.onTextPortion(oPortion)
+					&apos; champ texte
+					case &quot;TextField&quot;
+						oEventsModule.onTextField(oPortion.TextField, oPortion.String)
+&apos; &lt;fr&gt; RMQ: à priory, d&apos;après l&apos;api, TextField supporte une énumération du contenu (à voir)
+&apos;						ContentEnumeration(oPortion, &quot;&quot;)
+					&apos; &lt;fr&gt; note de bas de page
+					case &quot;Footnote&quot; 
+						oEventsModule.onFootnote(oPortion)
+					&apos; &lt;fr&gt; caractère de contrôle
+					case &quot;ControlCharacter&quot; 
+						oEventsModule.onControlCharacter(oPortion)
+					&apos; &lt;fr&gt; légende
+					case &quot;ReferenceMark&quot;
+						oEventsModule.onReferenceMark(oPortion)
+					&apos; &lt;fr&gt; index
+					case &quot;DocumentIndexMark&quot;
+						oEventsModule.onDocumentIndexMark(oPortion)
+					&apos; &lt;fr&gt; signet
+					case &quot;Bookmark&quot;
+						oEventsModule.onBookmark(oPortion)
+					&apos; &lt;fr&gt; modification
+					case &quot;Redline&quot;
+						oEventsModule.onRedline(oPortion)
+					&apos; &lt;fr&gt; attribut utilisé pour les textes asiatiques
+					case &quot;Ruby&quot;
+						oEventsModule.onRuby(oPortion)
+					&apos; &lt;fr&gt; cadre
+					case &quot;Frame&quot;
+						ContentEnumeration(oPortion, &quot;&quot;)
+					case else
+						&apos;debug
+						Print &quot;&lt;&quot; + .TextPortionType + &quot;/&gt;&quot;;
+					end select
+				end with
+			loop
+
+
+      
+			oEventsModule.onEndOfParagraph(oParagraph)
+    
+		&apos; &lt;fr&gt; paragraphe tableau
+		elseif oParagraph.supportsService(&quot;com.sun.star.text.TextTable&quot;) Then
+			oEventsModule.onStartOfTextTable(oParagraph)
+
+			oRows = oParagraph.getRows()
+			oCols = oParagraph.getColumns()
+			&apos; &lt;fr&gt; énumération de chaque ligne du tableau
+			for iRowIndex = 0 to (oRows.getCount()-1)
+				oEventsModule.onStartOfRow(oRows(iRowIndex), iRowIndex)
+				&apos; &lt;fr&gt; énumération de chaque cellule de la ligne
+				for iColIndex = 0 to (oCols.getCount()-1)
+&apos;RMQ: ligne à supprimer					oCell = oParagraph.getCellByPosition(iColIndex, iRowIndex)
+					oCell = oCellByPosition(oParagraph, iColIndex, iRowIndex)
+					if not isempty(oCell) then
+
+						oEventsModule.onStartOfCell(oCell, iColIndex)
+						WriterEnumeration(oCell, oCurrentTextSection)
+						oEventsModule.onEndOfCell(oCell, iColIndex)
+					end if
+				next iColIndex
+				oEventsModule.onEndOfRow(oRows(iRowIndex), iRowIndex)
+			next iRowIndex
+
+			oEventsModule.onEndOfTextTable(oParagraph)
+     
+		else
+			msgbox(&quot;type inconnu&quot;)
+			&apos; debug
+			print &quot;&lt;paragraphe_de_type_inconnu/&gt;&quot;;
+    
+		end if
+
+	loop
+	&apos; &lt;fr&gt; si aucune section courante n&apos;a été passée en paramètre, on s&apos;assure que toutes les sections sont bien refermées
+	if IsMissing(oTheCurrentTextSection) then
+		AncestorsTextSections(null, oCurrentTextSection)
+	&apos; &lt;fr&gt; sinon, la section courante doit être celle passée en paramètre en début d&apos;énumération
+	elseif not (isnull(oCurrentTextSection) and isnull(oTheCurrentTextSection)) _
+	and not EqualUnoObjects(oCurrentTextSection, oTheCurrentTextSection) then
+		print &quot;Erreur interne dans la gestion des sections !!!&quot;
+	end if
+oPgb.end
+&apos; &lt;fr&gt; RMQ: ne devrait-on pas libérer oParagraphEnum ?
+
+end sub
+
+&apos; *********************************************************************************
+sub AncestorsTextSections(oTheNewTextSection, oTheCurrentTextSection)
+
+	&apos; &lt;fr&gt; la section est inchangée, on ne fait rien
+	if EqualUnoObjects(oTheNewTextSection, oTheCurrentTextSection) _
+	or (isnull(oTheNewTextSection) and isnull(oTheCurrentTextSection))then
+		exit sub
+	end if
+
+	dim oAncestorNewTextSection(100)
+	dim oAncestorCurrentTextSection(100)
+	dim iCountNew as integer
+	dim iCountCurrent as integer
+	dim i as integer
+	dim icur as integer
+	dim inew as integer
+
+	&apos; &lt;fr&gt; mémorisation des sections ancêtres dans 2 tableaux (un pour la section courante l&apos;autre pour la nouvelle section).
+	oAncestorNewTextSection(0) = oTheNewTextSection
+	oAncestorCurrentTextSection(0) = oTheCurrentTextSection
+	iCountNew = 0
+	iCountCurrent = 0
+		
+	&apos; &lt;fr&gt; le parcourt des 2 sections est effectué en parallèle afin de détecter le plus rapidement possible si l&apos;une des
+	&apos; 2 sections est l&apos;ancêtre de l&apos;autre (ce qui est souvent le cas), le traitement est alors écourté car devenu inutile.
+	do until isnull(oAncestorNewTextSection(iCountNew)) and isnull(oAncestorCurrentTextSection(iCountCurrent))
+		&apos; &lt;fr&gt; parcourt des sections ancêtres de la nouvelle section
+		if not isnull(oAncestorNewTextSection(iCountNew)) then
+			if not isempty(oAncestorNewTextSection(iCountNew).ParentSection) then
+				iCountNew = iCountNew + 1
+				oAncestorNewTextSection(iCountNew) = oAncestorNewTextSection(iCountNew-1).ParentSection
+				&apos; &lt;fr&gt; si cet ancêtre est la  section courante, alors des sections filles ont été ouvertes
+				if EqualUnoObjects(oAncestorNewTextSection(iCountNew), oTheCurrentTextSection) then
+					for inew = iCountNew-1 to  0 step -1
+						oEventsModule.onStartOfTextSection(oAncestorNewTextSection(inew))
+					next inew
+					exit sub      &apos; &lt;fr&gt; désolé, mais c&apos;est le plus efficace :-)
+				end if
+			else
+				oAncestorNewTextSection(iCountNew) = null
+			end if
+		end if
+		
+		&apos; &lt;fr&gt; parcourt des sections ancêtres de la section courante
+		if not isnull(oAncestorCurrentTextSection(iCountCurrent)) then
+			if not isempty(oAncestorCurrentTextSection(iCountCurrent).ParentSection) then
+				iCountCurrent = iCountCurrent + 1
+				oAncestorCurrentTextSection(iCountCurrent) = oAncestorCurrentTextSection(iCountCurrent-1).ParentSection
+				&apos; &lt;fr&gt; si cet ancêtre est la nouvelle section, alors des sections filles ont été fermées
+				if EqualUnoObjects(oAncestorCurrentTextSection(iCountCurrent), oTheNewTextSection) then
+					for icur = 0 to iCountCurrent-1
+						oEventsModule.onEndOfTextSection(oAncestorCurrentTextSection(icur))
+					next icur
+					exit sub      &apos; &lt;fr&gt; désolé, mais c&apos;est le plus efficace :-)
+				end if
+			else
+				oAncestorCurrentTextSection(iCountCurrent) = null
+			end if
+		end if
+	loop
+
+	&apos; &lt;fr&gt; aucune section n&apos;est ouverte et une ou plusieurs sections imbriquées nouvelles viennent d&apos;être ouvertes
+	if isnull(oTheCurrentTextSection) and not isnull(oTheNewTextSection) then
+		for inew = iCountNew-1 to 0 step -1
+			oEventsModule.onStartOfTextSection(oAncestorNewTextSection(inew))
+		next inew
+
+	&apos; &lt;fr&gt; toutes les sections imbriquées ouvertes précédemment ont été fermées
+	elseif isnull(oTheNewTextSection) and not isnull(oTheCurrentTextSection) then
+		for icur = 0 to iCountCurrent-1
+			oEventsModule.onEndOfTextSection(oAncestorCurrentTextSection(icur))
+		next icur
+	
+	&apos; &lt;fr&gt; une ou plusieurs sections imbriquées ont été fermées et d&apos;autres ont été ouvertes
+	elseif not isnull(oTheNewTextSection) and not isnull(oTheCurrentTextSection) then
+		icur = iCountCurrent - 1
+		inew = iCountNew - 1
+		&apos; &lt;fr&gt; recherche de la section ancêtre commune
+		do while (icur &gt;= 0) and (inew &gt;=0)
+			&apos; &lt;fr&gt; si cette section est un ancêtre commun
+			&apos; et que celles au niveau suivant sont différentes
+
+&apos;			if EqualUnoObjects(oAncestorCurrentTextSection(icur), oAncestorNewTextSection(inew)) _
+&apos;			and not EqualUnoObjects(oAncestorCurrentTextSection(icur-1), oAncestorNewTextSection(inew-1)) then
+
+			&apos; &lt;fr&gt; merci Thierry, effectivement, c&apos;est plus simple :-)
+			if not EqualUnoObjects(oAncestorCurrentTextSection(icur), oAncestorNewTextSection(inew)) then
+				&apos; &lt;fr&gt; fermeture des sections jusqu&apos;à l&apos;ancêtre commun exclu
+&apos;				for i = 0 to icur-1
+				for i = 0 to icur
+					oEventsModule.onEndOfTextSection(oAncestorCurrentTextSection(i))
+				next i
+				&apos; &lt;fr&gt; ouverture des nouvelles sections à partir de l&apos;ancêtre commun exclu
+&apos;				for i = inew-1 to 0 step -1
+				for i = inew to 0 step -1
+					oEventsModule.onStartOfTextSection(oAncestorNewTextSection(i))
+				next i
+				exit do
+			end if
+			icur = icur - 1
+			inew = inew - 1
+		loop
+		
+	end if
+	
+end sub
+
+&apos; *********************************************************************************
+&apos;&lt;fr&gt; Cette fonction retourne un Objet Cellule (ou un objet vide si l&apos;adresse de la cellule est incorrecte)
+&apos; merci Thierry !
+function oCellByPosition(oTheTable as object, iTheColIndex as integer, iTheRowIndex as integer) as variant
+	dim oCell
+	on error resume next
+	oCell = oTheTable.getCellByPosition(iTheColIndex, iTheRowIndex)
+	oCellByPosition = oCell
+end function
+
+&apos; *********************************************************************************
+sub CalcEnumeration(oTheTextComponent as object)
+	&apos; &lt;fr&gt; ... y&apos;a encore du boulot ...
+end sub
+
+&apos; *********************************************************************************
+sub DrawEnumeration(oTheTextComponent as object)
+	&apos; &lt;fr&gt; ... ici aussi, mais ça vaut le coup ;-)
+end sub
+
+&apos; *********************************************************************************
+sub ContentEnumeration(oTheComponent as object, sTheServiceName as string)
+
+	dim oContentEnum
+	dim oContent
+  
+	&apos; &lt;fr&gt; RMQ: tester on&lt;&lt;event&gt;&gt;_isImplemented avant d&apos;appeler la sub correspondante
+	&apos; &lt;fr&gt; RMQ: voir si on gagne réellement du temps en n&apos;implémentant pas tous les gestionnaires d&apos;évènements
+
+	&apos; &lt;fr&gt; si l&apos;énumération a été désactivée pour ce composant, on n&apos;effectue pas le traitement
+	&apos; (cette fonctionnalité permet d&apos;optimiser l&apos;analyse du document)
+	if not EnumerationIsEnabled then
+		EnumerationIsEnabled = true
+		exit sub
+	end if
+		
+	&apos; &lt;fr&gt; énumération de tous les composants contenus
+	oContentEnum = oTheComponent.createContentEnumeration(sTheServiceName)
+	do while oContentEnum.hasMoreElements()
+		oContent = oContentEnum.nextElement()
+		&apos; &lt;fr&gt; cadre de texte
+		if oContent.supportsService(&quot;com.sun.star.text.TextFrame&quot;) then
+			&apos; &lt;fr&gt; les cadres de texte chainés sont vus comme un seul cadre
+			if (oContent.ChainPrevName = &quot;&quot;) then
+				oEventsModule.onStartOfTextFrame(oContent)
+				WriterEnumeration(oContent)
+				oEventsModule.onEndOfTextFrame(oContent)
+			end if
+&apos; &lt;fr&gt; RMQ : apparemment, c&apos;est déja traité comme ça par l&apos;api !!!
+&apos; le code ci dessous est donc inutile. Merci StarDivision ;-)
+&apos;			if (oContent.ChainNextName &lt;&gt; &quot;&quot;) then
+				&apos; RMQ: récuperer le cadre suivant
+&apos;				oEventsModule.onStartOfTextFrame(oContent)
+&apos;				WriterEnumeration(oContent)
+&apos;				oEventsModule.onEndOfTextFrame(oContent)
+&apos;			end if
+		&apos; &lt;fr&gt; image
+		elseif oContent.supportsService(&quot;com.sun.star.text.TextGraphicObject&quot;) then
+			oEventsModule.onTextGraphicObject(oContent)
+		&apos; &lt;fr&gt; objet incrusté (embbeded)
+		elseif oContent.supportsService(&quot;com.sun.star.text.TextEmbeddedObject&quot;) then
+			&apos; ajouté par C. Devalland
+			&apos; est-ce une formule ?
+			&apos;dim a as string
+			&apos;a=oContent.embeddedObject.getImplementationName
+			if oContent.Model.getImplementationName=&quot;com.sun.star.comp.math.FormulaDocument&quot; then
+				oEventsModule.onFormulaEmbeddedObject(oContent)
+			end if
+				&apos; &lt;fr&gt; RMQ: énumérer le contenu de l&apos;objet en fonction de son type Calc ou Draw
+				&apos; contenu de la formule 
+				&apos; CalcEnumeration(oContent)
+				&apos; DrawEnumeration(oContent)
+
+		elseif oContent.supportsService(&quot;com.sun.star.text.Shape&quot;) then
+			oEventsModule.onTextShape(oContent)
+		&apos; &lt;fr&gt; dessin ou contrôle de formulaire
+		elseif oContent.supportsService(&quot;com.sun.star.drawing.Shape&quot;) then
+			if oContent.ShapeType = &quot;com.sun.star.drawing.ControlShape&quot; then
+				&apos; &lt;fr&gt; contrôle de formulaire
+				oEventsModule.onFormControl(oContent.Control)
+			else
+				&apos; &lt;fr&gt; dessin
+				oEventsModule.onDrawingShape(oContent)
+			end if	
+		end if
+	loop
+
+&apos; &lt;fr&gt; RMQ: ne devrait-on pas libérer oContentEnum ?
+
+end sub
+
+&apos; *********************************************************************************
+&apos; &lt;fr&gt; merci à Bernard Marcelly pour cette idée
+&apos; RMQ: dommage que OOo prenne l&apos;initiative étrange d&apos;aller chercher dans un autre module, la fonction inexistante !!!
+sub DetectImplementedEnumerationEvents
+	onStartOfEnumeration_isImplemented = true
+	onEndOfEnumeration_isImplemented = true
+	onStartOfParagraph_isImplemented = true
+	onEndOfParagraph_isImplemented = true
+	onStartOfTextTable_isImplemented = true
+	onEndOfTextTable_isImplemented = true
+	onStartOfRow_isImplemented = true
+	onEndOfRow_isImplemented = true
+	onStartOfCell_isImplemented = true
+	onEndOfCell_isImplemented = true
+	onStartOfTextSection_isImplemented = true
+	onEndOfTextSection_isImplemented = true
+	onStartOfTextFrame_isImplemented = true
+	onEndOfTextFrame_isImplemented = true
+	onStartOfTextEmbeddedObject_isImplemented = true
+	onEndOfTextEmbeddedObject_isImplemented = true
+	onTextPortion_isImplemented = true
+	onTextField_isImplemented = true
+	onFootnote_isImplemented = true
+	onControlCharacter_isImplemented = true
+	onReferenceMark_isImplemented = true
+	onDocumentIndexMark_isImplemented = true
+	onBookmark_isImplemented = true
+	onRedline_isImplemented = true
+	onRuby_isImplemented = true
+	onTextGraphicObject_isImplemented = true
+	onTextShape_isImplemented = true
+	onDrawingShape_isImplemented = true
+	onFormControl_isImplemented = true
+
+	on error goto errorOnStartOfParagraph
+&apos; &lt;fr&gt; RMQ: étrange, si OOoBasic ne trouve pas onStartOfParagraph dans le module, il appelle le premier onStartOfParagraph d&apos;un autre module
+	oEventsModule.onStartOfPage(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0) &apos; &lt;fr&gt; passage de paramètres incohérents de façon à ne pas exécuter la sub
+	exit sub
+	
+	errorOnStartOfParagraph:
+print err
+		onStartOfParagraph_isImplemented = (err&lt;&gt;423)
+		resume next
+
+	&apos; &lt;fr&gt; RMQ: à répéter pour tous les évènements
+		
+end sub
+
+</script:module>

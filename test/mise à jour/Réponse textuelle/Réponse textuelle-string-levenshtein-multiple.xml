@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396811  -->
+  <question type="stack">
+    <name>
+      <text>string Réponse multiple Levenshtein (optimisé)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#dc2626;border-left:5px solid #991b1b;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Réponse textuelle multiple</strong>
+        <span style="background:#991b1b;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#991b1b;border:1px solid #991b1b;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🔤 Réponse texte</span>
+      </div>
+      <!-- ENONCE-START -->Que mets-tu sur ta tartine le matin ?<!-- ENONCE-END -->
+      <p>[[input:ans1]] [[validation:ans1]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
+        <div style="font-weight:bold;color:#0f766e;margin-bottom:8px;">🔑 Réponses acceptées :</div>
+        <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">miel</code>,
+        <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">confiture</code>,
+        <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">beurre</code>,
+        <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">pâte à tartiner</code>,
+        <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">nutella</code>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[levenshtein(s,t) := block(
+  [m,n,prev,curr,i,j,c],
+  if stringp(s)=false then s:string(s),
+  if stringp(t)=false then t:string(t),
+  m:slength(s),
+  n:slength(t),
+  if m=0 then return(n),
+  if n=0 then return(m),
+  if m>30 or n>30 then return(100),
+  prev:makelist(i,i,0,n),
+  for i:1 thru m do (
+    curr:[i],
+    for j:1 thru n do (
+      if charat(s,i)=charat(t,j) then c:0 else c:1,
+      curr:endcons(min(prev[j+1]+1,curr[j]+1,prev[j]+c),curr)
+    ),
+    prev:curr
+  ),
+  last(prev)
+)$ 
+supprimer_articles(s) := block(
+  [s2:sdowncase(s), arts:{"le ","la ","l'","du ","des ","un ","une ","de ","d'"}, a, p],
+  for a in arts do (
+    p:ssearch(a,s2,1),
+    if p=1 then s2:substring(s2,slength(a)+1)
+  ),
+  strim(" ",s2)
+)$ 
+meilleur_match(rep,liste) := block(
+  [md:100,bm:"",d,i],
+  for i:1 thru length(liste) do (
+    d:levenshtein(rep,liste[i]),
+    if d<md then (md:d,bm:liste[i])
+  ),
+  [md,bm]
+)$ 
+reponses_valides: ["miel","confiture","beurre","pâte à tartiner","nutella"]$ ta1: "miel"$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@ans1@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>HéStack V2 | string-levenshtein-multi-opt</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>E</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>string</type>
+      <tans>ta1</tans>
+      <boxsize>20</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[rep_norm:strim(" ",sdowncase(ans1))$ rep_core:supprimer_articles(rep_norm)$ if rep_core="" then rep_core:" "$ 
+res:meilleur_match(rep_core,reponses_valides)$ dist_min:res[1]$ best:res[2]$ est_exact:member(rep_core,reponses_valides)$ 
+a_plu:slength(rep_core)>1 and charat(rep_core,slength(rep_core))="s"$ rep_ss:if a_plu then substring(rep_core,1,slength(rep_core)-1) else rep_core$ d_ss:if a_plu then levenshtein(rep_ss,best) else 100$ plu_seul:a_plu and d_ss=0$ plu_f1:a_plu and d_ss=1$ 
+lst:""$ 
+for i:1 thru length(reponses_valides) do (
+  if i>1 then lst:sconcat(lst,", "),
+  lst:sconcat(lst,reponses_valides[i])
+)$ 
+fb0:sconcat("<div style='border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin:4px 0'><p>❌ <b>Réponse vide.</b> Réponses acceptées : ",lst,"</p></div>")$ fb1:sconcat("<div style='border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin:4px 0'><p>✅ <b>Parfait !</b> « <b>",best,"</b> » est correct.</p></div>")$ fb2:sconcat("<div style='border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin:4px 0'><p>🔶 <b>Pluriel incorrect.</b> Écrivez « <b>",best,"</b> » sans s. (0,5 pt)</p></div>")$ fb3:sconcat("<div style='border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin:4px 0'><p>🔶 <b>Pluriel + faute.</b> Retirez le s et corrigez vers « <b>",best,"</b> ». (0,25 pt)</p></div>")$ fb4:sconcat("<div style='border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin:4px 0'><p>🔶 <b>Une lettre d'écart.</b> Le mot attendu est « <b>",best,"</b> ». (0,5 pt)</p></div>")$ fb5:sconcat("<div style='border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin:4px 0'><p>🔶 <b>Deux lettres d'écart.</b> Le plus proche est « <b>",best,"</b> ». (0,25 pt)</p></div>")$ fb6:sconcat("<div style='border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin:4px 0'><p>❌ <b>Incorrect.</b> Réponses acceptées : ",lst,"</p></div>")$]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse vide</description>
+        <answertest>AlgEquiv</answertest>
+        <sans><![CDATA[rep_core=" "]]></sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text>{@fb0@}</text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Mot exact dans la liste</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>est_exact</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text>{@fb1@}</text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Pluriel seul : avec s final, sans s c'est exact</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>plu_seul</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text>{@fb2@}</text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Pluriel + 1 faute : avec s, sans s distance=1</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>plu_f1</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text>{@fb3@}</text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Une lettre d'écart</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>dist_min</sans>
+        <tans>1</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-4-T</trueanswernote>
+        <truefeedback format="html">
+          <text>{@fb4@}</text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>5</falsenextnode>
+        <falseanswernote>prt1-4-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>5</name>
+        <description>Deux lettres d'écart</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>dist_min</sans>
+        <tans>2</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-5-T</trueanswernote>
+        <truefeedback format="html">
+          <text>{@fb5@}</text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>6</falsenextnode>
+        <falseanswernote>prt1-5-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>6</name>
+        <description>Trop éloigné</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-6-T</trueanswernote>
+        <truefeedback format="html">
+          <text>{@fb6@}</text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-6-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

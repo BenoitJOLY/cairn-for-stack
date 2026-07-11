@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396088  -->
+  <question type="stack">
+    <name>
+      <text>Q3 - Algèbre : Développement (PRT Expert)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #7c3aed; border-left: 5px solid #6d28d9; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Q3 — Algèbre</strong> <span style="background: #6d28d9; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span> <span style="background: #ffffff; color: #6d28d9; border: 1px solid #6d28d9; padding: 2px 9px; border-radius: 20px; font-size: .75rem; font-weight: 600;">#️⃣ Développement ciblé</span></div>
+<p>Développer, ordonner et réduire <strong>au maximum</strong> l'expression mathématique suivante : <br><br>\( B(x) = {@exp1@} \)</p>
+<p>[[input:ans1]] [[validation:ans1]]</p>
+<p>[[iframe width="100%" height="160px" scrolling="false"]] [[style]] body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; } .stack-keyboard-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; max-width: 600px; box-sizing: border-box; margin-top: 10px; } .stack-keyboard-title { font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; } .stack-keyboard-row { display: flex; flex-wrap: wrap; gap: 6px; } .btn-ins { background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; color: #334155 !important; padding: 6px 12px !important; font-size: 0.9rem !important; font-weight: 600 !important; cursor: pointer !important; transition: all 0.15s ease !important; min-width: 38px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; user-select: none; } .btn-ins:hover { background: #f5f3ff !important; border-color: #ddd6fe !important; color: #7c3aed !important; } .btn-ins:active { background: #ede9fe !important; } .btn-var { background: #f1f5f9 !important; border-color: #94a3b8 !important; color: #0f172a !important; font-style: italic; } [[/style]]</p>
+<div class="stack-keyboard-container">
+<div class="stack-keyboard-title">🧮 Aide à la saisie algébrique</div>
+<div class="stack-keyboard-row"><button class="btn-ins btn-var" type="button" data-val="x">x</button> <button class="btn-ins" type="button" data-val="+">+</button> <button class="btn-ins" type="button" data-val="-">-</button> <button class="btn-ins" type="button" data-val="*">×</button> <button class="btn-ins" type="button" data-val="^2">²</button> <button class="btn-ins" type="button" data-val="^">xⁿ</button> <button class="btn-ins" type="button" data-val="(">(</button> <button class="btn-ins" type="button" data-val=")">)</button></div>
+</div>
+<p>[[script type="module"]] import {stack_js} from '[[cors src="stackjsiframe.js"/]]'; stack_js.request_access_to_input("ans1", true).then(function(input_id) { var stackInput = document.getElementById(input_id); document.querySelectorAll('.btn-ins').forEach(function(btn){ btn.addEventListener('click', function(e){ e.preventDefault(); var val = this.getAttribute('data-val'); var actuel = stackInput.value || ''; var texteAvant = actuel.trimEnd(); var charPrecedent = texteAvant.length &gt; 0 ? texteAvant.slice(-1) : null; var excl = [null, '=', '+', '-', '*', '/', '^', '(']; var estOp = /^[+\-*\/^)]/.test(val); var pref = ''; if (!excl.includes(charPrecedent) &amp;&amp; !estOp &amp;&amp; actuel.length &gt; 0) { pref = '*'; } stackInput.value = actuel + pref + val; stackInput.dispatchEvent(new Event('change')); }); }); }); [[/script]] [[/iframe]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">Développons l'expression par étapes :<br><br><strong>1) Double distributivité :</strong><br>\( (3x - 2)(x + 4) = 3x^2 + 12x - 2x - 8 = 3x^2 + 10x - 8 \)<br><br><strong>2) Identité remarquable \( (a-b)^2 \) :</strong><br>\( (2x - 1)^2 = 4x^2 - 4x + 1 \)<br><br><strong>3) Soustraction (attention au piège du signe moins !) :</strong><br>Le signe moins devant la parenthèse change le signe de <strong>tous</strong> les termes à l'intérieur :<br>\( B(x) = (3x^2 + 10x - 8) - (4x^2 - 4x + 1) \)<br>\( B(x) = 3x^2 + 10x - 8 - 4x^2 + 4x - 1 \)<br>\( B(x) = -x^2 + 14x - 9 \).</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>exp1: (3*x-2)*(x+4) - (2*x-1)^2;
+ta1: -x^2 + 14*x - 9;
+/* Expression correspondant à l'erreur classique de signe */
+erreur_signe: -x^2 + 6*x - 9;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+<li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>Développement de {@exp1@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed>i</variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>ta1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>ta1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT-EQUAL-GO-ON</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-NOT-EQUAL-CHECK-BUG</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description></description>
+        <answertest>Expanded</answertest>
+        <sans>ans1</sans>
+        <tans>ta1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-CORRECT-MAX</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> L'expression est correctement développée et réduite.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0.25</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-CORRECT-NOT-REDUCED</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #eab308; padding: 10px 14px; background: #fefce8; border-radius: 4px;">⚠️ <strong>Calcul correct mais non réduit.</strong> Votre expression est égale à \( B(x) \), mais vous devez regrouper les termes semblables entre eux.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>erreur_signe</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-BUG-SIGN-FOUND</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">❌ <strong>Attention au signe moins !</strong> Vous avez fait une erreur classique : le signe \(-\) placé devant \( (2x-1)^2 \) doit être distribué sur <em>tous</em> les termes issus du développement de l'identité remarquable, pas seulement le premier.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-WRONG-TOTAL</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Réponse incorrecte.</strong> Votre développement comporte des erreurs de calcul. Reprenez pas à pas la double distributivité et l'identité remarquable.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

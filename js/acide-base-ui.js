@@ -1,0 +1,100 @@
+// acide-base-ui.js — UI helpers for the Acide-Base question type
+
+function abFormChange() {
+    var abType    = (document.getElementById('ab-type')      || {}).value || 'af-bf';
+    var nProtonsEl = document.getElementById('ab-n-protons');
+    var nProtons  = parseInt((nProtonsEl || {}).value || '1');
+    var abFindEl  = document.getElementById('ab-find');
+
+    // ── Labels selon le type de titration ─────────────────────────────
+    var lbl1   = document.getElementById('ab-lbl-c1');
+    var lbl2   = document.getElementById('ab-lbl-c2');
+    var lblPka = document.getElementById('ab-lbl-pka');
+    var pkaRow = document.getElementById('ab-pka-row');
+    var nPRow  = document.getElementById('ab-n-protons-row');
+
+    if (abType === 'bf-af') {
+        if (lbl1)   lbl1.textContent   = 'Conc. base faible Cb (mol/L)';
+        if (lbl2)   lbl2.textContent   = 'Conc. acide fort Ca (mol/L)';
+        if (lblPka) lblPka.textContent = 'pKb de la base';
+        if (pkaRow) pkaRow.style.display = '';
+        // bf-af est toujours monoprote → cacher le sélecteur n-protons
+        if (nPRow)      nPRow.style.display  = 'none';
+        if (nProtonsEl) nProtonsEl.value     = '1';
+        nProtons = 1;
+    } else if (abType === 'af-fort-bf') {
+        if (lbl1)   lbl1.textContent   = 'Conc. acide fort Ca (mol/L)';
+        if (lbl2)   lbl2.textContent   = 'Conc. base forte Cb (mol/L)';
+        if (pkaRow) pkaRow.style.display = 'none';
+        if (nPRow)  nPRow.style.display  = 'none';
+        if (nProtonsEl) nProtonsEl.value = '1';
+        nProtons = 1;
+    } else {  // af-bf
+        if (lbl1)   lbl1.textContent   = 'Conc. acide faible Ca (mol/L)';
+        if (lbl2)   lbl2.textContent   = 'Conc. base forte Cb (mol/L)';
+        if (lblPka) lblPka.textContent = 'pKa1';
+        if (pkaRow) pkaRow.style.display = '';
+        if (nPRow)  nPRow.style.display  = '';
+    }
+
+    // ── Champs pKa2 / pKa3 ────────────────────────────────────────────
+    var pka2Row   = document.getElementById('ab-pka2-row');
+    var pka3Field = document.getElementById('ab-pka3-field');
+    if (pka2Row)   pka2Row.style.display   = (nProtons >= 2) ? '' : 'none';
+    if (pka3Field) pka3Field.style.display = (nProtons >= 3) ? '' : 'none';
+
+    // ── Mise à jour des options de ab-find ────────────────────────────
+    if (abFindEl) {
+        var opts = abFindEl.options;
+        // indices: 0=equivalence, 1=veq2, 2=veq3, 3=pka, 4=pka2, 5=pka3
+        opts[1].disabled = (nProtons < 2);
+        opts[2].disabled = (nProtons < 3);
+        opts[3].disabled = (abType === 'af-fort-bf');  // pas de pKa pour acide fort
+        opts[4].disabled = (nProtons < 2 || abType === 'af-fort-bf');
+        opts[5].disabled = (nProtons < 3 || abType === 'af-fort-bf');
+        // Corriger si l'option sélectionnée est maintenant désactivée
+        if (abFindEl.options[abFindEl.selectedIndex].disabled) abFindEl.value = 'equivalence';
+    }
+
+    // ── Tolérances ────────────────────────────────────────────────────
+    var abFind    = (abFindEl || {}).value || 'equivalence';
+    var isVolCur  = (abFind === 'equivalence' || abFind === 'veq2' || abFind === 'veq3');
+    var tolVolRow = document.getElementById('ab-tol-vol-row');
+    var tolPhRow  = document.getElementById('ab-tol-ph-row');
+    if (tolVolRow) tolVolRow.style.display = isVolCur ? '' : 'none';
+    if (tolPhRow)  tolPhRow.style.display  = isVolCur ? 'none' : '';
+
+    abUpdatePreview();
+}
+
+function abUpdatePreview() {
+    var el = document.getElementById('ab-preview');
+    if (!el) return;
+    var abType   = (document.getElementById('ab-type')      || {}).value || 'af-bf';
+    var nProtons = parseInt((document.getElementById('ab-n-protons') || {}).value || '1');
+    var abFind   = (document.getElementById('ab-find')      || {}).value || 'equivalence';
+    var c1  = parseFloat((document.getElementById('ab-c1')  || {}).value);
+    var v1  = parseFloat((document.getElementById('ab-v1')  || {}).value);
+    var c2  = parseFloat((document.getElementById('ab-c2')  || {}).value);
+    var pka = parseFloat((document.getElementById('ab-pka') || {}).value);
+    var pka2= parseFloat((document.getElementById('ab-pka2')|| {}).value);
+    var pka3= parseFloat((document.getElementById('ab-pka3')|| {}).value);
+
+    if (isNaN(c1)||isNaN(v1)||isNaN(c2)||c1<=0||v1<=0||c2<=0) {
+        el.innerHTML = '<em>Saisir les param\xe8tres…</em>'; return;
+    }
+
+    var Veq1 = c1 * v1 / c2;
+    var parts = ['Veq1 = <strong>' + Veq1.toFixed(1) + ' mL</strong>'];
+    if (nProtons >= 2) parts.push('Veq2 = <strong>' + (2*Veq1).toFixed(1) + ' mL</strong>');
+    if (nProtons >= 3) parts.push('Veq3 = <strong>' + (3*Veq1).toFixed(1) + ' mL</strong>');
+
+    if (abType !== 'af-fort-bf' && !isNaN(pka)) {
+        var pKa_exp = (abType === 'bf-af') ? (14 - pka) : pka;
+        parts.push('pKa1 = <strong>' + pKa_exp.toFixed(1) + '</strong>');
+        if (nProtons >= 2 && !isNaN(pka2)) parts.push('pKa2 = <strong>' + pka2.toFixed(1) + '</strong>');
+        if (nProtons >= 3 && !isNaN(pka3)) parts.push('pKa3 = <strong>' + pka3.toFixed(1) + '</strong>');
+    }
+
+    el.innerHTML = parts.join(' &nbsp;|&nbsp; ');
+}

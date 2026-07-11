@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396083  -->
+  <question type="stack">
+    <name>
+      <text>Exercice avec clavier STACK-JS</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#059669;border-left:5px solid #047857;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Arithmétique</strong>
+        <span style="background:#047857;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#047857;border:1px solid #047857;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">#️⃣ Calcul numérique</span>
+      </div>
+      
+      Soit la fonction \(f\) définie sur \(\mathbb{R} \setminus \{3\}\) par \(f(x) = \frac{2x + 1}{x - 3}\). Quelle est la valeur exacte de \(f(2)\) ?<p>[[input:ans1]] [[validation:ans1]]</p>
+
+[[iframe width="100%" height="230px" scrolling="false"]]
+
+[[style]]
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .stack-keyboard-container {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    max-width: 600px;
+    box-sizing: border-box;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+  .stack-keyboard-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .stack-keyboard-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .stack-keyboard-row:last-child {
+    margin-bottom: 0;
+  }
+  .btn-ins {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    color: #1e293b !important;
+    padding: 8px 14px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    min-width: 42px !important;
+    line-height: 1 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    user-select: none;
+  }
+  /* LE PLUS : Des effets de survil enfin possibles grâce à l'iframe ! */
+  .btn-ins:hover {
+    background: #059669 !important;
+    color: #ffffff !important;
+    border-color: #059669 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.25) !important;
+  }
+  .btn-ins:active {
+    background: #047857 !important;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  }
+  .stack-row-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    width: 100%;
+    margin-bottom: 4px;
+    margin-top: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .stack-row-label:first-of-type {
+    margin-top: 0;
+  }
+[[/style]]
+
+<div class="stack-keyboard-container">
+  <div class="stack-keyboard-title">⌨️ Aide à la saisie</div>
+  
+  <div class="stack-row-label">Opérateurs &amp; symboles</div>
+  <div class="stack-keyboard-row">
+    <button class="btn-ins" type="button" data-val="+">+</button>
+    <button class="btn-ins" type="button" data-val="-">−</button>
+    <button class="btn-ins" type="button" data-val="/">÷</button>
+    <button class="btn-ins" type="button" data-val="*">×</button>
+    <button class="btn-ins" type="button" data-val="%pi">π</button>
+    <button class="btn-ins" type="button" data-val="^2">x²</button>
+    <button class="btn-ins" type="button" data-val="^">xⁿ</button>
+    <button class="btn-ins" type="button" data-val="*10^">×10ⁿ</button>
+    <button class="btn-ins" type="button" data-val="(">(</button>
+    <button class="btn-ins" type="button" data-val=")">)</button>
+  </div>
+
+  <div class="stack-row-label">Fonctions usuelles</div>
+  <div class="stack-keyboard-row">
+    <button class="btn-ins" type="button" data-val="sqrt()">√</button>
+    <button class="btn-ins" type="button" data-val="abs()">|x|</button>
+    <button class="btn-ins" type="button" data-val="exp()">eˣ</button>
+    <button class="btn-ins" type="button" data-val="ln()">ln</button>
+    <button class="btn-ins" type="button" data-val="log_10()">log</button>
+    <button class="btn-ins" type="button" data-val="sin()">sin</button>
+    <button class="btn-ins" type="button" data-val="cos()">cos</button>
+    <button class="btn-ins" type="button" data-val="tan()">tan</button>
+    <button class="btn-ins" type="button" data-val="asin()">Asin</button>
+    <button class="btn-ins" type="button" data-val="acos()">Acos</button>
+    <button class="btn-ins" type="button" data-val="atan()">Atan</button>
+  </div>
+</div>
+
+[[script type="module"]]
+import {stack_js} from '[[cors src="stackjsiframe.js"/]]';
+
+// Demande l'accès à ans1 via l'API STACK
+stack_js.request_access_to_input("ans1", true).then(function(input_id) {
+    // STACK génère un "input fantôme" à l'intérieur de l'iframe pour communiquer
+    var stackInput = document.getElementById(input_id);
+    
+    document.querySelectorAll('.btn-ins').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+            e.preventDefault();
+            
+            var val = this.getAttribute('data-val');
+            var actuel = stackInput.value || '';
+            
+            var texteAvant = actuel.trimEnd();
+            var charPrecedent = texteAvant.length > 0 ? texteAvant.slice(-1) : null;
+            var excl = [null, '=', '+', '-', '*', '/', '^', '('];
+            var estOp = /^[+\-*\/^)]/.test(val);
+            var pref = '';
+            
+            if (!excl.includes(charPrecedent) && !estOp && actuel.length > 0) {
+                pref = '*';
+            }
+            
+            // On ajoute la valeur à la fin
+            stackInput.value = actuel + pref + val;
+            
+            // INDISPENSABLE : Informe STACK et la page principale que la valeur a changé
+            stackInput.dispatchEvent(new Event('change'));
+        });
+    });
+});
+[[/script]]
+[[/iframe]]]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);"><div style="font-weight:bold; color:var(--navy2); margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div><div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;"><span style="font-weight:bold;color:var(--navy2);">Q1 Arithmétique :</span><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">-5</code></div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text>/* Q1 : Arithmétique (1pt) */
+ta1:-5;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@ta1@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:numerical</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>numerical</type>
+      <tans>ta1</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>NumRelative</answertest>
+        <sans>ans1</sans>
+        <tans>ta1</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;"><p>✅ <strong>Bonne réponse !</strong></p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;margin:4px 0;"><p>❌ <strong>Réponse incorrecte.</strong> Vérifiez votre démarche et réessayez.</p></div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

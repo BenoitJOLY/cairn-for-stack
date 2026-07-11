@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="PatCylDlg" dlg:left="210" dlg:top="135" dlg:width="200" dlg:height="122" dlg:help-text="&amp;1065.PatCylDlg.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1066.PatCylDlg.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:text-color="0xff950e" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="1" dlg:font-weight="100"/>
+  <dlg:style dlg:style-id="2" dlg:background-color="0xff" dlg:text-color="0xffffff" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="3" dlg:text-color="0xff0000" dlg:font-weight="150"/>
+  <dlg:style dlg:style-id="4" dlg:background-color="0xff00"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:textfield dlg:id="PatCylDlg1" dlg:tab-index="1" dlg:left="13" dlg:top="36" dlg:width="20" dlg:height="15" dlg:help-text="&amp;1082.PatCylDlg.PatCylDlg1.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="3">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCyl.GestionCase1a?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-blur" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCyl.GestionCase1c?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:textfield dlg:id="PatCylDlg2" dlg:tab-index="3" dlg:left="63" dlg:top="36" dlg:width="20" dlg:height="15" dlg:help-text="&amp;1083.PatCylDlg.PatCylDlg2.HelpText" dlg:align="center" dlg:maxlength="4" dlg:value="5">
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCyl.GestionCase2a?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-blur" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCyl.GestionCase2c?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="8" dlg:left="108" dlg:top="67" dlg:width="89" dlg:height="50" dlg:help-text="&amp;1088.PatCylDlg.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;1089.PatCylDlg.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:style-id="0" dlg:id="FrameControl2" dlg:tab-index="9" dlg:left="108" dlg:top="14" dlg:width="89" dlg:height="32" dlg:help-text="&amp;1067.PatCylDlg.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;1068.PatCylDlg.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="PatCylDlg3" dlg:tab-index="10" dlg:left="114" dlg:top="28" dlg:width="30" dlg:height="10" dlg:help-text="&amp;1073.PatCylDlg.PatCylDlg3.HelpText" dlg:value="&amp;1074.PatCylDlg.PatCylDlg3.Label"/>
+   <dlg:radio dlg:id="PatCylDlg4" dlg:tab-index="11" dlg:left="160" dlg:top="28" dlg:width="30" dlg:height="10" dlg:help-text="&amp;1075.PatCylDlg.PatCylDlg4.HelpText" dlg:value="&amp;1076.PatCylDlg.PatCylDlg4.Label" dlg:checked="true"/>
+  </dlg:radiogroup>
+  <dlg:text dlg:style-id="1" dlg:id="Label4" dlg:tab-index="12" dlg:left="9" dlg:top="25" dlg:width="30" dlg:height="10" dlg:help-text="&amp;1077.PatCylDlg.Label4.HelpText" dlg:value="&amp;1078.PatCylDlg.Label4.Label" dlg:align="center"/>
+  <dlg:text dlg:style-id="1" dlg:id="Label5" dlg:tab-index="13" dlg:left="57" dlg:top="25" dlg:width="30" dlg:height="10" dlg:help-text="&amp;1079.PatCylDlg.Label5.HelpText" dlg:value="&amp;1080.PatCylDlg.Label5.Label" dlg:align="center"/>
+  <dlg:button dlg:id="BoutonAnnuler" dlg:tab-index="6" dlg:left="153" dlg:top="73" dlg:width="40" dlg:height="25" dlg:help-text="&amp;2911.PatCylDlg.BoutonAnnuler.HelpText" dlg:default="true" dlg:value="&amp;2912.PatCylDlg.BoutonAnnuler.Label" dlg:button-type="cancel"/>
+  <dlg:text dlg:style-id="2" dlg:id="BoutonSite" dlg:tab-index="7" dlg:left="111" dlg:top="103" dlg:width="83" dlg:height="8" dlg:help-text="&amp;2913.PatCylDlg.BoutonSite.HelpText" dlg:value="&amp;2913.PatCylDlg.BoutonSite.Label" dlg:align="center">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:OOoAHmath3D.Aide.MonSite?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:text>
+  <dlg:button dlg:id="BoutonOK" dlg:tab-index="5" dlg:left="111" dlg:top="73" dlg:width="40" dlg:height="25" dlg:help-text="&amp;2913.PatCylDlg.BoutonOK.HelpText" dlg:default="true" dlg:value="&amp;2914.PatCylDlg.BoutonOK.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCyl.GestionBoutonOK?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:img dlg:id="ImagePrincipale" dlg:tab-index="0" dlg:left="26" dlg:top="63" dlg:width="50" dlg:height="55" dlg:help-text="&amp;2915.PatCylDlg.ImagePrincipale.HelpText" dlg:tabstop="true">
+   <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCyl.ImageOuverture?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:img>
+  <dlg:titledbox dlg:style-id="3" dlg:id="FrameControl3" dlg:tab-index="14" dlg:left="5" dlg:top="14" dlg:width="96" dlg:height="43" dlg:help-text="&amp;2916.PatCylDlg.FrameControl3.HelpText">
+   <dlg:title dlg:value="&amp;2917.PatCylDlg.FrameControl3.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:style-id="4" dlg:id="Message1" dlg:tab-index="15" dlg:visible="false" dlg:left="-156" dlg:top="10" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2926.PatCylDlg.Message1.HelpText" dlg:value="&amp;2927.PatCylDlg.Message1.Label"/>
+  <dlg:text dlg:style-id="4" dlg:id="Message2" dlg:tab-index="16" dlg:visible="false" dlg:left="-156" dlg:top="-15" dlg:width="130" dlg:height="20" dlg:help-text="&amp;2930.PatCylDlg.Message2.HelpText" dlg:value="&amp;2931.PatCylDlg.Message2.Label"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="optionInch" dlg:tab-index="18" dlg:left="179" dlg:top="2" dlg:width="20" dlg:height="8" dlg:help-text="&amp;4827.PatCylDlg.optionInch.HelpText" dlg:value="&amp;4828.PatCylDlg.optionInch.Label">
+    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCyl.OptionUnite_click?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+   <dlg:radio dlg:id="optionCm" dlg:tab-index="17" dlg:left="157" dlg:top="2" dlg:width="20" dlg:height="8" dlg:help-text="&amp;4829.PatCylDlg.optionCm.HelpText" dlg:value="&amp;4830.PatCylDlg.optionCm.Label">
+    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoAHmath3D.PatCyl.OptionUnite_click?language=Basic&amp;location=application" script:language="Script"/>
+   </dlg:radio>
+  </dlg:radiogroup>
+  <dlg:text dlg:id="UL1" dlg:tab-index="2" dlg:left="33" dlg:top="44" dlg:width="10" dlg:height="8" dlg:help-text="&amp;4831.PatCylDlg.UL1.HelpText" dlg:value="&amp;4832.PatCylDlg.UL1.Label"/>
+  <dlg:text dlg:id="UL2" dlg:tab-index="4" dlg:left="83" dlg:top="44" dlg:width="10" dlg:height="8" dlg:help-text="&amp;4832.PatCylDlg.UL2.HelpText" dlg:value="&amp;4833.PatCylDlg.UL2.Label"/>
+ </dlg:bulletinboard>
+</dlg:window>

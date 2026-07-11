@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="ChoixPointsAHmath3D" dlg:left="186" dlg:top="139" dlg:width="120" dlg:height="64" dlg:help-text="&amp;3301.ChoixPointsAHmath3D.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;3302.ChoixPointsAHmath3D.Title">
+ <dlg:bulletinboard>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="0" dlg:left="15" dlg:top="31" dlg:width="30" dlg:height="18" dlg:help-text="&amp;3303.ChoixPointsAHmath3D.CommandButton1.HelpText" dlg:value="&amp;3304.ChoixPointsAHmath3D.CommandButton1.Label" dlg:button-type="ok"/>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="1" dlg:left="75" dlg:top="31" dlg:width="30" dlg:height="18" dlg:help-text="&amp;3305.ChoixPointsAHmath3D.CommandButton2.HelpText" dlg:value="&amp;3306.ChoixPointsAHmath3D.CommandButton2.Label" dlg:button-type="cancel"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="2" dlg:left="15" dlg:top="11" dlg:width="90" dlg:height="9" dlg:help-text="&amp;3394.ChoixPointsAHmath3D.Label1.HelpText" dlg:value="&amp;3395.ChoixPointsAHmath3D.Label1.Label" dlg:align="center"/>
+ </dlg:bulletinboard>
+</dlg:window>

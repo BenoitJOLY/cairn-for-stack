@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396179  -->
+  <question type="stack">
+    <name>
+      <text>Encadrement de solution (TVI / Dichotomie)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Analyse — TVI et Encadrement</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>On considère la fonction \(f\) définie sur \(\mathbb{R}\) par :<br><br></p>
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; font-size: 1.1rem; margin-bottom: 15px;">\( f(x) = e^x - x - {@k@} \)</div>
+<p><strong>1.</strong> À l'aide de la calculatrice, compléter les valeurs suivantes (arrondies à \(10^{-3}\)) :</p>
+<div style="display: flex; gap: 20px; margin: 10px 0 15px 0;">
+<div>\(f(1) \approx\) [[input:ans_f1]]</div>
+<div>\(f(2) \approx\) [[input:ans_f2]][[validation:ans_f1]][[validation:ans_f2]]</div>
+</div>
+<p><strong>2.</strong> On admet que l'équation \(f(x) = 0\) admet une unique solution \(\alpha\) sur \([1 ; 2]\).<br>En utilisant votre calculatrice (méthode par balayage ou dichotomie), donner un encadrement de \(\alpha\) à \(10^{-2}\) près.<br><br></p>
+<div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+<div> [[input:ans_inf]] [[validation:ans_inf]]</div>
+<div>&lt;\(\alpha\) &lt; [[input:ans_sup]] [[validation:ans_sup]]</div>
+</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;"><strong>1. Valeurs intermédiaires :</strong><br>\(f(1) = e^1 - 1 - {@k@} \approx {@f1@}\)<br>\(f(2) = e^2 - 2 - {@k@} \approx {@f2@}\)<br><br><strong>2. Encadrement :</strong><br>On a \(f(1) &lt; 0\) et \(f(2) &gt; 0\). Par le TVI, il existe \(\alpha \in [1 ; 2]\) tel que \(f(\alpha) = 0\).<br>En effectuant un balayage, on trouve que la vraie valeur est \(\alpha \approx {@alpha@}\).<br>Un encadrement correct à \(10^{-2}\) près est par exemple : [{@alpha_inf@} ; {@alpha_sup@}].</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>/* 1. Génération de la vraie solution alpha (un nombre à 1 chiffre après la virgule) */
+b: rand([2,3,4,5,6,7,8,9]);
+ alpha: 1 + b/10; 
+/* 2. Calcul de la constante k pour que f(alpha) = 0 */
+k: float(exp(alpha) - alpha);
+ f: exp(x) - x - k;
+/* 3. Calculs pour l'énoncé et la correction */
+f1: float(ev(f, x=1));
+ f2: float(ev(f, x=2));
+ a: 1;
+ alpha_inf: float(alpha - 0.01);
+ alpha_sup: float(alpha + 0.01);</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>f(x)=e^x-x-{@k@}, alpha={@alpha@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:tvi-bounds</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_f1</name>
+      <type>numerical</type>
+      <tans>f1</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_f2</name>
+      <type>numerical</type>
+      <tans>f2</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_inf</name>
+      <type>numerical</type>
+      <tans>alpha_inf</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_sup</name>
+      <type>numerical</type>
+      <tans>alpha_sup</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[tol: 0.001;
+test_inf: float(ans_inf) <= alpha + tol and alpha - float(ans_inf) <= 0.01 + tol;
+test_sup: float(ans_sup) >= alpha - tol and float(ans_sup) - alpha <= 0.01 + tol;
+test_encad: is(float(ans_sup) - float(ans_inf) <= 0.02 + tol);]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification borne inférieure</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>test_inf</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT-INF-OK</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-INF-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Borne inférieure incorrecte.</strong> Votre valeur doit être plus petite que la solution \(\alpha\), et la différence \(\alpha - \text{valeur}\) ne doit pas dépasser 0.01.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Vérification borne supérieure</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>test_sup</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>2</truenextnode>
+        <trueanswernote>PRT-SUP-OK</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-SUP-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Borne supérieure incorrecte.</strong> Votre valeur doit être plus grande que la solution \(\alpha\), et la différence \(\text{valeur} - \alpha\) ne doit pas dépasser 0.01.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Vérification amplitude finale</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>test_encad</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-AMP-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Votre encadrement est correct et sa précision est bien de \(10^{-2}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0.25</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-AMP-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">⚠️ <strong>Précision insuffisante !</strong> Vos bornes encadrent bien la solution, mais l'écart entre elles est trop grand. On demande un encadrement à \(10^{-2}\) près, ce qui signifie que la différence entre vos deux bornes ne doit pas dépasser 0.02.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

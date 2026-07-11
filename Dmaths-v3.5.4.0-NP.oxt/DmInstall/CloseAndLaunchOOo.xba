@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="CloseAndLaunchOOo" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) 2006-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye 
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.org
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+&apos;Declare Function GetActiveWindow Lib &quot;user32&quot; () As Long 
+&apos;Declare Sub ExitProcess Lib &quot;kernel32&quot; (ByVal uExitCode As Long)
+
+Private sNomFichierBatch  as String
+&apos;Private HandleWin as Long
+Private sURLFichierEnregistre as String
+Private sEmplacementLocalAddon as String
+
+
+
+Sub ReLanceOOo(Optional bInstMAJ as boolean,Optional bInstRezo as boolean) 
+	
+	If isMissing(bInstMAJ) Then bInstMAJ = False
+	If isMissing(bInstRezo) Then bInstRezo = False	
+		Call FermeToutesLesFenetres
+		Call FabriqueBatch(bInstMAJ, bInstRezo)	
+		rem modification du 28 octobre 2007	
+		LanceShell(sNomFichierBatch, true)
+	If GetguiType = 1 Then 
+		StarDesktop.SuspendQuickstartVeto = True
+		StarDesktop.Terminate
+	End if
+End Sub
+
+
+Sub	ReLanceOOoMac
+	rem	creation de moduleoptions.txt
+	EcritFichierDmOptionsTXT( sSource )
+	FermeToutesLesFenetres	
+	rem definit le chemin du fichier applescript	
+	sNomFichierBatch = GetRepertoirePath(&quot;user&quot;)&amp;&quot;/config/relanceOOo.scpt&quot;
+&apos;	Print sNomFichierBatch
+	rem definit le chemin de l&apos;application OOo/Neo
+	sCheminOffice = GetRepertoirePathprog &amp; &quot;soffice&quot;
+&apos;	Print FileExists (sCheminOffice)
+
+		iNumber = Freefile
+		Open sNomFichierBatch For Output As iNumber
+		rem ferme OOo/Neo
+		sLine = &quot;do shell script &quot;&quot;killall soffice&quot;&quot;&quot;
+		Print #iNumber, sLine
+		rem lance à nouveau OOo/Neo
+		If OOoName() = &quot;NeoOffice&quot; Then
+			sLine = &quot;tell application &quot;&quot;NeoOffice&quot;&quot; to launch&quot;
+		Elseif  OOoName() = &quot;LibreOffice&quot; Then
+			sLine = &quot;tell application &quot;&quot;LibreOffice&quot;&quot; to launch&quot;
+		Else
+			sLine = &quot;tell application &quot;&quot;OpenOffice.org&quot;&quot; to launch&quot;
+		EndIf
+		Print #iNumber, sLine
+		rem lance la macro qui installe les options.
+		sLine = &quot;do shell script (quoted form of (&quot;&quot;&quot; &amp; sCheminOffice &amp; &quot;&quot;&quot;) &amp; &quot;&quot; -norestore macro:///DmInstall.CloseAndLaunchOOo.InstallDmOptions&quot;&quot;)&quot;
+		Print #iNumber, sLine
+		Close  #iNumber		
+		Dim sys As Object
+		sys = CreateUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+		sys.execute(&quot;osascript&quot;,sNomFichierBatch,0)
+End Sub
+
+
+Sub FermeToutesLesFenetres
+		rem ferme toutes les fenetres
+		Dim myEnum,oDoc as Object		
+		On error resume Next
+		myEnum = StarDesktop.Components.CreateEnumeration
+		Do while myEnum.HasmoreElements
+			oDoc = myEnum.NextElement
+			If HasUnoInterfaces(oDoc, &quot;com.sun.star.util.XCloseable&quot;) Then
+				If oDoc.IsModified() Then			
+					If oDoc.haslocation() Then
+					oDoc.Store()										
+					Else
+					EnregistrerLeFichier(oDoc)
+					Endif				
+				Endif
+				If getguitype = 1 Then sURLFichierEnregistre = &quot; &quot; &amp; &quot;&quot;&quot;&quot; &amp; ConvertFromURL(oDoc.URL) &amp; &quot;&quot;&quot;&quot;  Else sURLFichierEnregistre = &quot; &quot; &amp; ConvertFromURL(oDoc.URL)	
+				oDoc.Close(true)						    	
+			Else
+				oDoc.dispose()				
+		  	End If			
+		Loop
+		On error goto 0
+End Sub
+
+Sub EnregistrerLeFichier(monDocument as Object)
+	Dim FP As Object, lesFichiers() As String
+	Dim FPtype(0) As Integer
+	FP = CreateUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;) 
+	FPtype(0) = com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_AUTOEXTENSION
+	With FP
+	  .initialize(FPtype())
+	  .DisplayDirectory = GetRepertoirePath(&quot;home&quot;)	 
+	  .appendFilter(&quot;Textes&quot;, &quot;*.txt&quot;)
+	  .appendFilter(&quot;Docs OpenOffice&quot;, &quot;*.odt;*.ott&quot;)
+	  .appendFilter(&quot;Docs MS-Office&quot;, &quot;*.doc&quot;)
+	  .CurrentFilter = &quot;Docs OpenOffice&quot;
+	
+	  if .Execute = com.sun.star.ui.dialogs.ExecutableDialogResults.OK then
+	    lesFichiers() = .Files &apos; tableau de 1 élément String
+	    Dim propFich2(0) As New com.sun.star.beans.PropertyValue
+		monDocument.storeAsURL(lesFichiers(0), propFich2())	    
+	  end if
+	  .dispose
+	End With
+End Sub
+
+
+Sub FabriqueBatch(bInstMAJ, bInstRezo as boolean) 
+
+		sCheminUnopkg = GetRepertoirePathprog &amp; &quot;unopkg&quot;
+		sCheminWriter = GetRepertoirePathprog &amp; &quot;swriter&quot;
+		sCheminOffice = GetRepertoirePathprog &amp; &quot;soffice&quot;
+		
+		If Getguitype = 1 Then 
+		sCheminWriter = sCheminWriter +&quot;.exe&quot;
+		sCheminOffice = sCheminOffice +&quot;.exe&quot;
+		sCheminUnopkg = sCheminUnopkg +&quot;.exe&quot;
+		Endif 
+
+		sCheminWriter = ConvertFromURL(sCheminWriter)
+		sCheminOffice = ConvertFromURL(sCheminOffice)
+		sCheminUnopkg = ConvertFromURL(sCheminUnopkg)
+		
+		
+		If GetguiType = 1 Then 
+		sCheminWriter = &quot;&quot;&quot;&quot;+sCheminWriter+&quot;&quot;&quot;&quot;
+		sCheminOffice = &quot;&quot;&quot;&quot;+sCheminOffice+&quot;&quot;&quot;&quot;
+		sCheminUnopkg = &quot;&quot;&quot;&quot;+sCheminUnopkg+&quot;&quot;&quot;&quot;
+		EndIf
+		
+		rem ------------------------------------------------------------------------------------------------------------------------
+		rem	creation de relanceooo	
+		
+		If Getguitype = 1 Then sNomFichierBatch = GetRepertoirePath(&quot;user&quot;)&amp;&quot;\config\relanceooo.bat&quot; Else sNomFichierBatch = GetRepertoirePath(&quot;user&quot;)&amp;&quot;/config/relanceooo.sh&quot;
+		If Fileexists(sNomFichierBatch) Then Kill sNomFichierBatch
+	
+		iNumber = Freefile
+		Open sNomFichierBatch For Output As iNumber
+		
+		rem lance un message patientez dans la console DOS sous windows
+		If GetguiType = 1 Then
+			sLine = &quot;echo PATIENTEZ JUSQU&apos;AU LANCEMENT COMPLET DE LibreOffice !!!&quot;
+			Print #iNumber, sLine
+			sLine = &quot;echo CELA PEUT PRENDRE PLUSIEURS MINUTES.&quot;
+			Print #iNumber, sLine		
+		Endif
+		
+		rem ligne fermant le quickstarter ou ligne fermant soffice sous linux
+		If GetguiType = 1 Then			
+	&apos;		If MSWin98 = False Then 
+	&apos;		sLine = sCheminOffice &amp; fInvisible &amp; &quot; &quot;&quot;macro:///Standard.DmCloseQuick.CloseQuick(&quot; &amp; Cstr( HandleWin ) &amp;&quot;)&quot;&quot;&quot;
+	&apos;		Else
+	&apos;		sLine = &quot;&quot;&quot;&quot; &amp; GetRepertoirePath(&quot;prog&quot;)&amp;&quot;\quickstart.exe&quot; &amp; &quot;&quot;&quot;&quot; &amp; &quot; -killtray&quot;
+	&apos;		Endif
+		Else
+			sLine = &quot;killall soffice&quot;
+			&apos;sLine = &quot;killall soffice.bin&quot;		  
+			Print #iNumber, sLine
+		End if				
+		
+		
+			If bInstMAJ Then
+					Dim NomdelAddonEnPlace as String rem contient le nom de l&apos;addon installé
+					NomdelAddonEnPlace = TrouveNomAddon rem a la fin du module uninstall
+					If bInstRezo Then sShare = &quot; --shared&quot; Else sShare = &quot;&quot;		
+					sLine = sCheminUnopkg &amp; &quot; remove&quot; &amp; sShare &amp; &quot; &quot; &amp; NomdelAddonEnPlace
+					Print #iNumber, sLine			
+					sLine = sCheminUnopkg &amp; &quot; add&quot; &amp; sShare &amp; &quot; &quot;&quot;&quot;+ ConvertFromURL(sEmplacementLocalAddon)+&quot;&quot;&quot;&quot;
+					Print #iNumber, sLine	
+					sLine = sCheminOffice + fInvisible +&quot;&quot;&quot;macro:///DmInstall.Install_Addon.MiseAJour&quot;&quot;&quot;			
+					Print #iNumber, sLine				
+			Else		
+				Dim Parametre$
+				Parametre = IIf(OOoNumVersion &gt;= 330,&quot;norestore&quot;,&quot;headless&quot;)	
+				sLine = sCheminOffice &amp; &quot; --&quot; &amp; Parametre &amp; &quot; &quot;&quot;macro:///DmInstall.CloseAndLaunchOOo.InstallDmOptions&quot;&quot;&quot;
+				Print #iNumber, sLine
+			Endif
+
+
+		If OOoName() = &quot;LibreOffice&quot; or getGuiType = 1 Then
+			sLine = sCheminWriter &amp; &quot; --norestore &quot;  &amp; sURLFichierEnregistre rem reouvre le dernier fichier ferme
+			Print #iNumber, sLine
+		Endif
+		
+		If getguitype = 1 Then rem ferme la fenetre Dos sous windows
+			sLine = &quot;exit&quot;
+			Print #iNumber, sLine
+		Endif
+		
+		Close #iNumber
+		If Getguitype = 4 Then Shell(&quot;chmod 777 &quot;+ConvertFromURL(sNomFichierBatch)) 	
+		
+		rem ------------------------------------------------------------------------------------------------------------------------
+		rem	creation de moduleoptions.txt	
+		EcritFichierDmOptionsTXT( sSource )
+		
+End Sub
+
+Sub EcritFichierDmOptionsTXT( sSource as String) rem cette macro écrit le fichier dmoptions.txt dans le dossier user/config
+	If Getguitype = 1 Then sFichierModule = GetRepertoirePath(&quot;user&quot;)&amp;&quot;\config\dmoptions.txt&quot; Else sFichierModule = GetRepertoirePath(&quot;user&quot;)&amp;&quot;/config/dmoptions.txt&quot;
+		If Fileexists(sFichierModule) Then Kill sFichierModule	
+		iNumber = Freefile
+		Open sFichierModule For Output As iNumber
+		Print #iNumber, sSource
+		Close #iNumber	
+End Sub
+
+
+
+Sub InstallDmOptions
+	Dim sSourceDmOptions, sFichierModule, sLigne as String
+	If Getguitype = 1 Then sFichierModule = GetRepertoirePath(&quot;user&quot;)&amp;&quot;\config\dmoptions.txt&quot; Else sFichierModule = GetRepertoirePath(&quot;user&quot;)&amp;&quot;/config/dmoptions.txt&quot;
+	iNumber = Freefile
+	Open sFichierModule For Input As iNumber
+	Line Input #iNumber, sSourceDmOptions
+	While Not Eof(iNumber)
+		Line Input #iNumber, sLigne
+		sSourceDmOptions = sSourceDmOptions + Chr(13) + sLigne
+	WEnd
+	Close #iNumber
+	InsertModuleDmOptions(sSourceDmOptions)
+	rem	Kill sFichierModule	
+End Sub
+
+
+Function LanceShell(sChemin as String,bMode as Boolean)
+		Dim sys As Object
+		Dim iFlags As Integer
+		sys = CreateUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+		iFlags = com.sun.star.system.SystemShellExecuteFlags.NO_SYSTEM_ERROR_MESSAGE &apos; = 0
+		sys.execute(sChemin,&quot; &quot;, iFlags)
+End Function
+
+Function MSWin98 as boolean rem determine si OS = Win98
+		MSWin98 = false
+		If GetguiType = 1 Then
+				const  HKEY_LOCAL_MACHINE = &amp;H80000002
+        		Dim sVersion as String
+		        Globalscope.BasicLibraries.loadLibrary(&quot;ImportWizard&quot;)		      
+		        OpenRegKey(HKEY_LOCAL_MACHINE,&quot;Software\Microsoft\Windows\CurrentVersion\&quot;)	        
+		        sVersion = QueryValue(HKEY_LOCAL_MACHINE,&quot;Software\Microsoft\Windows\CurrentVersion\&quot;,&quot;ProductName&quot;) 	              
+		        If sVersion = &quot;Microsoft Windows 98&quot; Then  	MSWin98 = True
+	    Endif
+End function
+
+Function fInvisible as String    
+        fInvisible = &quot; -invisible &quot;
+        If 	MSWin98 = true Then  fInvisible = &quot; &quot;        
+End Function
+
+
+Function GetRepertoirePathprog as String rem fournit le chemin du repertoire program
+		If  OOoNumVersion &gt;= 300 Then		
+		GetRepertoirePathprog = Mid(GetRepertoirePath(&quot;brandbaseurl&quot;),1,Len(GetRepertoirePath(&quot;brandbaseurl&quot;))-3) &amp; GetPathSeparator
+		Else
+		GetRepertoirePathprog = GetRepertoirePath(&quot;prog&quot;) &amp; GetPathSeparator
+		Endif
+End Function
+
+</script:module>

@@ -1,0 +1,191 @@
+[
+  {
+    "fichier": "test/mise à jour/Interactif visuel/Nouveau dossier/questions-parcours-69552c495bebf-longueur dondes de raies-20260702-1716.xml",
+    "tags": [
+      "bloom : analyse",
+      "stack",
+      "difficulté : élevée",
+      "jsxgraph",
+      "bloom : compréhension",
+      "bloom : application"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/APN/APN-Vitesse de prise de vue diaph changé-.xml",
+    "tags": [
+      "stack",
+      "bloom : application",
+      "difficulté : moyenne",
+      "apn"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/APN/APN-Vitesse de prise de vue diaph et iso changés-.xml",
+    "tags": [
+      "stack",
+      "bloom : application",
+      "apn",
+      "difficulté :élevée"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/APN/APN-Vitesse de prise de vue iso changé.xml",
+    "tags": [
+      "stack",
+      "bloom : application",
+      "difficulté : moyenne",
+      "apn"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/APN/APN-diaph de prise de vue iso changé-.xml",
+    "tags": [
+      "stack",
+      "bloom : application",
+      "difficulté : moyenne",
+      "apn"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/APN/APN-diaph de prise de vue iso et vitesse changés-.xml",
+    "tags": [
+      "stack",
+      "bloom : application",
+      "apn",
+      "difficulté :élevée"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/APN/APN-diaph de prise de vue vitesse changée.xml",
+    "tags": [
+      "stack",
+      "bloom : application",
+      "difficulté : moyenne",
+      "apn"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/APN/APN-iso de prise de vue diaph et vitesse changés .xml",
+    "tags": [
+      "stack",
+      "bloom : application",
+      "apn",
+      "difficulté :élevée"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/Interférences Diffraction/questions-parcours-696671a935ea8-Diffraction par 2 fentes avec capteur détermination de la largeur et de lécartement-20260702-0002.xml",
+    "tags": [
+      "stack",
+      "jsxgraph",
+      "bloom : analyse",
+      "bloom: application",
+      "difficulté : moyenne",
+      "interférences"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/Interférences Diffraction/questions-parcours-696671a935ea8-Diffraction par trous de young détermination de la longueur donde-20260702-0002.xml",
+    "tags": [
+      "stack",
+      "jsxgraph",
+      "bloom : analyse",
+      "bloom: application",
+      "difficulté : moyenne",
+      "interférences"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/Interférences Diffraction/questions-parcours-696671a935ea8-Diffraction par un trou avec écran détermination de la longueur donde-20260702-0002.xml",
+    "tags": [
+      "stack",
+      "jsxgraph",
+      "bloom : analyse",
+      "bloom: application",
+      "difficulté : moyenne",
+      "diffraction"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/Interférences Diffraction/questions-parcours-696671a935ea8-Diffraction par une fente avec capteur détermination longueur donde-20260702-0002.xml",
+    "tags": [
+      "stack",
+      "jsxgraph",
+      "bloom : analyse",
+      "bloom: application",
+      "difficulté : moyenne",
+      "diffraction"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/Interférences Diffraction/questions-parcours-696671a935ea8-Diffraction par une fente avec écran détermination longueur donde-20260702-0002.xml",
+    "tags": [
+      "stack",
+      "jsxgraph",
+      "bloom : analyse",
+      "bloom: application",
+      "difficulté : moyenne",
+      "diffraction"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/RVB/questions-parcours-69b486eebfaad-rvb reste general fb et image-20260702-1305.xml",
+    "tags": [
+      "stack",
+      "2nde",
+      "chapitre:axes",
+      "chapitre:representationdesoi",
+      "bloom:memoriser",
+      "difficulte:simple",
+      "qtype:eq-chimie",
+      "allemand"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/chimie topologique/questions-parcours-69b486eebfaad-Rentrez_le_nom_de_votre_exercice-20260701-1527.xml",
+    "tags": [
+      "stack",
+      "qtype:eq-topologique",
+      "allemand",
+      "2nde",
+      "chapitre:axes",
+      "chapitre:representationdesoi",
+      "bloom:memoriser",
+      "difficulte:simple"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/equation chimique/questions-parcours-69b486eebfaad-Rentrez_le_nom_de_votre_exercice-20260701-1530.xml",
+    "tags": [
+      "stack",
+      "qtype:eq-chimie",
+      "allemand",
+      "2nde",
+      "chapitre:axes",
+      "chapitre:representationdesoi",
+      "bloom:memoriser",
+      "difficulte:simple"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/nucléaire/Nucléaire-fission de l uranium 235.xml",
+    "tags": [
+      "stack",
+      "qtype:nucléaire",
+      "2nde",
+      "chapitre:algebre",
+      "chapitre:nombres",
+      "bloom:memoriser",
+      "difficulte:simple",
+      "maths"
+    ]
+  },
+  {
+    "fichier": "test/mise à jour/Physique-chimie/unités/Unités-conversion d unités- autogénérées-.xml",
+    "tags": [
+      "stack",
+      "conversion",
+      "calcul"
+    ]
+  }
+]

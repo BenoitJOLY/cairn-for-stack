@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module1" script:language="StarBasic">&apos;************************************************
+&apos;Copyright (C) 2005-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye 
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.com
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+REM  *****  BASIC  *****
+Public ListeRep(100) as string
+Public sRepertoireSource,sRepertoireBackup, sMessageErreur,sZipFile as String
+Public iNombreRepertoire,iIndexRepertoire,inombrefichiercopies,inombrerepertoirecopies,iNombreErreurs,iNombreRepertoireExamine as Integer
+Public inombrefichiersupprimes,inombrerepertoiresupprimes as integer
+Public iDimListeRep, iSyncro as integer
+Public oDocument, oPage, oDialog1, oChampProgress as Object
+Public bNettoie, bRestaure as Boolean
+
+
+Sub Sauvegarde
+	Dim RepTraites as Integer
+	Call VerifOperationnel
+&apos; On error resume next
+	DialogLibraries.loadLibrary(&quot;DmathsBup&quot;)
+	oDialog1 = CreateUnoDialog( DialogLibraries.DmathsBup.Dialog1 )
+	oChampProgress = oDialog1.GetControl(&quot;ProgressBar1&quot;)
+	oChampProgress.Value = 1
+	If oDialog2.GetControl(&quot;OptionButton2&quot;).State = True Then iSyncro = 2 Else iSyncro = 1 
+
+	oDialog1.GetControl(&quot;Label1&quot;).Text = Trad(iLangNumber,27)
+	oDialog1.GetControl(&quot;Label2&quot;).Text = Trad(iLangNumber,24)
+	oDialog1.GetControl(&quot;Label3&quot;).Text = Trad(iLangNumber,25)
+	iDimListeRep = 100
+	iNombreErreurs = 0
+	iNombreRepertoireExamine = 1
+	
+	sRepertoireSource = oDialog2.GetControl(&quot;TextField1&quot;).Text
+	sRepertoireBackup = oDialog2.GetControl(&quot;TextField2&quot;).Text
+	
+	rem ajouté le 20 janvier 2013 : contrôle sur les répertoires source et destination
+	
+	If sRepertoireSource = sRepertoireBackup Then
+		MsgBox(Trad(iLangNumber,31),16,&quot;Dmaths Backup&quot;)
+		Exit Sub	
+	Endif
+	
+	
+
+	If Right(sRepertoireSource,1)&lt;&gt;getPathSeparator Then 
+	oDialog2.GetControl(&quot;TextField1&quot;).Text=oDialog2.GetControl(&quot;TextField1&quot;).Text+getPathSeparator
+	sRepertoireSource=sRepertoireSource+getPathSeparator
+	Endif
+	If Right(sRepertoireBackup,1)&lt;&gt;getPathSeparator Then
+	oDialog2.GetControl(&quot;TextField2&quot;).Text=oDialog2.GetControl(&quot;TextField2&quot;).Text+getPathSeparator
+	sRepertoireBackup=sRepertoireBackup+getPathSeparator
+	Endif
+
+	inombrefichiercopies = 0
+	inombrerepertoirecopies = 0
+	inombrefichiersupprimes = 0
+	inombrerepertoiresupprimes = 0
+	sRepertoireSource = ConvertToUrl(sRepertoireSource)
+	sRepertoireBackup = ConvertTourl(sRepertoireBackup)
+
+	
+	If oDialog2.GetControl(&quot;OptionButton3&quot;).State = False Then &apos;Pas de restauration
+		If ControleDroits(sRepertoireBackup)=False Then
+		MsgBox(Trad(iLangNumber,12),16,&quot;Dmaths Backup&quot;)
+		Exit Sub
+		Endif
+		oDialog2.Visible = False
+		oDialog1.Visible = True
+		iIndexRepertoire = 0
+		iNombreRepertoire = 0
+		ListeRep(0) = &quot;&quot;
+		If Not FileExists(sRepertoireBackup) Then Mkdir sRepertoireBackup
+		Do 
+		TraiteRepertoire(sRepertoireSource+ListeRep(iIndexRepertoire),sRepertoireBackup+ListeRep(iIndexRepertoire),iIndexRepertoire)
+		iIndexRepertoire = iIndexRepertoire+1
+		Loop until iIndexRepertoire &gt; iNombreRepertoire
+	Endif
+
+	iNombreRepertoireExamine = iNombreRepertoire+1
+  	RepTraite = iNombreRepertoireExamine rem memorise le nombre pour le module DmBackup
+
+	rem si synchronisation des fichiers demandées ou restauration
+	If (oDialog2.GetControl(&quot;OptionButton2&quot;).State = True or oDialog2.GetControl(&quot;OptionButton3&quot;).State = True) Then
+		If ControleDroits(sRepertoireSource)=False Then
+		MsgBox(Trad(iLangNumber,13),16,&quot;Dmaths Backup&quot;)
+		Exit Sub
+		Endif
+		If Not FileExists(sRepertoireSource) Then MkDir sRepertoireSource
+		If  (oDialog2.GetControl(&quot;CheckBox4&quot;).State = 1 and oDialog2.GetControl(&quot;OptionButton3&quot;).State = False) Then bNettoie = True 
+		If oDialog2.GetControl(&quot;OptionButton3&quot;).State = True Then rem on restaure
+			If MsgBox(Trad(iLangNumber,14)+chr(10)+chr(10)+Trad(iLangNumber,15),256+48+1,&quot;Dmaths Backup&quot;)=2 Then Goto Fin
+			If Not FileExists(sRepertoireBackup) Then
+				MkDir sRepertoireBackup
+				Call ChoosesZipFile
+				unzipArchive(ConvertToUrl(sZipFile),sRepertoireBackup)
+			Endif
+			iNombreRepertoireExamine = 0
+		Endif
+		oDialog2.Visible = False
+		oDialog1.Visible = True
+		iIndexRepertoire = 0
+		iNombreRepertoire = 0
+		ListeRep(0) = &quot;&quot;
+		Do 
+		TraiteRepertoire(sRepertoireBackup+ListeRep(iIndexRepertoire),sRepertoireSource+ListeRep(iIndexRepertoire),	iIndexRepertoire)
+		iIndexRepertoire = iIndexRepertoire+1
+		Loop until iIndexRepertoire &gt; iNombreRepertoire
+		iNombreRepertoireExamine = iNombreRepertoireExamine + iNombreRepertoire
+		RepTraite = Int(iNombreRepertoireExamine/2) rem memorise le nombre traite pour le module DmBackup
+	Endif
+	
+	If  oDialog2.GetControl(&quot;CheckBox2&quot;).State = 1 Then &apos; CheckBox2
+		sZipFile = Mid(sRepertoireBackup,1,Len(sRepertoireBackup)-1)+&quot;.zip&quot;
+		ZipTree(sZipFile,sRepertoireBackup)
+		If oDialog2.GetControl(&quot;CheckBox3&quot;).State = 1 Then RmDir sRepertoireBackup &apos;
+	Endif
+
+	If 	oDialog2.GetControl(&quot;OptionButton3&quot;).State = False	Then
+	sMessage = Trad(iLangNumber,16)
+	Else
+	sMessage = Trad(iLangNumber,17)
+	Endif
+	sMessage = sMessage+chr(10)+chr(10)+ inombrerepertoirecopies+Trad(iLangNumber,18)+chr(10)
+	sMessage = sMessage + inombrefichiercopies+Trad(iLangNumber,19)+chr(10)
+	sMessage = sMessage+ inombrerepertoiresupprimes+Trad(iLangNumber,20)+chr(10)
+	sMessage = sMessage +inombrefichiersupprimes+Trad(iLangNumber,21)+chr(10)
+	sMessage = sMessage + iNombreRepertoireExamine +Trad(iLangNumber,22)+chr(10)+chr(10)
+	sMessage = sMessage + Trad(iLangNumber,23) +iNombreErreurs + chr(10)
+	sMessage = sMessage + sMessageErreur
+	oDialog1.Visible = False
+	oDialog1.EndExecute() 
+	MsgBox (sMessage,64,&quot;Dmaths Backup&quot;)
+rem insere un module contenant la date de la derniere sauvegarde
+	If Globalscope.BasicLibraries.HasByName(&quot;Dmaths&quot;) Then
+		Dim sSource, sMod, sDate as String
+		Dim oLib as Object
+		Globalscope.BasicLibraries.loadLibrary(&quot;Dmaths&quot;)
+		sDate = Date()
+		sSource=&quot;Rem (C) Didier Dorange-Pattoret www.dmaths.org 2005-2013&quot;+Chr(13)
+		sSource=sSource+&quot;Public const sDateSauvegarde = &quot;&quot;&quot;+sDate+&quot;&quot;&quot;&quot;+Chr(13)
+		If oDialog2.GetControl(&quot;CheckBox1&quot;).State = 1 Then oDialog2.GetControl(&quot;TextField2&quot;).Text = Mid(oDialog2.GetControl(&quot;TextField2&quot;).Text,1,Len(oDialog2.GetControl(&quot;TextField2&quot;).Text)-10) 
+		sSource=sSource+&quot;Public Const sRepertoireSourceDefaut = &quot;&quot;&quot;+oDialog2.GetControl(&quot;TextField1&quot;).Text+&quot;&quot;&quot;&quot;+Chr(13)
+		sSource=sSource+&quot;Public Const sRepertoireBackupDefaut = &quot;&quot;&quot;+oDialog2.GetControl(&quot;TextField2&quot;).Text+&quot;&quot;&quot;&quot;+Chr(13) 
+		sSource=sSource+&quot;Public Const iNombreRepertoiresTraites = &quot;+ RepTraite +Chr(13) 
+		sSource=sSource+&quot;Sub MyTest3&quot; &amp; Chr(13) &amp; &quot;Print &quot;&quot;Vive Dmaths !&quot;&quot;&quot; &amp; Chr(13) &amp; &quot;End Sub&quot;
+	    sMod = &quot;DmBackup&quot;
+	    oLib = GlobalScope.BasicLibraries.Standard
+	    If oLib.hasByName(sMod) Then
+	       oLib.removeByName(sMod)
+	    EndIf
+		oLib.InsertByName(sMod,sSource)
+	Endif
+rem processus de fin de sauvegarde
+
+Fin:
+oDialog2.EndExecute()
+End Sub
+
+
+
+Sub TraiteRepertoire(sRepertoireSource,sRepertoireBackup as String,iIndexRepertoire as Integer)
+REM Traite les fichiers et les dossiers d&apos;un répertoire
+Rem Les noms des répertoires paramètres finissent par un séparateur
+	On Error Goto TraitementErreurRep
+	Dim sValue as String
+	sValue = Dir$(sRepertoireSource,16)
+	Do Until sValue = &quot;&quot;
+		If Mid(sValue,1,1)&lt;&gt;&quot;.&quot; Then
+			If FileExists(sRepertoireBackup+sValue+&quot;/&quot;) Then
+			iNombreRepertoire = iNombreRepertoire+1
+			ListeRep(iNombreRepertoire)=ListeRep(iIndexRepertoire)+sValue+&quot;/&quot;
+			If iNombreRepertoire+1 &gt; iDimListeRep Then
+				iDimListeRep = iDimListeRep + 100
+				Redim Preserve ListeRep(iDimListeRep)
+			Endif  
+			Elseif bNettoie = True Then
+			RmDir sRepertoireSource+ sValue
+			inombrerepertoiresupprimes = inombrerepertoiresupprimes + 1
+			Else		
+			FileCopy(sRepertoireSource+sValue,sRepertoireBackup+sValue)
+			inombrerepertoirecopies = inombrerepertoirecopies + 1
+			Endif
+		Endif
+		sValue = Dir
+	Loop 
+	On Error Goto TraitementErreurFic
+	sValue = Dir$(sRepertoireSource,0)
+	Do Until sValue = &quot;&quot;
+		If FileExists(sRepertoireBackup+sValue) Then
+			If cDate(FileDateTime(sRepertoireSource+sValue)) &gt; cDate(FileDateTime(sRepertoireBackup+sValue)) Then
+			FileCopy(sRepertoireSource+sValue,sRepertoireBackup+sValue)
+			inombrefichiercopies = inombrefichiercopies+1
+			Endif
+		Elseif bNettoie = True Then
+		Kill sRepertoireSource+ sValue
+		inombrefichiersupprimes = inombrefichiersupprimes + 1
+		Else
+		FileCopy(sRepertoireSource+sValue,sRepertoireBackup+sValue)
+		inombrefichiercopies = inombrefichiercopies+1
+		Endif	
+		sValue = Dir
+	Loop
+	&apos;Xray.Xray oDialog1.GetControl(&quot;Label2&quot;)
+	oDialog1.GetControl(&quot;Label2&quot;).Text = Trad(iLangNumber,24)+cstr(iNombreRepertoireExamine+iIndexRepertoire)
+	oDialog1.GetControl(&quot;Label3&quot;).Text = Trad(iLangNumber,25)+ cstr(inombrerepertoirecopies+inombrefichiercopies)
+	If iNombreRepertoiresTraites &gt; 10 Then
+		oChampProgress.Value = 100*((iNombreRepertoireExamine+iIndexRepertoire)/(iNombreRepertoiresTraites*iSyncro))
+	Else
+		oChampProgress.Value = (iNombreRepertoireExamine+iIndexRepertoire)/5
+	Endif
+	Exit Sub
+	
+		TraitementErreurRep:
+		If iNombreErreurs = 0 Then sMessageErreur = Trad(iLangNumber,26)
+		iNombreRepertoire = iNombreRepertoire+1
+		ListeRep(iNombreRepertoire)=ListeRep(iIndexRepertoire)+sValue+&quot;/&quot; 
+		If iNombreRepertoire+1 &gt; iDimListeRep Then
+			iDimListeRep = iDimListeRep + 100
+			Redim Preserve ListeRep(iDimListeRep)
+		Endif  
+		inombrerepertoirecopies = inombrerepertoirecopies - 1
+		sMessageErreur = sMessageErreur+chr(10) + ConvertFromUrl(sRepertoireSource+sValue) 
+		iNombreErreurs = iNombreErreurs + 1 
+		Resume Next	
+		TraitementErreurFic:
+		If iNombreErreurs = 0 Then sMessageErreur = Trad(iLangNumber,26)
+		inombrefichiercopies = inombrefichiercopies-1
+		sMessageErreur = sMessageErreur+chr(10) + ConvertFromUrl(sRepertoireSource+sValue) 
+		iNombreErreurs = iNombreErreurs + 1 
+		Resume Next
+	
+End sub
+
+
+Sub ChooseFolderSource &apos;As String
+	dim sFolderPickerArgs as Variant
+	dim oFolderPicker as Object
+	sFolderPickerArgs = Array(com.sun.star.ui.dialogs.TemplateDescription.FILEOPEN_SIMPLE )
+	oFolderPicker = CreateUnoService( &quot;com.sun.star.ui.dialogs.FolderPicker&quot; )
+	oFolderPicker.setTitle( &quot;Dmaths Backup - Choix du répertoire source&quot; )
+	If FileExists(oDialog2.GetControl(&quot;TextField1&quot;).Text) Then
+	oFolderPicker.setDisplayDirectory(ConvertTourl(oDialog2.GetControl(&quot;TextField1&quot;).Text))
+	Else
+	oFolderPicker.setDisplayDirectory(ConvertToUrl(GetWorkPath))
+	Endif
+	If oFolderPicker.execute() Then
+		oDialog2.GetControl(&quot;TextField1&quot;).Text = ConvertFromUrl(oFolderPicker.Directory)
+	End If
+End Sub
+
+Sub ChooseFolderCible &apos;As String
+	dim sFolderPickerArgs as Variant
+	dim oFolderPicker as Object
+	sFolderPickerArgs = Array(com.sun.star.ui.dialogs.TemplateDescription.FILEOPEN_SIMPLE )
+	oFolderPicker = CreateUnoService( &quot;com.sun.star.ui.dialogs.FolderPicker&quot; )
+	oFolderPicker.setTitle( &quot;Dmaths Backup - Choix du répertoire cible&quot; )
+	If FileExists(oDialog2.GetControl(&quot;TextField2&quot;).Text) Then
+	oFolderPicker.setDisplayDirectory(ConvertTourl(oDialog2.GetControl(&quot;TextField2&quot;).Text))
+	Else
+	oFolderPicker.setDisplayDirectory(ConvertToUrl(GetWorkPath))
+	Endif
+&apos;	Print getIndexByName(&quot;TextBox2&quot;)
+	If oFolderPicker.execute() Then
+		oDialog2.GetControl(&quot;TextField2&quot;).Text = ConvertFromUrl(oFolderPicker.Directory)
+	End If
+End Sub
+
+Sub ChoosesZipFile &apos;As String
+	dim sFilePickerArgs as Variant
+	dim oFilePicker as Object
+	sFilePickerArgs = Array(com.sun.star.ui.dialogs.TemplateDescription.FILEOPEN_SIMPLE )
+	oFilePicker = CreateUnoService( &quot;com.sun.star.ui.dialogs.FilePicker&quot; )
+	oFilePicker.setTitle( &quot;Dmaths Backup - Choix du fichier à dézipper&quot; )
+	oFilePicker.appendFilter(&quot;Fichiers zip&quot;,&quot;*.zip&quot;)
+&apos;	Xray.Xray oFilePicker
+	oFilePicker.setDisplayDirectory(ConvertToUrl(GetWorkPath))
+	If oFilePicker.execute() Then
+		sZipFile = ConvertFromUrl(oFilePicker.Files(0))
+	End If
+End Sub
+
+Sub Click_ArchiveDatee
+	If oDialog2.GetControl(&quot;CheckBox1&quot;).State = 1 Then
+		If Right(oDialog2.GetControl(&quot;TextField2&quot;).Text,1)&lt;&gt;getPathSeparator Then oDialog2.GetControl(&quot;TextField2&quot;).Text=oDialog2.GetControl(&quot;TextField2&quot;).Text+getPathSeparator
+		oDialog2.GetControl(&quot;TextField2&quot;).Text = oDialog2.GetControl(&quot;TextField2&quot;).Text+Mid(Date(),1,2)+Mid(Date(),4,2)+&quot;-&quot;+Mid(Time(),1,2)+Mid(Time(),4,2)+getPathSeparator
+	Else
+		oDialog2.GetControl(&quot;TextField2&quot;).Text = Mid(oDialog2.GetControl(&quot;TextField2&quot;).Text,1,Len(oDialog2.GetControl(&quot;TextField2&quot;).Text)-10)	
+	Endif
+End Sub
+
+
+Sub Click_RadioGroup1
+oDialog2.GetControl(&quot;CheckBox4&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox2&quot;).Enable = True
+If oDialog2.GetControl(&quot;CheckBox2&quot;).State = 0 Then oDialog2.GetControl(&quot;CheckBox3&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox1&quot;).Enable = True
+End Sub
+
+Sub Click_RadioGroup2
+oDocument = ThisComponent
+oDialog2.GetControl(&quot;CheckBox4&quot;).Enable = True
+oDialog2.GetControl(&quot;CheckBox2&quot;).Enable = True
+If oDialog2.GetControl(&quot;CheckBox2&quot;).State = 0 Then oDialog2.GetControl(&quot;CheckBox3&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox1&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox4&quot;).State = 0
+oDialog2.GetControl(&quot;CheckBox3&quot;).State = 0
+If oDialog2.GetControl(&quot;CheckBox1&quot;).State = 1 Then oDialog2.GetControl(&quot;TextField2&quot;).Text = Mid(oDialog2.GetControl(&quot;TextField2&quot;).Text,1,Len(oDialog2.GetControl(&quot;TextField2&quot;).Text)-10) 
+oDialog2.GetControl(&quot;CheckBox1&quot;).State = 0
+End Sub
+
+Sub Click_RadioGroup3
+If oDialog2.GetControl(&quot;CheckBox1&quot;).State = 1 Then oDialog2.GetControl(&quot;TextField2&quot;).Text = Mid(oDialog2.GetControl(&quot;TextField2&quot;).Text,1,Len(oDialog2.GetControl(&quot;TextField2&quot;).Text)-10) 
+oDialog2.GetControl(&quot;CheckBox4&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox2&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox3&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox1&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox4&quot;).State = 0
+oDialog2.GetControl(&quot;CheckBox2&quot;).State = 0
+oDialog2.GetControl(&quot;CheckBox3&quot;).State = 0
+oDialog2.GetControl(&quot;CheckBox1&quot;).State = 0
+End Sub
+
+Sub Click_CheckBox2
+If oDialog2.GetControl(&quot;CheckBox2&quot;).State = 1 Then
+oDialog2.GetControl(&quot;CheckBox3&quot;).Enable = True
+Else
+oDialog2.GetControl(&quot;CheckBox3&quot;).Enable = False
+oDialog2.GetControl(&quot;CheckBox3&quot;).State = 0
+Endif
+End Sub
+
+Function GetWorkPath as String
+Dim  oPathSubstSrv as Object
+Dim sWorkPath as String
+  oPathSubstSrv = createUnoService(&quot;com.sun.star.comp.framework.PathSubstitution&quot;)
+  sWorkPath = ConvertFromUrl(oPathSubstSrv.getSubstituteVariableValue(&quot;$(work)&quot;))
+	GetWorkPath = sWorkPath
+End Function
+
+Function GetIndexByName(leNom As String) As Long
+Dim I,iIndex As Long
+For I = 0 to oPage.Count -1	
+  if oPage.GetByIndex(I).Control.Name = leNom then
+  	getIndexByName = I &apos; renvoyer l&apos;index correspondant au nom
+    Exit Function
+  end if
+next
+End Function
+
+Function FindObjectByName(nomObj As String, Optional service As String) As Object
+Dim objX As Object, x As Long
+  For x = 0 To oPage.Count - 1
+    objX = oPage.GetByIndex(x)
+    If objX.Control.Name = nomObj Then
+      if IsMissing(service) then
+        FindObjectByName = objX &apos; objet trouvé
+        Exit Function
+      else
+        if objX.supportsService(service) then
+          FindObjectByName = objX &apos; objet trouvé
+          Exit Function
+        end if
+      end if
+    EndIf
+  Next
+End Function &apos; renvoie Null en cas d&apos;échec
+
+
+&apos;**************************************************************************************
+&apos;rem cette fonction contrôle les droits d&apos;écriture dans le répertoire d&apos;installation
+
+Function ControleDroits(byVal optional LeChemin as string) as boolean
+
+	on error goto PasDroit
+	leChemin=convertToURL(leChemin)
+	open  leChemin+&quot;temp&quot; for output as #1
+	Print #1,cstr(now)
+	close #1
+	Kill LeChemin+&quot;temp&quot;
+	ControleDroits=True
+	Exit function
+
+	PasDroit:
+	ControleDroits=false
+
+end function
+&apos;******************************************************************************
+
+
+
+</script:module>

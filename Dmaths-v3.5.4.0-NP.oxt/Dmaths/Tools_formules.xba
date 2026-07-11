@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Tools_formules" script:language="StarBasic">&apos;Copyright (C) 2003-2014 Didier Dorange-Pattoret
+&apos;38, chemin de l&apos;Abbaye  
+&apos;74940 Annecy le Vieux
+&apos;France
+&apos;ddorange@dmaths.com
+&apos;module créé le 6 mars novembre 2013
+&apos;********************************************************************************
+
+
+Option Explicit
+
+rem ----------------------------------------------------------------------------------------------------------------
+
+rem macro mise au point le 6 mars 2013
+
+
+
+Function InsereFormuleDraw(UnTexte as string, x0 as single, y0 as single, sFonte as String, iTaille as Integer, Optional oDocumentDessin as Object) as object
+
+	Dim oDocumentTexte, maPageDessin, monCurseur, obj, objDessin, oDessin as Object
+	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+	Dim positionDessin as New com.sun.star.awt.Point
+    
+    rem ouverture des fichiers
+    mFileProperties(0).Name=&quot;Hidden&quot;
+    mFileProperties(0).Value = True
+	oDocumentTexte = StarDesktop.LoadComponentFromURL(&quot;private:factory/swriter&quot;,&quot;_blank&quot;, 0, mFileProperties())
+	
+	If Ismissing(oDocumentDessin) Then
+	mFileProperties(0).Value = True
+	oDocumentDessin = StarDesktop.LoadComponentFromURL(&quot;private:factory/sdraw&quot;,&quot;_blank&quot;, 0, mFileProperties())
+	Endif
+	
+	rem ecriture de la formule
+	monCurseur = oDocumentTexte.Text.CreateTextCursor
+	obj =  oDocumentTexte.CreateInstance(&quot;com.sun.star.text.TextEmbeddedObject&quot;)
+	obj.CLSID=&quot;078B7ABA-54FC-457F-8551-6147e776a997&quot;
+	obj.AnchorType=com.sun.star.text.TextContentAnchorType.AS_CHARACTER   
+	obj.LeftMargin = 0
+	obj.RightMargin = 0
+	monCurseur.Text.insertTextContent(monCurseur, obj, true)      
+
+	obj.model.Formula = UnTexte
+	obj.model.BaseFontHeight = iTaille
+	obj.model.FontNameVariables = sFonte		
+		
+	GereMargesFormule(obj)		
+
+	
+	obj.ExtendedControlOverEmbeddedObject.update()
+
+	rem copie dans le document draw
+	oDocumentTexte.CurrentController.Select(obj)
+	ClipboardCut(oDocumentTexte)
+	oDocumentTexte.Close(True)	
+	ClipboardPasteSpecial(oDocumentDessin)
+
+	rem fabrication de l&apos;objet image
+	objDessin = oDocumentDessin.CurrentSelection.GetByIndex(0)	
+	
+	oDessin = oDocumentDessin.CreateInstance(&quot;com.sun.star.drawing.GraphicObjectShape&quot;)
+
+	oDessin.Graphic = objDessin.Graphic	
+
+	maPageDessin = oDocumentDessin.Drawpages(0)	
+	maPageDessin.add(oDessin)
+	oDessin.LineColor = RGB(255,255,255)
+	oDessin.FillColor = RGB(255,255,255)
+	oDessin.Size = objDessin.Size
+	positionDessin.x = x0
+	positionDessin.y = y0
+	oDessin.Position = positionDessin
+
+	ToucheSuppr(oDocumentDessin)
+	
+	InsereFormuleDraw = oDessin
+End Function
+
+
+
+
+</script:module>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="CreePointSupp" dlg:left="178" dlg:top="75" dlg:width="156" dlg:height="147" dlg:help-text="&amp;2233.CreePointSupp.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;2234.CreePointSupp.Title">
+ <dlg:bulletinboard>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="1" dlg:left="5" dlg:top="27" dlg:width="145" dlg:height="40" dlg:help-text="&amp;2237.CreePointSupp.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;2238.CreePointSupp.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="0" dlg:left="12" dlg:top="33" dlg:width="52" dlg:height="11" dlg:help-text="&amp;2241.CreePointSupp.CheckBox1.HelpText" dlg:value="&amp;2242.CreePointSupp.CheckBox1.Label" dlg:checked="true"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="2" dlg:left="81" dlg:top="33" dlg:width="20" dlg:height="11" dlg:help-text="&amp;2243.CreePointSupp.Label1.HelpText" dlg:value="&amp;2244.CreePointSupp.Label1.Label"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="3" dlg:left="122" dlg:top="33" dlg:width="20" dlg:height="11" dlg:help-text="&amp;2247.CreePointSupp.Label2.HelpText" dlg:value="&amp;2248.CreePointSupp.Label2.Label"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="4" dlg:left="10" dlg:top="49" dlg:width="32" dlg:height="11" dlg:help-text="&amp;2249.CreePointSupp.Label3.HelpText" dlg:value="&amp;2250.CreePointSupp.Label3.Label"/>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="5" dlg:left="44" dlg:top="48" dlg:width="25" dlg:height="14" dlg:help-text="&amp;2251.CreePointSupp.TextField1.HelpText" dlg:align="center" dlg:value="&amp;2252.CreePointSupp.TextField1.Text"/>
+  <dlg:text dlg:id="Label4" dlg:tab-index="6" dlg:left="5" dlg:top="6" dlg:width="145" dlg:height="11" dlg:help-text="&amp;2253.CreePointSupp.Label4.HelpText" dlg:value="&amp;2254.CreePointSupp.Label4.Label"/>
+  <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="7" dlg:left="13" dlg:top="77" dlg:width="52" dlg:height="11" dlg:help-text="&amp;2255.CreePointSupp.CheckBox2.HelpText" dlg:value="&amp;2256.CreePointSupp.CheckBox2.Label" dlg:checked="true"/>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="8" dlg:left="5" dlg:top="71" dlg:width="145" dlg:height="40" dlg:help-text="&amp;2257.CreePointSupp.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;2258.CreePointSupp.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label5" dlg:tab-index="9" dlg:left="81" dlg:top="77" dlg:width="20" dlg:height="11" dlg:help-text="&amp;2259.CreePointSupp.Label5.HelpText" dlg:value="&amp;2260.CreePointSupp.Label5.Label"/>
+  <dlg:text dlg:id="Label6" dlg:tab-index="10" dlg:left="122" dlg:top="77" dlg:width="20" dlg:height="11" dlg:help-text="&amp;2261.CreePointSupp.Label6.HelpText" dlg:value="&amp;2262.CreePointSupp.Label6.Label"/>
+  <dlg:text dlg:id="Label7" dlg:tab-index="11" dlg:left="10" dlg:top="93" dlg:width="32" dlg:height="11" dlg:help-text="&amp;2263.CreePointSupp.Label7.HelpText" dlg:value="&amp;2264.CreePointSupp.Label7.Label"/>
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="12" dlg:left="44" dlg:top="92" dlg:width="25" dlg:height="14" dlg:help-text="&amp;2265.CreePointSupp.TextField2.HelpText" dlg:align="center" dlg:value="&amp;2266.CreePointSupp.TextField2.Text"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="13" dlg:left="80" dlg:top="119" dlg:width="70" dlg:height="20" dlg:help-text="&amp;2267.CreePointSupp.CommandButton1.HelpText" dlg:value="&amp;2268.CreePointSupp.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:Dmaths.Module6.FinCreationPointSupp?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:text dlg:id="Label8" dlg:tab-index="14" dlg:left="107" dlg:top="33" dlg:width="14" dlg:height="11" dlg:help-text="&amp;2729.CreePointSupp.Label8.HelpText" dlg:value="&amp;2730.CreePointSupp.Label8.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label9" dlg:tab-index="15" dlg:left="66" dlg:top="33" dlg:width="14" dlg:height="11" dlg:help-text="&amp;2731.CreePointSupp.Label9.HelpText" dlg:value="&amp;2732.CreePointSupp.Label9.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label10" dlg:tab-index="16" dlg:left="107" dlg:top="77" dlg:width="14" dlg:height="11" dlg:help-text="&amp;2733.CreePointSupp.Label10.HelpText" dlg:value="&amp;2734.CreePointSupp.Label10.Label" dlg:align="right"/>
+  <dlg:text dlg:id="Label11" dlg:tab-index="17" dlg:left="66" dlg:top="77" dlg:width="14" dlg:height="11" dlg:help-text="&amp;2735.CreePointSupp.Label11.HelpText" dlg:value="&amp;2736.CreePointSupp.Label11.Label" dlg:align="right"/>
+ </dlg:bulletinboard>
+</dlg:window>

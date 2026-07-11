@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE library:library PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "library.dtd">
+<library:library xmlns:library="http://openoffice.org/2000/library" library:name="Dmaths2" library:readonly="false" library:passwordprotected="false">
+ <library:element library:name="AxesDialog"/>
+ <library:element library:name="GraphDialog"/>
+ <library:element library:name="PiDialog"/>
+</library:library>

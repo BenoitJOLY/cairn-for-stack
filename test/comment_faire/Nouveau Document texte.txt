@@ -1,0 +1,289 @@
+Voici d'abord le **Type E** (Équivalence de deux propositions) en appliquant rigoureusement toutes les règles, puis le document mis à jour.
+
+### TYPE E — Équivalence logique
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>Logique — Équivalence de deux propositions</text></name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#1e3a5f;border-left:5px solid #2563eb;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Logique — Équivalence logique</strong>
+        <span style="background:#2563eb;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#1e3a5f;border:1px solid #1e3a5f;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📐 Mathématiques</span>
+      </div>
+
+      <p>Complétez les deux tables de vérité, puis indiquez si les deux propositions sont <strong>logiquement équivalentes</strong>.</p>
+
+      <div style="display:flex;gap:30px;justify-content:center;flex-wrap:wrap;margin:20px 0;">
+        <div>
+          <div style="text-align:center;font-size:1.15rem;font-weight:bold;margin-bottom:8px;padding:8px;background:#eff6ff;border-radius:6px;border:1px solid #bfdbfe;font-family:serif;">\( {@exprA@} \)</div>
+          <table style="border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+            <thead><tr style="background:#f1f5f9;">
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">P</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">Q</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;">Rés.</th>
+            </tr></thead>
+            <tbody>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:a0]] [[validation:a0]]</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:a1]] [[validation:a1]]</td></tr>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:a2]] [[validation:a2]]</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:a3]] [[validation:a3]]</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;align-items:center;font-size:2rem;font-weight:bold;color:#64748b;">⇔ ?</div>
+
+        <div>
+          <div style="text-align:center;font-size:1.15rem;font-weight:bold;margin-bottom:8px;padding:8px;background:#fef3c7;border-radius:6px;border:1px solid #fcd34d;font-family:serif;">\( {@exprB@} \)</div>
+          <table style="border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+            <thead><tr style="background:#f1f5f9;">
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">P</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">Q</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;">Rés.</th>
+            </tr></thead>
+            <tbody>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:b0]] [[validation:b0]]</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:b1]] [[validation:b1]]</td></tr>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:b2]] [[validation:b2]]</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:b3]] [[validation:b3]]</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin:20px 0;">
+        <p style="font-size:1.05rem;margin-bottom:8px;"><strong>Les deux propositions sont-elles logiquement équivalentes ?</strong></p>
+        [[input:equiv]] [[validation:equiv]]
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:var(--navy2); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponse attendue
+        </div>
+        <p><strong>{@exprA@}</strong> : [{@taA@}]</p>
+        <p><strong>{@exprB@}</strong> : [{@taB@}]</p>
+        <p><strong>{@equiv_txt@}</strong></p>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2026010500</text></stackversion>
+    <questionvariables>
+      <text>eq1_expr : [P implies Q, not(P) or Q]$
+eq2_expr : [not(P and Q), not(P) or not(Q)]$
+eq3_expr : [(P implies Q) and (Q implies P), (P and Q) or (not(P) and not(Q))]$
+eq4_expr : [not(P or Q), not(P) and not(Q)]$
+
+neq1_expr : [P and Q, P or Q]$
+neq2_expr : [P implies Q, Q implies P]$
+neq3_expr : [not(P and Q), not(P or Q)]$
+neq4_expr : [P or not(Q), not(P) or Q]$
+
+liste_eq : [eq1_expr, eq2_expr, eq3_expr, eq4_expr]$
+liste_neq : [neq1_expr, neq2_expr, neq3_expr, neq4_expr]$
+
+est_equiv : rand(2) = 1$
+
+if est_equiv then block(
+  pair : liste_eq[rand(length(liste_eq)) + 1],
+  ta_equiv_id : "1",
+  equiv_txt : "Oui, les deux propositions sont logiquement équivalentes."
+) else block(
+  pair : liste_neq[rand(length(liste_neq)) + 1],
+  ta_equiv_id : "2",
+  equiv_txt : "Non, les deux propositions ne sont PAS logiquement équivalentes."
+)$
+
+exprA : pair[1]$
+exprB : pair[2]$
+
+TA : truth_table(exprA)$
+RA : args(TA)$
+vA0 : if last(RA[2]) then 1 else 0$
+vA1 : if last(RA[3]) then 1 else 0$
+vA2 : if last(RA[4]) then 1 else 0$
+vA3 : if last(RA[5]) then 1 else 0$
+taA : [vA0, vA1, vA2, vA3]$
+
+TB : truth_table(exprB)$
+RB : args(TB)$
+vB0 : if last(RB[2]) then 1 else 0$
+vB1 : if last(RB[3]) then 1 else 0$
+vB2 : if last(RB[4]) then 1 else 0$
+vB3 : if last(RB[5]) then 1 else 0$
+taB : [vB0, vB1, vB2, vB3]$
+
+choix1 : [["1", true, "Oui, elles sont équivalentes"], ["2", false, "Non, elles ne sont pas équivalentes"]]$
+choix2 : [["1", false, "Oui, elles sont équivalentes"], ["2", true, "Non, elles ne sont pas équivalentes"]]$
+choix_brut : if est_equiv then choix1 else choix2$
+choix : random_permutation(choix_brut)$</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol><li>[[feedback:prt1]]</li></ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@exprA@} | {@exprB@} | {@equiv_txt@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:logique-prop-equivalence</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html"><text></text></prtcorrect>
+    <prtpartiallycorrect format="html"><text></text></prtpartiallycorrect>
+    <prtincorrect format="html"><text></text></prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>symbol</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input><name>a0</name><type>algebraic</type><tans>vA0</tans><boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars><syntaxhint>0</syntaxhint><syntaxattribute>0</syntaxattribute><forbidwords></forbidwords><allowwords></allowwords><forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>0</showvalidation><options></options></input>
+    <input><name>a1</name><type>algebraic</type><tans>vA1</tans><boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars><syntaxhint>0</syntaxhint><syntaxattribute>0</syntaxattribute><forbidwords></forbidwords><allowwords></allowwords><forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>0</showvalidation><options></options></input>
+    <input><name>a2</name><type>algebraic</type><tans>vA2</tans><boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars><syntaxhint>0</syntaxhint><syntaxattribute>0</syntaxattribute><forbidwords></forbidwords><allowwords></allowwords><forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>0</showvalidation><options></options></input>
+    <input><name>a3</name><type>algebraic</type><tans>vA3</tans><boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars><syntaxhint>0</syntaxhint><syntaxattribute>0</syntaxattribute><forbidwords></forbidwords><allowwords></allowwords><forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>0</showvalidation><options></options></input>
+    <input><name>b0</name><type>algebraic</type><tans>vB0</tans><boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars><syntaxhint>0</syntaxhint><syntaxattribute>0</syntaxattribute><forbidwords></forbidwords><allowwords></allowwords><forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>0</showvalidation><options></options></input>
+    <input><name>b1</name><type>algebraic</type><tans>vB1</tans><boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars><syntaxhint>0</syntaxhint><syntaxattribute>0</syntaxattribute><forbidwords></forbidwords><allowwords></allowwords><forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>0</showvalidation><options></options></input>
+    <input><name>b2</name><type>algebraic</type><tans>vB2</tans><boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars><syntaxhint>0</syntaxhint><syntaxattribute>0</syntaxattribute><forbidwords></forbidwords><allowwords></allowwords><forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>0</showvalidation><options></options></input>
+    <input><name>b3</name><type>algebraic</type><tans>vB3</tans><boxsize>3</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars><syntaxhint>0</syntaxhint><syntaxattribute>0</syntaxattribute><forbidwords></forbidwords><allowwords></allowwords><forbidfloat>1</forbidfloat><requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>0</showvalidation><options></options></input>
+    <input>
+      <name>equiv</name>
+      <type>dropdown</type>
+      <tans>choix</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>sa : [a0, a1, a2, a3]$
+sb : [b0, b1, b2, b3]$
+tables_ok : is(sa = taA and sb = taB)$
+vraie_id_equiv : first(first(sublist(choix, lambda([ex], second(ex)=true))))$</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification des tables</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>tables_ok</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html"><text></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html"><text></text></falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Tables OK → Vérifie équivalence</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>equiv</sans>
+        <tans>vraie_id_equiv</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;"><p>✅ <strong>Parfait !</strong> Les tables sont correctes et votre conclusion sur l'équivalence est juste. {@equiv_txt@}</p></div>]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Tables correctes, mais conclusion fausse !</strong> Comparez les deux colonnes de résultat ligne par ligne. Deux propositions sont équivalentes si et seulement si leurs colonnes sont <u>strictement identiques</u>.</p></div>]]></text></falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Tables incorrectes</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;margin:4px 0;"><p>❌ <strong>Tables incorrectes.</strong> Recalculez chaque colonne séparément avant de pouvoir conclure à une équivalence.</p></div>]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html"><text></text></falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>
+```
+
+***
+
+### Mise à jour du document des RÈGLES ABSOLUES
+
+**RÈGLES ABSOLUES À RESPECTER (NE PAS DÉVIER) :**
+
+**SYNTAXE GÉNÉRALE MAXIMA :**
+*   **Pas de point-virgule (`;`)** : Jamais de `;` à la fin des lignes dans `<questionvariables>`. On utilise UNIQUEMENT `$` pour terminer une instruction.
+*   **Une seule instruction par ligne** : JAMAIS de `instr1$ instr2$` sur la même ligne, surtout à l'intérieur d'un `block(...)` ou d'une boucle `do(...)`. Cela provoque l'erreur fatale `"Expected... but ';' found"`. Chaque `$` doit avoir son propre retour à la ligne.
+*   **Pas de syntaxe dynamique** : Ne JAMAIS stocker un opérateur (`and`, `or`) dans une variable pour l'évaluer. Faire une liste explicite de toutes les expressions possibles et utiliser `rand()` pour choisir un index.
+*   **Simplicité** : Ne JAMAIS utiliser `:=` pour créer des fonctions dans les variables de question. Utiliser uniquement des affectations `:` ou des `makelist(if...then...else...)`.
+
+**TABLES DE VÉRITÉ :**
+*   **Pas de `T[i]` pour les tables** : Ne JAMAIS accéder à une table Maxima avec des crochets. Utiliser obligatoirement la syntaxe `Rows : args(truth_table(...))` puis `last(Rows[i])`.
+*   **Le piège mortel de `boolean_form()`** : Ne JAMAIS passer le résultat de `boolean_form()` à `truth_table()`. Si l'expression est une tautologie ou une contradiction, `boolean_form()` la simplifie en la constante `true` ou `false`, ce qui fait crasher `truth_table(true)` ("invalid index..."). Utiliser TOUJOURS `truth_table(expr)` directement avec l'expression littérale.
+*   **Pas d'évaluation logique partielle** : Ne pas utiliser `if is(ev(expr, P=false...)) then...` car `is(ev(...))` peut rester en suspend et s'afficher en texte brut dans la page HTML.
+
+**INPUTS DE TYPE DROPDOWN (MÉGA PIÈGE) :**
+*   **Où mettre la liste ?** : La liste de choix `[[id, bool, "texte"], ...]` va EXCLUSIVEMENT dans le champ **Modèle de réponse (`<tans>`)**.
+*   **Options supplémentaires** : Le champ `<options>` dans le XML doit être **OBLIGATOIREMENT VIDE** (laisser `<options></options>`).
+*   **Les ID sont des STRINGS** : Les identifiants doivent OBLIGATOIREMENT être des chaînes de caractères : `["1", true, "..."]` et JAMAIS des entiers `[1, true, "..."]`.
+*   **Booléens en DUR** : Ne JAMAIS mettre d'expression logique directement dans la liste (ex: `idx_b=1`). Soit utiliser `if idx_b=1 then true else false`, soit (plus sûr) créer 4 listes statiques `choix1, choix2...` avec des `true`/`false` écrits en dur, puis faire `if idx=1 then choix1 elseif idx=2 then choix2...`.
+*   **Pas de LaTeX (`tex()`)** : Ne JAMAIS utiliser `tex()` pour générer le texte des options. MathJax ne parse pas le contenu des balises HTML `<option>`. Utiliser du texte Unicode pur (`∧`, `∨`, `¬`, `⇒`).
+*   **Récupérer la bonne réponse dans le PRT** : Utiliser exactement cette syntaxe dans les *Feedback variables* du PRT : `vraie_id : first(first(sublist(choix, lambda([ex], second(ex)=true))))$`.
+
+**JSXGRAPH & INTERFACE :**
+*   **Pas de `.moveTo()`** : Ne JAMAIS utiliser `.moveTo()` ou `.setAttribute()` dans la fonction `bd.update()` de JSXGraph (risque de boucle infinie).
+*   **Limites JS** : Mettre `numberPoints: 150` maximum pour les courbes.
+
+**UNITÉS & DIVERS STACK :**
+*   **Unités STACK** : Pour comparer des unités, appliquer `stack_unit_si_to_si_base()` sur la réponse de l'élève ET sur la réponse du prof avant de faire l'extraction avec le `subst(map(lambda...))`.
+*   **Pas de `scientificnotation` dans le XML** : Supprimer cette balise du XML pour éviter les crashes d'import, la régler dans l'interface Moodle.
+*   **Pas de balises en double** : Vérifier qu'il n'y a qu'un seul `<truefeedback>` ou `<falsefeedback>` par nœud de PRT.

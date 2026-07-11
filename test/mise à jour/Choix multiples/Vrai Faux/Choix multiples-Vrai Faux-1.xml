@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396873  -->
+  <question type="stack">
+    <name>
+      <text>Exercice_sans_titre_2026_06_30_15h13</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#4f46e5;border-left:5px solid #3730a3;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Vrai / Faux</strong><span style="background:#3730a3;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span></div>
+<!-- ENONCE-START --><p>Pour chacune de ces propositions dites si elles sont vraies ou fausses pour les ondes</p><!-- ENONCE-END -->
+<table style="border-collapse:collapse;width:100%;margin-top:8px;">
+<thead><tr><th style="text-align:left;padding:6px 12px;background:#eef2ff;border-bottom:2px solid #4f46e5;">Proposition</th><th style="text-align:center;padding:6px 12px;background:#eef2ff;border-bottom:2px solid #4f46e5;white-space:nowrap;">Vrai / Faux</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 12px;border-bottom:1px solid #e2e8f0;">1. {@first(ta_vf1[1])@}</td><td style="padding:6px 12px;border-bottom:1px solid #e2e8f0;white-space:nowrap;">[[input:ans1p01]]</td></tr>
+<tr><td style="padding:6px 12px;border-bottom:1px solid #e2e8f0;">2. {@first(ta_vf1[2])@}</td><td style="padding:6px 12px;border-bottom:1px solid #e2e8f0;white-space:nowrap;">[[input:ans1p02]]</td></tr>
+<tr><td style="padding:6px 12px;border-bottom:1px solid #e2e8f0;">3. {@first(ta_vf1[3])@}</td><td style="padding:6px 12px;border-bottom:1px solid #e2e8f0;white-space:nowrap;">[[input:ans1p03]]</td></tr>
+<tr><td style="padding:6px 12px;border-bottom:1px solid #e2e8f0;">4. {@first(ta_vf1[4])@}</td><td style="padding:6px 12px;border-bottom:1px solid #e2e8f0;white-space:nowrap;">[[input:ans1p04]]</td></tr>
+</tbody></table>
+<div style="display:none">[[validation:ans1p01]][[validation:ans1p02]][[validation:ans1p03]][[validation:ans1p04]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Q1 : Vrai/Faux (1pt) */
+ta_vf1_all:[["Une onde mecanique ne peut se propager que dans un milieu materiel.",true,"Exact !","Incorrect."],["Dans le vide, une onde sonore se propage a une vitesse superieure a celle de la lumiere.",false,"Exact !","Erreur : le son ne se propage pas du tout dans le vide, car il necessite un support materiel pour transmettre la vibration."],["La relation entre la longueur d'onde \\(\\lambda\\), la célérité \\(v\\) et la fréquence \\(f\\) est donnee par \\(v = \\lambda \\times f\\).",true,"Exact !","Incorrect."],["Pour une onde periodique, la periode \\(T\\) et la frequence \\(f\\) sont reliees par la relation \\(T = \\frac{1}{f}\\).",true,"Exact !","Incorrect."],["Lorsqu'une onde traverse une interface entre deux milieux, sa fréquence \\(f\\) change.",false,"Exact !","Erreur : la frequence d'une onde est imposee par la source et demeure inchangee lors du changement de milieu."],["L'intensite sonore \\(I\\) diminue lorsque la distance a la source augmente.",true,"Exact !","Incorrect."],["Une onde transversale est une onde dont la direction de perturbation est parallele a la direction de propagation.",false,"Exact !","Erreur : c'est la definition d'une onde longitudinale. Pour une onde transversale, la perturbation est perpendiculaire a la direction de propagation."],["La célérité d'une onde sonore dans l'air est strictement constante, quelle que soit la température.",false,"Exact !","Erreur : il s'agit du piege classique. La célérité du son dans l'air depend de la temperature : elle augmente avec celle-ci."],["La periode \\(T\\) represente la duree au bout de laquelle le phenomene se reproduit identique a lui-meme.",true,"Exact !","Incorrect."],["Le phenomene de diffraction se produit lorsque l'ouverture de l'obstacle est tres grande devant la longueur d'onde \\(\\lambda\\).",false,"Exact !","Erreur : la diffraction est marquee quand la dimension de l'ouverture est du meme ordre de grandeur ou inferieure a la longueur d'onde."]]$ listV_vf1:sublist(ta_vf1_all,lambda([ex],second(ex)=true))$ listF_vf1:sublist(ta_vf1_all,lambda([ex],second(ex)=false))$ nbV_vf1:rand(min(length(listV_vf1),4-1))+1$ nbF_vf1:min(length(listF_vf1),4-nbV_vf1)$ ta_vf1:random_permutation(append(rand_selection(listV_vf1,nbV_vf1),rand_selection(listF_vf1,nbF_vf1)))$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]] </li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@map(first,ta_vf1)@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:vf</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1p01</name>
+      <type>radio</type>
+      <tans><![CDATA[if second(ta_vf1[1]) then [[1,true,"Vrai"],[2,false,"Faux"]] else [[1,false,"Vrai"],[2,true,"Faux"]]]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options>nonotanswered</options>
+    </input>
+    <input>
+      <name>ans1p02</name>
+      <type>radio</type>
+      <tans><![CDATA[if second(ta_vf1[2]) then [[1,true,"Vrai"],[2,false,"Faux"]] else [[1,false,"Vrai"],[2,true,"Faux"]]]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options>nonotanswered</options>
+    </input>
+    <input>
+      <name>ans1p03</name>
+      <type>radio</type>
+      <tans><![CDATA[if second(ta_vf1[3]) then [[1,true,"Vrai"],[2,false,"Faux"]] else [[1,false,"Vrai"],[2,true,"Faux"]]]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options>nonotanswered</options>
+    </input>
+    <input>
+      <name>ans1p04</name>
+      <type>radio</type>
+      <tans><![CDATA[if second(ta_vf1[4]) then [[1,true,"Vrai"],[2,false,"Faux"]] else [[1,false,"Vrai"],[2,true,"Faux"]]]]></tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options>nonotanswered</options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>ok_vf1_p01:is(ans1p01=(if second(ta_vf1[1]) then 1 else 2))$ ok_vf1_p02:is(ans1p02=(if second(ta_vf1[2]) then 1 else 2))$ ok_vf1_p03:is(ans1p03=(if second(ta_vf1[3]) then 1 else 2))$ ok_vf1_p04:is(ans1p04=(if second(ta_vf1[4]) then 1 else 2))$ n_ok_vf1:(if ok_vf1_p01 then 1 else 0)+(if ok_vf1_p02 then 1 else 0)+(if ok_vf1_p03 then 1 else 0)+(if ok_vf1_p04 then 1 else 0)$ sc_vf1:float(n_ok_vf1/4)$ pct_vf1:round(sc_vf1*100)$</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>sc_vf1</sans>
+        <tans>1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty>0</truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><strong>Score :</strong> {@pct_vf1@} %</p>
+<div class="vf-prt-items">
+<div class="vf-fb-item"><span class="vf-pi-num">1.</span> <strong>{@first(ta_vf1[1])@}</strong> [[if test="is(ok_vf1_p01=true)"]]<span style="color:#15803d;border-left:4px solid #16a34a;padding:1px 10px">✅ {@if second(ta_vf1[1]) then third(ta_vf1[1]) else fourth(ta_vf1[1])@}</span>[[/if]][[if test="is(ok_vf1_p01=false)"]]<span style="color:#dc2626;border-left:4px solid #ef4444;padding:1px 10px">❌ {@if second(ta_vf1[1]) then third(ta_vf1[1]) else fourth(ta_vf1[1])@} <em>(attendu&nbsp;: {@if second(ta_vf1[1]) then "Vrai" else "Faux"@})</em></span>[[/if]]</div>
+<div class="vf-fb-item"><span class="vf-pi-num">2.</span> <strong>{@first(ta_vf1[2])@}</strong> [[if test="is(ok_vf1_p02=true)"]]<span style="color:#15803d;border-left:4px solid #16a34a;padding:1px 10px">✅ {@if second(ta_vf1[2]) then third(ta_vf1[2]) else fourth(ta_vf1[2])@}</span>[[/if]][[if test="is(ok_vf1_p02=false)"]]<span style="color:#dc2626;border-left:4px solid #ef4444;padding:1px 10px">❌ {@if second(ta_vf1[2]) then third(ta_vf1[2]) else fourth(ta_vf1[2])@} <em>(attendu&nbsp;: {@if second(ta_vf1[2]) then "Vrai" else "Faux"@})</em></span>[[/if]]</div>
+<div class="vf-fb-item"><span class="vf-pi-num">3.</span> <strong>{@first(ta_vf1[3])@}</strong> [[if test="is(ok_vf1_p03=true)"]]<span style="color:#15803d;border-left:4px solid #16a34a;padding:1px 10px">✅ {@if second(ta_vf1[3]) then third(ta_vf1[3]) else fourth(ta_vf1[3])@}</span>[[/if]][[if test="is(ok_vf1_p03=false)"]]<span style="color:#dc2626;border-left:4px solid #ef4444;padding:1px 10px">❌ {@if second(ta_vf1[3]) then third(ta_vf1[3]) else fourth(ta_vf1[3])@} <em>(attendu&nbsp;: {@if second(ta_vf1[3]) then "Vrai" else "Faux"@})</em></span>[[/if]]</div>
+<div class="vf-fb-item"><span class="vf-pi-num">4.</span> <strong>{@first(ta_vf1[4])@}</strong> [[if test="is(ok_vf1_p04=true)"]]<span style="color:#15803d;border-left:4px solid #16a34a;padding:1px 10px">✅ {@if second(ta_vf1[4]) then third(ta_vf1[4]) else fourth(ta_vf1[4])@}</span>[[/if]][[if test="is(ok_vf1_p04=false)"]]<span style="color:#dc2626;border-left:4px solid #ef4444;padding:1px 10px">❌ {@if second(ta_vf1[4]) then third(ta_vf1[4]) else fourth(ta_vf1[4])@} <em>(attendu&nbsp;: {@if second(ta_vf1[4]) then "Vrai" else "Faux"@})</em></span>[[/if]]</div>
+</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>sc_vf1</falsescore>
+        <falsepenalty>0</falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p><strong>Score :</strong> {@pct_vf1@} %</p>
+<div class="vf-prt-items">
+<div class="vf-fb-item"><span class="vf-pi-num">1.</span> <strong>{@first(ta_vf1[1])@}</strong> [[if test="is(ok_vf1_p01=true)"]]<span style="color:#15803d;border-left:4px solid #16a34a;padding:1px 10px">✅ {@if second(ta_vf1[1]) then third(ta_vf1[1]) else fourth(ta_vf1[1])@}</span>[[/if]][[if test="is(ok_vf1_p01=false)"]]<span style="color:#dc2626;border-left:4px solid #ef4444;padding:1px 10px">❌ {@if second(ta_vf1[1]) then third(ta_vf1[1]) else fourth(ta_vf1[1])@} <em>(attendu&nbsp;: {@if second(ta_vf1[1]) then "Vrai" else "Faux"@})</em></span>[[/if]]</div>
+<div class="vf-fb-item"><span class="vf-pi-num">2.</span> <strong>{@first(ta_vf1[2])@}</strong> [[if test="is(ok_vf1_p02=true)"]]<span style="color:#15803d;border-left:4px solid #16a34a;padding:1px 10px">✅ {@if second(ta_vf1[2]) then third(ta_vf1[2]) else fourth(ta_vf1[2])@}</span>[[/if]][[if test="is(ok_vf1_p02=false)"]]<span style="color:#dc2626;border-left:4px solid #ef4444;padding:1px 10px">❌ {@if second(ta_vf1[2]) then third(ta_vf1[2]) else fourth(ta_vf1[2])@} <em>(attendu&nbsp;: {@if second(ta_vf1[2]) then "Vrai" else "Faux"@})</em></span>[[/if]]</div>
+<div class="vf-fb-item"><span class="vf-pi-num">3.</span> <strong>{@first(ta_vf1[3])@}</strong> [[if test="is(ok_vf1_p03=true)"]]<span style="color:#15803d;border-left:4px solid #16a34a;padding:1px 10px">✅ {@if second(ta_vf1[3]) then third(ta_vf1[3]) else fourth(ta_vf1[3])@}</span>[[/if]][[if test="is(ok_vf1_p03=false)"]]<span style="color:#dc2626;border-left:4px solid #ef4444;padding:1px 10px">❌ {@if second(ta_vf1[3]) then third(ta_vf1[3]) else fourth(ta_vf1[3])@} <em>(attendu&nbsp;: {@if second(ta_vf1[3]) then "Vrai" else "Faux"@})</em></span>[[/if]]</div>
+<div class="vf-fb-item"><span class="vf-pi-num">4.</span> <strong>{@first(ta_vf1[4])@}</strong> [[if test="is(ok_vf1_p04=true)"]]<span style="color:#15803d;border-left:4px solid #16a34a;padding:1px 10px">✅ {@if second(ta_vf1[4]) then third(ta_vf1[4]) else fourth(ta_vf1[4])@}</span>[[/if]][[if test="is(ok_vf1_p04=false)"]]<span style="color:#dc2626;border-left:4px solid #ef4444;padding:1px 10px">❌ {@if second(ta_vf1[4]) then third(ta_vf1[4]) else fourth(ta_vf1[4])@} <em>(attendu&nbsp;: {@if second(ta_vf1[4]) then "Vrai" else "Faux"@})</em></span>[[/if]]</div>
+</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

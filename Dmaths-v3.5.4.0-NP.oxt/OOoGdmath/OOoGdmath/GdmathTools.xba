@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="GdmathTools" script:language="StarBasic">&apos;Dmaths
+&apos;Copyright (C) 2013  Didier Dorange-Pattoret
+
+&apos;This program is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public License
+&apos;as published by the Free Software Foundation; either version 2
+&apos;of the License, or (at your option) any later version.
+
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+&apos;GNU General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
+Option Explicit
+
+Rem cette macro écrite le 3 mars 2013 sert à gérer les majuscules qui doivent être écrites en caractère droit
+Rem dans les Ole2Shape
+Function GereMajusculesDroites(LaChaine$) as String
+	Dim Longueur, I, J as Integer
+	Dim Char$, Mot$
+	Mot = LaChaine
+	Longueur = Len(Mot)
+	J = 0
+	&apos;Print OOoGdmath_ItaliquePolice
+	If OOoGdmath_ItaliquePolice = 2 Then
+		For I=1 To Len(Mot)
+			If Asc(Mid(Mot,I,1)) &gt;= 65 and Asc(Mid(Mot,I,1)) &lt;= 90 Then
+				J = 1
+				If I+ J &lt;= Longueur Then
+					Do while  Asc(Mid(Mot,I+J,1)) &gt;= 65 and Asc(Mid(Mot,I+J,1)) &lt;= 90
+						 J=J+1 
+						 If  J + I &gt; Longueur Then  Exit Do 
+					Loop
+				Endif				
+				If I = 1 Then 
+					Mot = &quot; nitalic{&quot; &amp; Mid(Mot,1,J) &amp; &quot;}&quot; &amp; Mid(Mot,J+1,Longueur-J)
+				Elseif I = Longueur Then
+					Mot = Mid(Mot,1,Longueur-1) &amp; &quot; nitalic{&quot; &amp; Mid(Mot,Longueur,1) &amp; &quot;}&quot;
+				Elseif I+J = Longueur Then
+					Mot = Mid(Mot,1,I-1) &amp; &quot; nitalic{&quot; &amp; Mid(Mot,I,J) &amp; &quot;}&quot; + Mid(Mot,Longueur,1)
+				Else
+					Mot = Mid(Mot,1,I-1) &amp; &quot; nitalic{&quot; &amp; Mid(Mot,I,J) &amp; &quot;}&quot; &amp; Mid(Mot,I+J,Longueur-I-J-1)
+				Endif
+				Longueur = Len(Mot)
+				I = I + 10
+				J = 0						
+			Endif		
+		Next I
+	Else
+		Mot = &quot; nitalic{&quot; &amp; Mot &amp; &quot;}&quot;
+	Endif
+	GereMajusculesDroites = Mot
+End Function
+
+
+Function InsereFormuleOle2(UnTexte as string, UnType as String, x0 as single, y0 as single, Optional sgroupe as object) as object
+
+	Dim oDocumentTextePro, maPageDessin, monCurseur, obj, objDessin, oDessin as Object
+	Dim mFileProperties(0) As New com.sun.star.beans.PropertyValue
+	Dim positionDessin as New com.sun.star.awt.Point
+    
+    mFileProperties(0).Name=&quot;Hidden&quot;
+    mFileProperties(0).Value = True
+	oDocumentTextePro = StarDesktop.LoadComponentFromURL(&quot;private:factory/swriter&quot;,&quot;_blank&quot;, 0, mFileProperties())
+
+	
+	monCurseur = oDocumentTextePro.Text.CreateTextCursor
+	obj =  oDocumentTextePro.CreateInstance(&quot;com.sun.star.text.TextEmbeddedObject&quot;)
+	obj.CLSID=&quot;078B7ABA-54FC-457F-8551-6147e776a997&quot;
+	obj.AnchorType=com.sun.star.text.TextContentAnchorType.AS_CHARACTER   
+	obj.LeftMargin = 0
+	obj.RightMargin = 0
+	monCurseur.Text.insertTextContent(monCurseur, obj, true) 
+	      
+	obj.model.BaseFontHeight =  OOoGdmath_TaillePolice		
+	obj.model.FontNameVariables = OOoGdmath_NomPolice
+	obj.model.FontNameFunctions = OOoGdmath_NomPolice
+	obj.model.FontNameNumbers = OOoGdmath_NomPolice            
+	obj.model.FontNameText = OOoGdmath_NomPolice
+	obj.model.FontVariablesIsItalic = OooGdmath_ItaliquePolice
+		
+	obj.model.Formula = Untype &amp; &quot;{&quot; + GereMajusculesDroites(oAngleDDForm.Model.TextField3.Text) + &quot;}&quot;
+		
+	rem rehausse la barre de surlignage
+	If InStr(obj.model.Formula,&quot;overline&quot;)&gt;0 or InStr(obj.model.Formula,&quot;bar&quot;)&gt;0 Then			
+			obj.model.RelativeSymbolPrimaryHeight = 10
+	Endif
+		
+	rem rehausse le chapeau de l&apos;angle
+	If InStr(obj.model.Formula,&quot;hat&quot;)&gt;0 or InStr(obj.model.Formula,&quot;vec&quot;)&gt;0 Then		
+			obj.model.TopMargin = 50
+	Endif
+	
+	obj.ExtendedControlOverEmbeddedObject.update()
+	
+	oDocumentTextePro.CurrentController.Select(obj)
+	ClipboardCut(oDocumentTextePro)
+	oDocumentTextePro.Close(True)
+	
+	ClipboardPasteSpecial(oDocumentDessin)
+	
+
+	objDessin = oDocumentDessin.CurrentSelection.GetByIndex(0)
+	
+
+	
+	oDessin = oDocumentDessin.CreateInstance(&quot;com.sun.star.drawing.GraphicObjectShape&quot;)
+	oDessin.Graphic = objDessin.Graphic
+	
+	maPageDessin = oDocumentDessin.Drawpages(0)
+	
+	maPageDessin.add(oDessin)
+	oDessin.FillColor = RGB(255,255,255)
+	oDessin.LineColor = RGB(255,255,255)
+	oDessin.Size = objDessin.Size
+	positionDessin.x = x0
+	positionDessin.y = y0
+	oDessin.Position = positionDessin
+	
+	If Not IsMissing(sgroupe) Then sgroupe.add(oDessin)	
+	
+	ToucheSuppr(oDocumentDessin)
+	
+	InsereFormuleOle2 = oDessin
+
+	
+	      
+End Function
+
+
+Sub GereCaracteresDroits(UnTexte as String, UnShape as Object)
+	Rem Traite les lettres majuscules et les chiffres qui doivent être écrits en caractères droits.
+		Dim monCurseur as Object
+		Dim I as Integer
+		monCurseur = UnShape.Text.CreateTextCursor
+		monCurseur.gotoStart(false)
+		For I=1 To Len(Untexte)
+				monCurseur.goRight(1,True)
+				If IsMajuscule(Mid(UnTexte,I,1)) Then monCurseur.CharPosture = 0		
+		Next I	
+End Sub
+
+
+Function IsMajuscule(Char$) as Boolean
+	Rem teste si un caractère est une majuscule ou un chiffre
+		If (Asc(Char) &gt;= 65 and Asc(Char) &lt;= 90)  or (Asc(Char) &gt;= 48 and Asc(Char)&lt;= 57) Then
+			IsMajuscule = True
+		Else
+			IsMajuscule = False
+		Endif
+End Function
+
+
+
+
+
+
+Function GetDocumentFrame( oDoc As Object ) As Object
+   Dim oFrame As Object
+   Dim oCtrl As Object
+   
+   &apos; If the caller gave us the document model...
+   If oDoc.supportsService( &quot;com.sun.star.document.OfficeDocument&quot; ) Then
+      &apos; ...then get the controller from that.
+      oCtrl = oDoc.getCurrentController()
+      &apos; ...then get the frame from the controller.
+      oFrame = oCtrl.getFrame()
+
+   &apos; If the caller gave us a document controller...
+   ElseIf HasUnoInterfaces( oDoc, &quot;com.sun.star.frame.XController&quot; ) Then
+      oCtrl = oDoc
+      &apos; ...then get the frame from the controller.
+      oFrame = oCtrl.getFrame()
+   
+   &apos; If the caller gave us the document frame...
+   ElseIf HasUnoInterfaces( oDoc, &quot;com.sun.star.frame.XFrame&quot; ) Then
+      &apos; ...thanks!  That&apos;s just what we wanted!
+      oFrame = oDoc
+   
+   Else
+      &apos; The caller did not give us what we expected!
+      MsgBox( &quot;GetDocumentFrame called with incorrect parameter.&quot; )
+   EndIf
+   
+   GetDocumentFrame() = oFrame
+End Function
+
+
+
+&apos;----------
+&apos; An easy to use Dispatch on an office document.
+&apos; Arguments are similar to the args for the com.sun.star.frame.XDispatchHelper
+&apos;  interface of com.sun.star.frame.DispatchHelper.
+&apos; What makes this so easy to use are two things:
+&apos;   1. The fact that the oDocumentFrame parameter can actually accept
+&apos;      either the document model or one of its controllers.
+&apos;   2. The optional parameters.
+&apos; For an example of how simple this routine is to use, see
+&apos;  routines such as ClipboardCopy().
+&apos;
+&apos; Parameters:
+&apos;      oDocumentFrame      -   An office document frame.
+&apos;                        But wait!  It could be the document controller
+&apos;                         or the document model.  This routine will find
+&apos;                         the document frame from either of these.
+&apos;      cURL            -   The dispatch URL.
+&apos; Optional:
+&apos;      cTargetFrameName   -   Defaults to blank.
+&apos;      nSearchFlags      -   Defaults to zero.
+&apos;      aDispatchArgs      -   Defaults an an empty sequence.
+&apos;
+Sub DocumentDispatch( ByVal oDocumentFrame As Object,_
+                  ByVal cURL As String,_
+                  Optional cTargetFrameName,_
+                  Optional nSearchFlags,_
+                  Optional aDispatchArgs )
+
+   dim oDispatchHelper   
+
+   &apos; If they gave us the wrong parameter...
+   If Not HasUnoInterfaces( oDocumentFrame, &quot;com.sun.star.frame.XFrame&quot; ) Then
+      &apos; Be sure that we&apos;ve got the document frame.
+      &apos; Someone might have passed us the document model or one of
+      &apos;  its controller&apos;s.
+      oDocumentFrame = GetDocumentFrame( oDocumentFrame )
+   EndIf
+   
+   If IsMissing( cTargetFrameName ) Then
+      cTargetFrameName = &quot;&quot;
+   EndIf
+   If IsMissing( nSearchFlags ) Then
+      nSearchFlags = 0
+   EndIf
+   If IsMissing( aDispatchArgs ) Then
+      aDispatchArgs = Array()
+   EndIf
+   
+   oDispatchHelper = createUnoService( &quot;com.sun.star.frame.DispatchHelper&quot; )
+   oDispatchHelper.executeDispatch( oDocumentFrame, cURL, cTargetFrameName, nSearchFlags, aDispatchArgs )
+End Sub
+
+&apos;############################################################
+&apos;   Clipboard manipulation
+&apos;############################################################
+
+Sub ClipboardPaste( oDocumentFrame )
+   DocumentDispatch( oDocumentFrame, &quot;.uno:Paste&quot; )
+End Sub
+
+Sub ClipboardPasteSpecial( oDocumentFrame )
+	dim args1(0) as new com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;SelectedFormat&quot;
+	args1(0).Value = 3
+   DocumentDispatch( oDocumentFrame,&quot;.uno:ClipboardFormatItems&quot;, &quot;&quot;, 0, args1() )
+End Sub
+
+Sub ClipboardCopy( oDocumentFrame )
+   DocumentDispatch( oDocumentFrame, &quot;.uno:Copy&quot; )
+End Sub
+
+Sub ClipboardCut( oDocumentFrame )
+   DocumentDispatch( oDocumentFrame, &quot;.uno:Cut&quot; )
+End Sub
+	
+Sub ToucheEchap ( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:Escape&quot; )
+End Sub 
+
+Sub ToucheSuppr ( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:Delete&quot; )
+End Sub 
+
+Sub ToucheUndo ( oDocumentFrame )
+	DocumentDispatch( oDocumentFrame, &quot;.uno:Undo&quot; )
+End Sub 
+
+
+
+
+
+
+</script:module>

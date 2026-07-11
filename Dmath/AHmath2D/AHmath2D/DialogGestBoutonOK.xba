@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="DialogGestBoutonOK" script:language="StarBasic" script:moduleType="normal">
+&apos;************************************************
+&apos;Copyright (C) depuis 2011 Alain HAGUET
+&apos;ahmath3d@free.fr
+&apos;
+&apos;
+&apos;This library is free software; you can redistribute it and/or
+&apos;modify it under the terms of the GNU General Public Licence (GPL)
+&apos;as published by the Free Software Foundation; either
+&apos;version 2.1 of the License, or (at your option) any later version.
+
+&apos;This library is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+&apos;General Public License for more details.
+
+&apos;You should have received a copy of the GNU General Public Licence (GPL)
+&apos;along with this library; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+&apos;************************************************
+
+sub GestionBoutonOK
+Dim i as integer, test(6) as variant, oLongAB as Double 
+oStepDlg = monDlg.Model.Step
+
+
+
+&apos;-----------------------Gestion des erreurs de saisie avec variable test
+    test(1) = true
+    test(2) = true
+    test(3) = true
+    test(4) = true
+
+if oStepDlg = 1 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox1&quot;,&quot;ListBox&quot;)(1)
+    if 	oReponseDlg(1) = 0 then test(1) = ValideReponseListbox(monDlg,&quot;ListBox16&quot;, mesMessages1(4))
+	if 	oReponseDlg(1) = 1 then
+		test(1) = ValideReponseTexte(monDlg, &quot;TextField2&quot;, -20, 20,false , mesMessages1(0))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox16&quot;, mesMessages1(4))
+	End if
+	if 	oReponseDlg(1) = 2 then 
+		test(1) = ValideReponseTexte(monDlg, &quot;TextField2&quot;, 0, 20,false , mesMessages1(1) )
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField3&quot;, 0, 20,false , mesMessages1(1) )
+		test(3) = ValideReponseListbox(monDlg,&quot;ListBox16&quot;, mesMessages1(4))
+	End if		
+	if 	oReponseDlg(1) = 3 then 
+		test(1) = ValideReponseTexte(monDlg, &quot;TextField2&quot;, 0, 180,false , mesMessages1(2) )
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField3&quot;, 0, 20,false , mesMessages1(1) )
+		test(3) = ValideReponseListbox(monDlg,&quot;ListBox16&quot;, mesMessages1(4))
+		test(4) = ValideReponseListbox(monDlg,&quot;ListBox17&quot;, mesMessages1(4))
+	End if	
+	if 	oReponseDlg(1) = 4 or 	oReponseDlg(1) = 5 then test(1) = ValideReponseListbox(monDlg,&quot;ListBox16&quot;, mesMessages1(4))
+	if 	oReponseDlg(1) = 6 then
+		test(1) = ValideReponseTexte(monDlg, &quot;TextField2&quot;, -180, 180,false , mesMessages1(3))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox16&quot;, mesMessages1(4))
+	End if
+end if
+
+if oStepDlg = 4 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox4&quot;,&quot;ListBox&quot;)(1)
+	if 	oReponseDlg(1) = 0 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox21&quot;, mesMessages1(4))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox41&quot;, mesMessages1(4))
+	End if
+	if 	oReponseDlg(1) = 1 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox21&quot;, mesMessages1(4))
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField7&quot;, 0, 20,false , mesMessages1(1) )
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField8&quot;, -180, 180,false , mesMessages1(3) )
+	End if
+	if 	oReponseDlg(1) = 2 or oReponseDlg(1) = 3  then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox21&quot;, mesMessages1(4))
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField8&quot;, -180, 180,false , mesMessages1(3) )
+	End if
+	if 	oReponseDlg(1) = 4  then test(1) = ValideReponseListbox(monDlg,&quot;ListBox21&quot;, mesMessages1(4))
+End if
+   
+if oStepDlg = 8 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox8&quot;,&quot;ListBox&quot;)(1)
+    if 	oReponseDlg(1) = 0 or oReponseDlg(1) = 1 or oReponseDlg(1) = 5 then 
+    	test(1) = ValideReponseListbox(monDlg,&quot;ListBox5&quot;, mesMessages1(4))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox24&quot;, mesMessages1(4))
+    End if
+	if 	oReponseDlg(1) = 2 then test(1) = ValideReponseListbox(monDlg,&quot;ListBox5&quot;, mesMessages1(4))
+	if 	oReponseDlg(1) = 3 then test(1) = ValideReponseAngle(monDlg,&quot;TextField28&quot;,mesMessages1(5))
+	if 	oReponseDlg(1) = 4 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox5&quot;, mesMessages1(4))
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField28&quot;, -180, 180,false , mesMessages1(3) )
+	End if
+End if
+
+if oStepDlg = 9 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox9&quot;,&quot;ListBox&quot;)(1)
+	test(1) = ValideReponseListbox(monDlg,&quot;ListBox2&quot;, mesMessages1(4))
+
+    if 	oReponseDlg(1) = 0 then 
+    	if RepControl(monDlg,&quot;OptionButton3&quot;,&quot;OptionButton&quot;) = true then 
+    	test(2) = ValideReponseTexte(monDlg, &quot;TextField15&quot;, 0, 20,false , mesMessages1(1))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField16&quot;, 0, 20,false , mesMessages1(1))
+		End if
+		if RepControl(monDlg,&quot;OptionButton4&quot;,&quot;OptionButton&quot;) = true then 
+    	test(2) = ValideReponseTexte(monDlg, &quot;TextField17&quot;, 0, 180,false , mesMessages1(2))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField18&quot;, 0, 180,false , mesMessages1(2))
+		End if
+		if RepControl(monDlg,&quot;OptionButton5&quot;,&quot;OptionButton&quot;) = true then 
+    	test(2) = ValideReponseTexte(monDlg, &quot;TextField19&quot;, 0, 20,false , mesMessages1(1))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField20&quot;, 0, 180,false , mesMessages1(2))
+		End if
+		if RepControl(monDlg,&quot;OptionButton6&quot;,&quot;OptionButton&quot;) = true then 
+    	test(2) = ValideReponseTexte(monDlg, &quot;TextField21&quot;, 0, 20,false , mesMessages1(1))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField22&quot;, 0, 180,false , mesMessages1(2))
+		End if
+    End if
+	if 	oReponseDlg(1) = 1 then test(2) = ValideReponseTexte(monDlg, &quot;TextField15&quot;, 0, 20,false , mesMessages1(1))
+	if 	oReponseDlg(1) = 2 then 
+    	if RepControl(monDlg,&quot;OptionButton3&quot;,&quot;OptionButton&quot;) = true then test(2) = ValideReponseTexte(monDlg, &quot;TextField15&quot;, 0, 180,false , mesMessages1(2))
+		if RepControl(monDlg,&quot;OptionButton4&quot;,&quot;OptionButton&quot;) = true then test(2) = ValideReponseTexte(monDlg, &quot;TextField17&quot;, 0, 180,false , mesMessages1(2))
+    	if RepControl(monDlg,&quot;OptionButton5&quot;,&quot;OptionButton&quot;) = true then test(2) = ValideReponseTexte(monDlg, &quot;TextField19&quot;, 0, 20,false , mesMessages1(1))
+		if RepControl(monDlg,&quot;OptionButton6&quot;,&quot;OptionButton&quot;) = true then test(2) = ValideReponseTexte(monDlg, &quot;TextField21&quot;, 0, 20,false , mesMessages1(1))
+    End if
+	if 	oReponseDlg(1) = 3 then 
+    	if RepControl(monDlg,&quot;OptionButton3&quot;,&quot;OptionButton&quot;) = true then 
+    	test(2) = ValideReponseTexte(monDlg, &quot;TextField15&quot;, 0, 20,false , mesMessages1(1))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField16&quot;, 0, 20,false , mesMessages1(1))
+		End if
+		if RepControl(monDlg,&quot;OptionButton4&quot;,&quot;OptionButton&quot;) = true then 
+    	test(2) = ValideReponseTexte(monDlg, &quot;TextField17&quot;, 0, 20,false , mesMessages1(1))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField18&quot;, 0, 20,false , mesMessages1(1))
+		End if
+		if RepControl(monDlg,&quot;OptionButton5&quot;,&quot;OptionButton&quot;) = true then 
+    	test(2) = ValideReponseTexte(monDlg, &quot;TextField19&quot;, 0, 20,false , mesMessages1(1))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField20&quot;, 0, 20,false , mesMessages1(1))
+		End if
+		if RepControl(monDlg,&quot;OptionButton6&quot;,&quot;OptionButton&quot;) = true then 
+    	test(2) = ValideReponseTexte(monDlg, &quot;TextField21&quot;, 0, 180,false , mesMessages1(2))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField22&quot;, 0, 180,false , mesMessages1(2))
+		End if
+    End if
+	if 	oReponseDlg(1) = 4 then test(2) = ValideReponseTexte(monDlg, &quot;TextField15&quot;, 3, 20,true , mesMessages1(6))
+	if 	oReponseDlg(1) = 5 then 
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField15&quot;, 3, 20,true , mesMessages1(6))
+	   	test(3) = ValideReponseTexte(monDlg, &quot;TextField17&quot;, 0, 180,false , mesMessages1(2))
+	End if
+	if 	oReponseDlg(1) = 6 then 
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField15&quot;, 3, 20,true , mesMessages1(6))
+	   	test(3) = ValideReponseTexte(monDlg, &quot;TextField17&quot;, 0, 180,false , mesMessages1(2))
+	End if
+End if
+
+if oStepDlg = 11 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox12&quot;,&quot;ListBox&quot;)(1)
+	if 	oReponseDlg(1) = 0 or oReponseDlg(1) = 5  then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox6&quot;, mesMessages1(4))
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField29&quot;, 0, 20,false , mesMessages1(1) )
+	End if
+	if 	oReponseDlg(1) = 1 or oReponseDlg(1) = 3 or oReponseDlg(1) = 4 or oReponseDlg(1) = 6 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox6&quot;, mesMessages1(4))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox25&quot;, mesMessages1(4))
+	End if
+	if 	oReponseDlg(1) = 2 then test(1) = ValideReponseListbox(monDlg,&quot;ListBox6&quot;, mesMessages1(4))
+End if
+
+if oStepDlg = 12 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox13&quot;,&quot;ListBox&quot;)(1)
+	if 	oReponseDlg(1) = 0 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox26&quot;, mesMessages1(4))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox27&quot;, mesMessages1(4))
+		test(3) = ValideReponseListbox(monDlg,&quot;ListBox28&quot;, mesMessages1(4))
+	End if
+	if 	oReponseDlg(1) = 1 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox26&quot;, mesMessages1(4))
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField11&quot;, 0, 360,false , mesMessages1(7))
+	End if
+	if 	oReponseDlg(1) = 2 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox26&quot;, mesMessages1(4))
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField10&quot;, 0, 20,false , mesMessages1(1))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField11&quot;, 0, 360,false , mesMessages1(7))
+		test(4) = ValideReponseTexte(monDlg, &quot;TextField30&quot;, -180, 180,false , mesMessages1(3))
+	End if
+	if 	oReponseDlg(1) = 3 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox26&quot;, mesMessages1(4))
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField10&quot;, 0, 360,false , mesMessages1(7))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField11&quot;, -180, 180,false , mesMessages1(3))
+	End if
+	if 	oReponseDlg(1) = 4 then test(1) = ValideReponseListbox(monDlg,&quot;ListBox26&quot;, mesMessages1(4))
+	if 	oReponseDlg(1) = 5 then
+		test(1) = ValideReponseFraction(monDlg,&quot;TextField10&quot;, mesMessages1(8))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox28&quot;, mesMessages1(4))
+	End if
+	if 	oReponseDlg(1) = 6 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox28&quot;, mesMessages1(4))
+		test(2) = ValideReponseTexte(monDlg, &quot;TextField10&quot;, 0, 20,false , mesMessages1(1))
+	End if
+End if
+
+if oStepDlg = 15 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox29&quot;,&quot;ListBox&quot;)(1)
+	if 	oReponseDlg(1) = 0 then
+	test(1) = ValideReponseListbox(monDlg,&quot;ListBox3&quot;, mesMessages1(4))
+	test(2) = ValideReponseTexte(monDlg, &quot;TextField5&quot;, 0, 20,false , mesMessages1(1) )
+	End if
+	if 	oReponseDlg(1) = 1 then
+	test(1) = ValideReponseAngle(monDlg,&quot;TextField4&quot;,mesMessages1(5))
+	test(2) = ValideReponseTexte(monDlg, &quot;TextField5&quot;, 0, 20,false , mesMessages1(1) )
+	End if
+End if
+
+if oStepDlg = 16 then test(1) = ValideReponseListbox(monDlg,&quot;ListBox15&quot;, mesMessages1(4))
+
+if oStepDlg = 17 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox7&quot;, mesMessages1(4))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox34&quot;, mesMessages1(4))
+End if
+
+
+
+if oStepDlg = 21 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox35&quot;,&quot;ListBox&quot;)(1)
+	if 	oReponseDlg(1) = 0 or oReponseDlg(1) = 1 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox22&quot;, mesMessages1(4))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox36&quot;, mesMessages1(4))
+	End if
+	if 	oReponseDlg(1) = 2 then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox22&quot;, mesMessages1(4))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox36&quot;, mesMessages1(4))
+		test(3) = ValideReponseListbox(monDlg,&quot;ListBox37&quot;, mesMessages1(4))
+	End if
+	if 	oReponseDlg(1) = 3 or oReponseDlg(1) = 3  then
+		test(1) = ValideReponseListbox(monDlg,&quot;ListBox22&quot;, mesMessages1(4))
+		test(2) = ValideReponseListbox(monDlg,&quot;ListBox36&quot;, mesMessages1(4))
+		test(3) = ValideReponseTexte(monDlg, &quot;TextField39&quot;, -180, 180, , mesMessages1(3) )
+	End if
+End if
+
+if oStepDlg = 20 then test(0) = 1
+if oStepDlg = 23 then test(0) = 1
+
+
+if oStepDlg = 40 then
+	oReponseDlg(1) = RepControl(monDlg,&quot;ListBox40&quot;,&quot;ListBox&quot;)(1)
+	
+	test(1) =  ValideReponseTexte(monDlg, &quot;TextField12&quot;, 0, 20,false , mesMessages1(1) )
+	test(2) = ValideReponseTexte(monDlg, &quot;TextField12&quot;, 0, 360,false , mesMessages1(7))
+	test(3) = ValideReponseTexte(monDlg, &quot;TextField14&quot;, 0, 360,false , mesMessages1(7))
+	if test(1) = true and test(2) = true and test(3) = true then test(0) = 1
+End if
+
+&apos;---------------------- (test(0) contient 1 si tout est ok 0 sinon)
+
+if test(1) = true and test(2) = true and test(3) = true and test(4) = true then test(0) = 1
+
+if test(0) = 1 then
+
+	if oStepDlg = 1 then ConstPoint(1)
+	if oStepDlg = 4 then ConstSegment(4)
+	if oStepDlg = 8 then ConstDroitePart(8)
+	if oStepDlg = 9 then ConstPolygone(9)
+	if oStepDlg = 11 then ConstCercle(11)
+	if oStepDlg = 12 then ConstArc(12)
+	if oStepDlg = 15 then ConstCodage(15)
+	if oStepDlg = 16 then GommeElement(16)
+	if oStepDlg = 17 then ConstInters(17)
+	if oStepDlg = 20 then ConstSurface(20)
+	if oStepDlg = 21 then ConstIsom(21)
+	if oStepDlg = 23 then RecherchePoint
+	if oStepDlg = 40 then 
+		if oReponseDlg(1) = 0 then ConstPoint(40)
+		if oReponseDlg(1) = 1 then ConstSegment(40)
+		if oReponseDlg(1) &gt;= 2 then ConstCercle(40)
+	end if
+
+	oNbrObjets = NbrObjetsDessines(mesFormes)
+	FinNommage
+	GestionNommage
+	if oStepDlg = 40 then CommandButton7_Click
+	
+	if oNbrObjets(0) = 0 and oNbrObjets(1) = 0 and oNbrObjets(2) = 0 and oNbrObjets(3) = 0 then
+	  monDlg.Model.Step = 40
+	  AttributControl(monDlg,&quot;CommandButton&quot;,&quot;Actif&quot;,Array(7,8,9,10,11,12,13,14,15,16,17,18,19,23,24,25),)
+	  AttributControl(monDlg,&quot;CommandButton&quot;,&quot;Etat&quot;,Array(7,8,9,10,11,12,13,14,15,16,17,18,19,23,24,25),)
+	 End if
+end if
+
+
+end sub
+
+
+</script:module>

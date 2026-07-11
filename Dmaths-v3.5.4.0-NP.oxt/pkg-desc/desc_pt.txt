@@ -1,0 +1,12 @@
+DmathsAddon 
+Copyright Didier Dorange-Pattoret (c) 2001-2015
+O programa Dmaths versão 3.5.4.0
+
+Depois de uma primeira instalação, FECHAR e INICIAR completamente 
+o LibreOffice/OpenOffice (incluindo o iniciador rápido).
+
+
+Depois de uma atualização, clicar DESATIVAR e depois ATIVAR,
+Depois escrever uma fórmula, por exemplo 1/2 e F10 (ou F8).
+
+ 

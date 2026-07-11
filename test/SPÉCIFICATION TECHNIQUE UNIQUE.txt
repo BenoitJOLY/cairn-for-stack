@@ -1,0 +1,949 @@
+# DOCUMENT DE SPÉCIFICATION TECHNIQUE UNIQUE
+**Objet :** Développement et maintenance des questions STACK (JSXGraph, Parsons, Numération, Inéquations, Unités, QCM, Algèbre, Texte).
+**Statut :** Norme de conformité obligatoire.
+**Contexte :** Ce document fixe les règles techniques pour éviter les régressions et les bugs critiques identifiés lors du développement sur Moodle (STACK version 2024+). Il doit être fourni en préambule de toute demande de modification ou de création.
+
+---
+
+## PÔLE 1 : Architecture Générale et Intégrité XML
+
+### 1.1. Structure des couches et Isolation
+Le système repose sur trois couches indépendantes : `<questionvariables>` (Maxima), `<input>` / `<prt>` (Notation), `<questiontext>` (Vue).
+*   **CONTEXTE MAINTENANCE (JSXGraph/Oscilloscope) :** Le code généré **NE DOIT PAS** inclure les balises `<input>`, `<prt>`, ou `<questionvariables>`. Seul le contenu de la balise `<questiontext>` est modifié.
+*   **CONTEXTE CRÉATION / REFONTE :** Le code généré doit être un XML complet et valide.
+    *   **INTERDIT :** Utiliser la syntaxe "inline" `{@variable@}` pour créer une zone de saisie.
+    *   **OBLIGATOIRE :** Utiliser impérativement `[[input:nom]]` et `[[validation:nom]]`.
+
+1.2. Hiérarchie des balises
+    • OBLIGATOIRE : Les balises <input> et <prt> doivent être des enfants directs de <question> (jamais de balises englobantes <inputs> ou <prts>).
+    • OBLIGATOIRE : Présence de la balise <stackversion> avec la version cible.
+    • ALERT FATAL (Versionnage) : La balise <stackversion> ne doit JAMAIS être vide. L'absence de version cible (ex: <text></text>) peut provoquer des comportements indéfinis lors des mises à jour de Moodle. Exigez systématiquement la version exacte définie par l'instance cible (ex: <text>2024092500</text>).
+    • INTERDIT : Utiliser des balises d'ancienne génération (<responseprocessors>, <ansTestOptions> vide).
+    • ALERT FATAL (Structure PRT - Balise <nodes>) : 
+        ◦ Si le PRT contient un seul nœud, la balise <node> doit être directement enfant de <prt>. L'ajout d'une balise <nodes> englobante pour un seul nœud provoque l'erreur fatale Moodle "The PRT [nom] is malformed".
+        ◦ Si le PRT contient plusieurs nœuds, tous les nœuds doivent obligatoirement être regroupés à l'intérieur d'une balise parente unique <nodes>.
+    • OBLIGATOIRE (Balise Specificfeedback) : Si la question possède un PRT, la balise <specificfeedback> contenant l'appel [[feedback:nom_prt]] doit obligatoirement être présente dans le XML. Son absence totale empêche Moodle de faire remonter le score et le feedback de l'élève, rendant le PRT invisiblement inactif. (Et bien sûr, elle doit respecter la règle d'encapsulation CDATA avec l'espace de sécurité du Pôle 1.3).
+
+
+### 1.3. Règle Universelle d'Encapsulation CDATA
+*   **OBLIGATOIRE :** Tous les blocs de code (Maxima, HTML, JS) contenus dans des balises `<text>` **DOIVENT** être encapsulés dans `<![CDATA[ ... ]]>`. 
+*   **ALERT FATAL (Opérateurs de comparaison) :** Si le code Maxima contient des symboles `<`, `>`, `<=`, `>=` ou `&`, l'absence de CDATA provoque une erreur fatale `XML_ERR_NAME_REQUIRED` car le parseur XML les confond avec des balises.
+ALERT FATAL (Anti-corruption de PRT) : Dans la balise <specificfeedback>, il faut OBLIGATOIREMENT un espace après la balise Moodle de feedback mais avant la fermeture du CDATA. La séquence ]]]> (sans espace) corrompt silencieusement l'import Moodle et supprime les PRTs. ATTENTION XML : L'espace ne doit JAMAIS être inséré à l'intérieur des caractères de fermeture CDATA.
+    • Non-conformité (Erreur fatale XML) : <![CDATA[[[feedback:prt1]] ]]> (espace dans les crochets, provoque "Mismatched tag")
+    • Non-conformité (Corruption silencieuse) : <![CDATA[[[feedback:prt1]]]> (séquence ]]]> interdite)
+    • Conformité : <![CDATA[[[feedback:prt1]] ]]> (espace entre la balise et la fermeture CDATA)
+ALERT FATAL (Générateurs WYSIWYG) : Lors de la conversion de questions depuis des éditeurs visuels (comme TinyMCE ou des frameworks JS comme Angular/React), le générateur doit impérativement :
+    1. Purger tous les attributs de données techniques (ex: data-path-to-node, ng-content, cls-xxx).
+    2. Convertir les entités HTML (&lt;, &gt;) en CDATA brut pour les balises <generalfeedback>, <questiontext>, etc., afin de respecter la règle d'encapsulation universelle.
+
+1.4. Séparation stricte des Contextes d'Évaluation (Le piège des '@')
+    • CONTEXTE : STACK utilise deux moteurs distincts lors de la soumission d'une réponse. Confondre la syntaxe de ces deux moteurs provoque des erreurs fatales de score (souvent un score de 0 silencieux) ou des crashs CAS.
+    • CONTEXTE 1 : L'Évaluateur Maxima (Balises de logique pure). Les balises <sans>, <tans>, <truescore>, <falsescore>, <truepenalty> et le contenu des <feedbackvariables> sont évaluées directement par le moteur de calcul Maxima comme du code pur.
+        ◦ INTERDIT (FATAL) : Utiliser la syntaxe de rendu Moodle {@variable@} dans ces balises. Ex: <truescore>{@note_finale@}</truescore> injecte une chaîne de caractères littérale contenant des accolades dans le parseur Maxima, ce qui provoque un échec d'évaluation et un score nul.
+        ◦ OBLIGATOIRE : Utiliser le nom brut de la variable Maxima. Ex: <truescore><![CDATA[note_finale]]></truescore>.
+    • CONTEXTE 2 : Le Rendu HTML/Moodle (Balises d'affichage). Les balises <truefeedback>, <falsefeedback>, <questiontext>, et <generalfeedback> sont d'abord parsées par les filtres de texte de Moodle avant l'affichage.
+        ◦ OBLIGATOIRE : C'est uniquement dans ces balises HTML que la syntaxe {@variable@} doit être utilisée pour injecter le résultat d'une variable Maxima dans le texte affiché à l'écran. Ex: <text><![CDATA[{@fb_html@}]]></text>.
+
+
+---
+
+## PÔLE 2 : Syntaxe Maxima et Calculs (Moteur CAS)
+
+### 2.1. Contraintes de modélisation (Anti-Timeout & Anti-Fonctions Obscures)
+*   **INTERDIT :** Utiliser des fonctions Maxima de conversion de base non garanties dans le cœur de STACK (ex: `integer_to_binary`). Le CAS tente de les résoudre symboliquement et provoque un timeout.
+*   **INTERDIT (Fonctions d'affichage CAS) :** Utiliser des fonctions Maxima non standards ou obsolètes destinées à manipuler l'affichage (ex: `nonsimplification`, `dispform` complexe) pour forcer le rendu visuel d'une expression. Si la fonction n'est pas explicitement supportée par l'API STACK, le CAS lèvera une erreur fatale.
+*   **OBLIGATOIRE :** Toute conversion de base doit être réalisée par un algorithme natif explicite n'utilisant que les opérateurs de base (`mod`, `floor`, `concat`).
+*   **ALERT LOGS (Terminaison d'instruction) :** Dans les `<questionvariables>`, chaque instruction **DOIT** impérativement se terminer par un dollar `$` et **JAMAIS** par un point-virgule `;`. Le point-virgule force le CAS à écrire le résultat de l'évaluation dans les logs de débogage de Moodle. Sur des questions à forte volumétrie, cela provoque une inflation dramatique des logs et ralentit le système.
+
+### 2.2. Séparation Affichage (HTML) vs Calcul (Mathématiques)
+*   **INTERDIT (Habillage mathématique) :** Essayer de forcer l'affichage visuel (parenthèses, mise en forme) directement dans les `<questionvariables>`. Ne JAMAIS utiliser l'apostrophe `'` pour "figer" l'affichage (ex: `za_disp: '(3+%i);`), car Maxima crashe. Ne JAMAIS utiliser `texput` sur une expression composée.
+*   **INTERDIT (Obfuscation de chaînes de caractères) :** Pour générer une variable de type chaîne (ex: réponse modèle pour un mot), il est **INTERDIT** d'utiliser des artifices d'encodage par conversion de codes ASCII (ex: `sconcat(ascii(77), ascii(73)...)$`). Les variables textuelles pures doivent être déclarées directement avec des guillemets droits (ex: `ta_mot: "MILIEU"$`). L'obfuscation par `ascii()` alourdit inutilement le calcul du CAS sans aucune valeur ajoutée sécuritaire ou fonctionnelle.
+*   **OBLIGATOIRE (Objets purs) :** Déclarer des objets mathématiques purs dans les variables (ex: `za: 3+%i;`).
+*   **OBLIGATOIRE (Affichage HTML classique) :** Gérer l'affichage visuel uniquement dans le `<questiontext>` en utilisant du HTML/LaTeX autour de la variable (ex: `\( z_A = ({@za@}) \)`).
+*   **OBLIGATOIRE (Ré-encapsulation MathJax des Strings) :** Les variables de type string issues du pattern de découplage parallèle ne contenant que du code LaTeX brut (ex: `x^2`). Si ces variables sont injectées à l'intérieur de balises HTML standards (comme `<th>`, `<td>`, ou `<span>`), il est **OBLIGATOIRE** de les envelopper dans les délimiteurs MathJax `\( \)` directement dans le code HTML (ex: `<th>\({@var@}\)</th>`).
+*   **EXCEPTION (Squelette HTML structurel) :** Il est autorisé de générer des structures HTML complexes (comme des lignes de tableau `<tr>`) dans les variables via `sconcat()`, mais cela ne doit pas servir à contourner les règles d'affichage mathématique ci-dessus.
+*   **OBLIGATOIRE (Affichage conditionnel des signes) :** Lors de la génération de chaînes représentant des équations algébriques (ex: `2x - 3y = 5`), il est **INTERDIT** de laisser le CAS concaténer naïvement un opérateur `+` avec un coefficient négatif (ce qui donnerait `2x + -3y = 5`). Il est **OBLIGATOIRE** d'utiliser un `if` Maxima dans un `sconcat` pour remplacer dynamiquement `+ -` par `- `.
+*   **⚠️ ALERTE ARCHITECTURE AVANCÉE (Pattern de Découplage Parallèle) :** Lorsque le rendu LaTeX par défaut de STACK (via `{@var@}`) est inadapté (ex: symboles logiques mal rendus comme `Rightarrow` au lieu de `\to`, ou nécessité de formatages spécifiques complexes), il est **OBLIGATOIRE** d'utiliser un pattern de tableaux parallèles strictement indexés :
+    *   **OBLIGATOIRE (Tableau d'affichage) :** Créer un tableau de chaînes de caractères (strings) contenant le LaTeX brut souhaité (ex: `disp_pair : ["P \\to Q", "\\neg P \\lor Q"]`).
+    *   **OBLIGATOIRE (Tableau d'évaluation) :** Créer un tableau parallèle contenant les objets Maxima purs pour le moteur CAS (ex: `eval_pair : [P implies Q, not(P) or Q]`).
+    *   **OBLIGATOIRE (Sélection synchrone) :** Le tirage aléatoire ou la logique de sélection ne doit générer qu'un seul index (`idx`), appliqué simultanément aux deux tableaux.
+    *   **OBLIGATOIRE (Syntaxe de déréférencement Vue) :** Dans le `<questiontext>`, l'accès à l'élément tiré aléatoirement d'un tableau parallèle doit utiliser strictement la syntaxe `{@nom_tableau[index]@}`.
+    *   **OBLIGATOIRE (Cast Booléen vers Entier pour HTML) :** Si une boucle génère du HTML (via `sconcat`) destiné à afficher les résultats d'une table de vérité, les booléens Maxima (`true`/`false`) ne doivent **JAMAIS** être concaténés directement. Il est **OBLIGATOIRE** de les convertir en entiers via `if var_bool then 1 else 0` avant la concaténation pour éviter l'affichage textuel "true"/"false".
+    *   **INTERDIT :** Tenter de transformer une expression Maxima en chaîne LaTeX personnalisée à la volée dans les variables pour contourner ce pattern.
+*   **⚠️ ALERTE ÉCHAPPEMENT (Chaînes LaTeX dans Maxima) :** Dans le pattern de découplage parallèle, les variables de type string destinées à afficher du LaTeX doivent obligatoirement échapper les antislashs avec un double antislash `\\` à l'intérieur du code Maxima (ex: `"\\neg"` pour que Moodle reçoive `\neg`). L'oubli de ce double échappement corrompt l'affichage MathJax (ex: affichage plan texte `neg P` au lieu de `¬P`).
+
+### 2.3. Pattern de Génération Constructive (Anti-Cas Impossibles)
+*   **INTERDIT :** Tirer aléatoirement des coefficients d'une équation complexe (ex: polynôme de degré 2) en espérant que ses racines seront entières, rationnelles, ou même réelles. Cela génère des irrégularités ou nécessite des logiques de sauvegarde (`assume`) fragiles.
+*   **OBLIGATOIRE (Construction inversée) :** Pour toute question nécessitant des racines ou des points d'intersection connus, il est **OBLIGATOIRE** de tirer d'abord les racines aléatoires, puis de construire l'expression mathématique *autour* de ces racines (ex: `expr: k*(x-racine1)*(x-racine2)`). Le CAS ne "devine" jamais, il "subit" la construction.
+*   **OBLIGATOIRE (Construction par Inversion) :** Pour les exercices où l'élève doit trouver une approximation numérique d'une solution (ex: TVI, dichotomie), il est **INTERDIT** de tirer aléatoirement les paramètres de l'équation si cela génère une solution irrationnelle imprévisible. Il est **OBLIGATOIRE** de tirer la solution cible $\alpha$ sous forme de nombre décimal propre (ex: `alpha: 1 + rand([...])/10$`), puis de calculer les constantes de l'équation à l'envers pour forcer $f(\alpha) = 0$.
+
+### 2.4. Utilisation des Ensembles Maxima (`{}`) pour les Tuples Non Ordonnés
+*   **OBLIGATOIRE :** Lorsqu'une réponse attendue est une collection d'éléments indépendants dont l'ordre d'écriture n'a pas d'importance (ex: abscisses d'intersection `{1, 2}` ou `{2, 1}`), il est **OBLIGATOIRE** d'utiliser la notation d'ensemble Maxima `{}` (et non la liste `[]`) pour la variable professeur (`ta_ab: {a, b}$`) et d'indiquer le `syntaxhint` associé (`{a, b}`).
+*   **AVANTAGE :** Le test `AlgEquiv` valide nativement l'équivalence des ensembles sans se soucier de l'ordre, éliminant le besoin de créer des nœuds de PRT testant les permutations.
+*   **OBLIGATOIRE (Porte "OU" multi-réponses) :** Lorsqu'une consigne autorise plusieurs réponses distinctes et qu'il suffit d'en donner une seule (ex: "Donner l'équation de *l'une* des deux tangentes"), il est **OBLIGATOIRE** de mettre toutes les réponses acceptables dans un ensemble `ta: {rep1, rep2}$`. Le test `AlgEquiv` validera l'entrée de l'élève si elle correspond à *n'importe quel* élément de l'ensemble, supprimant le besoin de PRTs alternatifs ou de tests logiques complexes.
+
+### 2.5. Forçage de Propriété par Restreint Aléatoire
+*   **OBLIGATOIRE :** Lorsqu'une question porte sur une propriété fixe (ex: "Montrer que la fonction est convexe", "Résoudre une équation admettant 2 solutions"), il est **INTERDIT** de laisser le hasard mathématique générer un contre-exemple (ex: un coefficient $k$ négatif rendrait la fonction concave).
+*   **OBLIGATOIRE (Restreint) :** Le tirage aléatoire doit être restreint à un ensemble garantissant la propriété attendue (ex: `k: rand([1,2,3])$` pour garantir $k > 0$). Cela permet de garder les bonnes réponses et les feedbacks statiques, évitant ainsi des structures `if/else` coûteuses et fragiles dans les `<tans>`.
+
+### 2.6. Garantir la Distinction Aléatoire (Boucle `while`)
+*   **OBLIGATOIRE :** Lorsqu'un exercice nécessite de tirer plusieurs éléments qui **doivent être impérativement différents** (ex: deux racines distinctes $a \neq b$, deux points distincts), il est **OBLIGATOIRE** d'utiliser une boucle `while` pour contraindre le deuxième tirage.
+*   **Syntaxe :** `a: rand([...])$ b: rand([...])$ while a = b do b: rand([...])$`
+*   **ALERT TIMEOUT :** Le pool de tirage doit rester suffisamment grand (ex: 6 éléments minimum pour tirer 2 éléments distincts) pour éviter que la boucle `while` n'itère pas des milliers de fois, ce qui provoquerait un timeout du CAS.
+
+### 2.7. Forçage de la simplification pour l'Affichage (`ev(expr, simp)`)
+*   **OBLIGATOIRE (Séparation Évaluation/Affichage) :** Lorsqu'une expression mathématique possède une forme simplifiée canonique (ex: factorisée, réduite) mais que le `tans` doit rester permissif (pour accepter une forme développée non réduite via `AlgEquiv`), il est **OBLIGATOIRE** de créer deux variables :
+    *   `ta_eval: diff(f, x)$` (Utilisée **uniquement** dans le `<tans>` du PRT).
+    *   `ta_disp: ev(ta_eval, simp)$` (Utilisée **uniquement** dans le `<generalfeedback>` ou le texte de la question).
+*   **INTERDIT :** Utiliser `ev(..., simp)` ou `ratsimp()` sur la variable d'évaluation si l'élève est susceptible de taper une forme algébriquement équivalente mais non simplifiée (cela causerait un rejet injuste de `AlgEquiv`).
+*   **OBLIGATOIRE (Hygiène du code) :** Toute variable de pré-calcul (ex: `err_...`, variable intermédiaire) définie dans les `<questionvariables>` **DOIT** être impérativement utilisée dans un PRT ou dans l'affichage. L'existence de "variables mortes" (non appelées) est formellement **INTERDITE** car elle alourdit inutilement l'évaluation du CAS et nuit à la maintenabilité.
+*   **OBLIGATOIRE (Pattern "Squelette de Calcul") :** Pour les calculs algorithmiques à étapes multiples (ex: règle de Sarrus, dérivées logarithmiques, intégrales par parties), il est **OBLIGATOIRE** de pré-calculer chaque sous-étape intermédiaire dans une variable dédiée (ex: `p1: a11*a22*a33$`, `S1: p1+p2+p3$`). Ces variables doivent servir de double objectif : 
+    1. Construire la variable finale (`det_correct: S1 - S2$`).
+    2. Être injectées individuellement dans le `<generalfeedback>` via `{@p1@}` pour afficher une correction détaillée étape par étape, sans jamais demander au CAS de reconstituer la démarche a posteriori.
+
+### 2.8. Génération de Décimales et Formatage Statistique
+*   **OBLIGATOIRE (Logique du diviseur) :** Pour générer aléatoirement des nombres avec $n$ décimales exactes, il est **OBLIGATOIRE** d'utiliser la logique du diviseur : `rand(10^n) / 10^n` (ex: `rand(10)/10` retourne des nombres entre 0.0 et 10.0 pour 1 décimale ; `rand(100)/100` pour 2 décimales).
+*   **OBLIGATOIRE (Formatage typographique) :** L'affichage d'une liste Maxima `[v1, v2, v3]` utilise des virgules, ce qui est incorrect en typographie française pour les séries statistiques. Il est **OBLIGATOIRE** d'utiliser la fonction `simplode(liste, " ; ")` pour générer une chaîne de caractères séparée par des points-virgules, injectée dans le `<questiontext>`.
+
+### 2.9. Redéfinition Locale de Fonctions (Anti-dépendance Externe)
+*   **CONTEXTE :** Certaines fonctions Maxima utiles en statistiques, en algèbre linéaire ou en analyse textuelle (ex: `mean`, `var`, `std`, `cov`) ne sont pas toujours disponibles par défaut dans le core de STACK sans charger des bibliothèques externes via `load()`.
+*   **INTERDIT :** Utiliser `load("fichier.mac")` dans les `<questionvariables>` si la fonction peut être réécrite en quelques lignes de code simple. Le chargement de fichiers externes ralentit le CAS et peut provoquer des conflits de versions ou des erreurs silencieuses selon les configurations des serveurs.
+*   **OBLIGATOIRE (Redéfinition) :** Il est **OBLIGATOIRE** de redéfinir localement les fonctions nécessaires en utilisant l'opérateur de définition locale `:=` (ex: `mean(L) := apply("+", L) / length(L)$`). Cela garantit un fonctionnement à 100% autonome, reproductible et sûr.
+*   **OBLIGATOIRE (Redéfinition du tirage aléatoire inclusif) :** La fonction native `rand(n)` de Maxima génère un entier dans l'intervalle `[0, n-1]`. Pour générer un entier aléatoire dans un intervalle inclusif personnalisé `[a, b]`, il est **OBLIGATOIRE** de redéfinir localement une fonction utilitaire (ex: `ri(a,b) := a + rand(b - a + 1)$`) plutôt que d'utiliser des syntaxes complexes. Cela garantit un code lisible, autonome, et à l'abri des erreurs d'indexation (off-by-one).
+*   **OBLIGATOIRE (Fonction Anti-Zéro) :** Lorsqu'un tirage aléatoire nécessite impérativement des coefficients non nuls (ex: pour éviter des équations triviales comme `0x + 2y = 4`), il est **OBLIGATOIRE** de créer une fonction utilitaire locale d'exclusion (ex: `rnz(a,b) := block([v], v: ri(a,b), if v=0 then rnz(a,b) else v)$`) plutôt que d'utiliser une boucle `while` en aval. Cela garantit la propreté syntaxique à la source.
+*   **OBLIGATOIRE (Redéfinition des algorithmes de chaînes) :** Pour les questions à réponse textuelle (type `string`) nécessitant des calculs de proximité (ex: distance de Levenshtein), il est **OBLIGATOIRE** de redéfinir localement l'algorithme. 
+*   **OBLIGATOIRE (Optimisation mémoire O(n)) :** L'implémentation de ces algorithmes de chaînes **NE DOIT PAS** utiliser de structures matricielles 2D complètes (qui provoquent un `timeout`). Elle doit obligatoirement utiliser une optimisation en mémoire à une dimension (ex: deux listes unidimensionnelles `prev` et `curr`).
+*   **OBLIGATOIRE (Capsecur de longueur) :** Tout algorithme de traitement de chaîne doit intégrer une condition d'échappement précoce (ex: `if slength(s)>30 then return(100)`) pour empêcher un élève de provoquer un timeout en soumettant un texte de plusieurs milliers de caractères.
+*   **OBLIGATOIRE (Sécurité d'évaluation des Strings) : Lorsqu'un élève saisit du texte dans un input de type string et que le professeur tente d'utiliser cette chaîne dans un calcul Maxima (ex: ev(expr, student_string)), le CAS peut lever une erreur fatale si la chaîne contient des caractères non interprétables. Il est OBLIGATOIRE d'encapsuler l'évaluation potentielle dans la fonction native stack_validate(chaine, type_attendu) pour vérifier la validité syntaxique avant toute opération, ou de s'assurer que le PRT utilise exclusivement des tests de chaîne (String, StringSloppy) qui ne passent jamais la valeur au moteur de calcul formel. 
+---
+
+## PÔLE 3 : Règles d'Inputs et de Validation (Saisie élève)
+
+### 3.1. Cohérence sémantique
+*   **OBLIGATOIRE (Cohérence Flottants/Entiers) :** Équivalence stricte entre le type de nombre généré et le paramètre `<forbidfloat>` de l'input. Si une division peut générer un décimal, `<forbidfloat>` doit être à `0`.
+*   **OBLIGATOIRE (Objets strictement entiers) :** Si le résultat attendu est un objet mathématique garanti entier (matrice d'entiers, fraction d'entiers, entier pur) et que la consigne exige une valeur exacte, `<forbidfloat>` doit être **OBLIGATOIREMENT** à `1`. À défaut, l'élève pourrait saisir une réponse décimale (ex: `1.0` au lieu de `1`) qui serait acceptée à tort.
+*   **OBLIGATOIRE (Échappement RegExp) :** Dans un nœud de PRT utilisant le test `RegExp`, la valeur dans `<tans>` doit obligatoirement être encapsulée dans des guillemets doubles (ex: `<tans>"^[01]+$"</tans>`).
+*   **OBLIGATOIRE (Couplage Constante / allowwords) :** Si la réponse modèle (`<tans>`) d'une primitive contient une constante d'intégration symbolique (ex: `+ k`), il est **OBLIGATOIRE** d'ajouter cette constante exacte dans la balise `<allowwords>` de l'input (ex: `<allowwords>k</allowwords>`). À défaut, le validateur syntaxique de STACK rejettera la réponse de l'élève avec une erreur fatale "Variable inconnue".
+
+### 3.2. Configuration "Quartet" Algébrique (Rigueur requise)
+*   **OBLIGATOIRE (Champ d'application) :** Tout input de type `algebraic` exigeant une **transformation stricte d'expression** (développer, factoriser, réduire) doit obligatoirement avoir cette combinaison :
+    *   `<insertstars>0</insertstars>` : Oblige l'élève à écrire explicitement la multiplication.
+    *   `<checkanswertype>1</checkanswertype>` : Valide que la saisie est une expression algébrique.
+    *   `<mustverify>1</mustverify>` : Force l'élève à valider la syntaxe.
+    *   `<showvalidation>2</showvalidation>` : Affiche l'interprétation du CAS sous le champ pour correction (pont pédagogique essentiel, notamment pour `exp()` vers $e^x$).
+*   **EXCEPTION (Objets Non-Algébriques ou Finis) :** Si l'input `algebraic` attend un **ensemble** (ex: `{a, b}`), une **matrice**, ou un **nombre calculé final** (ex: une aire), le Quartet doit être **désactivé** (`insertstars=0`, `checkanswertype=0`, `mustverify=0`, `showvalidation=0`). L'affichage de l'interprétation CAS sous le champ (`showvalidation=2`) est alors nuisible et confus pour l'élève.
+
+### 3.3. Configuration Numérique (Tolérance)
+*   **OBLIGATOIRE :** Pour un nombre décimal avec tolérance, le type doit être `numerical` avec `<forbidfloat>0</forbidfloat>`.
+*   **INTERDIT :** Utiliser `AlgEquiv` pour comparer des flottants. Le PRT doit utiliser `NumRelative` (ou `NumAbsolute`) avec la tolérance dans `<testoptions>` (ex: `0.01`).
+*   **EXCEPTION (Entier strict dans un champ Numérique) :** Si un input est de type `numerical` avec `<forbidfloat>0</forbidfloat>` (pour autoriser l'élève à saisir une réponse décimale comme `12.0`), MAIS que la logique de génération Maxima garantit mathématiquement que la réponse modèle (`ta`) est un **entier pur** (ex: via `ri(a,b)`), alors la règle d'utilisation de `NumRelative` est annulée. 
+    *   **OBLIGATOIRE :** Le PRT doit utiliser le test `AlgEquiv`. L'utilisation de `NumRelative` avec une tolérance sur un entier pur créerait une faille de validation (ex: acceptation de `14.99` pour `15`). `AlgEquiv` garantit une égalité stricte tout en conservant la souplesse de saisie de l'input `numerical`.
+*   **OBLIGATOIRE (Tolérance de Midpoint pour l'arrondi) :** Lorsqu'un input numérique exige un arrondi à $10^{-n}$ près, l'utilisation de `NumAbsolute` avec une tolérance stricte de $10^{-n}$ est trop risquée (elle rejette les élèves ayant fait un arrondi de milieu de chaîne différent sur les calculs intermédiaires). Il est **OBLIGATOIRE** d'appliquer la règle du Midpoint : régler le `<testoptions>` à la moitié de la précision demandée (ex: pour $10^{-2}$, utiliser `<testoptions>0.015</testoptions>` ou idéalement `0.005` pour un arrondi strictement correct).
+*   **OBLIGATOIRE (Arrondi côté Prof) :** La variable professeur (`ta`) doit être générée en forçant l'arrondi mathématique à la même décimale (ex: `ta: round(float(expr*100)/100)$` pour $10^{-2}$) afin que la comparaison de référence soit stable.
+*   **OBLIGATOIRE (Forçage flottant dans le Tans) :** Lorsqu'un input `numerical` a `<forbidfloat>0</forbidfloat>` ET que la réponse modèle (`ta`) est issue d'un calcul pouvant théoriquement tomber sur un nombre entier (ex: variance entière, écart-type de 0), la variable `ta` doit être **obligatoirement** castée en flottant dans la balise `<tans>`. Multiplier par un flottant trivial (ex: `<tans>1.0*ta_var</tans>`) ou utiliser `float()`. À défaut, si `ta` vaut `2`, l'élève tapant `2.0` sera injustement rejeté par le validateur syntaxique.
+*   **EXCEPTION (Validation d'Encadrement) :** Lorsqu'un input `numerical` n'attend pas une valeur cible unique, mais l'appartenance à un intervalle valide (ex: borne inférieure d'un encadrement), la règle d'utilisation de `NumRelative` est annulée.
+    *   **OBLIGATOIRE :** Le PRT doit utiliser des `<feedbackvariables>` contenant des prédicats booléens (ex: `test: ans_inf <= alpha and alpha - ans_inf <= 0.01$`).
+    *   **OBLIGATOIRE :** Le nœud de PRT doit évaluer ce booléen avec le test `AlgEquiv` contre `true` (ex: `<sans>test</sans>`, `<tans>true</tans>`).
+
+### 3.4. Configuration "Texte Brut" (Type `string`)
+*   **CONTEXTE :** S'applique aux questions où l'élève doit saisir un mot, une phrase ou un terme de vocabulaire (ex: "miel", "dériver").
+*   **OBLIGATOIRE (Désactivation totale) :** Le type `string` exige la désactivation complète du Quartet Algébrique : `insertstars=0`, `checkanswertype=0`, `mustverify=0`, `showvalidation=0`.
+*   **RAISON :** La validation syntaxique (`showvalidation=2`) tenterait d'interpréter le texte français comme une expression mathématique Maxima, ce qui générerait des erreurs de parseur incompréhensibles pour l'élève ou un affichage CAS absurde (ex: interprétation implicite de la multiplication entre lettres).
+*   **OBLIGATOIRE (Forçage du type) :** Si des fonctions de traitement de chaîne sont appliquées dans le PRT, elles doivent intégrer un cast de sécurité : `if stringp(var)=false then var:string(var)$`.
+*   **OBLIGATOIRE (Validation par correspondance stricte) :** Dans le cas d'une saisie de vocabulaire exigeant le mot *exact* (sans aucune tolérance orthographique, par exemple pour une grille de mots croisés), le nœud de PRT doit utiliser **exclusivement** le test `String` (si la casse et les espaces comptent) ou `StringSloppy` (si la casse et les espaces aux extrémités sont ignorés, ce qui est recommandé pour les mots croisés).
+*   **INTERDIT (Test mathématique sur du texte) :** Il est **INTERDIT** d'utiliser le test `AlgEquiv` pour évaluer un input de type `string`. `AlgEquiv` est strictement réservé aux objets mathématiques ; son utilisation sur une chaîne de caractères lèvera une erreur fatale CAS ou retournera un résultat de comparaison aléatoire (`false`).
+*   ** RAPPEL (Isolation d'évaluation pour les Strings) : Bien que l'input soit de type texte, le PRT évalue ce texte. Si une variable de feedback (ex: fb_html) est construite dans les <feedbackvariables> via sconcat, elle doit être appelée via {@fb_html@} dans la balise <truefeedback> (couche HTML). En revanche, si un score calculé (ex: note_finale) doit être attribué, il doit être appelé par son nom brut note_finale dans la balise <truescore> (couche Maxima). 
+---
+3.5. Rendu DOM des Inputs et Type "Equiv"
+    • ALERT FATAL (Piège du Wrapping <span> par défaut) : L'appel de balise [[input:ans1]] génère toujours un élément HTML <span> englobant le <input> réel. Si le professeur tente de mettre ce [[input:ans1]] à l'intérieur d'un <div> configuré en display: flex (comme pour aligner des éléments), la balise <span> casse le flexbox. Il est OBLIGATOIRE d'utiliser l'attribut class de l'input dans le XML pour appliquer des styles (ex: <cssclasses>ma-classe-flex</cssclasses>) plutôt que d'essayer d'englober [[input:...]] dans des divs flexibles.
+    • OBLIGATOIRE (Type equiv) : Pour les questions de logique propositionnelle où l'élève doit répondre par "Vrai", "Faux" ou "Je ne sais pas" (3 états), l'input doit être de type equiv. La réponse modèle (ta) doit utiliser exclusivement les booléens Maxima natifs true, false ou unknown. Le PRT doit utiliser le test Equiv avec <testoptions>unknown</testoptions> pour tolérer la réponse "Je ne sais pas".
+
+## PÔLE 4 : Typologies Spécifiques de Questions (Les "Recettes")
+
+### 4.1. Modélisation des Inéquations
+*   **INTERDIT :** Notation ensembliste (ex: `{x | x > 3}`).
+*   **OBLIGATOIRE :** Utiliser `and` / `or` (ex: `x < x1 or x > x2`). Ajouter `and, or` dans `<allowwords>`.
+*   **OBLIGATOIRE (Génération) :** Tirer les racines au hasard, puis calculer les coefficients (jamais l'inverse, pour éviter les discriminants négatifs). Forcer l'ordre $x_1 < x_2$ avant la construction logique.
+*   **OBLIGATOIRE (Anticipation) :** Pré-calculer une variable `err_sign` en inversant les opérateurs `and`/`or` de la réponse correcte.
+
+### 4.2. Séparation des erreurs d'Unités
+*   **OBLIGATOIRE :** Isoler l'unité dans les `<feedbackvariables>` du PRT pour faire un feedback différencié.
+    ```maxima
+    stud_si : stack_unit_si_to_si_base(ans_VOTRE_INPUT);
+    teach_si : VOTRE_VARIABLE_UNIT_ATTENDUE;
+    v_pure_e : subst(map(lambda([u], u=1), listofvars(stud_si)), stud_si);
+    v_pure_t : subst(map(lambda([u], u=1), listofvars(teach_si)), teach_si);
+    eleve_unit : 2 * stud_si / v_pure_e;
+    teacher_unit : 2 * teach_si / v_pure_t;
+    ```
+*   **STRUCTURE PRT :** Nœud 0 : Test `UnitsAbsolute` (SAns=`eleve_unit`, TAns=`teacher_unit`). Si Vrai -> Nœud 1 : Test `UnitsRelative` (SAns=`ans_INPUT`, TAns=`VARIABLE_TA`).
+
+### 4.3. Parsons Puzzle
+*   **OBLIGATOIRE :** Type d'input `parsons` (jamais `dragndrop`). Inclure `stack_include_contrib("prooflib.mac");` en première ligne.
+*   **OBLIGATOIRE (Formatage) :** Chaque bloc doit être un tableau `[Identifiant, "Texte"]`.
+*   **OBLIGATOIRE (Structure) :** La réponse modèle `ta` doit utiliser `proof()`. Sans cela, erreur `Failed to connect`.
+*   **OBLIGATOIRE (Évaluation) :** Utiliser `parsons_decode`, `proof_flatten` et `elementp` dans le PRT.
+
+### 4.4. Modélisation Expert : Chaînage Logique avec Score Partiel
+*   **INTERDIT :** Utiliser un seul nœud `AlgEquiv` pour évaluer une transformation ou une chaîne logique.
+*   **OBLIGATOIRE (Pattern Routeur) :** Nœud 0 = Test de la 1ère étape. Si Vrai -> Nœud 1 (étape suivante). Si Faux -> Nœuds diagnostiques.
+*   **OBLIGATOIRE (Anticipation "Hors-Étape") :** Pour les calculs itératifs (dérivées successives, primitives), il est **OBLIGATOIRE** de pré-calculer l'étape précédente (ex: `ta_fp: diff(f,x)$`) et de l'utiliser dans un nœud de diagnostic (ex: tester si l'élève a donné $f'$ au lieu de $f''$).
+*   **OBLIGATOIRE (Feedback de Contradiction) :** Lorsqu'un nœud N est atteint après l'échec du nœud N+1 (qui nécessitait que N soit vrai), le feedback du nœud N+1 **DOIT** rappeler la valeur validée au nœud N (ex: *"Votre dérivée seconde était juste ({@fpp@}), cependant..."*) pour forcer l'élève à faire le lien logique.
+
+### 4.5. Questions à Choix Multiples (QCM) : ⚡ PIÈGES CONTEXTUELS
+
+> **⚠️ ALERTE CONFLIT CONTEXTUEL :** La nature de la variable `ans1` change radicalement selon le type d'input. Ne pas appliquer la recette d'un type à un autre.
+
+A. QCM Cases à cocher (Type checkbox)
+    • Comportement : ans1 est une structure imbriquée complexe (liste de listes).
+    • OBLIGATOIRE : Appliquer flatten([ans1]) dans les <feedbackvariables> pour obtenir une liste plate des identifiants cochés.
+    • OBLIGATOIRE (Calcul du score) : Utiliser la théorie des ensembles (setify, intersection, cardinality). Formule : (nb_bons - nb_mauvais) / total_bons. Le score final doit être borné avec max(0, ...) pour éviter les scores négatifs.
+    • OBLIGATOIRE (Rendu HTML des feedbacks cochés) : Utiliser la boucle Moodle [[foreach item="nom_variable"]]{@item@}[[/foreach]] dans le feedback. Utiliser [[if test="liste # []"]] pour masquer une liste vide.
+    • OBLIGATOIRE (Pattern de Feedback des Oublis) : Lorsqu'une réponse est incorrecte, le système doit obligatoirement afficher deux sections distinctes :
+        1. Le détail des propositions cochées par l'élève (Correctes en vert, Incorrectes en rouge).
+        2. La liste des propositions vraies que l'élève a oublié de cocher.
+    • OBLIGATOIRE (Calcul des Oublis) : Extraire les identifiants manquants via la différence ensembliste : manques: listify(setdifference(setify(bons), setify(idx_coches)));. Générer un bloc HTML distinct (ex: couleur ambre/orange) et itérer dessus avec [[foreach]].
+    • OBLIGATOIRE (Optimisation du Mapping) : Pour les QCM avec une grande base de propositions (ex: >10 items), il est INTERDIT d'imbriquer des boucles for pour chercher le texte d'un identifiant. Il est OBLIGATOIRE d'utiliser la fonction assoc sur un tableau de cartographie pré-crée : assoc(id, map(lambda([x],[x[1],x[3]]), liste_complete)).
+    • OBLIGATOIRE (Feedback Global - Generalfeedback) : Si le <generalfeedback> doit afficher la liste des bonnes réponses sous forme de liste à puces, la structure HTML (<ul><li>) doit être générée dans les <questionvariables> via simplode et injectée via {@variable@}.
+
+
+#### B. QCM Choix Unique (Type `radio`) & Menus déroulants (Type `dropdown`)
+*   **Équivalence stricte :** Les types `radio` et `dropdown` partagent exactement le même moteur et la même logique Maxima. Seule la balise XML `<type>` change.
+*   **COMPORTEMENT DOUBLE (L'ID) :** `ans1` est évaluée comme la valeur du premier élément (`[0]`) de l'option choisie par l'élève.
+*   **CAS 1 : ID Sémantique (Recommandé - Simplifié) :** Si l'identifiant de la liste `tans` est *déjà* la chaîne de texte lisible (ex: `tans: [["convexe", true, "convexe"], ...]`), alors `ans1` vaut `"convexe"`.
+    *   **OBLIGATOIRE :** Utiliser directement le test `String` dans le PRT : `<sans>ans1</sans>`, `<tans>"convexe"</tans>`.
+    *   **INTERDIT :** Utiliser des fonctions d'extraction complexes (`sublist`, `lambda`) ou des boucles dans ce cas.
+*   **CAS 2 : ID Technique (Avancé) : Si l'identifiant est un index technique (ex: tans: [["1", true, "Texte long..."], ...]), alors ans1 vaut "1".
+    • OBLIGATOIRE (Extraction de la cible) : Le <tans> du PRT ne doit pas être le tableau complet, mais uniquement l'ID de la bonne réponse, extrait via l'algorithme strict suivant dans les <feedbackvariables> : vid: first(first(sublist(ta, lambda([ex], second(ex)=true))))$
+    • OBLIGATOIRE (Test) : Le nœud de PRT doit utiliser exclusivement le test String (et non AlgEquiv) : <sans>ans1</sans>, <tans>vid</tans>.
+    • OBLIGATOIRE (Pattern de Centralisation) : Pour éviter la duplication de code, le feedback textuel doit être extrait dans les <feedbackvariables> avant le test : fb_texte: assoc(ans1, liste_feedback)$. Les balises <truefeedback> et <falsefeedback> utiliseront alors toutes les deux la variable {@fb_texte@} avec un habillage CSS conditionnel (vert/rouge).
+
+#### C. Grille Vrai / Faux (Multiples inputs `radio`)
+*   **OBLIGATOIRE :** Modèle de données à 4 éléments : `["Énoncé", Booléen, "Explication Vrai", "Explication Faux"]`.
+*   **OBLIGATOIRE (Inputs multiples) :** Un input `radio` indexé par proposition (ex: `ans1p01`). Regrouper toutes les validations dans une balise cachée : `<div style="display:none">[[validation:...]]</div>`.
+*   **OBLIGATOIRE (Inversion Tans) :** Le `<tans>` doit inverser la bonne réponse dynamiquement : `if second(ta[X]) then [[1,true,"Vrai"],[2,false,"Faux"]] else [[1,false,"Vrai"],[2,true,"Faux"]]`.
+*   **OBLIGATOIRE (Anti-défaut) :** L'option `<options>nonotanswered</options>` est obligatoire pour chaque input.
+*   **OBLIGATOIRE (Évaluation) :** Évaluer avec `is(ansX = (if second(ta[X]) then 1 else 2))` et utiliser l'opérateur ternaire Maxima pour le feedback inline.
+
+### 4.6. Modélisation des Tableaux de Vérité / Grilles Multiples
+*   **INTERDIT :** Créer un PRT distinct ou des nœuds de validation distincts pour chaque cellule d'un tableau (ex: 8 inputs = 8 PRTs).
+*   **OBLIGATOIRE (Agrégation en liste) :** Les réponses de l'élève doivent être rassemblées en une seule liste Maxima dans les `<feedbackvariables>` du PRT principal (ex: `student_ans : [ans0, ans1, ans2, ...];`).
+*   **OBLIGATOIRE (Comparaison Globale) :** La réponse modèle (`ta`) doit être un tableau de la même dimension. L'évaluation globale se fait en un seul nœud utilisant le test `AlgEquiv` comparant la liste élève à la liste professeur.
+*   **OBLIGATOIRE (Pièges d'erreur calculés) :** Les erreurs classiques de tableaux (ex: inversion de l'ordre des lignes, calcul de la négation `1 - valeur`) doivent être pré-calculées dans les `<questionvariables>` sous forme de tableaux parallèles (ex: `ta_inverse`, `ta_negation`) et testées dans les nœuds suivants du PRT pour offrir un feedback différencié partiel.
+PRÉCISION (Indexation des inputs agrégés) : Lors de la construction de la liste student_ans : [ans1, ans2...] dans les <feedbackvariables>, il faut rappeler que ans1 correspond strictement à l'ordre d'apparition de la première balise <input> dans le code XML, indépendamment de son attribut <name>. En cas de doute sur l'ordre de lecture du parseur XML, il est plus sûr d'appeler les variables par leur vrai nom (ex: student_ans : [cw1_3, cw1_4...]) pour éviter tout décalage d'index. 
+
+### 4.7. Modélisation des Intégrales et Mesures Géométriques (Aires, Longueurs)
+*   **OBLIGATOIRE (Anticipation du signe) :** Le calcul d'une mesure (aire sous une courbe, longueur d'arc) implique une intégrale qui peut s'avérer négative selon le sens d'intégration ou la position des courbes. Il est **OBLIGATOIRE** de pré-calculer une variable d'erreur de signe (ex: `ta_err_sign: -ta_aire`) dans les `<questionvariables>`.
+*   **STRUCTURE PRT :** Le nœud testant la réponse finale doit diriger vers un nœud sibling (même niveau) testant spécifiquement `ta_err_sign` pour accorder un score partiel (ex: 25%) avec un feedback explicite sur l'oubli de la valeur absolue.
+*   **OBLIGATOIRE (Séparation de la condition d'affichage) :** Si le feedback général nécessite d'afficher quelles courbes sont au-dessus/en-dessous des autres (ex: "Sur [a,b], on a f > g"), cette condition logique ne doit **JAMAIS** être évaluée en HTML. Elle doit être figée dans une variable string dans les `<questionvariables>` via un `if` Maxima (ex: `cond_sup: if g > f then ">" else "<"$`).
+*   **OBLIGATOIRE (Anticipation "Primitive Non Évaluée") :** Il est **OBLIGATOIRE** de pré-calculer la variable de la primitive brute (ex: `ta_err_prim: F(x)$`) et de la tester dans un nœud dédié de la Cascade Diagnostique. Si l'élève donne une expression contenant encore la variable $x$, le feedback doit expliciter : *"Vous avez donné la primitive F(x), il faut calculer F(b) - F(a)"*.
+*   **OBLIGATOIRE (Anticipation "Oubli de termes multiples") :** Dans les intégrales de fonctions sommes (ex: $ce^{dx} + f$), il est **OBLIGATOIRE** de pré-calculer les erreurs de primitive partielle (ex: intégration de l'exponentielle seule sans la constante) pour accorder un micro-score partiel (ex: 0.25) avec un feedback ciblé sur le terme manquant.
+
+### 4.8. Anti-Pattern : Le piège du test contre `false`
+*   **INTERDIT (Faux diagnostique) :** Utiliser le test `AlgEquiv` avec `<tans>false</tans>` pour tenter de détecter une erreur de formule algébrique spécifique (ex: pour détecter qu'il manque un terme comme $(x-a)$).
+*   **RAISON :** Si un élève tape une expression algébrique incorrecte mais syntaxiquement valide (ex: `y = 2*a*x + f(a)`), Maxima l'évalue comme une expression algébrique. `AlgEquiv(expression_valide, false)` renverra systématiquement `false`. La branche "Vrai" du nœud (contenant le feedback ciblé) **ne se déclenchera jamais**. Le test `var = false` ne renvoie `true` que si l'élève tape une contradiction logique explicite (ex: `1=2`).
+*   **OBLIGATOIRE (Anticipation Algébrique) :** Pour cibler une erreur de formule précise, il est **OBLIGATOIRE** de pré-calculer la fausse formule attendue dans les `<questionvariables>` (ex: `ta_err_missing_a: fp*x + ev(f, x=a)$`) et de tester `AlgEquiv(ans, ta_err_missing_a)` dans le nœud de diagnostic.
+
+### 4.9. Modélisation Expert : La Cascade Diagnostique (Sans score partiel)
+*   **CONTEXTE :** S'applique aux questions à une seule réponse où la notation est binaire (Tout ou Rien, ex: 1 point), mais où l'on souhaite fournir un feedback hyper-ciblé sur l'erreur exacte commise (ex: erreurs de formules de dérivation).
+*   **OBLIGATOIRE (Dictionnaire des erreurs) :** Toutes les erreurs classiques doivent être modélisées mathématiquement sous forme de variables distinctes dans les `<questionvariables>` (ex: `err_oublie_exp`, `err_produit`), en respectant scrupuleusement la règle du Pôle 4.8 (Anti-pattern `false`).
+*   **OBLIGATOIRE (Convention lexicale des erreurs) :** Dans le cadre d'une Cascade Diagnostique, toutes les variables pré-calculées dans les `<questionvariables>` représentant une erreur classique doivent **OBLIGATOIREMENT** être préfixées par `err_` suivi d'un nom sémantique court (ex: `err_trace`, `err_plus`, `err_signe`). Les variables de réponse correcte doivent utiliser le préfixe `ta_` ou des noms explicites (ex: `det_correct`). Aucune variable intermédiaire ne doit utiliser de noms génériques (ex: `var1`, `calc1`).
+*   **STRUCTURE PRT (Arbre binaire de routage) :** 
+    *   Nœud 0 : Test `AlgEquiv` contre la réponse correcte. Si Vrai -> Score = Points max, Fin.
+    *   Si Faux -> Nœud 1 : Test `AlgEquiv` contre l'erreur A. Si Vrai -> Score = 0, Feedback Erreur A, Fin.
+    *   Si Faux -> Nœud 2 : Test `AlgEquiv` contre l'erreur B. Si Vrai -> Score = 0, Feedback Erreur B, Fin.
+    *   ...
+    *   Dernier Nœud : Score = 0, Feedback Générique "Incorrect", Fin.
+*   **ALERT FATAL (Terminaison de la Cascade) :** La structure arborescente de la Cascade Diagnostique doit **OBLIGATOIREMENT** se terminer par un nœud "Fallback" (Nœud N). Ce dernier nœud ne doit tester aucune erreur spécifique. Sa branche Fausse n'existe pas, et sa branche Vraie (atteinte parce que toutes les erreurs précédentes ont renvoyé Faux) doit **IMPERATIVEMENT** avoir un score de 0 et un `<truenextnode>-1</truenextnode>`. 
+*   **INTERDIT (Score de rattrapage fantôme) :** Il est formellement **INTERDIT** d'accorder un score supérieur à 0 dans la branche Fausse d'un nœud de diagnostic intermédiaire, sous peine de valider des réponses aléatoires.
+*   **VÉRIFICATION CROISÉE (Anti-variable morte) :** Toute variable d'erreur préfixée `err_` dans les `<questionvariables>` **DOIT** impérativement être appelée dans un nœud de PRT en tant que `<tans>`. Si une erreur est modélisée mais non testée dans le PRT, le code est rejeté.
+*   **DIFFÉRENCE avec le Pôle 4.4 :** Dans la Cascade Diagnostique standard, les nœuds d'erreur accordent **généralement 0 point** (ex: erreurs de formules pures). 
+*   **VARIANTE (Cascade Récompensée) :** Pour les calculs longs (dérivées complexes, intégrales de sommes), il est autorisé d'accorder des micro-scores d'effort (ex: `0.25`) sur les nœuds aval de la cascade si l'erreur démontre que l'élève a partiellement réussi une sous-tâche complexe (ex: a intégré l'exponentielle mais a oublié le polynôme), tout en maintenant le score à 0 pour les erreurs de compréhension fondamentales (ex: donner la primitive au lieu de l'intégrale).
+
+### 4.10. Modélisation des Encadrements et Intervalles de Confiance (TVI, Dichotomie)
+*   **CONTEXTE :** S'applique lorsqu'on demande à l'élève de fournir un intervalle $[a ; b]$ encadrant une valeur exacte $\alpha$ avec une amplitude maximale donnée (ex: à $10^{-2}$ près).
+*   **OBLIGATOIRE (Tolérance Machine) :** Les calculs dans les `<feedbackvariables>` utilisant `float()` sont soumis aux imprécisions de l'ordinateur. Il est **OBLIGATOIRE** de définir une micro-tolérance (ex: `tol: 0.001$`) et de l'ajouter aux inégalités strictes pour ne pas pénaliser l'élève injustement (ex: `ans_inf <= alpha + tol`).
+*   **OBLIGATOIRE (Structure de validation en 3 temps) :** Le PRT doit valider séparément :
+    1.  `test_inf` : La borne inférieure est bien inférieure à $\alpha$ ET respecte la distance maximale autorisée.
+    2.  `test_sup` : La borne supérieure est bien supérieure à $\alpha$ ET respecte la distance maximale.
+    3.  `test_amplitude` : L'écart entre la borne supérieure et inférieure ne dépasse pas l'amplitude totale autorisée (ex: $0.02$ pour $10^{-2}$).
+*   **OBLIGATOIRE (Gestion du Score - Malus) :** Si les bornes sont justes individuellement (Nœuds 0 et 1 accordant par exemple 0.5 pts chacun), mais que l'amplitude globale est trop grande, il est **OBLIGATOIRE** d'utiliser l'opérateur de soustraction de score : `<truescoremode>-</truescoremode>` combiné à `<falsescore>0.25</falsescore>` sur le nœud de l'amplitude pour retirer des points sans remettre à zéro.
+
+### 4.11. Modélisation des Primitives
+*   **OBLIGATOIRE (Validation par dérivation) :** Il est **INTERDIT** d'utiliser `AlgEquiv(ans_F, ta_F)` pour évaluer une primitive (l'élève pourrait utiliser une constante $C$, $k$, ou aucune constante, rendant le test impossible). La seule méthode valide est le test par dérivation : `<sans>diff(ans_F, x)</sans>`, `<tans>f</tans>`, `<answertest>AlgEquiv</answertest>`.
+*   **ALERT PARADOXE (Le mythe du "oubli de + k") :** Si la validation par dérivation est utilisée, un élève qui tape la primitive exacte mais **oublie le + k** verra sa réponse validée avec le score maximal. En effet, mathématiquement, `diff(primitive_sans_k, x)` donne exactement `f(x)` (la constante $k=0$ est valide).
+*   **INTERDIT (Nœud de détection "Dead Code") :** Il est formellement **INTERDIT** de créer un nœud PRT destiné à pénaliser l'oubli du `+ k` *après* un nœud de validation par dérivation réussi. Ce nœud serait du code mort (inatteignable).
+*   **EXCEPTION (Forçage absolu du + k) :** Si le cahier des charges exige *impérativement* de refuser une réponse sans `+ k`, il est **OBLIGATOIRE** de ne pas utiliser la validation par dérivation comme nœud principal. Il faut utiliser le test `SubstEquiv` ou une expression régulière (`RegExp`) pour vérifier la présence de la constante, bien que cela soit complexe et fragile. En règle générale, on privilégie la validation par dérivation et on accepte l'absence de constante.
+
+### 4.12. Modélisation Statistique (Moyenne, Variance, Écart-Type)
+*   **CONTEXTE :** S'applique aux calculs de statistiques descriptives où l'élève est soumis à 3 erreurs de formule massives et simultanées.
+*   **OBLIGATOIRE (Cascade de la Trinité) :** Le PRT doit impérativement contenir une cascade diagnostique (Pôle 4.9) testant dans l'ordre les 3 erreurs fondamentales :
+    1.  **L'Erreur de Racine :** L'élève a calculé l'écart-type ($\sqrt{V}$) au lieu de la variance ($V$).
+    2.  **L'Oubli de l'Effectif :** L'élève a calculé la somme des carrés des écarts ($\sum (x_i - \bar{x})^2$) au lieu de diviser par $n$.
+    3.  **L'Erreur d'Échantillon :** L'élève a utilisé la formule biaisée de l'échantillon (division par $n-1$) au lieu de la population (division par $n$).
+*   **OBLIGATOIRE (Calcul des variables d'erreur) :** Les variables `ta_err_...` de ces erreurs doivent être calculées en réutilisant la fonction locale redéfinie (Pôle 2.9) pour éviter de dupliquer du code mathématique (ex: `ta_err_n1: round(float(var(L) * 5 / 4) * 100) / 100$`).
+
+### 4.13. Modélisation Expert : Déterminant de Matrice 2×2
+*   **CONTEXTE :** Le calcul du déterminant d'une matrice 2×2 ($ad - bc$) génère systématiquement les mêmes erreurs cognitives chez les élèves, rendant une Cascade Diagnostique (Pôle 4.9) indispensable.
+*   **OBLIGATOIRE (Génération) :** Utiliser la fonction de redéfinition locale (Pôle 2.9) pour générer les 4 coefficients entiers (ex: `a11: ri(-4,4)$`). Construire la matrice via `matrix()`.
+*   **OBLIGATOIRE (Dictionnaire des erreurs) :** Les `<questionvariables>` doivent obligatoirement contenir les 3 variables d'erreur suivantes pour alimenter la cascade :
+    1.  `err_trace : a11 + a22$` (Confusion avec la trace de la matrice).
+    2.  `err_plus : a11*a22 + a12*a21$` (Erreur de signe : addition au lieu de la soustraction des produits croisés).
+    3.  `err_oppose : a12*a21 - a11*a22$` (Inversion complète du signe du déterminant).
+*   **OBLIGATOIRE (Configuration Input) :** L'input doit être de type `numerical` avec `<forbidfloat>0</forbidfloat>` et le "Quartet" désactivé (Pôle 3.2 Exception). Le PRT doit utiliser `AlgEquiv` (Pôle 3.3 Exception).
+*   **STRUCTURE PRT :** Arbre binaire de routage standard :
+    *   Nœud 0 : `AlgEquiv` vs réponse correcte. (Si Vrai -> 1 pt).
+    *   Nœud 1 : `AlgEquiv` vs `err_trace`. (Feedback : "Confusion trace / déterminant, vous avez fait une somme au lieu d'un produit croisé").
+    *   Nœud 2 : `AlgEquiv` vs `err_plus`. (Feedback : "Erreur de signe, il faut soustraire la diagonale secondaire").
+    *   Nœud 3 : `AlgEquiv` vs `err_oppose`. (Feedback : "Signe inversé, c'est la diagonale principale moins la secondaire").
+    *   Nœud 4 (Faux final) : Feedback générique rappelant la formule $ad - bc$.
+
+### 4.14. Modélisation Expert : Réponse Textuelle Multiple avec Tolérance Orthographique (Levenshtein)
+*   **CONTEXTE :** S'applique lorsqu'une question accepte plusieurs mots valides et qu'on souhaite tolérer des fautes de frappe mineures tout en pénalisant les erreurs graves ou les erreurs grammaticales spécifiques (comme le pluriel).
+*   **OBLIGATOIRE (Pipeline de normalisation) :** Le traitement de la variable `ans1` ne peut pas se faire dans les `<questionvariables>` (où `ans1` n'existe pas encore). Il doit être effectué dans les `<feedbackvariables>` du PRT selon un ordre strict :
+    1.  `sdowncase(ans1)` (Passage en minuscules pour ignorer la casse).
+    2.  `strim(" ", ...)` (Suppression des espaces parasites en début et fin de chaîne).
+    3.  Fonction de nettoyage sémantique (ex: `supprimer_articles` pour ignorer "le ", "la ", "l'").
+*   **OBLIGATOIRE (Heuristique du Pluriel) :** La détection d'un "s" final parasite ne doit **JAMAIS** se baser sur un dictionnaire durcodé, mais sur une règle algorithmique stricte : détection d'un "s" final sur un mot de plus d'une lettre. Il faut soustraire ce "s", recalculer la distance avec le meilleur mot, et isoler les variables booléennes `plu_seul` (mot sans "s" est exact, distance=0) et `plu_f1` (mot sans "s" a une distance d'1).
+*   **OBLIGATOIRE (Structure PRT de routage par paliers) :** L'arbre de validation doit suivre cet ordre strict pour éviter les conflits de scores (car "miels" a une distance globale de 1 par rapport à "miel") :
+    *   Nœud 0 : Réponse vide (après nettoyage).
+    *   Nœud 1 : Mot exact (distance 0) -> Score max.
+    *   Nœud 2 : Pluriel seul (`plu_seul`) -> Score partiel (ex: 0.5).
+    *   Nœud 3 : Pluriel + 1 faute (`plu_f1`) -> Score plus faible (ex: 0.25).
+    *   Nœud 4 : Distance globale = 1 -> Score partiel (ex: 0.5).
+    *   Nœud 5 : Distance globale = 2 -> Score plus faible (ex: 0.25).
+    *   Nœud 6 : Fallback (distance > 2) -> Score 0.
+*   **OBLIGATOIRE (Génération dynamique du Feedback Enrichi) :** Lorsqu'un PRT de ce type contient de nombreux nœuds avec des feedbacks textuels complexes (mise en forme, couleurs, liste des réponses acceptées), il est **OBLIGATOIRE** de générer les blocs HTML complets (avec styles inline) dans les `<feedbackvariables>` via `sconcat` (ex: `fb1: sconcat("<div style='...'>✅ <b>", best, "</b></div>")$`), puis de les injecter via `{@fb1@}` dans les nœuds. Cela évite de surcharger la structure XML du PRT et centralise la logique d'affichage.
+*   **OBLIGATOIRE (Liste de mots pour le Feedback) :** L'affichage de la liste des réponses acceptées dans le feedback ne doit **JAMAIS** utiliser l'affichage natif d'une liste Maxima (qui génère des crochets `[` et `]`). Il est **OBLIGATOIRE** de construire une chaîne de caractères via une boucle `for` utilisant `sconcat` et des séparateurs typographiques (ex: `", "`).
+
+### 4.15. Modélisation des Grilles de Mots Croisés (Mots Exacts)
+*   **CONTEXTE :** S'applique aux exercices de type mots croisés où une grille visuelle est mise à jour par JavaScript, mais où la saisie réelle de l'élève s'effectue via des inputs textuels cachés ou alignés exigeant des mots exacts.
+*   **OBLIGATOIRE (Typage `string`) :** Tous les inputs de la grille doivent être de type `string`.
+*   **OBLIGATOIRE (Désactivation totale) :** Le Quartet Algébrique doit être intégralement désactivé (`insertstars=0`, `checkanswertype=0`, `mustverify=0`, `showvalidation=0`). Toute validation CAS affichée sous un champ de mot (ex: interprétation de "SIGNAL" en `S*I*G*N*A*L`) est strictement prohibée et destructrice pour l'UX.
+*   **OBLIGATOIRE (Structure PRT minimaliste) :** Puisqu'il n'y a pas de logique algorithmique de tolérance (pas de Levenshtein), chaque mot dispose d'un PRT dédié ne contenant **qu'un seul nœud** :
+    *   Nœud 0 : Test `StringSloppy` contre la variable professeur (ex: `"SIGNAL"`). Si Vrai -> Score = Points du mot, Fin.
+    *   Si Faux -> Score = 0, Feedback "Incorrect", Fin.
+*   **OBLIGATOIRE (Synchronisation JS) :** Si la grille utilise un script JavaScript pour refléter la saisie dans les cases (Pôle 5.3.A), le script ne doit **jamais** tenter de valider les mots lui-même. Il doit se contenter d'écouter les événements `input` et de mettre à jour le DOM (textContent). La validation logique appartient exclusivement aux PRTs STACK.
+
+---
+
+## PÔLE 5 : Front-End, Affichage et Interactivité (HTML/JS/CSS)
+
+### 5.1. Intégration HTML dynamique (Tableaux)
+*   **OBLIGATOIRE (Positionnement DOM) :** Une variable de lignes de tableau générée par `sconcat()` (ex: `{@table_rows@}`) **DOIT** être injectée strictement à l'intérieur de la balise `<tbody>`.
+*   **OBLIGATOIRE (Isolation des balises parentes) :** Lors de la génération dynamique de lignes de tableau via `sconcat()`, seules les balises de lignes (`<tr>`) ou de cellules (`<td>`, `<th>`) peuvent être générées dans la variable. Il est **FORMELLEMENT INTERDIT** de générer les balises parentes du tableau (`<table>`, `<tbody>`, `<thead>`) dans cette variable. Ces balises structurantes doivent obligatoirement rester en dur dans le `<questiontext>` pour garantir la validité du DOM.
+*   **OBLIGATOIRE (Séparation stricte des instructions) :** Chaque instruction d'affectation dans les `<questionvariables>` (qu'elle génère du HTML ou non) **DOIT** être sur sa propre ligne, terminée par `$`. L'empilement sur une seule ligne (ex: `a:1$ b:2$`) est formellement **INTERDIT** pour garantir la lisibilité, faciliter le débogage, et éviter les erreurs d'évaluation parsers CAS.
+
+### 5.2. Spécificités JSXGraph (Oscilloscope)
+*   **OBLIGATOIRE (Performance) :** Dans `functiongraph`, ajouter `numberPoints: 150` et `doAdvancedPlot: false`.
+*   **INTERDIT (Anti-boucle infinie) :** Utiliser `moveTo()`, `setPosition()`, ou modifier `.X()` / `.Y()` dans `bd.update()`.
+*   **OBLIGATOIRE :** `bd.update()` est exclusivement réservé à la mise à jour textuelle (`textContent`). Les curseurs utilisent l'attribut `drag` à la création.
+*   **OBLIGATOIRE (Injection de variables) :** Utiliser exclusivement la syntaxe `{#variable#}` (avec des dièses) pour faire passer une variable depuis le contexte Moodle (PHP) vers le bloc JavaScript encapsulé dans le `<questiontext>` (ex: `var fct = {#ta_fonction#};`). Ne JAMAIS utiliser la syntaxe `{@variable@}` dans un bloc `<script>`, car l'évaluation s'effectuerait au moment de la construction du DOM (et pourrait échouer ou corrompre le code JS) au lieu d'être injectée proprement comme une valeur littérale JavaScript.
+*   **OBLIGATOIRE (Isolation du conteneur) :** La div contenant le graphe JSXGraph doit avoir un `width` et un `height` explicitement définis en style inline ou dans une classe CSS dédiée. Ne jamais laisser le conteneur sans dimensions, sinon le board aura une taille de 0px et sera invisible.
+
+### 5.3. Architecture STACK-JS et Isolation du Sandbox (ALERT FATAL)
+    • CONTEXTE : Le bloc [[javascript]] ... [[/javascript]] ne s'exécute PAS dans le DOM principal de Moodle. Il est injecté dans une iframe sandboxée strictement isolée. Toute l'architecture JS doit être pensée en conséquence.
+    • ALERT FATAL (Aveuglement du DOM) : Il est strictement INTERDIT d'utiliser document.getElementById() ou document.querySelector() pour cibler un élément HTML de la question (comme une image ou un div) depuis l'intérieur du bloc [[javascript]]. Le script cherchera dans l'iframe vide et renverra null.
+    • OBLIGATOIRE (Génération d'IDs avec QUID) : Tout élément du DOM de Moodle avec lequel le JS doit interagir doit obligatoirement recevoir un ID généré par la balise CASText2 [[quid id="mon_element"/]].
+    • OBLIGATOIRE (Pont de données via API) : Toute communication entre le sandbox JS et la page Moodle doit passer par l'API native stack_js de manière asynchrone (Promises).
+        ◦ Pour lire le contenu d'un élément Moodle : let promise = stack_js.get_content('[[quid id="mon_element"/]]');
+        ◦ Pour écrire dans un élément Moodle : stack_js.switch_content('[[quid id="cible"/]]', '<img src="..." />');
+    • ALERT FATAL (Traduction @@PLUGINFILE@@) : La balise @@PLUGINFILE@@ NE FONCTIONNE PAS à l'intérieur d'un bloc [[javascript]]. Le moteur CASText2 ne parse pas l'intérieur de ce bloc. Si @@PLUGINFILE@@ est écrit dans le JS, il est envoyé au navigateur sous forme de chaîne littérale et l'image ne se charge pas.
+    • OBLIGATOIRE (Contournement de la traduction) : Pour passer l'URL d'une image au JS, l'URL (ou le Base64) doit être placée dans un div caché avec un [[quid]] en dehors du bloc JS, puis lue via stack_js.get_content().
+    • INTERDIT (Écouteurs d'inputs natifs) : Ne jamais utiliser document.querySelector('[id$="_ans1"]') pour lier un input. Utiliser exclusivement stack_js.request_access_to_input('ans1').
+    • OBLIGATOIRE (Débogage Sandbox) : La console console.log() est inutile car les logs de l'iframe sont masqués par défaut dans certains navigateurs/ENT. Utiliser obligatoirement stack_js.display_error("mon message"); pour afficher un retour visuel depuis le sandbox.
+5.4. Interactions Graphiques (Canvas / SVG) et Sécurité CORS des ENT
+    • CONTEXTE : L'utilisation de l'API Canvas 2D (drawImage, getImageData) à l'intérieur du sandbox STACK-JS se heurte aux politiques de sécurité des ENT (ex: Elea).
+    • ALERT FATAL (Blocage CORS des iframes) : Si une image est chargée via son URL (pluginfile.php) dans un objet new Image() à l'intérieur du sandbox, le mécanisme CORS de l'ENT bloque la lecture des pixels. L'événement onerror se déclenche (sans message d'erreur explicite), et le Canvas reste vide/transparent. L'ajout de crossorigin="anonymous" aggrave le blocage.
+    • INTERDIT (Chargement réseau d'images dans le Canvas) : Il est strictement INTERDIT de tenter de charger une image via une URL (http...) pour un traitement Canvas dans un bloc [[javascript]].
+    • OBLIGATOIRE (Pattern Base64 d'isolation) : Pour utiliser une image de fond ou la manipuler (filtres RVB, dessin vectoriel), l'image doit être encodée en Base64 côté serveur/édition, stockée dans un div caché (avec [[quid]]), puis injectée dans le Canvas via un Data-URI.
+        ◦ Stockage HTML : <div id="[[quid id="img-data"/]]" style="display: none;">/9j/4AAQSkZJRg... (code base64)</div>
+        ◦ Lecture JS : let data = await stack_js.get_content('[[quid id="img-data"/]]');
+        ◦ Injection Canvas : img.src = "data:image/jpeg;base64," + data.trim();
+    • OBLIGATOIRE (Restauration d'État - Restore) : Le code JS DOIT impérativement inclure une fonction de restauration (ex: restore()) qui relit le div [[quid]] au chargement pour reconstruire le Canvas/SVG à l'identique, sinon l'interface disparaît lors de la soumission AJAX du formulaire.
+    • OBLIGATOIRE (Verrouillage Post-Validation) : Il est FORMELLEMENT INTERDIT de se baser sur l'écoute du bouton de soumission Moodle pour geler l'interface graphique. Le seul mécanisme valide est d'utiliser un MutationObserver surveillant l'ajout de nœuds au DOM (ex: childList: true, subtree: true). Dès que les classes .outcome ou .feedback (générées par le rendu de STACK) sont détectées, le JS doit basculer un booléen global (isValidated = true) qui désactive tous les EventListeners du Canvas.
+
+
+
+### 5.5. Accessibilité (W3C / Normes Moodle)
+*   **OBLIGATOIRE (Inputs masqués) :** Si un input STACK est caché visuellement (CSS `display:none` ou `opacity:0`), il est **OBLIGATOIRE** de lui adjoindre les attributs `aria-hidden="true"` et `tabindex="-1"` pour empêcher les lecteurs d'écran d'interagir avec un champ invisible et bloquer la navigation clavier de l'élève.
+*   **OBLIGATOIRE (Labels pour JS) :** Si une interface JS remplace un input classique (ex: clic sur une image au lieu de saisir une coordonnée), le conteneur cliquable doit posséder un `role="button"`, un `tabindex="0"` et un `aria-label` explicite décrivant l'action pour les utilisateurs naviguant au clavier.
+
+5.6. Sécurité CASText2 et Injection de Données (Anti-XSS / Anti-Corruption)
+    • CONTEXTE : Si le professeur génère du HTML complexe dans les variables Maxima (via sconcat) et y injecte la réponse de l'élève (ex: {@ans1@}) pour l'afficher dans le feedback (ex: <div class="{@ans1@}">), cela ouvre une faille XSS majeure et corrompt le DOM si l'élève injecte des guillemets ou du JavaScript.
+    • INTERDIT (Injection directe en HTML brut) : Il est INTERDIT d'injecter directement {@ans1@} ou {@ta@} à l'intérieur d'attributs HTML (ex: style="{@var@}", id="{@var@}") ou dans des balises <script>.
+    • OBLIGATOIRE (Balise d'échappement CASText2) : Toute variable MAXIMA contenant du texte non contrôlé (saisie élève, ou chaîne générée algorithmiquement) injectée dans un contexte HTML délicat DOIT être encapsulée dans la balise CASText2 [[escape]] : [[escape:{@ans1@}]]. Cela convertit les guillemets, les < et > en entités HTML sûres.
+    • OBLIGATOIRE (Pattern de nettoyage JS) : Si une variable doit être passée de CASText2 vers un bloc [[javascript]], elle doit subir un double échappement (CASText2 pour le HTML, puis JSON.stringify() dans le JS) pour éviter qu'une apostrophe dans la réponse d'un élève ne casse la syntaxe du script (ex: var rep = JSON.parse("{@rep_json@}");).
+
+
+PÔLE 6 : Architecture JSXGraph et Pont CAS / JavaScript (Interactivité)
+6.1. Isolation Stricte des Balises d'Input (Alerte Fatale XML)
+    • INTERDIT (FATAL) : Placer les balises [[input:nom]] ou [[validation:nom]] à l'intérieur d'un bloc [[jsxgraph]]...[[/jsxgraph]]. 
+    • RAISON : STACK génère ces balises en HTML brut (<input type="text">). Si elles sont injectées au milieu du code JavaScript, le parseur JS lève immédiatement une erreur fatale SyntaxError: got '<' (écran blanc).
+    • OBLIGATOIRE : Les inputs doivent être strictement en dehors du bloc JSXGraph (idéalement juste au-dessus).
+6.2. Le Piège de l'Injection de Dérivées (Anti-Corruption Math.E)
+    • CONTEXTE : Pour tracer des tangentes, il est tentant de générer la formule de la dérivée dans Maxima et de l'injecter via {@js_dB@} dans un new Function().
+    • ALERT FATAL (Notation Scientifique) : Maxima exporte les petits nombres sous la forme 1.5849e-5. Toute routine remplaçant e corrompra la notation en 1.5849Math.E-5.
+    • ALERT FATAL (Opérateur de Puissance) : L'injection directe expose l'opérateur ^ de Maxima, que JS interprète comme un XOR binaire, provoquant un NaN silencieux.
+    • OBLIGATOIRE (Calcul Natif JS) : Pour les dérivées de fonctions standard, il est OBLIGATOIRE d'abandonner l'injection Maxima et de réécrire la formule nativement en JavaScript (ex: function dB(pH) { return V1 * LN10 * (...) }).
+6.3. L'Architecture Officielle de Liaison (input-ref- et dispatchEvent)
+    • CONTEXTE : Contrairement aux idées reçues lors du développement initial de certaines questions, les versions de STACK (y compris 2021+) supportent l'attribut input-ref- dans la balise [[jsxgraph]].
+    • OBLIGATOIRE (Référence de l'input) : Ne jamais deviner l'ID HTML d'un input (ex: document.querySelector('input[name*="ans1"]')) car l'iframe srcdoc et le préfixage aléatoire de Moodle rendent cette méthode extrêmement fragile. Il est OBLIGATOIRE d'utiliser : [[jsxgraph input-ref-ans1="refAns1" ...]] pour que STACK injecte la variable refAns1 contenant le vrai ID.
+    • OBLIGATOIRE (Déclenchement de l'événement) : Modifier la propriété .value de l'input en JavaScript ne suffit plus pour que Moodle enregistre la réponse lors d'un submit AJAX. Il est IMPERATIF de déclencher manuellement l'événement change après chaque mise à jour :
+      javascript
+      
+      var inputElement = document.getElementById(refAns1);
+      inputElement.value = "ma_valeur";
+      inputElement.dispatchEvent(new Event('change'));
+      
+    • OBLIGATOIRE (Formatage des données complexes) : Si le JS doit envoyer un tableau ou un objet (ex: des coordonnées ou des paires de pentes), l'input STACK doit être de type string. Le JS doit sérialiser les données (ex: JSON.stringify(tableau)) et le PRT doit utiliser sscanf ou stackjson_decode pour les lire.
+(Note d'architecture : L'ancienne méthode stack_jxxg.bind_point("ans1", board, point) à 3 arguments est obsolète et source d'erreurs fatales input is not defined sur les iframes modernes).
+6.4. Le Bug de Rendu des Droites Implicites (Versions JSXGraph intégrées)
+    • CONTEXTE : JSXGraph permet de tracer une droite via son équation cartésienne 
+      aV+bpH+c=0
+      en passant 3 fonctions dynamiques : board.create('line', [func_a, func_b, func_c]).
+    • ALERT VISUEL FATAL (Droite Fantôme) : Sur certaines versions de JSXGraph intégrées à STACK, ce moteur de rendu possède un bug critique : il calcule mathématiquement l'équation juste, mais le dessine visuellement de manière incorrecte (la droite pivote autour d'une coordonnée aberrante proche de l'origine).
+    • OBLIGATOIRE (Tracé par Vecteur Tangent) : Il est formellement INTERDIT d'utiliser le tracé implicite pour les éléments mobiles. Il est OBLIGATOIRE de forcer le tracé en passant par deux points physiques (le point d'ancrage + un point secondaire utilisant le vecteur tangent 
+      (−b,a)
+      ).
+6.5. Typage de l'Input pour Coordonnées ou Listes (Pattern String / JSON)
+    • INTERDIT : Utiliser un input de type algebraic pour des données structurées. Le validateur Maxima refusera les crochets [ ] ou les objets JSON {.
+    • OBLIGATOIRE : L'input doit être de type string.
+    • OBLIGATOIRE (Extraction PRT) : Le PRT doit utiliser sscanf (pour des listes simples [a, b]) ou stackjson_decode (pour des structures complexes) pour extraire proprement les valeurs numériques de la chaîne.
+    • OBLIGATOIRE (Sécurité d'extraction) : Toujours vérifier que l'extraction a réussi (ex: if listp(parsed)) avant d'extraire la valeur, sinon un élève ayant effacé le champ provoquera une erreur CAS fatale.
+6.6. Interdiction Absolue des Commentaires HTML dans CASText2
+    • INTERDIT (FATAL) : Insérer un commentaire HTML <!-- Mon commentaire --> n'importe où dans le champ "Texte de la question" (même en dehors du bloc jsxgraph).
+    • RAISON : Le parseur CASText2 de STACK confond la balise de fermeture --> avec une syntaxe mathématique invalide et lève immédiatement l'erreur fatale Expected "comment", "define", "escape" or "if" but "\/" found. Cette erreur masque totalement le vrai problème et fait perdre des heures de débogage.
+    • OBLIGATOIRE : Pour documenter le code, utiliser uniquement des commentaires JavaScript // Mon commentaire à l'intérieur des blocs [[jsxgraph]], ou supprimer les commentaires.
+    • ALERT FATAL (Héritage de commentaires cassés) : Lors de l'utilisation de Copier/Coller ou de génération par IA, vérifier impérativement qu'aucun marqueur de commentaire HTML (<!--) n'a été injecté à l'intérieur des blocs CDATA des balises de feedback. La séquence <!--[CDATA[ est une corruption fatale qui doit être systématiquement purgée. 
+6.7. Débogage Visuel par Cavalier (Le Pattern isFinite)
+    • OBLIGATOIRE : Toute fonction de calcul JS retournant un nombre pour un graphique DOIT intégrer un test de sécurité final : return (x < 0 || !isFinite(x) || isNaN(x)) ? NaN : x;.
+    • RAISON : Une division par zéro dans les limites extrêmes du graphique génère des valeurs Infinity que JSXGraph tente de relier, provoquant des traits noirs horizontaux traversant tout l'écran ("l'effet pinceau").
+6.8. Création d'Interfaces Utilisateurs (Boutons, Menus)
+    • INTERDIT (Sécurité CSP / HTMLPurifier) : Ne pas mettre de balises HTML brutes (<button>, <div id="...">) dans le texte de la question en dehors de JSXGraph en espérant les cibler depuis le JS. Les filtres agressifs de certains ENT (ex: Elea) les supprimeront silencieusement du DOM.
+    • OBLIGATOIRE (Pattern Overlay Absolu) : Toute interface utilisateur (boutons, menus déroulants) à l'intérieur d'un graphique JSXGraph doit être créée entièrement en JavaScript pur (document.createElement('button')) et attachée au conteneur du graphique (document.getElementById(divid)) avec un positionnement CSS position: absolute.
+6.9. Le Piège de la Visibilité par Défaut sur les Éléments Fixes (fixed:true)
+    • CONTEXTE : Découvert le 2026-07-11 sur un générateur (image-clic, mode séquence chronométrée) utilisant un overlay JSXGraph cliquable (polygone + textes) pour bloquer le démarrage d'un exercice tant que l'élève n'a pas cliqué.
+    • ALERT FATAL (Élément invisible sans erreur) : Dans la version de JSXGraph embarquée par STACK, un élément créé avec fixed:true dans son objet d'attributs peut voir son visProp.visible évalué à false PAR DÉFAUT, contrairement à l'hypothèse standard JSXGraph où visible vaut true par défaut. Aucune erreur JS n'est levée ; l'élément existe dans board.objects mais ne s'affiche jamais.
+    • DIAGNOSTIC : Confirmable uniquement en inspectant l'objet réel du board en direct (JXG.boards[boardId].objects[id].visProp.visible), pas via getComputedStyle() seul (les éléments texte JSXGraph sont des <div class="JXGtext"> positionnés en absolu, pas des <text> SVG).
+    • OBLIGATOIRE : Tout élément créé avec fixed:true DOIT recevoir explicitement visible:true dans son objet d'attributs de création, sans compter sur un défaut supposé.
+    • NOTE ANNEXE : Le hit-testing (clic) interne de JSXGraph est indépendant de la visibilité CSS/visProp — un élément invisible peut néanmoins déclencher son gestionnaire 'down'. Ne pas déduire qu'un élément fonctionne correctement du seul fait qu'il réagit au clic.
+6.10. Le Piège de la Hauteur d'Iframe Fixe (Contenu HTML Ajouté Après le Board)
+    • CONTEXTE : Un pattern courant consiste à ajouter du HTML natif (bouton, texte d'instruction) en sibling après le conteneur du board JSXGraph, via document.getElementById(divid).parentNode.insertBefore(...) (cf. Pattern Overlay Absolu, §6.8, et OBLIGATOIRE Isolation du Conteneur, §5.2).
+    • ALERT FATAL (Contenu invisible sans erreur ni CSS overflow détectable) : La hauteur totale de l'iframe srcdoc sandboxée injectée par stackjsvle.create_iframe() est fixée par l'attribut height de la balise [[jsxgraph width="..." height="..."]]. Cette iframe n'a PAS de barre de défilement (sandbox). Tout contenu HTML positionné après le board et dépassant cette hauteur déclarée reste dans le DOM (display/visibility corrects, aucune erreur JS) mais devient physiquement invisible, hors de la zone visible du document — vérifiable uniquement par getBoundingClientRect() comparé à document.documentElement.clientHeight.
+    • OBLIGATOIRE : Si du contenu HTML est ajouté après le board, l'attribut height du tag [[jsxgraph]] DOIT inclure une marge supplémentaire pour ce contenu, jamais seulement la hauteur du board seul. Recontraindre ensuite explicitement le div du board (divid) à sa hauteur réelle via style.height avant l'appel à JXG.JSXGraph.initBoard(), pour que l'espace ajouté ne déforme pas le rendu du board et reste disponible en dessous pour le HTML ajouté.
+    • RÉFÉRENCE : gen-match.js applique déjà ce pattern (matchBoardH = matchMaxN*52 + 60, le +60 réservant la place d'un bouton "Effacer les liaisons" ajouté après le board).
+
+
+## ANNEXES : Gabarits XML de Référence
+
+### ANNEXE 1 : Question Classique / Numération
+*(Le code XML complet respectant les règles de hiérarchie, de CDATA et du Quartet Algébrique vu dans les Pôles 1 et 3)*
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>NOM_DE_LA_QUESTION</text></name>
+    <questiontext format="html">
+      <text><![CDATA[ <!-- INSERER HTML ET [[input:ans1]] [[validation:ans1]] ICI --> ]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[ <!-- INSERER LE FEEDBACK GENERAL ICI --> ]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[ /* INSERER LE CODE MAXIMA ICI (Règles du Pôle 2) */ ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <!-- ... autres balises générales ... -->
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>VARIABLE_MAXIMA_ATTENDUE</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Noeud 0</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>VARIABLE_PROF</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[ <!-- OK --> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[ <!-- NOK --> ]]></text></falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>
+```
+
+### ANNEXE 2 : Question Parsons Puzzle
+*(Le code XML complet respectant les règles spécifiques du Pôle 4.3)*
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>Parsons - NOM</text></name>
+    <questiontext format="moodle_auto_format">
+      <text><![CDATA[
+        [[parsons input="ans1"]]
+        {# parsons_encode(proof_steps) #}
+        [[/parsons ]]
+        <p>[[input:ans1]] [[validation:ans1]]</p>
+      ]]></text>
+    </questiontext>
+    <generalfeedback format="moodle_auto_format">
+      <text><![CDATA[ <!-- FEEDBACK GENERAL --> ]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+stack_include_contrib("prooflib.mac");
+
+proof_steps: [
+    ["L1", "Ligne de code 1"],
+    ["L2", "Ligne de code 2"]
+];
+
+ta: proof("L1", "L2");
+proof_steps: random_permutation(proof_steps);
+
+tal: proof_alternatives(ta);
+tas: setify(map(proof_flatten, tal));
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html"><text>[[feedback:prt1]]</text></specificfeedback>
+    <questionnote format="html"><text>{@map(first, proof_steps)@}</text></questionnote>
+    <!-- ... autres balises générales ... -->
+    <input>
+      <name>ans1</name>
+      <type>parsons</type>
+      <tans>[ta, proof_steps]</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[sa: parsons_decode(ans1);
+check: elementp(sa,tas);]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>check</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html"><text></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html"><text></text></falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>
+```
+ANNEXE 3 : Sécurité des Answer Tests (Tests de Réponse)
+Afin d'éviter les comportements imprévisibles du CAS et de garantir la maintenance du générateur, l'utilisation des balises <answertest> est strictement encadrée.
+1. Liste Blanche Autorisée (OBLIGATOIRE)
+Le générateur doit exclusivement utiliser les tests de réponse suivants, en respectant scrupuleusement le Pôle du DSTU qui les encadre :
+A. Algèbre et Logique pure
+    • AlgEquiv : Test par défaut pour l'équivalence mathématique, les ensembles, les listes, et les booléens (Pôles 3.3, 4.5, 4.6, 4.8, 4.9, etc.).
+    • LowestTerms : Pour vérifier qu'une fraction est sous sa forme irréductible (si besoin spécifique, bien que requirelowestterms dans l'input soit préféré).
+    • Sets : Pour valider strictement le format ensemble (alternative à AlgEquiv si l'on veut forcer l'élève à écrire {a,b} et non [a,b]).
+B. Chaînes de caractères (Texte)
+    • String : Comparaison textuelle stricte, sensible à la casse et aux espaces (Pôles 3.4, 3.5, 4.5.B, 4.15).
+    • StringSloppy : Comparaison textuelle ignorant la casse et les espaces aux extrémités (Pôles 3.4, 4.15).
+    • Levenshtein : Pour le calcul algorithmique de la distance entre deux chaînes (Pôles 2.9, 4.14).
+    • RegExp : Pour la validation par expressions régulières (Pôle 3.1). Attention : Exige un échappement strict des guillemets dans le <tans>.
+C. Numérique
+    • NumAbsolute : Tolérance numérique absolue (Pôle 3.3).
+    • NumRelative : Tolérance numérique relative (Pôle 3.3, 4.2).
+    • NumDecPlaces : Validation stricte sur le nombre de décimales (si besoin).
+    • NumSigFigs : Validation sur les chiffres significatifs (si besoin).
+    • (Note : Les tests Num-GT, Num-LT etc. sont ignorés au profit de l'utilisation de prédicats Maxima évalués par AlgEquiv, cf. Pôle 3.3 Exception).
+D. Unités
+    • UnitsAbsolute : Comparaison stricte d'unités (Pôle 4.2).
+    • UnitsRelative : Comparaison d'unités avec tolérance (Pôle 4.2).
+    • UnitsStrictAbsolute / UnitsStrictRelative : Variantes strictes si le besoin pédagogique l'exige.
+E. Cas d'exception très stricte
+    • SubstEquiv : UNIQUEMENT dans le cadre très précis du Pôle 4.11 (Forçage absolu du + k pour les primitives). Interdit partout ailleurs.
+2. Liste Noire Absolue (INTERDIT - ALERT FATAL)
+Quel que soit le contexte, si l'IA ou un développeur génère l'un de ces tests dans un nœud de PRT, le code doit être rejeté :
+    • Equiv : INTERDIT FORMEL. Bien que ce soit une fonction Maxima native, ce test de réponse est banni du projet pour cause d'instabilité chronique avec les inputs de type texte/radio et d'incompatibilité avec notre architecture.
+    • EquivFirst / EquivReasoning : Tests de logique propositionnelle avancée (preuves). Trop complexes, hors périmètre.
+    • Sausages : Test de débogage interne à STACK.
+    • CasEqual / EqualComAss / EqualComAssRules : Tests portant sur la forme CAS interne de l'expression. Ils génèrent des retours incohérents pour les élèves (ex: "Vous avez entré (x+1)^2 au lieu de x^2+2x+1" alors que c'est mathématiquement juste). On utilise AlgEquiv et FacForm à la place.
+    • Antidiff / Int : Tests d'intégration obsolètes ou stricts. On utilise le test par dérivation (diff(ans, x) avec AlgEquiv) défini au Pôle 4.11.
+    • Validator : Fonction de validation personnalisée complexe, hors périmètre du générateur standardisé.
+
+**Fin du document de référence.**
+"Voici mon document de spécification technique, qui est ma référence absolue. Voici également une de mes questions STACK fonctionnelle ('Solution Finale'). Ta mission : > 1. Analyse cette 'Solution Finale' pour extraire les subtilités, les choix de structure Maxima, et les logiques de PRT qui la rendent fonctionnelle. 2. Compare-la rigoureusement avec mon 'DOCUMENT DE SPÉCIFICATION TECHNIQUE'. 3. Identifie les règles implicites ou les 'subtilités' présentes dans le code qui ne seraient pas encore explicitement listées dans mon document. 4. Propose-moi une mise à jour du document pour inclure ces nouvelles règles afin qu'elles soient appliquées à 100% lors des futures générations." 
+
+Tu es un expert technique de très haut niveau spécialisé dans le développement de questions STACK pour Moodle (version 2024+). Tu as une connaissance absolue du code source de STACK, de l'API JSXGraph et du langage Maxima.
+
+Le document qui précède ce prompt est ta BIBLE. C'est un document de conformité OBLIGATOIRE issu de dizaines d'heures de correction de bugs critiques (Timeout CAS, crash JSXGraph, corruption XML, erreurs de typage Maxima).
+
+RÈGLES DE FONCTIONNEMENT ABSOLUES POUR NOTRE SESSION :
+1. ZERO IMPROVISATION : Tu n'as pas le droit d'inventer une syntaxe XML, une balise, ou une fonction Maxima qui ne serait pas explicitement dans le document de spécification ou dans les gabarits fournis.
+2. MÉTHODOLOGIE DU GABARIT : Quand je te demande une nouvelle question, tu dois OBLIGATOIREMENT partir du Gabarit XML correspondant (Annexe 1 ou 2) et n'y modifier QUE les zones de texte, les variables Maxima et les nœuds du PRT. Tu ne réécris JAMAIS les balises de configuration générales.
+3. APPLICATION STRICTE DES PÔLES : Selon le type de question, tu dois appliquer les règles des Pôles 1 à 5 au mot près.
+   - PÔLE 1 : Tu utilises TOUJOURS les balises CDATA. Tu laisses TOUJOURS un espace avant `]]>` dans le specificfeedback.
+   - PÔLE 2 : Si tu génères du HTML dans Maxima, tu utilises `sconcat()`, JAMAIS `concat()`. Dans les boucles `do` et `block`, tu utilises des virgules et tu termines par `$`.
+   - PÔLE 3 : Tu respectes le "Quartet Algébrique" si demandé. Tu utilises `NumRelative` pour les flottants, JAMAIS `AlgEquiv`.
+   - PÔLE 4 (PIÈGES CONTEXTUELS) : 
+     * Si c'est un QCM "Checkbox" : tu utilises `flatten([ans1])` et `[[foreach]]`.
+     * Si c'est un QCM "Radio" ou "Dropdown" : tu utilises `assoc()` et JAMAIS `flatten` ou `foreach`.
+     * Si c'est des inéquations : génération à l'envers, `and`/`or`, anticipation `err_sign`.
+     * Si c'est des unités : algorithme d'isolation `eleve_unit` obligatoire.
+   - PÔLE 5 (PIÈGES CONTEXTUELS) :
+     * Si c'est du JSXGraph : syntaxe `{#var#}` et `parseFloat()`.
+     * Si c'est un clavier HORS iframe : style inline, JS sur 1 ligne, `stackjs.getInput` sur `window.load`.
+     * Si c'est un clavier DANS une iframe : `[[style]]`, JS multi-lignes, import ES6 `request_access_to_input`.
+4. FORMAT DE REPONSE :  Tu me fournis UNIQUEMENT le code XML complet, encapsulé dans un bloc de code xml, prêt à être importé dans Moodle. Si tu dois ajouter une note technique très courte, tu la mets après le bloc XML.
+
+Confirme-moi que tu as assimilé ces règles en répondant uniquement : "Règles de spécification intégrées. Prêt pour la première demande."
+
+La marche à suivre (Workflow)
+    1. Copiez-collez votre document de spécification technique dans le chat.
+    2. Copiez-collez ensuite votre "solution finale" (le code qui fonctionne chez vous).
+    3. Utilisez le prompt de rétro-ingénierie suivant :
+"Voici mon document de spécification technique, qui est ma référence absolue. Voici également une de mes questions STACK fonctionnelle ('Solution Finale').
+Ta mission : > 1. Analyse cette 'Solution Finale' pour extraire les subtilités, les choix de structure Maxima, et les logiques de PRT qui la rendent fonctionnelle. 2. Compare-la rigoureusement avec mon 'DOCUMENT DE SPÉCIFICATION TECHNIQUE'. 3. Identifie les règles implicites ou les 'subtilités' présentes dans le code qui ne seraient pas encore explicitement listées dans mon document. 4. Propose-moi une mise à jour du document pour inclure ces nouvelles règles afin qu'elles soient appliquées à 100% lors des futures générations."
+Pourquoi c'est très puissant ?
+    • Combler les angles morts : Il y a souvent des détails que vous faites naturellement (ex: l'ordre des ev(..., simp) ou une syntaxe spécifique pour parsons_decode) que vous avez oubliés de noter. L'IA les verra.
+    • Validation croisée : L'IA va vous dire : "Votre code fait ceci, mais votre document dit cela, est-ce une erreur de documentation ou une exception ?". Cela permet de toiletter votre manuel.
+    • Mise en conformité : Vous allez finir avec un document de référence qui est réellement aligné avec ce qui tourne physiquement sur votre serveur Moodle, et non une théorie lue dans une doc en ligne.
+Voici le prompt définitif, taillé sur mesure pour votre réalité. Il intègre toutes les leçons apprises : le moteur validé, l'horreur des fichiers de 2000 lignes, la complexité des modales (fixe/aléatoire), et les règles strictes pour que l'IA ne recrée plus jamais les bugs du passé.
+
+***
+
+### COPIEZ TOUT CE QUI SUIT DANS LE NOUVEAU CHAT :
+
+```text
+# CONTEXTES ET DIRECTIVES POUR LA RECONSTRUCTION DE L'APPLICATION HÉSTACK
+
+**Rôle :** Tu es un architecte logiciel expert en JavaScript/HTML/CSS et en normes Moodle/STACK (QTI). Tu assistes au développement d'une application "No-Code" de génération de questions mathématiques complexes.
+
+**Projet :** Reconstruction totale d'une application JS (l'ancienne version a échoué à cause de fichiers monolithiques de 2000 à 5000 lignes où le code HTML, le code Maxima et la génération XML étaient mélangés). L'application génère du XML importable dans Moodle via une interface visuelle basée sur des menus et des MODALES dynamiques.
+
+**La Bible :** Un "Document de Spécification Technique Unique" très strict régit ce projet (Pôles 1 à 5 : Architecture XML stricte, Syntaxe Maxima anti-timeout, Règles d'Inputs, Typologies spécifiques, Front-End).
+
+---
+
+# CE QUI A DÉJÁ ÉTÉ VALIDÉ (NE JAMAIS MODIFIER OU REFAIRE)
+
+## 1. L'architecture des modales
+L'interface utilise un menu à gauche. Cliquer sur une catégorie ouvre une **Modale** (fenêtre centrée). 
+TOUTES les catégories sont complexes : elles comportent des états dynamiques (ex: bouton bascule "Saisie Fixe" vs "Génération Aléatoire Maxima", tailles variables comme Matrice 2x2 vs 3x3, calculs de preview en JS en temps réel).
+
+## 2. Le Moteur XML Puriste (Sprint 1.5 - VERROUILLÉ)
+Le fichier `src/core/xmlEngine.js` est FINI et PARFAIT. Il prend un objet JSON en entrée et ressort un XML Moodle 100% conforme, avec toutes les sécurités du Pôle 1 (CDATA, espace vital avant `]]>` dans le specificfeedback, balises cachées comme `<syntaxattribute>` ou `<questionnote>`).
+Voici son code exact (il doit être conservé tel quel dans le projet) :
+
+```javascript
+/**
+ * MOTEUR XML STACK - SPRINT 1.5
+ */
+function moodleTextTag(content, useCData = false, isSpecificFeedback = false) {
+    let strContent = String(content === undefined || content === null ? '' : content);
+    if (useCData) {
+        if (isSpecificFeedback) {
+            strContent = strContent.replace(/\]\]>/g, '] ]]>'); // Règle Pôle 1.3
+        }
+        return `<text><![CDATA[${strContent}]]></text>`;
+    }
+    return `<text>${strContent}</text>`;
+}
+
+export function generateStackXML(data) {
+    if (!data.metadata || !data.metadata.stackversion || data.metadata.stackversion.trim() === '') {
+        throw new Error("ALERT FATAL : La balise <stackversion> ne doit JAMAIS être vide.");
+    }
+
+    const defaultGrade = data.metadata.defaultgrade || "1";
+    const penalty = data.metadata.penalty || "0.1";
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<quiz>\n  <question type="stack">\n`;
+    xml += `    <name>\n      ${moodleTextTag(data.metadata.name)}\n    </name>\n`;
+    xml += `    <questiontext format="html">\n      ${moodleTextTag(data.questiontext, true)}\n    </questiontext>\n`;
+    xml += `    <generalfeedback format="html">\n      ${moodleTextTag(data.generalfeedback || '', true)}\n    </generalfeedback>\n`;
+    xml += `    <defaultgrade>${defaultGrade}</defaultgrade>\n`;
+    xml += `    <penalty>${penalty}</penalty>\n`;
+    xml += `    <hidden>0</hidden>\n`;
+    xml += `    <idnumber></idnumber>\n`;
+    xml += `    <stackversion>\n      ${moodleTextTag(data.metadata.stackversion)}\n    </stackversion>\n`;
+
+    if (data.questionvariables) {
+        xml += `    <questionvariables>\n      ${moodleTextTag(data.questionvariables, true)}\n    </questionvariables>\n`;
+    }
+
+    xml += `    <specificfeedback format="html">\n      ${moodleTextTag(data.specificfeedback || '', true, true)}\n    </specificfeedback>\n`;
+    xml += `    <questionnote format="html">\n      ${moodleTextTag(data.questionnote || '', true)}\n    </questionnote>\n`;
+    xml += `    <questiondescription format="html">\n      ${moodleTextTag(data.questiondescription || '', true)}\n    </questiondescription>\n`;
+    xml += `    <questionsimplify>1</questionsimplify>\n`;
+    xml += `    <assumepositive>0</assumepositive>\n`;
+    xml += `    <assumereal>0</assumereal>\n`;
+    xml += `    <prtcorrect format="html"><text></text></prtcorrect>\n`;
+    xml += `    <prtpartiallycorrect format="html"><text></text></prtpartiallycorrect>\n`;
+    xml += `    <prtincorrect format="html"><text></text></prtincorrect>\n`;
+    xml += `    <decimals>.</decimals>\n`;
+    xml += `    <scientificnotation>*10</scientificnotation>\n`;
+    xml += `    <multiplicationsign>dot</multiplicationsign>\n`;
+    xml += `    <sqrtsign>1</sqrtsign>\n`;
+    xml += `    <complexno>i</complexno>\n`;
+    xml += `    <inversetrig>cos-1</inversetrig>\n`;
+    xml += `    <logicsymbol>lang</logicsymbol>\n`;
+    xml += `    <matrixparens>[</matrixparens>\n`;
+    xml += `    <isbroken>0</isbroken>\n`;
+    xml += `    <variantsselectionseed></variantsselectionseed>\n`;
+
+    if (data.inputs && data.inputs.length > 0) {
+        data.inputs.forEach(input => {
+            const def = {
+                boxsize: input.boxsize || 15,
+                strictsyntax: input.strictsyntax !== undefined ? input.strictsyntax : 1,
+                insertstars: input.insertstars !== undefined ? input.insertstars : 0,
+                syntaxhint: input.syntaxhint || '',
+                syntaxattribute: input.syntaxattribute !== undefined ? input.syntaxattribute : 0,
+                forbidwords: input.forbidwords || '',
+                allowwords: input.allowwords || '',
+                forbidfloat: input.forbidfloat !== undefined ? input.forbidfloat : 0,
+                requirelowestterms: input.requirelowestterms !== undefined ? input.requirelowestterms : 0,
+                checkanswertype: input.checkanswertype !== undefined ? input.checkanswertype : 0,
+                mustverify: input.mustverify !== undefined ? input.mustverify : 0,
+                showvalidation: input.showvalidation !== undefined ? input.showvalidation : 0
+            };
+
+            xml += `    <input>\n`;
+            xml += `      <name>${input.name}</name>\n`;
+            xml += `      <type>${input.type}</type>\n`;
+            xml += `      <tans>${moodleTextTag(input.modelAnswer, true)}</tans>\n`;
+            xml += `      <boxsize>${def.boxsize}</boxsize>\n`;
+            xml += `      <strictsyntax>${def.strictsyntax}</strictsyntax>\n`;
+            xml += `      <insertstars>${def.insertstars}</insertstars>\n`;
+            xml += `      <syntaxhint>${moodleTextTag(def.syntaxhint)}</syntaxhint>\n`;
+            xml += `      <syntaxattribute>${def.syntaxattribute}</syntaxattribute>\n`;
+            xml += `      <forbidwords>${moodleTextTag(def.forbidwords)}</forbidwords>\n`;
+            xml += `      <allowwords>${moodleTextTag(def.allowwords)}</allowwords>\n`;
+            xml += `      <forbidfloat>${def.forbidfloat}</forbidfloat>\n`;
+            xml += `      <requirelowestterms>${def.requirelowestterms}</requirelowestterms>\n`;
+            xml += `      <checkanswertype>${def.checkanswertype}</checkanswertype>\n`;
+            xml += `      <mustverify>${def.mustverify}</mustverify>\n`;
+            xml += `      <showvalidation>${def.showvalidation}</showvalidation>\n`;
+            xml += `      <options>${moodleTextTag(input.options || '')}</options>\n`;
+            xml += `    </input>\n`;
+        });
+    }
+
+    if (data.prts && data.prts.length > 0) {
+        data.prts.forEach(prt => {
+            xml += `    <prt>\n`;
+            xml += `      <name>${prt.name}</name>\n`;
+            xml += `      <value>${prt.value || "1.0000000"}</value>\n`;
+            xml += `      <autosimplify>1</autosimplify>\n`;
+            xml += `      <feedbackstyle>1</feedbackstyle>\n`;
+            xml += `      <feedbackvariables>\n        ${moodleTextTag(prt.feedbackvariables || '', true)}\n      </feedbackvariables>\n`;
+            
+            if (prt.nodes && prt.nodes.length > 0) {
+                xml += `      <nodes>\n`;
+                prt.nodes.forEach((node, index) => {
+                    const trueScore = node.trueScore !== undefined ? node.trueScore : 1;
+                    const falseScore = node.falseScore !== undefined ? node.falseScore : 0;
+                    const trueNextNode = node.trueNextNode !== undefined ? node.trueNextNode : -1;
+                    const falseNextNode = node.falseNextNode !== undefined ? node.falseNextNode : -1;
+                    
+                    xml += `        <node>\n`;
+                    xml += `          <name>${index}</name>\n`;
+                    xml += `          <description>${moodleTextTag(node.description || '')}</description>\n`;
+                    xml += `          <answertest>${node.type}</answertest>\n`;
+                    xml += `          <sans>${moodleTextTag(node.sans, true)}</sans>\n`;
+                    xml += `          <tans>${moodleTextTag(node.tans, true)}</tans>\n`;
+                    xml += `          <testoptions>${moodleTextTag(node.testOptions || '', true)}</testoptions>\n`;
+                    xml += `          <quiet>0</quiet>\n`;
+                    xml += `          <truescoremode>${node.trueScoreMode || '='}</truescoremode>\n`;
+                    xml += `          <truescore>${Number(trueScore).toFixed(7)}</truescore>\n`;
+                    xml += `          <truepenalty>${moodleTextTag(node.truePenalty || '')}</truepenalty>\n`;
+                    xml += `          <truenextnode>${trueNextNode}</truenextnode>\n`;
+                    xml += `          <trueanswernote>${moodleTextTag(node.trueAnswerNote || '')}</trueanswernote>\n`;
+                    xml += `          <truefeedback format="html">\n            ${moodleTextTag(node.trueFeedback || '', true)}\n          </truefeedback>\n`;
+                    xml += `          <falsescoremode>${node.falseScoreMode || '='}</falsescoremode>\n`;
+                    xml += `          <falsescore>${Number(falseScore).toFixed(7)}</falsescore>\n`;
+                    xml += `          <falsepenalty>${moodleTextTag(node.falsePenalty || '')}</falsepenalty>\n`;
+                    xml += `          <falsenextnode>${falseNextNode}</falsenextnode>\n`;
+                    xml += `          <falseanswernote>${moodleTextTag(node.falseAnswerNote || '')}</falseanswernote>\n`;
+                    xml += `          <falsefeedback format="html">\n            ${moodleTextTag(node.falseFeedback || '', true)}\n          </falsefeedback>\n`;
+                    xml += `        </node>\n`;
+                });
+                xml += `      </nodes>\n`;
+            }
+            xml += `    </prt>\n`;
+        });
+    }
+
+    xml += `    <deployedseeds></deployedseeds>\n`;
+    xml += `    <qtype_options></qtype_options>\n`;
+    xml += `  </question>\n</quiz>`;
+
+    return xml;
+}
+```
+
+---
+
+# RÈGLES ABSOLUES D'ISOLATION (LES DEUX LOIS INTOUCHABLES)
+
+Mon ancien projet a échoué pour deux raisons que tu dois ABSOLUMENT éviter :
+
+## LOI 1 : ANTI-FICHIER MONSTRE (Max 200 lignes)
+L'ancien code génère des fichiers de 2000 lignes car le HTML (styles inline, `div`, `border-left`), la logique de calcul JS, et la génération XML (les blocs `<prt>` écrits en dur) sont mélangés.
+**RÈGLE :** Tu n'as PAS le droit de me donner un fichier qui dépasse 200 lignes. Tu dois appliquer le pattern MVC strict :
+- `.view.js` : Uniquement le HTML/CSS de la modale (retourné sous forme de template literal).
+- `.data.js` : Uniquement les variables Maxima, les `tans`, et les textes de feedback.
+- `.controller.js` : Uniquement la logique (gestion des clics, affichage conditionnel Fixe/Aléatoire) et l'appel final à `generateStackXML()`.
+Si tu vois que ta réponse dépasse 200 lignes, arrête-toi immédiatement et dis-moi : "La logique est trop grosse, on doit la diviser."
+
+## LOI 2 : ANTI-EFFET DOMINO (Isolation des variants)
+Dans l'ancien code, modifier la logique d'une matrice 3x3 aléatoire cassait les indices de PRT de la matrice 2x2 fixe car tout était dans le même `if/else`.
+**RÈGLE :** Chaque variante complexe (ex: "Moyenne Fixe", "Moyenne Aléatoire", "Matrice 3x3") doit être isolée dans son propre petit fichier ou fonction. Un scénario ne doit JAMAIS dépendre de variables ou d'index (`truenextnode`) d'un autre scénario.
+
+---
+
+# MÉTHODE DE TRAVAIL POUR CE CHAT
+
+L'ancien code JS est considéré comme "mort". La seule vérité est le **XML valide qui fonctionne dans Moodle**.
+
+1. Je te fournirai un XML valide d'une question complexe (ex: Statistiques en mode Fixe).
+2. Tu vas l'analyser et le découper pour créer les petits fichiers `.view.js`, `.data.js`, `.controller.js` correspondants, en respectant les Lois 1 et 2.
+3. Les données (Maxima, PRTs) devront être formatées en JSON pur pour être avalées par `generateStackXML()`, sans que tu aies à écrire la moindre balise XML à la main.
+
+Es-tu prêt ? Je vais te donner mon premier élément à traiter.
+```
+
+
+
+
+
+
+DOCUMENT DE SPÉCIFICATION TECHNIQUE (DST) Projet : Intégration et débogage de JSXGraph au sein du type de question STACK (Moodle) Référence Source : https://github.com/maths/moodle-qtype_stack/tree/master Version du document : 1.1 Contexte : Correction des erreurs récurrentes JSXGraph spécifiques à l'écosystème STACK
+============================================================
+    1. OBJET DU DOCUMENT
+       Ce document corrige et remplace le précédent. Il se concentre exclusivement sur l'intégration de JSXGraph à l'intérieur du plugin de questions STACK (qui utilise Maxima comme moteur de calcul algébrique). Les erreurs JSXGraph dans STACK sont fondamentalement différentes de celles du filtre générique, car elles impliquent des ponts entre le PHP, le moteur CAS (Maxima), et le JavaScript.
+============================================================ 2. ARCHITECTURE SPÉCIFIQUE STACK / JSXGRAPH ============================================================ Dans STACK, JSXGraph n'est pas géré par un "filtre de texte" Moodle, mais par le type de question lui-même (qtype_stack).
+2.1 Le flux de données (Le pont CAS -> JS) :
+    1. Maxima génère des valeurs mathématiques lors de l'évaluation de la question.
+    2. Le texte de la question (CASText2) est parsé par STACK.
+    3. Lorsque STACK rencontre le bloc [[jsxgraph]]...[[/jsxgraph]], il extrait le code JavaScript.
+    4. Il remplace les variables CASText (ex: {@ma_variable@}) par leurs valeurs calculées (ex: 3.14 ou "[1, 2]").
+    5. STACK wrappe ce code dans une fonction d'exécution locale (IIFE) pour éviter les conflits de variables globales.
+    6. Le code est injecté dans le DOM de la page de quiz.
+2.2 Le flux de données inverse (Le pont JS -> STACK / Inputs) :
+    1. L'élève interagit avec le graphique (déplace un point).
+    2. Le JavaScript de JSXGraph doit capturer ces nouvelles coordonnées.
+    3. Il doit les injecter de manière invisible dans les champs de formulaire (<input>) générés par STACK.
+    4. Lors de la soumission, STACK récupère ces inputs et les envoie à Maxima pour évaluation via l'arbre de réponse (PRT).
+============================================================ 3. SYNTAXE DE RÉFÉRENCE STACK (CASText2) ============================================================ Ne JAMAIS utiliser de balises <div class="jsxgraph"> dans STACK. Utiliser exclusivement la syntaxe propriétaire :
+[[jsxgraph width="500" height="400"]] // Le code JS commence ici. // Attention : pas de balise <script>
+var board = JXG.JSXGraph.initBoard('stack_jxg_board_{{ UNIQUE_ID }}', { boundingbox: [-5, 5, 5, -5], axis: true, keepaspectratio: true });
+// Exemple d'injection d'une variable Maxima : var monPointX = {@x0@}; // Remplacé par PHP/Maxima avant l'exécution
+var p = board.create('point', [monPointX, 2], { name: 'A', // Liaison CRITIQUE avec l'input STACK nommé "ans1" showInfobox: false });
+// La fonction STACK pour lier le point à l'input stack_jxg.bind_point(ans1, p);
+[[/jsxgraph]]
+============================================================ 4. CATALOGUE DES ERREURS SPÉCIFIQUES À STACK ET SOLUTIONS ============================================================
+
+ERREUR A : "ans1 is not defined" ou "stack_jxg is not defined"
+Cause : Vous essayez d'utiliser stack_jxg.bind_point(ans1, p) mais l'input STACK n'existe pas dans cette zone de texte, ou le nom est mal orthographié. Correction : 
+    • Dans l'onglet "Réponse" (Input) de STACK, le nom de l'input doit être exactement ans1 (sans guillemets dans le code JS).
+    • Vérifier que le type d'input est configuré pour accepter du JSXGraph (souvent de type "Algébrique" ou "Chaîne" selon la façon dont vous formatez les coordonnées). Si vous utilisez les outils modernes de STACK, l'input est de type "Algebraic" et le binding se fait via l'API stack_jxg.
+
+ERREUR B : Le point ne se déplace pas / L'input ne se met pas à jour
+Cause : La fonction stack_jxg.bind_point est absente ou mal paramétrée. Le point est créé, mais il n'est pas "écouté" par le mécanisme de soumission de STACK. Correction : Ajouter impérativement la ligne suivante après la création du point mobile : stack_jxg.bind_point(ans1, p); // où 'ans1' est le nom de l'input et 'p' l'objet JSXGraph. Si vous déplacez une ligne ou un cercle, vous devez utiliser stack_jxg.bind_point sur les points de contrôle de cette ligne/cercle.
+
+ERREUR C : Erreur d'évaluation Maxima lors de la soumission (Ex: "Found an extra character")
+Cause : Le JavaScript envoie les coordonnées à STACK sous un format que Maxima ne comprend pas (ex: "1.23456789012345" avec trop de décimales, ou "[1,2]" au lieu de "(1,2)"). Correction : Dans les paramètres de l'input ans1 dans STACK, vous devez configurer le "Modèle de réponse" (Answer test) pour qu'il tolère les listes, ou utiliser une fonction Maxima personnalisée pour nettoyer la chaîne. Alternative moderne : Utiliser le type d'input spécifique de STACK pour les coordonnées (si disponible dans votre version) ou formater le binding en JSON propre que Maxima peut parser avec stackjson_decode.
+
+ERREUR D : Le graphique s'affiche une fois, puis disparaît ou se duplique à la soumission
+Cause : Lorsqu'un élève clique sur "Vérifier", Moodle recharge une partie de la page via AJAX ou réévalue le formulaire. Le div conteneur de JSXGraph est détruit par Moodle, mais le script JS tente de réinitialiser le tableau sur un élément du DOM qui n'existe plus. Correction : 
+    • S'assurer que vous utilisez la version la plus récente de qtype_stack qui gère le cycle de vie AJAX.
+    • Ne JAMAIS coder en dur l'ID du board. Utiliser la variable fournie par STACK : 'stack_jxg_board_{{ UNIQUE_ID }}'. Si vous écrivez initBoard('monDiv'), ça plantera au 2ème essai.
+
+ERREUR E : Les variables Maxima {@var@} apparaissent littéralement dans le code JS
+Cause : Erreur de syntaxe CASText2. Vous avez probablement échappé les accolades ou utilisé une ancienne syntaxe. Correction : En CASText2 (la version actuelle de STACK), les variables Maxima s'injectent avec {@nom_variable@}. Ne pas écrire {{@var@}} ni {!var!} (ancienne syntaxe). Ne pas mettre d'espace dans les accolades : {@ var @} provoquera une erreur de parsage.
+
+ERREUR F : Conflit de variables sur la page de révision du quiz (Review)
+Cause : Sur la page de révision, Moodle affiche toutes les questions du quiz sur la même page HTML. Si deux questions STACK utilisent var board = JXG.JSXGraph.initBoard(...), la seconde écrasera la première dans la portée globale JavaScript. Correction : C'est l'erreur la plus sournoise. Vous DEVEZ encapsuler votre code ou utiliser les mécanismes de STACK. Depuis les versions récentes, le bloc [[jsxgraph]] de STACK encapsule automatiquement le code. Cependant, si vous faites appel à des fonctions externes ou des variables globales, ça plantera. Règle d'or : Tout doit être déclaré avec var à l'intérieur du bloc [[jsxgraph]]. Ne déclarez aucune fonction globale en dehors.
+============================================================ 5. BONNES PRATIQUES DE DÉVELOPPEMENT STACK / JSXGRAPH ============================================================
+    1. DÉVELOPPEMENT DÉCOUPLÉ : Ne codez JAMAIS directement dans l'interface Moodle. Codez votre graphique sur https://jsxgraph.org/share/. Une fois qu'il marche parfaitement, copiez-le dans le bloc [[jsxgraph]] de STACK en ajoutant les bindings stack_jxg.
+    2. GESTION DES DECIMALES : JSXGraph travaille en JavaScript (Float 64 bits). Maxima travaille en précision infinie. Quand un élève déplace un point à (1/3, 2/3), JS envoie "0.3333333333333333". Maxima va souvent bloquer ça. Utilisez la fonction N(y, 5) dans les tests de réponse de STACK pour arrondir la réponse de l'élève à 5 décimales avant de la comparer à la valeur exacte de Maxima.
+    3. UTILISER LES MACROS STACK : Si vous avez des graphiques complexes (ex: une figure géométrique fixe + un point mobile), il est recommandé de créer des "Macros" dans les paramètres de la question pour générer le code JS dynamiquement depuis Maxima, plutôt que de faire de la concaténation de chaîne complexe dans le CASText.
+    4. INPUTS CACHÉS : Pour lier un point, l'input ans1 dans l'onglet "Réponse" de STACK doit généralement être paramétré avec :
+        ◦ Type de saisie : Algébrique (ou Chaîne selon l'implémentation).
+        ◦ Contrôle de saisie : Aucun (ou très souple) pour ne pas que le validateur de formulaire bloque la soumission avant même que Maxima ne l'évalue.
+============================================================ 6. PIPELINE DE DEBUG QUAND UNE ERREUR SURVIENT ============================================================ Si votre graphique ne marche pas dans STACK, suivez cet ordre strict :
+    1. Ouvrir la Console du Navigateur (F12). L'erreur est-elle côté JavaScript (ex: syntax error) ? Si oui, corrigez le JS.
+    2. Si pas d'erreur JS, faire un clic droit > "Inspecter l'élément" sur le cadre vide. L'input caché ans1 existe-t-il dans le DOM ? A-t-il une valeur ?
+    3. Si l'input a une valeur mais que STACK dit "Incorrect", le problème est le formatage. Le JS envoie "[1,2]" mais Maxima attend "(1,2)" ou "list(1,2)". Corriger le formatage dans le binding JS ou le PRT Maxima.
+    4. Si l'input n'a pas de valeur, stack_jxg.bind_point échoue silencieusement. Vérifier l'orthographe du nom de l'input.

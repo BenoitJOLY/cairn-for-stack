@@ -1,0 +1,3 @@
+﻿Copyright (c) 2024 Alain HAGUET
+
+This extension integrates WRITER and DRAW and allow to create complex geometric constructions.

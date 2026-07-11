@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:style-id="2" dlg:id="RepFractionForm" dlg:left="15" dlg:top="54" dlg:width="200" dlg:height="153" dlg:help-text="&amp;1796.RepFractionForm.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;1797.RepFractionForm.Title">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:background-color="0x0" dlg:border="simple"/>
+  <dlg:style dlg:style-id="1" dlg:background-color="0x99ccff" dlg:border="simple"/>
+  <dlg:style dlg:style-id="2" dlg:font-name="Tahoma" dlg:font-stylename="Normal" dlg:font-family="swiss"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="0" dlg:left="155" dlg:top="5" dlg:width="39" dlg:height="15" dlg:page="1" dlg:help-text="&amp;1798.RepFractionForm.TextField1.HelpText" dlg:align="center" dlg:value="3/5"/>
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="1" dlg:left="34" dlg:top="97" dlg:width="30" dlg:height="11" dlg:page="1" dlg:help-text="&amp;1800.RepFractionForm.TextField2.HelpText" dlg:align="right" dlg:value="3"/>
+  <dlg:textfield dlg:id="TextField3" dlg:tab-index="2" dlg:left="34" dlg:top="111" dlg:width="30" dlg:height="11" dlg:page="2" dlg:help-text="&amp;1802.RepFractionForm.TextField3.HelpText" dlg:align="right" dlg:value="5"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="3" dlg:left="2" dlg:top="5" dlg:width="150" dlg:height="16" dlg:page="1" dlg:help-text="&amp;1804.RepFractionForm.Label1.HelpText" dlg:value="&amp;1805.RepFractionForm.Label1.Label" dlg:align="center" dlg:multiline="true"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="4" dlg:left="6" dlg:top="98" dlg:width="28" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1806.RepFractionForm.Label2.HelpText" dlg:value="&amp;1807.RepFractionForm.Label2.Label"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="5" dlg:left="65" dlg:top="98" dlg:width="12" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1808.RepFractionForm.Label3.HelpText" dlg:value="&amp;1809.RepFractionForm.Label3.Label"/>
+  <dlg:text dlg:id="Label4" dlg:tab-index="6" dlg:left="65" dlg:top="112" dlg:width="12" dlg:height="10" dlg:page="2" dlg:help-text="&amp;1810.RepFractionForm.Label4.HelpText" dlg:value="&amp;1811.RepFractionForm.Label4.Label"/>
+  <dlg:text dlg:id="Label5" dlg:tab-index="7" dlg:left="6" dlg:top="112" dlg:width="28" dlg:height="10" dlg:page="2" dlg:help-text="&amp;1812.RepFractionForm.Label5.HelpText" dlg:value="&amp;1813.RepFractionForm.Label5.Label"/>
+  <dlg:text dlg:id="Label6" dlg:tab-index="8" dlg:left="108" dlg:top="98" dlg:width="40" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1814.RepFractionForm.Label6.HelpText" dlg:value="&amp;1815.RepFractionForm.Label6.Label"/>
+  <dlg:text dlg:id="Label7" dlg:tab-index="9" dlg:left="108" dlg:top="112" dlg:width="40" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1816.RepFractionForm.Label7.HelpText" dlg:value="&amp;1817.RepFractionForm.Label7.Label"/>
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl9" dlg:tab-index="10" dlg:left="152" dlg:top="100" dlg:width="15" dlg:height="5" dlg:page="1" dlg:help-text="&amp;1818.RepFractionForm.ImageControl9.HelpText">
+   <script:event script:event-name="on-mouseup" script:location="application" script:macro-name="OOoGdmath.RepFractionForm.RepFractionForm_Image9" script:language="StarBasic"/>
+  </dlg:img>
+  <dlg:img dlg:style-id="1" dlg:id="ImageControl10" dlg:tab-index="11" dlg:left="152" dlg:top="114" dlg:width="15" dlg:height="5" dlg:page="1" dlg:help-text="&amp;1819.RepFractionForm.ImageControl10.HelpText">
+   <script:event script:event-name="on-mouseup" script:location="application" script:macro-name="OOoGdmath.RepFractionForm.RepFractionForm_Image10" script:language="StarBasic"/>
+  </dlg:img>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="12" dlg:left="5" dlg:top="31" dlg:width="90" dlg:height="51" dlg:page="1" dlg:help-text="&amp;1820.RepFractionForm.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;1821.RepFractionForm.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="13" dlg:left="104" dlg:top="31" dlg:width="90" dlg:height="62" dlg:page="1" dlg:help-text="&amp;1822.RepFractionForm.FrameControl2.HelpText">
+   <dlg:title dlg:value="&amp;1823.RepFractionForm.FrameControl2.Label"/>
+  </dlg:titledbox>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="14" dlg:left="11" dlg:top="43" dlg:width="75" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1824.RepFractionForm.OptionButton1.HelpText" dlg:value="&amp;1825.RepFractionForm.OptionButton1.Label" dlg:checked="true">
+    <script:event script:event-name="on-performaction" script:location="application" script:macro-name="OOoGdmath.RepFractionForm.RepFractionForm_OptionButton1" script:language="StarBasic"/>
+   </dlg:radio>
+   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="15" dlg:left="11" dlg:top="55" dlg:width="75" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1826.RepFractionForm.OptionButton2.HelpText" dlg:value="&amp;1827.RepFractionForm.OptionButton2.Label">
+    <script:event script:event-name="on-performaction" script:location="application" script:macro-name="OOoGdmath.RepFractionForm.RepFractionForm_OptionButton2" script:language="StarBasic"/>
+   </dlg:radio>
+   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="16" dlg:left="11" dlg:top="67" dlg:width="75" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1828.RepFractionForm.OptionButton3.HelpText" dlg:value="&amp;1829.RepFractionForm.OptionButton3.Label">
+    <script:event script:event-name="on-performaction" script:location="application" script:macro-name="OOoGdmath.RepFractionForm.RepFractionForm_OptionButton3" script:language="StarBasic"/>
+   </dlg:radio>
+   <dlg:radio dlg:id="OptionButton4" dlg:tab-index="19" dlg:left="110" dlg:top="43" dlg:width="75" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1830.RepFractionForm.OptionButton4.HelpText" dlg:value="&amp;1831.RepFractionForm.OptionButton4.Label"/>
+   <dlg:radio dlg:id="OptionButton5" dlg:tab-index="20" dlg:left="110" dlg:top="55" dlg:width="75" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1832.RepFractionForm.OptionButton5.HelpText" dlg:value="&amp;1833.RepFractionForm.OptionButton5.Label"/>
+   <dlg:radio dlg:id="OptionButton6" dlg:tab-index="21" dlg:left="110" dlg:top="67" dlg:width="75" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1834.RepFractionForm.OptionButton6.HelpText" dlg:value="&amp;1835.RepFractionForm.OptionButton6.Label"/>
+   <dlg:radio dlg:id="OptionButton7" dlg:tab-index="22" dlg:left="110" dlg:top="79" dlg:width="75" dlg:height="10" dlg:page="1" dlg:help-text="&amp;1836.RepFractionForm.OptionButton7.HelpText" dlg:value="&amp;1837.RepFractionForm.OptionButton7.Label"/>
+  </dlg:radiogroup>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="17" dlg:left="52" dlg:top="131" dlg:width="42" dlg:height="16" dlg:page="1" dlg:help-text="&amp;1838.RepFractionForm.CommandButton1.HelpText" dlg:value="&amp;1839.RepFractionForm.CommandButton1.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="OOoGdmath.RepFractionForm.RepFractionForm_CommandButton1" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="18" dlg:left="100" dlg:top="131" dlg:width="42" dlg:height="16" dlg:page="1" dlg:help-text="&amp;1840.RepFractionForm.CommandButton2.HelpText" dlg:value="&amp;1841.RepFractionForm.CommandButton2.Label">
+   <script:event script:event-name="on-performaction" script:location="application" script:macro-name="OOoGdmath.RepFractionForm.RepFractionForm_CommandButton2" script:language="StarBasic"/>
+  </dlg:button>
+  <dlg:checkbox dlg:id="sauve" dlg:tab-index="23" dlg:left="152" dlg:top="137" dlg:width="32" dlg:height="10" dlg:help-text="&amp;2128.RepFractionForm.sauve.HelpText" dlg:value="&amp;2129.RepFractionForm.sauve.Label" dlg:checked="true"/>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="24" dlg:left="186" dlg:top="137" dlg:width="8" dlg:height="10" dlg:help-text="&amp;2291.RepFractionForm.CommandButton3.HelpText" dlg:value="&amp;2292.RepFractionForm.CommandButton3.Label">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:OOoGdmath.Debug.RestaureBoiteDialogue?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>
