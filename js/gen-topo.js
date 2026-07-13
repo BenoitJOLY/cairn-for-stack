@@ -72,18 +72,26 @@ tans_arrow_wrong_symbol${X}: if is(${vSep}="->") then "<=>" else "->";`;
 
   // ── HTML + Script (calqué exactement sur la référence) ──
   const htmlBlock=`<div id="inst_{#qid#}" style="font-family: sans-serif; background: #fff; border: 1px solid #d1d8dd; border-radius: 8px; padding: 15px;">
-<div id="jsme_modal_{#qid#}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.55); z-index: 9999; align-items: center; justify-content: center;">
-<div style="background: #fff; border-radius: 10px; padding: 20px; max-width: 480px; width: 95%; box-shadow: 0 8px 30px rgba(0,0,0,.3);">
-<h3 style="margin-bottom: 10px; color: #2c3e50;">Dessiner une molécule</h3>
-<div id="jsme_{#qid#}" style="width: 420px; height: 300px; margin: 0 auto;"></div>
-<div style="display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end;"><button class="btn-stk" type="button" onclick="window['insertJsme_{#qid#}']()">Insérer</button> <button class="btn-stk" style="background: #95a5a6;" type="button" onclick="document.getElementById('jsme_modal_{#qid#}').style.display='none'">Annuler</button></div>
+<style>
+#inst_{#qid#} .btn-stk{padding:8px 14px;border:none;border-radius:8px;background:#334155;color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;transition:filter .15s,transform .1s;font-family:inherit;}
+#inst_{#qid#} .btn-stk:hover{filter:brightness(1.12);}
+#inst_{#qid#} .btn-stk:active{transform:translateY(1px);}
+#inst_{#qid#} .jsme-modal-box{background:#fff;border-radius:14px;padding:22px;max-width:480px;width:95%;box-shadow:0 20px 50px rgba(15,23,42,.28);}
+#inst_{#qid#} .jsme-modal-box h3{margin:0 0 14px;color:#1e293b;font-size:1.05rem;}
+#inst_{#qid#} .jsme-canvas{width:420px;height:300px;margin:0 auto;border:1.5px solid #e2e8f0;border-radius:10px;overflow:hidden;}
+</style>
+<div id="jsme_modal_{#qid#}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,.55); z-index: 9999; align-items: center; justify-content: center;">
+<div class="jsme-modal-box">
+<h3>${I18N.t('tpl.topo_jsme_modal_title')}</h3>
+<div id="jsme_{#qid#}" class="jsme-canvas"></div>
+<div style="display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end;"><button class="btn-stk" style="background: #94a3b8;" type="button" onclick="document.getElementById('jsme_modal_{#qid#}').style.display='none'">${I18N.t('tpl.topo_btn_cancel')}</button> <button class="btn-stk" style="background: #4338ca;" type="button" onclick="window['insertJsme_{#qid#}']()">${I18N.t('tpl.topo_btn_insert')}</button></div>
 </div>
 </div>
 <div class="toolbar" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
-<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('->')">→ Total</button>
-<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('<=>')">⇌ Équilibre</button>
-<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('+')">+ Ajouter</button>
-<button class="btn-stk" style="background: #8e44ad;" type="button" onclick="window['openJsme_{#qid#}']()">🔬 Molécule</button>
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('->')">${I18N.t('tpl.topo_btn_total')}</button>
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('<=>')">${I18N.t('tpl.topo_btn_equilibrium')}</button>
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('+')">${I18N.t('tpl.topo_btn_add')}</button>
+<button class="btn-stk" style="background: #8e44ad;" type="button" onclick="window['openJsme_{#qid#}']()">${I18N.t('tpl.topo_btn_molecule')}</button>
 </div>
 <div id="ed_{#qid#}" style="border: 2px solid #3498db; min-height: 45px; font-size: 1.15rem; padding: 12px; outline: none; border-radius: 5px; margin-bottom: 15px; font-family: monospace; background: #fdfdfd;" contenteditable="true"></div>
 <div id="viz_{#qid#}" style="background: #fcfcfc; border: 1px solid #eee; border-radius: 5px; padding: 12px; min-height: 100px; overflow-x: auto;">
@@ -278,7 +286,7 @@ tans_arrow_wrong_symbol${X}: if is(${vSep}="->") then "<=>" else "->";`;
 </p>`;
 
   // ── textFrag / previewFrag ────────────────────────
-  const textFrag=`<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Chimie Topologique</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>
+  const textFrag=`<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('tpl.topo_title')}</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>
 <!-- ENONCE-START -->
 <div style="margin-bottom:12px;">${text||''}</div>
 <!-- ENONCE-END -->
@@ -304,7 +312,7 @@ ${htmlBlock}`;
     }, 350);
   });
 
-  const previewFrag=`<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} Chimie Topologique</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>
+  const previewFrag=`<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} ${I18N.t('tpl.topo_title')}</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>
 <!-- ENONCE-START --><div>${text||''}</div><!-- ENONCE-END -->
 <div style="padding:10px;background:#f8f8f8;border:1px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">${capturedHtml}</div>`;
 
@@ -736,7 +744,7 @@ if (editor.innerHTML !== '') { update(); }`;
 
   // ── textFrag / previewFrag ────────────────────────
   const textFrag=`<div style="background:#53B57C;border-left:5px solid #2F855E;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-  <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Réaction chimique</strong>
+  <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('tpl.chem_title')}</strong>
   <span style="background:#2F855E;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div style="margin-bottom:12px;">${text||''}</div><!-- ENONCE-END -->
@@ -758,7 +766,7 @@ ${jsxOpen}
 </div>`;
 
   const previewFrag=`<div style="background:#53B57C;border-left:5px solid #2F855E;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-  <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} équation Chimique</strong>
+  <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} ${I18N.t('tpl.chem_title_preview')}</strong>
   <span style="background:#2F855E;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div>${text||''}</div><!-- ENONCE-END -->
@@ -894,9 +902,9 @@ stpf${X}: sort(map(sort,tpf${X}));`;
   // l'enseignant a tapé/collé sans espace après la flèche (ex: "->H3O+" au lieu de
   // "-> H3O+") — déjà la même technique que l'aperçu Config (_chemHtmlToLatexDisplay).
   const chemAnswerBox = `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
-    <span style="font-weight:bold;color:#1e293b;">Réaction chimique</span>
-    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">La réponse attendue était</span>
-    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\ce{${encodeURIComponent(latex)}}" alt="équation chimique" style="max-height:60px;max-width:100%;"></div>
+    <span style="font-weight:bold;color:#1e293b;">${I18N.t('tpl.chem_title')}</span>
+    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N.t('chem.answerbox_expected')}</span>
+    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\ce{${encodeURIComponent(latex)}}" alt="${I18N.t('chem.answerbox_alt')}" style="max-height:60px;max-width:100%;"></div>
   </div>`;
 
   return {bareme, vars, qnote:editorPlain, textFrag, previewFrag, inputXML, prtXML, kbdRaw,
@@ -930,7 +938,7 @@ function chemUpdateLock() {
     editor.setAttribute('contenteditable', hasText ? 'true' : 'false');
     editor.style.opacity = hasText ? '1' : '.5';
     editor.style.pointerEvents = hasText ? '' : 'none';
-    editor.title = hasText ? '' : 'Rédigez d\'abord l\'énoncé ci-dessus.';
+    editor.title = hasText ? '' : I18N.t('chem.tooltip_write_first');
   }
   if (toolbar) toolbar.querySelectorAll('button').forEach(b => { b.disabled = !hasText; });
   if (hint) hint.style.display = hasText ? 'none' : 'block';
@@ -1132,10 +1140,10 @@ function chemOnInput() {
   _chemWireEditor(editor);
   const plain = _chemHtmlToPlain(editor.innerHTML);
   clearTimeout(_chemImgTimer);
-  if (!plain) { out.innerHTML = '<p style="color:#94a3b8;font-style:italic;">Saisissez une équation pour afficher l\'aperçu...</p>'; return; }
+  if (!plain) { out.innerHTML = '<p style="color:#94a3b8;font-style:italic;">' + I18N.t('chem.preview_placeholder') + '</p>'; return; }
   const display = _chemHtmlToLatexDisplay(editor.innerHTML);
   _chemImgTimer = setTimeout(function () {
-    out.innerHTML = `<img src="https://latex.codecogs.com/svg.image?\\ce{${encodeURIComponent(display)}}" alt="équation chimique" style="max-height:70px;max-width:100%;">`;
+    out.innerHTML = `<img src="https://latex.codecogs.com/svg.image?\\ce{${encodeURIComponent(display)}}" alt="${I18N.t('chem.answerbox_alt')}" style="max-height:70px;max-width:100%;">`;
   }, 500);
 }
 
@@ -1168,7 +1176,7 @@ function topoOpenJsme() {
     var container = document.getElementById('jsme_gen_container');
     if (!container) return;
     var f = container.querySelector('iframe');
-    if (f && !f.title) f.title = 'Éditeur de structure moléculaire JSME';
+    if (f && !f.title) f.title = I18N.t('topo.jsme_iframe_title');
   }
   function _watchJsmeIframe() {
     var container = document.getElementById('jsme_gen_container');
