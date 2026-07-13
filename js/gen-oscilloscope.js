@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   HÉSTACK — Générateur Oscilloscope (JSXGraph, thème clair)
+   STACKFORGE — Générateur Oscilloscope (JSXGraph, thème clair)
    Basé sur les exports Moodle de référence (test/mise à jour/Physique-chimie/Oscilloscope)
    Écran : 10×8 divisions  x∈[-5,5]  y∈[-4,4] — vrais boutons, curseurs togglables,
    réponses en 2 champs "units" (grandeur + unité), PRT diagnostique multi-nœuds.
@@ -410,7 +410,7 @@ function _oscInputHintsHTML(exList){
     + '</ul></div>';
 }
 
-/* ── Bandeau titre (identique norme UI HéStack) ── */
+/* ── Bandeau titre (identique norme UI StackForge) ── */
 function _oscHeader(X, bareme, title, tagBg, tagIcon, tagLabel){
   return '<div style="background:'+tagBg.bg+';border-left:5px solid '+tagBg.accent+';border-radius:0 8px 8px 0;'
     + 'padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'

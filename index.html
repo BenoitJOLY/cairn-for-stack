@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="assets/icone_18x18.png">
-  <title>HéSTACK V2</title>
+  <title>STACKFORGE V2</title>
   <link rel="stylesheet" href="lib/katex/katex.min.css">
   <link rel="stylesheet" href="lib/jsxgraph/jsxgraph.css">
   <link rel="stylesheet" href="css/style.css">
@@ -13,8 +13,8 @@
   <script src="lib/smiles-drawer/smiles-drawer.min.js"></script>
   <script src="lib/katex/katex.min.js"></script>
 </head>
-<body><!-- HÉSTACK — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
-<!-- HÉSTACK — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
+<body><!-- STACKFORGE — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
+<!-- STACKFORGE — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><defs>
 <symbol id="ico-action-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line>
       <line x1="6" y1="6" x2="18" y2="18"></line></symbol>
@@ -795,9 +795,9 @@ fill="currentColor" stroke="none">
 
 <header class="v4-header app-header" role="banner">
   <div class="v4-header-left">
-    <img src="assets/hestack.png" class="v4-logo-img" alt="HéStack">
+    <img src="assets/stackforge.png" class="v4-logo-img" alt="StackForge">
     <div class="v4-brand">
-      <h1 class="v4-app-name">HéStack</h1>
+      <h1 class="v4-app-name">StackForge</h1>
       <span class="v4-app-sub" data-i18n="app.subtitle">Générez le savoir, certifiez la réponse.</span>
     </div>
     <input type="text" id="quiz-name" class="v4-quiz-input" value="Exercice sans titre" aria-label="Nom de l exercice" data-i18n-aria="header.exercise_name_aria">
@@ -943,7 +943,7 @@ fill="currentColor" stroke="none">
         <div class="mtab" onclick="tab('jd','fb-gen',this);if(typeof jdRefreshPreview==='function')jdRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
       </div>
       <div class="mpane on" id="jd-cfg">
-      <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-info"></use></svg> <span data-i18n="jd.info_box">Définissez une image de fond, placez des zones de dépôt et listez les propositions. Héstack génère automatiquement le code JSXGraph responsive et la correction automatique.</span></div>
+      <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-info"></use></svg> <span data-i18n="jd.info_box">Définissez une image de fond, placez des zones de dépôt et listez les propositions. Stackforge génère automatiquement le code JSXGraph responsive et la correction automatique.</span></div>
 
       <!-- Énoncé -->
       <div class="field">
@@ -5462,7 +5462,7 @@ fill="currentColor" stroke="none">
                 <input type="file" accept=".json" style="display:none" onchange="expImportJson(this)">
               </label>
             </div>
-            <div class="exp-hint" style="margin-top:6px;" data-i18n="exp.sauvegarde_json_hint">Sauvegarde complète de la question (variables, énoncé, inputs, PRTs) indépendante du quiz HéStack.</div>
+            <div class="exp-hint" style="margin-top:6px;" data-i18n="exp.sauvegarde_json_hint">Sauvegarde complète de la question (variables, énoncé, inputs, PRTs) indépendante du quiz StackForge.</div>
           </div>
         </div>
       </div>
@@ -7345,10 +7345,10 @@ E H --</textarea>
 <!-- ══════════════════════════════════════════════════ -->
 <div id="copyModal" class="modal-backdrop" onclick="closeCopyModal(event)" style="z-index:2000;">
   <div class="calc-box" style="width:520px;max-width:95vw;" onclick="event.stopPropagation()">
-  <img src="assets\hestack.png" alt="Héstack" style="display:block;margin:0 auto 16px;height:60px;width:auto;border-radius:10px;">
+  <img src="assets\stackforge.png" alt="Stackforge" style="display:block;margin:0 auto 16px;height:60px;width:auto;border-radius:10px;">
     <h2 style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);font-size:1rem;"><svg class="hs-ico"><use href="#ico-footer-legal"></use></svg> <span data-i18n="modal.mentions_legales_amp_droits">Mentions légales &amp; Droits d'utilisation</span></h2>
     <div style="font-size:.85rem;color:var(--navy2);line-height:1.7;">
-      <p><strong>Héstack</strong> est un outil open-source conçu pour faciliter la création de questions STACK pour la plateforme Moodle.</p>
+      <p><strong>Stackforge</strong> est un outil open-source conçu pour faciliter la création de questions STACK pour la plateforme Moodle.</p>
       <p style="margin-top:10px;"><strong>Auteur :</strong> Benoit Joly — 2026</p>
       <div class="modal-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin:12px 0;">
         <p style="font-weight:700;color:#15803d;margin-bottom:6px;">📄 Licence d'utilisation</p>
@@ -7361,7 +7361,7 @@ E H --</textarea>
         Aucune donnée personnelle n'est collectée, stockée sur un serveur, ni transmise à des tiers.<br>
         Aucun cookie de tracking. Aucune police de caractère externe.</p>
       </div>
-      <p style="font-size:.78rem;color:var(--slate);margin-top:8px;">Les questions générées appartiennent à leurs auteurs. Héstack n'est qu'un outil de mise en forme.</p>
+      <p style="font-size:.78rem;color:var(--slate);margin-top:8px;">Les questions générées appartiennent à leurs auteurs. Stackforge n'est qu'un outil de mise en forme.</p>
     </div>
     <div style="margin-top:18px;">
       <button style="background:var(--navy);color:white;width:100%;padding:11px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.9rem;" onclick="document.getElementById('copyModal').style.display='none'" data-i18n="btn.fermer">Fermer</button>
@@ -7374,7 +7374,7 @@ E H --</textarea>
 <!-- ══════════════════════════════════════════════════ -->
 <div id="contactModal" class="modal-backdrop" onclick="closeContactModal(event)" style="z-index:2000;">
   <div class="calc-box" style="width:480px;max-width:95vw;" onclick="event.stopPropagation()">
-    <img src="assets\hestack.png" alt="Héstack" style="display:block;margin:0 auto 16px;height:60px;width:auto;border-radius:10px;">
+    <img src="assets\stackforge.png" alt="Stackforge" style="display:block;margin:0 auto 16px;height:60px;width:auto;border-radius:10px;">
     <h2 style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);font-size:1rem;"><svg class="hs-ico"><use href="#ico-footer-contact"></use></svg> <span data-i18n="modal.contact_amp_support">Contact &amp; Support</span></h2>
     <div style="font-size:.85rem;color:var(--navy2);line-height:1.7;">
       <div class="contact-author-box" style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;">
@@ -7389,7 +7389,7 @@ E H --</textarea>
       </div>
       <div class="modal-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;">
         <p style="font-weight:700;color:#15803d;margin-bottom:4px;"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-info"></use></svg> Suggestions &amp; améliorations</p>
-        <p style="color:#166534;font-size:.82rem;">Toute idée pour enrichir Héstack est la bienvenue. N'hésitez pas à écrire !</p>
+        <p style="color:#166534;font-size:.82rem;">Toute idée pour enrichir Stackforge est la bienvenue. N'hésitez pas à écrire !</p>
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:18px;">
@@ -7918,7 +7918,7 @@ E H --</textarea>
      onclick="if(event.target.id==='projectsModal')closeProjectsModal()">
   <div class="proj-modal">
     <div class="proj-modal-head">
-      <span><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-projects"></use></svg> Projets HéStack</span>
+      <span><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-projects"></use></svg> Projets StackForge</span>
       <button class="proj-close-btn" onclick="closeProjectsModal()" title="Fermer">✕</button>
     </div>
 
@@ -7938,15 +7938,15 @@ E H --</textarea>
 
     <!-- Export / Import fichier -->
     <div class="proj-file-zone">
-      <div class="proj-section-title">Fichier .hestack (portable)</div>
+      <div class="proj-section-title">Fichier .stackforge (portable)</div>
       <div class="proj-file-row">
         <button class="proj-btn proj-btn-export" onclick="projExport()">📤 Exporter le projet actuel</button>
         <label class="proj-btn proj-btn-import">
-          📥 Importer un .hestack
-          <input type="file" accept=".hestack,.json" style="display:none" onchange="projImport(this)">
+          📥 Importer un .stackforge
+          <input type="file" accept=".stackforge,.json" style="display:none" onchange="projImport(this)">
         </label>
       </div>
-      <div class="proj-file-hint">Le fichier .hestack contient tout votre exercice (questions, variables, PRTs). Il peut être partagé entre ordinateurs.</div>
+      <div class="proj-file-hint">Le fichier .stackforge contient tout votre exercice (questions, variables, PRTs). Il peut être partagé entre ordinateurs.</div>
     </div>
   </div>
 </div>

@@ -1,4 +1,4 @@
-# CHANGELOG — HéStack V4
+# CHANGELOG — StackForge V4
 
 ## [4.1.0] — 2026-06-20
 

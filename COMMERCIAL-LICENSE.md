@@ -1,27 +1,27 @@
-# HéStack — Licence double (dual licensing)
+# StackForge — Licence double (dual licensing)
 
-HéStack est publié sous licence libre **[GNU AGPL-3.0](LICENSE.md)**.
+StackForge est publié sous licence libre **[GNU AGPL-3.0](LICENSE.md)**.
 
 ## Ce que l'AGPL-3.0 vous permet gratuitement
 
-Vous pouvez utiliser, copier, modifier et redistribuer HéStack librement —
+Vous pouvez utiliser, copier, modifier et redistribuer StackForge librement —
 y compris à des fins commerciales — à une condition : si vous exploitez une
-version modifiée de HéStack sur un serveur accessible au public (y compris
+version modifiée de StackForge sur un serveur accessible au public (y compris
 en tant que service payant / SaaS), vous devez rendre le code source
 correspondant de cette version disponible à vos utilisateurs, sous la même
 licence.
 
 C'est cette obligation de transparence qui protège le travail de l'auteur :
 personne ne peut construire un produit fermé et payant sur la base de
-HéStack sans reverser ses propres modifications à la communauté.
+StackForge sans reverser ses propres modifications à la communauté.
 
 ## Licence commerciale (sans les obligations AGPL)
 
 Si votre organisation souhaite :
 
-- intégrer HéStack (ou du code dérivé) dans un produit ou service **sans**
+- intégrer StackForge (ou du code dérivé) dans un produit ou service **sans**
   publier le code source de vos modifications, ou
-- distribuer HéStack dans un produit propriétaire fermé,
+- distribuer StackForge dans un produit propriétaire fermé,
 
 une licence commerciale distincte, sans les obligations de copyleft de
 l'AGPL, peut être négociée directement avec l'auteur.

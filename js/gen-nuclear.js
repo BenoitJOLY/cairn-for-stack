@@ -1,7 +1,7 @@
 // ── NUCLEAR REACTION GENERATOR (Réaction Nucléaire) ─────────────
 
 // ══════════════════════════════════════════════════════
-//  HÉSTACK FORM PANEL — INTERACTIONS ÉDITEUR
+//  STACKFORGE FORM PANEL — INTERACTIONS ÉDITEUR
 // ══════════════════════════════════════════════════════
 
 // Verrouille la zone de saisie de la réaction (éditeur + barre d'outils) tant que
@@ -77,7 +77,7 @@ function nucRenderPreview() {
 }
 
 // ══════════════════════════════════════════════════════
-//  PARSING CÔTÉ HÉSTACK (pour générer ta3 / ta4)
+//  PARSING CÔTÉ STACKFORGE (pour générer ta3 / ta4)
 // ══════════════════════════════════════════════════════
 
 // Clés = ce que les boutons insèrent (espaces tailing strippés)
@@ -440,7 +440,7 @@ ${jsxOpen}
     [[input:ans${X}p]] [[validation:ans${X}p]]
 </div>`;
 
-  // ── previewFrag (dans Héstack) ────────────────────
+  // ── previewFrag (dans Stackforge) ────────────────────
   const previewFrag =
 `<div style="background:#EAB308;border-left:5px solid #676863;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
   <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — ${I18N.t('tpl.nuc_title')}</strong>

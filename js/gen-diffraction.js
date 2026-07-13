@@ -1,4 +1,4 @@
-/* HESTACK - Generateur Interferences-Diffraction (JSXGraph)
+/* STACKFORGE - Generateur Interferences-Diffraction (JSXGraph)
    3 types de mesure : fente_simple, fente_double, young
    2 modes par type : ecran (mesure directe sur la figure), capteur (figure + courbe I(distance))
    La figure de diffraction/interferences est toujours affichee, quel que soit le mode. */

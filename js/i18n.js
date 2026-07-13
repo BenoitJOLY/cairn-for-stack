@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════
-   HÉSTACK — MOTEUR i18n (architecture cible, livraison nationale)
+   STACKFORGE — MOTEUR i18n (architecture cible, livraison nationale)
    ------------------------------------------------------------------------
    Principe : aucun texte d'interface en dur dans le code. Chaque texte est
    une CLÉ ; les traductions vivent dans des fichiers de langue (lang/xx.js)
@@ -21,7 +21,7 @@
 window.I18N = (function () {
   "use strict";
 
-  var STORE_KEY = "hestack_lang";
+  var STORE_KEY = "stackforge_lang";
   var FALLBACK  = "fr";
 
   // code -> { strings:{clé:texte}, name:"Français", dir:"ltr" }

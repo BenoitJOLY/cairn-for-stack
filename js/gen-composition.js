@@ -347,7 +347,7 @@ function genComposition(X) {
     '  [[input:ans' + X + '_flag]] [[validation:ans' + X + '_flag]]\n' +
     '</div>';
 
-  // ── previewFrag : prévisualisation HéStack — Q{X} Rédaction + énoncé seul, sans JSXGraph ──
+  // ── previewFrag : prévisualisation StackForge — Q{X} Rédaction + énoncé seul, sans JSXGraph ──
   var previewFrag =
     '<div style="background:#ede9fe;border-left:5px solid #6d28d9;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
       '<strong style="font-weight:800;color:#4c1d95;font-size:.95rem;">Q' + X + ' — Rédaction</strong>' +

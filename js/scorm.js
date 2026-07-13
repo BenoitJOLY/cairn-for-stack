@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════
-//  SCORM 1.2 — Héstack Générateur
+//  SCORM 1.2 — Stackforge Générateur
 //  Complété = au moins 1 XML téléchargé
 // ══════════════════════════════════════════════════
 var SCORM_API = null;

@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   HÉSTACK — LANGUE DE RÉFÉRENCE : FRANÇAIS
+   STACKFORGE — LANGUE DE RÉFÉRENCE : FRANÇAIS
    Fichier de langue : aucune logique, uniquement des clés → textes.
    Pour ajouter une langue : copier ce fichier, renommer le code et
    traduire les VALEURS (ne jamais changer les clés).
@@ -922,7 +922,7 @@ I18N.add("fr", {
   "jd.instruction_lbl":     "Énoncé",
   "jd.bareme_lbl":          "Barème :",
   "jd.zones_visible_lbl":   "Zones de dépôts visibles",
-  "jd.info_box":            "Définissez une image de fond, placez des zones de dépôt et listez les propositions. Héstack génère automatiquement le code JSXGraph responsive et la correction automatique.",
+  "jd.info_box":            "Définissez une image de fond, placez des zones de dépôt et listez les propositions. Stackforge génère automatiquement le code JSXGraph responsive et la correction automatique.",
   "jd.zones_lbl":           "Zones de dépôt :",
   "jd.zone_num_lbl":        "Zone",
   "jd.centre_x":            "Centre X",
@@ -2339,7 +2339,7 @@ I18N.add("fr", {
   "exp.sauvegarde_json_lbl":     "Sauvegarde de la question (JSON)",
   "exp.exporter_json_btn":       "💾 Exporter en JSON",
   "exp.importer_json_btn":       "📂 Importer un JSON",
-  "exp.sauvegarde_json_hint":    "Sauvegarde complète de la question (variables, énoncé, inputs, PRTs) indépendante du quiz HéStack.",
+  "exp.sauvegarde_json_hint":    "Sauvegarde complète de la question (variables, énoncé, inputs, PRTs) indépendante du quiz StackForge.",
   "exp.valeurs_simulees_lbl":    "Valeurs simulées :",
   "exp.nouvelles_valeurs_title": "Regénérer des valeurs aléatoires",
   "exp.nouvelles_valeurs_btn":   "🔀 Nouvelles valeurs",

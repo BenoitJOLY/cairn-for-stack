@@ -1,5 +1,5 @@
-// projects.js — Gestionnaire de projets HéStack
-// Slots nommés localStorage + export/import .hestack
+// projects.js — Gestionnaire de projets StackForge
+// Slots nommés localStorage + export/import .stackforge
 
 var _PROJ_KEY = 'v4_projects';
 var _PROJ_MAX = 10;
@@ -10,7 +10,7 @@ function _projList(){
 }
 function _projSave(list){
   try{ localStorage.setItem(_PROJ_KEY, JSON.stringify(list)); }catch(e){
-    toast('❌ Espace localStorage insuffisant. Exportez un projet en .hestack pour libérer de la place.');
+    toast('❌ Espace localStorage insuffisant. Exportez un projet en .stackforge pour libérer de la place.');
   }
 }
 
@@ -100,7 +100,7 @@ function projRename(id){
   renderProjectsList();
 }
 
-/* ── Export .hestack ────────────────────────────────────────────── */
+/* ── Export .stackforge ────────────────────────────────────────────── */
 function projExport(){
   var data = _projCapture();
   var quizName = data.quizName || 'projet';
@@ -108,20 +108,20 @@ function projExport(){
   var blob = new Blob([payload],{type:'application/json'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = quizName.replace(/[^a-zA-Z0-9_\-À-ž]/g,'_')+'.hestack';
+  a.download = quizName.replace(/[^a-zA-Z0-9_\-À-ž]/g,'_')+'.stackforge';
   a.click();
   URL.revokeObjectURL(a.href);
   toast('💾 Exporté : '+a.download);
 }
 
-/* ── Import .hestack ────────────────────────────────────────────── */
+/* ── Import .stackforge ────────────────────────────────────────────── */
 function projImport(input){
   var file = input.files[0]; if(!file) return;
   var reader = new FileReader();
   reader.onload = function(e){
     try{
       var obj = JSON.parse(e.target.result);
-      if(!obj.data || obj.data.html===undefined) throw new Error('Format .hestack invalide.');
+      if(!obj.data || obj.data.html===undefined) throw new Error('Format .stackforge invalide.');
       if(!confirm('Importer « '+(obj.data.quizName||file.name)+' » ? Le travail non sauvegardé sera perdu.')) return;
       questions = {};
       nextQid   = 1;

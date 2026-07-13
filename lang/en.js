@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   HÉSTACK — LANGUE : ANGLAIS
+   STACKFORGE — LANGUE : ANGLAIS
    Mêmes clés que fr.js, valeurs traduites.
    ════════════════════════════════════════════════════════════════ */
 I18N.add("en", {
@@ -920,7 +920,7 @@ I18N.add("en", {
   "jd.instruction_lbl":     "Question text",
   "jd.bareme_lbl":          "Score:",
   "jd.zones_visible_lbl":   "Drop zones visible",
-  "jd.info_box":            "Set a background image, place drop zones and list the proposals. Héstack automatically generates the responsive JSXGraph code and the automatic marking.",
+  "jd.info_box":            "Set a background image, place drop zones and list the proposals. Stackforge automatically generates the responsive JSXGraph code and the automatic marking.",
   "jd.zones_lbl":           "Drop zones:",
   "jd.zone_num_lbl":        "Zone",
   "jd.centre_x":            "Center X",
@@ -2337,7 +2337,7 @@ I18N.add("en", {
   "exp.sauvegarde_json_lbl":     "Question backup (JSON)",
   "exp.exporter_json_btn":       "💾 Export as JSON",
   "exp.importer_json_btn":       "📂 Import a JSON",
-  "exp.sauvegarde_json_hint":    "Complete backup of the question (variables, statement, inputs, PRTs) independent of the HéStack quiz.",
+  "exp.sauvegarde_json_hint":    "Complete backup of the question (variables, statement, inputs, PRTs) independent of the StackForge quiz.",
   "exp.valeurs_simulees_lbl":    "Simulated values:",
   "exp.nouvelles_valeurs_title": "Regenerate random values",
   "exp.nouvelles_valeurs_btn":   "🔀 New values",

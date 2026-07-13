@@ -15,17 +15,17 @@ si besoin sur les formulations d'antériorité/paternité.
 
 ## Draft (English — for STACK community / moodle.org)
 
-**Subject: HéStack — a visual PRT/question authoring layer for STACK**
+**Subject: StackForge — a visual PRT/question authoring layer for STACK**
 
 Hi all,
 
-I'd like to introduce **HéStack**, a tool I've been building to close
+I'd like to introduce **StackForge**, a tool I've been building to close
 a gap I believe STACK has had since close to its beginning: authoring
 Potential Response Trees and STACK questions has always required
 writing Maxima code and hand-crafted XML directly, with no visual,
 non-programmer-friendly path from idea to a working, gradable question.
 
-HéStack is a standalone web tool that generates STACK questions
+StackForge is a standalone web tool that generates STACK questions
 (math, physics/chemistry, computer science) through structured
 generators and a visual PRT tree editor, producing valid Moodle STACK
 question XML without requiring the author to write Maxima or XML by

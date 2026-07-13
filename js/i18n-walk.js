@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   HÉSTACK — i18n « marcheur » (traduction sûre par nœuds de texte)
+   STACKFORGE — i18n « marcheur » (traduction sûre par nœuds de texte)
    Ne touche QUE les nœuds de texte et les attributs title/placeholder
    dont le contenu figure dans le dictionnaire ci-dessous. Tout le reste
    (syntaxe Maxima/STACK, SMILES, LaTeX, unités, code…) est laissé tel quel.
@@ -514,7 +514,7 @@
     "c (trinôme ou valeur abs)":"c (trinomial or absolute value)",
     "d — h ou F (m ou N)":"d — h or F (m or N)",
     "Énergie potentielle de pesanteur Ep = mgh":"Gravitational potential energy Ep = mgh",
-    "🎯 Définissez une image de fond, placez des zones de dépôt et listez les propositions. Héstack génère automatiquement le code JSXGraph responsive et le PRT STACK.":"🎯 Define a background image, place drop zones and list the proposals. HéStack automatically generates the responsive JSXGraph code and STACK PRT.",
+    "🎯 Définissez une image de fond, placez des zones de dépôt et listez les propositions. Stackforge génère automatiquement le code JSXGraph responsive et le PRT STACK.":"🎯 Define a background image, place drop zones and list the proposals. StackForge automatically generates the responsive JSXGraph code and STACK PRT.",
     // — Lot 5 : labels optiques et physique —
     "Tolérance Δ(OA') (cm)":"Tolerance Δ(OA') (cm)",
     "Tolérance Δ(A'B') (cm)":"Tolerance Δ(A'B') (cm)",

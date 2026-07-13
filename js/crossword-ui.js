@@ -92,7 +92,7 @@ function generateCWGrid() {
 function exportCWJSON() {
     const words = getCWTableWords();
     if (words.length === 0) return toast(I18N.t('msg.aucun_mot_a_exporter'));
-    // On utilise la fonction dlJSON déjà présente dans HéSTACK
+    // On utilise la fonction dlJSON déjà présente dans STACKFORGE
     dlJSON(words, "crossword_words.json");
 }
 

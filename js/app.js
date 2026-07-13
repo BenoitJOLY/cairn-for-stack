@@ -312,11 +312,11 @@ function buildXML() {
     generalFeedbackContent = generalFeedbackContent.split(markerFb).join(q.kbdRawFbGen);
   });
 
-  /* ── Signature HéStack pour round-trip ─────────────────────────
+  /* ── Signature StackForge pour round-trip ─────────────────────────
      stack-import.js lit le fichier XML comme du texte brut (FileReader),
      jamais via un champ Moodle — la signature n'a donc pas besoin de vivre
      dans un champ de question. Elle est stockée dans un commentaire XML
-     <!-- hestack::v1::... -->, jamais rendu ni affiché nulle part (ni côté
+     <!-- stackforge::v1::... -->, jamais rendu ni affiché nulle part (ni côté
      élève, ni côté enseignant dans la banque de questions). Le JSON est
      encodé en base64 pour éviter tout souci d'échappement XML et la
      séquence interdite "--" dans un commentaire.
@@ -372,9 +372,9 @@ function buildXML() {
     + '      <text>' + allQnote + '</text>\n'
     + '    </questionnote>\n'
     + '    <questiondescription format="html">\n'
-    + '      <text>Généré avec HéStack V2 | hestack-types:' + hsTypes + '</text>\n'
+    + '      <text>Généré avec StackForge V2 | stackforge-types:' + hsTypes + '</text>\n'
     + '    </questiondescription>\n'
-    + '    <!-- hestack::v1::' + _hsState + ' -->\n'
+    + '    <!-- stackforge::v1::' + _hsState + ' -->\n'
     + '    <questionsimplify>1</questionsimplify>\n'
     + '    <assumepositive>0</assumepositive>\n'
     + '    <assumereal>0</assumereal>\n'
@@ -621,16 +621,16 @@ function updateTagRecap() {
 // Chaque enseignant fournit son propre jeton (fine-grained PAT, écriture
 // limitée à ce dépôt) : le fichier XML est committé directement dans
 // a_verifier/ sur une branche dédiée, jamais sur main, pour relecture.
-var GH_OWNER = 'bjoly-hestack';
+var GH_OWNER = 'bjoly-stackforge';
 var GH_REPO = 'H-stack';
 var GH_REVIEW_BRANCH = 'depot-a-verifier';
 var GH_REVIEW_FOLDER = 'a_verifier';
 
 function ghGetToken() {
-  var t = localStorage.getItem('hestack_gh_token');
+  var t = localStorage.getItem('stackforge_gh_token');
   if (!t) {
     t = prompt('Jeton GitHub (fine-grained, accès en écriture limité à ce dépôt) — sera mémorisé dans ce navigateur pour les prochains dépôts :');
-    if (t && t.trim()) localStorage.setItem('hestack_gh_token', t.trim());
+    if (t && t.trim()) localStorage.setItem('stackforge_gh_token', t.trim());
   }
   return t ? t.trim() : null;
 }

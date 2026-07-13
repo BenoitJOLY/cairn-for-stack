@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HéStack V4 — Guide enseignant</title>
+<title>StackForge V4 — Guide enseignant</title>
 <style>
 /* ─── Palette ─── */
 :root {
@@ -251,7 +251,7 @@ kbd{
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <strong>HéStack V4</strong>
+    <strong>StackForge V4</strong>
     <span>Guide enseignant · v4.1</span>
   </div>
   <nav>
@@ -294,7 +294,7 @@ kbd{
 
 <!-- HEADER -->
 <div class="doc-header">
-  <h1>HéStack V4 — Guide enseignant</h1>
+  <h1>StackForge V4 — Guide enseignant</h1>
   <p>Créer, personnaliser et exporter des questions STACK pour Moodle — sans écrire de code</p>
   <div class="header-badges">
     <span class="badge badge-navy">Version 4.1 · 2026</span>
@@ -306,12 +306,12 @@ kbd{
 <div class="section" id="intro">
   <h2 class="sec-title">1. Introduction</h2>
 
-  <p><strong>HéStack V4</strong> est un outil de création de questions <strong>STACK</strong> pour Moodle. STACK (<em>System for Teaching and Assessment using a Computer algebra system</em>) évalue automatiquement des réponses mathématiques et scientifiques grâce au moteur de calcul formel <strong>Maxima</strong>.</p>
+  <p><strong>StackForge V4</strong> est un outil de création de questions <strong>STACK</strong> pour Moodle. STACK (<em>System for Teaching and Assessment using a Computer algebra system</em>) évalue automatiquement des réponses mathématiques et scientifiques grâce au moteur de calcul formel <strong>Maxima</strong>.</p>
 
-  <p>Avec HéStack, vous concevez vos questions dans une interface visuelle et vous exportez un fichier XML prêt à importer dans Moodle — <strong>sans écrire une seule ligne de code STACK</strong>.</p>
+  <p>Avec StackForge, vous concevez vos questions dans une interface visuelle et vous exportez un fichier XML prêt à importer dans Moodle — <strong>sans écrire une seule ligne de code STACK</strong>.</p>
 
   <div class="info-box">
-    <div class="box-title">Ce qu'HéStack fait pour vous</div>
+    <div class="box-title">Ce qu'StackForge fait pour vous</div>
     <ul>
       <li>Génère les variables Maxima (<code>ta1</code>, <code>ta2</code>…) et les randomise</li>
       <li>Construit l'arbre de réponse (PRT) adapté à chaque type</li>
@@ -337,7 +337,7 @@ kbd{
 
   <div class="tip-box">
     <div class="box-title">Sauvegarde automatique</div>
-    Votre travail est enregistré automatiquement dans le navigateur après chaque modification. L'indicateur en bas de page confirme la sauvegarde. Pour transférer votre travail sur un autre poste, utilisez <strong>Exporter projet (.hestack)</strong>.
+    Votre travail est enregistré automatiquement dans le navigateur après chaque modification. L'indicateur en bas de page confirme la sauvegarde. Pour transférer votre travail sur un autre poste, utilisez <strong>Exporter projet (.stackforge)</strong>.
   </div>
 </div>
 
@@ -359,7 +359,7 @@ kbd{
     <li><strong>Nom de l'exercice</strong> — apparaîtra dans Moodle comme catégorie</li>
     <li><strong>Variables partagées</strong> — définir des variables Maxima communes à toutes les questions</li>
     <li><strong>Exporter XML</strong> — générer le fichier Moodle</li>
-    <li><strong>Exporter projet / Importer projet</strong> — sauvegarder/charger au format <code>.hestack</code></li>
+    <li><strong>Exporter projet / Importer projet</strong> — sauvegarder/charger au format <code>.stackforge</code></li>
   </ul>
 
   <h3>Panneau de configuration (droite)</h3>
@@ -378,7 +378,7 @@ kbd{
 <div class="section" id="projets">
   <h2 class="sec-title">4. Gestion des projets</h2>
 
-  <p>HéStack V4 dispose d'un gestionnaire de projets permettant de travailler sur plusieurs exercices indépendants.</p>
+  <p>StackForge V4 dispose d'un gestionnaire de projets permettant de travailler sur plusieurs exercices indépendants.</p>
 
   <h3>Slots de sauvegarde</h3>
   <p>Cliquez sur l'icône <strong>dossier</strong> dans la barre pour ouvrir le gestionnaire. Vous disposez de <strong>5 emplacements nommés</strong> dans le localStorage :</p>
@@ -391,12 +391,12 @@ kbd{
   <h3>Export / Import portable</h3>
   <p>Pour transférer un projet entre ordinateurs ou le partager :</p>
   <ul>
-    <li><strong>Exporter projet (.hestack)</strong> — télécharge un fichier JSON complet</li>
-    <li><strong>Importer projet (.hestack)</strong> — restaure depuis ce fichier</li>
+    <li><strong>Exporter projet (.stackforge)</strong> — télécharge un fichier JSON complet</li>
+    <li><strong>Importer projet (.stackforge)</strong> — restaure depuis ce fichier</li>
   </ul>
 
   <div class="info-box">
-    Le format <code>.hestack</code> contient l'intégralité de l'exercice (questions, configurations, feedback, PRT) et peut être réimporté même après une vidange du cache du navigateur.
+    Le format <code>.stackforge</code> contient l'intégralité de l'exercice (questions, configurations, feedback, PRT) et peut être réimporté même après une vidange du cache du navigateur.
   </div>
 </div>
 
@@ -404,7 +404,7 @@ kbd{
 <div class="section" id="types">
   <h2 class="sec-title">5. Les types de questions disponibles</h2>
 
-  <p>HéStack propose <strong>40+ types</strong> organisés en catégories. Choisissez celui qui correspond le mieux à la compétence évaluée.</p>
+  <p>StackForge propose <strong>40+ types</strong> organisés en catégories. Choisissez celui qui correspond le mieux à la compétence évaluée.</p>
 
   <!-- QCM -->
   <div class="type-group-title">Questionnaire à choix</div>
@@ -846,7 +846,7 @@ kbd{
 
   <div class="info-box">
     <div class="box-title">PRT généré automatiquement</div>
-    Pour tous les types simples, HéStack crée un PRT de base : réponse correcte → 100%, incorrecte → 0%. C'est suffisant dans la plupart des cas.
+    Pour tous les types simples, StackForge crée un PRT de base : réponse correcte → 100%, incorrecte → 0%. C'est suffisant dans la plupart des cas.
   </div>
 
   <h3>Structure d'un nœud PRT</h3>
@@ -889,7 +889,7 @@ kbd{
 
   <div class="warn-box">
     <div class="box-title">Règle du chemin vrai = 1</div>
-    La somme des scores sur le chemin des branches <em>vraies</em> successives doit atteindre exactement <strong>1</strong>. HéStack affiche un bandeau d'avertissement si ce n'est pas le cas.
+    La somme des scores sur le chemin des branches <em>vraies</em> successives doit atteindre exactement <strong>1</strong>. StackForge affiche un bandeau d'avertissement si ce n'est pas le cas.
   </div>
 </div>
 
@@ -943,18 +943,18 @@ kbd{
 <div class="section" id="import-xml">
   <h2 class="sec-title">11. Import d'une question STACK existante</h2>
 
-  <p>HéStack peut importer une question STACK déjà exportée depuis Moodle pour en modifier le PRT.</p>
+  <p>StackForge peut importer une question STACK déjà exportée depuis Moodle pour en modifier le PRT.</p>
 
   <div class="steps">
     <div class="step"><div class="step-body">Dans Moodle, allez dans la banque de questions, sélectionnez la question STACK et exportez-la au format <strong>Moodle XML</strong>.</div></div>
-    <div class="step"><div class="step-body">Dans HéStack, cliquez sur <strong>Import XML STACK</strong> (type de question).</div></div>
+    <div class="step"><div class="step-body">Dans StackForge, cliquez sur <strong>Import XML STACK</strong> (type de question).</div></div>
     <div class="step"><div class="step-body">Sélectionnez le fichier XML. La question est importée avec tous ses PRT.</div></div>
     <div class="step"><div class="step-body">Cliquez sur <strong>PRT — nom</strong> pour ouvrir et modifier chaque arbre.</div></div>
     <div class="step"><div class="step-body">Cliquez sur <strong>Télécharger XML modifié</strong> pour exporter la version corrigée.</div></div>
   </div>
 
   <div class="info-box">
-    Si le fichier XML provient d'HéStack (il contient une signature <code>hestack::v1::</code>), le projet complet est restauré automatiquement avec tous les modules.
+    Si le fichier XML provient d'StackForge (il contient une signature <code>stackforge::v1::</code>), le projet complet est restauré automatiquement avec tous les modules.
   </div>
 </div>
 
@@ -964,7 +964,7 @@ kbd{
 
   <div class="steps">
     <div class="step"><div class="step-body">Assurez-vous que toutes les questions ont leur chip <strong>verte</strong> (Enregistrer appliqué).</div></div>
-    <div class="step"><div class="step-body">Cliquez sur <strong>Exporter XML</strong> dans la barre d'en-tête. Un fichier <code>hestack-export.xml</code> est téléchargé.</div></div>
+    <div class="step"><div class="step-body">Cliquez sur <strong>Exporter XML</strong> dans la barre d'en-tête. Un fichier <code>stackforge-export.xml</code> est téléchargé.</div></div>
     <div class="step"><div class="step-body">Dans Moodle : <strong>Banque de questions → Importer → Moodle XML</strong>.</div></div>
     <div class="step"><div class="step-body">Sélectionnez la catégorie cible, importez le fichier.</div></div>
     <div class="step"><div class="step-body">Testez avec <strong>Aperçu</strong> dans Moodle avant d'ajouter la question à un quiz.</div></div>
@@ -1057,9 +1057,9 @@ kbd{
   </details>
 
   <details>
-    <summary>Les paramètres aléatoires donnent toujours la même valeur dans HéStack</summary>
+    <summary>Les paramètres aléatoires donnent toujours la même valeur dans StackForge</summary>
     <div class="faq-body">
-      <p>L'aperçu dans HéStack affiche toujours la même valeur initiale (pour la cohérence de l'interface). Dans Moodle, chaque tentative génère de nouvelles valeurs. Pour tester plusieurs variantes, utilisez <strong>Aperçu → Commencer une nouvelle tentative</strong> dans Moodle.</p>
+      <p>L'aperçu dans StackForge affiche toujours la même valeur initiale (pour la cohérence de l'interface). Dans Moodle, chaque tentative génère de nouvelles valeurs. Pour tester plusieurs variantes, utilisez <strong>Aperçu → Commencer une nouvelle tentative</strong> dans Moodle.</p>
     </div>
   </details>
 
@@ -1097,7 +1097,7 @@ kbd{
   <details>
     <summary>Comment écrire une inéquation comme réponse attendue ?</summary>
     <div class="faq-body">
-      <p>En Maxima : <code>x > 2</code>, <code>x &lt;= 5</code>, <code>-1 &lt; x and x &lt;= 3</code>. Le test <code>AlgEquiv</code> gère les inéquations. Pour des ensembles de solutions, utilisez <code>Sets</code>. HéStack propose également un type dédié <strong>Inéquation</strong>.</p>
+      <p>En Maxima : <code>x > 2</code>, <code>x &lt;= 5</code>, <code>-1 &lt; x and x &lt;= 3</code>. Le test <code>AlgEquiv</code> gère les inéquations. Pour des ensembles de solutions, utilisez <code>Sets</code>. StackForge propose également un type dédié <strong>Inéquation</strong>.</p>
     </div>
   </details>
 
@@ -1119,9 +1119,9 @@ kbd{
     <div class="faq-body">
       <p>L'autosauvegarde utilise le localStorage du navigateur, qui est effacé lors d'une vidange de cache. Pour éviter toute perte :</p>
       <ul>
-        <li>Exportez régulièrement votre projet avec <strong>Exporter projet (.hestack)</strong></li>
+        <li>Exportez régulièrement votre projet avec <strong>Exporter projet (.stackforge)</strong></li>
         <li>Exportez également le XML Moodle comme sauvegarde de secours</li>
-        <li>En cas de perte, le fichier <code>.hestack</code> permet une restauration complète</li>
+        <li>En cas de perte, le fichier <code>.stackforge</code> permet une restauration complète</li>
       </ul>
     </div>
   </details>
@@ -1129,7 +1129,7 @@ kbd{
 
 <!-- ═══ FOOTER ═══ -->
 <div class="doc-footer">
-  <p>HéStack V4 — Guide enseignant — Version 4.1 — 2026</p>
+  <p>StackForge V4 — Guide enseignant — Version 4.1 — 2026</p>
   <p style="margin-top:5px;">Contact : <a href="mailto:b_joly@orange.fr">b_joly@orange.fr</a></p>
 </div>
 

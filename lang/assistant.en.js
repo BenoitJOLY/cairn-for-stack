@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════
-   HÉSTACK — ASSISTANT MODE content (English)
+   STACKFORGE — ASSISTANT MODE content (English)
    Registered in window.ASSIST_LANG.en ; read by assistant.js per language.
    ════════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -78,7 +78,7 @@
         "Click « <strong>📋 Copy the prompt</strong> ».",
         "Paste it into an <strong>AI</strong> (ChatGPT, Claude, Gemini…) and run the generation.",
         "Collect the <strong>result</strong> produced by the AI (in JSON format).",
-        "Come back to Héstack and <strong>import it</strong> via the « 📥 JSON » button of the form."
+        "Come back to Stackforge and <strong>import it</strong> via the « 📥 JSON » button of the form."
       ],
       note: "⚠️ <strong>Do not confuse this with the student display.</strong> " +
         "These two fields describe what <strong>the AI must produce</strong> (the pool), not what the student will see:" +
@@ -114,7 +114,7 @@
     /* ── Detailed step-3 guidance, field by field, per type ── */
     STEP3: {
       checkbox: {
-        intro: "Multiple-choice question: Héstack randomly draws the correct/incorrect options on each attempt.",
+        intro: "Multiple-choice question: Stackforge randomly draws the correct/incorrect options on each attempt.",
         fields: [
           "<strong>Question text</strong> — click « ✏️ Editor » to write the question (text, formula, image).",
           "<strong>Marking</strong> (yellow banner at the top) — points awarded.",
@@ -147,7 +147,7 @@
         ]
       },
       algebraic: {
-        intro: "The student enters a mathematical expression; Héstack checks algebraic equivalence.",
+        intro: "The student enters a mathematical expression; Stackforge checks algebraic equivalence.",
         fields: [
           "<strong>Question text</strong> — via « ✏️ Editor ».",
           "<strong>Variables</strong> — list the ones used (e.g. x, y, z).",
@@ -168,7 +168,7 @@
         ]
       },
       units: {
-        intro: "Answer = a numerical value AND a unit (Héstack checks both).",
+        intro: "Answer = a numerical value AND a unit (Stackforge checks both).",
         fields: [
           "<strong>Question text</strong> — via « ✏️ Editor ».",
           "<strong>Numerical value</strong> expected.",
@@ -202,7 +202,7 @@
         fields: [
           "<strong>Marking</strong> and <strong>number of words</strong> to use.",
           "<strong>Words + clues</strong> — add each line (« + Add a word »).",
-          "<strong>Generate the grid</strong> — Héstack computes the layout."
+          "<strong>Generate the grid</strong> — Stackforge computes the layout."
         ],
         tip: "« 🤖 AI Prompt » builds a word/clue list on a topic in one click."
       },

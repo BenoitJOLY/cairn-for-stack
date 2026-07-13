@@ -1,6 +1,6 @@
 /*
  * ═══════════════════════════════════════════════════════════════════
- *  HéStack V4 — style.css
+ *  StackForge V4 — style.css
  *  TABLE DES MATIÈRES
  * ───────────────────────────────────────────────────────────────────
  *  1. Variables CSS & reset global
@@ -1593,7 +1593,7 @@ html[data-theme="dark"] .ic-seq-order-row-sel{border-color:#f59e0b;background:#3
 html[data-theme="dark"] .ic-seq-order-label{color:#5eead4;}
 
 /* ═══════════════════════════════════════════════════════════════
-   HÉSTACK V4 — Styles spécifiques (cumulatif)
+   STACKFORGE V4 — Styles spécifiques (cumulatif)
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Variables V4 ── */

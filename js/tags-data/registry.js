@@ -3,14 +3,14 @@
 // séparé (js/tags-data/<code>.js) qui s'enregistre via registerCountryTags().
 // Voir js/tags-data/_modele.js pour créer un nouveau pays.
 var TAGS_COUNTRIES = {};
-var HESTACK_PAYS_KEY = 'hestack_pays';
+var STACKFORGE_PAYS_KEY = 'stackforge_pays';
 
 function registerCountryTags(code, label, tree) {
   TAGS_COUNTRIES[code] = { label: label, tree: tree };
 }
 
 function currentPays() {
-  try { return localStorage.getItem(HESTACK_PAYS_KEY) || 'fr'; } catch (e) { return 'fr'; }
+  try { return localStorage.getItem(STACKFORGE_PAYS_KEY) || 'fr'; } catch (e) { return 'fr'; }
 }
 
 // tagsArbre reste la variable globale lue par tmInitMat()/tmSelectMat() etc.
@@ -19,7 +19,7 @@ function currentPays() {
 function applyPays(code) {
   var entry = TAGS_COUNTRIES[code] || TAGS_COUNTRIES['fr'] || { tree: {} };
   window.tagsArbre = entry.tree;
-  try { localStorage.setItem(HESTACK_PAYS_KEY, code); } catch (e) {}
+  try { localStorage.setItem(STACKFORGE_PAYS_KEY, code); } catch (e) {}
   if (typeof tmInitMat === 'function' && document.getElementById('tagModal') &&
       document.getElementById('tagModal').style.display !== 'none') {
     tmInitMat();

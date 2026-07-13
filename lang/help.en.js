@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   HÉSTACK — HELP CONTENT: ENGLISH
+   STACKFORGE — HELP CONTENT: ENGLISH
    Data only (no logic). To add a help language,
    copy this file (e.g. help.es.js), translate the texts, and end
    with : window.HELP_LANG.en = HELP_CONTENT;
@@ -620,7 +620,7 @@ const HELP_CONTENT = {
     title: '<svg class="hs-ico"><use href="#ico-type-jxgdrop"></use></svg> JSXGraph Drag-and-Drop — Help',
     body:
       _hSection('What it is for',
-        '<p>The student <b>drags labels (proposals) onto an image</b> and drops them into defined zones (labelled diagram, map, experimental setup…). Héstack automatically generates the responsive JSXGraph code and the grading.</p>') +
+        '<p>The student <b>drags labels (proposals) onto an image</b> and drops them into defined zones (labelled diagram, map, experimental setup…). Stackforge automatically generates the responsive JSXGraph code and the grading.</p>') +
       _hSection('How to fill', _hList([
         '<b>Background image</b>: upload an image (PNG/JPG) — it serves as the visual support for zones and proposals.',
         '<b>Proposals</b>: click <b>＋ Add a proposal</b> for each label the student will be able to drop.',

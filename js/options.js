@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════
-   HÉSTACK — OPTIONS (langue + thème clair/sombre + mode normal/expert)
+   STACKFORGE — OPTIONS (langue + thème clair/sombre + mode normal/expert)
    Ajoute un lien « ⚙ Options » sous le bouton « Mode assistant » et une
    fenêtre modale permettant de choisir la langue, le thème et le mode.
    Le thème et le mode sont mémorisés (localStorage).
@@ -8,8 +8,8 @@
 (function () {
   "use strict";
 
-  var THEME_KEY = "hestack_theme";
-  var MODE_KEY  = "hestack_mode";
+  var THEME_KEY = "stackforge_theme";
+  var MODE_KEY  = "stackforge_mode";
   function t(k, d) {
     var v = (window.I18N && I18N.t) ? I18N.t(k) : k;
     return (v === k && d) ? d : v;   // si la clé n'est pas traduite, utiliser le libellé par défaut

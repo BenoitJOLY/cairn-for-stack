@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   HÉSTACK — MODE ASSISTANT (autonome)
+   STACKFORGE — MODE ASSISTANT (autonome)
    Lit l'état global (currentType, questions, editingId, nameLocked) ;
    ne modifie aucun fichier existant.
    À charger EN DERNIER, après app.js :
@@ -8,9 +8,9 @@
 (function () {
   "use strict";
 
-  var STORE_KEY = "hestack_assistant";
-  var STORE_W   = "hestack_assistant_w";
-  var STORE_H   = "hestack_assistant_h";
+  var STORE_KEY = "stackforge_assistant";
+  var STORE_W   = "stackforge_assistant_w";
+  var STORE_H   = "stackforge_assistant_h";
   var DEFAULT_NAME = "Exercice sans titre";
   var DIM_SELECTOR =
     ".quiz-name-bar, .q-list-box, .type-grid, .form-panel, .action-bar";
