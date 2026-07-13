@@ -21,8 +21,8 @@ function genAcideBase(X) {
     var dispH    = parseInt(v('ab-h'))  || 400;
     var bareme   = parseFloat(v('ab-bareme')) || 1;
     var text     = richVal('ab-text');
-    var fbOk     = v('ab-fb-ok')    || wrapFb('✅ <strong>Bonne r\xe9ponse !</strong>', true);
-    var fbWrong  = v('ab-fb-wrong') || wrapFb('❌ <strong>R\xe9ponse incorrecte.</strong> V\xe9rifiez sur la courbe.', false);
+    var fbOk     = v('ab-fb-ok')    || wrapFb(I18N.t('ab.fb_ok_default'), true);
+    var fbWrong  = v('ab-fb-wrong') || wrapFb(I18N.t('ab.fb_wrong_default'), false);
 
     // ── Physique ───────────────────────────────────────────────────────
     var isBfAf = (abType === 'bf-af');
@@ -196,14 +196,14 @@ function genAcideBase(X) {
     var prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
     // ── Données et consigne ─────────────────────────────────────────
-    var typeMap = {'af-bf':'Acide faible + base forte','bf-af':'Base faible + acide fort','af-fort-bf':'Acide fort + base forte'};
+    var typeMap = {'af-bf':I18N.t('ab.typemap_af_bf'),'bf-af':I18N.t('ab.typemap_bf_af'),'af-fort-bf':I18N.t('ab.typemap_af_fort_bf')};
     var instrMap = {
-        'equivalence': 'Faites glisser le curseur vertical (rouge) jusqu\'au saut de pH de la 1ʳᵉ \xe9quivalence.',
-        'veq2':        'Faites glisser le curseur vertical (rouge) jusqu\'au saut de pH de la 2ᵉ \xe9quivalence.',
-        'veq3':        'Faites glisser le curseur vertical (rouge) jusqu\'au saut de pH de la 3ᵉ \xe9quivalence.',
-        'pka':         'Faites glisser le curseur horizontal (violet) \xe0 la hauteur du pKa1 (\xe0 la demi-\xe9quivalence).',
-        'pka2':        'Faites glisser le curseur horizontal (violet) \xe0 la hauteur du pKa2.',
-        'pka3':        'Faites glisser le curseur horizontal (violet) \xe0 la hauteur du pKa3.'
+        'equivalence': I18N.t('ab.instr_equivalence'),
+        'veq2':        I18N.t('ab.instr_veq2'),
+        'veq3':        I18N.t('ab.instr_veq3'),
+        'pka':         I18N.t('ab.instr_pka'),
+        'pka2':        I18N.t('ab.instr_pka2'),
+        'pka3':        I18N.t('ab.instr_pka3')
     };
 
     var pkaStr = '';
@@ -215,7 +215,7 @@ function genAcideBase(X) {
     var nStr  = nProtons > 1 ? ' (H₂A, n=' + nProtons + ')' : '';
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Donn\xe9es :</strong> '
+        + '<strong>' + I18N.t('ab.donnees_lbl') + '</strong> '
         + (typeMap[abType] || abType) + nStr
         + ' &mdash; C₁&nbsp;=&nbsp;' + c1 + '&nbsp;mol/L,'
         + ' V₁&nbsp;=&nbsp;' + v1 + '&nbsp;mL,'
@@ -227,7 +227,7 @@ function genAcideBase(X) {
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — pH-m\xe9trie</strong>'
+        + ' — ' + I18N.t('ab.banniere') + '</strong>'
         + '<span style="background:#166534;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'

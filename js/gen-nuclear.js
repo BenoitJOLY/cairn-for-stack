@@ -17,7 +17,7 @@ function nucUpdateLock() {
     editor.setAttribute('contenteditable', hasText ? 'true' : 'false');
     editor.style.opacity = hasText ? '1' : '.5';
     editor.style.pointerEvents = hasText ? '' : 'none';
-    editor.title = hasText ? '' : 'Rédigez d\'abord l\'énoncé ci-dessus.';
+    editor.title = hasText ? '' : I18N.t('nuc.tooltip_write_first');
   }
   if (toolbar) toolbar.querySelectorAll('button').forEach(b => { b.disabled = !hasText; });
   if (hint) hint.style.display = hasText ? 'none' : 'block';
@@ -49,7 +49,7 @@ function nucClear() {
   const editor = document.getElementById('nuc-editor');
   if (editor) editor.innerText = '';
   const preview = document.getElementById('nuc-preview');
-  if (preview) preview.innerHTML = '<span style="color:#94a3b8;font-style:italic;">Aperçu KaTeX...</span>';
+  if (preview) preview.innerHTML = '<span style="color:#94a3b8;font-style:italic;">' + I18N.t('nuc.preview_placeholder') + '</span>';
 }
 
 function nucRenderPreview() {
@@ -59,7 +59,7 @@ function nucRenderPreview() {
 
   let raw = editor.innerText.trim();
   if (!raw) {
-    preview.innerHTML = '<span style="color:#94a3b8;font-style:italic;">Aperçu KaTeX...</span>';
+    preview.innerHTML = '<span style="color:#94a3b8;font-style:italic;">' + I18N.t('nuc.preview_placeholder') + '</span>';
     return;
   }
 
@@ -426,7 +426,7 @@ nuc${X}_latex: "${latexForMaxima}"`;
 
   const textFrag =
 `<div style="background:#EAB308;border-left:5px solid #676863;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-  <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — Réaction Nucléaire</strong>
+  <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — ${I18N.t('tpl.nuc_title')}</strong>
   <span style="background:#676863;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div style="margin-bottom:14px;">${text || ''}</div><!-- ENONCE-END -->
@@ -443,7 +443,7 @@ ${jsxOpen}
   // ── previewFrag (dans Héstack) ────────────────────
   const previewFrag =
 `<div style="background:#EAB308;border-left:5px solid #676863;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-  <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — Réaction Nucléaire</strong>
+  <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — ${I18N.t('tpl.nuc_title')}</strong>
   <span style="background:#676863;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div style="margin-bottom:10px;">${text || ''}</div><!-- ENONCE-END -->
@@ -692,12 +692,12 @@ fb_asterisk${X}: sconcat(
   // message réel (voir fbVars ci-dessus), uniquement pour l'onglet Config — l'export
   // XML utilise toujours le vrai jeton via canonicalNodes/prtXML, inchangé.
   const diagPreviewText = {
-    '0f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>❌ Les réactifs sont incorrects</strong><br><span style="font-size:.85rem;color:#64748b;">(liste les réactifs saisis par l'élève vs ceux attendus)</span></div>`,
-    '1f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>❌ Les produits sont incorrects</strong><br><span style="font-size:.85rem;color:#64748b;">(liste les produits saisis par l'élève vs ceux attendus)</span></div>`,
-    '3f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>⚠️ Attention aux coefficients (Réactifs)</strong><br><span style="font-size:.85rem;color:#64748b;">(détail des coefficients erronés)</span></div>`,
-    '4f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>⚠️ Attention aux coefficients (Produits)</strong><br><span style="font-size:.85rem;color:#64748b;">(détail des coefficients erronés)</span></div>`,
-    '5f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>⚠️ Attention aux états excités</strong><br><span style="font-size:.85rem;color:#64748b;">(structure correcte mais * manquant/en trop)</span></div>`,
-    '6t': `<div style="padding:10px 14px;background:#f0fff4;border-radius:8px;border-left:4px solid #27ae60;color:#166534;"><strong>✅ Excellent ! La réaction est correctement équilibrée.</strong></div>`
+    '0f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>${I18N.t('nuc.fb_reactants_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_reactants')}</span></div>`,
+    '1f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>${I18N.t('nuc.fb_products_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_products')}</span></div>`,
+    '3f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N.t('nuc.fb_coeffs_reactants_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_coeffs')}</span></div>`,
+    '4f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N.t('nuc.fb_coeffs_products_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_coeffs')}</span></div>`,
+    '5f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N.t('nuc.fb_asterisk_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_asterisk')}</span></div>`,
+    '6t': `<div style="padding:10px 14px;background:#f0fff4;border-radius:8px;border-left:4px solid #27ae60;color:#166534;"><strong>${I18N.t('nuc.fb_success_title')} ${I18N.t('nuc.fb_success_text')}</strong></div>`
   };
   const diagNodes = [];
   canonicalNodes.forEach((n, i) => {
@@ -710,9 +710,9 @@ fb_asterisk${X}: sconcat(
   // une question nucléaire sans commentaire manuel exportait un <generalfeedback>
   // totalement vide (même fix que genChemical/chemAnswerBox, voir gen-topo.js).
   const nucAnswerBox = `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
-    <span style="font-weight:bold;color:#1e293b;">Réaction nucléaire</span>
-    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">La réponse attendue était</span>
-    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\displaystyle%20${encodeURIComponent(latexEq)}" alt="réaction nucléaire" style="max-height:60px;max-width:100%;"></div>
+    <span style="font-weight:bold;color:#1e293b;">${I18N.t('nuc.answerbox_label')}</span>
+    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N.t('nuc.answerbox_expected')}</span>
+    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\displaystyle%20${encodeURIComponent(latexEq)}" alt="${I18N.t('nuc.answerbox_alt')}" style="max-height:60px;max-width:100%;"></div>
   </div>`;
 
   return {

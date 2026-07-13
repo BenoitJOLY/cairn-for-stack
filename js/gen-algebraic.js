@@ -10,7 +10,7 @@ function genAlgebraic(X){
   if(!formula)throw new Error(I18N.t('msg.err_formule_vide', {n: X}));
   if(!exprDisplay)throw new Error(I18N.t('msg.err_expr_display_vide', {n: X}));
   if(typeof algSyntaxIssues==='function'){
-    [['Réponse attendue',formula],['Expression à afficher',exprDisplay],['Erreur classique',errorExpr]].forEach(function(pair){
+    [[I18N.t('msg.alg_label_reponse_attendue'),formula],[I18N.t('msg.alg_label_expr_affichee'),exprDisplay],[I18N.t('msg.alg_label_erreur_classique'),errorExpr]].forEach(function(pair){
       const issues=algSyntaxIssues(pair[1]);
       if(issues.length)throw new Error('Q'+X+' — '+pair[0]+' : '+issues.join(' '));
     });
@@ -90,9 +90,9 @@ function genAlgebraic(X){
   return{bareme,vars,qnote,kbdRaw:useKbd?kbdHtml:null,
     textFrag:`
       <div style="background:#0891b2;border-left:5px solid #0e7490;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Algébrique</strong>
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('tpl.alg_banniere')}</strong>
         <span style="background:#0e7490;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
-        <span style="background:#ffffff;color:#0e7490;border:1px solid #0e7490;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">∑ Réponse formelle</span>
+        <span style="background:#ffffff;color:#0e7490;border:1px solid #0e7490;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">${I18N.t('tpl.alg_badge_reponse_formelle')}</span>
       </div>
       <!-- ENONCE-START -->${text||''}<!-- ENONCE-END -->
       ${hasDisplay?`<p style="font-weight:600;">\\({@exp${X}@}\\)</p>`:''}
@@ -119,7 +119,7 @@ function genAlgebraic(X){
     prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
     feedbackRef:`[[feedback:prt${X}]]`,
-    generalFeedback: `<p><strong>Réponse attendue :</strong> \\({@ta${X}@}\\)</p>`+(sol?`<div style="margin-top:8px;">${sol}</div>`:''),
+    generalFeedback: `<p><strong>${I18N.t('tpl.alg_fb_reponse_attendue')}</strong> \\({@ta${X}@}\\)</p>`+(sol?`<div style="margin-top:8px;">${sol}</div>`:''),
     solution:sol};
 }
 

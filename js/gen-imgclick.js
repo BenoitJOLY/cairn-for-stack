@@ -61,9 +61,9 @@ function genImgClick(X) {
 
     /* ── Feedback ── */
     var labelPart = zoneLabel ? ' <em>' + htmlEsc(zoneLabel) + '</em>' : '';
-    var fbOk    = wrapFb('<p>✅ <strong>Zone correcte !</strong>' + labelPart + '</p>'
+    var fbOk    = wrapFb('<p>✅ <strong>' + I18N.t('ic.fb_ok_title') + '</strong>' + labelPart + '</p>'
                        + (fbOkTxt ? '<p>' + htmlEsc(fbOkTxt) + '</p>' : ''), true);
-    var fbWrong = wrapFb('<p>❌ <strong>Zone incorrecte.</strong>'
+    var fbWrong = wrapFb('<p>❌ <strong>' + I18N.t('ic.fb_wrong_title') + '</strong>'
                        + (fbWrTxt ? ' ' + htmlEsc(fbWrTxt) : '') + '</p>', false);
 
     /* ── PRT ── */
@@ -122,7 +122,7 @@ function genImgClick(X) {
     var textFrag = '<div style="background:#0d9488;border-left:5px solid #0f766e;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — Zone cliquable</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t('ic.banniere') + '</strong>'
         + '<span style="background:#0f766e;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -134,7 +134,7 @@ function genImgClick(X) {
     return {
         bareme:          bareme,
         vars:            '',
-        qnote:           'Click Q' + X,
+        qnote:           'Zone cliquable Q' + X,
         kbdRaw:          jxgCode,
         textFrag:        textFrag,
         inputXML:        inputXML,
@@ -158,7 +158,7 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
 
     var BGW = st.bgW, BGH = st.bgH;
     var zones = st.zones.map(function (z, i) {
-        var label = (z.label || '').trim() || ('Zone ' + (i + 1));
+        var label = (z.label || '').trim() || I18N.t('jd.zone_label', {n: i + 1});
         return { id: 'z' + i, label: label, shape: z.shape, x: z.x, y: z.y, r: z.r, w: z.w, h: z.h };
     });
 
@@ -183,9 +183,9 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         + '    </input>';
 
     /* ── Feedback ── */
-    var fbOk    = wrapFb('<p>✅ <strong>Bravo, vous avez trouvé toutes les zones dans le temps imparti !</strong></p>'
+    var fbOk    = wrapFb('<p>✅ <strong>' + I18N.t('ic.fb_ok_seq') + '</strong></p>'
                        + (fbOkTxt ? '<p>' + htmlEsc(fbOkTxt) + '</p>' : ''), true);
-    var fbWrong = wrapFb('<p>❌ <strong>Temps écoulé.</strong> Vous n\'avez pas trouvé toutes les zones à temps.</p>'
+    var fbWrong = wrapFb('<p>❌ <strong>' + I18N.t('ic.fb_wrong_seq_title') + '</strong> ' + I18N.t('ic.fb_wrong_seq_detail') + '</p>'
                        + (fbWrTxt ? '<p>' + htmlEsc(fbWrTxt) + '</p>' : ''), false);
 
     /* ── PRT ── */
@@ -249,15 +249,15 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         + 'var _boardCont=document.getElementById(divid);\n'
         + "var instrEl=document.createElement('div');\n"
         + "instrEl.style.cssText='display:block;margin-top:10px;text-align:center;font-size:1.15rem;font-weight:800;color:#0f766e;';\n"
-        + "instrEl.textContent=" + JSON.stringify('Vous devrez cliquer, dans l\'ordre annoncé, sur chaque zone en moins de ' + seqTime + 's.') + ";\n"
+        + "instrEl.textContent=" + JSON.stringify(I18N.t('ic.instr_template', {sec: seqTime})) + ";\n"
         + "if(_boardCont&&_boardCont.parentNode)_boardCont.parentNode.insertBefore(instrEl,_boardCont.nextSibling);\n"
         + "var startBtn=document.createElement('button');\n"
         + "startBtn.type='button';\n"
-        + "startBtn.textContent=" + JSON.stringify('▶ Démarrer') + ";\n"
+        + "startBtn.textContent=" + JSON.stringify(I18N.t('ic.start_btn')) + ";\n"
         + "startBtn.style.cssText='display:block;margin:10px auto 0;padding:10px 22px;font-size:1.05rem;font-weight:800;color:#fff;background:#0f766e;border:none;border-radius:8px;cursor:pointer;';\n"
         + "if(instrEl.parentNode)instrEl.parentNode.insertBefore(startBtn,instrEl.nextSibling);\n"
         + 'var etatActuel=0,tempsRestant=TEMPS,estFini=false,gameStarted=false,compteur;\n'
-        + 'function majConsigne(){if(instrEl)instrEl.textContent="Trouvez : "+cibles[etatActuel].label;}\n'
+        + 'function majConsigne(){if(instrEl)instrEl.textContent=' + JSON.stringify(I18N.t('ic.find_prefix')) + '+cibles[etatActuel].label;}\n'
         + 'function lancerTimer(){\n'
         + '  clearInterval(compteur);\n'
         + '  tempsRestant=TEMPS;\n'
@@ -275,9 +275,9 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         + '  clearInterval(compteur);\n'
         + '  var inputEl=document.getElementById(refAns' + X + ');\n'
         + '  if(statut==="reussi"){\n'
-        + "    if(instrEl){instrEl.textContent='Bravo !';instrEl.style.color='#15803d';}\n"
+        + "    if(instrEl){instrEl.textContent=" + JSON.stringify(I18N.t('ic.win_msg')) + ";instrEl.style.color='#15803d';}\n"
         + '  } else {\n'
-        + "    if(instrEl){instrEl.textContent='Temps écoulé !';instrEl.style.color='#dc2626';}\n"
+        + "    if(instrEl){instrEl.textContent=" + JSON.stringify(I18N.t('ic.timeout_msg')) + ";instrEl.style.color='#dc2626';}\n"
         + '  }\n'
         + '  timerTxt.setText("");\n'
         + '  inputEl.value=statut;\n'
@@ -316,7 +316,7 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
     var textFrag = '<div style="background:#0d9488;border-left:5px solid #0f766e;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — Séquence chronométrée</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t('ic.banniere_seq') + '</strong>'
         + '<span style="background:#0f766e;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'

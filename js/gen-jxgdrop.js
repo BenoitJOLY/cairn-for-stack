@@ -51,7 +51,7 @@ function jxgDropBuildSolutionImage(st) {
         var assignments = z.assignments && z.assignments.length ? z.assignments : (z.assignment ? [z.assignment] : []);
         var labels = assignments.map(function (id) {
             var p = st.proposals.find(function (pp) { return pp.id === id; });
-            return p ? (p.text || ('Prop. ' + p.id)) : '?';
+            return p ? (p.text || I18N.t('tpl.vf_prop_fallback', {n: p.id})) : '?';
         });
         var label = labels.join(' / ') || '?';
         var cx, cy;
@@ -176,7 +176,7 @@ function genJxgDrop(X) {
 
     var propItems = st.proposals.map(function (p, i) {
         var px = initPos[i][0], py = initPos[i][1];
-        var label = (p.text || 'Prop. ' + p.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        var label = (p.text || I18N.t('tpl.vf_prop_fallback', {n: p.id})).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         return "board.create('point',[" + px + ',' + py + "],"
             + "{name:'" + label + "',size:11,face:'circle',fixed:IS_RO_" + X + ',highlight:!IS_RO_' + X + ','
             + "strokeColor:'#fff',strokeWidth:3,fillColor:'#2563eb',shadow:true,"
@@ -306,12 +306,12 @@ function genJxgDrop(X) {
         var assignments = z.assignments && z.assignments.length ? z.assignments : (z.assignment ? [z.assignment] : []);
         var lbls = assignments.map(function (id) {
             var prop = st.proposals.find(function (p) { return p.id === id; });
-            return prop ? htmlEsc(prop.text || 'Prop. ' + prop.id) : '?';
+            return prop ? htmlEsc(prop.text || I18N.t('tpl.vf_prop_fallback', {n: prop.id})) : '?';
         });
-        return '<li>Zone ' + (i + 1) + ' → ' + (lbls.join(' <em>ou</em> ') || '?') + '</li>';
+        return '<li>' + I18N.t('jd.zone_label', {n: i + 1}) + ' → ' + (lbls.join(' <em>ou</em> ') || '?') + '</li>';
     }).join('');
-    var trueFb  = '<p>✅ <strong>Parfait !</strong> Toutes les propositions sont correctement placées.</p>';
-    var falseFb = '<p>❌ Score : {@pct_' + X + '@} %. Rappel de la correction :</p><ul>' + solutionLines + '</ul>';
+    var trueFb  = '<p>✅ <strong>' + I18N.t('jd.fb_ok_title') + '</strong> ' + I18N.t('jd.fb_ok_detail') + '</p>';
+    var falseFb = '<p>❌ ' + I18N.t('jd.fb_wrong', {pctvar: 'pct_' + X}) + '</p><ul>' + solutionLines + '</ul>';
 
     // L'image-solution va dans le feedback général (generalfeedback), affiché
     // à tous les élèves après validation quel que soit leur score — c'est
@@ -345,7 +345,7 @@ function genJxgDrop(X) {
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — Glisser-Déposer JSXGraph</strong>'
+        + ' — ' + I18N.t('jd.banniere') + '</strong>'
         + '<span style="background:#92400e;color:#fff;padding:2px 9px;'
         + 'border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
@@ -360,7 +360,7 @@ function genJxgDrop(X) {
     return {
         bareme:          bareme,
         vars:            '',
-        qnote:           'Drag-drop Q' + X,
+        qnote:           'Glisser-déposer Q' + X,
         textFrag:        textFrag,
         kbdRaw:          jxgCode,
         inputXML:        inputsXML,

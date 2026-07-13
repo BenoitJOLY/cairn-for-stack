@@ -28,35 +28,35 @@ function buildInputXml(inp){
 /* ── Generator ─────────────────────────────────────────────────── */
 async function genExpert(qid){
   var q=questions[qid];
-  if(!q) throw new Error('Question introuvable.');
+  if(!q) throw new Error(I18N.t('msg.err_expert_q_introuvable'));
 
   /* Sync live form → _expertState */
   if(typeof expertCaptureToState==='function') expertCaptureToState(qid);
 
   var s=q._expertState;
-  if(!s) throw new Error('État expert non initialisé. Ouvrez d\'abord le panneau de configuration.');
+  if(!s) throw new Error(I18N.t('msg.err_expert_state'));
 
   var inputs=s.inputs||[];
   var prts=s.prts||[];
 
-  if(!inputs.length) throw new Error('Au moins un input est requis.');
-  if(!prts.length)   throw new Error('Au moins un PRT est requis.');
+  if(!inputs.length) throw new Error(I18N.t('msg.err_expert_input_requis'));
+  if(!prts.length)   throw new Error(I18N.t('msg.err_expert_prt_requis'));
 
   /* Validate inputs */
   for(var i=0;i<inputs.length;i++){
     if(!String(inputs[i].name||'').match(/^[a-zA-Z][a-zA-Z0-9_]*$/))
-      throw new Error('Nom d\'input invalide : "'+inputs[i].name+'". Lettres/chiffres/underscore, commence par une lettre.');
+      throw new Error(I18N.t('msg.err_expert_input_nom', {name: inputs[i].name}));
     if(!String(inputs[i].tans||'').trim())
-      throw new Error('Réponse modèle (tans) manquante pour l\'input "'+inputs[i].name+'".');
+      throw new Error(I18N.t('msg.err_expert_tans', {name: inputs[i].name}));
   }
 
   /* Validate PRTs */
   for(var j=0;j<prts.length;j++){
     var prt=prts[j];
     if(!String(prt.name||'').match(/^[a-zA-Z][a-zA-Z0-9_]*$/))
-      throw new Error('Nom de PRT invalide : "'+prt.name+'".');
+      throw new Error(I18N.t('msg.err_expert_prt_nom', {name: prt.name}));
     if(!(prt.nodes&&prt.nodes.length))
-      throw new Error('Le PRT "'+prt.name+'" n\'a aucun nœud. Ouvrez l\'éditeur PRT pour en ajouter.');
+      throw new Error(I18N.t('msg.err_expert_prt_noeud', {name: prt.name}));
     /* Détection de boucle infinie : DFS depuis le nœud 0 */
     var nodeIds=prt.nodes.map(function(n){return String(n.id||n.name||n.nodeid);});
     var adjTrue={}, adjFalse={};
@@ -92,16 +92,16 @@ async function genExpert(qid){
         if(adjTrue[cur2]) subStack.push(adjTrue[cur2]);
         if(adjFalse[cur2]) subStack.push(adjFalse[cur2]);
       }
-      if(cycleFound) throw new Error('⚠️ Boucle infinie détectée dans le PRT "'+prt.name+'" : le nœud '+nid+' peut être atteint depuis lui-même. Vérifiez les liens Suivant.');
+      if(cycleFound) throw new Error(I18N.t('msg.err_expert_boucle', {name: prt.name, nid: nid}));
     }
     /* Vérifier que les nœuds référencés existent */
     prt.nodes.forEach(function(n){
       var id=String(n.id||n.name||n.nodeid);
       var tNext=adjTrue[id]; var fNext=adjFalse[id];
       if(tNext&&tNext!=='END'&&tNext!=='-1'&&nodeIds.indexOf(tNext)<0)
-        throw new Error('PRT "'+prt.name+'" nœud '+id+' : le successeur vrai "'+tNext+'" n\'existe pas.');
+        throw new Error(I18N.t('msg.err_expert_succ_vrai', {name: prt.name, id: id, tnext: tNext}));
       if(fNext&&fNext!=='END'&&fNext!=='-1'&&nodeIds.indexOf(fNext)<0)
-        throw new Error('PRT "'+prt.name+'" nœud '+id+' : le successeur faux "'+fNext+'" n\'existe pas.');
+        throw new Error(I18N.t('msg.err_expert_succ_faux', {name: prt.name, id: id, fnext: fNext}));
     });
     /* Vérifier que tous les nœuds sont atteignables depuis le nœud racine (0) */
     var rootId=nodeIds[0];
@@ -115,7 +115,7 @@ async function genExpert(qid){
     }
     var orphans=nodeIds.filter(function(id){ return !reachable[id]; });
     if(orphans.length)
-      throw new Error('⚠️ PRT "'+prt.name+'" : nœud(s) orphelin(s) non atteignable(s) depuis le nœud racine : '+orphans.join(', ')+'. Reliez-les ou supprimez-les.');
+      throw new Error(I18N.t('msg.err_expert_orphelins', {name: prt.name, orphans: orphans.join(', ')}));
   }
 
   var inputXML = inputs.map(buildInputXml).join('\n');

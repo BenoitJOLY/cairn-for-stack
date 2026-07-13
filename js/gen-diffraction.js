@@ -9,38 +9,12 @@ var DIFF_A_LIST = [20, 30, 40, 50, 60, 80, 100];
 var DIFF_D_LIST = [1, 1.5, 2, 2.5, 3];
 var DIFF_B_LIST = [200, 250, 300, 350, 400, 450, 500];
 
-var DIFF_INFO = {
-  fente_simple: {
-    ecran: "Fente unique, mesure directe sur la figure. L'eleve deplace le reticule sur les taches "
-      + "pour mesurer la largeur l de la tache centrale, puis en deduit lambda.",
-    capteur: "Fente unique, mesure au capteur. La figure est affichee, et un capteur relevant "
-      + "l'intensite I(y) = sinc²(beta) est ajoute ; l'eleve mesure l sur cette courbe."
-  },
-  fente_double: {
-    ecran: "Deux fentes, mesure directe sur la figure de franges (enveloppe de diffraction sinc² x "
-      + "interferences cos²). L'eleve mesure l'interfrange i et la largeur l de la tache centrale.",
-    capteur: "Deux fentes, mesure au capteur. La figure de franges est affichee, et une courbe "
-      + "d'intensite I(y) = sinc²(alpha) x cos²(beta) est ajoutee pour la mesure."
-  },
-  young: {
-    ecran: "Trous de Young, mesure directe sur la figure 2D (tache d'Airy x cos²). L'eleve deplace "
-      + "le reticule sur les anneaux/franges pour mesurer l'interfrange i.",
-    capteur: "Trous de Young, mesure au capteur. La figure 2D est affichee, et une coupe 1D de "
-      + "l'intensite le long d'un axe est ajoutee pour la mesure au capteur."
-  },
-  trou_circulaire: {
-    ecran: "Trou circulaire, mesure directe sur la figure 2D (tache d'Airy). L'eleve deplace "
-      + "le reticule sur le premier anneau sombre pour mesurer le rayon r de la tache centrale.",
-    capteur: "Trou circulaire, mesure au capteur. La figure 2D est affichee, et une coupe 1D "
-      + "radiale de l'intensite est ajoutee pour la mesure au capteur."
-  },
-  trou_carre: {
-    ecran: "Trou carre, mesure directe sur la figure 2D (tache centrale carree en croix). L'eleve "
-      + "deplace le reticule pour mesurer la largeur l de la tache centrale.",
-    capteur: "Trou carre, mesure au capteur. La figure 2D est affichee, et une courbe I(y) issue "
-      + "d'un capteur est ajoutee pour mesurer la largeur l de la tache centrale."
-  }
-};
+var DIFF_INFO_TYPES = ["fente_simple", "fente_double", "young", "trou_circulaire", "trou_carre"];
+var DIFF_INFO_MODES = ["ecran", "capteur"];
+function _diffInfoText(type, mode) {
+  if (DIFF_INFO_TYPES.indexOf(type) === -1 || DIFF_INFO_MODES.indexOf(mode) === -1) return "";
+  return I18N.t("diff.info_" + type + "_" + mode);
+}
 
 function _diffNeedsB(type) { return type === "fente_double" || type === "young"; }
 
@@ -730,7 +704,7 @@ function diffTypeChange() {
   var type = (document.getElementById("diff-type") || {}).value || "fente_simple";
   var mode = (document.getElementById("diff-mode") || {}).value || "ecran";
   var info = document.getElementById("diff-info-box");
-  if (info) info.innerHTML = (DIFF_INFO[type] || {})[mode] || "";
+  if (info) info.innerHTML = _diffInfoText(type, mode);
   var bRow = document.getElementById("diff-row-b");
   if (bRow) bRow.style.display = _diffNeedsB(type) ? "" : "none";
   diffUpdatePreview();
@@ -980,9 +954,9 @@ function _diffBuildSvgPreview(type, mode, a_um, D_m, b_um, lambdaNm) {
   svg += "</svg>";
 
   var meas = "";
-  if (type === "fente_simple" || type === "trou_carre") meas = "Largeur tache centrale l = <strong>" + (2 * ymin * 1000).toFixed(2) + " mm</strong>";
-  else if (type === "trou_circulaire") meas = "Rayon tache centrale r = <strong>" + (1.22 * ymin * 1000).toFixed(2) + " mm</strong>";
-  else meas = "Interfrange i = <strong>" + (inter * 1000).toFixed(3) + " mm</strong>";
+  if (type === "fente_simple" || type === "trou_carre") meas = I18N.t("diff.meas_largeur") + "<strong>" + (2 * ymin * 1000).toFixed(2) + " mm</strong>";
+  else if (type === "trou_circulaire") meas = I18N.t("diff.meas_rayon") + "<strong>" + (1.22 * ymin * 1000).toFixed(2) + " mm</strong>";
+  else meas = I18N.t("diff.meas_interfrange") + "<strong>" + (inter * 1000).toFixed(3) + " mm</strong>";
   return { svg: svg, meas: meas, ymin: ymin, inter: inter };
 }
 
@@ -996,11 +970,11 @@ function diffUpdatePreview() {
     '<div style="margin-bottom:6px;">' + demo.svg + "</div>"
     + '<div style="font-size:.82rem;color:#334155;">'
     + (p.isRnd
-      ? "→ a, D" + (_diffNeedsB(p.type) ? ", b" : "") + ", λ tires au hasard – aperçu : "
-      : "→ valeurs fixes : ")
+      ? I18N.t("diff.preview_random_ad") + (_diffNeedsB(p.type) ? I18N.t("diff.preview_random_b") : "") + I18N.t("diff.preview_random_suffix")
+      : I18N.t("diff.preview_fixed"))
     + "a=" + p.a + " µm, D=" + p.D + " m" + (_diffNeedsB(p.type) ? ", b=" + p.b + " µm" : "")
     + ", λ=" + p.lambda + " nm"
-    + (p.isRnd ? "<br>λ tiree parmi : " + lasersTxt + " nm" : "")
+    + (p.isRnd ? I18N.t("diff.preview_laser_choice") + lasersTxt + " nm" : "")
     + "<br>" + demo.meas + "</div>";
 }
 
@@ -1121,18 +1095,18 @@ function genDiffraction(X) {
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
     consigneJsx = mode === "ecran"
-      ? "<p>La figure de diffraction est representee ci-dessus. Deplacez le reticule pour mesurer la largeur l de la tache centrale.</p>"
-      : "<p>La figure de diffraction est affichee ci-dessus. La courbe I(y) issue d'un capteur est representee ci-dessous : deplacez le reticule sur la courbe pour mesurer la largeur l de la tache centrale.</p>";
-    consigneMes = "<p>Incertitude sur la mesure au reticule : u(l) = 0,06 mm.</p>";
+      ? I18N.t("diff.consigne_diffraction_l_ecran")
+      : I18N.t("diff.consigne_diffraction_l_capteur");
+    consigneMes = I18N.t("diff.mesincert_l");
 
     subQs = "<ol>"
-      + "<li>Quel est le nom du phenomene observe ? " + inp(1) + "</li>"
-      + "<li>Donner l'expression litterale de tan(θ) en fonction de l et D : tan(θ) = " + inp(2) + "</li>"
-      + "<li>Calculer l'angle θ en radian : θ = " + inp(3) + "</li>"
-      + "<li>Calculer λ et indiquer l'unite avec * (ex : 635*nm) : λ = " + inp(4) + "</li>"
-      + "<li>Calculer u(λ) avec 2 chiffres significatifs, sachant que u(λ) = λ√[(u(a)/a)²+(u(D)/D)²+(u(l)/l)²] : u(λ) = " + inp(5) + "</li>"
-      + "<li>Quel est le parametre le plus important a ameliorer ? " + inp(6) + "</li>"
-      + "<li>En deduire un encadrement de λ (avec unites) : " + inp(7) + " &lt; λ &lt; " + inp(8) + "</li>"
+      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N.t("diff.subq_tan_ld") + inp(2) + "</li>"
+      + "<li>" + I18N.t("diff.subq_angle") + inp(3) + "</li>"
+      + "<li>" + I18N.t("diff.subq_lambda_ex") + inp(4) + "</li>"
+      + "<li>" + I18N.t("diff.subq_incertitude_l") + inp(5) + "</li>"
+      + "<li>" + I18N.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
+      + "<li>" + I18N.t("diff.subq_encadrement") + inp(7) + I18N.t("diff.lt_lambda_lt") + inp(8) + "</li>"
       + "</ol>";
 
     var fv6a = "gl" + X + ": mcq_correct(" + t(6) + "); rp6" + X + ": if(" + t(6) + "[ans6" + X + "][1]=gl" + X + "[1]) then 1 else 0;";
@@ -1161,47 +1135,47 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, fv2a, [
         _diffNode(0, "AlgEquiv", "ans2" + X, t(2), "", "=", 1, -1,
-          _diffOK + "Expression correcte : tan(θ) = l/(2D)." + _diffEnd,
+          _diffOK + I18N.t("diff.fb_tan_l_ok") + _diffEnd,
           "=", 0, 1, "", "prt2" + X),
         _diffNode(1, "AlgEquiv", "ans2" + X, "1/(" + t(2) + ")", "", "+", 0.25, -1,
-          _diffOK + "Attention, vous avez inverse numerateur et denominateur : tan(θ) = l/(2D)." + _diffEnd,
-          "-", 0, -1, _diffKO + "Incorrect. On a tan(θ) = l/(2D), avec l la largeur de la tache centrale." + _diffEnd, "prt2" + X)
+          _diffOK + I18N.t("diff.fb_tan_l_inverted") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_tan_l_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, fv3a, [
         _diffNode(0, "NumRelative", "ans3" + X, t(3), "0.05", "=", 1, -1,
-          _diffOK + "Angle θ correct." + _diffEnd, "=", 0, 1, "", "prt3" + X),
+          _diffOK + I18N.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
         _diffNode(1, "NumRelative", "verif1" + X, "verif2" + X, "0.05", "+", 0.25, -1,
-          _diffOK + "Ordre de grandeur correct mais puissance de 10 erronee." + _diffEnd,
-          "-", 0, -1, _diffKO + "Angle incorrect. θ = λ(nm)/a(µm) × 10⁻³ = {@" + t(3) + "@} rad." + _diffEnd, "prt3" + X)
+          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_angle_ko_std").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, fv4a, [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + "Longueur d'onde correcte : λ = {@" + t(4) + "@}." + _diffEnd, "=", 0, 1, "", "prt4" + X),
+          _diffOK + I18N.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
         _diffNode(1, "UnitsRelative", "verif3" + X, "verif4" + X, "0.05", "+", 0.25, -1,
-          _diffOK + "Ordre de grandeur correct mais puissance de 10 erronee." + _diffEnd,
-          "-", 0, -1, _diffKO + "Valeur ou unite incorrecte. λ = a·l / (2D). Exemple : 635*nm." + _diffEnd, "prt4" + X)
+          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_lambda_ko_l") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans5" + X, t(5), "0.15", "=", 1, -1,
-          _diffOK + "Incertitude u(λ) correcte." + _diffEnd, "=", 0, -1,
-          _diffKO + "Incorrect. u(λ) = λ√[(u(a)/a)²+(u(D)/D)²+(u(l)/l)²] avec u(l) = 0,06 mm." + _diffEnd, "prt5" + X)
+          _diffOK + I18N.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
+          _diffKO + I18N.t("diff.fb_incertitude_ko_l") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, fv6a, [
         _diffNode(0, "NumRelative", "rp6" + X, "1", "0", "=", 1, -1,
-          _diffOK + "Correct ! Il faut ameliorer {@" + t(6) + "[ans6" + X + "][3]@}." + _diffEnd,
-          "=", 0, -1, _diffKO + "Comparez u(a)/a, u(D)/D et u(l)/l : le plus grand rapport indique le parametre a ameliorer." + _diffEnd, "prt6" + X)
+          _diffOK + I18N.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_comparer_l") + _diffEnd, "prt6" + X)
       ]),
       _diffPRT("prt7" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans7" + X, t(7), "0.05", "=", 1, 1, "", "=", 0, 2, "", "prt7" + X),
         _diffNode(1, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + "Encadrement complet correct : {@" + t(8) + "@} < λ < {@" + t(7) + "@}." + _diffEnd,
-          "-", 0, -1, _diffKO + "Borne inferieure incorrecte. λ-u(λ) = {@" + t(8) + "@}." + _diffEnd, "prt7" + X),
+          I18N.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
         _diffNode(2, "UnitsRelative", "ans7" + X, t(8), "0.05", "+", 0.5, 3, "", "-", 0, 3, "", "prt7" + X),
         _diffNode(3, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + "Borne basse correcte." + _diffEnd, "-", 0, 4, "", "prt7" + X),
+          _diffOK + I18N.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
         _diffNode(4, "UnitsRelative", "ans8" + X, t(7), "0.05", "+", 0.5, -1,
-          _diffOK + "Vous avez interverti la valeur haute et la valeur basse de l'encadrement." + _diffEnd,
-          "-", 0, -1, _diffKO + "Borne superieure incorrecte. λ+u(λ) = {@" + t(7) + "@}." + _diffEnd, "prt7" + X)
+          I18N.t("diff.fb_bornes_interverties") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1223,18 +1197,18 @@ function genDiffraction(X) {
     vars += t(7) + ": float((round(100*" + A + "))/100*1E-6)*m;";
 
     consigneJsx = mode === "ecran"
-      ? "<p>La figure de franges est representee ci-dessus. Deplacez le reticule pour mesurer l'interfrange i et la largeur l de la tache centrale.</p>"
-      : "<p>La figure de franges est affichee ci-dessus. La courbe I(y) issue d'un capteur est representee ci-dessous : deplacez le reticule sur la courbe pour mesurer l'interfrange i.</p>";
+      ? I18N.t("diff.consigne_franges_ecran")
+      : I18N.t("diff.consigne_franges_capteur");
     consigneMes = "";
 
     subQs = "<ol>"
-      + "<li>Quel est le nom du phenomene observe ? " + inp(1) + "</li>"
-      + "<li>Calculer l'interfrange i (avec unite, ex : 2.5*mm) : i = " + inp(2) + "</li>"
-      + "<li>Sachant que i = λD/b, donner l'expression litterale de b : b = " + inp(3) + "</li>"
-      + "<li>Calculer b (avec unite) : b = " + inp(4) + "</li>"
-      + "<li>Mesurer la largeur l de la tache centrale (avec unite) : l = " + inp(5) + "</li>"
-      + "<li>Sachant que l = 2λD/a, donner l'expression litterale de a : a = " + inp(6) + "</li>"
-      + "<li>Calculer a (avec unite) : a = " + inp(7) + "</li>"
+      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N.t("diff.subq_interfrange_i") + inp(2) + "</li>"
+      + "<li>" + I18N.t("diff.subq_expr_b") + inp(3) + "</li>"
+      + "<li>" + I18N.t("diff.subq_calc_b") + inp(4) + "</li>"
+      + "<li>" + I18N.t("diff.subq_mesurer_l") + inp(5) + "</li>"
+      + "<li>" + I18N.t("diff.subq_expr_a") + inp(6) + "</li>"
+      + "<li>" + I18N.t("diff.subq_calc_a") + inp(7) + "</li>"
       + "</ol>";
 
     var fv1b = "repq1" + X + ": difffb1" + X + "[ans1" + X + "]; text1" + X + ": repq1" + X + ";";
@@ -1254,33 +1228,33 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans2" + X, t(2), "0.05", "=", 1, -1,
-          _diffOK + "Interfrange correct : i = {@" + t(2) + "@}." + _diffEnd,
-          "=", 0, -1, _diffKO + "Interfrange incorrect. i = λD/b. N'oubliez pas l'unite (ex : 2.5*mm)." + _diffEnd, "prt2" + X)
+          I18N.t("diff.fb_interfrange_ok").split("{V}").join("{@" + t(2) + "@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_interfrange_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, "", [
         _diffNode(0, "AlgEquiv", "ans3" + X, t(3), "", "=", 1, -1,
-          _diffOK + "Formule correcte : b = λD/i." + _diffEnd,
-          "=", 0, -1, _diffKO + "Incorrect. On isole b dans i = λD/b." + _diffEnd, "prt3" + X)
+          I18N.t("diff.fb_formule_b_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_formule_b_ko") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + "Valeur de b correcte." + _diffEnd,
-          "=", 0, -1, _diffKO + "Valeur ou unite incorrecte pour b." + _diffEnd, "prt4" + X)
+          I18N.t("diff.fb_valeur_b_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_valeur_b_ko") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans5" + X, t(5), "0.05", "=", 1, -1,
-          _diffOK + "Largeur l correcte." + _diffEnd,
-          "=", 0, -1, _diffKO + "Largeur l incorrecte." + _diffEnd, "prt5" + X)
+          I18N.t("diff.fb_largeur_l_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_largeur_l_ko") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, "", [
         _diffNode(0, "AlgEquiv", "ans6" + X, t(6), "", "=", 1, -1,
-          _diffOK + "Formule correcte : a = 2λD/l." + _diffEnd,
-          "=", 0, -1, _diffKO + "Incorrect. On isole a dans l = 2λD/a." + _diffEnd, "prt6" + X)
+          I18N.t("diff.fb_formule_a_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_formule_a_ko") + _diffEnd, "prt6" + X)
       ]),
       _diffPRT("prt7" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans7" + X, t(7), "0.05", "=", 1, -1,
-          _diffOK + "Valeur de a correcte." + _diffEnd,
-          "=", 0, -1, _diffKO + "Valeur ou unite incorrecte pour a." + _diffEnd, "prt7" + X)
+          I18N.t("diff.fb_valeur_a_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_valeur_a_ko") + _diffEnd, "prt7" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1311,18 +1285,18 @@ function genDiffraction(X) {
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
     consigneJsx = mode === "ecran"
-      ? "<p>La tache d'Airy du trou circulaire est representee ci-dessus. Deplacez le reticule sur le premier anneau sombre pour mesurer le rayon r de la tache centrale.</p>"
-      : "<p>La tache d'Airy est affichee ci-dessus. La coupe radiale I(r) issue d'un capteur est representee ci-dessous : deplacez le reticule sur la courbe pour mesurer le rayon r de la tache centrale.</p>";
-    consigneMes = "<p>Incertitude sur la mesure au reticule : u(r) = 0,06 mm.</p>";
+      ? I18N.t("diff.consigne_airy_circ_ecran")
+      : I18N.t("diff.consigne_airy_circ_capteur");
+    consigneMes = I18N.t("diff.mesincert_r");
 
     subQs = "<ol>"
-      + "<li>Quel est le nom du phenomene observe ? " + inp(1) + "</li>"
-      + "<li>Donner l'expression litterale de tan(θ) en fonction de r et D : tan(θ) = " + inp(2) + "</li>"
-      + "<li>Sachant que le premier anneau sombre correspond a θ = 1,22λ/a, calculer l'angle θ en radian : θ = " + inp(3) + "</li>"
-      + "<li>Calculer λ et indiquer l'unite avec * (ex : 635*nm) : λ = " + inp(4) + "</li>"
-      + "<li>Calculer u(λ) avec 2 chiffres significatifs, sachant que u(λ) = λ√[(u(a)/a)²+(u(D)/D)²+(u(r)/r)²] : u(λ) = " + inp(5) + "</li>"
-      + "<li>Quel est le parametre le plus important a ameliorer ? " + inp(6) + "</li>"
-      + "<li>En deduire un encadrement de λ (avec unites) : " + inp(7) + " &lt; λ &lt; " + inp(8) + "</li>"
+      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N.t("diff.subq_tan_rd") + inp(2) + "</li>"
+      + "<li>" + I18N.t("diff.subq_angle_airy") + inp(3) + "</li>"
+      + "<li>" + I18N.t("diff.subq_lambda_ex") + inp(4) + "</li>"
+      + "<li>" + I18N.t("diff.subq_incertitude_r") + inp(5) + "</li>"
+      + "<li>" + I18N.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
+      + "<li>" + I18N.t("diff.subq_encadrement") + inp(7) + I18N.t("diff.lt_lambda_lt") + inp(8) + "</li>"
       + "</ol>";
 
     var fv6d = "gl" + X + ": mcq_correct(" + t(6) + "); rp6" + X + ": if(" + t(6) + "[ans6" + X + "][1]=gl" + X + "[1]) then 1 else 0;";
@@ -1351,47 +1325,47 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, fv2d, [
         _diffNode(0, "AlgEquiv", "ans2" + X, t(2), "", "=", 1, -1,
-          _diffOK + "Expression correcte : tan(θ) = r/D." + _diffEnd,
+          _diffOK + I18N.t("diff.fb_tan_r_ok") + _diffEnd,
           "=", 0, 1, "", "prt2" + X),
         _diffNode(1, "AlgEquiv", "ans2" + X, "1/(" + t(2) + ")", "", "+", 0.25, -1,
-          _diffOK + "Attention, vous avez inverse numerateur et denominateur : tan(θ) = r/D." + _diffEnd,
-          "-", 0, -1, _diffKO + "Incorrect. On a tan(θ) = r/D, avec r le rayon de la tache centrale." + _diffEnd, "prt2" + X)
+          _diffOK + I18N.t("diff.fb_tan_r_inverted") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_tan_r_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, fv3d, [
         _diffNode(0, "NumRelative", "ans3" + X, t(3), "0.05", "=", 1, -1,
-          _diffOK + "Angle θ correct." + _diffEnd, "=", 0, 1, "", "prt3" + X),
+          _diffOK + I18N.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
         _diffNode(1, "NumRelative", "verif1" + X, "verif2" + X, "0.05", "+", 0.25, -1,
-          _diffOK + "Ordre de grandeur correct mais puissance de 10 erronee." + _diffEnd,
-          "-", 0, -1, _diffKO + "Angle incorrect. θ = 1,22×λ(nm)/a(µm) × 10⁻³ = {@" + t(3) + "@} rad." + _diffEnd, "prt3" + X)
+          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_angle_ko_airy").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, fv4d, [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + "Longueur d'onde correcte : λ = {@" + t(4) + "@}." + _diffEnd, "=", 0, 1, "", "prt4" + X),
+          _diffOK + I18N.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
         _diffNode(1, "UnitsRelative", "verif3" + X, "verif4" + X, "0.05", "+", 0.25, -1,
-          _diffOK + "Ordre de grandeur correct mais puissance de 10 erronee." + _diffEnd,
-          "-", 0, -1, _diffKO + "Valeur ou unite incorrecte. λ = a·r / (1,22·D). Exemple : 635*nm." + _diffEnd, "prt4" + X)
+          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_lambda_ko_r") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans5" + X, t(5), "0.15", "=", 1, -1,
-          _diffOK + "Incertitude u(λ) correcte." + _diffEnd, "=", 0, -1,
-          _diffKO + "Incorrect. u(λ) = λ√[(u(a)/a)²+(u(D)/D)²+(u(r)/r)²] avec u(r) = 0,06 mm." + _diffEnd, "prt5" + X)
+          _diffOK + I18N.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
+          _diffKO + I18N.t("diff.fb_incertitude_ko_r") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, fv6d, [
         _diffNode(0, "NumRelative", "rp6" + X, "1", "0", "=", 1, -1,
-          _diffOK + "Correct ! Il faut ameliorer {@" + t(6) + "[ans6" + X + "][3]@}." + _diffEnd,
-          "=", 0, -1, _diffKO + "Comparez u(a)/a, u(D)/D et u(r)/r : le plus grand rapport indique le parametre a ameliorer." + _diffEnd, "prt6" + X)
+          _diffOK + I18N.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_comparer_r") + _diffEnd, "prt6" + X)
       ]),
       _diffPRT("prt7" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans7" + X, t(7), "0.05", "=", 1, 1, "", "=", 0, 2, "", "prt7" + X),
         _diffNode(1, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + "Encadrement complet correct : {@" + t(8) + "@} < λ < {@" + t(7) + "@}." + _diffEnd,
-          "-", 0, -1, _diffKO + "Borne inferieure incorrecte. λ-u(λ) = {@" + t(8) + "@}." + _diffEnd, "prt7" + X),
+          I18N.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
         _diffNode(2, "UnitsRelative", "ans7" + X, t(8), "0.05", "+", 0.5, 3, "", "-", 0, 3, "", "prt7" + X),
         _diffNode(3, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + "Borne basse correcte." + _diffEnd, "-", 0, 4, "", "prt7" + X),
+          _diffOK + I18N.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
         _diffNode(4, "UnitsRelative", "ans8" + X, t(7), "0.05", "+", 0.5, -1,
-          _diffOK + "Vous avez interverti la valeur haute et la valeur basse de l'encadrement." + _diffEnd,
-          "-", 0, -1, _diffKO + "Borne superieure incorrecte. λ+u(λ) = {@" + t(7) + "@}." + _diffEnd, "prt7" + X)
+          I18N.t("diff.fb_bornes_interverties") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1422,18 +1396,18 @@ function genDiffraction(X) {
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
     consigneJsx = mode === "ecran"
-      ? "<p>La figure de diffraction du trou carre est representee ci-dessus. Deplacez le reticule pour mesurer la largeur l de la tache centrale.</p>"
-      : "<p>La figure de diffraction est affichee ci-dessus. La courbe I(y) issue d'un capteur est representee ci-dessous : deplacez le reticule sur la courbe pour mesurer la largeur l de la tache centrale.</p>";
-    consigneMes = "<p>Incertitude sur la mesure au reticule : u(l) = 0,06 mm.</p>";
+      ? I18N.t("diff.consigne_diffraction_carre_ecran")
+      : I18N.t("diff.consigne_diffraction_l_capteur");
+    consigneMes = I18N.t("diff.mesincert_l");
 
     subQs = "<ol>"
-      + "<li>Quel est le nom du phenomene observe ? " + inp(1) + "</li>"
-      + "<li>Donner l'expression litterale de tan(θ) en fonction de l et D : tan(θ) = " + inp(2) + "</li>"
-      + "<li>Calculer l'angle θ en radian : θ = " + inp(3) + "</li>"
-      + "<li>Calculer λ et indiquer l'unite avec * (ex : 635*nm) : λ = " + inp(4) + "</li>"
-      + "<li>Calculer u(λ) avec 2 chiffres significatifs, sachant que u(λ) = λ√[(u(a)/a)²+(u(D)/D)²+(u(l)/l)²] : u(λ) = " + inp(5) + "</li>"
-      + "<li>Quel est le parametre le plus important a ameliorer ? " + inp(6) + "</li>"
-      + "<li>En deduire un encadrement de λ (avec unites) : " + inp(7) + " &lt; λ &lt; " + inp(8) + "</li>"
+      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N.t("diff.subq_tan_ld") + inp(2) + "</li>"
+      + "<li>" + I18N.t("diff.subq_angle") + inp(3) + "</li>"
+      + "<li>" + I18N.t("diff.subq_lambda_ex") + inp(4) + "</li>"
+      + "<li>" + I18N.t("diff.subq_incertitude_l") + inp(5) + "</li>"
+      + "<li>" + I18N.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
+      + "<li>" + I18N.t("diff.subq_encadrement") + inp(7) + I18N.t("diff.lt_lambda_lt") + inp(8) + "</li>"
       + "</ol>";
 
     var fv6e = "gl" + X + ": mcq_correct(" + t(6) + "); rp6" + X + ": if(" + t(6) + "[ans6" + X + "][1]=gl" + X + "[1]) then 1 else 0;";
@@ -1462,47 +1436,47 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, fv2e, [
         _diffNode(0, "AlgEquiv", "ans2" + X, t(2), "", "=", 1, -1,
-          _diffOK + "Expression correcte : tan(θ) = l/(2D)." + _diffEnd,
+          _diffOK + I18N.t("diff.fb_tan_l_ok") + _diffEnd,
           "=", 0, 1, "", "prt2" + X),
         _diffNode(1, "AlgEquiv", "ans2" + X, "1/(" + t(2) + ")", "", "+", 0.25, -1,
-          _diffOK + "Attention, vous avez inverse numerateur et denominateur : tan(θ) = l/(2D)." + _diffEnd,
-          "-", 0, -1, _diffKO + "Incorrect. On a tan(θ) = l/(2D), avec l la largeur de la tache centrale." + _diffEnd, "prt2" + X)
+          _diffOK + I18N.t("diff.fb_tan_l_inverted") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_tan_l_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, fv3e, [
         _diffNode(0, "NumRelative", "ans3" + X, t(3), "0.05", "=", 1, -1,
-          _diffOK + "Angle θ correct." + _diffEnd, "=", 0, 1, "", "prt3" + X),
+          _diffOK + I18N.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
         _diffNode(1, "NumRelative", "verif1" + X, "verif2" + X, "0.05", "+", 0.25, -1,
-          _diffOK + "Ordre de grandeur correct mais puissance de 10 erronee." + _diffEnd,
-          "-", 0, -1, _diffKO + "Angle incorrect. θ = λ(nm)/a(µm) × 10⁻³ = {@" + t(3) + "@} rad." + _diffEnd, "prt3" + X)
+          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_angle_ko_std").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, fv4e, [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + "Longueur d'onde correcte : λ = {@" + t(4) + "@}." + _diffEnd, "=", 0, 1, "", "prt4" + X),
+          _diffOK + I18N.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
         _diffNode(1, "UnitsRelative", "verif3" + X, "verif4" + X, "0.05", "+", 0.25, -1,
-          _diffOK + "Ordre de grandeur correct mais puissance de 10 erronee." + _diffEnd,
-          "-", 0, -1, _diffKO + "Valeur ou unite incorrecte. λ = a·l / (2D). Exemple : 635*nm." + _diffEnd, "prt4" + X)
+          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_lambda_ko_l") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans5" + X, t(5), "0.15", "=", 1, -1,
-          _diffOK + "Incertitude u(λ) correcte." + _diffEnd, "=", 0, -1,
-          _diffKO + "Incorrect. u(λ) = λ√[(u(a)/a)²+(u(D)/D)²+(u(l)/l)²] avec u(l) = 0,06 mm." + _diffEnd, "prt5" + X)
+          _diffOK + I18N.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
+          _diffKO + I18N.t("diff.fb_incertitude_ko_l") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, fv6e, [
         _diffNode(0, "NumRelative", "rp6" + X, "1", "0", "=", 1, -1,
-          _diffOK + "Correct ! Il faut ameliorer {@" + t(6) + "[ans6" + X + "][3]@}." + _diffEnd,
-          "=", 0, -1, _diffKO + "Comparez u(a)/a, u(D)/D et u(l)/l : le plus grand rapport indique le parametre a ameliorer." + _diffEnd, "prt6" + X)
+          _diffOK + I18N.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_comparer_l") + _diffEnd, "prt6" + X)
       ]),
       _diffPRT("prt7" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans7" + X, t(7), "0.05", "=", 1, 1, "", "=", 0, 2, "", "prt7" + X),
         _diffNode(1, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + "Encadrement complet correct : {@" + t(8) + "@} < λ < {@" + t(7) + "@}." + _diffEnd,
-          "-", 0, -1, _diffKO + "Borne inferieure incorrecte. λ-u(λ) = {@" + t(8) + "@}." + _diffEnd, "prt7" + X),
+          I18N.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
         _diffNode(2, "UnitsRelative", "ans7" + X, t(8), "0.05", "+", 0.5, 3, "", "-", 0, 3, "", "prt7" + X),
         _diffNode(3, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + "Borne basse correcte." + _diffEnd, "-", 0, 4, "", "prt7" + X),
+          _diffOK + I18N.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
         _diffNode(4, "UnitsRelative", "ans8" + X, t(7), "0.05", "+", 0.5, -1,
-          _diffOK + "Vous avez interverti la valeur haute et la valeur basse de l'encadrement." + _diffEnd,
-          "-", 0, -1, _diffKO + "Borne superieure incorrecte. λ+u(λ) = {@" + t(7) + "@}." + _diffEnd, "prt7" + X)
+          I18N.t("diff.fb_bornes_interverties") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1531,17 +1505,17 @@ function genDiffraction(X) {
     vars += t(7) + ": float((" + L + "-" + t(4) + "/nm))*nm;";
 
     consigneJsx = mode === "ecran"
-      ? "<p>La figure 2D de la tache d'Airy et des franges est representee ci-dessus. Deplacez le reticule pour mesurer l'interfrange i.</p>"
-      : "<p>La figure 2D est affichee ci-dessus. Une coupe 1D de l'intensite (issue d'un capteur) est representee ci-dessous : deplacez le reticule sur la courbe pour mesurer l'interfrange i.</p>";
-    consigneMes = "<p>Incertitude sur la mesure de l'interfrange : u(i) = {@" + UI_ + "@} m.</p>";
+      ? I18N.t("diff.consigne_young_ecran")
+      : I18N.t("diff.consigne_young_capteur");
+    consigneMes = I18N.t("diff.mesincert_interfrange").split("{V}").join("{@" + UI_ + "@}");
 
     subQs = "<ol>"
-      + "<li>Quel est le nom du phenomene observe ? " + inp(1) + "</li>"
-      + "<li>Calculer l'interfrange i (avec unite, ex : 2.5*mm) : i = " + inp(2) + "</li>"
-      + "<li>Sachant que i = λD/b, determiner λ (avec unite, ex : 635*nm) : λ = " + inp(3) + "</li>"
-      + "<li>Calculer u(λ) avec 2 chiffres significatifs, sachant que u(λ) = λ√[(u(i)/i)²+(u(D)/D)²+(u(b)/b)²] : u(λ) = " + inp(4) + "</li>"
-      + "<li>Quel est le parametre le plus important a ameliorer ? " + inp(5) + "</li>"
-      + "<li>En deduire un encadrement de λ (avec unites) : " + inp(6) + " &lt; λ &lt; " + inp(7) + "</li>"
+      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N.t("diff.subq_interfrange_i") + inp(2) + "</li>"
+      + "<li>" + I18N.t("diff.subq_determiner_lambda_young") + inp(3) + "</li>"
+      + "<li>" + I18N.t("diff.subq_incertitude_young") + inp(4) + "</li>"
+      + "<li>" + I18N.t("diff.subq_parametre_ameliorer") + inp(5) + "</li>"
+      + "<li>" + I18N.t("diff.subq_encadrement") + inp(6) + I18N.t("diff.lt_lambda_lt") + inp(7) + "</li>"
       + "</ol>";
 
     var fv1c = "repq1" + X + ": difffb1" + X + "[ans1" + X + "]; text1" + X + ": repq1" + X + ";";
@@ -1567,39 +1541,39 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans2" + X, t(2), "0.05", "=", 1, -1,
-          _diffOK + "Interfrange correct : i = {@" + t(2) + "@}." + _diffEnd,
-          "=", 0, -1, _diffKO + "Interfrange incorrect. i = λD/b. N'oubliez pas l'unite (ex : 2.5*mm)." + _diffEnd, "prt2" + X)
+          I18N.t("diff.fb_interfrange_ok").split("{V}").join("{@" + t(2) + "@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_interfrange_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, fv3c, [
         _diffNode(0, "UnitsRelative", "ans3" + X, t(3), "0.05", "=", 1, -1,
-          _diffOK + "Longueur d'onde correcte : λ = {@" + t(3) + "@}." + _diffEnd, "=", 0, 1, "", "prt3" + X),
+          _diffOK + I18N.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "=", 0, 1, "", "prt3" + X),
         _diffNode(1, "NumRelative", "verif1" + X, "verif2" + X, "0.05", "+", 0.25, -1,
-          _diffOK + "Ordre de grandeur correct mais puissance de 10 erronee." + _diffEnd,
-          "-", 0, -1, _diffKO + "Longueur d'onde incorrecte. λ = ib/D. Unite attendue (ex : 635*nm)." + _diffEnd, "prt3" + X)
+          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_lambda_ko_young") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, fv4c, [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + "Incertitude u(λ) correcte." + _diffEnd, "=", 0, 1, "", "prt4" + X),
+          _diffOK + I18N.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, 1, "", "prt4" + X),
         _diffNode(1, "UnitsRelative", "verif3" + X, "verif4" + X, "0.05", "+", 0.25, -1,
-          _diffOK + "Ordre de grandeur correct mais puissance de 10 erronee." + _diffEnd,
-          "-", 0, -1, _diffKO + "Incorrect. u(λ) = λ√[(u(i)/i)²+(u(D)/D)²+(u(b)/b)²]." + _diffEnd, "prt4" + X)
+          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_incertitude_ko_young") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, fv5c, [
         _diffNode(0, "NumRelative", "rp5" + X, "1", "0", "=", 1, -1,
-          _diffOK + "Correct ! Il faut ameliorer {@" + t(5) + "[ans5" + X + "][3]@}." + _diffEnd,
-          "=", 0, -1, _diffKO + "Comparez u(i)/i, u(D)/D et u(b)/b pour trouver le parametre dominant." + _diffEnd, "prt5" + X)
+          _diffOK + I18N.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(5) + "[ans5" + X + "][3]@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N.t("diff.fb_comparer_young") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans6" + X, t(6), "0.05", "=", 1, 1, "", "=", 0, 2, "", "prt6" + X),
         _diffNode(1, "UnitsRelative", "ans7" + X, t(7), "0.05", "+", 1, -1,
-          _diffOK + "Encadrement complet correct : {@" + t(7) + "@} < λ < {@" + t(6) + "@}." + _diffEnd,
-          "-", 0, -1, _diffKO + "Borne inferieure incorrecte. λ-u(λ) = {@" + t(7) + "@}." + _diffEnd, "prt6" + X),
+          I18N.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(7) + "@}").split("{V2}").join("{@" + t(6) + "@}") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt6" + X),
         _diffNode(2, "UnitsRelative", "ans6" + X, t(7), "0.05", "+", 0.5, 3, "", "-", 0, 3, "", "prt6" + X),
         _diffNode(3, "NumRelative", "ans7" + X, t(7), "0.05", "+", 1, -1,
-          _diffOK + "Borne basse correcte." + _diffEnd, "-", 0, 4, "", "prt6" + X),
+          _diffOK + I18N.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt6" + X),
         _diffNode(4, "UnitsRelative", "ans7" + X, t(6), "0.05", "+", 0.5, -1,
-          _diffOK + "Vous avez interverti la valeur haute et la valeur basse de l'encadrement." + _diffEnd,
-          "-", 0, -1, _diffKO + "Borne superieure incorrecte. λ+u(λ) = {@" + t(6) + "@}." + _diffEnd, "prt6" + X)
+          I18N.t("diff.fb_bornes_interverties") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(6) + "@}") + _diffEnd, "prt6" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1613,7 +1587,7 @@ function genDiffraction(X) {
 
   var header = '<div style="background:#4338ca;border-left:5px solid #312e81;border-radius:0 8px 8px 0;'
     + 'padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-    + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — Interferences-Diffraction</strong>'
+    + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t("diff.header_title") + '</strong>'
     + '<span style="background:#312e81;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
     + '<span style="background:#fff;color:#312e81;border:1px solid #312e81;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">' + type + ' / ' + mode + '</span>'
     + "</div>";
@@ -1635,8 +1609,8 @@ function genDiffraction(X) {
     + '<p style="font-size:.85rem;color:#475569;">' + demo.meas + " – " + nPRT + " sous-questions</p>"
     + params + subQs.replace(/\[\[input:[^\]]+\]\] \[\[validation:[^\]]+\]\]/g, "<em style=\"color:#6b7280;\">[reponse]</em>");
 
-  var recap = "<p>Phenomene observe : " + ((type === "fente_simple" || type === "trou_circulaire" || type === "trou_carre") ? "diffraction" : "interferences") + ". "
-    + "Longueur d'onde λ = {@" + L + "@} nm.</p>";
+  var recap = I18N.t("diff.recap_prefix") + ((type === "fente_simple" || type === "trou_circulaire" || type === "trou_carre") ? I18N.t("diff.recap_diffraction") : I18N.t("diff.recap_interferences")) + I18N.t("diff.recap_lambda_suffix")
+    + "{@" + L + "@} nm.</p>";
 
   return {
     bareme: bareme, vars: vars, qnote: "{@" + L + "@} nm",

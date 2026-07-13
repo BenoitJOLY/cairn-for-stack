@@ -100,12 +100,12 @@ function genCrossword(X){
     const vertWords = currentPlacedWords.filter(w => w.direction === 'V').sort((a,b)=>a.number-b.number);
 
     if(horizWords.length > 0) {
-        definitionsHTML += `<h4>Horizontal</h4><ul style="list-style-type: none; padding-left: 0;">`;
+        definitionsHTML += `<h4>${I18N.t('cw.horizontal')}</h4><ul style="list-style-type: none; padding-left: 0;">`;
         horizWords.forEach(w => { definitionsHTML += `<li style="margin-bottom: 10px;"><strong>${w.number}.</strong> ${w.def}<br>[[input:${w.varName}]] [[validation:${w.varName}]]</li>`; });
         definitionsHTML += `</ul>`;
     }
     if(vertWords.length > 0) {
-        definitionsHTML += `<h4>Vertical</h4><ul style="list-style-type: none; padding-left: 0;">`;
+        definitionsHTML += `<h4>${I18N.t('cw.vertical')}</h4><ul style="list-style-type: none; padding-left: 0;">`;
         vertWords.forEach(w => { definitionsHTML += `<li style="margin-bottom: 10px;"><strong>${w.number}.</strong> ${w.def}<br>[[input:${w.varName}]] [[validation:${w.varName}]]</li>`; });
         definitionsHTML += `</ul>`;
     }
@@ -165,9 +165,9 @@ fb_html: sconcat(fb_html, "</div>");`;
         name: '0', description: 'Test tous les mots', answertest: 'AlgEquiv', sans: 'score', tans: '1',
         testoptions: '', quiet: '0',
         truescoremode: '=', truescore: '1', truepenalty: '0', truenextnode: '-1',
-        trueanswernote: 'PRT-'+X+'-1-T', truefeedback: `<p><strong>Bravo, tous vos mots sont corrects !</strong></p>{#fb_html#} `,
+        trueanswernote: 'PRT-'+X+'-1-T', truefeedback: `<p><strong>${I18N.t('cw.fb_ok')}</strong></p>{#fb_html#} `,
         falsescoremode: '=', falsescore: 'score', falsepenalty: '0.1', falsenextnode: '-1',
-        falseanswernote: 'PRT-'+X+'-1-F', falsefeedback: `<p>Score : {@round(score*100)@}% &mdash; 1 lettre d'ecart = 1/2 point.</p>{#fb_html#} `
+        falseanswernote: 'PRT-'+X+'-1-F', falsefeedback: `<p>${I18N.t('cw.fb_wrong')}</p>{#fb_html#} `
     }];
     let prtXML = buildPrtXml(prtMeta, canonicalNodes);
     
@@ -210,14 +210,14 @@ fb_html: sconcat(fb_html, "</div>");`;
     const vertFb  = currentPlacedWords.filter(function(w){return w.direction==='V';}).sort(function(a,b){return a.number-b.number;});
     let fbDefsHTML = `<div style="margin-top:12px;font-size:.92rem;">`;
     if (horizFb.length > 0) {
-        fbDefsHTML += `<strong style="display:block;margin:4px 0;">Horizontal</strong><ul style="list-style:none;padding:0;margin:0 0 8px 0;">`;
+        fbDefsHTML += `<strong style="display:block;margin:4px 0;">${I18N.t('cw.horizontal')}</strong><ul style="list-style:none;padding:0;margin:0 0 8px 0;">`;
         horizFb.forEach(function(w) {
             fbDefsHTML += `<li style="margin-bottom:5px;"><strong>${w.number}.</strong> ${w.def} <span style="color:#166534;font-weight:bold;">→ ${w.word}</span></li>`;
         });
         fbDefsHTML += `</ul>`;
     }
     if (vertFb.length > 0) {
-        fbDefsHTML += `<strong style="display:block;margin:4px 0;">Vertical</strong><ul style="list-style:none;padding:0;margin:0;">`;
+        fbDefsHTML += `<strong style="display:block;margin:4px 0;">${I18N.t('cw.vertical')}</strong><ul style="list-style:none;padding:0;margin:0;">`;
         vertFb.forEach(function(w) {
             fbDefsHTML += `<li style="margin-bottom:5px;"><strong>${w.number}.</strong> ${w.def} <span style="color:#166534;font-weight:bold;">→ ${w.word}</span></li>`;
         });
@@ -225,15 +225,15 @@ fb_html: sconcat(fb_html, "</div>");`;
     }
     fbDefsHTML += `</div>`;
 
-    const generalFeedbackContent = `<div style="padding:12px 16px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;margin-bottom:8px;"><strong style="display:block;margin-bottom:10px;font-size:.95rem;">Correction — Mots croisés</strong>${fbGridHTML}${fbDefsHTML}</div>`;
+    const generalFeedbackContent = `<div style="padding:12px 16px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;margin-bottom:8px;"><strong style="display:block;margin-bottom:10px;font-size:.95rem;">${I18N.t('cw.correction_title')}</strong>${fbGridHTML}${fbDefsHTML}</div>`;
 
 
     return{bareme,vars:questionVariables,qnote:`Mots Croisés`,
     textFrag:`
       <div style="background:#ea580c;border-left:5px solid #c2410c;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Mots Croisés</strong>
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('cw.banniere')}</strong>
         <span style="background:#c2410c;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
-        <span style="background:#ffffff;color:#c2410c;border:1px solid #c2410c;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🧩 Grille interactive</span>
+        <span style="background:#ffffff;color:#c2410c;border:1px solid #c2410c;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">${I18N.t('cw.badge_grille')}</span>
       </div>
       <!-- ENONCE-START --><!-- ENONCE-END -->
       ${questionHTML}

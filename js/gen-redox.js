@@ -117,8 +117,8 @@ function genRedox(X) {
                  + 'rx_ok:is(abs(rx_ecur-rx_etgt)<=' + tolE.toFixed(3) + ');\n';
     }
 
-    var fbOkFinal    = fbOk    || '<p>✅ <strong>Bonne réponse !</strong></p>';
-    var fbWrongFinal = fbWrong || '<p>❌ <strong>Réponse incorrecte.</strong></p>';
+    var fbOkFinal    = fbOk    || '<p>✅ <strong>'+I18N.t('rx.fb_ok_default')+'</strong></p>';
+    var fbWrongFinal = fbWrong || '<p>❌ <strong>'+I18N.t('rx.fb_wrong_default')+'</strong></p>';
 
     var prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedVars };
     var canonicalNodes = [{
@@ -131,7 +131,7 @@ function genRedox(X) {
     }];
     var prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
-    var questionLabel = 'Question ' + X + ' — Dosage redox';
+    var questionLabel = I18N.t('rx.qnote_fallback', {n: String(X)});
     var rxFindLabel   = isVolCursor ? ('Veq = ' + Veq.toFixed(2) + ' mL')
                                     : ((rxFind==='eo1'?'E°₁':'E°₂') + ' = ' + targetE.toFixed(3) + ' V');
     var questionText  = '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML

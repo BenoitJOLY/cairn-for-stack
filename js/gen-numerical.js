@@ -31,9 +31,9 @@ function genNumerical(X){
   return{bareme,vars,qnote,kbdRaw:useKbd?kbdHtml:null,
     textFrag:`
       <div style="background:#059669;border-left:5px solid #047857;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Arithmétique</strong>
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('tpl.num_banniere')}</strong>
         <span style="background:#047857;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
-        <span style="background:#ffffff;color:#047857;border:1px solid #047857;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">#️⃣ Calcul numérique</span>
+        <span style="background:#ffffff;color:#047857;border:1px solid #047857;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">${I18N.t('tpl.num_badge_calcul')}</span>
       </div>
       <!-- ENONCE-START -->${text||''}<!-- ENONCE-END -->
       ${inputLine}
@@ -59,7 +59,7 @@ function genNumerical(X){
     </input>`,
     prtXML: prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
-  generalFeedback: `<p><strong>La valeur attendue était :</strong> {@ta${X}@}</p>`+(numFbGen?`<p>${numFbGen}</p>`:''),
+  generalFeedback: `<p><strong>${I18N.t('tpl.num_fb_valeur_attendue')}</strong> {@ta${X}@}</p>`+(numFbGen?`<p>${numFbGen}</p>`:''),
   feedbackRef:`[[feedback:prt${X}]]`};
 }
 

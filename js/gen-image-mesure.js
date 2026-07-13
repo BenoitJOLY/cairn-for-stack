@@ -36,7 +36,7 @@ function immLoadImage(input) {
       var kb = Math.round(finalDataUrl.length / 1024);
       var warn = document.getElementById('imm-size-warn');
       if (kb > 200) {
-        warn.textContent = '⚠️ Image volumineuse (' + kb + ' Ko en base64) — le XML sera lourd.';
+        warn.textContent = I18N.t('imm.warn_lourd', {kb: kb});
         warn.style.display = '';
       } else {
         warn.style.display = 'none';
@@ -57,9 +57,9 @@ function immStartCapture(target) {
   imgEl.style.outline = '3px solid #0891b2';
   var hint = document.getElementById('imm-capture-hint');
   if (target && target.type === 'target' && target.ecart) {
-    hint.textContent = target.stage === 2 ? '👆 Cliquez sur le second point (B)…' : '👆 Cliquez sur le premier point (A)…';
+    hint.textContent = target.stage === 2 ? I18N.t('imm.hint_second_point') : I18N.t('imm.hint_first_point');
   } else {
-    hint.textContent = '👆 Cliquez sur l\'image pour placer le repère…';
+    hint.textContent = I18N.t('imm.hint_place_repere');
   }
   hint.style.display = '';
 }
@@ -131,7 +131,7 @@ function immOnImageClick(e) {
         row.dataset.py2 = py;
         row.querySelector('.imm-t-val').value = (distAB * echelleMag).toFixed(2);
       } else {
-        alert('Définissez d\'abord les 2 repères d\'étalonnage (position + valeur réelle).');
+        alert(I18N.t('imm.alert_etalonnage_manquant'));
       }
     } else {
       // Valeur attendue = projection du point cliqué sur la droite repère1→repère2
@@ -144,7 +144,7 @@ function immOnImageClick(e) {
         row.dataset.px = px;
         row.dataset.py = py;
       } else {
-        alert('Définissez d\'abord les 2 repères d\'étalonnage (position + valeur réelle).');
+        alert(I18N.t('imm.alert_etalonnage_manquant'));
       }
     }
     _immCapture = null;
@@ -228,19 +228,19 @@ function immAddTarget(desc, val) {
   row.style.cssText = 'border:1px solid #e5e7eb;border-radius:6px;padding:8px 10px;margin:6px 0;background:#f9fafb;';
   row.innerHTML =
     '<div class="g2">' +
-    '<div class="field"><label style="font-size:.8rem;">Description — mesure ' + n + '</label>' +
-    '<input type="text" class="imm-t-desc" placeholder="ex : Raie rouge" value="' + (desc || '') + '" style="width:100%;"></div>' +
-    '<div class="field"><label style="font-size:.8rem;">Valeur attendue (' + unit + ')</label>' +
+    '<div class="field"><label style="font-size:.8rem;">' + I18N.t('imm.desc_mesure_lbl', {n: n}) + '</label>' +
+    '<input type="text" class="imm-t-desc" placeholder="' + I18N.t('imm.desc_mesure_ph') + '" value="' + (desc || '') + '" style="width:100%;"></div>' +
+    '<div class="field"><label style="font-size:.8rem;">' + I18N.t('imm.valeur_attendue_lbl', {unit: unit}) + '</label>' +
     '<div style="display:flex;gap:6px;align-items:center;">' +
-    '<input type="number" class="imm-t-val" step="any" placeholder="ex : 656" value="' + (val !== undefined ? val : '') + '" style="width:90px;" oninput="immUpdateOverlay()">' +
-    '<button type="button" class="btn-sm" title="Cliquer sur l\'image pour capturer" onclick="immCaptureForTarget(this)">📍</button>' +
-    '<button type="button" class="btn-sm" title="Supprimer" onclick="this.closest(\'.imm-target-row\').remove();immUpdateOverlay();" style="color:#dc2626;">🗑️</button>' +
+    '<input type="number" class="imm-t-val" step="any" placeholder="' + I18N.t('imm.valeur_attendue_ph') + '" value="' + (val !== undefined ? val : '') + '" style="width:90px;" oninput="immUpdateOverlay()">' +
+    '<button type="button" class="btn-sm" title="' + I18N.t('imm.capturer_title') + '" onclick="immCaptureForTarget(this)">📍</button>' +
+    '<button type="button" class="btn-sm" title="' + I18N.t('imm.supprimer_title') + '" onclick="this.closest(\'.imm-target-row\').remove();immUpdateOverlay();" style="color:#dc2626;">🗑️</button>' +
     '</div></div>' +
     '</div>' +
-    '<div class="field" style="margin-top:4px;"><label style="font-size:.8rem;">Type de mesure</label>' +
+    '<div class="field" style="margin-top:4px;"><label style="font-size:.8rem;">' + I18N.t('imm.type_mesure_lbl') + '</label>' +
     '<select class="imm-t-type" onchange="var r=this.closest(\'.imm-target-row\');r.dataset.px=\'\';r.dataset.py=\'\';r.dataset.px2=\'\';r.dataset.py2=\'\';immUpdateOverlay();">' +
-    '<option value="position">Position (par rapport au repère 1)</option>' +
-    '<option value="ecart">Écart entre 2 points (ex : période)</option>' +
+    '<option value="position">' + I18N.t('imm.type_position_opt') + '</option>' +
+    '<option value="ecart">' + I18N.t('imm.type_ecart_opt') + '</option>' +
     '</select></div>';
   container.appendChild(row);
 }
@@ -311,7 +311,7 @@ function genImageMesure(X) {
         : Math.round(Math.hypot(px - r1x, py - r1y) * 1000) / 1000;
     }
     if (!isNaN(val)) targets.push({
-      desc: d || ('Mesure ' + (targets.length + 1)),
+      desc: d || I18N.t('imm.mesure_default_desc', {n: targets.length + 1}),
       val: val,
       type: type,
       hasPx: hasPx,
@@ -320,12 +320,12 @@ function genImageMesure(X) {
   });
 
   // Validations
-  if (!imgData) { alert('Veuillez charger une image.'); return ''; }
+  if (!imgData) { alert(I18N.t('imm.alert_charger_image')); return ''; }
   if (isNaN(r1x) || isNaN(r1y) || isNaN(r2x) || isNaN(r2y) || isNaN(r1v) || isNaN(r2v) || (r1x === r2x && r1y === r2y)) {
-    alert('Définissez les 2 repères d\'étalonnage (position sur l\'image + valeur réelle), à des emplacements différents.'); return '';
+    alert(I18N.t('imm.alert_etalonnage_distinct')); return '';
   }
-  if (targets.length === 0) { alert('Ajoutez au moins une mesure.'); return ''; }
-  if (isNaN(imgW) || isNaN(imgH)) { alert('Erreur dimensions image.'); return ''; }
+  if (targets.length === 0) { alert(I18N.t('imm.alert_ajouter_mesure')); return ''; }
+  if (isNaN(imgW) || isNaN(imgH)) { alert(I18N.t('imm.alert_erreur_dimensions')); return ''; }
 
   var N   = targets.length;
 
@@ -355,25 +355,20 @@ function genImageMesure(X) {
   // pédagogique (même l'Expert, qui ne donne aucun indice pendant la tentative, doit
   // pouvoir comprendre APRÈS coup comment on obtient la bonne réponse). ──
   var fbAuto = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-    + '<div style="font-weight:bold;color:#0c4a6e;margin-bottom:10px;">🔑 Méthode et corrigé</div>'
+    + '<div style="font-weight:bold;color:#0c4a6e;margin-bottom:10px;">' + I18N.t('imm.methode_corrige_lbl') + '</div>'
     + '<div style="margin-bottom:10px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:8px;">'
-    + '<strong>Échelle</strong> — on divise l\'écart réel entre les 2 repères par leur écart en pixels sur l\'image : '
-    + '(' + r2v + ' − ' + r1v + ') ÷ ' + Math.round(calibDistPx) + ' px = <strong>' + echelleRounded + ' ' + htmlEsc(unit) + '/px</strong></div>';
+    + '<strong>' + I18N.t('imm.echelle_lbl') + '</strong> — ' + I18N.t('imm.echelle_full_desc', {r2v: r2v, r1v: r1v, calibDistPx: Math.round(calibDistPx), echelleRounded: echelleRounded, unit: htmlEsc(unit)}) + '</div>';
   targets.forEach(function(t, i) {
     var n = i + 1;
     var isLast = i === targets.length - 1;
     fbAuto += '<div style="margin-bottom:8px;font-size:.9rem;' + (isLast ? '' : 'border-bottom:1px dashed #e2e8f0;padding-bottom:8px;') + '">';
     fbAuto += '<span style="font-weight:bold;color:#0c4a6e;">' + n + '. ' + htmlEsc(t.desc) + ' :</span> ';
     if (!t.hasPx) {
-      fbAuto += '<p>Valeur attendue&nbsp;: <strong>' + t.val + ' ' + htmlEsc(unit) + '</strong>.</p>';
+      fbAuto += '<p>' + I18N.t('imm.valeur_attendue_simple', {val: t.val, unit: htmlEsc(unit)}) + '</p>';
     } else if (t.type === 'ecart') {
-      fbAuto += '<p>On mesure la distance en pixels <strong>entre les 2 points</strong> (ce n\'est pas une position par rapport au repère 1, mais un écart) : ' + t.pxDist + ' px.<br>'
-        + 'On multiplie par l\'échelle&nbsp;: ' + t.pxDist + ' × ' + echelleRounded + ' = <strong>' + t.val + ' ' + htmlEsc(unit) + '</strong>.<br>'
-        + '⚠️ On n\'ajoute pas la valeur du repère 1&nbsp;: un écart entre 2 points n\'a pas d\'origine.</p>';
+      fbAuto += '<p>' + I18N.t('imm.methode_ecart_desc', {pxDist: t.pxDist, echelleRounded: echelleRounded, val: t.val, unit: htmlEsc(unit)}) + '</p>';
     } else {
-      fbAuto += '<p>On mesure la distance en pixels entre le <strong>repère 1</strong> et ce point&nbsp;: ' + t.pxDist + ' px.<br>'
-        + 'On multiplie par l\'échelle&nbsp;: ' + t.pxDist + ' × ' + echelleRounded + ' = ' + t.rawDist + ' ' + htmlEsc(unit) + '.<br>'
-        + 'Comme le repère 1 ne vaut pas forcément 0, on ajoute son origine&nbsp;: ' + t.rawDist + ' + ' + r1v + ' = <strong>' + t.val + ' ' + htmlEsc(unit) + '</strong>.</p>';
+      fbAuto += '<p>' + I18N.t('imm.methode_position_desc', {pxDist: t.pxDist, echelleRounded: echelleRounded, rawDist: t.rawDist, r1v: r1v, val: t.val, unit: htmlEsc(unit)}) + '</p>';
     }
     fbAuto += '</div>';
   });
@@ -417,35 +412,35 @@ function genImageMesure(X) {
   // Aucune valeur/description de repère n'est injectée automatiquement ici :
   // le professeur les rédige lui-même dans le champ Énoncé (ci-dessus, "text").
   var textFrag = '<div style="background:#0e7490;border-left:5px solid #164e63;padding:8px 14px;margin:0 0 10px 0;border-radius:6px;color:#fff;font-family:sans-serif;">'
-      + '<strong style="font-size:1rem;">Q' + X + ' — Mesure sur image</strong>'
+      + '<strong style="font-size:1rem;">Q' + X + ' — ' + I18N.t('imm.banniere') + '</strong>'
       + '<span style="float:right;opacity:.85;">/ ' + bareme + ' pt</span></div>\n';
   if (text) textFrag += '<div>' + text + '</div>\n';
   textFrag += '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n';
   textFrag += '<!--HS-KBD:' + X + '-->\n';
   textFrag += '[[/jsxgraph]]\n';
 
-  var modeLabel = mode === 'expert' ? 'Expert' : (mode === 'autonome' ? 'Autonome' : 'Guidé');
-  textFrag += '<p style="font-size:.78rem;color:#6b7280;margin:0 0 6px 0;">Mode <strong>' + modeLabel + '</strong></p>\n';
+  var modeLabel = mode === 'expert' ? I18N.t('imm.mode_expert_lbl') : (mode === 'autonome' ? I18N.t('imm.mode_autonome_lbl') : I18N.t('imm.mode_guide_lbl'));
+  textFrag += '<p style="font-size:.78rem;color:#6b7280;margin:0 0 6px 0;">' + I18N.t('imm.mode_prefix') + ' <strong>' + modeLabel + '</strong></p>\n';
 
   if (mode === 'guide') {
     textFrag += '<p style="background:#ecfeff;border:1px solid #a5f3fc;border-radius:6px;padding:8px 12px;font-size:.92rem;">'
-        + '<strong>Étalonnage</strong> — positionnez les points A et B de l\'outil de mesure sur les 2 repères décrits ci-dessus.<br>'
-        + 'Échelle déduite (' + htmlEsc(unit) + ' par pixel)&nbsp;: [[input:' + P + 'ec]] [[validation:' + P + 'ec]]</p>\n';
+        + '<strong>' + I18N.t('imm.etalonnage_lbl') + '</strong> — ' + I18N.t('imm.etalonnage_guide_desc') + '<br>'
+        + I18N.t('imm.echelle_deduite_lbl', {unit: htmlEsc(unit)}) + ' [[input:' + P + 'ec]] [[validation:' + P + 'ec]]</p>\n';
   } else if (mode === 'autonome') {
     textFrag += '<p style="background:#ecfeff;border:1px solid #a5f3fc;border-radius:6px;padding:8px 12px;font-size:.92rem;">'
-        + '<strong>Étalonnage</strong> — positionnez les points A et B de l\'outil de mesure sur les 2 repères décrits ci-dessus, et calculez votre échelle au brouillon.<br>'
-        + 'Échelle calculée (' + htmlEsc(unit) + ' par pixel)&nbsp;: [[input:' + P + 'ec]] [[validation:' + P + 'ec]]</p>\n';
+        + '<strong>' + I18N.t('imm.etalonnage_lbl') + '</strong> — ' + I18N.t('imm.etalonnage_autonome_desc') + '<br>'
+        + I18N.t('imm.echelle_calculee_lbl', {unit: htmlEsc(unit)}) + ' [[input:' + P + 'ec]] [[validation:' + P + 'ec]]</p>\n';
   }
 
   targets.forEach(function(t, i) {
     var n = i + 1;
     textFrag += '<p><strong>' + n + '. ' + htmlEsc(t.desc) + '</strong><br>';
     if (mode === 'guide' && t.hasPx && t.type !== 'ecart') {
-      textFrag += 'Distance brute avant origine (' + htmlEsc(unit) + ')&nbsp;: [[input:' + P + 'r' + n + ']] [[validation:' + P + 'r' + n + ']]<br>';
+      textFrag += I18N.t('imm.distance_brute_lbl', {unit: htmlEsc(unit)}) + ' [[input:' + P + 'r' + n + ']] [[validation:' + P + 'r' + n + ']]<br>';
     }
     var finalLabel = t.type === 'ecart'
-      ? 'Valeur mesurée (écart entre les 2 points)'
-      : 'Valeur finale (en tenant compte du point de départ)';
+      ? I18N.t('imm.valeur_mesuree_ecart_lbl')
+      : I18N.t('imm.valeur_finale_lbl');
     textFrag += finalLabel + '&nbsp;: [[input:' + P + 'a' + n + ']] (' + htmlEsc(unit) + ') [[validation:' + P + 'a' + n + ']]</p>\n';
   });
 
@@ -510,12 +505,12 @@ function genImageMesure(X) {
     var nodes = [
       _immNode('0', 'Vérification de l\'échelle de conversion (pixels → ' + unit + ')',
         'NumRelative', sans, tans, tol,
-        '+', 1, -1, prtName + '-0-T', _immOk('<strong>Échelle correcte&nbsp;:</strong> ' + fbOk),
+        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N.t('imm.echelle_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
       _immNode('1', 'Piège : repères 1 et 2 inversés (signe de l\'échelle)',
         'NumRelative', sans, pieges, tol,
-        '=', 0, -1, prtName + '-1-T', _immTrap('Votre échelle a le <strong>signe opposé</strong> à celle attendue&nbsp;: vous avez sans doute inversé l\'ordre des repères 1 et 2 dans le calcul (repère 2 − repère 1), et non l\'inverse.'),
-        '=', 0, -1, prtName + '-1-F', _immKo('<strong>Échelle incorrecte.</strong> ' + fbWrong + '<p>💡 Rappel&nbsp;: échelle = (valeur du repère 2 − valeur du repère 1) ÷ distance en pixels entre les 2 repères.</p>')
+        '=', 0, -1, prtName + '-1-T', _immTrap(I18N.t('imm.piege_signe_desc')),
+        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N.t('imm.echelle_incorrecte_lbl') + '</strong> ' + fbWrong + '<p>' + I18N.t('imm.echelle_rappel_desc') + '</p>')
       )
     ];
     return buildPrtXml(_immMeta(prtName, value), nodes);
@@ -528,12 +523,12 @@ function genImageMesure(X) {
     var nodes = [
       _immNode('0', 'Vérification de la distance convertie (avant ajout de l\'origine)',
         'NumRelative', sans, tans, tol,
-        '+', 1, -1, prtName + '-0-T', _immOk('<strong>Distance convertie correcte&nbsp;:</strong> ' + fbOk),
+        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N.t('imm.distance_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
       _immNode('1', 'Piège : distance laissée en pixels (oubli de la conversion par l\'échelle)',
         'NumRelative', sans, piege, tol,
-        '=', 0, -1, prtName + '-1-T', _immTrap('Vous avez donné le <strong>nombre de pixels</strong> mesuré directement, sans le multiplier par l\'échelle. Il faut convertir&nbsp;: distance (px) × échelle (' + unit + '/px).'),
-        '=', 0, -1, prtName + '-1-F', _immKo('<strong>Distance incorrecte.</strong> ' + fbWrong + '<p>💡 Mesurez la distance en pixels entre le repère 1 et ce point, puis multipliez par l\'échelle.</p>')
+        '=', 0, -1, prtName + '-1-T', _immTrap(I18N.t('imm.piege_pixels_desc', {unit: unit})),
+        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N.t('imm.distance_incorrecte_lbl') + '</strong> ' + fbWrong + '<p>' + I18N.t('imm.distance_rappel_desc') + '</p>')
       )
     ];
     return buildPrtXml(_immMeta(prtName, value), nodes);
@@ -544,20 +539,20 @@ function genImageMesure(X) {
   function immPrtFinalGuideXML(prtName, value, sans, tans, targetType, altLit) {
     var piege = String(altLit);
     var trapTxt = targetType === 'ecart'
-      ? 'Vous avez <strong>ajouté la valeur du repère 1</strong> à votre distance mesurée. Or il s\'agit d\'un écart entre 2 points, pas d\'une position par rapport au repère&nbsp;: un écart n\'a pas d\'origine à ajouter.'
-      : 'Vous avez donné la distance convertie <strong>sans ajouter l\'origine</strong> (la valeur du repère 1). Comme le repère 1 ne vaut pas forcément 0, il faut l\'ajouter à la distance calculée.';
+      ? I18N.t('imm.piege_origine_ajoutee_desc')
+      : I18N.t('imm.piege_origine_manquante_desc');
     var koHint = targetType === 'ecart'
-      ? '<p>💡 C\'est un écart entre 2 points, pas une position — n\'ajoutez pas la valeur du repère 1.</p>'
-      : '<p>💡 N\'oubliez pas d\'ajouter la valeur du repère 1 (l\'origine) à la distance calculée.</p>';
+      ? '<p>' + I18N.t('imm.kohint_ecart') + '</p>'
+      : '<p>' + I18N.t('imm.kohint_position') + '</p>';
     var nodes = [
       _immNode('0', 'Vérification de la valeur finale',
         'NumRelative', sans, tans, tol,
-        '+', 1, -1, prtName + '-0-T', _immOk('<strong>Valeur finale correcte&nbsp;:</strong> ' + fbOk),
+        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N.t('imm.valeur_finale_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
       _immNode('1', targetType === 'ecart' ? 'Piège : origine ajoutée à tort à un écart' : 'Piège : origine (repère 1) non ajoutée',
         'NumRelative', sans, piege, tol,
         '=', 0, -1, prtName + '-1-T', _immTrap(trapTxt),
-        '=', 0, -1, prtName + '-1-F', _immKo('<strong>Valeur finale incorrecte.</strong> ' + fbWrong + koHint)
+        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N.t('imm.valeur_finale_incorrecte_lbl') + '</strong> ' + fbWrong + koHint)
       )
     ];
     return buildPrtXml(_immMeta(prtName, value), nodes);
@@ -568,9 +563,9 @@ function genImageMesure(X) {
   // sans révéler la nature exacte de l'erreur finale (tier intentionnellement générique).
   function immPrtAutonomeXML(prtName, value, sansFinal, tansFinal, targetType) {
     var hintFb = targetType === 'ecart'
-      ? _immTrap('Ton étalonnage est correct. Vérifie ta mesure de distance entre les 2 points — et n\'ajoute pas la valeur du repère 1, ce n\'est pas une position !')
-      : _immTrap('Ton étalonnage est correct. Vérifie ta conversion et n\'oublie pas de tenir compte du point de départ !');
-    var failFb = _immKo('Ta valeur finale et ton échelle sont toutes les deux incorrectes. Revois le calcul de l\'échelle à partir des 2 repères, puis la conversion.');
+      ? _immTrap(I18N.t('imm.hint_autonome_ecart'))
+      : _immTrap(I18N.t('imm.hint_autonome_position'));
+    var failFb = _immKo(I18N.t('imm.fail_autonome_desc'));
     var nodes = [
       _immNode('0', 'Vérification de la valeur finale attendue',
         'NumRelative', sansFinal, tansFinal, tol,
@@ -587,7 +582,7 @@ function genImageMesure(X) {
   // PRT Expert — 1 nœud, feedback neutre, aucune indication sur la localisation
   // de l'erreur (étalonnage / conversion / origine) : tier intentionnellement neutre.
   function immPrtExpertXML(prtName, value, sansFinal, tansFinal) {
-    var neutralFail = _immKo('Faux. Refais tes calculs sur ton brouillon en vérifiant l\'étalonnage, la conversion, et le point de départ.');
+    var neutralFail = _immKo(I18N.t('imm.neutral_fail_expert_desc'));
     var nodes = [
       _immNode('0', 'Vérification de la valeur finale (sans indication de la nature de l\'erreur)',
         'NumRelative', sansFinal, tansFinal, tol,

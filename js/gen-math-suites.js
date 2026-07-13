@@ -98,7 +98,7 @@ function genSuites(X) {
         return `q${X}_k:ri(${mn},${mx});`;
     }
 
-    var HDR = `<div style="background:#7c3aed;border-left:5px solid #6d28d9;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Suites num\xe9riques</strong> <span style="background:#6d28d9;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
+    var HDR = `<div style="background:#7c3aed;border-left:5px solid #6d28d9;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('sui.title')}</strong> <span style="background:#6d28d9;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
 
     if (scenario === 'terme-arith' || scenario === 'expr-arith') {
         vars = `/* Q${X} Suites — Terme g\xe9n\xe9ral arithm\xe9tique */
@@ -113,31 +113,31 @@ q${X}_err_inv:q${X}_U0-n*q${X}_r;
 q${X}_err_const:q${X}_Uk;
 q${X}_err_nok:q${X}_U0+q${X}_r;`;
         qnote = `U0={@q${X}_U0@}, k={@q${X}_k@}, Uk={@q${X}_Uk@}, r={@q${X}_r@}, Un={@q${X}_ans@}`;
-        textFrag = `${HDR}${custText}<p>Soit \\((U_n)\\) une suite arithm\xe9tique telle que :</p>
+        textFrag = `${HDR}${custText}<p>${I18N.t('sui.q_terme_arith_intro')}</p>
 <div style="display:flex;gap:30px;justify-content:center;margin:15px 0;">
 <div>\\(U_0={@q${X}_U0@}\\)</div>
 <div>\\(U_{{@q${X}_k@}}={@q${X}_Uk@}\\)</div>
 </div>
-<p>D\xe9terminer l'expression de \\(U_n\\) en fonction de \\(n\\).</p>
+<p>${I18N.t('sui.q_terme_arith_ask')}</p>
 <p>\\(U_n=\\) [[input:ans_un${X}]] [[validation:ans_un${X}]]</p>`;
         inputXML = _mkInput({name:`ans_un${X}`,tans:`q${X}_ans`,boxsize:20,hint:'U0 + n*r',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsArith = [
             { description: 'Terme g\xe9n\xe9ral correct ?', sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', '<strong>Parfait !</strong> Le terme g\xe9n\xe9ral est correct.') },
+                feedback: fbOk || _suiBox('ok', I18N.t('sui.fb_ok_terme_arith')) },
             { description: 'Erreur : signe de la raison invers\xe9', sans: `ans_un${X}`, tans: `q${X}_err_inv`, score: 0,
-                feedback: _suiBox('warn', `Signe de la raison invers\xe9 ! \\(r=\\frac{U_{{@q${X}_k@}}-U_0}{{@q${X}_k@}}={@q${X}_r@}\\).`) },
+                feedback: _suiBox('warn', I18N.t('sui.err_signe_raison', {kvar:'q'+X+'_k', rvar:'q'+X+'_r'})) },
             { description: 'Erreur : a donn\xe9 U_k au lieu de U_n', sans: `ans_un${X}`, tans: `q${X}_err_const`, score: 0,
-                feedback: _suiBox('warn', `Vous avez donn\xe9 \\(U_{{@q${X}_k@}}\\) au lieu de \\(U_n\\). L'expression doit contenir \\(n\\).`) },
+                feedback: _suiBox('warn', I18N.t('sui.err_confusion_uk', {kvar:'q'+X+'_k'})) },
             { description: 'Erreur : oubli du facteur n', sans: `ans_un${X}`, tans: `q${X}_err_nok`, score: 0,
-                feedback: _suiBox('warn', 'Oubli du facteur \\(n\\) ! \\(U_n=U_0+n\\times r\\).') },
+                feedback: _suiBox('warn', I18N.t('sui.err_oubli_facteur_n')) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', `Incorrect. \\(r=\\frac{U_{{@q${X}_k@}}-U_0}{{@q${X}_k@}}={@q${X}_r@}\\), donc \\(U_n=U_0+n\\times r\\).`) }
+                feedback: fbWrong || _suiBox('bad', I18N.t('sui.fb_wrong_terme_arith', {kvar:'q'+X+'_k', rvar:'q'+X+'_r'})) }
         ];
         diagNodes = _suiDiagNodes(specsArith);
         var builtArith = _suiSeqPrt(X, bareme, specsArith);
         prtMeta = builtArith.prtMeta; canonicalNodes = builtArith.canonicalNodes; prtXML = builtArith.prtXML;
-        generalFeedback = _suiGenFbBox(`\\(r=\\frac{U_{{@q${X}_k@}}-U_0}{{@q${X}_k@}}=\\frac{{@q${X}_Uk_m_U0@}}{{@q${X}_k@}}={@q${X}_r@}\\)<br>\\(U_n=U_0+n\\times r={@q${X}_ans@}\\).`);
+        generalFeedback = _suiGenFbBox(I18N.t('sui.fbgen_terme_arith', {kvar:'q'+X+'_k', ukmu0var:'q'+X+'_Uk_m_U0', rvar:'q'+X+'_r', ansvar:'q'+X+'_ans'}));
 
     } else if (scenario === 'terme-geo') {
         vars = `/* Q${X} Suites — Terme g\xe9om\xe9trique */
@@ -148,21 +148,21 @@ ${declK(5)}
 q${X}_Uk:q${X}_U0*q${X}_q^q${X}_k;
 q${X}_ans:q${X}_U0*q${X}_q^n;`;
         qnote = `U0={@q${X}_U0@}, q={@q${X}_q@}, Un={@q${X}_ans@}`;
-        textFrag = `${HDR}${custText}<p>Soit \\((U_n)\\) une suite g\xe9om\xe9trique telle que \\(U_0={@q${X}_U0@}\\) et \\(U_{{@q${X}_k@}}={@q${X}_Uk@}\\).</p>
-<p>D\xe9terminer \\(U_n\\).</p>
+        textFrag = `${HDR}${custText}<p>${I18N.t('sui.q_terme_geo_intro', {u0var:'q'+X+'_U0', kvar:'q'+X+'_k', ukvar:'q'+X+'_Uk'})}</p>
+<p>${I18N.t('sui.q_terme_geo_ask')}</p>
 <p>\\(U_n=\\) [[input:ans_un${X}]] [[validation:ans_un${X}]]</p>`;
         inputXML = _mkInput({name:`ans_un${X}`,tans:`q${X}_ans`,boxsize:20,hint:'U0 * q^n',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsGeo = [
             { description: 'Terme g\xe9n\xe9ral correct ?', sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', '<strong>Parfait !</strong>') },
+                feedback: fbOk || _suiBox('ok', `<strong>${I18N.t('mat.fb_ok_parfait')}</strong>`) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', `Incorrect. \\(U_n=U_0\\times q^n={@q${X}_ans@}\\).`) }
+                feedback: fbWrong || _suiBox('bad', I18N.t('sui.fb_wrong_terme_geo', {ansvar:'q'+X+'_ans'})) }
         ];
         diagNodes = _suiDiagNodes(specsGeo);
         var builtGeo = _suiSeqPrt(X, bareme, specsGeo);
         prtMeta = builtGeo.prtMeta; canonicalNodes = builtGeo.canonicalNodes; prtXML = builtGeo.prtXML;
-        generalFeedback = _suiGenFbBox(`Raison : \\(q=\\sqrt[{@q${X}_k@}]{\\frac{U_{{@q${X}_k@}}}{U_0}}={@q${X}_q@}\\)<br>\\(U_n={@q${X}_ans@}\\).`);
+        generalFeedback = _suiGenFbBox(I18N.t('sui.fbgen_terme_geo', {kvar:'q'+X+'_k', qvar:'q'+X+'_q', ansvar:'q'+X+'_ans'}));
 
     } else if (scenario === 'somme-arith') {
         vars = `/* Q${X} Suites — Somme arithm\xe9tique */
@@ -172,21 +172,21 @@ ${declR(1, true)}
 q${X}_Un_1:q${X}_U0+(n-1)*q${X}_r;
 q${X}_ans:n*(q${X}_U0+q${X}_Un_1)/2;`;
         qnote = `Sn=n*(U0+Un-1)/2={@q${X}_ans@}`;
-        textFrag = `${HDR}${custText}<p>Soit \\((U_n)\\) arithm\xe9tique avec \\(U_0={@q${X}_U0@}\\) et \\(r={@q${X}_r@}\\).</p>
-<p>Calculer \\(S_n=U_0+U_1+\\cdots+U_{n-1}\\).</p>
+        textFrag = `${HDR}${custText}<p>${I18N.t('sui.q_somme_arith_intro', {u0var:'q'+X+'_U0', rvar:'q'+X+'_r'})}</p>
+<p>${I18N.t('sui.q_calculer_sn')}</p>
 <p>\\(S_n=\\) [[input:ans_sn${X}]] [[validation:ans_sn${X}]]</p>`;
         inputXML = _mkInput({name:`ans_sn${X}`,tans:`q${X}_ans`,boxsize:25,forbidfloat:1,mustverify:1,showvalidation:2});
 
         var specsSomA = [
             { description: 'Somme correcte ?', sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', '<strong>Correct !</strong>') },
+                feedback: fbOk || _suiBox('ok', `<strong>${I18N.t('mat.fb_ok_correct')}</strong>`) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', `Incorrect. \\(S_n=\\frac{n(U_0+U_{n-1})}{2}={@q${X}_ans@}\\).`) }
+                feedback: fbWrong || _suiBox('bad', I18N.t('sui.fb_wrong_somme_arith', {ansvar:'q'+X+'_ans'})) }
         ];
         diagNodes = _suiDiagNodes(specsSomA);
         var builtSomA = _suiSeqPrt(X, bareme, specsSomA);
         prtMeta = builtSomA.prtMeta; canonicalNodes = builtSomA.canonicalNodes; prtXML = builtSomA.prtXML;
-        generalFeedback = _suiGenFbBox(`\\(U_{n-1}={@q${X}_Un_1@}\\)<br>\\(S_n=\\frac{n(U_0+U_{n-1})}{2}={@q${X}_ans@}\\).`);
+        generalFeedback = _suiGenFbBox(I18N.t('sui.fbgen_somme_arith', {un1var:'q'+X+'_Un_1', ansvar:'q'+X+'_ans'}));
 
     } else if (scenario === 'somme-geo') {
         vars = `/* Q${X} Suites — Somme g\xe9om\xe9trique */
@@ -195,21 +195,21 @@ ${declU0(1)}
 ${declQ(2, true)}
 q${X}_ans:q${X}_U0*(1-q${X}_q^n)/(1-q${X}_q);`;
         qnote = `Sn=U0*(1-q^n)/(1-q)={@q${X}_ans@}`;
-        textFrag = `${HDR}${custText}<p>Soit \\((U_n)\\) g\xe9om\xe9trique avec \\(U_0={@q${X}_U0@}\\) et \\(q={@q${X}_q@}\\).</p>
-<p>Calculer \\(S_n=U_0+U_1+\\cdots+U_{n-1}\\).</p>
+        textFrag = `${HDR}${custText}<p>${I18N.t('sui.q_somme_geo_intro', {u0var:'q'+X+'_U0', qvar:'q'+X+'_q'})}</p>
+<p>${I18N.t('sui.q_calculer_sn')}</p>
 <p>\\(S_n=\\) [[input:ans_sn${X}]] [[validation:ans_sn${X}]]</p>`;
         inputXML = _mkInput({name:`ans_sn${X}`,tans:`q${X}_ans`,boxsize:25,forbidfloat:1,mustverify:1,showvalidation:2});
 
         var specsSomG = [
             { description: 'Somme correcte ?', sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', '<strong>Correct !</strong>') },
+                feedback: fbOk || _suiBox('ok', `<strong>${I18N.t('mat.fb_ok_correct')}</strong>`) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', `Incorrect. \\(S_n=U_0\\frac{1-q^n}{1-q}={@q${X}_ans@}\\).`) }
+                feedback: fbWrong || _suiBox('bad', I18N.t('sui.fb_wrong_somme_geo', {ansvar:'q'+X+'_ans'})) }
         ];
         diagNodes = _suiDiagNodes(specsSomG);
         var builtSomG = _suiSeqPrt(X, bareme, specsSomG);
         prtMeta = builtSomG.prtMeta; canonicalNodes = builtSomG.canonicalNodes; prtXML = builtSomG.prtXML;
-        generalFeedback = _suiGenFbBox(`\\(S_n=U_0\\frac{1-q^n}{1-q}={@q${X}_ans@}\\).`);
+        generalFeedback = _suiGenFbBox(I18N.t('sui.fbgen_somme_geo', {ansvar:'q'+X+'_ans'}));
 
     } else { /* limite-geo */
         vars = `/* Q${X} Suites — Limite g\xe9om\xe9trique */
@@ -218,21 +218,21 @@ ${declU0(10)}
 ${declQLim(0.5)}
 q${X}_ans:0;`;
         qnote = `U0={@q${X}_U0@}, q={@q${X}_q@}, limite=0`;
-        textFrag = `${HDR}${custText}<p>Soit \\((U_n)\\) g\xe9om\xe9trique avec \\(U_0={@q${X}_U0@}\\) et \\(q={@q${X}_q@}\\) avec \\(|q|<1\\).</p>
-<p>Calculer \\(\\displaystyle\\lim_{n\\to+\\infty} U_n\\).</p>
+        textFrag = `${HDR}${custText}<p>${I18N.t('sui.q_limite_geo_intro', {u0var:'q'+X+'_U0', qvar:'q'+X+'_q'})}</p>
+<p>${I18N.t('sui.q_limite_geo_ask')}</p>
 <p>\\(\\lim U_n=\\) [[input:ans_lim${X}]] [[validation:ans_lim${X}]]</p>`;
         inputXML = _mkInput({name:`ans_lim${X}`,tans:`q${X}_ans`,boxsize:10,allowwords:'inf',hint:'0',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsLim = [
             { description: 'Limite correcte ?', sans: `ans_lim${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', '<strong>Correct !</strong> Quand \\(|q|<1\\), \\(q^n\\to 0\\) donc \\(U_n\\to 0\\).') },
+                feedback: fbOk || _suiBox('ok', I18N.t('sui.fb_ok_limite_geo')) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', "Quand \\(|q|<1\\), \\(U_0\\cdot q^n\\to 0\\).") }
+                feedback: fbWrong || _suiBox('bad', I18N.t('sui.fb_wrong_limite_geo')) }
         ];
         diagNodes = _suiDiagNodes(specsLim);
         var builtLim = _suiSeqPrt(X, bareme, specsLim);
         prtMeta = builtLim.prtMeta; canonicalNodes = builtLim.canonicalNodes; prtXML = builtLim.prtXML;
-        generalFeedback = _suiGenFbBox(`\\(|q|={@abs(q${X}_q)@}<1\\) donc \\(q^n\\to 0\\) et \\(U_n=U_0\\cdot q^n\\to 0\\).`);
+        generalFeedback = _suiGenFbBox(I18N.t('sui.fbgen_limite_geo', {absqvar:'abs(q'+X+'_q)'}));
     }
 
     generalFeedback = _mkFbGen(generalFeedback, gs('sui-fbgen'));

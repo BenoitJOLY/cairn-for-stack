@@ -74,12 +74,12 @@ function genGLR(X) {
         + '    </input>';
 
     /* ── Feedback ── */
-    var fbOk    = wrapFb('<p>✅ <strong>Bonne lecture !</strong>'
+    var fbOk    = wrapFb('<p>✅ <strong>' + I18N.t('glr.fb_ok_title') + '</strong>'
                        + (fbOkTxt ? ' ' + htmlEsc(fbOkTxt) : '')
-                       + '</p><p style="font-size:.9em">x&nbsp;≈&nbsp;{@round(glr_x_' + X + '*100)/100@} — réponse attendue&nbsp;: x&nbsp;=&nbsp;' + x0 + '</p>', true);
-    var fbWrong = wrapFb('<p>❌ <strong>Point incorrect.</strong>'
+                       + '</p><p style="font-size:.9em">' + I18N.t('glr.fb_ok_detail', {qid: X, x0: x0}) + '</p>', true);
+    var fbWrong = wrapFb('<p>❌ <strong>' + I18N.t('glr.fb_wrong_title') + '</strong>'
                        + (fbWrTxt ? ' ' + htmlEsc(fbWrTxt) : '')
-                       + '</p><p style="font-size:.9em">Vous avez sélectionné x&nbsp;≈&nbsp;{@round(glr_x_' + X + '*100)/100@}. La tolérance est ±' + tol + ' unités.</p>', false);
+                       + '</p><p style="font-size:.9em">' + I18N.t('glr.fb_wrong_detail', {qid: X, tol: tol}) + '</p>', false);
 
     /* ── PRT ── */
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
@@ -151,7 +151,7 @@ function genGLR(X) {
     var textFrag = '<div style="background:#0369A1;border-left:5px solid #075985;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — Lecture graphique</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t('glr.banniere') + '</strong>'
         + '<span style="background:#075985;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'

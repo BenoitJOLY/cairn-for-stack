@@ -88,7 +88,7 @@ function _lgBox(kind, html) {
 // Encart "Réponse attendue" du feedback général.
 function _lgGenFbBox(bodyHtml) {
     return '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-        + '<div style="font-weight:bold;color:#0f766e;margin-bottom:15px;">🔑 Réponse attendue</div>' + bodyHtml + '</div>';
+        + '<div style="font-weight:bold;color:#0f766e;margin-bottom:15px;">' + I18N.t('log.reponse_attendue_lbl') + '</div>' + bodyHtml + '</div>';
 }
 
 // Table de vérité complète (toutes les lignes, même celles non demandées)
@@ -173,7 +173,7 @@ function genLogique(X) {
     var text = richVal('lg-text');
 
     var HDR = '<div style="background:#7c3aed;border-left:5px solid #5b21b6;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Logique booléenne</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">' + I18N.t('log.title') + '</strong>'
         + '<span style="background:#5b21b6;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>';
 
     var inputXML = '', prtXML = '', prtMeta, canonicalNodes, questionText, qnote, generalFeedback;
@@ -221,38 +221,34 @@ function genLogique(X) {
             {
                 description: isCases ? 'Cases correctes' : 'Tableau correct',
                 sans: sansList, tans: tansMain, score: 1,
-                feedback: fbOk || _lgBox('ok', '✅ <strong>' + (isCases ? 'Exact !' : 'Parfait !') + '</strong> ' + (isCases ? 'Vous avez correctement déduit les valeurs manquantes.' : 'Votre tableau est rempli correctement.'))
+                feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N.t(isCases ? 'log.cases_ok_title' : 'log.table_ok_title') + '</strong> ' + I18N.t(isCases ? 'log.cases_ok_desc' : 'log.table_ok_desc'))
             },
             {
                 description: 'Négation calculée',
                 sans: sansList, tans: tansNeg, score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>Presque ça !</strong> Vos résultats correspondent à \\(\\neg(' + _lgToLatex(expr) + ')\\). Vous avez calculé l\'inverse de ce qui était demandé.')
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.presque_ca_title') + '</strong> ' + I18N.t('log.neg_desc', {expr: _lgToLatex(expr)}))
             }
         ];
         if (items.length >= 2) {
             specs.push({
                 description: 'Ordre inversé',
                 sans: sansList, tans: tansRev, score: 0.5,
-                feedback: _lgBox('warn', nbVars === 3
-                    ? '🔶 <strong>Attention à l\'ordre !</strong> Avec 3 variables, l\'ordre est P (poids fort) → Q → R (poids faible). Vous semblez avoir inversé l\'ordre.'
-                    : '🔶 <strong>Attention à l\'ordre !</strong> Vous avez rempli le tableau en commençant par P=1, Q=1 (de haut en bas), alors qu\'il faut le remplir en commençant par P=0, Q=0 (de bas en haut).')
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.ordre_title') + '</strong> ' + I18N.t(nbVars === 3 ? 'log.ordre_3vars_desc' : 'log.ordre_2vars_desc'))
             });
         }
         specs.push({
             description: isCases ? 'Cases incorrectes' : 'Tableau incorrect',
             sans: 'true', tans: 'true', score: 0, quiet: true,
-            feedback: fbWrong || _lgBox('bad', '❌ <strong>Incorrect.</strong> Vérifiez pas à pas l\'évaluation de chaque opérateur. Rappel :<br>• L\'implication \\(P \\to Q\\) est fausse <u>uniquement</u> si P est vrai et Q est faux.<br>• Le NON s\'applique en priorité.')
+            feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N.t('log.table_fallback_desc'))
         });
 
         var built = _lgSeqPrt(X, bareme, specs);
         prtMeta = built.prtMeta; canonicalNodes = built.canonicalNodes; prtXML = built.prtXML;
 
-        var instrText = text || (isCases
-            ? '<p>Certaines cases de la table de vérité manquent. Déduisez leur valeur (0 ou 1) :</p>'
-            : '<p>Complétez entièrement la colonne de résultat de la table de vérité (0 ou 1) :</p>');
+        var instrText = text || '<p>' + I18N.t(isCases ? 'log.cases_instr' : 'log.table_instr') + '</p>';
         questionText = HDR + instrText + tbl;
         qnote = 'Logique Q' + X + ' ' + scenario + ' ' + expr.substring(0, 20);
-        generalFeedback = _mkFbGen(_lgGenFbBox('<p>Expression : \\(' + _lgToLatex(expr) + '\\)</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes)), fbGen);
+        generalFeedback = _mkFbGen(_lgGenFbBox('<p>' + I18N.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes)), fbGen);
 
     } else if (scenario === 'identifier') {
         var choices = [
@@ -288,27 +284,27 @@ function genLogique(X) {
         var specsI = [{
             description: 'Bonne expression',
             answertest: 'String', sans: ansName, tans: '"A"', score: 1,
-            feedback: fbOk || _lgBox('ok', '✅ <strong>Exact !</strong> Vous avez correctement identifié l\'expression logique à partir de sa table de vérité.')
+            feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N.t('log.cases_ok_title') + '</strong> ' + I18N.t('log.identifier_ok_desc'))
         }];
         if (negChoice) {
             specsI.push({
                 description: 'A choisi la négation de l\'expression',
                 answertest: 'String', sans: ansName, tans: '"' + negChoice.key + '"', score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>Presque ça !</strong> L\'expression choisie correspond exactement à l\'<strong>inverse</strong> de la table demandée (les 0 et 1 sont permutés). Vérifiez si vous n\'avez pas confondu avec la négation de la proposition.')
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.presque_ca_title') + '</strong> ' + I18N.t('log.identifier_neg_desc'))
             });
         }
         specsI.push({
             description: 'Expression incorrecte',
             sans: 'true', tans: 'true', score: 0, quiet: true,
-            feedback: fbWrong || _lgBox('bad', '❌ <strong>Incorrect.</strong> Pour trouver la bonne expression, repérez les lignes où le résultat vaut <strong>1</strong> et déduisez-en le connecteur logique principal :<br>• Si seul (1,1) donne 1 → <em>ET</em><br>• Si seul (0,0) donne 0 → <em>OU</em><br>• Si seul (1,0) donne 0 → <em>IMPLIQUE</em>')
+            feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N.t('log.identifier_fallback_desc'))
         });
 
         var builtI = _lgSeqPrt(X, bareme, specsI);
         prtMeta = builtI.prtMeta; canonicalNodes = builtI.canonicalNodes; prtXML = builtI.prtXML;
 
-        var instrText2 = text || '<p>Quelle expression logique correspond à la table de vérité suivante ?</p>';
+        var instrText2 = text || '<p>' + I18N.t('log.identifier_instr') + '</p>';
         questionText = HDR + instrText2 + tbl2
-            + '<div style="text-align:center;margin:16px 0;"><p><strong>Expression correspondante :</strong></p>[[input:' + ansName + ']][[validation:' + ansName + ']]</div>';
+            + '<div style="text-align:center;margin:16px 0;"><p><strong>' + I18N.t('log.expr_correspondante_lbl') + '</strong></p>[[input:' + ansName + ']][[validation:' + ansName + ']]</div>';
         qnote = 'Logique Q' + X + ' identifier ' + expr.substring(0, 20);
         generalFeedback = _mkFbGen(_lgGenFbBox(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI)), fbGen);
 
@@ -360,17 +356,17 @@ function genLogique(X) {
                 sans: eqName, tans: equiv ? 'true' : 'false', testoptions: '', quiet: '0',
                 truescoremode: '+', truescore: '0.5', truepenalty: '0', truenextnode: '-1',
                 trueanswernote: 'PRT' + X + '-1-T',
-                truefeedback: fbOk || _lgBox('ok', '✅ <strong>Parfait !</strong> Les tables sont correctes et votre conclusion sur l\'équivalence est juste.'),
+                truefeedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N.t('mat.fb_ok_parfait') + '</strong> ' + I18N.t('log.equiv_ok_desc')),
                 falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
                 falseanswernote: 'PRT' + X + '-1-F',
-                falsefeedback: _lgBox('warn', '🔶 <strong>Tables correctes, mais conclusion fausse !</strong> Comparez les deux colonnes de résultat ligne par ligne. Deux propositions sont équivalentes si et seulement si leurs colonnes sont <u>strictement identiques</u>.')
+                falsefeedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.equiv_partial_title') + '</strong> ' + I18N.t('log.equiv_partial_desc'))
             },
             {
                 name: '2', description: 'Tables incorrectes', answertest: 'AlgEquiv',
                 sans: 'true', tans: 'true', testoptions: '', quiet: '1',
                 truescoremode: '=', truescore: '0', truepenalty: '0', truenextnode: '-1',
                 trueanswernote: 'PRT' + X + '-2-T',
-                truefeedback: fbWrong || _lgBox('bad', '❌ <strong>Tables incorrectes.</strong> Recalculez chaque colonne séparément avant de pouvoir conclure à une équivalence.'),
+                truefeedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N.t('log.equiv_wrong_title') + '</strong> ' + I18N.t('log.equiv_wrong_desc')),
                 falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
                 falseanswernote: 'PRT' + X + '-2-F', falsefeedback: ''
             }
@@ -378,22 +374,22 @@ function genLogique(X) {
         prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVarsEq };
         prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
-        var instrText3 = text || '<p>Complétez les deux tables de vérité, puis indiquez si les deux propositions sont <strong>logiquement équivalentes</strong> (<code>true</code> ou <code>false</code>) :</p>';
+        var instrText3 = text || '<p>' + I18N.t('log.equiv_instr') + '</p>';
         questionText = HDR + instrText3
             + '<div style="display:flex;gap:24px;flex-wrap:wrap;">'
-            + '<div><p><strong>E₁ :</strong> \\(' + _lgToLatex(expr) + '\\)</p>' + tblE1 + '</div>'
-            + '<div><p><strong>E₂ :</strong> ' + (expr2 ? '\\(' + _lgToLatex(expr2) + '\\)' : '—') + '</p>' + tblE2 + '</div>'
+            + '<div><p><strong>' + I18N.t('log.e1_lbl') + '</strong> \\(' + _lgToLatex(expr) + '\\)</p>' + tblE1 + '</div>'
+            + '<div><p><strong>' + I18N.t('log.e2_lbl') + '</strong> ' + (expr2 ? '\\(' + _lgToLatex(expr2) + '\\)' : '—') + '</p>' + tblE2 + '</div>'
             + '</div>'
-            + '<div style="margin-top:12px;"><p><strong>Équivalentes ?</strong> [[input:' + eqName + ']][[validation:' + eqName + ']]</p></div>';
+            + '<div style="margin-top:12px;"><p><strong>' + I18N.t('log.equivalentes_lbl') + '</strong> [[input:' + eqName + ']][[validation:' + eqName + ']]</p></div>';
         qnote = 'Logique Q' + X + ' equivalence ' + expr.substring(0, 15) + ' vs ' + (expr2 || '').substring(0, 15);
 
-        var eqGenBody = '<p style="text-align:center;margin-bottom:15px;font-size:1.05rem;"><strong>Les deux propositions sont ' + (equiv ? 'logiquement équivalentes.' : 'NON équivalentes.') + '</strong></p>'
+        var eqGenBody = '<p style="text-align:center;margin-bottom:15px;font-size:1.05rem;"><strong>' + I18N.t('log.equiv_result_prefix') + ' ' + I18N.t(equiv ? 'log.equiv_yes' : 'log.equiv_no') + '</strong></p>'
             + '<div style="overflow-x:auto;width:fit-content;margin:0 auto;"><table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">'
             + '<thead><tr style="background:#f1f5f9;">'
             + vars.map(function (v) { return '<th style="border:1px solid #94a3b8;padding:8px 18px;">' + v + '</th>'; }).join('')
             + '<th style="border:1px solid #94a3b8;padding:8px 18px;background:#dbeafe;">\\(' + _lgToLatex(expr) + '\\)</th>'
             + '<th style="border:1px solid #94a3b8;padding:8px 18px;background:#fef3c7;">\\(' + _lgToLatex(expr2 || expr) + '\\)</th>'
-            + '<th style="border:1px solid #94a3b8;padding:8px 18px;">Identique ?</th></tr></thead><tbody>';
+            + '<th style="border:1px solid #94a3b8;padding:8px 18px;">' + I18N.t('log.identique_lbl') + '</th></tr></thead><tbody>';
         for (var qj = 0; qj < nRows; qj++) {
             var valsQ = _lgBuildRow(qj, vars);
             var vA = allResE['e1r'][qj], vB = allResE['e2r'][qj];
@@ -444,28 +440,28 @@ function genLogique(X) {
             {
                 description: 'Tout correct',
                 sans: '[' + allNames.join(',') + ']', tans: '[' + allTargets.join(',') + ']', score: 1,
-                feedback: fbOk || _lgBox('ok', '✅ <strong>Parfait !</strong> Toutes les colonnes sont correctement remplies.')
+                feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N.t('mat.fb_ok_parfait') + '</strong> ' + I18N.t('log.inter_ok_desc'))
             },
             {
                 description: 'Sous-expressions correctes, finale fausse',
                 sans: '[' + interNames.join(',') + ']', tans: '[' + interTargets.join(',') + ']', score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>Bonne décomposition, mais erreur finale !</strong> Les sous-expressions sont correctes, mais vérifiez l\'opérateur principal qui les combine.')
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.inter_partial1_title') + '</strong> ' + I18N.t('log.inter_partial1_desc'))
             },
             {
                 description: 'Seule la finale est correcte',
                 sans: '[' + nfNames.join(',') + ']', tans: '[' + allResFin.join(',') + ']', score: 0.3,
-                feedback: _lgBox('warn', '🔶 <strong>Résultat final correct, mais sous-expressions fausses.</strong> Le résultat est bon, mais vos colonnes intermédiaires contiennent des erreurs. Recalculez-les.')
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.inter_partial2_title') + '</strong> ' + I18N.t('log.inter_partial2_desc'))
             },
             {
                 description: 'Tout incorrect',
                 sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _lgBox('bad', '❌ <strong>Incorrect.</strong> Procédez colonne par colonne, de gauche à droite. Vérifiez chaque opérateur séparément. Rappel :<br>• <code>NOT</code> : inverse les 0 et 1<br>• <code>AND</code> : vaut 1 uniquement si les deux opérandes valent 1<br>• <code>OR</code> : vaut 0 uniquement si les deux opérandes valent 0<br>• <code>IMPLIES</code> : vaut 0 uniquement si gauche=1 et droite=0')
+                feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N.t('log.inter_fallback_desc'))
             }
         ];
         var built3 = _lgSeqPrt(X, bareme, specs4);
         prtMeta = built3.prtMeta; canonicalNodes = built3.canonicalNodes; prtXML = built3.prtXML;
 
-        var instrText4 = text || '<p>Complétez le tableau en calculant d\'abord les colonnes intermédiaires, puis le résultat final :</p>';
+        var instrText4 = text || '<p>' + I18N.t('log.inter_instr') + '</p>';
         questionText = HDR + instrText4 + _lgMathBox(expr) + tbl4;
         qnote = 'Logique Q' + X + ' intermediaire ' + expr.substring(0, 15);
 
@@ -498,8 +494,8 @@ function genLogique(X) {
             + '<checkanswertype>0</checkanswertype><mustverify>0</mustverify>'
             + '<showvalidation>0</showvalidation><options></options></input>';
 
-        fbOkFinal = fbOk || '<p>✅ Bonne simplification ! La forme <code>' + tansMaxima + '</code> est logiquement équivalente.</p>';
-        fbWrongFinal = fbWrong || '<p>❌ Incorrect. La forme simplifiée attendue est <code>' + tansMaxima + '</code>.</p>';
+        fbOkFinal = fbOk || '<p>✅ ' + I18N.t('log.simplif_ok_desc', {tans: tansMaxima}) + '</p>';
+        fbWrongFinal = fbWrong || '<p>❌ ' + I18N.t('log.simplif_wrong_desc', {tans: tansMaxima}) + '</p>';
         canonicalNodes = [{
             name: '0', description: '', answertest: 'PropLogic', sans: ansName2, tans: tansMaxima,
             testoptions: '', quiet: '0',
@@ -511,12 +507,12 @@ function genLogique(X) {
         prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
         prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
-        var instrText5 = text || ('<p>Simplifier l\'expression logique suivante :</p>'
+        var instrText5 = text || ('<p>' + I18N.t('log.simplif_instr1') + '</p>'
             + _lgMathBox(expr)
-            + '<p>Entrer la forme simplifiée en syntaxe Maxima (<code>P and Q</code>, <code>not(P)</code>, <code>true</code>…).</p>');
+            + '<p>' + I18N.t('log.simplif_instr2') + '</p>');
         questionText = HDR + instrText5 + '[[input:' + ansName2 + ']][[validation:' + ansName2 + ']]';
         qnote = 'Logique Q' + X + ' simplif ' + expr.substring(0, 20);
-        generalFeedback = _mkFbGen(_lgGenFbBox('<p>Forme simplifiée attendue : \\(' + _lgToLatex(tansMaxima) + '\\)</p><p>Expression d\'origine : \\(' + _lgToLatex(expr) + '\\)</p>'), fbGen);
+        generalFeedback = _mkFbGen(_lgGenFbBox('<p>' + I18N.t('log.simplif_genfb_line1', {tans: _lgToLatex(tansMaxima)}) + '</p><p>' + I18N.t('log.simplif_genfb_line2', {expr: _lgToLatex(expr)}) + '</p>'), fbGen);
     }
 
     questionText += '[[feedback:prt' + X + ']]';

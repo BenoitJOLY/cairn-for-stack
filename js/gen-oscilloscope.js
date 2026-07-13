@@ -402,11 +402,11 @@ function buildOscJSXCode_Retard(cfg){
 /* ── Encart de conseils de saisie (units) ── */
 function _oscInputHintsHTML(exList){
   return '<div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin:15px 0;">'
-    + '<strong>Conseils pour la saisie :</strong>'
+    + '<strong>' + I18N.t('osc.hint_title') + '</strong>'
     + '<ul style="margin:8px 0 0 20px;line-height:1.7">'
-    + '<li>La virgule se note avec un point (ex : <code>1.32</code>).</li>'
-    + '<li><strong>Lier nombre et unité</strong> : reliez-les par <code>*</code> (ex : '+exList+').</li>'
-    + '<li><strong>Unités usuelles</strong> : <code>s</code>, <code>ms</code>, <code>us</code> pour µs, <code>Hz</code>, <code>kHz</code>, <code>V</code>, <code>mV</code>.</li>'
+    + '<li>' + I18N.t('osc.hint_virgule') + '</li>'
+    + '<li><strong>' + I18N.t('osc.hint_lier_lbl') + '</strong>' + I18N.t('osc.hint_lier_desc', {exList: exList}) + '</li>'
+    + '<li><strong>' + I18N.t('osc.hint_unites_lbl') + '</strong>' + I18N.t('osc.hint_unites_desc') + '</li>'
     + '</ul></div>';
 }
 
@@ -438,11 +438,11 @@ function _oscTrap(txt){ return '<div style="border-left:4px solid #ca8a04;paddin
 /* Structure simplifiée (Autonome/Expert) : 2 nœuds indépendants, un par grandeur,
    sans décomposition unité/piège. neutral=true (Expert) => feedback d'échec sans indice. */
 function _oscSimplePair(idPrefix, q1, q2, neutral){
-  var neutralFb = _oscKo('<p>Faux. Refaites votre mesure et votre calcul sur le brouillon.</p>');
-  var fb1ok   = _oscOk('<strong>'+q1.label+' :</strong> Correcte.');
-  var fb2ok   = _oscOk('<strong>'+q2.label+' :</strong> Correcte.');
-  var fb1fail = neutral ? neutralFb : _oscKo('<strong>'+q1.label+' :</strong> Incorrecte. Vérifiez votre unité et votre valeur.');
-  var fb2fail = neutral ? neutralFb : _oscKo('<strong>'+q2.label+' :</strong> Incorrecte. Vérifiez votre unité et votre valeur.');
+  var neutralFb = _oscKo('<p>' + I18N.t('osc.fb_faux_refaites') + '</p>');
+  var fb1ok   = _oscOk('<strong>'+q1.label+I18N.t('osc.fb_correcte_suffix'));
+  var fb2ok   = _oscOk('<strong>'+q2.label+I18N.t('osc.fb_correcte_suffix'));
+  var fb1fail = neutral ? neutralFb : _oscKo('<strong>'+q1.label+I18N.t('osc.fb_incorrecte_suffix'));
+  var fb2fail = neutral ? neutralFb : _oscKo('<strong>'+q2.label+I18N.t('osc.fb_incorrecte_suffix'));
   return [
     _oscNode('0','Vérification '+q1.label,'UnitsRelative',q1.sans,q1.tans,q1.testopt,'+',0.5,1,idPrefix+'-0-T',fb1ok,'-',0,1,idPrefix+'-0-F',fb1fail),
     _oscNode('1','Vérification '+q2.label,'UnitsRelative',q2.sans,q2.tans,q2.testopt,'+',0.5,-1,idPrefix+'-1-T',fb2ok,'-',0,-1,idPrefix+'-1-F',fb2fail)
@@ -500,20 +500,20 @@ function genOscilloscope(X){
       freqExpr: '{#ta'+X+'_f#}', umExpr: '{#ta'+X+'_um#}', typeExpr: '{#ta'+X+'_type_val#}'
     });
 
-    var header = _oscHeader(X, bareme, 'Oscilloscope — Période et Fréquence', {bg:'#0c4a6e',accent:'#0369a1'}, '📏', 'Grandeur physique');
+    var header = _oscHeader(X, bareme, I18N.t('osc.title_periode_frequence'), {bg:'#0c4a6e',accent:'#0369a1'}, '📏', I18N.t('osc.subtitle_grandeur_physique'));
     textFrag = header
       + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
-      + '<p><strong>Consigne :</strong> À l\'aide des curseurs (boutons <span style="color:#a855f7;font-weight:bold;">■ X</span> et <span style="color:#ef4444;font-weight:bold;">■ Y</span>), mesurez la période \\(T\\) de la tension <strong>{@ta'+X+'_type_text@}</strong>, puis en déduire sa fréquence \\(f\\).</p>'
+      + '<p><strong>' + I18N.t('osc.consigne_lbl') + '</strong> ' + I18N.t('osc.consigne_periode_frequence', {X: X}) + '</p>'
       + (text||'') + '</div><!-- ENONCE-END -->\n'
       + '<div><!--HS-KBD:'+X+'--></div>\n'
       + _oscInputHintsHTML('<code>10*ms</code>')
-      + '<p>1. Période \\(T\\) mesurée : [[input:ans_T'+X+']] [[validation:ans_T'+X+']]</p>\n'
-      + '<p>2. Fréquence \\(f\\) déduite : [[input:ans_F'+X+']] [[validation:ans_F'+X+']]</p>';
+      + '<p>' + I18N.t('osc.label_periode_mesuree') + '[[input:ans_T'+X+']] [[validation:ans_T'+X+']]</p>\n'
+      + '<p>' + I18N.t('osc.label_frequence_deduite') + '[[input:ans_F'+X+']] [[validation:ans_F'+X+']]</p>';
 
     previewFrag = header
       + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
       + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#1e3a5f;font-family:monospace;font-size:.85rem;">'
-      + '📡 Oscilloscope JSXGraph (thème clair)<br>Forme : '+forme+' | Fréquence : '+(freqMode==='alea'?'aléatoire (liste)':ffreq+' Hz')
+      + I18N.t('osc.preview_periode_frequence') + forme + I18N.t('osc.preview_frequence_sep') + (freqMode==='alea'?I18N.t('osc.freq_alea_preview'):ffreq+' Hz')
       + '</div>';
 
     inputXML = _oscUnitsInput('ans_T'+X, '1.0*ta'+X+'_T')
@@ -536,28 +536,28 @@ function genOscilloscope(X){
 
     if(pedMode==='guide'){
       canonicalNodes = [
-        _oscNode('0','Vérification de l\'unité de T','UnitsAbsolute','eleve_unit_T'+X,'teacher_unit_T'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo('<strong>Période :</strong> Votre période est incorrecte car elle n\'a pas la bonne unité. L\'unité attendue en base SI était {@teacher_unit_T'+X+'/2@}.')),
-        _oscNode('1','Vérification de la valeur de T (conversion unité)','UnitsRelative','ans_T'+X,'ta'+X+'_T','ta'+X+'_precision_T','+',0.25,2,'prt'+X+'-1-T',_oscOk('<strong>Période :</strong> Votre période est correcte'),'-',0,4,'prt'+X+'-1-F',_oscKo('<strong>Période :</strong> La valeur numérique ou la précision de votre période est incorrecte.')),
-        _oscNode('2','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_F'+X,'teacher_unit_F'+X,'0','+',0.25,3,'prt'+X+'-2-T','','-',0,-1,'prt'+X+'-2-F',_oscKo('L\'unité de votre fréquence n\'est pas une unité admise. L\'unité attendue était : {@teacher_unit_F'+X+'/2@}.')),
-        _oscNode('3','Vérification de la valeur de f','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0.05','+',0.25,-1,'prt'+X+'-3-T',_oscOk('<strong>Bravo</strong> Votre fréquence est parfaitement exacte'),'-',0,-1,'prt'+X+'-3-F',_oscKo('La valeur numérique (ou la précision) de votre fréquence est incorrecte, vous avez dû faire une erreur de calcul.')),
-        _oscNode('4','Unité de f dans le cas où T est faux','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0','+',0,5,'prt'+X+'-4-T','','-',0,-1,'prt'+X+'-4-F',_oscKo('Votre unité de fréquence n\'est pas cohérente, elle ne correspond pas à une fréquence.')),
-        _oscNode('5','Cohérence f = 1/T (réponse élève)','UnitsRelative','ans_F'+X,'1/ans_T'+X,'0.05','+',0,-1,'prt'+X+'-5-T',_oscTrap('Votre fréquence est cohérente par rapport à votre réponse sur la période mais ce n\'était pas la réponse attendue.'),'-',0,-1,'prt'+X+'-5-F',_oscKo('Votre fréquence n\'est pas logique par rapport à votre réponse précédente \\( f= \\frac {1}{T} \\)'))
+        _oscNode('0','Vérification de l\'unité de T','UnitsAbsolute','eleve_unit_T'+X,'teacher_unit_T'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N.t('osc.fb_periode_unite_ko',{X:X}))),
+        _oscNode('1','Vérification de la valeur de T (conversion unité)','UnitsRelative','ans_T'+X,'ta'+X+'_T','ta'+X+'_precision_T','+',0.25,2,'prt'+X+'-1-T',_oscOk(I18N.t('osc.fb_periode_ok')),'-',0,4,'prt'+X+'-1-F',_oscKo(I18N.t('osc.fb_periode_valeur_ko'))),
+        _oscNode('2','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_F'+X,'teacher_unit_F'+X,'0','+',0.25,3,'prt'+X+'-2-T','','-',0,-1,'prt'+X+'-2-F',_oscKo(I18N.t('osc.fb_frequence_unite_ko',{X:X}))),
+        _oscNode('3','Vérification de la valeur de f','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0.05','+',0.25,-1,'prt'+X+'-3-T',_oscOk(I18N.t('osc.fb_frequence_ok')),'-',0,-1,'prt'+X+'-3-F',_oscKo(I18N.t('osc.fb_frequence_valeur_ko'))),
+        _oscNode('4','Unité de f dans le cas où T est faux','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0','+',0,5,'prt'+X+'-4-T','','-',0,-1,'prt'+X+'-4-F',_oscKo(I18N.t('osc.fb_frequence_unite_incoherente'))),
+        _oscNode('5','Cohérence f = 1/T (réponse élève)','UnitsRelative','ans_F'+X,'1/ans_T'+X,'0.05','+',0,-1,'prt'+X+'-5-T',_oscTrap(I18N.t('osc.fb_frequence_coherente_trap')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N.t('osc.fb_frequence_incoherente')))
       ];
     } else {
       canonicalNodes = _oscSimplePair('prt'+X,
-        {label:'Période',   sans:'ans_T'+X, tans:'ta'+X+'_T',  testopt:'ta'+X+'_precision_T'},
-        {label:'Fréquence', sans:'ans_F'+X, tans:'ta'+X+'_fq', testopt:'0.05'},
+        {label:I18N.t('osc.label_periode'),   sans:'ans_T'+X, tans:'ta'+X+'_T',  testopt:'ta'+X+'_precision_T'},
+        {label:I18N.t('osc.label_frequence'), sans:'ans_F'+X, tans:'ta'+X+'_fq', testopt:'0.05'},
         pedMode==='expert');
     }
 
     qnote = 'Type: {@ta'+X+'_type_text@} | f={@ta'+X+'_f@} Hz, T={@ta'+X+'_T@}, f={@ta'+X+'_fq@}';
     genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-      + '<div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px;">🔑 Réponses attendues</div>'
+      + '<div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px;">' + I18N.t('osc.genfb_reponses_attendues') + '</div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
-      + '<span style="font-weight:bold;color:#0c4a6e;">Q1 Période :</span> <p>La période est le temps que met un phénomène cyclique à se reproduire à l\'identique. Sur cette tension {@ta'+X+'_type_text@}, avec les curseurs de temps on trouve T = {@1.0*ta'+X+'_T@}</p></div>'
+      + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N.t('osc.genfb_q1_periode') + '</span> <p>' + I18N.t('osc.genfb_periode_explanation', {X: X}) + '</p></div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;">'
-      + '<span style="font-weight:bold;color:#0c4a6e;">Q2 Fréquence :</span> <p>La fréquence est le nombre de fois qu\'un phénomène se reproduit par seconde, on la calcule avec \\[ f = \\frac{1}{T} \\]</p>'
-      + '<p>On a donc \\[ f= \\frac {1}{ {@1.0*ta'+X+'_T@} }= {@ta'+X+'_fq@} \\]</p></div></div>';
+      + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N.t('osc.genfb_q2_frequence') + '</span> <p>' + I18N.t('osc.genfb_frequence_explanation') + '</p>'
+      + '<p>' + I18N.t('osc.genfb_frequence_calcul', {X: X}) + '</p></div></div>';
 
     var prtMeta = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv };
     return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta, canonicalNodes, genFb, fbGen, jsx);
@@ -581,29 +581,29 @@ function genOscilloscope(X){
 
     jsx = buildOscJSXCode_RC({ si: svIdx, ti: shIdx, evExpr:'{#ta'+X+'_ev_val#}', tauExpr:'{#ta'+X+'_tau_val#}', decharge: decharge });
 
-    var titre = decharge ? 'Oscilloscope — Décharge d\'un condensateur (RC)' : 'Oscilloscope — Charge d\'un condensateur (RC)';
-    var header2 = _oscHeader(X, bareme, titre, {bg:'#0c4a6e',accent:'#0369a1'}, '📏', 'Grandeur physique');
+    var titre = decharge ? I18N.t('osc.title_rc_decharge') : I18N.t('osc.title_rc_charge');
+    var header2 = _oscHeader(X, bareme, titre, {bg:'#0c4a6e',accent:'#0369a1'}, '📏', I18N.t('osc.subtitle_grandeur_physique'));
     var consigneY = decharge
-      ? 'Avec <span style="color:#ef4444;font-weight:bold;">■ Y</span>, mesurez l\'amplitude de la tension initiale \\(E\\) (entre le palier et la ligne du bas).'
-      : 'Avec <span style="color:#ef4444;font-weight:bold;">■ Y</span>, mesurez l\'amplitude de la tension finale \\(E\\) (entre le palier et la ligne du bas).';
+      ? I18N.t('osc.consigne_y_decharge')
+      : I18N.t('osc.consigne_y_charge');
     var consigneTau = decharge
-      ? 'Avec <span style="color:#a855f7;font-weight:bold;">■ X</span>, mesurez la constante de temps \\(\\tau\\) (entre l\'instant \\(t=0\\) et le point correspondant à 36,8% de \\(E\\)).'
-      : 'Avec <span style="color:#a855f7;font-weight:bold;">■ X</span>, mesurez la constante de temps \\(\\tau\\) (entre l\'instant \\(t=0\\) et le point correspondant à 63,2% de \\(E\\)).';
+      ? I18N.t('osc.consigne_tau_decharge')
+      : I18N.t('osc.consigne_tau_charge');
 
     textFrag = header2
       + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
-      + '<p>On visualise sur l\'oscilloscope la tension \\(u_C(t)\\) aux bornes d\'un condensateur lors de sa '+(decharge?'décharge':'charge')+'.</p>'
-      + '<p><strong>Consigne :</strong><ul><li>'+consigneY+'</li><li>'+consigneTau+'</li></ul></p>'
+      + '<p>' + I18N.t('osc.rc_intro', {mode: decharge ? I18N.t('osc.mot_decharge') : I18N.t('osc.mot_charge')}) + '</p>'
+      + '<p><strong>' + I18N.t('osc.consigne_lbl') + '</strong><ul><li>'+consigneY+'</li><li>'+consigneTau+'</li></ul></p>'
       + (text||'') + '</div><!-- ENONCE-END -->\n'
       + '<div><!--HS-KBD:'+X+'--></div>\n'
-      + _oscInputHintsHTML('<code>1500*us</code> pour µs')
-      + '<p>1. Constante de temps \\( \\tau \\) du circuit : [[input:ans_tau'+X+']] [[validation:ans_tau'+X+']]</p>\n'
-      + '<p>2. Tension '+(decharge?'initiale':'finale')+' \\( E \\) du générateur : [[input:ans_E'+X+']] [[validation:ans_E'+X+']]</p>';
+      + _oscInputHintsHTML('<code>1500*us</code> ' + I18N.t('osc.pour_us'))
+      + '<p>' + I18N.t('osc.label_tau_mesuree') + '[[input:ans_tau'+X+']] [[validation:ans_tau'+X+']]</p>\n'
+      + '<p>' + I18N.t('osc.label_tension_mesuree', {mode: decharge ? I18N.t('osc.mot_initiale') : I18N.t('osc.mot_finale')}) + '[[input:ans_E'+X+']] [[validation:ans_E'+X+']]</p>';
 
     previewFrag = header2
       + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
       + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#1e3a5f;font-family:monospace;font-size:.85rem;">'
-      + '📡 Oscilloscope RC '+(decharge?'décharge':'charge')+' (thème clair)</div>';
+      + I18N.t('osc.preview_rc', {mode: decharge ? I18N.t('osc.mot_decharge') : I18N.t('osc.mot_charge')}) + '</div>';
 
     inputXML = _oscUnitsInput('ans_E'+X, 'ta'+X+'_E') + '\n' + _oscUnitsInput('ans_tau'+X, 'ta'+X+'_tau');
 
@@ -623,27 +623,27 @@ function genOscilloscope(X){
 
     if(pedMode==='guide'){
       canonicalNodes = [
-        _oscNode('0','Vérification de l\'unité de tau','UnitsAbsolute','eleve_unit_tau'+X,'teacher_unit_tau'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo('<strong>Constante de temps :</strong> L\'unité est incorrecte (attendue en base SI : {@teacher_unit_tau'+X+'/2@}).')),
-        _oscNode('1','Vérification de la valeur de tau','UnitsRelative','ans_tau'+X,'ta'+X+'_tau','ta'+X+'_precision_q','+',0.25,3,'prt'+X+'-1-T',_oscOk('<strong>Constante de temps :</strong> Correcte.'),'-',0,2,'prt'+X+'-1-F',''),
-        _oscNode('2','Piège Tau — A-t-il mis E ?','UnitsRelative','ans_tau'+X,'ta'+X+'_E','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap('<strong>Constante de temps :</strong> Vous avez entré la valeur de la tension \\(E\\) au lieu de la constante de temps \\(\\tau\\).'),'-',0,-1,'prt'+X+'-2-F',_oscKo('<strong>Constante de temps :</strong> La valeur numérique ou la précision est incorrecte. Mesurez précisément l\'abscisse correspondant à '+(decharge?'36,8%':'63,2%')+' de la tension.')),
-        _oscNode('3','Vérification de l\'unité de E','UnitsAbsolute','eleve_unit_E'+X,'teacher_unit_E'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo('<strong>Tension :</strong> L\'unité est incorrecte (attendue en base SI : {@teacher_unit_E'+X+'/2@}).')),
-        _oscNode('4','Vérification de la valeur de E','UnitsRelative','ans_E'+X,'ta'+X+'_E','0.05','+',0.25,-1,'prt'+X+'-4-T',_oscOk('<strong>Tension :</strong> Correcte.'),'-',0,5,'prt'+X+'-4-F',''),
-        _oscNode('5','Piège E — A-t-il mis tau ?','UnitsRelative','ans_E'+X,'ta'+X+'_tau','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-5-T',_oscTrap('<strong>Tension :</strong> Vous avez entré la valeur de la constante de temps \\(\\tau\\) au lieu de la tension \\(E\\).'),'-',0,-1,'prt'+X+'-5-F',_oscKo('<strong>Tension :</strong> La valeur numérique ou la précision est incorrecte. Mesurez l\'écart entre le palier et la ligne du bas avec les curseurs Y.'))
+        _oscNode('0','Vérification de l\'unité de tau','UnitsAbsolute','eleve_unit_tau'+X,'teacher_unit_tau'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N.t('osc.fb_tau_unite_ko',{X:X}))),
+        _oscNode('1','Vérification de la valeur de tau','UnitsRelative','ans_tau'+X,'ta'+X+'_tau','ta'+X+'_precision_q','+',0.25,3,'prt'+X+'-1-T',_oscOk(I18N.t('osc.fb_tau_correcte')),'-',0,2,'prt'+X+'-1-F',''),
+        _oscNode('2','Piège Tau — A-t-il mis E ?','UnitsRelative','ans_tau'+X,'ta'+X+'_E','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N.t('osc.fb_tau_trap_e')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N.t('osc.fb_tau_valeur_ko',{pct: decharge?I18N.t('osc.pct_368'):I18N.t('osc.pct_632')}))),
+        _oscNode('3','Vérification de l\'unité de E','UnitsAbsolute','eleve_unit_E'+X,'teacher_unit_E'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N.t('osc.fb_tension_unite_ko',{X:X}))),
+        _oscNode('4','Vérification de la valeur de E','UnitsRelative','ans_E'+X,'ta'+X+'_E','0.05','+',0.25,-1,'prt'+X+'-4-T',_oscOk(I18N.t('osc.fb_tension_correcte')),'-',0,5,'prt'+X+'-4-F',''),
+        _oscNode('5','Piège E — A-t-il mis tau ?','UnitsRelative','ans_E'+X,'ta'+X+'_tau','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N.t('osc.fb_tension_trap_tau')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N.t('osc.fb_tension_valeur_ko')))
       ];
     } else {
       canonicalNodes = _oscSimplePair('prt'+X,
-        {label:'Constante de temps', sans:'ans_tau'+X, tans:'ta'+X+'_tau', testopt:'ta'+X+'_precision_q'},
-        {label:'Tension',            sans:'ans_E'+X,   tans:'ta'+X+'_E',   testopt:'0.05'},
+        {label:I18N.t('osc.label_constante_temps'), sans:'ans_tau'+X, tans:'ta'+X+'_tau', testopt:'ta'+X+'_precision_q'},
+        {label:I18N.t('osc.label_tension'),            sans:'ans_E'+X,   tans:'ta'+X+'_E',   testopt:'0.05'},
         pedMode==='expert');
     }
 
     qnote = 'E={@ta'+X+'_E@} | tau={@ta'+X+'_tau@}';
     genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-      + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">🔑 Réponses attendues</div>'
+      + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N.t('osc.genfb_reponses_attendues') + '</div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
-      + '<span style="font-weight:bold;color:#0f766e;">Q1 Constante de temps :</span> <p>En mesurant entre \\(t=0\\) et le point correspondant à '+(decharge?'36,8%':'63,2%')+' de la tension, on trouve \\(\\tau\\) = {@ta'+X+'_tau@}.</p></div>'
+      + '<span style="font-weight:bold;color:#0f766e;">' + I18N.t('osc.genfb_q1_tau') + '</span> <p>' + I18N.t('osc.genfb_tau_explanation', {pct: decharge?I18N.t('osc.pct_368'):I18N.t('osc.pct_632'), X: X}) + '</p></div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;">'
-      + '<span style="font-weight:bold;color:#0f766e;">Q2 Tension '+(decharge?'initiale':'finale')+' :</span> <p>En mesurant le palier de tension avec les curseurs Y, on trouve \\(E\\) = {@ta'+X+'_E@}.</p></div></div>';
+      + '<span style="font-weight:bold;color:#0f766e;">' + I18N.t('osc.genfb_q2_tension', {mode: decharge?I18N.t('osc.mot_initiale'):I18N.t('osc.mot_finale')}) + '</span> <p>' + I18N.t('osc.genfb_tension_explanation', {X: X}) + '</p></div></div>';
 
     var prtMeta2 = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv2 };
     return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta2, canonicalNodes, genFb, fbGen, jsx);
@@ -670,21 +670,21 @@ function genOscilloscope(X){
 
   jsx = buildOscJSXCode_Retard({ siA: svIdx, siB: Math.min(OSC_SV.length-1, svIdx+1), ti: shIdx, fcExpr:'{#ta'+X+'_f_carrier_val#}', dtExpr:'{#ta'+X+'_dt_val#}' });
 
-  var header3 = _oscHeader(X, bareme, 'Oscilloscope — Propagation des Ultrasons', {bg:'#0f766e',accent:'#14b8a6'}, '📡', 'Ondes mécaniques');
+  var header3 = _oscHeader(X, bareme, I18N.t('osc.title_retard'), {bg:'#0f766e',accent:'#14b8a6'}, '📡', I18N.t('osc.subtitle_ondes_mecaniques'));
   textFrag = header3
     + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
-    + '<p><strong>Consigne :</strong> On visualise le signal de l\'émetteur (Voie A, <span style="color:#2563eb;font-weight:bold;">Bleu</span>) et le signal du récepteur (Voie B, <span style="color:#dc2626;font-weight:bold;">Rouge</span>).</p>'
-    + '<p>À l\'aide des curseurs temporels (■ X), déterminez :</p>'
-    + '<ol style="margin-left:20px;line-height:2;"><li>La fréquence des ultrasons émis \\(f\\).</li><li>Le retard temporel \\(\\Delta t\\) entre l\'émission et la réception.</li></ol>'
+    + '<p><strong>' + I18N.t('osc.consigne_lbl') + '</strong> ' + I18N.t('osc.retard_intro') + '</p>'
+    + '<p>' + I18N.t('osc.retard_determinez') + '</p>'
+    + '<ol style="margin-left:20px;line-height:2;"><li>' + I18N.t('osc.retard_li_frequence') + '</li><li>' + I18N.t('osc.retard_li_delta_t') + '</li></ol>'
     + (text||'') + '</div><!-- ENONCE-END -->\n'
     + '<div><!--HS-KBD:'+X+'--></div>\n'
-    + _oscInputHintsHTML('<code>25*us</code> pour µs')
-    + '<p>1. Fréquence des ultrasons \\(f\\) : [[input:ans_fc'+X+']] [[validation:ans_fc'+X+']]</p>\n'
-    + '<p>2. Retard temporel \\(\\Delta t\\) : [[input:ans_dt'+X+']] [[validation:ans_dt'+X+']]</p>';
+    + _oscInputHintsHTML('<code>25*us</code> ' + I18N.t('osc.pour_us'))
+    + '<p>' + I18N.t('osc.label_frequence_ultrasons') + '[[input:ans_fc'+X+']] [[validation:ans_fc'+X+']]</p>\n'
+    + '<p>' + I18N.t('osc.label_retard_temporel') + '[[input:ans_dt'+X+']] [[validation:ans_dt'+X+']]</p>';
 
   previewFrag = header3
     + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
-    + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#0f766e;font-family:monospace;font-size:.85rem;">📡 Oscilloscope — Retard ultrasonore (2 voies)</div>';
+    + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#0f766e;font-family:monospace;font-size:.85rem;">' + I18N.t('osc.preview_retard') + '</div>';
 
   inputXML = _oscUnitsInput('ans_dt'+X, 'ta'+X+'_dt') + '\n' + _oscUnitsInput('ans_fc'+X, 'ta'+X+'_fc');
 
@@ -705,28 +705,28 @@ function genOscilloscope(X){
 
   if(pedMode==='guide'){
     canonicalNodes = [
-      _oscNode('0','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_f'+X,'teacher_unit_f'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo('<strong>Fréquence :</strong> L\'unité est incorrecte (attendue en base SI : {@teacher_unit_f'+X+'/2@}).')),
-      _oscNode('1','Vérification de la valeur de f','UnitsRelative','ans_fc'+X,'ta'+X+'_fc','ta'+X+'_precision_q','+',0.75,3,'prt'+X+'-1-T',_oscOk('<strong>Fréquence :</strong> Correcte.'),'-',0,2,'prt'+X+'-1-F',''),
-      _oscNode('2','Piège — Mesure de la fréquence de la salve','UnitsRelative','ans_fc'+X,'ta'+X+'_fm','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap('<strong>Fréquence :</strong> Vous avez mesuré la période de la salve (l\'enveloppe globale), pas la période du signal ultrasonore haute fréquence.'),'-',0,-1,'prt'+X+'-2-F',_oscKo('<strong>Fréquence :</strong> La valeur numérique ou la précision est incorrecte. Mesurez précisément la distance d\'UNE petite oscillation.')),
-      _oscNode('3','Vérification de l\'unité du retard','UnitsAbsolute','eleve_unit_dt'+X,'teacher_unit_dt'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo('<strong>Retard :</strong> L\'unité est incorrecte (attendue en base SI : {@teacher_unit_dt'+X+'/2@}).')),
-      _oscNode('4','Vérification de la valeur du retard','UnitsRelative','ans_dt'+X,'ta'+X+'_dt','0.05','+',0.75,-1,'prt'+X+'-4-T',_oscOk('<strong>Retard :</strong> Correct.'),'-',0,5,'prt'+X+'-4-F',''),
-      _oscNode('5','Piège Retard — A-t-il mis la période du signal ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_periode','0.05','-',0,-1,'prt'+X+'-5-T',_oscTrap('<strong>Retard :</strong> Vous avez calculé et entré la période du signal ultrasonore (\\(T = 1/f\\)) au lieu du décalage temporel entre l\'émission et la réception.'),'-',0,6,'prt'+X+'-5-F',''),
-      _oscNode('6','Piège Retard — A-t-il mis T/2 ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_demi_periode','0.05','-',0,-1,'prt'+X+'-6-T',_oscTrap('<strong>Retard :</strong> Vous avez calculé la moitié de la période du signal (\\(T/2\\)) au lieu du décalage temporel entre les salves.'),'-',0,-1,'prt'+X+'-6-F',_oscKo('<strong>Retard :</strong> La valeur numérique ou la précision est incorrecte. Placez un curseur sur le début de la salve bleue (émission) et l\'autre sur le début de la salve rouge (réception).'))
+      _oscNode('0','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_f'+X,'teacher_unit_f'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N.t('osc.fb_freq_unite_ko_retard',{X:X}))),
+      _oscNode('1','Vérification de la valeur de f','UnitsRelative','ans_fc'+X,'ta'+X+'_fc','ta'+X+'_precision_q','+',0.75,3,'prt'+X+'-1-T',_oscOk(I18N.t('osc.fb_freq_correcte_retard')),'-',0,2,'prt'+X+'-1-F',''),
+      _oscNode('2','Piège — Mesure de la fréquence de la salve','UnitsRelative','ans_fc'+X,'ta'+X+'_fm','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N.t('osc.fb_freq_trap_salve')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N.t('osc.fb_freq_valeur_ko_retard'))),
+      _oscNode('3','Vérification de l\'unité du retard','UnitsAbsolute','eleve_unit_dt'+X,'teacher_unit_dt'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N.t('osc.fb_retard_unite_ko',{X:X}))),
+      _oscNode('4','Vérification de la valeur du retard','UnitsRelative','ans_dt'+X,'ta'+X+'_dt','0.05','+',0.75,-1,'prt'+X+'-4-T',_oscOk(I18N.t('osc.fb_retard_correct')),'-',0,5,'prt'+X+'-4-F',''),
+      _oscNode('5','Piège Retard — A-t-il mis la période du signal ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_periode','0.05','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N.t('osc.fb_retard_trap_periode')),'-',0,6,'prt'+X+'-5-F',''),
+      _oscNode('6','Piège Retard — A-t-il mis T/2 ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_demi_periode','0.05','-',0,-1,'prt'+X+'-6-T',_oscTrap(I18N.t('osc.fb_retard_trap_demi_periode')),'-',0,-1,'prt'+X+'-6-F',_oscKo(I18N.t('osc.fb_retard_valeur_ko')))
     ];
   } else {
     canonicalNodes = _oscSimplePair('prt'+X,
-      {label:'Fréquence', sans:'ans_fc'+X, tans:'ta'+X+'_fc', testopt:'ta'+X+'_precision_q'},
-      {label:'Retard',    sans:'ans_dt'+X, tans:'ta'+X+'_dt', testopt:'0.05'},
+      {label:I18N.t('osc.label_frequence'), sans:'ans_fc'+X, tans:'ta'+X+'_fc', testopt:'ta'+X+'_precision_q'},
+      {label:I18N.t('osc.label_retard'),    sans:'ans_dt'+X, tans:'ta'+X+'_dt', testopt:'0.05'},
       pedMode==='expert');
   }
 
   qnote = 'f={@ta'+X+'_f_carrier_val@} Hz | dt={@ta'+X+'_dt@}';
   genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-    + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">🔑 Réponses attendues</div>'
+    + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N.t('osc.genfb_reponses_attendues') + '</div>'
     + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
-    + '<span style="font-weight:bold;color:#0f766e;">Q1 Fréquence :</span> <p>En mesurant UNE période du signal haute fréquence (les petites oscillations), on trouve \\(f\\) = {@ta'+X+'_fc@}.</p></div>'
+    + '<span style="font-weight:bold;color:#0f766e;">' + I18N.t('osc.genfb_q1_frequence_retard') + '</span> <p>' + I18N.t('osc.genfb_frequence_retard_explanation', {X: X}) + '</p></div>'
     + '<div style="margin-bottom:8px;font-size:.9rem;">'
-    + '<span style="font-weight:bold;color:#0f766e;">Q2 Retard temporel :</span> <p>En plaçant un curseur sur le début de la salve bleue et l\'autre sur le début de la salve rouge, on mesure \\(\\Delta t\\) = {@ta'+X+'_dt@}.</p></div></div>';
+    + '<span style="font-weight:bold;color:#0f766e;">' + I18N.t('osc.genfb_q2_retard') + '</span> <p>' + I18N.t('osc.genfb_retard_explanation', {X: X}) + '</p></div></div>';
 
   var prtMeta3 = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv3 };
   return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta3, canonicalNodes, genFb, fbGen, jsx);

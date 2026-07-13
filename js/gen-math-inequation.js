@@ -99,14 +99,14 @@ function genInequation(X) {
             name: '0', description: 'Solution correcte ?', answertest: 'AlgEquiv', sans: `_ic${X}`, tans: `q${X}_ta`,
             testoptions: '', quiet: '0',
             truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
-            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Correct !</strong></div>',
+            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N.t('mat.fb_ok_correct')}</strong></div>`,
             falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'PRT-'+X+'-NOK', falsefeedback: fbWrong || falseFb
         };
     }
 
-    var HDR = `<div style="background:#8b5cf6;border-left:5px solid #7c3aed;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — In\xe9quations</strong> <span style="background:#7c3aed;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
-    var NOTE = `<p><em>Ensemble solution : ]a;b[ (ouvert), [a;b] (ferm\xe9), [a;b[ ou ]a;b] (semi-ouvert), inf pour l'infini (ex. ]3;inf[). Plusieurs intervalles : ]a;b[ U ]c;d[.</em></p>`;
+    var HDR = `<div style="background:#8b5cf6;border-left:5px solid #7c3aed;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('ineq.banniere')}</strong> <span style="background:#7c3aed;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
+    var NOTE = `<p><em>${I18N.t('ineq.note_notation')}</em></p>`;
 
     if (mode === 'fixe') {
         var fa = gs('ineq-a').trim() || '2', fb = gs('ineq-b').trim() || '-6', fc = gs('ineq-c').trim() || '0';
@@ -117,9 +117,9 @@ function genInequation(X) {
 q${X}_a:${fa};q${X}_b:${fb};q${X}_op:"${op}";
 q${X}_ta:${tans};${ineqPrettyVarStmt(X)}`;
             qnote = `{@q${X}_a@}x+{@q${X}_b@}{@q${X}_op@}0, sol={@q${X}_ta@}`;
-            textFrag = `${HDR}${custText}<p>R\xe9soudre dans \\(\\mathbb{R}\\) :</p>
+            textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( {@q${X}_a@}x + {@q${X}_b@} {@q${X}_op@} 0 \\)</div>
-<p>Ensemble solution : [[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         } else if (scenario === 'trinome') {
             vars = `/* Q${X} In\xe9q — Degr\xe9 2 (fixe) */
@@ -127,23 +127,23 @@ q${X}_a:${fa};q${X}_b:${fb};q${X}_c:${fc};q${X}_op:"${op}";
 q${X}_poly:q${X}_a*x^2+q${X}_b*x+q${X}_c;
 q${X}_ta:${tans};${ineqPrettyVarStmt(X)}`;
             qnote = `sol={@q${X}_ta@}`;
-            textFrag = `${HDR}${custText}<p>R\xe9soudre dans \\(\\mathbb{R}\\) :</p>
+            textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( {@q${X}_poly@} {@q${X}_op@} 0 \\)</div>
-<p>Ensemble solution : [[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         } else { /* valeur-abs */
             vars = `/* Q${X} In\xe9q — Valeur absolue (fixe) */
 q${X}_a:${fa};q${X}_b:${fb};q${X}_c:${fc};q${X}_op:"${op}";
 q${X}_ta:${tans};${ineqPrettyVarStmt(X)}`;
             qnote = `|{@q${X}_a@}x+{@q${X}_b@}|{@q${X}_op@}{@q${X}_c@}, sol={@q${X}_ta@}`;
-            textFrag = `${HDR}${custText}<p>R\xe9soudre dans \\(\\mathbb{R}\\) :</p>
+            textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( |{@q${X}_a@}x + {@q${X}_b@}| {@q${X}_op@} {@q${X}_c@} \\)</div>
-<p>Ensemble solution : [[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         }
         inputXML = _mkInput({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
-        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ R\xe9ponse : {@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>🔑 Correction</strong><br>Solution : {@q${X}_ta@}.</div>`;
+        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('ineq.fb_wrong_reponse', {tavar:'q'+X+'_ta'})}</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>${I18N.t('ineq.fbgen_fixe', {tavar:'q'+X+'_ta'})}</div>`;
 
     } else if (scenario === 'lineaire') {
         vars = `/* Q${X} In\xe9q — Degr\xe9 1 */
@@ -159,13 +159,13 @@ q${X}_ta:if q${X}_op=">" then (if q${X}_a>0 then oo(q${X}_sol,inf) else oo(-inf,
      elseif q${X}_op="<" then (if q${X}_a>0 then oo(-inf,q${X}_sol) else oo(q${X}_sol,inf))
      else (if q${X}_a>0 then cc(-inf,q${X}_sol) else cc(q${X}_sol,inf));${ineqPrettyVarStmt(X)}`;
         qnote = `{@q${X}_a@}x+{@q${X}_b@}{@q${X}_op@}0, sol={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>R\xe9soudre dans \\(\\mathbb{R}\\) :</p>
+        textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( {@q${X}_a@}x + {@q${X}_b@} {@q${X}_op@} 0 \\)</div>
-<p>Ensemble solution : [[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         inputXML = _mkInput({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
-        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ Isoler \\(x\\) (attention au signe si on divise par un n\xe9gatif). R\xe9ponse : {@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>🔑 Correction</strong><br>\\({@q${X}_a@}x {@q${X}_op@} -{@q${X}_b@}\\)<br>\\(x {@q${X}_op@} \\frac{-({@q${X}_b@})}{{@q${X}_a@}}={@q${X}_sol@}\\) (attention au signe si a &lt; 0).<br>Solution : {@q${X}_ta@}.</div>`;
+        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('ineq.fb_wrong_lineaire', {tavar:'q'+X+'_ta'})}</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>${I18N.t('ineq.fbgen_lineaire', {avar:'q'+X+'_a', opvar:'q'+X+'_op', bvar:'q'+X+'_b', solvar:'q'+X+'_sol', tavar:'q'+X+'_ta'})}</div>`;
 
     } else if (scenario === 'trinome') {
         vars = `/* Q${X} In\xe9q — Degr\xe9 2 */
@@ -182,13 +182,13 @@ q${X}_op:q${X}_ops[1+rand(4)];
 q${X}_ta:if q${X}_a>0 then (if q${X}_op=">" or q${X}_op=">=" then %union(oo(-inf,q${X}_x1),oo(q${X}_x2,inf)) else oo(q${X}_x1,q${X}_x2))
      else (if q${X}_op="<" or q${X}_op="<=" then %union(oo(-inf,q${X}_x1),oo(q${X}_x2,inf)) else oo(q${X}_x1,q${X}_x2));${ineqPrettyVarStmt(X)}`;
         qnote = `sol={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>R\xe9soudre dans \\(\\mathbb{R}\\) :</p>
+        textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( {@q${X}_poly@} {@q${X}_op@} 0 \\)</div>
-<p>Ensemble solution : [[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         inputXML = _mkInput({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
-        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ Racines : \\(x_1={@q${X}_x1@}\\), \\(x_2={@q${X}_x2@}\\). Signe de \\(a={@q${X}_a@}\\). R\xe9ponse : {@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>🔑 Correction</strong><br>Racines : \\(x_1={@q${X}_x1@}\\), \\(x_2={@q${X}_x2@}\\)<br>Signe de \\(a={@q${X}_a@}\\) d\xe9termine la solution : {@q${X}_ta@}.</div>`;
+        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('ineq.fb_wrong_trinome', {x1var:'q'+X+'_x1', x2var:'q'+X+'_x2', avar:'q'+X+'_a', tavar:'q'+X+'_ta'})}</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>${I18N.t('ineq.fbgen_trinome', {x1var:'q'+X+'_x1', x2var:'q'+X+'_x2', avar:'q'+X+'_a', tavar:'q'+X+'_ta'})}</div>`;
 
     } else { /* valeur-abs */
         vars = `/* Q${X} In\xe9q — Valeur absolue */
@@ -205,13 +205,13 @@ q${X}_sl:min(q${X}_s1,q${X}_s2);q${X}_su:max(q${X}_s1,q${X}_s2);
 q${X}_ta:if q${X}_op=">" or q${X}_op=">=" then %union(oo(-inf,q${X}_sl),oo(q${X}_su,inf))
      else oo(q${X}_sl,q${X}_su);${ineqPrettyVarStmt(X)}`;
         qnote = `|{@q${X}_a@}x+{@q${X}_b@}|{@q${X}_op@}{@q${X}_c@}, sol={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>R\xe9soudre dans \\(\\mathbb{R}\\) :</p>
+        textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( |{@q${X}_a@}x + {@q${X}_b@}| {@q${X}_op@} {@q${X}_c@} \\)</div>
-<p>Ensemble solution : [[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         inputXML = _mkInput({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
-        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ \\(|u|\\leq c\\Leftrightarrow -c\\leq u\\leq c\\), \\(|u|>c\\Leftrightarrow u<-c\\) ou \\(u>c\\). R\xe9ponse : {@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>🔑 Correction</strong><br>\\(|{@q${X}_a@}x+{@q${X}_b@}|{@q${X}_op@}{@q${X}_c@}\\)<br>Solution : {@q${X}_ta@}.</div>`;
+        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('ineq.fb_wrong_valeur_abs', {tavar:'q'+X+'_ta'})}</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>${I18N.t('ineq.fbgen_valeur_abs', {avar:'q'+X+'_a', bvar:'q'+X+'_b', opvar:'q'+X+'_op', cvar:'q'+X+'_c', tavar:'q'+X+'_ta'})}</div>`;
     }
 
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: ineqIntervalFeedbackVars(X) };

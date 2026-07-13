@@ -270,11 +270,11 @@ function genRvbCmj(X) {
 
     var filterLabels, modeLabel;
     if (mode === 'cmj') {
-        filterLabels = ['Filtre Cyan','Filtre Magenta','Filtre Jaune'];
-        modeLabel    = 'Filtres CMJN';
+        filterLabels = [I18N.t('rvb.filter_cyan'), I18N.t('rvb.filter_magenta'), I18N.t('rvb.filter_jaune')];
+        modeLabel    = I18N.t('rvb.title_cmj');
     } else {
-        filterLabels = ['Filtre Rouge','Filtre Vert','Filtre Bleu'];
-        modeLabel    = 'Filtres RVB';
+        filterLabels = [I18N.t('rvb.filter_rouge'), I18N.t('rvb.filter_vert'), I18N.t('rvb.filter_bleu')];
+        modeLabel    = I18N.t('rvb.title_rvb');
     }
 
     var okTxtHtml = fbOkTxt ? ' ' + htmlEsc(fbOkTxt) : '';
@@ -316,26 +316,26 @@ function genRvbCmj(X) {
         + '["rouge","vert","bleu","cyan","magenta","jaune","noir","blanc"]))$\n'
         + 'fb_ok_' + X + ': "' + _rvbMx(
             "<div style='background:#dcfce7;color:#166534;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #16a34a;'><strong>Correct !</strong> L'objet est bien " + colorKey + "." + okTxtHtml + "</div>"
+            "border-left:4px solid #16a34a;'>" + I18N.t('rvb.fb_ok_prefix') + colorKey + "." + okTxtHtml + "</div>"
         ) + '"$\n'
         + 'fb_comp_' + X + ': "' + _rvbMx(
             "<div style='background:#fef2f2;color:#991b1b;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #dc2626;'><strong>Piège complémentaire.</strong> " + errComp +
-            " est la couleur complémentaire de " + colorKey + "." + wrTxtHtml + "</div>"
+            "border-left:4px solid #dc2626;'>" + I18N.t('rvb.fb_comp_prefix') + errComp +
+            I18N.t('rvb.fb_comp_mid') + colorKey + "." + wrTxtHtml + "</div>"
         ) + '"$\n'
         + 'fb_part1_' + X + ': "' + _rvbMx(
             "<div style='background:#fef2f2;color:#991b1b;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #dc2626;'><strong>Piège partiel.</strong> " + errPartiel1 +
-            " et " + colorKey + " partagent une composante." + wrTxtHtml + "</div>"
+            "border-left:4px solid #dc2626;'>" + I18N.t('rvb.fb_part_prefix') + errPartiel1 +
+            I18N.t('rvb.fb_part_mid') + colorKey + I18N.t('rvb.fb_part_suffix') + wrTxtHtml + "</div>"
         ) + '"$\n'
         + 'fb_part2_' + X + ': "' + _rvbMx(
             "<div style='background:#fef2f2;color:#991b1b;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #dc2626;'><strong>Piège partiel.</strong> " + errPartiel2 +
-            " et " + colorKey + " partagent une composante." + wrTxtHtml + "</div>"
+            "border-left:4px solid #dc2626;'>" + I18N.t('rvb.fb_part_prefix') + errPartiel2 +
+            I18N.t('rvb.fb_part_mid') + colorKey + I18N.t('rvb.fb_part_suffix') + wrTxtHtml + "</div>"
         ) + '"$\n'
         + 'fb_finale_' + X + ': "' + _rvbMx(
             "<div style='background:#f8fafc;color:#475569;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #94a3b8;'><strong>Incorrect.</strong> Observez à travers quels filtres l'objet est clair." + wrTxtHtml + "</div>"
+            "border-left:4px solid #94a3b8;'>" + I18N.t('rvb.fb_finale_text') + wrTxtHtml + "</div>"
         ) + '"$';
 
     /* ── Input XML : dropdown, mélangé côté Maxima (choices_X) ── */
@@ -519,8 +519,8 @@ function genRvbCmj(X) {
     /* ── Feedback général : image d'origine, sans filtre ──
        Base64 sur une seule ligne (voir rawB64Chunked ci-dessus : le découpage
        n'est ni nécessaire à cette taille d'image, ni validé ici). */
-    var genFbDefault = '<p>Voici l\'image originale sans filtre pour vérifier&nbsp;:</p>'
-        + '<p><img src="' + imgData + '" alt="scène originale" style="max-width:600px;border-radius:6px;"></p>';
+    var genFbDefault = '<p>' + I18N.t('rvb.genfb_text') + '</p>'
+        + '<p><img src="' + imgData + '" alt="' + I18N.t('rvb.genfb_alt') + '" style="max-width:600px;border-radius:6px;"></p>';
 
     return {
         bareme:          bareme,
@@ -547,7 +547,7 @@ function genOptique(X) {
     if (scenario === 'miroir-plan')       return _genOptiqueMiroirPlan(X);
     if (scenario === 'miroir-spherique')  return _genOptiqueMiroirSpherique(X);
     if (scenario === 'telescope')         return _genOptiqueTelescope(X);
-    throw new Error('Scénario optique inconnu : ' + scenario);
+    throw new Error(I18N.t('msg.optique_err_scenario') + scenario);
 }
 
 /* ── Scénario 1 : Trouver l'image (glisser B') ── */
@@ -566,11 +566,11 @@ function _genOptiqueLentilleImage(X) {
 
     /* ── Validation des paramètres ── */
     if (f <= 0)
-        throw new Error('La distance focale f\' doit être positive (lentille convergente).');
+        throw new Error(I18N.t('opt.err_f_positive'));
     if (OA >= 0)
-        throw new Error('La position OA doit être négative (objet réel, avant la lentille).');
+        throw new Error(I18N.t('opt.err_oa_negative'));
     if (Math.abs(OA + f) < 0.01)
-        throw new Error('OA = −f\' : l\'objet est au foyer → image à l\'infini (non représentable).');
+        throw new Error(I18N.t('opt.err_oa_eq_f_s1'));
 
     /* ── Calcul de l'image ── */
     var OAp   = f * OA / (OA + f);          // relation de conjugaison
@@ -721,23 +721,23 @@ function _genOptiqueLentilleImage(X) {
 
     /* ── Feedback messages ── */
     var fbOk = wrapFb(
-        '<p>✅ <strong>Bonne position !</strong>'
+        '<p>' + I18N.t('opt.fb_ok_title')
         + (fbOkTxt ? ' ' + htmlEsc(fbOkTxt) : '')
         + '</p><p style="font-size:.88em;">'
         + 'OA\'&nbsp;≈&nbsp;{@round(opt_x_' + X + '*100)/100@}&nbsp;cm'
-        + ' (attendu&nbsp;: ' + OAp.toFixed(2) + '&nbsp;cm) —&nbsp;'
+        + I18N.t('opt.fb_attendu_prefix') + OAp.toFixed(2) + '&nbsp;cm) —&nbsp;'
         + 'A\'B\'&nbsp;≈&nbsp;{@round(opt_y_' + X + '*100)/100@}&nbsp;cm'
-        + ' (attendu&nbsp;: ' + ABp.toFixed(2) + '&nbsp;cm)'
+        + I18N.t('opt.fb_attendu_prefix') + ABp.toFixed(2) + '&nbsp;cm)'
         + '</p>',
         true
     );
     var fbWrong = wrapFb(
-        '<p>❌ <strong>Position incorrecte.</strong>'
+        '<p>' + I18N.t('opt.fb_wrong_title')
         + (fbWrTxt ? ' ' + htmlEsc(fbWrTxt) : '')
         + '</p><p style="font-size:.88em;">'
-        + 'Vous avez placé B\' en ({@round(opt_x_' + X + '*100)/100@}&nbsp;cm&nbsp;;&nbsp;'
+        + I18N.t('opt.fb_wrong_placed_prefix') + '({@round(opt_x_' + X + '*100)/100@}&nbsp;cm&nbsp;;&nbsp;'
         + '{@round(opt_y_' + X + '*100)/100@}&nbsp;cm). '
-        + 'Utilisez&nbsp;: 1/OA\' − 1/OA = 1/f\' puis γ = OA\'/OA.'
+        + I18N.t('opt.fb_wrong_formula')
         + '</p>',
         false
     );
@@ -756,7 +756,7 @@ function _genOptiqueLentilleImage(X) {
 
     /* ── Encart données affiché à l'élève ── */
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données&nbsp;:</strong>&nbsp;'
+        + I18N.t('opt.data_label_nbsp')
         + 'f\'&nbsp;=&nbsp;' + f + '&nbsp;cm,&nbsp;'
         + 'OA&nbsp;=&nbsp;' + OA + '&nbsp;cm,&nbsp;'
         + 'AB&nbsp;=&nbsp;' + AB + '&nbsp;cm</p>\n';
@@ -766,7 +766,7 @@ function _genOptiqueLentilleImage(X) {
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — Optique&nbsp;: Lentille convergente</strong>'
+        + ' — ' + I18N.t('opt.title_lentille_image') + '</strong>'
         + '<span style="background:#0369a1;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
@@ -776,8 +776,8 @@ function _genOptiqueLentilleImage(X) {
         + jxgCode + '\n'
         + '[[/jsxgraph]]\n'
         + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + '💡 Faites glisser le point <strong style="color:#dc2626;">B\'</strong>'
-        + ' pour positionner l\'image A\'B\' (A\' suit automatiquement sur l\'axe).</p>\n'
+        + I18N.t('opt.hint_lentille_image_1')
+        + I18N.t('opt.hint_lentille_image_2') + '</p>\n'
         + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
 
     return {
@@ -807,11 +807,11 @@ function _genOptiqueLentilleRayons(X) {
     var fbWrTxt = v('opt-fb-wrong').trim();
 
     if (f <= 0)
-        throw new Error("La distance focale f' doit être positive (lentille convergente).");
+        throw new Error(I18N.t("opt.err_f_positive"));
     if (OA >= 0)
-        throw new Error("La position OA doit être négative (objet réel, avant la lentille).");
+        throw new Error(I18N.t("opt.err_oa_negative"));
     if (Math.abs(OA + f) < 0.01)
-        throw new Error("OA = -f' : l'objet est au foyer — image à l'infini (non représentable).");
+        throw new Error(I18N.t("opt.err_oa_eq_f_s2"));
 
     var OAp   = f * OA / (OA + f);
     var gamma = OAp / OA;
@@ -925,12 +925,12 @@ function _genOptiqueLentilleRayons(X) {
         + y3hit.toFixed(4) + '))^2<=' + tol + '^2);\n'
         + 'opt_ok_' + X + ': is(opt_rk1_' + X + ' and opt_rk2_' + X + ' and opt_rk3_' + X + ');';
 
-    var fbOk    = fbOkTxt || '<p>✅ Excellent ! Les 3 rayons sont correctement tracés.</p>';
+    var fbOk    = fbOkTxt || I18N.t('opt.rayons_fbok');
     var fbWrong = fbWrTxt
-        || '<p>❌ Au moins un rayon n\'est pas correct.</p><ul>'
-        + '<li><span style="color:#2563eb;">●</span> Rayon 1 : non dévié, sort de O dans la même direction.</li>'
-        + '<li><span style="color:#16a34a;">●</span> Rayon 2 : parallèle à l\'axe → sort en passant par F\'.</li>'
-        + '<li><span style="color:#d97706;">●</span> Rayon 3 : dirigé vers F → sort parallèle à l\'axe.</li>'
+        || I18N.t('opt.rayons_fbwrong_title')
+        + I18N.t('opt.rayons_fbwrong_li1')
+        + I18N.t('opt.rayons_fbwrong_li2')
+        + I18N.t('opt.rayons_fbwrong_li3')
         + '</ul>';
 
     var inputXML = ['a', 'b', 'c'].map(function (sfx, i) {
@@ -966,7 +966,7 @@ function _genOptiqueLentilleRayons(X) {
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — Optique : Rayons remarquables</strong>'
+        + ' — ' + I18N.t('opt.title_lentille_rayons') + '</strong>'
         + '<span style="background:#0369a1;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -974,9 +974,9 @@ function _genOptiqueLentilleRayons(X) {
         + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
         + jxg + '\n[[/jsxgraph]]\n'
         + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + '🔵 Rayon 1 (bleu) : rayon émergent passant par O. '
-        + '🟢 Rayon 2 (vert) : rayon émergent passant par F\'. '
-        + '🟠 Rayon 3 (orange) : rayon émergent parallèle à l\'axe.</p>\n'
+        + I18N.t('opt.hint_rayons_1')
+        + I18N.t('opt.hint_rayons_2')
+        + I18N.t('opt.hint_rayons_3') + '</p>\n'
         + '<div style="display:none">'
         + '[[input:ans' + X + 'a]][[validation:ans' + X + 'a]]'
         + '[[input:ans' + X + 'b]][[validation:ans' + X + 'b]]'
@@ -1011,9 +1011,9 @@ function _genOptiqueLunette(X) {
     var fbOkTxt = v('opt-fb-ok').trim();
     var fbWrTxt = v('opt-fb-wrong').trim();
 
-    if (f1 <= 0) throw new Error("La focale f'1 doit être positive.");
-    if (f2 <= 0) throw new Error("La focale f'2 doit être positive.");
-    if (theta <= 0) throw new Error("L'angle d'incidence θ doit être positif.");
+    if (f1 <= 0) throw new Error(I18N.t('opt.err_f1_positive'));
+    if (f2 <= 0) throw new Error(I18N.t('opt.err_f2_positive'));
+    if (theta <= 0) throw new Error(I18N.t('opt.err_theta_positive'));
 
     var tanT   = Math.tan(theta * Math.PI / 180);
     var d      = f1 + f2;          // afocal distance
@@ -1118,13 +1118,13 @@ function _genOptiqueLunette(X) {
         + 'opt_ok_' + X + ': is(opt_ok_x_' + X + ' and opt_ok_y_' + X + ');';
 
     var fbOk = fbOkTxt
-        || '<p>✅ Correct ! B₁ est au foyer image F\'₁ de l\'objectif.</p>'
-        + '<p>Position : x = f\'₁ = ' + f1 + ' cm, y ≈ ' + yB1exp.toFixed(2) + ' cm.</p>';
+        || I18N.t('opt.lunette_fbok_title')
+        + I18N.t('opt.lunette_fbok_pos_prefix') + f1 + I18N.t('opt.lunette_fbok_pos_mid') + yB1exp.toFixed(2) + I18N.t('opt.lunette_fbok_pos_suffix');
     var fbWrong = fbWrTxt
-        || '<p>❌ La position de B₁ n\'est pas exacte.</p><ul>'
-        + '<li>B₁ doit être dans le plan focal de l\'objectif : x = f\'₁ = <strong>' + f1 + ' cm</strong>.</li>'
-        + '<li>Hauteur : y(B₁) = −f\'₁·tanθ ≈ <strong>' + yB1exp.toFixed(2) + ' cm</strong>.</li>'
-        + '<li>Indice : quand B₁ est correct, les deux rayons émergents de L₂ deviennent <strong>parallèles</strong>.</li>'
+        || I18N.t('opt.lunette_fbwrong_title')
+        + I18N.t('opt.lunette_fbwrong_li1_prefix') + f1 + I18N.t('opt.lunette_fbwrong_li1_suffix')
+        + I18N.t('opt.lunette_fbwrong_li2_prefix') + yB1exp.toFixed(2) + I18N.t('opt.lunette_fbwrong_li2_suffix')
+        + I18N.t('opt.lunette_fbwrong_li3')
         + '</ul>';
 
     var inputXML = '    <input>\n'
@@ -1160,7 +1160,7 @@ function _genOptiqueLunette(X) {
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — Optique : Lunette astronomique</strong>'
+        + ' — ' + I18N.t('opt.title_lunette') + '</strong>'
         + '<span style="background:#0369a1;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -1168,9 +1168,9 @@ function _genOptiqueLunette(X) {
         + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
         + jxg + '\n[[/jsxgraph]]\n'
         + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + '💡 Faites glisser B₁ (rouge) dans le plan focal commun F\'₁.'
-        + ' Les rayons émergents de L₂ deviennent <strong>parallèles</strong>'
-        + ' quand B₁ est à la bonne position.</p>\n'
+        + I18N.t('opt.hint_lunette_1')
+        + I18N.t('opt.hint_lunette_2')
+        + I18N.t('opt.hint_lunette_3') + '</p>\n'
         + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
 
     return {
@@ -1308,15 +1308,15 @@ function _genOptiqueMiroirPlan(X) {
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
         + '<strong>Données :</strong> '
-        + 'Miroir plan en xₘ = ' + xM + ' cm, '
-        + 'Objet A en xₐ = ' + xA + ' cm, '
+        + I18N.t('opt.mp_data_miroir') + xM + ' cm, '
+        + I18N.t('opt.mp_data_objet') + xA + ' cm, '
         + 'AB = ' + AB + ' cm</p>\n';
 
     var textFrag = '<div style="background:#b45309;border-left:5px solid #92400e;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — Optique : Miroir plan</strong>'
+        + ' — ' + I18N.t('opt.title_miroir_plan') + '</strong>'
         + '<span style="background:#92400e;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -1324,8 +1324,8 @@ function _genOptiqueMiroirPlan(X) {
         + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
         + jxg + '\n[[/jsxgraph]]\n'
         + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + '💡 Faites glisser B\' (rouge) \xe0 la position de l\'image.'
-        + ' L\'image est <strong>sym\xe9trique</strong> de B par rapport au miroir.</p>\n'
+        + I18N.t('opt.hint_miroir_plan_1')
+        + I18N.t('opt.hint_miroir_plan_2') + '</p>\n'
         + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
 
     return {
@@ -1496,18 +1496,18 @@ function _genOptiqueMiroirSpherique(X) {
     }];
     var prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
-    var typeLabel = (msType === 'concave') ? 'concave (convergent)' : 'convexe (divergent)';
+    var typeLabel = (msType === 'concave') ? I18N.t('opt.ms_type_concave') : I18N.t('opt.ms_type_convexe');
     var SAp = -xAp;
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
         + '<strong>Données :</strong> '
-        + 'Miroir ' + typeLabel + ', |f\'| = ' + f + ' cm, '
+        + I18N.t('opt.ms_data_miroir_prefix') + typeLabel + ', |f\'| = ' + f + ' cm, '
         + 'SA = ' + SA + ' cm, AB = ' + AB + ' cm</p>\n';
 
     var textFrag = '<div style="background:#b45309;border-left:5px solid #92400e;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — Optique : Miroir sphérique</strong>'
+        + ' — ' + I18N.t('opt.title_miroir_spherique') + '</strong>'
         + '<span style="background:#92400e;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -1515,8 +1515,8 @@ function _genOptiqueMiroirSpherique(X) {
         + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
         + jxg + '\n[[/jsxgraph]]\n'
         + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + '💡 Faites glisser B\' (rouge) \xe0 la position de l\'image. '
-        + (isVirtual ? 'Image <strong>virtuelle</strong> (en pointill\xe9s) derri\xe8re le miroir.' : 'Image <strong>r\xe9elle</strong> devant le miroir.')
+        + I18N.t('opt.hint_miroir_sph_1')
+        + (isVirtual ? I18N.t('opt.hint_miroir_sph_virtual') : I18N.t('opt.hint_miroir_sph_real'))
         + '</p>\n'
         + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
 
@@ -1680,13 +1680,13 @@ function _genOptiqueTelescope(X) {
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
         + '<strong>Données :</strong> '
-        + 'Miroir concave f\'₁ = ' + f1 + ' cm, θ = ' + theta + '°</p>\n';
+        + I18N.t('opt.tel_data_miroir') + f1 + ' cm, θ = ' + theta + '°</p>\n';
 
     var textFrag = '<div style="background:#065f46;border-left:5px solid #064e3b;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — Optique : Télescope</strong>'
+        + ' — ' + I18N.t('opt.title_telescope') + '</strong>'
         + '<span style="background:#064e3b;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -1694,9 +1694,9 @@ function _genOptiqueTelescope(X) {
         + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
         + jxg + '\n[[/jsxgraph]]\n'
         + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + '💉 Faites glisser B₁ (rouge) dans le plan focal du miroir primaire.'
-        + ' Les rayons réfléchis <strong>convergent</strong> vers B₁'
-        + ' quand il est à la bonne position.</p>\n'
+        + I18N.t('opt.hint_telescope_1')
+        + I18N.t('opt.hint_telescope_2')
+        + I18N.t('opt.hint_telescope_3') + '</p>\n'
         + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
 
     return {

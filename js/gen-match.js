@@ -28,7 +28,7 @@ total: length(rep_corr_set);
 if total > 0 then note_calculee: max(0, (nb_bons - nb_faux) / total) else note_calculee: 0;
 faux_elements: setdifference(rep_etud_set, rep_corr_set);
 faux_list: listify(faux_elements);
-faux_feedback_str: if length(faux_list) = 0 then "Aucune erreur de liaison." else
+faux_feedback_str: if length(faux_list) = 0 then "${I18N.t('match.no_errors')}" else
     block([txt],
         txt: "<ul style='margin: 5px 0; padding-left: 20px; color: #c0392b;'>",
         for i:1 thru length(faux_list) do (
@@ -203,7 +203,7 @@ function match_init() {
 
     // Bouton effacer
     var btn = document.createElement('button');
-    btn.type = 'button'; btn.innerHTML = '🗑 Effacer les liaisons';
+    btn.type = 'button'; btn.innerHTML = '${I18N.t('match.clear_btn')}';
     btn.style.cssText = 'margin:10px auto 0;display:block;padding:6px 16px;border:1px solid #c4b5fd;border-radius:8px;background:#faf5ff;color:#6d28d9;font-size:13px;cursor:pointer;font-weight:600;';
     btn.onmouseenter = function(){ this.style.background='#ede9fe'; };
     btn.onmouseleave = function(){ this.style.background='#faf5ff'; };
@@ -305,17 +305,17 @@ setTimeout(sol_init, 100);
     testoptions: '0', quiet: '0',
     truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
     trueanswernote: 'PRT-'+X+'-0-T', truefeedback: `<div style="padding:10px; background-color:#d4edda; color:#155724; border-radius:5px;">
-    <strong>Excellent !</strong> Vous avez trouvé les {@nb_bons@} liaisons correctes.
+    <strong>${I18N.t('match.fb_ok_title')}</strong> ${I18N.t('match.fb_ok_detail')}
 </div>`,
     falsescoremode: '=', falsescore: 'note_calculee', falsepenalty: '', falsenextnode: '-1',
     falseanswernote: 'PRT-'+X+'-0-F', falsefeedback: `<div style="padding:10px; background-color:#fff3cd; color:#856404; border-radius:5px;">
-    <strong>Résultat :</strong> Vous avez trouvé {@nb_bons@} bonne(s) liaison(s) sur {@total@}.<br>
+    <strong>${I18N.t('match.fb_wrong_title')}</strong> ${I18N.t('match.fb_wrong_detail')}<br>
     <div style="margin-top:10px;">
-        <strong>Vos erreurs (liaisons incorrectes) :</strong><br>
+        <strong>${I18N.t('match.fb_wrong_errors_title')}</strong><br>
         {@faux_feedback_str@}
     </div>
     <div style="margin-top:10px; font-weight:bold;">
-        Note : {@note_calculee@} / ${bareme}
+        ${I18N.t('match.fb_wrong_note')} {@note_calculee@} / ${bareme}
     </div>
 </div>`
   }];
@@ -326,9 +326,9 @@ setTimeout(sol_init, 100);
     kbdRaw: jsxCode,
     textFrag: `
   <div style="background:#B686D8;border-left:5px solid #7c3aed;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Relier les éléments</strong>
+    <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('match.banniere')}</strong>
     <span style="background:#7c3aed;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
-    <span style="background:#ffffff;color:#7c3aed;border:1px solid #7c3aed;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">Appariements</span>
+    <span style="background:#ffffff;color:#7c3aed;border:1px solid #7c3aed;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">${I18N.t('match.badge')}</span>
   </div>
   <!-- ENONCE-START -->${text||''}<!-- ENONCE-END -->
 <div id="match-container-${X}" style="width:100%;margin:16px 0;border:1px solid #e9d5ff;border-radius:12px;padding:4px;background:#faf5ff;box-shadow:0 2px 8px rgba(109,40,217,.07);position:relative;">
@@ -355,7 +355,7 @@ setTimeout(sol_init, 100);
     prtXML:prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
     kbdRawFbGen: jsxSol,
-    generalFeedback: _mkFbGen(`<p style="color:#166534;font-weight:bold;margin-top:12px;">📋 Correction :</p><div id="match-solution-container-${X}" style="width:100%;margin:12px 0;border:1px solid #86efac;border-radius:12px;padding:4px;background:#f0fdf4;box-shadow:0 2px 8px rgba(22,163,74,.07);"><!--HS-KBD-FBGEN:${X}--></div>`, v('match-fbgen')),
+    generalFeedback: _mkFbGen(`<p style="color:#166534;font-weight:bold;margin-top:12px;">${I18N.t('match.correction_title')}</p><div id="match-solution-container-${X}" style="width:100%;margin:12px 0;border:1px solid #86efac;border-radius:12px;padding:4px;background:#f0fdf4;box-shadow:0 2px 8px rgba(22,163,74,.07);"><!--HS-KBD-FBGEN:${X}--></div>`, v('match-fbgen')),
     feedbackRef:`[[feedback:prt${X}]]`
   };
 }

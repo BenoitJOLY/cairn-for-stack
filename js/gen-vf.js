@@ -18,7 +18,7 @@ function genVF(X) {
     rows.forEach(function(r, i) {
         var expEl = r.querySelector('.vf-exp:checked');
         var isV   = !(expEl && expEl.value === 'f');
-        taAll.push('["' + rawEsc(r.querySelector('.vf-ptext').value.trim() || ('Prop. ' + (i+1)))
+        taAll.push('["' + rawEsc(r.querySelector('.vf-ptext').value.trim() || I18N.t('tpl.vf_prop_fallback', {n: i+1}))
             + '",' + isV
             + ',"' + rawEsc(r.querySelector('.vf-fb-ifvrai')?.value || '')
             + '","' + rawEsc(r.querySelector('.vf-fb-iffaux')?.value || '')

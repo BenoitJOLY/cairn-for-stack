@@ -12,7 +12,7 @@ function genOrd(X) {
     rows.forEach(function (r, i) {
         items.push({
             key:  'i' + (i + 1),
-            text: r.querySelector('.ord-item-text').value.trim() || ('Élément ' + (i + 1))
+            text: r.querySelector('.ord-item-text').value.trim() || I18N.t('ord.item_fallback', {n: i + 1})
         });
     });
 
@@ -56,8 +56,8 @@ function genOrd(X) {
     var fbVars = 'ord_sa_' + X + ': parsons_decode(ans' + X + ');\n'
         + 'ord_check_' + X + ': elementp(ord_sa_' + X + ', ord_tas_' + X + ');';
 
-    var fbOk    = wrapFb('<p>✅ <strong>Ordre correct !</strong></p>', true);
-    var fbWrong = wrapFb('<p>❌ <strong>Ordre incorrect.</strong> Révisez la séquence.</p>', false);
+    var fbOk    = wrapFb('<p>✅ <strong>' + I18N.t('ord.fb_ok') + '</strong></p>', true);
+    var fbWrong = wrapFb('<p>❌ <strong>' + I18N.t('ord.fb_wrong_title') + '</strong> ' + I18N.t('ord.fb_wrong_detail') + '</p>', false);
 
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
     var canonicalNodes = [{
@@ -73,14 +73,14 @@ function genOrd(X) {
     /* ── Question text ── */
     var cloneAttr = isClone ? ' clone="true"' : '';
     var textFrag = '<div style="background:#be185d;border-left:5px solid #831843;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — Ordonnancement</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t('ord.banniere') + '</strong>'
         + '<span style="background:#831843;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
         + '[[parsons input="ans' + X + '"' + cloneAttr + ']]\n'
         + '{ "steps": {# parsons_encode(ord_steps_' + X + ') #},\n'
-        + '  "headers": ["Déposez vos éléments ici :"],\n'
-        + '  "available_header": ["Glissez à partir d\'ici :"] }\n'
+        + '  "headers": ["' + I18N.t('ord.parsons_headers') + '"],\n'
+        + '  "available_header": ["' + I18N.t('ord.parsons_available_header') + '"] }\n'
         + '[[/parsons]]\n'
         + '<div style="display:none">[[input:ans' + X + ']] [[validation:ans' + X + ']]</div>';
 

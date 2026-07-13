@@ -107,8 +107,8 @@ function genCircuit(X) {
         + "cir_err:if is(tans = 0) then abs(ans" + X + ") else abs((ans" + X + " - tans)/tans);\n"
         + "cir_ok:is(cir_err < cir_tol_frac);\n";
 
-    var fbOkFinal    = fbOk    || "<p>&#10003; <strong>Bonne reponse !</strong> " + tansStr + "</p>";
-    var fbWrongFinal = fbWrong || ("<p>&#10007; <strong>Reponse incorrecte.</strong> Valeur attendue : " + tansStr + " (+-" + tol + "%).</p>");
+    var fbOkFinal    = fbOk    || "<p>&#10003; <strong>" + I18N.t('cir.fb_ok_default') + "</strong> " + tansStr + "</p>";
+    var fbWrongFinal = fbWrong || ("<p>&#10007; <strong>" + I18N.t('cir.fb_wrong_default') + "</strong> " + I18N.t('cir.fb_wrong_valeur_attendue') + tansStr + " (+-" + tol + "%).</p>");
 
     var prtMeta = { name: "prt" + X, value: "1", autosimplify: "1", feedbackstyle: "1", feedbackvariables: feedVars };
     var canonicalNodes = [{
@@ -121,18 +121,16 @@ function genCircuit(X) {
     }];
     var prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
-    var scenarioLabel = scenario === "loi-ohm" ? "circuit simple (loi d Ohm)" : "circuit " + scenario;
+    var scenarioLabel = scenario === "loi-ohm" ? I18N.t('cir.scenario_label_ohm') : I18N.t('cir.scenario_label_prefix') + scenario;
     var askLabels = {
-        i:"le courant I", r:"la resistance R", u:"la tension U",
-        "r-eq":"la resistance equivalente Req", "i-total":"le courant total I",
-        u1:"la tension U1 aux bornes de R1", u2:"la tension U2 aux bornes de R2", u3:"la tension U3 aux bornes de R3",
-        i1:"le courant I1 dans R1", i2:"le courant I2 dans R2"
+        i: I18N.t('cir.ask_lbl_i'), r: I18N.t('cir.ask_lbl_r'), u: I18N.t('cir.ask_lbl_u'),
+        "r-eq": I18N.t('cir.ask_lbl_r_eq'), "i-total": I18N.t('cir.ask_lbl_i_total'),
+        u1: I18N.t('cir.ask_lbl_u1'), u2: I18N.t('cir.ask_lbl_u2'), u3: I18N.t('cir.ask_lbl_u3'),
+        i1: I18N.t('cir.ask_lbl_i1'), i2: I18N.t('cir.ask_lbl_i2')
     };
     var askLabel = askLabels[ask] || ask;
-    var instrText = text || ("<p>Dans le " + scenarioLabel + " ci-dessous, calculer <strong>"
-        + askLabel + "</strong> en <strong>" + unit + "</strong>.</p>"
-        + "<p style=\"font-size:.85em;color:#6b7280;\">Donner la reponse en unites SI ("
-        + unit + "). Tolerance : +/-" + tol + "%.</p>");
+    var instrText = text || ("<p>" + I18N.t('cir.instr_line1', {scenario: scenarioLabel, ask: askLabel, unit: unit}) + "</p>"
+        + "<p style=\"font-size:.85em;color:#6b7280;\">" + I18N.t('cir.instr_line2', {unit: unit, tol: String(tol)}) + "</p>");
 
     var questionText = instrText
         + "[[input:ans" + X + "]][[validation:ans" + X + "]]"

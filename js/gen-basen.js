@@ -24,7 +24,7 @@ function genBasen(X) {
     var fixedWidth = (toBase !== 10 && fixedWidthRaw > 0) ? fixedWidthRaw : 0;
 
     var baseName = function(b) {
-        return b===2?'binaire':b===8?'octal':b===10?'décimal':b===16?'hexadécimal':'base '+b;
+        return b===2?I18N.t('bn.basename_binaire'):b===8?I18N.t('bn.basename_octal'):b===10?I18N.t('bn.basename_decimal'):b===16?I18N.t('bn.basename_hexadecimal'):I18N.t('bn.basename_generic',{b:String(b)});
     };
 
     // La notation ne concerne que la base d'arrivee (c'est la reponse attendue de l'eleve) :
@@ -125,7 +125,7 @@ function genBasen(X) {
     // l'apercu de l'onglet Config pour eviter que les deux textes divergent.
     var syntaxHint = (typeof bnSyntaxHint === 'function')
         ? bnSyntaxHint(format, toBase, fixedWidth)
-        : 'Notation attendue : voir les consignes ci-dessus.';
+        : I18N.t('bn.syntaxhint_fallback');
     // Affiche en texte simple juste AVANT la zone de saisie (qui doit rester la
     // toute derniere chose avant le feedback) : le champ <syntaxhint> du STACK
     // <input> reste vide (sinon STACK pre-remplit la zone de reponse avec ce
@@ -133,27 +133,25 @@ function genBasen(X) {
     var conseilsHTML = '<p style="font-size:.85em;color:#374151;">' + syntaxHint + '</p>';
 
     var HDR = '<div style="background:#1e3a8a;border-left:5px solid #1d4ed8;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Numération — Conversion en ' + baseName(toBase) + '</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">' + I18N.t('bn.banniere', {base: baseName(toBase)}) + '</strong>'
         + ' <span style="background:#1d4ed8;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
-        + ' <span style="background:#ffffff;color:#1d4ed8;border:1px solid #1d4ed8;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🔢 Base ' + toBase + '</span></div>';
+        + ' <span style="background:#ffffff;color:#1d4ed8;border:1px solid #1d4ed8;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🔢 ' + I18N.t('bn.base_badge', {toBase: String(toBase)}) + '</span></div>';
 
-    var widthUnit = (toBase === 2) ? 'bit' : 'chiffre';
-    var instrText = HDR + (text || ('<p>Convertir <strong>{@' + vSrcStr + '@}</strong>'
-        + (fromBase !== 10 ? ' (base ' + fromBase + ')' : '')
-        + ' en <strong>' + baseName(toBase) + '</strong> (base ' + toBase + ')'
-        + (fixedWidth > 0 ? ' sur ' + fixedWidth + ' ' + widthUnit + (fixedWidth > 1 ? 's' : '') : '')
-        + '.</p>'));
+    var widthUnit = (toBase === 2) ? I18N.t('bn.unit_bit') : I18N.t('bn.unit_chiffre');
+    var fromPart = (fromBase !== 10) ? I18N.t('bn.frompart', {fromBase: String(fromBase)}) : '';
+    var widthPart = (fixedWidth > 0) ? I18N.t('bn.widthpart', {width: String(fixedWidth), unit: widthUnit + (fixedWidth > 1 ? 's' : '')}) : '';
+    var instrText = HDR + (text || ('<p>' + I18N.t('bn.default_question', {
+        val: '{@' + vSrcStr + '@}', fromPart: fromPart, toName: baseName(toBase), toBase: String(toBase), widthPart: widthPart
+    }) + '</p>'));
 
     // ── Feedback general automatique, mirroring des exports reels ──
     var autoFb;
     if (toBase === 10) {
-        autoFb = '<p>Pour convertir {@' + vSrcStr + '@} (base ' + fromBase + ') vers le décimal, on multiplie chaque chiffre '
-            + 'par la puissance de ' + fromBase + ' correspondant a son rang, puis on additionne le tout.</p>'
-            + '<p>{@' + vSrcStr + '@}<sub>' + fromBase + '</sub> = {@' + vVal + '@}<sub>10</sub></p>';
+        autoFb = '<p>' + I18N.t('bn.fbgen_to_decimal', {val: '{@' + vSrcStr + '@}', fromBase: String(fromBase)}) + '</p>'
+            + '<p>' + I18N.t('bn.fbgen_to_decimal_result', {val: '{@' + vSrcStr + '@}', fromBase: String(fromBase), valDec: '{@' + vVal + '@}'}) + '</p>';
     } else {
-        autoFb = '<p>Pour convertir {@' + vSrcStr + '@} en base ' + toBase + ', on effectue des divisions successives par ' + toBase + '. '
-            + 'Le résultat se lit en remontant les restes (du dernier au premier).</p>'
-            + '<p>{@' + vSrcStr + '@}<sub>' + fromBase + '</sub> = {@' + vDstStr + '@}<sub>' + toBase + '</sub></p>';
+        autoFb = '<p>' + I18N.t('bn.fbgen_to_base', {val: '{@' + vSrcStr + '@}', toBase: String(toBase)}) + '</p>'
+            + '<p>' + I18N.t('bn.fbgen_to_base_result', {val: '{@' + vSrcStr + '@}', fromBase: String(fromBase), valDst: '{@' + vDstStr + '@}', toBase: String(toBase)}) + '</p>';
     }
 
     // ── Type et tans de l input ──
@@ -178,20 +176,20 @@ function genBasen(X) {
     // ── Construction des noeuds du PRT ──
     var nodes = [];
     var fbVars = '';
-    var fbOkFinal = fbOk || '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Correct !</strong> La conversion est bonne.</div>';
-    var fbWrongFinal = fbWrong || ('<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Le resultat attendu etait <code>{@'
-        + (toBase === 10 ? vVal : vDstStr) + '@}</code>.</div>');
+    var fbOkFinal = fbOk || ('<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>' + I18N.t('mat.fb_ok_correct') + '</strong> ' + I18N.t('bn.fb_ok_desc') + '</div>');
+    var fbWrongFinal = fbWrong || ('<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> '
+        + I18N.t('bn.fb_wrong_resultat', {val: '{@' + (toBase === 10 ? vVal : vDstStr) + '@}'}) + '</div>');
 
     if (toBase === 10) {
         nodes.push({ desc: 'Reponse exacte', test: 'EqualComAss', tans: vVal, fb: fbOkFinal, isCorrect: true });
         if (fromBase !== 10) {
             nodes.push({
                 desc: 'Lecture comme un nombre decimal', test: 'EqualComAss', tans: vMisread10,
-                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de base.</strong> Vous avez calcule comme si le nombre etait en base 10. C\'est un nombre en <strong>base ' + fromBase + '</strong>, il faut utiliser des puissances de ' + fromBase + ' !</div>'
+                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('bn.fb_err_base_title') + '</strong> ' + I18N.t('bn.fb_err_base_desc', {fromBase: String(fromBase)}) + '</div>'
             });
             nodes.push({
                 desc: 'Poids des chiffres inverses', test: 'EqualComAss', tans: vSrcRevVal,
-                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de sens de lecture.</strong> Le chiffre le plus a droite vaut toujours ' + fromBase + '<sup>0</sup>, le suivant vers la gauche ' + fromBase + '<sup>1</sup>, etc.</div>'
+                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('bn.fb_err_sens_title') + '</strong> ' + I18N.t('bn.fb_err_sens_desc', {fromBase: String(fromBase)}) + '</div>'
             });
         }
         // Noeud "attrape-tout" toujours vrai (EqualComAss 1=1) : pas besoin de regex ici,
@@ -222,44 +220,44 @@ function genBasen(X) {
         nodes.push({ desc: 'Reponse exacte', test: 'String', tans: vDstStr, fb: fbOkFinal, isCorrect: true });
         nodes.push({
             desc: 'Espaces detectes', test: 'EqualComAss', sans: vHasSpace, tans: 'true',
-            fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Format incorrect.</strong> Votre reponse contient des espaces. Tapez la reponse sans aucun espace.</div>'
+            fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>' + I18N.t('bn.fb_format_incorrect') + '</strong> ' + I18N.t('bn.fb_err_espaces_desc') + '</div>'
         });
         if (toBaseFormat === 'S') {
             nodes.push({
                 desc: 'Prefixe interdit detecte', test: 'EqualComAss', sans: vHasPrefix, tans: 'true',
-                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Format incorrect.</strong> Ne mettez pas de prefixe. Tapez uniquement la suite de caracteres.</div>'
+                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('bn.fb_format_incorrect') + '</strong> ' + I18N.t('bn.fb_err_prefixe_desc') + '</div>'
             });
             if (toBase <= 10) {
                 nodes.push({
                     desc: 'Lettres interdites detectees', test: 'EqualComAss', sans: vHasLetters, tans: 'true',
-                    fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Format incorrect.</strong> La base ' + toBase + ' ne contient pas de lettres. Tapez uniquement des chiffres.</div>'
+                    fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('bn.fb_format_incorrect') + '</strong> ' + I18N.t('bn.fb_err_lettres_desc', {toBase: String(toBase)}) + '</div>'
                 });
             } else {
                 nodes.push({
                     desc: 'Minuscules utilisees', test: 'String', tans: vLower,
-                    fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Presque correct.</strong> Le resultat semble bon, mais les lettres doivent etre en <strong>majuscules</strong>.</div>'
+                    fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>' + I18N.t('bn.fb_presque_correct') + '</strong> ' + I18N.t('bn.fb_err_minuscules_desc') + '</div>'
                 });
             }
             if (!fixedWidth) {
                 nodes.push({
                     desc: 'Zeros inutiles au debut', test: 'EqualComAss', sans: vLeadZero, tans: 'true',
-                    fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Presque correct.</strong> En notation standard, on ne met pas de zero au debut. Enlevez le(s) zero(s) inutile(s).</div>'
+                    fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>' + I18N.t('bn.fb_presque_correct') + '</strong> ' + I18N.t('bn.fb_err_zeros_desc') + '</div>'
                 });
             }
         }
         nodes.push({
             desc: 'Recopie de la valeur de depart', test: 'String', tans: vSrcStr,
-            fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Vous avez recopie la valeur de depart. La consigne demande de la convertir en base ' + toBase + '.</div>'
+            fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N.t('bn.fb_err_recopie_desc', {toBase: String(toBase)}) + '</div>'
         });
         nodes.push({
             desc: 'Restes lus a l\'envers', test: 'String', tans: vDstStrRev,
-            fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de lecture.</strong> Vous avez lu les restes dans le mauvais sens ! Il faut lire les restes de la <b>derniere</b> division jusqu\'a la <b>premiere</b>.</div>'
+            fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('bn.fb_err_lecture_title') + '</strong> ' + I18N.t('bn.fb_err_lecture_desc') + '</div>'
         });
         nodes.push({
             desc: 'Caracteres valides pour la base ' + toBase, test: 'EqualComAss', sans: vValidChars, tans: 'true',
             fb: fbWrongFinal,
             isFinal: true,
-            falseFb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Caracteres invalides.</strong> Un nombre en base ' + toBase + ' ne doit contenir que les symboles autorises dans cette base.</div>'
+            falseFb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('bn.fb_err_carac_title') + '</strong> ' + I18N.t('bn.fb_err_carac_desc', {toBase: String(toBase)}) + '</div>'
         });
     }
 

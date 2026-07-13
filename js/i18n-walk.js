@@ -14,6 +14,16 @@
   /* ── Dictionnaire FR → langue cible. Lot 1 : interface de construction.
         N'ajouter ICI que du texte d'INTERFACE (jamais de tokens techniques). */
   var MAP = { en: {
+    // — Placeholders génériques des éditeurs riches (attribut data-ph) —
+    "Cliquez sur Éditeur...":"Click Editor...",
+    "Cliquez sur Éditeur…":"Click Editor…",
+    "Cliquez sur ✏️ pour rédiger l'énoncé…":"Click ✏️ to write the question text…",
+    "(défaut auto si vide)":"(auto default if empty)",
+    "Laissez vide pour l'énoncé automatique...":"Leave empty for the automatic wording...",
+    "Réponse incorrecte.":"Incorrect answer.",
+    "Correct !":"Correct!",
+    "(optionnel)":"(optional)",
+
     // — Coque (app subtitle/tagline/list.empty/btn.cancel → data-i18n dans HTML) —
     "📝 Nom de l'exercice":"📝 Exercise name",
     "🔒 Verrouillé":"🔒 Locked",

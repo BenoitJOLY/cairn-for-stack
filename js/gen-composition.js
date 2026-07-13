@@ -135,20 +135,20 @@ makeSymBtn('a^n', '^{n}', paneMath);
 makeSymBtn('a_n', '_{}', paneMath);
 makeSymBtn('√a', '\\\\sqrt{a}', paneMath);
 makeSymBtn('b√a', '\\ \\\\sqrt[a]{b} ', paneMath);
-var s1=document.createElement('div'); s1.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s1.innerText='Opérations'; paneMath.appendChild(s1);
+var s1=document.createElement('div'); s1.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s1.innerText=I18N.t('comp.section_operations'); paneMath.appendChild(s1);
 makeSymBtn('≠', '\\\\neq', paneMath);
 makeSymBtn('≤', '\\\\le', paneMath);
 makeSymBtn('≥', '\\\\ge', paneMath);
 makeSymBtn('∈', '\\\\in', paneMath);
 makeSymBtn('∉', '\\\\notin', paneMath);
-var s2=document.createElement('div'); s2.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s2.innerText='Ensembles'; paneMath.appendChild(s2);
+var s2=document.createElement('div'); s2.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s2.innerText=I18N.t('comp.section_ensembles'); paneMath.appendChild(s2);
 makeSymBtn('N','\\\\mathbb{N}',paneMath); makeSymBtn('Z','\\\\mathbb{Z}',paneMath); makeSymBtn('Q','\\\\mathbb{Q}',paneMath); makeSymBtn('R','\\\\mathbb{R}',paneMath); makeSymBtn('C','\\\\mathbb{C}',paneMath);
-var s3=document.createElement('div'); s3.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s3.innerText='Fonctions & Vecteurs'; paneMath.appendChild(s3);
+var s3=document.createElement('div'); s3.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s3.innerText=I18N.t('comp.section_fonctions_vecteurs'); paneMath.appendChild(s3);
 makeSymBtn('|a|','|a|',paneMath); makeSymBtn('n!','n!',paneMath); makeSymBtn('∑','\\\\sum a',paneMath); makeSymBtn('∑lim','\\\\sum_{n=1}^{10} n^2',paneMath); makeSymBtn('∫','\\\\int_{a}^{b} x dx',paneMath); makeSymBtn('a⃗','\\\\vec{a}',paneMath); makeSymBtn('ȧ','\\\\dot{a}',paneMath); makeSymBtn('ä','\\\\ddot{a}',paneMath); makeSymBtn('â','\\\\widehat{...}',paneMath); makeSymBtn('∞','\\\\infty',paneMath);
 
 // Panneau Physique
 makeSymBtn('ā','\\\\overline{ab}',panePhys); makeSymBtn('a⃗','\\\\overrightarrow{ab}',panePhys); makeSymBtn('→','\\\\rightarrow',panePhys); makeSymBtn('←','\\\\leftarrow',panePhys); makeSymBtn('⇄','\\\\rightleftharpoons',panePhys);
-var s4=document.createElement('div'); s4.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s4.innerText='Chimie & Logique'; panePhys.appendChild(s4);
+var s4=document.createElement('div'); s4.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s4.innerText=I18N.t('comp.section_chimie_logique'); panePhys.appendChild(s4);
 makeSymBtn('H₂SO₄','H_2SO_4',panePhys); makeSymBtn('²³⁸U','{}_{92}^{238}U',panePhys); makeSymBtn('SO₄²⁻','SO_4^{2-}',panePhys); makeSymBtn('∧','\\\\land',panePhys); makeSymBtn('a⃗','\\\\vec{a}',panePhys); makeSymBtn('ȧ','\\\\dot{a}',panePhys); makeSymBtn('ä','\\\\ddot{a}',panePhys);
 
 // Panneau Grec
@@ -170,7 +170,7 @@ modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; 
 var modalContent = document.createElement('div');
 modalContent.style.cssText = 'background:white; padding:0; border-radius:8px; width:95%; max-width:600px; box-shadow:0 4px 15px rgba(0,0,0,0.2); max-height:90vh; display:flex; flex-direction:column; box-sizing:border-box;';
 var mHead = document.createElement('h3');
-mHead.innerText = 'Éditeur LaTeX';
+mHead.innerText = I18N.t('comp.modal_title');
 mHead.style.cssText = 'margin:0; padding:15px; border-bottom:1px solid #eee; background:#f9f9f9; font-size:1.1rem; color:#333; text-align:center;';
 var mBody = document.createElement('div');
 mBody.style.cssText = 'flex:1; overflow-y:auto; padding:10px; overflow-x:hidden; min-height:200px;';
@@ -180,10 +180,11 @@ mFoot.style.cssText = 'padding:15px; background:#f9f9f9; border-top:1px solid #c
 // Onglets
 var tabBar = document.createElement('div');
 tabBar.style.cssText = 'display:flex; border-bottom:1px solid #ccc; margin-bottom:10px;';
-var tabPanes = { 'Math': paneMath, 'Physique': panePhys, 'Lettres (Grec)': paneGreek };
-['Math','Physique','Lettres (Grec)'].forEach(function(name, i) {
+var tabPanes = { 'math': paneMath, 'physique': panePhys, 'grec': paneGreek };
+var tabLabels = { 'math': I18N.t('comp.tab_math'), 'physique': I18N.t('comp.tab_physique'), 'grec': I18N.t('comp.tab_grec') };
+['math','physique','grec'].forEach(function(name, i) {
   var tb = document.createElement('button');
-  tb.innerText = name;
+  tb.innerText = tabLabels[name];
   tb.style.cssText = 'flex:1; padding:8px; cursor:pointer; font-weight:bold; outline:none; border:none; border-bottom:2px solid ' + (i===0?'#34495e':'transparent') + '; background:' + (i===0?'#34495e':'none') + '; color:' + (i===0?'white':'#666') + ';';
   tb.onclick = function() {
     tabBar.querySelectorAll('button').forEach(function(b){ b.style.background='none'; b.style.color='#666'; b.style.borderBottomColor='transparent'; });
@@ -202,7 +203,7 @@ prevDiv.style.cssText = 'border:1px dashed #ccc; padding:5px; min-height:20px; t
 var prevImg = document.createElement('img');
 prevImg.style.cssText = 'max-width:100%; max-height:30px;';
 prevDiv.appendChild(prevImg);
-prevDiv.appendChild(document.createTextNode(' Prévisualisation'));
+prevDiv.appendChild(document.createTextNode(' ' + I18N.t('comp.previsualisation')));
 mFoot.appendChild(prevDiv);
 mFoot.appendChild(txtLatex);
 
@@ -210,11 +211,11 @@ mFoot.appendChild(txtLatex);
 var btnRow = document.createElement('div');
 btnRow.style.cssText = 'display:flex; gap:10px;';
 var btnCancel = document.createElement('button');
-btnCancel.innerText = 'Annuler';
+btnCancel.innerText = I18N.t('comp.annuler');
 btnCancel.style.cssText = 'flex:1; padding:10px; cursor:pointer; background:#95a5a6; color:white; border:none; border-radius:4px; font-weight:bold;';
 btnCancel.onclick = function() { modal.style.display='none'; };
 var btnIns = document.createElement('button');
-btnIns.innerText = 'Insérer la formule';
+btnIns.innerText = I18N.t('comp.inserer_formule');
 btnIns.style.cssText = 'flex:2; padding:10px; cursor:pointer; background:#27ae60; color:white; border:none; border-radius:4px; font-weight:bold;';
 btnIns.onclick = function() {
   var txt = txtLatex.value;
@@ -254,11 +255,11 @@ function makeToolBtn(html, cmd, color) {
   b.onclick = function() { editor.focus(); document.execCommand(cmd, false, null); updateData(); };
   return b;
 }
-toolbar.appendChild(makeToolBtn('<b>Gras</b>', 'bold'));
-toolbar.appendChild(makeToolBtn('<i>Italique</i>', 'italic'));
-toolbar.appendChild(makeToolBtn('<u>Souligné</u>', 'underline'));
+toolbar.appendChild(makeToolBtn('<b>' + I18N.t('comp.gras') + '</b>', 'bold'));
+toolbar.appendChild(makeToolBtn('<i>' + I18N.t('comp.italique') + '</i>', 'italic'));
+toolbar.appendChild(makeToolBtn('<u>' + I18N.t('comp.souligne') + '</u>', 'underline'));
 var btnMath = document.createElement('button');
-btnMath.type = 'button'; btnMath.innerHTML = '∑ Formule (LaTeX)';
+btnMath.type = 'button'; btnMath.innerHTML = I18N.t('comp.formule_latex_btn');
 btnMath.style.cssText = 'padding:6px 12px; cursor:pointer; background:#8e44ad; color:white; border:none; border-radius:4px; font-weight:bold; font-size:.9rem; margin-left:8px;';
 btnMath.onclick = function() { modal.style.display='flex'; txtLatex.value=''; prevImg.src=''; txtLatex.focus(); updatePreview(); };
 toolbar.appendChild(btnMath);
@@ -268,7 +269,7 @@ var editor = document.createElement('div');
 editor.contentEditable = true;
 editor.innerHTML = I18N.t('tpl.tapez_votre_reponse_ici');
 editor.style.cssText = 'width:100%; min-height:300px; border:2px solid #34495e; padding:10px; background:white; border-radius:4px; outline:none; line-height:1.6; font-size:1.1rem; box-sizing:border-box; overflow-wrap:break-word;';
-editor.addEventListener('focus', function() { if (editor.innerHTML === 'Tapez votre réponse ici...') editor.innerHTML = ''; }, {once:true});
+editor.addEventListener('focus', function() { if (editor.innerHTML === I18N.t('tpl.tapez_votre_reponse_ici')) editor.innerHTML = ''; }, {once:true});
 
 box.appendChild(toolbar);
 box.appendChild(editor);
@@ -297,7 +298,7 @@ function updateData() {
   var html = editor.innerHTML;
   var plain = editor.innerText || '';
   setRef(refAns1, html);
-  setRef(refAns2, (plain.trim()!=='' && plain.trim()!=='Tapez votre réponse ici...') ? '0' : '');
+  setRef(refAns2, (plain.trim()!=='' && plain.trim()!==I18N.t('tpl.tapez_votre_reponse_ici')) ? '0' : '');
 }
 editor.addEventListener('input', updateData);
 editor.addEventListener('keyup', updateData);
@@ -322,7 +323,7 @@ function genComposition(X) {
   var text   = richVal('comp-text');
   var height = document.getElementById('comp-height').value || '600px';
   var msgEl  = document.getElementById('comp-msg');
-  var msg    = msgEl ? msgEl.value.trim() : 'Votre réponse sera lue et corrigée par votre professeur.';
+  var msg    = msgEl ? msgEl.value.trim() : I18N.t('comp.default_msg');
 
   if (!text || !text.replace(/<[^>]+>/g, '').trim()) {
     throw new Error(I18N.t('msg.err_comp_enonce', {n: X}));
@@ -403,7 +404,7 @@ function genComposition(X) {
     answertest: 'AlgEquiv', sans: '1', tans: '1', testoptions: '', quiet: '0',
     truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
     trueanswernote: 'PRT-' + X + '-1-T',
-    truefeedback: '<p style="padding:10px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:4px;color:#166534;">✅ Réponse enregistrée. Votre professeur la corrigera et attribuera la note.</p>',
+    truefeedback: '<p style="padding:10px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:4px;color:#166534;">✅ ' + I18N.t('comp.fb_enregistre') + '</p>',
     falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
     falseanswernote: 'PRT-' + X + '-1-F', falsefeedback: ''
   }];
@@ -442,7 +443,7 @@ function restoreComposition(data) {
   setRichVal('comp-text', data.text || '');
   document.getElementById('comp-height').value = data.height || '600px';
   if (document.getElementById('comp-msg')) {
-    document.getElementById('comp-msg').value = data.msg || 'Votre réponse sera lue et corrigée par votre professeur.';
+    document.getElementById('comp-msg').value = data.msg || I18N.t('comp.default_msg');
   }
 }
 
