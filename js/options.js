@@ -67,6 +67,8 @@
       '<button class="hs-opt-x" aria-label="close">&times;</button></div>' +
       '<section class="hs-opt-sec"><label id="hs-opt-lang-lbl"></label>' +
       '<div id="hs-opt-langs" class="hs-opt-row"></div></section>' +
+      '<section class="hs-opt-sec"><label id="hs-opt-pays-lbl"></label>' +
+      '<div id="hs-opt-pays" class="hs-opt-row"></div></section>' +
       '<section class="hs-opt-sec"><label id="hs-opt-theme-lbl"></label>' +
       '<div id="hs-opt-themes" class="hs-opt-row">' +
       '<button data-theme="light"></button><button data-theme="dark"></button></div></section>' +
@@ -88,6 +90,17 @@
       b.addEventListener("click", function () { I18N.setLang(code); syncLangButtons(); });
       langs.appendChild(b);
     });
+    // référentiel de tags (pays)
+    var paysBox = box.querySelector("#hs-opt-pays");
+    if (window.TAGS_COUNTRIES) {
+      Object.keys(TAGS_COUNTRIES).sort().forEach(function (code) {
+        var b = document.createElement("button");
+        b.setAttribute("data-pays", code);
+        b.textContent = TAGS_COUNTRIES[code].label || code;
+        b.addEventListener("click", function () { applyPays(code); syncPaysButtons(); });
+        paysBox.appendChild(b);
+      });
+    }
     // thème
     box.querySelectorAll("#hs-opt-themes button").forEach(function (b) {
       b.addEventListener("click", function () { applyTheme(b.getAttribute("data-theme")); });
@@ -99,6 +112,7 @@
 
     relabel();
     syncLangButtons();
+    syncPaysButtons();
     syncThemeButtons(currentTheme());
     syncModeButtons(currentMode());
   }
@@ -111,10 +125,20 @@
     });
   }
 
+  function syncPaysButtons() {
+    var box = document.getElementById("hs-opt-pays");
+    if (!box || typeof currentPays !== "function") return;
+    var code = currentPays();
+    box.querySelectorAll("button").forEach(function (b) {
+      b.classList.toggle("on", b.getAttribute("data-pays") === code);
+    });
+  }
+
   function relabel() {
     var set = function (id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
     set("hs-opt-title", t("opt.title", "⚙ Options"));
     set("hs-opt-lang-lbl", t("opt.language", "Langue"));
+    set("hs-opt-pays-lbl", t("opt.pays", "Référentiel de tags (pays)"));
     set("hs-opt-theme-lbl", t("opt.theme", "Thème"));
     set("hs-opt-mode-lbl", t("opt.mode", "Mode"));
     set("hs-opt-mode-hint", t("opt.mode_hint", "Mode Expert : accès aux variables partagées et à l'importation XML."));

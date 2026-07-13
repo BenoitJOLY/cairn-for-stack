@@ -51,6 +51,10 @@ function buildXML() {
     .filter(function(c){ return c && !tags.some(function(u){ return u.clean===c; }); })
     .map(function(c){ return { raw: c, clean: c }; });
   var allTags = tags.concat(mandatoryTags);
+  if (!_tmNoTag && typeof currentPays === 'function') {
+    var paysTag = 'pays:' + currentPays();
+    allTags.push({ raw: paysTag, clean: typeof tagClean==='function' ? tagClean(paysTag) : paysTag });
+  }
   var tagsXML = '  <tags>\n' + allTags.map(function(t){ return '    <tag><text>' + t.clean + '</text></tag>'; }).join('\n') + '\n  </tags>';
 
   var _rawName = (document.getElementById('quiz-name').value || '').trim();
@@ -670,7 +674,8 @@ async function depositForReview() {
 
   try {
     await ghEnsureReviewBranch();
-    var path = GH_REVIEW_FOLDER + '/' + built.qName + '.xml';
+    var pays = (typeof currentPays === 'function') ? currentPays() : 'fr';
+    var path = GH_REVIEW_FOLDER + '/' + pays + '/' + built.qName + '.xml';
     var putResp = await ghApi('/contents/' + path, {
       method: 'PUT',
       body: JSON.stringify({

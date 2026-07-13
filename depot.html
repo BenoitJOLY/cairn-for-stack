@@ -53,6 +53,10 @@
         <div class="filter-section">
           <h4>Contexte principal</h4>
           <div class="filter-group">
+            <label>Pays</label>
+            <select class="depot-select" id="f-pays" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
+          </div>
+          <div class="filter-group">
             <label>Matière</label>
             <select class="depot-select" id="f-matiere" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
           </div>
@@ -109,7 +113,7 @@
   let selectedFiles = new Set(); // resource.fichier currently checked
   let lastRenderedResources = [];
 
-  const PREFIXES = ['matiere','niveau','sous-matiere','chapitre','bloom','difficulte'];
+  const PREFIXES = ['pays','matiere','niveau','sous-matiere','chapitre','bloom','difficulte'];
 
   // Comparaison insensible aux accents/casse — utilisée pour comparer des VALEURS,
   // jamais pour repérer le séparateur ':' d'un tag préfixé (voir splitTag).

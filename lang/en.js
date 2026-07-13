@@ -226,6 +226,7 @@ I18N.add("en", {
   "msg.topo_somme_err":                 "Sum = {val}% (Error)",
   "opt.title": "Options",
   "opt.language": "Language",
+  "opt.pays": "Tag reference (country)",
   "opt.theme": "Theme",
   "opt.light": "☀ Light",
   "opt.dark": "🌙 Dark",

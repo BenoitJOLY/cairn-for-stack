@@ -228,6 +228,7 @@ I18N.add("fr", {
   "msg.topo_somme_err":                 "Somme = {val}% (Erreur)",
   "opt.title": "Options",
   "opt.language": "Langue",
+  "opt.pays": "Référentiel de tags (pays)",
   "opt.theme": "Thème",
   "opt.light": "☀ Clair",
   "opt.dark": "🌙 Sombre",

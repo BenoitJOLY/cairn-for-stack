@@ -1,5 +1,6 @@
-// tags-data.js — Arborescence des tags pédagogiques (matière / niveau / chapitre)
-var tagsArbre = {
+// fr.js — Référentiel de tags pédagogiques France (matière / niveau / sous-matière / chapitre)
+// Système éducatif français (lycée général/techno). Voir js/tags-data/_modele.js pour créer un autre pays.
+registerCountryTags('fr', 'France', {
   "Allemand": {
     "2nde": {
       "Axes": [
@@ -1228,4 +1229,4 @@ var tagsArbre = {
       ]
     }
   }
-}
+});
