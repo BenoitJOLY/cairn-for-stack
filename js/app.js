@@ -498,7 +498,7 @@ function tmInitMat() {
     return '<button class="tm-btn tm-mat" data-mat="' + m + '" onclick="tmSelectMat(this,\'' + m + '\')">' + m + '</button>';
   }).join('') + '<button class="tm-btn tm-mat" data-mat="autre" onclick="tmHandleAutre(this,\'tm-matiere\',1)">' + (I18N.t('btn.autre')||'Autre…') + '</button>';
   ['tm-sec-niv','tm-sec-sous','tm-sec-chap'].forEach(function(id){ var el=document.getElementById(id);if(el)el.style.display='none'; });
-  tagSel = {1:new Set(),2:new Set(),3:new Set(),4:new Set(),5:new Set()};
+  tagSel = {1:new Set(),2:new Set(),3:new Set(),4:new Set(),5:new Set(),6:new Set(),7:new Set()};
   document.querySelectorAll('.tm-btn').forEach(function(b){b.classList.remove('active');});
   updateTagRecap();
 }
@@ -582,15 +582,16 @@ function tmHandleAutre(btn, inputId, cat) {
   if (inp.style.display !== 'none') inp.focus();
 }
 
+var TM_PREFIX = {1:'matiere',2:'niveau',3:'sous-matiere',4:'chapitre',6:'bloom',7:'difficulte'};
+
 function getTagList() {
   var raw = [];
-  tagSel[1].forEach(function(v){raw.push(v);});
-  tagSel[2].forEach(function(v){raw.push(v);});
-  tagSel[3].forEach(function(v){raw.push(v);});
-  tagSel[4].forEach(function(v){raw.push(v);});
+  [1,2,3,4,6,7].forEach(function(cat){
+    tagSel[cat].forEach(function(v){raw.push(TM_PREFIX[cat] + ':' + v);});
+  });
   tagSel[5].forEach(function(v){raw.push(v);});
-  var autre1 = document.getElementById('tm-matiere');if(autre1&&autre1.value.trim())raw.push(autre1.value.trim());
-  var autre2 = document.getElementById('tm-niveau');if(autre2&&autre2.value.trim())raw.push(autre2.value.trim());
+  var autre1 = document.getElementById('tm-matiere');if(autre1&&autre1.value.trim())raw.push('matiere:' + autre1.value.trim());
+  var autre2 = document.getElementById('tm-niveau');if(autre2&&autre2.value.trim())raw.push('niveau:' + autre2.value.trim());
   var autre5 = document.getElementById('tm-divers');if(autre5&&autre5.value.trim())raw.push(autre5.value.trim());
   return raw.filter(function(t){return t&&t.trim();}).map(function(t){
     return {raw:t, clean:typeof tagClean==='function'?tagClean(t):t};
@@ -605,12 +606,95 @@ function updateTagRecap() {
       ? '<em style="color:#92400e;font-size:.82rem;">Aucun tag — question non mutualisable</em>'
       : tags.map(function(t){ return '<span class="tm-tag">' + t.clean + '</span>'; }).join('');
   }
+  var disabled = !_tmNoTag && tags.length === 0;
   var btn = document.getElementById('tm-confirm-btn');
-  if (btn) btn.disabled = !_tmNoTag && tags.length === 0;
+  if (btn) btn.disabled = disabled;
+  var depositBtn = document.getElementById('tm-deposit-btn');
+  if (depositBtn) depositBtn.disabled = disabled;
+}
+
+// ── DÉPÔT POUR VALIDATION (GitHub Contents API, sans backend) ────
+// Chaque enseignant fournit son propre jeton (fine-grained PAT, écriture
+// limitée à ce dépôt) : le fichier XML est committé directement dans
+// a_verifier/ sur une branche dédiée, jamais sur main, pour relecture.
+var GH_OWNER = 'bjoly-hestack';
+var GH_REPO = 'H-stack';
+var GH_REVIEW_BRANCH = 'depot-a-verifier';
+var GH_REVIEW_FOLDER = 'a_verifier';
+
+function ghGetToken() {
+  var t = localStorage.getItem('hestack_gh_token');
+  if (!t) {
+    t = prompt('Jeton GitHub (fine-grained, accès en écriture limité à ce dépôt) — sera mémorisé dans ce navigateur pour les prochains dépôts :');
+    if (t && t.trim()) localStorage.setItem('hestack_gh_token', t.trim());
+  }
+  return t ? t.trim() : null;
+}
+
+async function ghApi(path, opts) {
+  var token = ghGetToken();
+  if (!token) throw new Error('Jeton GitHub manquant.');
+  return fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + path, Object.assign({
+    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+  }, opts || {}));
+}
+
+async function ghEnsureReviewBranch() {
+  var resp = await ghApi('/git/ref/heads/' + GH_REVIEW_BRANCH);
+  if (resp.status === 200) return;
+  if (resp.status !== 404) throw new Error('Impossible de vérifier la branche de relecture (HTTP ' + resp.status + ').');
+  var mainRef = await ghApi('/git/ref/heads/main');
+  if (!mainRef.ok) throw new Error('Impossible de lire la branche main (HTTP ' + mainRef.status + ').');
+  var mainData = await mainRef.json();
+  var createResp = await ghApi('/git/refs', {
+    method: 'POST',
+    body: JSON.stringify({ ref: 'refs/heads/' + GH_REVIEW_BRANCH, sha: mainData.object.sha })
+  });
+  if (!createResp.ok) throw new Error('Impossible de créer la branche de relecture (HTTP ' + createResp.status + ').');
+}
+
+function ghBase64Utf8(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+async function depositForReview() {
+  var orderedQ = getQuestionsInDOMOrder();
+  if (!orderedQ.length) { toast(I18N.t('msg.aucune_question_a_previsualiser') || 'Aucune question à déposer.'); return; }
+
+  var built;
+  try { built = buildXML(); } catch(e) { console.error(e); toast((I18N.t('msg.erreur_xml') || 'Erreur XML : ') + e.message); return; }
+
+  var btn = document.getElementById('tm-deposit-btn');
+  var originalLabel = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Dépôt en cours…'; }
+
+  try {
+    await ghEnsureReviewBranch();
+    var path = GH_REVIEW_FOLDER + '/' + built.qName + '.xml';
+    var putResp = await ghApi('/contents/' + path, {
+      method: 'PUT',
+      body: JSON.stringify({
+        message: 'Dépôt pour validation : ' + built.qName,
+        content: ghBase64Utf8(built.xml),
+        branch: GH_REVIEW_BRANCH
+      })
+    });
+    if (!putResp.ok) {
+      var errBody = await putResp.json().catch(function(){ return {}; });
+      throw new Error(errBody.message || ('HTTP ' + putResp.status));
+    }
+    closeTagModal();
+    toast('Déposé pour validation : ' + built.qName + '.xml (branche ' + GH_REVIEW_BRANCH + ')');
+  } catch(e) {
+    console.error(e);
+    alert('Erreur lors du dépôt sur GitHub : ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = originalLabel; }
+  }
 }
 
 function tagClean(s) {
-  return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9_\-]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'').toLowerCase();
+  return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9_\-:]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'').toLowerCase();
 }
 
 function tmIO() {}

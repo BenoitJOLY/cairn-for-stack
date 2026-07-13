@@ -807,6 +807,9 @@ fill="currentColor" stroke="none">
     <button class="v4-btn-projects" onclick="openProjectsModal()" title="Gérer les projets sauvegardés" data-i18n-title="header.projects_title">
       <svg class="hs-ico" aria-hidden="true"><use href="#ico-file-projects"></use></svg> <span data-i18n="header.projects_label">Projets</span>
     </button>
+    <a class="v4-btn-projects" href="depot.html" style="text-decoration:none;" title="Consulter ou télécharger des questions déjà partagées">
+      <svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-structure"></use></svg> <span>Banque</span>
+    </a>
     <span id="proj-autosave-lbl" class="proj-autosave-lbl" style="opacity:.45;"></span>
   </div>
   <!-- Mode assistant + Options injectés ici par assistant.js / options.js -->
@@ -7295,20 +7298,20 @@ E H --</textarea>
     </div>
     <!-- 5. Bloom -->
     <div class="tm-section"><div class="tm-title"><span data-i18n="modal.tag_bloom">5. Bloom</span> <span class="tm-req">*</span></div>
-      <div class="tm-group" id="tm-group-3">
-        <button class="tm-btn tm-bloom" data-display="Memoriser"  onclick="tmToggle(this,3)">Mémoriser</button>
-        <button class="tm-btn tm-bloom" data-display="Comprendre" onclick="tmToggle(this,3)">Comprendre</button>
-        <button class="tm-btn tm-bloom" data-display="Appliquer"  onclick="tmToggle(this,3)">Appliquer</button>
-        <button class="tm-btn tm-bloom" data-display="Analyser"   onclick="tmToggle(this,3)">Analyser</button>
-        <button class="tm-btn tm-bloom" data-display="Evaluer"    onclick="tmToggle(this,3)">Évaluer</button>
+      <div class="tm-group" id="tm-group-6">
+        <button class="tm-btn tm-bloom" data-display="Memoriser"  onclick="tmToggle(this,6)">Mémoriser</button>
+        <button class="tm-btn tm-bloom" data-display="Comprendre" onclick="tmToggle(this,6)">Comprendre</button>
+        <button class="tm-btn tm-bloom" data-display="Appliquer"  onclick="tmToggle(this,6)">Appliquer</button>
+        <button class="tm-btn tm-bloom" data-display="Analyser"   onclick="tmToggle(this,6)">Analyser</button>
+        <button class="tm-btn tm-bloom" data-display="Evaluer"    onclick="tmToggle(this,6)">Évaluer</button>
       </div>
     </div>
     <!-- 6. Difficulté -->
     <div class="tm-section"><div class="tm-title"><span data-i18n="modal.tag_diff">6. Difficulté</span> <span class="tm-req">*</span> <small style="font-weight:400;color:var(--slate)">(unique)</small></div>
-      <div class="tm-group" id="tm-group-4">
-        <button class="tm-btn tm-diff" data-display="Simple" onclick="tmToggleSingle(this,4)">Simple</button>
-        <button class="tm-btn tm-diff" data-display="Modere" onclick="tmToggleSingle(this,4)">Modéré</button>
-        <button class="tm-btn tm-diff" data-display="Dur"    onclick="tmToggleSingle(this,4)">Dur</button>
+      <div class="tm-group" id="tm-group-7">
+        <button class="tm-btn tm-diff" data-display="Simple" onclick="tmToggleSingle(this,7)">Simple</button>
+        <button class="tm-btn tm-diff" data-display="Modere" onclick="tmToggleSingle(this,7)">Modéré</button>
+        <button class="tm-btn tm-diff" data-display="Dur"    onclick="tmToggleSingle(this,7)">Dur</button>
       </div>
     </div>
     <!-- 7. Outils & Divers -->
@@ -7331,6 +7334,7 @@ E H --</textarea>
     <div class="tm-footer">
       <button class="hs-bg-slate" onclick="closeTagModal()" data-i18n="btn.annuler">Annuler</button>
       <button id="tm-confirm-btn" onclick="confirmAndPreview()" style="background:#7c3aed;color:#fff;" disabled><svg class="hs-ico"><use href="#ico-action-search"></use></svg> <span data-i18n="modal.tag_confirmer">Confirmer et prévisualiser</span></button>
+      <button id="tm-deposit-btn" onclick="depositForReview()" style="background:#0e7490;color:#fff;" disabled title="Envoie le XML dans le dossier a_verifier/ du dépôt GitHub, pour relecture avant publication"><svg class="hs-ico"><use href="#ico-file-import"></use></svg> Déposer pour validation</button>
     </div>
   </div>
 </div>
@@ -7590,15 +7594,15 @@ E H --</textarea>
   </div>
 </footer>
 <!-- MODALE JSME POUR LE GÉNÉRATEUR -->
-<div id="jsme_generator_modal" role="dialog" aria-modal="true" aria-labelledby="jsme-modal-title" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.55); z-index: 9999; align-items: center; justify-content: center;">
-  <div style="background: #fff; border-radius: 10px; padding: 20px; max-width: 500px; width: 95%; box-shadow: 0 8px 30px rgba(0,0,0,.3);">
-    <h3 id="jsme-modal-title" style="margin-bottom: 10px; color: #2c3e50;" data-i18n="modal.dessiner_la_molecule_attendue">Dessiner la molécule attendue</h3>
+<div id="jsme_generator_modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="jsme-modal-title" style="z-index: 9999;">
+  <div class="jsme-box">
+    <h3 id="jsme-modal-title" class="jsme-box-title"><svg class="hs-ico"><use href="#ico-tool-structure"></use></svg> <span data-i18n="modal.dessiner_la_molecule_attendue">Dessiner la molécule attendue</span></h3>
     <!-- Le conteneur où JSME va dessiner -->
-    <div id="jsme_gen_container" style="width: 100%; height: 350px; border: 1px solid #ccc;"></div>
-    
-    <div style="display: flex; gap: 8px; margin-top: 15px; justify-content: flex-end;">
-      <button class="btn btn-primary" type="button" onclick="topoInsertSmiles()" data-i18n="btn.inserer_smiles">✅ Insérer</button>
-      <button class="btn" style="background: #95a5a6;" type="button" onclick="topoCloseJsme()" data-i18n="btn.annuler">Annuler</button>
+    <div id="jsme_gen_container" class="jsme-canvas"></div>
+
+    <div class="jsme-btns">
+      <button class="btn-cnl" type="button" onclick="topoCloseJsme()" data-i18n="btn.annuler">Annuler</button>
+      <button class="btn-ins" type="button" onclick="topoInsertSmiles()" data-i18n="btn.inserer_smiles">✅ Insérer</button>
     </div>
   </div>
 </div>

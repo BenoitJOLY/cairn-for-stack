@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="assets/icone_18x18.png">
+<title>HéSTACK — Dépôt de questions</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/darkmode.css">
+<style>
+  .depot-wrap{max-width:1200px;margin:0 auto;}
+  .depot-body{display:flex;gap:24px;align-items:flex-start;}
+  .depot-sidebar{flex:0 0 320px;position:sticky;top:16px;}
+  .depot-main{flex:1;min-width:0;}
+  .filter-section{margin-bottom:16px;padding-bottom:14px;border-bottom:1px dashed var(--border);}
+  .filter-section h4{margin:0 0 8px;font-size:.72rem;color:var(--slate);text-transform:uppercase;letter-spacing:.05em;}
+  .filter-group{margin-bottom:10px;}
+  .filter-group label{display:block;font-size:.78rem;font-weight:700;color:var(--navy3);margin-bottom:4px;}
+  select.depot-select{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:.85rem;cursor:pointer;}
+  select.depot-select.auto-filled{border-color:#198754;background:#eafaf1;}
+  .optional-tags label{display:block;font-size:.78rem;font-weight:700;color:var(--navy3);margin-bottom:6px;}
+  .tag-btn{display:inline-block;background:#fff;color:var(--navy3);border:1.5px solid var(--border);padding:4px 9px;margin:2px;border-radius:12px;cursor:pointer;font-size:.72rem;}
+  .tag-btn:hover{border-color:var(--navy2);color:var(--navy2);}
+  .tag-btn.active{background:var(--navy2);color:#fff;border-color:var(--navy2);}
+  .clear-btn{margin-top:8px;width:100%;background:var(--slate);color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem;}
+  .clear-btn:hover{background:var(--navy3);}
+  .depot-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .depot-count{font-size:.82rem;color:var(--slate);font-weight:600;}
+  .btn-zip{background:#059669;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+  .btn-zip:disabled{background:var(--border);color:var(--slate);cursor:not-allowed;}
+  .btn-zip:hover:not(:disabled){background:#047857;}
+  .file-list{list-style:none;padding:0;margin:0;}
+  .file-list li{display:flex;align-items:flex-start;gap:12px;padding:14px;margin-bottom:9px;background:#f8fafc;border-radius:10px;border-left:4px solid #198754;}
+  .file-check{margin-top:3px;width:17px;height:17px;flex:none;cursor:pointer;}
+  .file-info{flex:1;min-width:0;}
+  .file-name{font-weight:700;color:var(--navy);font-size:.9rem;word-break:break-all;}
+  .file-tags{margin-top:6px;}
+  .file-tag{font-size:.68rem;background:#e2e8f0;color:var(--navy3);padding:2px 7px;border-radius:9px;margin:2px 4px 0 0;display:inline-block;}
+  .btn-download{background:var(--navy2);color:#fff;text-decoration:none;padding:7px 13px;border-radius:7px;font-size:.78rem;font-weight:700;white-space:nowrap;align-self:center;}
+  .btn-download:hover{background:var(--navy);}
+  .no-result{text-align:center;color:var(--slate);padding:26px;font-style:italic;border:2px dashed var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<div class="depot-wrap">
+  <div class="app-header" style="border-radius:14px 14px 0 0;">
+    <div><strong style="font-size:1.1rem;">📦 Dépôt de questions HéStack</strong></div>
+    <a href="index.html" class="tagline" style="color:#fff;text-decoration:none;">← Retour au générateur</a>
+  </div>
+  <div class="card" style="border-radius:0 0 14px 14px;">
+    <div class="depot-body">
+      <div class="depot-sidebar">
+        <div class="filter-section">
+          <h4>Contexte principal</h4>
+          <div class="filter-group">
+            <label>Matière</label>
+            <select class="depot-select" id="f-matiere" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
+          </div>
+          <div class="filter-group">
+            <label>Niveau</label>
+            <select class="depot-select" id="f-niveau" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
+          </div>
+        </div>
+        <div class="filter-section">
+          <h4>Contenu</h4>
+          <div class="filter-group">
+            <label>Sous-matière</label>
+            <select class="depot-select" id="f-sous-matiere" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
+          </div>
+          <div class="filter-group">
+            <label>Chapitre</label>
+            <select class="depot-select" id="f-chapitre" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
+          </div>
+        </div>
+        <div class="filter-section">
+          <h4>Pédagogie</h4>
+          <div class="filter-group">
+            <label>Taxonomie de Bloom</label>
+            <select class="depot-select" id="f-bloom" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
+          </div>
+          <div class="filter-group">
+            <label>Difficulté</label>
+            <select class="depot-select" id="f-difficulte" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
+          </div>
+        </div>
+        <div class="optional-tags" id="optional-section" style="display:none;">
+          <label>🔧 Outils &amp; autres (optionnel)</label>
+          <div id="optional-tags-buttons"></div>
+        </div>
+        <button class="clear-btn" onclick="resetAll()">🔄 Tout réinitialiser</button>
+      </div>
+
+      <div class="depot-main">
+        <div class="depot-toolbar">
+          <span class="depot-count" id="depot-count"></span>
+          <button class="btn-zip" id="btn-zip" onclick="downloadSelectionZip()" disabled>⬇ Télécharger la sélection (.zip)</button>
+        </div>
+        <ul id="file-list" class="file-list"><li class="no-result">Chargement…</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="lib/fflate/fflate.min.js"></script>
+<script>
+  const JSON_URL = 'test/index.json';
+  let allResources = [];
+  let activeOptionalTags = new Set();
+  let selectedFiles = new Set(); // resource.fichier currently checked
+  let lastRenderedResources = [];
+
+  const PREFIXES = ['matiere','niveau','sous-matiere','chapitre','bloom','difficulte'];
+
+  // Comparaison insensible aux accents/casse — utilisée pour comparer des VALEURS,
+  // jamais pour repérer le séparateur ':' d'un tag préfixé (voir splitTag).
+  function normalize(str) {
+    return str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+  }
+
+  // Sépare un tag "prefixe:valeur" en {prefix, value}. Renvoie null si pas de ':'.
+  function splitTag(tag) {
+    const idx = tag.indexOf(':');
+    if (idx === -1) return null;
+    return { prefix: normalize(tag.slice(0, idx)).replace(/\s+/g,''), value: tag.slice(idx+1).trim() };
+  }
+
+  async function loadData() {
+    const listElement = document.getElementById('file-list');
+    try {
+      const response = await fetch(JSON_URL);
+      if (!response.ok) throw new Error("Fichier " + JSON_URL + " introuvable.");
+      allResources = await response.json();
+      PREFIXES.forEach(prefix => populateSelect(prefix, allResources, ""));
+      applyFinalRender(allResources);
+    } catch (error) {
+      listElement.innerHTML = `<li class="no-result" style="color:#b91c1c;">Erreur : ${error.message}</li>`;
+    }
+  }
+
+  function populateSelect(prefix, resources, valueToKeep) {
+    const selectEl = document.getElementById(`f-${prefix}`);
+    selectEl.innerHTML = '<option value="">-- Indifférent --</option>';
+    selectEl.classList.remove('auto-filled');
+
+    let options = new Set();
+    resources.forEach(res => {
+      res.tags.forEach(tag => {
+        const t = splitTag(tag);
+        if (t && t.prefix === prefix) options.add(t.value.trim());
+      });
+    });
+
+    [...options].sort((a, b) => a.localeCompare(b)).forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt;
+      option.innerText = opt;
+      if (normalize(opt) === normalize(valueToKeep)) option.selected = true;
+      selectEl.appendChild(option);
+    });
+  }
+
+  function recalculate() {
+    const currentSelections = {};
+    PREFIXES.forEach(prefix => {
+      const val = document.getElementById(`f-${prefix}`).value;
+      if (val) currentSelections[prefix] = val;
+    });
+
+    let validResources = allResources;
+    Object.entries(currentSelections).forEach(([prefix, value]) => {
+      validResources = validResources.filter(res =>
+        res.tags.some(tag => {
+          const t = splitTag(tag);
+          return t && t.prefix === prefix && normalize(t.value) === normalize(value);
+        })
+      );
+    });
+
+    let somethingAutoFilled = false;
+
+    PREFIXES.forEach(prefix => {
+      const selectEl = document.getElementById(`f-${prefix}`);
+      const currentVal = selectEl.value;
+
+      let possibleOptions = new Set();
+      validResources.forEach(res => {
+        res.tags.forEach(tag => {
+          const t = splitTag(tag);
+          if (t && t.prefix === prefix) possibleOptions.add(t.value.trim());
+        });
+      });
+
+      populateSelect(prefix, validResources, currentVal);
+
+      if (!currentVal && possibleOptions.size === 1) {
+        const onlyOption = [...possibleOptions][0];
+        selectEl.value = onlyOption;
+        selectEl.classList.add('auto-filled');
+        somethingAutoFilled = true;
+      }
+    });
+
+    if (somethingAutoFilled) {
+      recalculate();
+    } else {
+      applyFinalRender(validResources);
+    }
+  }
+
+  function applyFinalRender(validResources) {
+    if (activeOptionalTags.size > 0) {
+      validResources = validResources.filter(res =>
+        [...activeOptionalTags].every(optTag => res.tags.includes(optTag))
+      );
+    }
+    renderOptionalTags(validResources);
+    renderFiles(validResources);
+  }
+
+  function renderOptionalTags(resources) {
+    const container = document.getElementById('optional-tags-buttons');
+    const section = document.getElementById('optional-section');
+    container.innerHTML = '';
+
+    let otherTags = new Set();
+    resources.forEach(res => {
+      res.tags.forEach(tag => {
+        if (!splitTag(tag)) otherTags.add(tag);
+      });
+    });
+
+    if (otherTags.size > 0) {
+      section.style.display = 'block';
+      [...otherTags].sort().forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'tag-btn';
+        btn.innerText = tag;
+        if (activeOptionalTags.has(tag)) btn.classList.add('active');
+        btn.onclick = () => {
+          if (activeOptionalTags.has(tag)) activeOptionalTags.delete(tag);
+          else activeOptionalTags.add(tag);
+          btn.classList.toggle('active');
+          recalculate();
+        };
+        container.appendChild(btn);
+      });
+    } else {
+      section.style.display = 'none';
+    }
+  }
+
+  function renderFiles(resources) {
+    lastRenderedResources = resources;
+    const listElement = document.getElementById('file-list');
+    listElement.innerHTML = '';
+
+    if (resources.length === 0) {
+      listElement.innerHTML = '<li class="no-result">Aucune ressource ne correspond à cette combinaison.</li>';
+    } else {
+      resources.forEach(resource => {
+        const li = document.createElement('li');
+        const fullPath = resource.fichier;
+        const fileName = fullPath.split('/').pop();
+        const tagsHtml = resource.tags.map(t => `<span class="file-tag">${t}</span>`).join('');
+        const checked = selectedFiles.has(fullPath) ? 'checked' : '';
+
+        li.innerHTML = `
+          <input type="checkbox" class="file-check" data-file="${fullPath.replace(/"/g,'&quot;')}" ${checked} onchange="toggleSelect(this)">
+          <div class="file-info">
+            <div class="file-name">${fileName}</div>
+            <div class="file-tags">${tagsHtml}</div>
+          </div>
+          <a href="${fullPath}" download="${fileName}" class="btn-download">⬇</a>
+        `;
+        listElement.appendChild(li);
+      });
+    }
+    updateToolbar();
+  }
+
+  function toggleSelect(checkbox) {
+    const file = checkbox.dataset.file;
+    if (checkbox.checked) selectedFiles.add(file);
+    else selectedFiles.delete(file);
+    updateToolbar();
+  }
+
+  function updateToolbar() {
+    document.getElementById('depot-count').textContent =
+      `${lastRenderedResources.length} ressource(s) affichée(s) — ${selectedFiles.size} sélectionnée(s)`;
+    document.getElementById('btn-zip').disabled = selectedFiles.size === 0;
+  }
+
+  async function downloadSelectionZip() {
+    if (selectedFiles.size === 0) return;
+    const btn = document.getElementById('btn-zip');
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Préparation…';
+    try {
+      const files = {};
+      const usedNames = new Set();
+      for (const path of selectedFiles) {
+        const resp = await fetch(path);
+        if (!resp.ok) throw new Error('Échec de récupération : ' + path);
+        const buf = new Uint8Array(await resp.arrayBuffer());
+        let name = path.split('/').pop();
+        let uniqueName = name, i = 1;
+        while (usedNames.has(uniqueName)) { uniqueName = name.replace(/(\.[^.]+)?$/, '_' + (++i) + '$1'); }
+        usedNames.add(uniqueName);
+        files[uniqueName] = buf;
+      }
+      const zipped = fflate.zipSync(files);
+      const blob = new Blob([zipped], { type: 'application/zip' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'questions_hestack.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Erreur lors de la création du zip : ' + err.message);
+    } finally {
+      btn.disabled = selectedFiles.size === 0;
+      btn.textContent = originalLabel;
+    }
+  }
+
+  function resetAll() {
+    PREFIXES.forEach(prefix => {
+      const el = document.getElementById(`f-${prefix}`);
+      el.classList.remove('auto-filled');
+      populateSelect(prefix, allResources, "");
+    });
+    activeOptionalTags.clear();
+    document.getElementById('optional-section').style.display = 'none';
+    applyFinalRender(allResources);
+  }
+
+  loadData();
+</script>
+</body>
+</html>
