@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Test comparatif SmilesDrawer</title></head>
+<body>
+  <h3>Test A — 300x200, statique (comme le test précédent qui marchait)</h3>
+  <canvas id="cvA" width="300" height="200" style="border:2px solid red;background:#fff;"></canvas>
+
+  <h3>Test B — 110x80, statique (taille de l'appli)</h3>
+  <canvas id="cvB" width="110" height="80" style="border:2px solid blue;background:#fff;"></canvas>
+
+  <h3>Test C — 110x80, créé dynamiquement et inséré via innerHTML (comme dans l'appli)</h3>
+  <div id="hostC"></div>
+
+  <h3>Test D — 110x80, deux molécules à la suite avec une INSTANCE Drawer différente chacune (comme dans l'appli actuellement)</h3>
+  <div id="hostD"></div>
+
+  <script src="lib/smiles-drawer/smiles-drawer.min.js"></script>
+  <script>
+    var sdA = new SmilesDrawer.Drawer({ width: 300, height: 200, compactDrawing: true });
+    SmilesDrawer.parse('CCCl', function (tree) { sdA.draw(tree, 'cvA', 'light', false); });
+
+    var sdB = new SmilesDrawer.Drawer({ width: 110, height: 80, compactDrawing: true });
+    SmilesDrawer.parse('CCCl', function (tree) { sdB.draw(tree, 'cvB', 'light', false); });
+
+    var hostC = document.getElementById('hostC');
+    hostC.innerHTML = "<canvas id='cvC' width='110' height='80' style='border:2px solid green;background:#fff;'></canvas>";
+    var sdC = new SmilesDrawer.Drawer({ width: 110, height: 80, compactDrawing: true });
+    SmilesDrawer.parse('CCCl', function (tree) { sdC.draw(tree, document.getElementById('cvC'), 'light', false); });
+
+    var hostD = document.getElementById('hostD');
+    hostD.innerHTML = "<canvas id='cvD1' width='110' height='80' style='border:2px solid purple;background:#fff;'></canvas> <canvas id='cvD2' width='110' height='80' style='border:2px solid orange;background:#fff;'></canvas>";
+    SmilesDrawer.parse('CCCl', function (tree) {
+      var sdD1 = new SmilesDrawer.Drawer({ width: 110, height: 80, compactDrawing: true });
+      sdD1.draw(tree, document.getElementById('cvD1'), 'light', false);
+    });
+    SmilesDrawer.parse('CCO', function (tree) {
+      var sdD2 = new SmilesDrawer.Drawer({ width: 110, height: 80, compactDrawing: true });
+      sdD2.draw(tree, document.getElementById('cvD2'), 'light', false);
+    });
+  </script>
+</body>
+</html>

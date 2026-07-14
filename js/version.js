@@ -1,5 +1,5 @@
-const STACKFORGE_VERSION = '2.1.0';
-const STACKFORGE_VERSION_DATE = 'Juin 2026';
+const STACKFORGE_VERSION = '1.0';
+const STACKFORGE_VERSION_DATE = 'Juillet 2026';
 
 document.addEventListener('DOMContentLoaded', () => {
   const semver = document.getElementById('app-semver');
