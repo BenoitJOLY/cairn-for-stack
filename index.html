@@ -2101,6 +2101,22 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane on" id="ab-cfg">
 
+      <!-- Énoncé -->
+      <div class="field">
+        <label><span data-i18n="ab.enonce_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('ab-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
+        <div class="rich-preview" id="prev-ab-text" data-ph="Ex : Sur la courbe de titrage ci-dessous, déterminer le volume équivalent." onclick="openRich('ab-text')"></div>
+        <textarea id="ab-text" style="display:none"></textarea>
+      </div>
+
+      <!-- Méthode -->
+      <div class="field">
+        <label data-i18n="ab.method_lbl">Méthode</label>
+        <select id="ab-method" onchange="abFormChange()">
+          <option value="colorimetrie" data-i18n="ab.method_colorimetrie">Simulation colorimétrique (indicateur coloré)</option>
+          <option value="tangentes" data-i18n="ab.method_tangentes">Méthode des tangentes (JSXGraph)</option>
+        </select>
+      </div>
+
       <!-- Type et objectif -->
       <div class="g2">
         <div class="field">
@@ -2124,12 +2140,9 @@ fill="currentColor" stroke="none">
       <div class="field">
         <label data-i18n="ab.eleve_identifie_lbl">L'élève doit identifier</label>
         <select id="ab-find" onchange="abFormChange()">
-          <option value="equivalence" data-i18n="ab.find_eq1">1ʳᵉ équivalence Veq1 — curseur vertical</option>
-          <option value="veq2" disabled data-i18n="ab.find_eq2">2ᵉ équivalence Veq2 — curseur vertical</option>
-          <option value="veq3" disabled data-i18n="ab.find_eq3">3ᵉ équivalence Veq3 — curseur vertical</option>
-          <option value="pka" data-i18n="ab.find_pka1">pKa1 à la demi-équivalence — curseur horizontal</option>
-          <option value="pka2" disabled data-i18n="ab.find_pka2">pKa2 — curseur horizontal</option>
-          <option value="pka3" disabled data-i18n="ab.find_pka3">pKa3 — curseur horizontal</option>
+          <option value="equivalence" data-i18n="ab.find_eq1">1ʳᵉ équivalence Veq1</option>
+          <option value="veq2" disabled data-i18n="ab.find_eq2">2ᵉ équivalence Veq2</option>
+          <option value="veq3" disabled data-i18n="ab.find_eq3">3ᵉ équivalence Veq3</option>
         </select>
       </div>
 
@@ -2152,7 +2165,7 @@ fill="currentColor" stroke="none">
             <input type="number" id="ab-c2" value="0.1" min="0.001" max="5" step="0.001" oninput="abUpdatePreview()">
           </div>
           <div class="field" id="ab-pka-row">
-            <label id="ab-lbl-pka">pKa1</label>
+            <label id="ab-lbl-pka" data-i18n="ab.pka1_physique_lbl">pKa1 (paramètre physique)</label>
             <input type="number" id="ab-pka" value="4.8" min="0" max="14" step="0.1" oninput="abUpdatePreview()">
           </div>
         </div>
@@ -2172,20 +2185,31 @@ fill="currentColor" stroke="none">
         </div>
       </fieldset>
 
+      <!-- Indicateurs colorés (méthode colorimétrie) -->
+      <fieldset style="border:1.5px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin:10px 0;" id="ab-ind-fieldset">
+        <legend style="font-size:.85rem;color:#16a34a;font-weight:600;" data-i18n="ab.indicateurs_legend">Indicateurs colorés proposés à l'élève</legend>
+        <p class="hint" data-i18n="ab.indicateurs_hint">Cochez les indicateurs affichés dans la simulation (au moins un).</p>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" class="ab-ind-chk" id="ab-ind-hel" data-ind="hel" checked onchange="abFormChange()"> <span data-i18n="ab.ind_hel">Hélianthine (3.1–4.4)</span></label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" class="ab-ind-chk" id="ab-ind-vbc" data-ind="vbc" onchange="abFormChange()"> <span data-i18n="ab.ind_vbc">Vert de bromocrésol (3.8–5.4)</span></label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" class="ab-ind-chk" id="ab-ind-rm" data-ind="rm" onchange="abFormChange()"> <span data-i18n="ab.ind_rm">Rouge de méthyle (4.2–6.3)</span></label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" class="ab-ind-chk" id="ab-ind-bbt" data-ind="bbt" checked onchange="abFormChange()"> <span data-i18n="ab.ind_bbt">Bleu de bromothymol (6.0–7.6)</span></label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" class="ab-ind-chk" id="ab-ind-rc" data-ind="rc" onchange="abFormChange()"> <span data-i18n="ab.ind_rc">Rouge de crésol (7.2–8.8)</span></label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" class="ab-ind-chk" id="ab-ind-phph" data-ind="phph" checked onchange="abFormChange()"> <span data-i18n="ab.ind_phph">Phénolphtaléine (8.2–10.0)</span></label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" class="ab-ind-chk" id="ab-ind-ja" data-ind="ja" onchange="abFormChange()"> <span data-i18n="ab.ind_ja">Jaune d'alizarine (10.1–12.0)</span></label>
+        </div>
+      </fieldset>
+
       <!-- Tolérances -->
       <div class="g2">
         <div class="field" id="ab-tol-vol-row">
           <label data-i18n="ab.tol_veq_lbl">Tolérance Veq (mL)</label>
           <input type="number" id="ab-tol-vol" value="0.5" min="0.05" max="5" step="0.05">
         </div>
-        <div class="field" id="ab-tol-ph-row" style="display:none;">
-          <label data-i18n="ab.tol_pka_lbl">Tolérance pKa</label>
-          <input type="number" id="ab-tol-ph" value="0.2" min="0.05" max="1" step="0.05">
-        </div>
       </div>
 
       <!-- Dimensions -->
-      <fieldset style="border:1.5px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin:10px 0;">
+      <fieldset style="border:1.5px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin:10px 0;" id="ab-dims-fieldset">
         <legend style="font-size:.85rem;color:#16a34a;font-weight:600;" data-i18n="glr.size_lbl">Dimensions du graphe</legend>
         <div class="g2">
           <div class="field"><label data-i18n="glr.w_lbl">Largeur (px)</label><input type="number" id="ab-w" value="500" min="300" max="900" step="10"></div>
@@ -2193,28 +2217,9 @@ fill="currentColor" stroke="none">
         </div>
       </fieldset>
 
-      <!-- Consigne -->
-      <div class="field">
-        <label><span data-i18n="glr.text_lbl">Consigne</span> <button class="btn-rich" onclick="openRich('ab-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-ab-text" data-ph="Ex : Sur la courbe de titrage ci-dessous, déterminer le volume équivalent." onclick="openRich('ab-text')"></div>
-        <textarea id="ab-text" style="display:none"></textarea>
-      </div>
-
-      <!-- Feedback -->
-      <div class="g2" style="margin-top:10px;">
-        <div class="field">
-          <label><span data-i18n="ab.fb_ok_lbl">✅ Message si bonne réponse (opt.)</span></label>
-          <input type="text" id="ab-fb-ok" placeholder="">
-        </div>
-        <div class="field">
-          <label><span data-i18n="ab.fb_wrong_lbl">❌ Message si mauvaise réponse (opt.)</span></label>
-          <input type="text" id="ab-fb-wrong" placeholder="">
-        </div>
-      </div>
-
       </div>
       <div class="mpane" id="ab-fb-gen">
-        <p class="hint" data-i18n="ab.fbgen_auto_desc">La correction (volume ou pKa attendu) est générée automatiquement selon le type de titrage choisi dans Config.</p>
+        <p class="hint" data-i18n="ab.fbgen_auto_desc">La correction (indicateur, volume équivalent) est générée automatiquement selon le type de titrage et la méthode choisis dans Config.</p>
         <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ab.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="ab-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>

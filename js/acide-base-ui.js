@@ -46,23 +46,25 @@ function abFormChange() {
     // ── Mise à jour des options de ab-find ────────────────────────────
     if (abFindEl) {
         var opts = abFindEl.options;
-        // indices: 0=equivalence, 1=veq2, 2=veq3, 3=pka, 4=pka2, 5=pka3
+        // indices: 0=equivalence, 1=veq2, 2=veq3
         opts[1].disabled = (nProtons < 2);
         opts[2].disabled = (nProtons < 3);
-        opts[3].disabled = (abType === 'af-fort-bf');  // pas de pKa pour acide fort
-        opts[4].disabled = (nProtons < 2 || abType === 'af-fort-bf');
-        opts[5].disabled = (nProtons < 3 || abType === 'af-fort-bf');
         // Corriger si l'option sélectionnée est maintenant désactivée
         if (abFindEl.options[abFindEl.selectedIndex].disabled) abFindEl.value = 'equivalence';
     }
 
-    // ── Tolérances ────────────────────────────────────────────────────
-    var abFind    = (abFindEl || {}).value || 'equivalence';
-    var isVolCur  = (abFind === 'equivalence' || abFind === 'veq2' || abFind === 'veq3');
-    var tolVolRow = document.getElementById('ab-tol-vol-row');
-    var tolPhRow  = document.getElementById('ab-tol-ph-row');
-    if (tolVolRow) tolVolRow.style.display = isVolCur ? '' : 'none';
-    if (tolPhRow)  tolPhRow.style.display  = isVolCur ? 'none' : '';
+    // ── Champs propres à la méthode "tangentes" ────────────────────────
+    var abMethod   = (document.getElementById('ab-method') || {}).value || 'colorimetrie';
+    var dimsFieldset = document.getElementById('ab-dims-fieldset');
+    if (dimsFieldset) dimsFieldset.style.display = (abMethod === 'tangentes') ? '' : 'none';
+    var indFieldset = document.getElementById('ab-ind-fieldset');
+    if (indFieldset) indFieldset.style.display = (abMethod === 'colorimetrie') ? '' : 'none';
+
+    // ── Au moins un indicateur doit rester coché ────────────────────────
+    var indChks = document.querySelectorAll('.ab-ind-chk');
+    if (indChks.length && !document.querySelector('.ab-ind-chk:checked')) {
+        indChks[0].checked = true;
+    }
 
     abUpdatePreview();
 }

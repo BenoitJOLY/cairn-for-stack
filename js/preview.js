@@ -2395,11 +2395,13 @@ function _hsSimplePreviewHTML(cfg) {
   // gabarit standard à 2 boîtes (Ok/Faux). On les liste ici pour que rien ne reste
   // caché à l'enseignant dans l'aperçu.
   const extraNodesHTML = (cfg.extraFeedbackNodes && cfg.extraFeedbackNodes.length) ? `
-    <div style="font-size:.75rem;color:#64748b;margin:10px 0 4px;font-weight:600;">Autres diagnostics possibles selon l'erreur détectée :</div>
+    <div style="font-size:.75rem;color:#64748b;margin:10px 0 4px;font-weight:600;">${cfg.extraFeedbackNodesTitle || "Autres diagnostics possibles selon l'erreur détectée :"}</div>
     ${cfg.extraFeedbackNodes.map(n => `<div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${_hsRenderMath(n.desc || '')}</div>${_hsRenderMath(n.fb || '')}`).join('')}` : '';
-  const fbHTML = `
+  const okWrongHTML = cfg.hideOkWrongBoxes ? '' : `
     <div data-${cfg.prefix}-field="fbc">${fbOkDescHTML}${wrapFb(_hsRenderMath(cfg.fbOk || '✅ <strong>Bonne réponse !</strong>'), true)}</div>
-    <div data-${cfg.prefix}-field="fbe">${fbWrongDescHTML}${wrapFb(_hsRenderMath(cfg.fbWrong || '❌ <strong>Réponse incorrecte.</strong>'), false)}</div>
+    <div data-${cfg.prefix}-field="fbe">${fbWrongDescHTML}${wrapFb(_hsRenderMath(cfg.fbWrong || '❌ <strong>Réponse incorrecte.</strong>'), false)}</div>`;
+  const fbHTML = `
+    ${okWrongHTML}
     ${extraNodesHTML}
     ${cfg.hideFbGen ? '' : fbGenHTML}`;
   const bodyHTML = cfg.onlyFbGen ? `
@@ -2960,17 +2962,83 @@ function renderPreviewHTML_thermo(state) {
 }
 window.thyRefreshPreview = _hsWireSimplePreview('thermo', 'thy', 'thy-preview-container', 'fp-thermo', renderPreviewHTML_thermo);
 
+// Extrait le contenu d'un bloc STACK [[tag ...]]...[[/tag]] et, pour l'iframe,
+// sépare [[style]]/[[script type="module"]] du reste du HTML — sert uniquement à
+// rejouer une version "live" (littéraux JS à la place des {#...#}) dans l'aperçu.
+function _abExtractBlock(textFrag, openTag, closeTag) {
+  var re = new RegExp('\\[\\[' + openTag + '[^\\]]*\\]\\]([\\s\\S]*?)\\[\\[\\/' + (closeTag || openTag) + '\\]\\]');
+  var m = re.exec(textFrag || '');
+  return m ? m[1] : '';
+}
+function _abSubstitutePlaceholders(js, previewVars) {
+  return (js || '').replace(/\{#([A-Za-z0-9_]+)#\}/g, function (full, name) {
+    return (previewVars && previewVars[name] !== undefined) ? previewVars[name] : '0';
+  });
+}
+
 function renderPreviewHTML_acideBase(state) {
-  var liveEl = document.getElementById('ab-preview');
+  var realParts = {};
+  try { realParts = (typeof genAcideBase === 'function') ? genAcideBase(1) : {}; } catch (e) { realParts = {}; console.error('[preview] acide-base build error:', e); }
+  var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
+  var bodyFrag = (realParts.textFrag || '')
+    .replace(/\[\[iframe[\s\S]*?\[\[\/iframe\]\]/, '<!--HS-AB-GRAPHIC-->')
+    .replace(/\[\[jsxgraph[\s\S]*?\[\[\/jsxgraph\]\]/, '<!--HS-AB-GRAPHIC-->')
+    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled style="' + fakeInputStyle + '">')
+    .replace(/\[\[validation:[^\]]+\]\]/g, '');
+  var scenarioParts = bodyFrag.split('<!--HS-AB-GRAPHIC-->');
+  var textBefore = scenarioParts[0] ? _hsRenderMath(scenarioParts[0]) : '<p><em>Énoncé automatique : titrage pH-métrique.</em></p>';
+  var textAfter = scenarioParts[1] ? _hsRenderMath(scenarioParts[1]) : '';
+
+  var abMethod = realParts.abMethod || 'colorimetrie';
+  var pv = realParts.previewVars || {};
+  var inNames = realParts.previewInputNames || {};
+  var dispW = realParts.dispW || 500, dispH = realParts.dispH || 400;
+  var exampleHTML;
+
+  if (abMethod === 'colorimetrie') {
+    var iframeInner = _abExtractBlock(realParts.textFrag, 'iframe');
+    var css = _abExtractBlock(iframeInner, 'style');
+    var scriptRaw = _abExtractBlock(iframeInner, 'script type="module"', 'script');
+    var body = iframeInner
+      .replace(/\[\[style\]\][\s\S]*?\[\[\/style\]\]/, '')
+      .replace(/\[\[script type="module"\][\s\S]*?\[\[\/script\]\]/, '')
+      .trim();
+    var js = _abSubstitutePlaceholders(scriptRaw, pv)
+      .replace(/^\s*import\s*\{\s*stack_js\s*\}\s*from\s*'\[\[cors[^\]]*\]\]';\s*\n/, '');
+    var hiddenInputs = '<input type="hidden" id="' + (inNames.vol || '') + '" value="0.0">'
+      + '<input type="hidden" id="' + (inNames.ind || '') + '" value="">'
+      + '<input type="hidden" id="' + (inNames.tries || '') + '" value="1">';
+    exampleHTML = '<style>' + css + '</style>' + hiddenInputs + body
+      + '<script type="module">\n'
+      + 'const stack_js = { request_access_to_input: function(name){ return Promise.resolve(name); } };\n'
+      + js + '\n<\/script>';
+  } else {
+    var jxgRaw = _abExtractBlock(realParts.textFrag, 'jsxgraph');
+    var jxgJs = _abSubstitutePlaceholders(jxgRaw, pv);
+    var refSlopesVar = realParts.previewRefSlopesVar || 'refSlopes';
+    var boardId = 'abTangBoard';
+    var jsBody = 'var ' + refSlopesVar + ' = null; var stack_jxg = { bind_point: function(){} };\n' + jxgJs;
+    exampleHTML = '<div id="' + boardId + '" style="position:relative;width:100%;max-width:' + dispW + 'px;height:' + dispH + 'px;margin:0 auto;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;background:#fff;"></div>'
+      + '<script src="lib/jsxgraph/jsxgraphcore.js"><\/script>'
+      + '<script>(function(){ try { var divid = ' + JSON.stringify(boardId) + '; ' + jsBody + ' } catch(e){ var el=document.getElementById(' + JSON.stringify(boardId) + '); if(el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">Erreur JSXGraph : " + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; console.error(e); } })();<\/script>';
+  }
+  if (textAfter) exampleHTML += '<div style="margin-top:10px;">' + textAfter + '</div>';
+  exampleHTML = '<div style="background:#fef9c3;border:1px solid #eab308;color:#713f12;font-size:.78rem;padding:6px 10px;border-radius:6px;margin-bottom:10px;">⚠️ Aperçu — la simulation ci-dessous est visuelle uniquement : les interactions (clics, glisser, saisie) ne sont pas prises en compte dans le calcul du score ici. La correction réelle se fait dans Moodle.</div>' + exampleHTML;
+
   return _hsSimplePreviewHTML({
     badge: 'Acide-base', badgeColor: '#16a34a', noteBg: '#d1fae5', noteColor: '#065f46',
     prefix: 'ab', bareme: state.bareme || 1,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : titrage pH-métrique.</em></p>'),
-    exampleHTML: _hsRenderMath(liveEl ? liveEl.innerHTML : ''),
-    fbOk: state.fbOk, fbWrong: state.fbWrong, fbGen: state.fbGen
+    text: textBefore,
+    exampleLabel: '',
+    exampleHTML: exampleHTML,
+    hideOkWrongBoxes: true,
+    extraFeedbackNodesTitle: "Feedbacks du PRT (dans l'ordre d'évaluation) :",
+    extraFeedbackNodes: realParts.diagNodes || [],
+    fbGenAuto: _hsRenderMath(realParts.generalFeedbackAuto || ''),
+    fbGen: state.fbGen
   });
 }
-window.abRefreshPreview = _hsWireSimplePreview('acide-base', 'ab', 'ab-preview-container', 'fp-acide-base', renderPreviewHTML_acideBase);
+window.abRefreshPreview = _hsWireSimplePreview('acide-base', 'ab', 'ab-preview-container', 'fp-acide-base', renderPreviewHTML_acideBase, true);
 
 function renderPreviewHTML_circuit(state) {
   var realParts = {};
