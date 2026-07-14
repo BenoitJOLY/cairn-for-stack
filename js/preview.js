@@ -3483,16 +3483,87 @@ function renderPreviewHTML_chemical(state) {
 }
 window.chemRefreshPreview = _hsWireSimplePreview('chemical', 'chem', 'chem-preview-container', 'fp-chemical', renderPreviewHTML_chemical);
 
-function renderPreviewHTML_topo(state) {
+// Miroir des 7 nœuds PRT de genChemicalTopo (js/gen-topo.js, canonicalNodes) — texte
+// des descriptions/feedbacks recopié tel quel, car genChemicalTopo() est async
+// (capture des canvases SmilesDrawer) et ne peut pas être appelé de façon synchrone
+// ici comme genChemical()/genNuclear() le sont pour leur propre aperçu.
+function _topoDiagNodes() {
+  var X = '';
+  return [
+    { description: 'Fleche',
+      truefeedback: '<p><span style="color: green; font-weight: bold;">✓ Bonne flèche de réaction !</span></p>',
+      falsefeedback: '<p><span style="color: red; font-weight: bold;">✗ Mauvaise flèche.</span> Détectée : {@ans_arrow_det' + X + '@}, attendue : {@tans_arrow' + X + '@}</p>' },
+    { description: 'Bilan atomes',
+      truefeedback: '<p><span style="color: green; font-weight: bold;">✓ Votre réaction est équilibrée du point de vue des éléments chimiques !</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">✗ Votre réaction n\'est pas équilibrée du point des éléments chimiques !</span></p>' },
+    { description: 'Charges',
+      truefeedback: '<p><span style="color: green;">✓ Votre équation est équilibrée électriquement.</span></p>',
+      falsefeedback: '<p><span style="color: red;">✗ Les charges ne sont pas conservées dans votre réaction.</span> Réactifs : {@charge_rea_s' + X + '@}, Produits : {@charge_pro_s' + X + '@}</p>' },
+    { description: 'Formules',
+      truefeedback: '<p><span style="color: green;">✓ Vos formules sont correctes !</span></p>',
+      falsefeedback: '<p><span style="color: red;">✗ Vos formules sont incorrectes.</span></p>' },
+    { description: 'Groupes',
+      truefeedback: '<p><span style="color: orange;">⚠ Bonne compréhension du type de réaction.</span></p>',
+      falsefeedback: '<p><span style="color: red;">✗ Groupes fonctionnels non reconnus.</span></p>' },
+    { description: 'Coefficients',
+      truefeedback: '<p><span style="color: green;">✓ Vos coefficients stœchiométriques sont corrects !</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222;">✗ Vos coefficients stœchiométriques sont incorrects !</span></p>' },
+    { description: 'Coefs prop', sans: 'is_proportional' + X, tans: 'true',
+      truefeedback: '<p><span style="color: orange;">⚠ Coefficients proportionnels (k={@k_ratio' + X + '@}) mais non réduits.</span></p>',
+      falsefeedback: '<p><span style="color: red;">✗ Coefficients non proportionnels.</span></p>' }
+  ];
+}
+
+// Capture synchrone de #topo-preview-area (déjà dessiné par topoOnInput() pendant la
+// saisie) pour l'encart "réaction attendue" de l'aperçu Feedback général — même
+// principe que capturedHtml dans genChemicalTopo (gen-topo.js), mais sans setTimeout
+// puisqu'on est appelé après coup sur un canvas déjà peint, pas juste inséré.
+function _topoCaptureAnswerHTML() {
   var pa = document.getElementById('topo-preview-area');
+  if (!pa || !pa.children.length) return '';
+  var cl = pa.cloneNode(true);
+  var canvases = pa.querySelectorAll('canvas');
+  var cloneCanvases = cl.querySelectorAll('canvas');
+  canvases.forEach(function (cv, i) {
+    try {
+      var img = document.createElement('img');
+      img.src = cv.toDataURL('image/png');
+      img.width = cv.width; img.height = cv.height;
+      cloneCanvases[i].replaceWith(img);
+    } catch (e) {}
+  });
+  return '<div style="margin-top:10px;padding:10px;background:#f8f8f8;border:1px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' + cl.innerHTML + '</div>';
+}
+
+function renderPreviewHTML_topo(state) {
+  var topoNodes = _topoDiagNodes();
+  var prtBoxes = _hsPrtBoxes({ prt: { nodes: topoNodes } });
+  var extraNodes = [];
+  topoNodes.forEach(function (n, i) {
+    var isFirst = i === 0, isLast = i === topoNodes.length - 1;
+    if (!isFirst && n.truefeedback) extraNodes.push({ desc: n.description + ' (succès)', fb: n.truefeedback });
+    if (!isLast && n.falsefeedback) extraNodes.push({ desc: n.description + ' (échec)', fb: n.falsefeedback });
+  });
+  var widgetHTML = '<div style="font-family:sans-serif;background:#fff;border:1px solid #d1d8dd;border-radius:8px;padding:15px;margin-top:10px;">'
+    + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">'
+    + '<button type="button" disabled style="padding:8px 14px;border:none;border-radius:8px;background:#334155;color:#fff;font-weight:700;font-size:.85rem;font-family:inherit;">' + I18N.t('tpl.topo_btn_total') + '</button>'
+    + '<button type="button" disabled style="padding:8px 14px;border:none;border-radius:8px;background:#334155;color:#fff;font-weight:700;font-size:.85rem;font-family:inherit;">' + I18N.t('tpl.topo_btn_equilibrium') + '</button>'
+    + '<button type="button" disabled style="padding:8px 14px;border:none;border-radius:8px;background:#334155;color:#fff;font-weight:700;font-size:.85rem;font-family:inherit;">' + I18N.t('tpl.topo_btn_add') + '</button>'
+    + '<button type="button" disabled style="padding:8px 14px;border:none;border-radius:8px;background:#8e44ad;color:#fff;font-weight:700;font-size:.85rem;font-family:inherit;">' + I18N.t('tpl.topo_btn_molecule') + '</button>'
+    + '</div>'
+    + '<div style="border:2px solid #3498db;min-height:45px;font-size:1.15rem;padding:12px;border-radius:5px;margin-bottom:15px;font-family:monospace;background:#fdfdfd;color:#94a3b8;">&nbsp;</div>'
+    + '<div style="background:#fcfcfc;border:1px solid #eee;border-radius:5px;padding:12px;min-height:80px;"></div>'
+    + '</div>';
   return _hsSimplePreviewHTML({
     badge: 'Chimie Topologique', badgeColor: '#8f2b33', noteBg: '#fef2f2', noteColor: '#8f2b33',
     prefix: 'topo', bareme: state.bareme || 2,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : compléter la réaction (structures moléculaires).</em></p>'),
-    exampleHTML: (pa && pa.innerHTML.trim())
-      ? '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' + pa.innerHTML + '</div>'
-      : '<p style="color:#94a3b8;font-style:italic;">Actualisez l\'aperçu dans l\'onglet Config pour afficher les structures.</p>',
-    fbOk: '', fbWrong: '', fbGen: state.fbGen
+    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : compléter la réaction (structures moléculaires).</em></p>') + widgetHTML,
+    hideExampleBox: true,
+    fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
+    fbOk: prtBoxes.okFb, fbWrong: prtBoxes.wrongFb,
+    fbGenAuto: '<p><strong>' + I18N.t('tpl.vf_sol_reaction_was') + ' :</strong></p>' + _topoCaptureAnswerHTML(),
+    fbGen: state.fbGen,
+    extraFeedbackNodes: extraNodes
   });
 }
 window.topoRefreshPreview = _hsWireSimplePreview('chemical_topo', 'topo', 'topo-preview-container', 'fp-chemical_topo', renderPreviewHTML_topo);

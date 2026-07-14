@@ -446,9 +446,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .topo-editor:focus { border-color: var(--chem); }
 
 /* Prévisualisation Smiles */
-.topo-preview { 
-  text-align: center; padding: 10px; background: #f8fafc; 
-  border: 1px dashed var(--border); border-radius: 6px; margin-top: 0; 
+.topo-preview {
+  display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 8px;
+  text-align: center; padding: 10px; background: #f8fafc;
+  border: 1px dashed var(--border); border-radius: 6px; margin-top: 0;
   min-height: 50px; font-size: 1.2rem;
 }
 

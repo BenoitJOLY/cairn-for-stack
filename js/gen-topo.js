@@ -68,7 +68,8 @@ arrow_expl_eq${X}: "une reaction D EQUILIBRE (reversible)";
 tans_arrow_expl${X}: if is(${vSep}="->") then arrow_expl_fwd${X} else arrow_expl_eq${X};
 tans_arrow_other_expl${X}: if is(${vSep}="->") then arrow_expl_eq${X} else arrow_expl_fwd${X};
 tans_arrow_symbol${X}: if is(${vSep}="->") then "->" else "<=>";
-tans_arrow_wrong_symbol${X}: if is(${vSep}="->") then "<=>" else "->";`;
+tans_arrow_wrong_symbol${X}: if is(${vSep}="->") then "<=>" else "->";
+tans_raw${X}: "${equation.replace(/ /g,' ').replace(/\s+/g,' ').trim().replace(/\\/g,'\\\\').replace(/"/g,'\\"')}";`;
 
   // ── HTML + Script (calqué exactement sur la référence) ──
   const htmlBlock=`<div id="inst_{#qid#}" style="font-family: sans-serif; background: #fff; border: 1px solid #d1d8dd; border-radius: 8px; padding: 15px;">
@@ -278,6 +279,18 @@ tans_arrow_wrong_symbol${X}: if is(${vSep}="->") then "<=>" else "->";`;
         if (rawInp && rawInp.value.trim() !== "") {
             ed.innerText = rawInp.value; ed.dispatchEvent(new Event("input"));
         }
+
+        // "Remplir avec la reponse correcte" de Moodle met a jour rawInp.value en direct
+        // (sans recharger la page) et declenche "change" dessus : sans cet ecouteur, seul
+        // le chargement initial ci-dessus resynchronisait l'editeur visible.
+        if (rawInp) {
+            rawInp.addEventListener("change", function() {
+                if (rawInp.value.trim() !== "" && ed.innerText.trim() !== rawInp.value.trim()) {
+                    ed.innerText = rawInp.value;
+                    ed.dispatchEvent(new Event("input"));
+                }
+            });
+        }
     } // fin core()
 
     var wait = setInterval(function(){ if (document.getElementById("ed_"+qId)) { clearInterval(wait); core(); } }, 200);
@@ -343,7 +356,7 @@ ${htmlBlock}`;
     mkInp(iPch, 'algebraic', vPch),
     mkInp(iPc,  'algebraic', vPc),
     mkInp(iPf,  'algebraic', vPf),
-    mkInp(iRaw, 'string',   '"" '),
+    mkInp(iRaw, 'string',   `tans_raw${X}`),
     mkInp(iRch, 'algebraic', vRch),
     mkInp(iRc,  'algebraic', vRc),
     mkInp(iRf,  'algebraic', vRf),
@@ -425,6 +438,15 @@ is_proportional${X}: if length(full_ans_map${X})=0 then false else is(length(sub
   const prtMeta = { name:`prt${X}`, value:'1.0000000', autosimplify:'1', feedbackstyle:'2', feedbackvariables: fbVars };
   const prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
+  // Encart "réaction attendue" injecté dans generalFeedback, même principe que
+  // chemAnswerBox pour genChemical() ci-dessous : reprend les structures moléculaires
+  // déjà capturées dans capturedHtml (canvases SmilesDrawer convertis en <img>).
+  const topoAnswerBox = capturedHtml ? `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
+    <span style="font-weight:bold;color:#1e293b;">${I18N.t('tpl.topo_title')}</span>
+    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N.t('tpl.vf_sol_reaction_was')}</span>
+    <div style="margin-top:10px;padding:10px;background:#f8f8f8;border:1px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">${capturedHtml}</div>
+  </div>` : '';
+
   return {
     bareme, vars,
     qnote:`Topo Q${X}: ${equation}`,
@@ -433,7 +455,7 @@ is_proportional${X}: if length(full_ans_map${X})=0 then false else is(length(sub
     inputXML,
     prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
-    generalFeedback: _mkFbGen('', v('topo-fbgen')),
+    generalFeedback: _mkFbGen(topoAnswerBox, v('topo-fbgen')),
     feedbackRef:`[[feedback:prt${X}]]`
   };
 }
@@ -1229,3 +1251,84 @@ function topoCloseJsme() {
   document.getElementById('jsme_generator_modal').style.display = 'none';
   if (typeof FocusTrap !== 'undefined') FocusTrap.release();
 }
+
+// ── Aperçu Config (panneau enseignant) ────────────────────────────────────
+// Miroir du core() embarqué dans htmlBlock (ci-dessus, élève) : même découpage
+// des tokens et même rendu SmilesDrawer, mais ciblant topo-editor/topo-preview-area
+// côté enseignant.
+var _topoSd = null;
+
+function topoInsert(text) {
+  const editor = document.getElementById('topo-editor');
+  if (!editor) return;
+  editor.focus();
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const node = document.createTextNode(text);
+    range.insertNode(node);
+    range.setStartAfter(node); range.collapse(true);
+    sel.removeAllRanges(); sel.addRange(range);
+  } else {
+    editor.innerText = editor.innerText + text;
+  }
+  editor.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function topoOnInput() {
+  const editor = document.getElementById('topo-editor');
+  const pa = document.getElementById('topo-preview-area');
+  if (!editor || !pa) return;
+  const val = editor.innerText.replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+  pa.innerHTML = '';
+  if (!val) return;
+  if (!_topoSd && typeof SmilesDrawer !== 'undefined') _topoSd = new SmilesDrawer.Drawer({ width: 110, height: 80, compactDrawing: true });
+  val.split(' ').forEach(function (t, idx) {
+    t = t.trim(); if (!t) return;
+    const el = document.createElement('div');
+    el.style.flexShrink = '0'; el.style.display = 'flex'; el.style.alignItems = 'center';
+    if (t === '->' || t === '→') {
+      el.innerHTML = '<span style="font-size:1.5rem;font-weight:bold;padding:0 8px;">→</span>';
+    } else if (t === '<=>' || t === '⇌') {
+      el.innerHTML = '<span style="font-size:1.5rem;font-weight:bold;padding:0 8px;">⇌</span>';
+    } else if (t === '+') {
+      el.innerHTML = '<span style="font-size:1.2rem;font-weight:bold;padding:0 10px;color:#666;">+</span>';
+    } else if (!isNaN(t)) {
+      el.innerHTML = '<span style="font-size:1.4rem;font-weight:bold;padding:0 5px;">' + t + '</span>';
+    } else {
+      const cid = 'topo_prev_c_' + idx + '_' + Date.now();
+      el.innerHTML = "<canvas id='" + cid + "' width='110' height='80' style='border:1px solid #eee;background:#fff;border-radius:4px;'></canvas>";
+      setTimeout(function (token, canvasId) {
+        return function () {
+          if (typeof SmilesDrawer !== 'undefined' && document.getElementById(canvasId)) {
+            SmilesDrawer.parse(token, function (tree) {
+              if (!document.getElementById(canvasId)) return;
+              _topoSd.draw(tree, canvasId, 'light', false);
+            }, function () {
+              const cv = document.getElementById(canvasId);
+              if (cv) cv.parentElement.innerHTML = '<span style="padding:10px;font-family:monospace;">' + token + '</span>';
+            });
+          }
+        };
+      }(t, cid), 50);
+    }
+    pa.appendChild(el);
+  });
+}
+
+function topoRenderPreview() {
+  topoOnInput();
+  setTimeout(function () {
+    if (typeof topoRefreshPreview === 'function') topoRefreshPreview();
+  }, 350);
+}
+
+(function () {
+  function _topoInit() {
+    const editor = document.getElementById('topo-editor');
+    if (editor) topoOnInput();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _topoInit);
+  else _topoInit();
+})();
