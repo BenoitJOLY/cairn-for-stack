@@ -14,7 +14,7 @@ Ce fichier est la référence unique et persistante du projet. Toute session de 
 
 ## ⚠️ Changement de plateforme Moodle — toutes les validations antérieures sont à reconfirmer
 
-La plateforme Moodle utilisée pour les tests a changé. Tous les statuts `✅ validé` présents dans ce document (aussi bien dans "Problèmes connus" que dans le tableau "État par type") reflètent une validation faite **sur l'ancienne plateforme**, avant ce changement. **Aucun type ne doit être considéré comme fonctionnel tant qu'il n'a pas été retesté et reconfirmé sur la nouvelle plateforme** — même ceux marqués `✅ validé` ci-dessous. Ne pas réinterpréter un `✅ validé` existant comme une garantie de fonctionnement actuel : c'est un historique de ce qui marchait avant le changement, pas un état présent.
+La plateforme Moodle utilisée pour les tests a changé : **Moodle 4.5.12, plugin qtype_stack 4.11.1**. Tous les statuts `✅ validé` présents dans ce document (aussi bien dans "Problèmes connus" que dans le tableau "État par type") reflètent une validation faite **sur l'ancienne plateforme**, avant ce changement. **Aucun type ne doit être considéré comme fonctionnel tant qu'il n'a pas été retesté et reconfirmé sur la nouvelle plateforme** — même ceux marqués `✅ validé` ci-dessous. Ne pas réinterpréter un `✅ validé` existant comme une garantie de fonctionnement actuel : c'est un historique de ce qui marchait avant le changement, pas un état présent.
 
 ## Direction architecturale (décidée)
 
