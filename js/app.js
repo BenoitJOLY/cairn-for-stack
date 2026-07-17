@@ -426,6 +426,19 @@ function confirmAndPreview() {
   _lastXML = built.xml;
   _lastQName = built.qName;
 
+  if (typeof lintExportedXML === 'function') {
+    var lintWarnings = lintExportedXML(built.xml);
+    if (lintWarnings.length) {
+      console.warn('[xml-lint] Avertissements sur le XML exporté :\n- ' + lintWarnings.join('\n- '));
+      var proceed = confirm(
+        '⚠️ ' + lintWarnings.length + ' avertissement(s) détecté(s) dans le XML avant export :\n\n'
+        + lintWarnings.map(function(w,i){ return (i+1) + '. ' + w; }).join('\n\n')
+        + '\n\nExporter quand même ?'
+      );
+      if (!proceed) return;
+    }
+  }
+
   closeTagModal();
   try {
     var blob = new Blob([built.xml], { type: 'text/xml' });
