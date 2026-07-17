@@ -159,17 +159,32 @@ function ggbBuildEmbedHtml(X, st, opts) {
   };
 }
 
-/* Construit le HTML des 2 feedbacks (bonne / mauvaise réponse) à partir des
-   sorties déclarées. Factorisé pour être réutilisé à la fois par la génération
-   XML réelle (genGeoGebra) et par l'aperçu du panneau de configuration
-   (ggbRefreshPreview dans geogebra-ui.js), qui doit montrer exactement le
-   même texte que ce qui sera affiché dans Moodle. */
+function _ggbOk(txt) { return '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:8px;">✅ ' + txt + '</div>'; }
+function _ggbKo(txt) { return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:8px;">❌ ' + txt + '</div>'; }
+
+/* Construit, pour UNE sortie, le feedback pédagogique bonne/mauvaise réponse :
+   l'élève doit comprendre QUEL critère a échoué et COMMENT le corriger, pas
+   juste obtenir un score global. Si le diagnostic (modèle préréglé) fournit
+   un "hint" pédagogique, on l'affiche ; sinon (mode Expert, sans métadonnée)
+   on retombe sur la révélation de la valeur attendue, seule information
+   disponible. Factorisé pour être réutilisé à la fois par la génération XML
+   réelle (genGeoGebra) et par l'aperçu du panneau de configuration
+   (ggbRefreshPreview dans geogebra-ui.js). */
+function ggbBuildOutputFeedback(o) {
+  var label = htmlEsc(o.desc || o.ggbName);
+  var trueFb = _ggbOk('<strong>' + label + '</strong> ' + I18N.t('ggb.fb_crit_ok'));
+  var remedy = o.hint
+    ? htmlEsc(o.hint)
+    : I18N.t('ggb.fb_expected_value') + ' <code>' + htmlEsc(String(o.tans || '')) + '</code>';
+  var falseFb = _ggbKo('<strong>' + label + '</strong> ' + I18N.t('ggb.fb_crit_ko') + '<br>' + remedy);
+  return {trueFb: trueFb, falseFb: falseFb};
+}
+
+/* Conservé pour compatibilité (aperçu) : concatène le feedback pédagogique de
+   toutes les sorties, comme le fera la chaîne de nœuds PRT séquentiels. */
 function ggbBuildFeedbackHtml(outputs, X) {
-  var solutionLines = outputs.map(function (o) {
-    return '<li><code>' + htmlEsc(o.ggbName) + '</code> = ' + htmlEsc(String(o.tans || '')) + '</li>';
-  }).join('');
-  var trueFb = '<p>✅ <strong>' + I18N.t('ggb.fb_ok_title') + '</strong></p>';
-  var falseFb = '<p>❌ ' + I18N.t('ggb.fb_wrong', {pctvar: 'ggb_pct_' + X}) + '</p><ul>' + solutionLines + '</ul>';
+  var trueFb = outputs.map(function (o) { return ggbBuildOutputFeedback(o).trueFb; }).join('');
+  var falseFb = outputs.map(function (o) { return ggbBuildOutputFeedback(o).falseFb; }).join('');
   return {trueFb: trueFb, falseFb: falseFb};
 }
 
@@ -287,23 +302,36 @@ async function genGeoGebra(qid) {
     return 'if stringp(' + name + ') and sdowncase(strim(" ", ' + name + ')) = sdowncase("' + String(o.tans || '').replace(/"/g, '\\"') + '") then 1 else 0';
   });
 
-  var fbVarsMaxima = 'ggb_ok_' + X + ': [' + okItems.join(', ') + '];\n'
-    + 'ggb_n_ok_' + X + ': apply("+", ggb_ok_' + X + ');\n'
-    + 'ggb_sc_' + X + ': float(ggb_n_ok_' + X + ' / ' + outputs.length + ');\n'
-    + 'ggb_pct_' + X + ': round(ggb_sc_' + X + ' * 100);';
+  var fbVarsMaxima = 'ggb_ok_' + X + ': [' + okItems.join(', ') + '];';
 
-  var fb = ggbBuildFeedbackHtml(outputs, X);
-  var trueFb = fb.trueFb, falseFb = fb.falseFb;
-
+  /* PRT séquentiel : un nœud PAR critère de sortie, plutôt qu'un unique nœud
+     agrégeant un score global. L'élève voit ainsi, pour chaque critère,
+     s'il est correct ou non et pourquoi (cf. ggbBuildOutputFeedback) — au
+     lieu d'un score en % et d'une révélation brute de tous les objets
+     GeoGebra attendus. Chaque nœud teste ggb_ok_X[i+1] (déjà 0/1, protégé
+     par numberp/stringp dans okItems) et enchaîne vers le suivant QUE le
+     critère soit correct ou non (comme dans gen-oscilloscope.js), afin que
+     tous les critères soient évalués et que leurs feedbacks respectifs
+     s'accumulent. Chaque critère correct apporte 1/N du score, sans
+     pénalité en cas d'échec (falsescoremode '-' avec 0 = aucun changement). */
+  var N = outputs.length;
+  var scorePerNode = String(Math.round((1 / N) * 1e10) / 1e10);
+  var canonicalNodes = outputs.map(function (o, i) {
+    var fb = ggbBuildOutputFeedback(o);
+    var isLast = i === N - 1;
+    var nextNode = isLast ? '-1' : String(i + 1);
+    var desc = o.desc || I18N.t('ggb.prt_node0_desc') + ' (' + o.ggbName + ')';
+    return {
+      name: String(i), description: desc, answertest: 'AlgEquiv',
+      sans: 'ggb_ok_' + X + '[' + (i + 1) + ']', tans: '1',
+      testoptions: '', quiet: '0',
+      truescoremode: '+', truescore: scorePerNode, truepenalty: '0', truenextnode: nextNode,
+      trueanswernote: 'PRT' + X + '-' + (i + 1) + '-T', truefeedback: fb.trueFb,
+      falsescoremode: '-', falsescore: '0', falsepenalty: '0', falsenextnode: nextNode,
+      falseanswernote: 'PRT' + X + '-' + (i + 1) + '-F', falsefeedback: fb.falseFb
+    };
+  });
   var prtMeta = {name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVarsMaxima};
-  var canonicalNodes = [{
-    name: '0', description: I18N.t('ggb.prt_node0_desc'), answertest: 'AlgEquiv', sans: 'ggb_sc_' + X, tans: '1',
-    testoptions: '', quiet: '0',
-    truescoremode: '=', truescore: '1', truepenalty: '0', truenextnode: '-1',
-    trueanswernote: 'PRT' + X + '-1-T', truefeedback: trueFb,
-    falsescoremode: '=', falsescore: 'ggb_sc_' + X, falsepenalty: '0', falsenextnode: '-1',
-    falseanswernote: 'PRT' + X + '-1-F', falsefeedback: falseFb
-  }];
   var prtXML = buildPrtXml(prtMeta, canonicalNodes);
 
   var formulaHtml = '';
