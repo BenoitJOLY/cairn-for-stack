@@ -1,7 +1,7 @@
 // ── GÉNÉRATEUR : COMPOSITION LIBRE (Éditeur riche + LaTeX) ──────────────────
 // Ce module génère une question STACK avec un éditeur rich-text JSXGraph
 // permettant à l'élève de rédiger une réponse libre avec formules LaTeX.
-// ans1 (notes, manualgraded:1) = contenu HTML de l'éditeur — correction manuelle
+// ans1 (notes, manualgraded:true) = contenu HTML de l'éditeur — correction manuelle
 // STACK officielle (cf. docs.stack-assessment.org/en/Moodle/Semi-automatic_Marking).
 // Le PRT généré est inerte (jamais évalué par STACK une fois manualgraded posé) ;
 // il n'existe que pour donner une cible à [[feedback:prt]] et pour le panneau de
@@ -38,7 +38,7 @@ function renderComposition() {
         <div>
           <strong style="color:#92400e;font-size:.95rem;">Correction manuelle STACK (semi-automatic marking)</strong>
           <p style="margin:5px 0 0 0;font-size:.82rem;color:#78350f;line-height:1.5;">
-            Ce type de question laisse l'élève rédiger librement une réponse (texte, formules LaTeX, mise en forme) via l'input STACK <code>notes</code> configuré en <code>manualgraded:1</code>.
+            Ce type de question laisse l'élève rédiger librement une réponse (texte, formules LaTeX, mise en forme) via l'input STACK <code>notes</code> configuré en <code>manualgraded:true</code>.
             <strong>Elle ne peut pas être évaluée par STACK</strong> : la tentative apparaît dans Moodle sous <em>Quiz → Résultats → « Nécessite une correction »</em>, et c'est le professeur qui attribue la note à cet endroit.
             Le barème indiqué ci-dessus fixe la note maximale (<code>defaultgrade</code>) de la question.
           </p>
@@ -112,10 +112,13 @@ function renderComposition() {
 //  CODE JSXGRAPH (Template — injecté dans le XML)
 // ════════════════════════════════════════════════════════
 
-function buildCompositionJSX(height) {
+function buildCompositionJSX(height, X) {
   // Ce code est injecté tel quel dans le CDATA du questiontext
   // Il doit être une string JS valide en contexte JSXGraph STACK
-  return `[[jsxgraph width="100%" height="${height}" input-ref-ans1="refAns1"]]
+  // input-ref-{nom exact de l'input STACK}="{var JS}" : le nom doit correspondre
+  // EXACTEMENT à <name> déclaré dans inputXML (ans{X}_html), sinon STACK ne
+  // résout pas le binding et le bloc jsxgraph reste vide.
+  return `[[jsxgraph width="100%" height="${height}" input-ref-ans${X}_html="refAns1"]]
 
 // --- UTILITAIRE ---
 function setRef(ref, value) {
@@ -167,20 +170,20 @@ makeSymBtn('a^n', '^{n}', paneMath);
 makeSymBtn('a_n', '_{}', paneMath);
 makeSymBtn('√a', '\\\\sqrt{a}', paneMath);
 makeSymBtn('b√a', '\\ \\\\sqrt[a]{b} ', paneMath);
-var s1=document.createElement('div'); s1.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s1.innerText=I18N.t('comp.section_operations'); paneMath.appendChild(s1);
+var s1=document.createElement('div'); s1.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s1.innerText=${JSON.stringify(I18N.t('comp.section_operations'))}; paneMath.appendChild(s1);
 makeSymBtn('≠', '\\\\neq', paneMath);
 makeSymBtn('≤', '\\\\le', paneMath);
 makeSymBtn('≥', '\\\\ge', paneMath);
 makeSymBtn('∈', '\\\\in', paneMath);
 makeSymBtn('∉', '\\\\notin', paneMath);
-var s2=document.createElement('div'); s2.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s2.innerText=I18N.t('comp.section_ensembles'); paneMath.appendChild(s2);
+var s2=document.createElement('div'); s2.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s2.innerText=${JSON.stringify(I18N.t('comp.section_ensembles'))}; paneMath.appendChild(s2);
 makeSymBtn('N','\\\\mathbb{N}',paneMath); makeSymBtn('Z','\\\\mathbb{Z}',paneMath); makeSymBtn('Q','\\\\mathbb{Q}',paneMath); makeSymBtn('R','\\\\mathbb{R}',paneMath); makeSymBtn('C','\\\\mathbb{C}',paneMath);
-var s3=document.createElement('div'); s3.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s3.innerText=I18N.t('comp.section_fonctions_vecteurs'); paneMath.appendChild(s3);
+var s3=document.createElement('div'); s3.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s3.innerText=${JSON.stringify(I18N.t('comp.section_fonctions_vecteurs'))}; paneMath.appendChild(s3);
 makeSymBtn('|a|','|a|',paneMath); makeSymBtn('n!','n!',paneMath); makeSymBtn('∑','\\\\sum a',paneMath); makeSymBtn('∑lim','\\\\sum_{n=1}^{10} n^2',paneMath); makeSymBtn('∫','\\\\int_{a}^{b} x dx',paneMath); makeSymBtn('a⃗','\\\\vec{a}',paneMath); makeSymBtn('ȧ','\\\\dot{a}',paneMath); makeSymBtn('ä','\\\\ddot{a}',paneMath); makeSymBtn('â','\\\\widehat{...}',paneMath); makeSymBtn('∞','\\\\infty',paneMath);
 
 // Panneau Physique
 makeSymBtn('ā','\\\\overline{ab}',panePhys); makeSymBtn('a⃗','\\\\overrightarrow{ab}',panePhys); makeSymBtn('→','\\\\rightarrow',panePhys); makeSymBtn('←','\\\\leftarrow',panePhys); makeSymBtn('⇄','\\\\rightleftharpoons',panePhys);
-var s4=document.createElement('div'); s4.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s4.innerText=I18N.t('comp.section_chimie_logique'); panePhys.appendChild(s4);
+var s4=document.createElement('div'); s4.style.cssText='width:100%;border-top:1px solid #eee;margin:5px 0;font-size:.8em;color:#aaa;'; s4.innerText=${JSON.stringify(I18N.t('comp.section_chimie_logique'))}; panePhys.appendChild(s4);
 makeSymBtn('H₂SO₄','H_2SO_4',panePhys); makeSymBtn('²³⁸U','{}_{92}^{238}U',panePhys); makeSymBtn('SO₄²⁻','SO_4^{2-}',panePhys); makeSymBtn('∧','\\\\land',panePhys); makeSymBtn('a⃗','\\\\vec{a}',panePhys); makeSymBtn('ȧ','\\\\dot{a}',panePhys); makeSymBtn('ä','\\\\ddot{a}',panePhys);
 
 // Panneau Grec
@@ -202,7 +205,7 @@ modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; 
 var modalContent = document.createElement('div');
 modalContent.style.cssText = 'background:white; padding:0; border-radius:8px; width:95%; max-width:600px; box-shadow:0 4px 15px rgba(0,0,0,0.2); max-height:90vh; display:flex; flex-direction:column; box-sizing:border-box;';
 var mHead = document.createElement('h3');
-mHead.innerText = I18N.t('comp.modal_title');
+mHead.innerText = ${JSON.stringify(I18N.t('comp.modal_title'))};
 mHead.style.cssText = 'margin:0; padding:15px; border-bottom:1px solid #eee; background:#f9f9f9; font-size:1.1rem; color:#333; text-align:center;';
 var mBody = document.createElement('div');
 mBody.style.cssText = 'flex:1; overflow-y:auto; padding:10px; overflow-x:hidden; min-height:200px;';
@@ -213,7 +216,7 @@ mFoot.style.cssText = 'padding:15px; background:#f9f9f9; border-top:1px solid #c
 var tabBar = document.createElement('div');
 tabBar.style.cssText = 'display:flex; border-bottom:1px solid #ccc; margin-bottom:10px;';
 var tabPanes = { 'math': paneMath, 'physique': panePhys, 'grec': paneGreek };
-var tabLabels = { 'math': I18N.t('comp.tab_math'), 'physique': I18N.t('comp.tab_physique'), 'grec': I18N.t('comp.tab_grec') };
+var tabLabels = { 'math': ${JSON.stringify(I18N.t('comp.tab_math'))}, 'physique': ${JSON.stringify(I18N.t('comp.tab_physique'))}, 'grec': ${JSON.stringify(I18N.t('comp.tab_grec'))} };
 ['math','physique','grec'].forEach(function(name, i) {
   var tb = document.createElement('button');
   tb.innerText = tabLabels[name];
@@ -235,7 +238,7 @@ prevDiv.style.cssText = 'border:1px dashed #ccc; padding:5px; min-height:20px; t
 var prevImg = document.createElement('img');
 prevImg.style.cssText = 'max-width:100%; max-height:30px;';
 prevDiv.appendChild(prevImg);
-prevDiv.appendChild(document.createTextNode(' ' + I18N.t('comp.previsualisation')));
+prevDiv.appendChild(document.createTextNode(' ' + ${JSON.stringify(I18N.t('comp.previsualisation'))}));
 mFoot.appendChild(prevDiv);
 mFoot.appendChild(txtLatex);
 
@@ -243,11 +246,11 @@ mFoot.appendChild(txtLatex);
 var btnRow = document.createElement('div');
 btnRow.style.cssText = 'display:flex; gap:10px;';
 var btnCancel = document.createElement('button');
-btnCancel.innerText = I18N.t('comp.annuler');
+btnCancel.innerText = ${JSON.stringify(I18N.t('comp.annuler'))};
 btnCancel.style.cssText = 'flex:1; padding:10px; cursor:pointer; background:#95a5a6; color:white; border:none; border-radius:4px; font-weight:bold;';
 btnCancel.onclick = function() { modal.style.display='none'; };
 var btnIns = document.createElement('button');
-btnIns.innerText = I18N.t('comp.inserer_formule');
+btnIns.innerText = ${JSON.stringify(I18N.t('comp.inserer_formule'))};
 btnIns.style.cssText = 'flex:2; padding:10px; cursor:pointer; background:#27ae60; color:white; border:none; border-radius:4px; font-weight:bold;';
 btnIns.onclick = function() {
   var txt = txtLatex.value;
@@ -287,11 +290,11 @@ function makeToolBtn(html, cmd, color) {
   b.onclick = function() { editor.focus(); document.execCommand(cmd, false, null); updateData(); };
   return b;
 }
-toolbar.appendChild(makeToolBtn('<b>' + I18N.t('comp.gras') + '</b>', 'bold'));
-toolbar.appendChild(makeToolBtn('<i>' + I18N.t('comp.italique') + '</i>', 'italic'));
-toolbar.appendChild(makeToolBtn('<u>' + I18N.t('comp.souligne') + '</u>', 'underline'));
+toolbar.appendChild(makeToolBtn('<b>' + ${JSON.stringify(I18N.t('comp.gras'))} + '</b>', 'bold'));
+toolbar.appendChild(makeToolBtn('<i>' + ${JSON.stringify(I18N.t('comp.italique'))} + '</i>', 'italic'));
+toolbar.appendChild(makeToolBtn('<u>' + ${JSON.stringify(I18N.t('comp.souligne'))} + '</u>', 'underline'));
 var btnMath = document.createElement('button');
-btnMath.type = 'button'; btnMath.innerHTML = I18N.t('comp.formule_latex_btn');
+btnMath.type = 'button'; btnMath.innerHTML = ${JSON.stringify(I18N.t('comp.formule_latex_btn'))};
 btnMath.style.cssText = 'padding:6px 12px; cursor:pointer; background:#8e44ad; color:white; border:none; border-radius:4px; font-weight:bold; font-size:.9rem; margin-left:8px;';
 btnMath.onclick = function() { modal.style.display='flex'; txtLatex.value=''; prevImg.src=''; txtLatex.focus(); updatePreview(); };
 toolbar.appendChild(btnMath);
@@ -299,9 +302,9 @@ toolbar.appendChild(btnMath);
 // --- ÉDITEUR ---
 var editor = document.createElement('div');
 editor.contentEditable = true;
-editor.innerHTML = I18N.t('tpl.tapez_votre_reponse_ici');
+editor.innerHTML = ${JSON.stringify(I18N.t('tpl.tapez_votre_reponse_ici'))};
 editor.style.cssText = 'width:100%; min-height:300px; border:2px solid #34495e; padding:10px; background:white; border-radius:4px; outline:none; line-height:1.6; font-size:1.1rem; box-sizing:border-box; overflow-wrap:break-word;';
-editor.addEventListener('focus', function() { if (editor.innerHTML === I18N.t('tpl.tapez_votre_reponse_ici')) editor.innerHTML = ''; }, {once:true});
+editor.addEventListener('focus', function() { if (editor.innerHTML === ${JSON.stringify(I18N.t('tpl.tapez_votre_reponse_ici'))}) editor.innerHTML = ''; }, {once:true});
 
 box.appendChild(toolbar);
 box.appendChild(editor);
@@ -351,7 +354,7 @@ function flagPasteAttempt() {
     banner.style.cssText = 'background:#fee2e2;border:2px solid #dc2626;border-radius:6px;padding:8px 12px;margin-bottom:8px;color:#991b1b;font-size:.85rem;font-weight:700;';
     editor.insertBefore(banner, editor.firstChild);
   }
-  banner.textContent = I18N.t('comp.paste_banner', {n: pasteAttempts});
+  banner.textContent = ${JSON.stringify(I18N.t('comp.paste_banner'))}.replace('{n}', pasteAttempts);
   updateData();
 }
 editor.addEventListener('paste', function(e) { e.preventDefault(); flagPasteAttempt(); });
@@ -392,9 +395,15 @@ function genComposition(X) {
     : '';
 
   // ── textFrag : XML Moodle — énoncé AU-DESSUS du JSXGraph ──
+  // Le code JSXGraph brut n'est PAS inséré ici : buildQuestionText()/moodleLatex()
+  // font passer tout le texte par des allers-retours DOM (innerHTML) qui échappent
+  // le JS littéral (< > &&) en entités HTML et cassent le script (jsxgraph vide).
+  // On insère un marqueur texte (voir genAlgebraic/kbdRaw) et le vrai code est
+  // réinjecté tel quel par app.js, après tous ces allers-retours.
+  var jsxMarker = '<!--HS-KBD:' + X + '-->';
   var textFrag =
     '<!-- ENONCE-START --><div style="margin-bottom:14px;">' + text + '</div><!-- ENONCE-END -->\n' +
-    jsxCode + '\n' +
+    jsxMarker + '\n' +
     msgHtml + '\n' +
     '<div style="display:none;">\n' +
     '  [[input:ans' + X + '_html]] [[validation:ans' + X + '_html]]\n' +
@@ -412,7 +421,11 @@ function genComposition(X) {
       '📝 Éditeur de réponse élève (visible dans Moodle uniquement)' +
     '</div>';
 
-  // Input XML — type "notes" en manualgraded:1 (cf. STACK "Semi-automatic Marking").
+  // Input XML — type "notes" en manualgraded:true (cf. STACK "Semi-automatic Marking").
+  // STACK valide côté serveur que cette option est un booléen PHP réel ("true"/"false"),
+  // pas 1/0 (inputbase.class.php::validate_extra_options → is_bool). tans doit aussi être
+  // non-vide (edit_stack_form.php impose un modèle de réponse non-blanc, même si notes.class.php
+  // l'ignore ensuite et renvoie toujours 'true' côté correction).
   // Poser manualgraded sur cet input suffit à basculer TOUTE la question en
   // correction manuelle Moodle ("Nécessite une correction") : le PRT ci-dessous
   // n'est alors jamais évalué par STACK (question.php::grade_response court-circuite
@@ -425,7 +438,7 @@ function genComposition(X) {
     '    <input>\n' +
     '      <name>ans' + X + '_html</name>\n' +
     '      <type>notes</type>\n' +
-    '      <tans></tans>\n' +
+    '      <tans>1</tans>\n' +
     '      <boxsize>2000</boxsize>\n' +
     '      <strictsyntax>1</strictsyntax>\n' +
     '      <insertstars>0</insertstars>\n' +
@@ -438,7 +451,7 @@ function genComposition(X) {
     '      <checkanswertype>0</checkanswertype>\n' +
     '      <mustverify>1</mustverify>\n' +
     '      <showvalidation>1</showvalidation>\n' +
-    '      <options>manualgraded:1</options>\n' +
+    '      <options>manualgraded:true</options>\n' +
     '    </input>';
 
   var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
@@ -463,6 +476,7 @@ function genComposition(X) {
     prtXML     : prtXML,
     generalFeedback: _mkFbGen('', v('comp-fbgen')),
     feedbackRef: '[[feedback:prt' + X + ']]',
+    kbdRaw     : jsxCode,
     prt        : { meta: prtMeta, nodes: canonicalNodes }
   };
 }

@@ -234,7 +234,7 @@ function attachChipHandlers(chip) {
 }
 
 // STACK ne permet pas de mélanger, dans une même question, un input à
-// correction manuelle (Composition Libre, manualgraded:1 — voir gen-composition.js)
+// correction manuelle (Composition Libre, manualgraded:true — voir gen-composition.js)
 // et un input à correction automatique. On bloque donc toute insertion qui
 // créerait ce mélange, dans les deux sens.
 function canInsertChipType(type) {
