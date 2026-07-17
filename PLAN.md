@@ -16,6 +16,27 @@ Ce fichier est la référence unique et persistante du projet. Toute session de 
 
 La plateforme Moodle utilisée pour les tests a changé : **Moodle 4.5.12, plugin qtype_stack 4.11.1**. Tous les statuts `✅ validé` présents dans ce document (aussi bien dans "Problèmes connus" que dans le tableau "État par type") reflètent une validation faite **sur l'ancienne plateforme**, avant ce changement. **Aucun type ne doit être considéré comme fonctionnel tant qu'il n'a pas été retesté et reconfirmé sur la nouvelle plateforme** — même ceux marqués `✅ validé` ci-dessous. Ne pas réinterpréter un `✅ validé` existant comme une garantie de fonctionnement actuel : c'est un historique de ce qui marchait avant le changement, pas un état présent.
 
+## Chantier de consolidation structurelle (ouvert 2026-07-17)
+
+Constat fait le 2026-07-17, à la demande explicite de l'utilisateur ("est-ce que le programme est solide ?") : le contenu métier (Maxima/PRT/XML STACK) est de plus en plus éprouvé (~34 types revalidés en conditions réelles ce jour-là), mais l'architecture reste artisanale — aucun test automatisé, générateurs = gros templates JS en chaînes de caractères sans vérification syntaxique avant export, fichiers monolithiques, bugs découverts un par un en prod Moodle (36 entrées dans "Problèmes connus" à ce jour). Deux garde-fous ont déjà été ajoutés ce jour-là (`js/xml-lint.js`, vérif statique pré-export ; `tools/Importer vers Moodle.bat`, import réel automatisé) mais ne changent pas le fond. Quatre chantiers restent ouverts, par ordre de rapport effort/bénéfice décroissant :
+
+1. **Auditer les 7 types jamais vérifiés au niveau XML** (statut actuel dans le tableau "État par type" : "Non audité XML"). Suivre le même patron que Composition Libre (Problème connu #36) : exporter, lire le XML produit ligne par ligne, comparer au comportement attendu, corriger, faire valider par l'utilisateur en conditions réelles Moodle avant de marquer `✅`.
+   - `js/gen-optique.js` (1480 lignes — volumineux, prévoir un découpage à l'occasion de l'audit)
+   - `js/gen-acidebase.js` (268 lignes)
+   - `js/gen-redox.js` (164 lignes — aperçu déjà corrigé au Problème connu #12, seul l'export XML reste à auditer)
+   - `js/gen-circuit.js` (165 lignes)
+   - `js/gen-glr.js` (192 lignes)
+   - Physique/Thermo (`js/gen-math-*.js`, fichiers variables)
+   - Expert/Topo (fichiers séparés)
+
+2. **Étendre `js/xml-lint.js`** au-delà des classes de bugs déjà rencontrées une fois. Pistes concrètes : détecter les appels `I18N.t(` dans n'importe quel contexte JS brut (pas seulement kbdRaw), vérifier qu'aucun marqueur interne (`<!--HS-KBD`, `{@...@}` mal fermé) ne fuit dans le texte visible, vérifier la présence d'au moins un `<tans>` non vide par `<input>` déclaré plutôt que juste détecter `<tans></tans>`.
+
+3. **Découper les fichiers monolithiques** sans changer le comportement (un commit = un split, règle #4 ci-dessus) : `js/preview.js` (3858 lignes), `js/config-panel.js` (1880 lignes), `js/gen-optique.js` (1714 lignes), `js/gen-diffraction.js` (1623 lignes), `js/gen-topo.js` (1334 lignes). Objectif : réduire le risque qu'une modification sur un type ait un ricochet sur un autre type logé dans le même fichier.
+
+4. **Tests automatisés sur la logique métier** (le chantier le plus lourd) : aujourd'hui rien ne vérifie que les scénarios Maxima/PRT produisent le bon résultat mathématique — seul le linter (point 2) vérifie la forme du XML, pas le fond. Nécessiterait probablement un petit harnais Node (ou navigateur headless) capable d'appeler les fonctions `gen*` directement et de comparer la sortie à des fixtures de référence (les XML déjà validés dans `test/mise à jour/` sont un bon point de départ de fixtures).
+
+Pour reprendre ce chantier dans une nouvelle session : lire cette section, choisir un point (1 recommandé en premier), et suivre les règles de fonctionnement en haut de ce fichier (un type/action à la fois, validation utilisateur avant `✅`, un commit par action isolée).
+
 ## Direction architecturale (décidée)
 
 - **Tout ce qui sort des modales de configuration est du JSON** (déjà le cas: `questions[qid]` + `questions[qid].state`, sérialisés en JSON dans localStorage / fichier `.stackforge`).
