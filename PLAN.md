@@ -280,9 +280,24 @@ La plateforme Moodle utilisée pour les tests a changé : **Moodle 4.5.12, plugi
  - **Bug Moodle réel: erreur PRT `RUNTIME_ERROR: The score was not fully evaluated to a numerical value`, `gVx`/`gVy`/`gSlopeSign` affichés comme `null` littéral.** Reproduit 2 fois, y compris après retrait de `remember` (donc indépendant de ce bug-là). Hypothèse (non confirmée à 100%, communiquée comme telle à l'utilisateur): bug dans le propre code du plugin STACK — `bind_value`/`updateValues()` (`stackgeogebra.js`) compare `if (theInput.value != tmp && tmp!=null)` où `tmp` est une **chaîne** JS (`JSON.stringify(...)`, donc `"null"` est une chaîne de 4 caractères) comparée par inégalité faible à `null` — `"null" != null` vaut toujours `true`, donc rien n'empêche d'écrire la chaîne littérale `"null"` dans un input STACK quand `getValue()` renvoie `null` côté GeoGebra. Maxima traite alors ce texte comme un symbole non lié → crash du PRT. **Mitigation appliquée** (pas une vraie correction de la cause, qui reste côté plugin officiel): gardes `numberp(...)`/`stringp(...)` ajoutées à tous les critères de notation PRT dans `genGeoGebra`/`okItems` (`js/gen-geogebra.js`) — une valeur non numérique/non-string issue de GeoGebra est désormais notée fausse (0) au lieu de faire planter tout le PRT.
  - **Nouveau bug signalé, non investigué**: coefficient aléatoire `a=0` obtenu sur le modèle deg2 (`f(x)=0(x-(-3))²+2`, parabole dégénérée). Cause probable (à confirmer): la plage aléatoire de `a` (`GGB_MODELS.deg2`, min -4/max 4/step 1) autorise `0` comme tirage valide. `deg3.a` (plage -2 à 2) et `exp.B` (plage -1 à 1, pas 0.2) ont potentiellement le même problème; `trig` (A/B ≥1) et `exp.A` (≥1) ne semblent pas concernés.
  - **⚠️ Correctifs `afficherCorrige`/`numberp`/`stringp` ci-dessus: Validé par l'utilisateur en conditions réelles Moodle** ("je viens de tester ça semble marcher"). Le bug `a=0` reste non investigué.
- - **Nouveaux points signalés après ce test (non corrigés)**:
-   - **Feedbacks à reprendre** — pas de détail donné par l'utilisateur sur ce qui ne va pas précisément, à clarifier avant d'intervenir.
-   - **Bouton "Recommencer" visible alors qu'il ne devrait pas l'être**: doit être visible uniquement quand une courbe élève est tracée (donc caché tant que rien n'est tracé), et ne doit jamais apparaître dans l'instance de feedback général (correction). Actuellement (XML des 4 `.ggb`, ex. `presets/trig.ggb`) l'élément `btnRecommencer` a `<show object="true" label="true"/>` inconditionnel — aucune `<condition showObject="...">` contrairement au bouton `btnValider` ou à la courbe `f`, donc il reste affiché tout le temps, y compris dans l'instance de correction (`afficherCorrige=true`).
+ - **Nouveaux points signalés après ce test**:
+   - **Feedbacks à reprendre** — pas de détail donné par l'utilisateur sur ce qui ne va pas précisément, **toujours non corrigé**, à clarifier avant d'intervenir.
+   - **[CORRIGÉ] Bouton "Recommencer" visible alors qu'il ne devrait pas l'être** (visible en permanence y compris dans l'instance de feedback/correction, `<show object="true">` inconditionnel, aucune condition contrairement à `btnValider`/`f`). **Fix** (fait directement sur les 4 fichiers publiés geogebra.org, puis re-téléchargés dans le dépôt): `btnRecommencer` passe par le même mécanisme JS que `btnValider` (listeners `hsOnAjout`/`hsOnSuppr` sur l'ajout/suppression de l'objet `g`, `<show object="false">` par défaut) — **piste `IsDefined(g)` en "Condition pour afficher l'objet" abandonnée**, elle ne se réévalue pas de façon fiable à la création/suppression d'un tracé à main levée. Nouveau code (`ggbOnInit`/`hsOnAjout`/`hsOnSuppr`, identique dans les 4 fichiers, seule la ligne `setCoordSystem` diffère par modèle):
+     ```js
+     function hsOnAjout(nom) {
+     	if (nom === "g" && ggbApplet.getValue("afficherCorrige") !== 1) {
+     		ggbApplet.setVisible("btnValider", true);
+     	}
+     	if (nom === "g" && ggbApplet.getValue("afficherCorrige") !== 1) {
+     		ggbApplet.setVisible("btnRecommencer", true);
+     	}
+     }
+     function hsOnSuppr(nom) {
+     	if (nom === "g") { ggbApplet.setVisible("btnValider", false); }
+     	if (nom === "g") { ggbApplet.setVisible("btnRecommencer", false); }
+     }
+     ```
+     **Faux négatif de diagnostic rencontré en cours de route**: après une 1ʳᵉ édition, `ggbApplet.getVisible("btnRecommencer")` renvoyait `true` en console mais le bouton restait invisible à l'écran — pas un bug de logique, l'onglet du navigateur faisait tourner une instance JS restée en mémoire d'avant la dernière sauvegarde (l'éditeur classic ne recharge pas l'applet, donc ne ré-enregistre pas les listeners, au simple clic Enregistrer). Un rechargement complet (Ctrl+F5) de la page a résolu ce faux négatif — **piège à retenir pour toute future modif du JS embarqué dans un `.ggb`: toujours forcer un rechargement complet avant de retester, pas juste enregistrer.** **⚠️ Validé par l'utilisateur en conditions réelles** sur les 4 modèles (fichiers re-téléchargés depuis geogebra.org et vérifiés octet par octet dans le dépôt).
 
 ## Audit round-trip état JSON ↔ formulaire ↔ XML (fusionné depuis `PLANIFICATION.md`)
 
