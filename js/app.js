@@ -40,6 +40,14 @@ function buildXML() {
   var orderedQ = getQuestionsInDOMOrder();
   if (!orderedQ.length) throw new Error(I18N.t('msg.aucune_question_a_previsualiser') || 'Aucune question configurée.');
 
+  // Garde-fou XML : STACK interdit de mélanger, dans une même question, un
+  // input à correction manuelle (Composition Libre) et un input à correction
+  // automatique. Les points d'insertion (palette/drag&drop) bloquent déjà ce
+  // cas, mais on revalide ici (état restauré depuis localStorage, etc.).
+  if (orderedQ.some(function(q){ return q.type === 'composition'; }) && orderedQ.length > 1) {
+    throw new Error(I18N.t('msg.err_composition_exclusive'));
+  }
+
   var tags = _tmNoTag ? [] : getTagList();
   // Tags obligatoires : "stack" + un tag par type de question (toujours ajoutés)
   var mandatoryClean = new Set(['stack']);

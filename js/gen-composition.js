@@ -1,8 +1,15 @@
 // ── GÉNÉRATEUR : COMPOSITION LIBRE (Éditeur riche + LaTeX) ──────────────────
 // Ce module génère une question STACK avec un éditeur rich-text JSXGraph
 // permettant à l'élève de rédiger une réponse libre avec formules LaTeX.
-// ans1 (notes)    = contenu HTML de l'éditeur
-// ans2 (algebraic)= "0" si non vide, "" si vide → PRT vérifie que l'élève a écrit
+// ans1 (notes, manualgraded:1) = contenu HTML de l'éditeur — correction manuelle
+// STACK officielle (cf. docs.stack-assessment.org/en/Moodle/Semi-automatic_Marking).
+// Le PRT généré est inerte (jamais évalué par STACK une fois manualgraded posé) ;
+// il n'existe que pour donner une cible à [[feedback:prt]] et pour le panneau de
+// test interne (js/verif.js). Contrainte STACK : ce type de question ne peut pas
+// être combiné avec un autre type dans le même exercice (voir garde-fous dans
+// editor.js/palette.js/app.js).
+// Le collage (paste/drop) dans l'éditeur élève est bloqué ; chaque tentative
+// est signalée par un bandeau inséré dans ans1_html, donc visible du correcteur.
 
 // ════════════════════════════════════════════════════════
 //  RENDU HTML DU PANNEAU DE CONFIGURATION
@@ -26,14 +33,39 @@ function renderComposition() {
     <div class="form-panel-body">
 
       <!-- Bandeau d'avertissement bien visible -->
-      <div style="background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
+      <div style="background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;padding:14px 18px;margin-bottom:12px;display:flex;align-items:flex-start;gap:12px;">
         <span style="font-size:1.6rem;flex-shrink:0;">👨‍🏫</span>
         <div>
-          <strong style="color:#92400e;font-size:.95rem;">Question non corrigée automatiquement</strong>
+          <strong style="color:#92400e;font-size:.95rem;">Correction manuelle STACK (semi-automatic marking)</strong>
           <p style="margin:5px 0 0 0;font-size:.82rem;color:#78350f;line-height:1.5;">
-            Ce type de question laisse l'élève rédiger librement une réponse (texte, formules LaTeX, mise en forme).
-            <strong>Elle ne peut pas être évaluée par STACK</strong> — c'est le professeur qui lit les copies et attribue la note manuellement dans Moodle.
-            Le barème indiqué ci-dessus sert uniquement à informer l'élève du poids de la question.
+            Ce type de question laisse l'élève rédiger librement une réponse (texte, formules LaTeX, mise en forme) via l'input STACK <code>notes</code> configuré en <code>manualgraded:1</code>.
+            <strong>Elle ne peut pas être évaluée par STACK</strong> : la tentative apparaît dans Moodle sous <em>Quiz → Résultats → « Nécessite une correction »</em>, et c'est le professeur qui attribue la note à cet endroit.
+            Le barème indiqué ci-dessus fixe la note maximale (<code>defaultgrade</code>) de la question.
+          </p>
+        </div>
+      </div>
+
+      <!-- Bandeau contrainte d'exclusivité -->
+      <div style="background:#fee2e2;border:2px solid #dc2626;border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
+        <span style="font-size:1.4rem;flex-shrink:0;">⚠️</span>
+        <div>
+          <strong style="color:#991b1b;font-size:.9rem;">Doit être seule dans l'exercice</strong>
+          <p style="margin:5px 0 0 0;font-size:.8rem;color:#7f1d1d;line-height:1.5;">
+            STACK ne permet pas de mélanger, dans une même question, un input à correction manuelle et un input à correction automatique.
+            Cette Composition Libre ne peut donc pas être combinée avec un autre type de question dans le même exercice : StackForge bloque l'ajout d'une autre question si une Composition Libre est présente (et inversement).
+          </p>
+        </div>
+      </div>
+
+      <!-- Bandeau anti copier-coller -->
+      <div style="background:#eff6ff;border:2px solid #2563eb;border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
+        <span style="font-size:1.4rem;flex-shrink:0;">🚫</span>
+        <div>
+          <strong style="color:#1e3a8a;font-size:.9rem;">Copier-coller bloqué et signalé</strong>
+          <p style="margin:5px 0 0 0;font-size:.8rem;color:#1e3a8a;line-height:1.5;">
+            Dans l'éditeur de réponse de l'élève, le collage (Ctrl+V, menu contextuel ou glisser-déposer de texte) est intercepté et n'insère rien.
+            Chaque tentative bloquée fait apparaître un bandeau rouge <em>dans la réponse elle-même</em> avec un compteur — il est donc enregistré avec la copie et visible par le professeur au moment de la correction manuelle.
+            Cela ne peut pas empêcher toute forme de triche (ex. recopie manuelle depuis une autre source), mais dissuade et trace le copier-coller direct.
           </p>
         </div>
       </div>
@@ -83,7 +115,7 @@ function renderComposition() {
 function buildCompositionJSX(height) {
   // Ce code est injecté tel quel dans le CDATA du questiontext
   // Il doit être une string JS valide en contexte JSXGraph STACK
-  return `[[jsxgraph width="100%" height="${height}" input-ref-ans1="refAns1" input-ref-ans2="refAns2"]]
+  return `[[jsxgraph width="100%" height="${height}" input-ref-ans1="refAns1"]]
 
 // --- UTILITAIRE ---
 function setRef(ref, value) {
@@ -296,13 +328,35 @@ txtLatex.addEventListener('keyup', updatePreview);
 
 function updateData() {
   var html = editor.innerHTML;
-  var plain = editor.innerText || '';
   setRef(refAns1, html);
-  setRef(refAns2, (plain.trim()!=='' && plain.trim()!==I18N.t('tpl.tapez_votre_reponse_ici')) ? '0' : '');
 }
 editor.addEventListener('input', updateData);
 editor.addEventListener('keyup', updateData);
 editor.addEventListener('mouseup', updateData);
+
+// --- ANTI COPIER-COLLER ---
+// Le collage (clavier, menu contextuel ou glisser-déposer) est bloqué. Une
+// tentative bloquée reste néanmoins tracée : un bandeau visible est inséré
+// dans la réponse elle-même (donc sauvegardé dans ans1_html) afin que le
+// correcteur voie, au moment de la correction manuelle, qu'un collage a été
+// tenté — même si le contenu collé n'a pas été inséré.
+var pasteAttempts = 0;
+function flagPasteAttempt() {
+  pasteAttempts++;
+  var banner = document.getElementById('paste-warn-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'paste-warn-banner';
+    banner.contentEditable = false;
+    banner.style.cssText = 'background:#fee2e2;border:2px solid #dc2626;border-radius:6px;padding:8px 12px;margin-bottom:8px;color:#991b1b;font-size:.85rem;font-weight:700;';
+    editor.insertBefore(banner, editor.firstChild);
+  }
+  banner.textContent = I18N.t('comp.paste_banner', {n: pasteAttempts});
+  updateData();
+}
+editor.addEventListener('paste', function(e) { e.preventDefault(); flagPasteAttempt(); });
+editor.addEventListener('drop', function(e) { e.preventDefault(); flagPasteAttempt(); });
+editor.addEventListener('dragover', function(e) { e.preventDefault(); });
 
 // Restauration si déjà saisi
 var savedVal = document.getElementById(refAns1);
@@ -330,7 +384,7 @@ function genComposition(X) {
   }
 
   var jsxCode = buildCompositionJSX(height, X);
-  var vars  = '/* Q' + X + ' : Composition libre (correction manuelle) */\nta' + X + ':1;';
+  var vars  = '/* Q' + X + ' : Composition libre (correction manuelle STACK — manualgraded) */';
   var qnote = 'Composition Q' + X;
 
   var msgHtml = msg
@@ -344,7 +398,6 @@ function genComposition(X) {
     msgHtml + '\n' +
     '<div style="display:none;">\n' +
     '  [[input:ans' + X + '_html]] [[validation:ans' + X + '_html]]\n' +
-    '  [[input:ans' + X + '_flag]] [[validation:ans' + X + '_flag]]\n' +
     '</div>';
 
   // ── previewFrag : prévisualisation StackForge — Q{X} Rédaction + énoncé seul, sans JSXGraph ──
@@ -359,12 +412,20 @@ function genComposition(X) {
       '📝 Éditeur de réponse élève (visible dans Moodle uniquement)' +
     '</div>';
 
-  // Inputs XML
+  // Input XML — type "notes" en manualgraded:1 (cf. STACK "Semi-automatic Marking").
+  // Poser manualgraded sur cet input suffit à basculer TOUTE la question en
+  // correction manuelle Moodle ("Nécessite une correction") : le PRT ci-dessous
+  // n'est alors jamais évalué par STACK (question.php::grade_response court-circuite
+  // dès qu'un input manualgraded est détecté, avant toute évaluation de PRT).
+  // On le garde volontairement — nœud "toujours vrai" indépendant de toute saisie —
+  // uniquement pour (a) donner une cible valide à [[feedback:prt]] dans le XML et
+  // (b) permettre au panneau de test interne de StackForge (js/verif.js) d'afficher
+  // le bandeau « correction manuelle ». Il n'a aucun effet sur la note réelle.
   var inputXML =
     '    <input>\n' +
     '      <name>ans' + X + '_html</name>\n' +
     '      <type>notes</type>\n' +
-    '      <tans>1</tans>\n' +
+    '      <tans></tans>\n' +
     '      <boxsize>2000</boxsize>\n' +
     '      <strictsyntax>1</strictsyntax>\n' +
     '      <insertstars>0</insertstars>\n' +
@@ -377,30 +438,12 @@ function genComposition(X) {
     '      <checkanswertype>0</checkanswertype>\n' +
     '      <mustverify>1</mustverify>\n' +
     '      <showvalidation>1</showvalidation>\n' +
-    '      <options></options>\n' +
-    '    </input>\n' +
-    '    <input>\n' +
-    '      <name>ans' + X + '_flag</name>\n' +
-    '      <type>algebraic</type>\n' +
-    '      <tans>1</tans>\n' +
-    '      <boxsize>15</boxsize>\n' +
-    '      <strictsyntax>1</strictsyntax>\n' +
-    '      <insertstars>0</insertstars>\n' +
-    '      <syntaxhint></syntaxhint>\n' +
-    '      <syntaxattribute>0</syntaxattribute>\n' +
-    '      <forbidwords></forbidwords>\n' +
-    '      <allowwords></allowwords>\n' +
-    '      <forbidfloat>1</forbidfloat>\n' +
-    '      <requirelowestterms>0</requirelowestterms>\n' +
-    '      <checkanswertype>0</checkanswertype>\n' +
-    '      <mustverify>1</mustverify>\n' +
-    '      <showvalidation>1</showvalidation>\n' +
-    '      <options></options>\n' +
+    '      <options>manualgraded:1</options>\n' +
     '    </input>';
 
   var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
   var canonicalNodes = [{
-    name: '0', description: 'Toujours vrai — correction manuelle par le professeur',
+    name: '0', description: 'Inerte — correction manuelle par le professeur (manualgraded)',
     answertest: 'AlgEquiv', sans: '1', tans: '1', testoptions: '', quiet: '0',
     truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
     trueanswernote: 'PRT-' + X + '-1-T',

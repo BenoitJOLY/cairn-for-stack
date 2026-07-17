@@ -358,7 +358,6 @@ function doDownload(){
   const isComposition = window._verifQData && window._verifQData.some(q => q.type === 'composition');
   if (isComposition) {
     finalXml = finalXml.replace(/input-ref-ans(\d+)="refAns1"/g, 'input-ref-ans$1_html="refAns1"');
-    finalXml = finalXml.replace(/input-ref-ans2="refAns2"/g, 'input-ref-ans1_flag="refAns2"');
   }
 
   if (window._verifOriginalJsxTag) {

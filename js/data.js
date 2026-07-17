@@ -9,7 +9,7 @@ let _verifZoneActive=null; // active verif zone element for toolbar routing
 let tagSel={1:new Set(),2:new Set(),3:new Set(),4:new Set(),5:new Set(),6:new Set(),7:new Set()};
 let matchState = { left: [], right: [], connections: [], selectedLeft: null };
 let matchEditContext = null; // Sert à savoir si on édite ou on crée un item match
-const COLORS={checkbox:'#7c3aed',radio:'#2563eb',dropdown:'#db2777',algebraic:'#0891b2',numerical:'#059669',units:'#d97706',string:'#dc2626',match:'#B686D8',crossword:'#ea580c',doi:'#ADA762',chemical:'#53B57C',chemical_topo:'#B5464D',nuclear: '#EAB308',composition:'#31B1BC',jxgdrop:'#FFCEAF',vf:'#E3FF96',ord:'#7C6A5E',imgclick:'#047C6A',glr:'#0369A1',rvbcmj:'#7E22CE',optique:'#0284c7','acide-base':'#16a34a','redox':'#b91c1c','basen':'#1d4ed8','circuit':'#c2410c','logique':'#7c3aed','complexe':'#be185d','calcul':'#4338ca','statistiques':'#0f766e','matrices':'#7c2d12','geometrie':'#1e40af','suites':'#7e22ce','probabilites':'#0369a1','trigonometrie':'#b45309','polynomes':'#166534','limites':'#1e3a8a','physique':'#7f1d1d','oscilloscope':'#166534','inequation':'#0e7490','thermo':'#92400e','diffraction':'#4338ca','stack-raw':'#b45309','expert':'#7c3aed'};
+const COLORS={checkbox:'#7c3aed',radio:'#2563eb',dropdown:'#db2777',algebraic:'#0891b2',numerical:'#059669',units:'#d97706',string:'#dc2626',match:'#B686D8',crossword:'#ea580c',doi:'#ADA762',chemical:'#53B57C',chemical_topo:'#B5464D',nuclear: '#EAB308',composition:'#31B1BC',jxgdrop:'#FFCEAF',vf:'#E3FF96',ord:'#7C6A5E',imgclick:'#047C6A',glr:'#0369A1',rvbcmj:'#7E22CE',optique:'#0284c7','acide-base':'#16a34a','redox':'#b91c1c','basen':'#1d4ed8','circuit':'#c2410c','logique':'#7c3aed','complexe':'#be185d','calcul':'#4338ca','statistiques':'#0f766e','matrices':'#7c2d12','geometrie':'#1e40af','suites':'#7e22ce','probabilites':'#0369a1','trigonometrie':'#b45309','polynomes':'#166534','limites':'#1e3a8a','physique':'#7f1d1d','oscilloscope':'#166534','inequation':'#0e7490','thermo':'#92400e','diffraction':'#4338ca','equivalence':'#5b21b6','stack-raw':'#b45309','expert':'#7c3aed','geogebra':'#38761d'};
 
 const LABELS={
     checkbox:'☑️ Cases',
@@ -53,9 +53,11 @@ const LABELS={
     'inequation':'≤ Inéquations',
     'thermo':'🌡️ Thermo',
     'diffraction':'🌊 Diffraction',
+    'equivalence':'⇔ Équivalence',
     'image-mesure':'📏 Mesure sur image',
     'stack-raw':'📥 STACK importé',
-    'expert':'🛠 Expert STACK'
+    'expert':'🛠 Expert STACK',
+    'geogebra':'📐 GeoGebra'
 };
 // default feedbacks when left empty
 const FB_JUSTE_DEFAULT='<p>✅ <strong>Bonne réponse !</strong></p>';
@@ -95,8 +97,10 @@ const LABELS_PLAIN={
     'polynomes':'🔢 Polynômes', 'limites':'→ Limites', 'physique':'⚡ Physique',
     'inequation':'≤ Inéquations', 'thermo':'🌡️ Thermo',
     'diffraction':'🌊 Diffraction',
+    'equivalence':'⇔ Équivalence',
     'image-mesure':'📏 Mesure sur image',
     'stack-raw':'📥 STACK importé',
-    'expert':'🛠 Expert STACK'
+    'expert':'🛠 Expert STACK',
+    'geogebra':'📐 GeoGebra'
 };
 function applyFormula(){document.getElementById('num-val').value=document.getElementById('modal-formula').value;document.getElementById('calcModal').style.display='none';}

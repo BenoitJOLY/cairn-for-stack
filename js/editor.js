@@ -110,9 +110,10 @@ const TYPE_ICON_MAP = {
   string:'string', match:'match', crossword:'crossword', doi:'doi',
   chemical:'chemistry', chemical_topo:'chemical_topo', nuclear:'nuclear',
   composition:'composition', jxgdrop:'jxgdrop', vf:'vf', ord:'ord',
-  imgclick:'imgclick', glr:'glr', rvbcmj:'rvbcmj', optique:'optique', 'acide-base':'acide-base', 'redox':'redox', 'basen':'basen', 'circuit':'circuit', 'logique':'logique', 'complexe':'complexe', 'calcul':'calcul', 'statistiques':'statistiques', 'matrices':'matrices', 'geometrie':'geometrie', 'suites':'suites', 'probabilites':'probabilites', 'trigonometrie':'trigonometrie', 'polynomes':'polynomes', 'limites':'limites', 'physique':'physique', 'oscilloscope':'oscilloscope', 'inequation':'inequation', 'thermo':'thermo', 'diffraction':'diffraction', 'image-mesure':'image-mesure',
+  imgclick:'imgclick', glr:'glr', rvbcmj:'rvbcmj', optique:'optique', 'acide-base':'acide-base', 'redox':'redox', 'basen':'basen', 'circuit':'circuit', 'logique':'logique', 'complexe':'complexe', 'calcul':'calcul', 'statistiques':'statistiques', 'matrices':'matrices', 'geometrie':'geometrie', 'suites':'suites', 'probabilites':'probabilites', 'trigonometrie':'trigonometrie', 'polynomes':'polynomes', 'limites':'limites', 'physique':'physique', 'oscilloscope':'oscilloscope', 'inequation':'inequation', 'thermo':'thermo', 'diffraction':'diffraction', 'image-mesure':'image-mesure', 'equivalence':'equivalence',
   'stack-raw':'stack-import',
-  'expert':'expert'
+  'expert':'expert',
+  'geogebra':'geogebra'
 };
 
 function initEditor() {
@@ -232,7 +233,24 @@ function attachChipHandlers(chip) {
   });
 }
 
+// STACK ne permet pas de mélanger, dans une même question, un input à
+// correction manuelle (Composition Libre, manualgraded:1 — voir gen-composition.js)
+// et un input à correction automatique. On bloque donc toute insertion qui
+// créerait ce mélange, dans les deux sens.
+function canInsertChipType(type) {
+  var existingTypes = getChipsInOrder().map(function(c) { return c.dataset.type; });
+  var mixesComposition = type === 'composition'
+    ? existingTypes.length > 0
+    : existingTypes.indexOf('composition') !== -1;
+  if (mixesComposition) {
+    toast(I18N.t('msg.err_composition_exclusive'));
+    return false;
+  }
+  return true;
+}
+
 function insertChipAtPoint(x, y, type) {
+  if (!canInsertChipType(type)) return;
   var qid = nextQid++;
   var chip = createChipEl(qid, type);
   var editor = document.getElementById('v4-editor');
@@ -386,23 +404,46 @@ function renumberChips() {
           if (!s) return s;
           return s.replace(new RegExp('([a-zA-Z_])' + oldQid + '(?!\\d)', 'g'), '$1' + newQid);
         };
-        q.textFrag = ren(q.textFrag);      // contient l'énoncé : regex ciblé seulement
-        q.inputXML = ren(q.inputXML);
-        q.prtXML = renCode(q.prtXML);      // Maxima : feedbackvariables, sans, tans, feedback
-        q.vars = renCode(q.vars);           // Maxima : variables question
-        q.qnote = renCode(q.qnote);
-        q.feedbackRef = renCode(q.feedbackRef);
-        q.generalFeedback = renCode(q.generalFeedback);
+        /* renGgb : identifiants GeoGebra (ggbApp_X, ggbXoN, ggbX_sync…) — renCode est trop
+           générique et confond le suffixe qid avec l'index de sortie intégré dans "ggbXoN"
+           (ex: "ggb2o1" → "ggb1o1" au lieu de "ggb1o1" attendu), désynchronisant le nom
+           d'input STACK (jamais renommé par ren, qui ignore ce schéma) et sa référence dans
+           le PRT (renommée à tort par renCode). On applique donc un renommage ciblé et
+           identique sur textFrag/inputXML ET prtXML/vars/qnote/feedbackRef/generalFeedback. */
+        var renGgb = function(s) {
+          if (!s) return s;
+          return s
+            .replace(new RegExp('ggbApp_' + oldQid + '\\b', 'g'), 'ggbApp_' + newQid)
+            .replace(new RegExp('ggbApplet_' + oldQid + '\\b', 'g'), 'ggbApplet_' + newQid)
+            .replace(new RegExp('\\bggb' + oldQid + '_(sync|start)\\b', 'g'), 'ggb' + newQid + '_$1')
+            .replace(new RegExp('\\bggb' + oldQid + 'o(\\d+)\\b', 'g'), 'ggb' + newQid + 'o$1')
+            .replace(new RegExp('\\bggb_ok_' + oldQid + '\\b', 'g'), 'ggb_ok_' + newQid)
+            .replace(new RegExp('\\bggb_n_ok_' + oldQid + '\\b', 'g'), 'ggb_n_ok_' + newQid)
+            .replace(new RegExp('\\bggb_sc_' + oldQid + '\\b', 'g'), 'ggb_sc_' + newQid)
+            .replace(new RegExp('\\bggb_pct_' + oldQid + '\\b', 'g'), 'ggb_pct_' + newQid)
+            .replace(new RegExp('\\bprt' + oldQid + '\\b', 'g'), 'prt' + newQid)
+            .replace(new RegExp('\\bPRT' + oldQid + '-', 'g'), 'PRT' + newQid + '-')
+            .replace(new RegExp('GeoGebra Q' + oldQid + '\\b', 'g'), 'GeoGebra Q' + newQid);
+        };
+        var isGgb = q.type === 'geogebra';
+        q.textFrag = isGgb ? renGgb(ren(q.textFrag)) : ren(q.textFrag);      // contient l'énoncé : regex ciblé seulement
+        q.inputXML = isGgb ? renGgb(ren(q.inputXML)) : ren(q.inputXML);
+        q.prtXML = isGgb ? renGgb(q.prtXML) : renCode(q.prtXML);      // Maxima : feedbackvariables, sans, tans, feedback
+        q.vars = isGgb ? renGgb(q.vars) : renCode(q.vars);           // Maxima : variables question
+        q.qnote = isGgb ? renGgb(q.qnote) : renCode(q.qnote);
+        q.feedbackRef = isGgb ? renGgb(q.feedbackRef) : renCode(q.feedbackRef);
+        q.generalFeedback = isGgb ? renGgb(q.generalFeedback) : renCode(q.generalFeedback);
         // Types migrés JSON (ex: Base N) : q.prt doit suivre le même renommage que
         // q.prtXML, sinon il redevient une source de vérité périmée après renumérotation.
         if (q.prt) {
+          var renPrt = isGgb ? renGgb : renCode;
           q.prt = {
-            meta: Object.assign({}, q.prt.meta, { name: renCode(q.prt.meta.name) }),
+            meta: Object.assign({}, q.prt.meta, { name: renPrt(q.prt.meta.name) }),
             nodes: q.prt.nodes.map(function(n) {
               return Object.assign({}, n, {
-                sans: renCode(n.sans), tans: renCode(n.tans),
-                trueanswernote: renCode(n.trueanswernote), falseanswernote: renCode(n.falseanswernote),
-                truefeedback: renCode(n.truefeedback), falsefeedback: renCode(n.falsefeedback)
+                sans: renPrt(n.sans), tans: renPrt(n.tans),
+                trueanswernote: renPrt(n.trueanswernote), falseanswernote: renPrt(n.falseanswernote),
+                truefeedback: renPrt(n.truefeedback), falsefeedback: renPrt(n.falsefeedback)
               });
             })
           };

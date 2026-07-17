@@ -89,9 +89,10 @@ async function _generateAndStoreQuestion(qid, type) {
     string: W.genString, match: W.genMatch, crossword: W.genCrossword, doi: W.genDOI,
     chemical: W.genChemical, chemical_topo: W.genChemicalTopo, nuclear: W.genNuclear,
     composition: W.genComposition, jxgdrop: W.genJxgDrop, vf: W.genVF, ord: W.genOrd,
-    imgclick: W.genImgClick, glr: W.genGLR, rvbcmj: W.genRvbCmj, optique: W.genOptique, 'acide-base': W.genAcideBase, 'redox': W.genRedox, 'basen': W.genBasen, 'circuit': W.genCircuit, 'logique': W.genLogique, 'complexe': W.genComplexe, 'calcul': W.genCalcul, 'statistiques': W.genStatistiques, 'matrices': W.genMatrices, 'geometrie': W.genGeometrie, 'suites': W.genSuites, 'probabilites': W.genProbabilites, 'trigonometrie': W.genTrigonometrie, 'polynomes': W.genPolynomes, 'limites': W.genLimites, 'physique': W.genPhysique, 'oscilloscope': W.genOscilloscope, 'inequation': W.genInequation, 'thermo': W.genThermo, 'diffraction': W.genDiffraction, 'image-mesure': W.genImageMesure, 'apn': W.genApn,
+    imgclick: W.genImgClick, glr: W.genGLR, rvbcmj: W.genRvbCmj, optique: W.genOptique, 'acide-base': W.genAcideBase, 'redox': W.genRedox, 'basen': W.genBasen, 'circuit': W.genCircuit, 'logique': W.genLogique, 'complexe': W.genComplexe, 'calcul': W.genCalcul, 'statistiques': W.genStatistiques, 'matrices': W.genMatrices, 'geometrie': W.genGeometrie, 'suites': W.genSuites, 'probabilites': W.genProbabilites, 'trigonometrie': W.genTrigonometrie, 'polynomes': W.genPolynomes, 'equivalence': W.genEquivalence, 'limites': W.genLimites, 'physique': W.genPhysique, 'oscilloscope': W.genOscilloscope, 'inequation': W.genInequation, 'thermo': W.genThermo, 'diffraction': W.genDiffraction, 'image-mesure': W.genImageMesure, 'apn': W.genApn,
     'stack-raw': W.genStackRaw,
-    'expert': W.genExpert
+    'expert': W.genExpert,
+    'geogebra': W.genGeoGebra
   };
 
   var gen = genMap[type];
@@ -279,6 +280,18 @@ function captureState() {
       s.nextPropId=jdst.nextPropId||1;s.nextZoneId=jdst.nextZoneId||1;
       s.zonesVisible=document.getElementById('jd-zones-visible')?document.getElementById('jd-zones-visible').checked:true;
       s.fbGen=v('jd-fbgen');
+      break;
+    }
+    case 'geogebra': {
+      var ggbSt=(typeof ggbCaptureFromForm==='function')?ggbCaptureFromForm():(window._ggbState||{});
+      s.bareme=v('ggb-bareme');s.text=richVal('ggb-text');
+      s.model=ggbSt.model||'expert';
+      s.materialId=ggbSt.materialId||'';s.width=ggbSt.width||700;s.height=ggbSt.height||500;
+      s.showToolbar=!!ggbSt.showToolbar;
+      s.inputs=JSON.parse(JSON.stringify(ggbSt.inputs||[]));
+      s.outputs=JSON.parse(JSON.stringify(ggbSt.outputs||[]));
+      s.coeffCfg=JSON.parse(JSON.stringify(ggbSt.coeffCfg||{}));
+      s.fbGen=v('ggb-fbgen');
       break;
     }
     case 'vf':
@@ -487,6 +500,16 @@ function captureState() {
       s.a=v('pol-a')||'1'; s.b=v('pol-b')||'-5'; s.c=v('pol-c')||'6';
       s.deltaMin=v('pol-delta-min')||'1'; s.deltaMax=v('pol-delta-max')||'50';
       s.fbOk=v('pol-fb-ok');s.fbWrong=v('pol-fb-wrong');s.fbGen=v('pol-fbgen');
+      break;
+    case 'equivalence':
+      s.bareme=v('eq-bareme');s.text=richVal('eq-text');
+      s.scenario=v('eq-scenario')||'developpement';
+      s.formule=v('eq-formule')||'';
+      s.variable=v('eq-variable')||'x'; s.variables=v('eq-variables')||'x,y';
+      s.resultat=v('eq-resultat')||'';
+      s.etapeCheck=!!document.getElementById('eq-etape-check').checked;
+      s.etapeVal=v('eq-etape-val')||'';
+      s.fbOk=v('eq-fb-ok');s.fbWrong=v('eq-fb-wrong');s.fbGen=v('eq-fbgen');
       break;
     case 'limites':
       s.bareme=v('lim-bareme');s.text=richVal('lim-text');
@@ -736,6 +759,11 @@ function restoreState(s) {
     case 'jxgdrop':
       if(typeof jdRestoreState==='function')jdRestoreState(s);
       var _jdFbGen=document.getElementById('jd-fbgen');if(_jdFbGen)_jdFbGen.value=s.fbGen||'';
+      break;
+    case 'geogebra':
+      document.getElementById('ggb-bareme').value=s.bareme||1;setRichVal('ggb-text',s.text||'');
+      if(typeof ggbRestoreState==='function')ggbRestoreState(s);
+      var _ggbFbGen=document.getElementById('ggb-fbgen');if(_ggbFbGen)_ggbFbGen.value=s.fbGen||'';
       break;
     case 'vf':
       document.getElementById('vf-bareme').value=s.bareme||1;setRichVal('vf-text',s.text||'');
@@ -1043,6 +1071,21 @@ function restoreState(s) {
       document.getElementById('pol-fbgen').value=s.fbGen||'';
       if(typeof polOnScenarioChange==='function')polOnScenarioChange();
       else if(typeof polFormChange==='function')polFormChange();
+      break;
+    case 'equivalence':
+      document.getElementById('eq-bareme').value=s.bareme||1;
+      setRichVal('eq-text',s.text||'');
+      document.getElementById('eq-scenario').value=s.scenario||'developpement';
+      document.getElementById('eq-formule').value=s.formule||'';
+      document.getElementById('eq-variable').value=s.variable||'x';
+      document.getElementById('eq-variables').value=s.variables||'x,y';
+      document.getElementById('eq-resultat').value=s.resultat||'';
+      document.getElementById('eq-etape-check').checked=!!s.etapeCheck;
+      document.getElementById('eq-etape-val').value=s.etapeVal||'';
+      document.getElementById('eq-fb-ok').value=s.fbOk||'';
+      document.getElementById('eq-fb-wrong').value=s.fbWrong||'';
+      document.getElementById('eq-fbgen').value=s.fbGen||'';
+      if(typeof eqOnScenarioChange==='function')eqOnScenarioChange();
       break;
     case 'limites':
       document.getElementById('lim-bareme').value=s.bareme||1;
@@ -1352,6 +1395,10 @@ function resetFormForType(type) {
       if(typeof jdReset==='function')jdReset();
       var _jdfbGen=document.getElementById('jd-fbgen');if(_jdfbGen)_jdfbGen.value='';
       break;
+    case 'geogebra':
+      if(typeof ggbReset==='function')ggbReset();
+      var _ggbfbGen=document.getElementById('ggb-fbgen');if(_ggbfbGen)_ggbfbGen.value='';
+      break;
     case 'vf':
       document.getElementById('vf-props').innerHTML='';
       if(typeof addVFRow==='function'){addVFRow();}
@@ -1631,6 +1678,21 @@ function resetFormForType(type) {
       document.getElementById('pol-fb-wrong').value='';
       document.getElementById('pol-fbgen').value='';
       if(typeof polFormChange==='function')polFormChange();
+      break;
+    case 'equivalence':
+      setRichVal('eq-text','');
+      document.getElementById('eq-bareme').value=1;
+      document.getElementById('eq-scenario').value='developpement';
+      document.getElementById('eq-formule').value='';
+      document.getElementById('eq-variable').value='x';
+      document.getElementById('eq-variables').value='x,y';
+      document.getElementById('eq-resultat').value='';
+      document.getElementById('eq-etape-check').checked=false;
+      document.getElementById('eq-etape-val').value='';
+      document.getElementById('eq-fb-ok').value='';
+      document.getElementById('eq-fb-wrong').value='';
+      document.getElementById('eq-fbgen').value='';
+      if(typeof eqFormChange==='function')eqFormChange();
       break;
     case 'limites':
       setRichVal('lim-text','');

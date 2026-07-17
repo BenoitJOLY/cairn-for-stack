@@ -462,6 +462,8 @@ function validateCurrentType(){
       toast('❌ Configuration invalide (voir l\'aperçu) : corrigez avant d\'enregistrer.');
       ok=false;
     }
+  }else if(currentType==='equivalence'){
+    if(markErr('eq-formule','err-eq-formule',!v('eq-formule').trim()))ok=false;
   }
   return ok;
 }

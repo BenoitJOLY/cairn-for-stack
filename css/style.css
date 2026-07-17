@@ -2966,7 +2966,8 @@ html[data-theme="dark"] .palette-cat-body { background: #0f172a; }
 #fp-algebraic[style*="display: block"], #fp-numerical[style*="display: block"], #fp-units[style*="display: block"], #fp-string[style*="display: block"], #fp-match[style*="display: block"],
 #fp-complexe[style*="display: block"], #fp-redox[style*="display: block"],
 #fp-inequation[style*="display: block"], #fp-polynomes[style*="display: block"], #fp-limites[style*="display: block"], #fp-suites[style*="display: block"], #fp-probabilites[style*="display: block"],
-#fp-trigonometrie[style*="display: block"], #fp-statistiques[style*="display: block"], #fp-matrices[style*="display: block"], #fp-geometrie[style*="display: block"], #fp-calcul[style*="display: block"] {
+#fp-trigonometrie[style*="display: block"], #fp-statistiques[style*="display: block"], #fp-matrices[style*="display: block"], #fp-geometrie[style*="display: block"], #fp-calcul[style*="display: block"],
+#fp-equivalence[style*="display: block"] {
   display: flex !important;
   flex-direction: column;
 }
@@ -3044,7 +3045,9 @@ html[data-theme="dark"] .hs-preview-panel {
 #q-config-modal:has(#fp-crossword[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-doi[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-image-mesure[style*="display: block"]) .q-config-modal-box,
-#q-config-modal:has(#fp-apn[style*="display: block"]) .q-config-modal-box {
+#q-config-modal:has(#fp-apn[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-equivalence[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-geogebra[style*="display: block"]) .q-config-modal-box {
   width: min(1200px, 96vw);
 }
 @media (max-width: 1000px) {
@@ -3058,7 +3061,8 @@ html[data-theme="dark"] .hs-preview-panel {
   #fp-acide-base[style*="display: block"], #fp-diffraction[style*="display: block"], #fp-oscilloscope[style*="display: block"], #fp-optique[style*="display: block"],
   #fp-rvbcmj[style*="display: block"], #fp-imgclick[style*="display: block"], #fp-glr[style*="display: block"], #fp-jxgdrop[style*="display: block"], #fp-ord[style*="display: block"],
   #fp-chemical[style*="display: block"], #fp-chemical_topo[style*="display: block"], #fp-nuclear[style*="display: block"], #fp-composition[style*="display: block"],
-  #fp-crossword[style*="display: block"], #fp-doi[style*="display: block"], #fp-image-mesure[style*="display: block"], #fp-apn[style*="display: block"] { display: block !important; }
+  #fp-crossword[style*="display: block"], #fp-doi[style*="display: block"], #fp-image-mesure[style*="display: block"], #fp-apn[style*="display: block"],
+  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"] { display: block !important; }
   .hs-split-row { display: block; }
   .hs-split-left, .hs-preview-panel { max-width: none; }
   .hs-preview-panel { margin-top: 15px; border-top: 1px dashed #ccc; }
@@ -3073,3 +3077,17 @@ html[data-theme="dark"] .hs-preview-panel {
   0%   { box-shadow: 0 0 0 3px #7c3aed; }
   100% { box-shadow: 0 0 0 3px rgba(124,58,237,0); }
 }
+
+/* ── Coefficients GeoGebra (mode préréglé) ── */
+.ggb-coeff-row {
+  display:block; padding:10px 12px; margin-bottom:8px;
+  background:var(--panel-2, rgba(0,0,0,.02)); border:1px solid var(--border); border-radius:8px;
+}
+.ggb-coeff-name {
+  display:block; font-size:.85rem; font-weight:600; color:#374151; margin-bottom:8px;
+}
+.ggb-coeff-fields { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.ggb-coeff-fields select.ggb-coeff-mode { flex:0 0 200px; }
+.ggb-coeff-fields input.ggb-coeff-val { flex:0 0 90px; text-align:center; }
+html[data-theme="dark"] .ggb-coeff-name { color:#cbd5e1; }
+html[data-theme="dark"] .ggb-coeff-row { background:rgba(255,255,255,.03); }

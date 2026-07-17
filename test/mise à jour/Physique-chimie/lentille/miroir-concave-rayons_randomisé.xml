@@ -1,0 +1,738 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name>
+      <text>Miroir concave — Tracer les rayons remarquables</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div class="stack-comment">
+<h2>Construction — Miroir sphérique concave</h2>
+<p>Le miroir concave a une distance focale f' = {@f@} cm. L'objet AB, de taille {@AB@} cm, est placé perpendiculairement
+à l'axe optique à SA = {@SA@} cm du sommet S.</p>
+<p>À l'aide des outils ci-dessous, <strong>tracez au moins deux des quatre rayons remarquables issus de B</strong> et
+faites-les se réfléchir sur le miroir pour construire l'image B' de B :</p>
+<ul>
+<li>le rayon issu de B, parallèle à l'axe optique, qui ressort du miroir en passant par le foyer F' ;</li>
+<li>le rayon issu de B passant par le centre C, qui se réfléchit sur lui-même ;</li>
+<li>le rayon issu de B passant par le foyer F, qui ressort parallèle à l'axe optique ;</li>
+<li>le rayon issu de B arrivant au sommet S, qui repart symétriquement par rapport à l'axe optique.</li>
+</ul>
+<p>Une fois deux rayons réfléchis tracés, utilisez le bouton <strong>« Intersection (2 clics) → point B' »</strong>
+et cliquez successivement sur les deux rayons réfléchis (la partie du tracé <em>après</em> le miroir) pour
+construire précisément le point B'.</p>
+<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le
+bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.</p>
+</div>
+
+[[jsxgraph input-ref-ans1="state" width="46em" aspect-ratio="2"]]
+const board = JXG.JSXGraph.initBoard(divid, {
+    boundingbox: [-12, 6, 12, -6],
+    axis: false,
+    keepaspectratio: true,
+    showNavigation: true,
+    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },
+    pan: { enabled: true, needTwoFingers: false, needShift: true }
+});
+
+const f = {@f@}, mirrorHeight = 5;
+const X_MIN = -12, X_MAX = 12, Y_MIN = -6, Y_MAX = 6;
+const SA = {@SA@}, AB = {@AB@};
+
+let toolMode = '';
+let tempPoint = null, dirPoint1 = null, dirPoint2 = null, interSeg1 = null;
+let selectedSegment = null;
+
+let allDrawnElements = [];
+let raySegments = [];
+let logicalRays = [];
+let standaloneElements = [];
+let intersectionCounter = 0;
+
+board.create('line', [[X_MIN, 0], [X_MAX, 0]], { strokeColor: 'black', strokeWidth: 1, fixed: true, highlight: false, tabindex: null });
+board.create('arrow', [[11.5, 0], [X_MAX, 0]], { fixed: true, highlight: false, tabindex: null });
+
+board.create('segment', [[0, -mirrorHeight], [0, mirrorHeight]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });
+board.create('segment', [[0, mirrorHeight], [-0.4, mirrorHeight + 0.4]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });
+board.create('segment', [[0, -mirrorHeight], [-0.4, -mirrorHeight - 0.4]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });
+for (let i = -4; i <= 4; i++) {
+    let y = i * (mirrorHeight / 4);
+    board.create('segment', [[0, y], [0.4, y - 0.4]], { strokeColor: 'black', strokeWidth: 1.5, fixed: true, highlight: false, tabindex: null });
+}
+
+board.create('point', [0, 0], { name: 'S', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });
+board.create('point', [-f, 0], { name: "F'", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });
+board.create('point', [-2 * f, 0], { name: 'C', size: 3, fixed: true, color: 'darkgreen', highlight: false, tabindex: null });
+
+const xObj = -SA;
+board.create('point', [xObj, 0], { name: 'A', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });
+board.create('point', [xObj, AB], { name: 'B', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });
+board.create('arrow', [[xObj, 0], [xObj, AB]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });
+
+const handlePoint = board.create('point', [0, -5.7], { visible: false, fixed: true, name: '', tabindex: null });
+
+const DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";
+
+const instructionsEl = document.createElement('p');
+instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';
+instructionsEl.textContent = DEFAULT_MSG;
+
+function setInstructions(msg) {
+    instructionsEl.textContent = msg;
+}
+
+const toolbarDiv = document.createElement('div');
+toolbarDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:.4em;margin-top:.6em;';
+const toolButtons = {};
+
+function addToolButton(label, mode, msgOrHandler) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = label;
+    btn.style.cssText = 'padding:.35em .7em;font-size:.85em;cursor:pointer;';
+    if (mode === null) {
+        btn.addEventListener('click', msgOrHandler);
+    } else {
+        btn.addEventListener('click', () => activateTool(mode, msgOrHandler));
+        toolButtons[mode] = btn;
+    }
+    toolbarDiv.appendChild(btn);
+    return btn;
+}
+
+function setActiveButton(mode) {
+    for (let m in toolButtons) {
+        toolButtons[m].style.background = (m === mode) ? '#dbeafe' : '';
+        toolButtons[m].style.fontWeight = (m === mode) ? 'bold' : 'normal';
+    }
+}
+
+function resetTool() {
+    toolMode = '';
+    tempPoint = null; dirPoint1 = null; dirPoint2 = null; interSeg1 = null;
+    board.defaultCursor = 'default';
+    setInstructions(DEFAULT_MSG);
+    setActiveButton(null);
+    deselectSegment();
+}
+
+function paintSegment(seg) {
+    let status = seg.__status || 'defaut';
+    if (status === 'reel') {
+        seg.setAttribute({ strokeColor: '#e67e22', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    } else if (status === 'virtuel') {
+        seg.setAttribute({ strokeColor: '#2980b9', dash: 2, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    } else {
+        seg.setAttribute({ strokeColor: '#555555', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    }
+}
+
+function statusCode(seg) {
+    let s = seg.__status || 'defaut';
+    return s === 'reel' ? 1 : (s === 'virtuel' ? 2 : 0);
+}
+
+function statusFromCode(code) {
+    return code === 1 ? 'reel' : (code === 2 ? 'virtuel' : 'defaut');
+}
+
+function deselectSegment() {
+    let prev = selectedSegment;
+    selectedSegment = null;
+    if (prev) { paintSegment(prev); }
+}
+
+function onSegmentClick(seg) {
+    let status = seg.__status || 'defaut';
+    seg.__status = (status === 'reel') ? 'virtuel' : 'reel';
+    let prev = selectedSegment;
+    selectedSegment = seg;
+    if (prev && prev !== seg) { paintSegment(prev); }
+    paintSegment(seg);
+    setInstructions(DEFAULT_MSG);
+    syncState();
+}
+
+function deleteSelectedSegment() {
+    if (!selectedSegment) { setInstructions("Cliquez d'abord sur un tronçon de rayon pour le sélectionner."); return; }
+    let seg = selectedSegment;
+    selectedSegment = null;
+    board.removeObject(seg);
+    let idx = raySegments.indexOf(seg);
+    if (idx > -1) raySegments.splice(idx, 1);
+    for (let lr of logicalRays) {
+        let sIdx = lr.segments.indexOf(seg);
+        if (sIdx > -1) {
+            lr.segments.splice(sIdx, 1);
+            if (lr.segments.length === 0) {
+                logicalRays = logicalRays.filter(l => l !== lr);
+            }
+            break;
+        }
+    }
+    setInstructions(DEFAULT_MSG);
+    syncState();
+}
+
+function activateTool(mode, msg) {
+    if (toolMode === mode) { resetTool(); return; }
+    resetTool(); toolMode = mode;
+    board.defaultCursor = 'crosshair';
+    setInstructions(msg);
+    setActiveButton(mode);
+}
+
+function syncState() {
+    handlePoint.trigger(['update']);
+    board.update();
+}
+
+function snapToPoint(x, y) {
+    let threshold = 0.6, closestX = x, closestY = y, minDist = Infinity;
+    for (let id in board.objects) {
+        let obj = board.objects[id];
+        if (obj.elType === 'point' && obj.visProp.visible !== false && obj.visProp.hidden !== true) {
+            let dx = obj.X() - x, dy = obj.Y() - y, dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < threshold && dist < minDist) { minDist = dist; closestX = obj.X(); closestY = obj.Y(); }
+        }
+    }
+    return { x: closestX, y: closestY };
+}
+
+function getClickedSegment(x, y, threshold, excludeSeg) {
+    let closestSeg = null, minDist = Infinity;
+    for (let i = 0; i < raySegments.length; i++) {
+        let seg = raySegments[i];
+        if (seg === excludeSeg) continue;
+        if (!seg.point1 || !seg.point2) continue;
+        let x1 = seg.point1.X(), y1 = seg.point1.Y();
+        let x2 = seg.point2.X(), y2 = seg.point2.Y();
+        let dx = x2 - x1, dy = y2 - y1;
+        let lengthSq = dx * dx + dy * dy;
+        if (lengthSq === 0) continue;
+        let t = ((x - x1) * dx + (y - y1) * dy) / lengthSq;
+        t = Math.max(0, Math.min(1, t));
+        let projX = x1 + t * dx, projY = y1 + t * dy;
+        let dist = Math.sqrt((x - projX) ** 2 + (y - projY) ** 2);
+        if (dist < threshold && dist < minDist) { minDist = dist; closestSeg = seg; }
+    }
+    return closestSeg;
+}
+
+function getClickedPoint(x, y, threshold) {
+    let closest = null, minDist = Infinity;
+    for (let el of standaloneElements) {
+        if (el.elType === 'point' && el.visProp.visible !== false) {
+            let d = Math.hypot(el.X() - x, el.Y() - y);
+            if (d < threshold && d < minDist) { minDist = d; closest = el; }
+        }
+    }
+    return closest;
+}
+
+function addCustomRayFromEq(m, p, isVert, xVert, xOrigin) {
+    let currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };
+    if (isVert) {
+        let pA = board.create('point', [xVert, Y_MIN], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        let pB = board.create('point', [xVert, Y_MAX], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        let seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);
+        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);
+    } else {
+        let boundsX = [X_MIN, X_MAX];
+        if (typeof xOrigin === 'number') boundsX.push(xOrigin);
+        if (Math.abs(p) <= mirrorHeight) {
+            boundsX.push(0);
+            let impactPoint = board.create('point', [0, p], { name: '', size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+            allDrawnElements.push(impactPoint);
+            currentLogicalRay.points.push(impactPoint);
+        }
+        boundsX.sort((a, b) => a - b);
+        for (let i = 0; i < boundsX.length - 1; i++) {
+            let xa = boundsX[i], xb = boundsX[i + 1];
+            if (xa === xb) continue;
+            let ya = m * xa + p, yb = m * xb + p;
+            let pA = board.create('point', [xa, ya], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            let pB = board.create('point', [xb, yb], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            let seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+            raySegments.push(seg); allDrawnElements.push(pA, pB, seg);
+            currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);
+        }
+    }
+    logicalRays.push(currentLogicalRay);
+    return currentLogicalRay;
+}
+
+function addRayFromPieces(m, p, isVert, xVert, pieces) {
+    let currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };
+    for (let piece of pieces) {
+        let pA, pB;
+        if (isVert) {
+            pA = board.create('point', [xVert, piece[0]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            pB = board.create('point', [xVert, piece[1]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        } else {
+            pA = board.create('point', [piece[0], m * piece[0] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            pB = board.create('point', [piece[1], m * piece[1] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        }
+        let seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+        seg.__status = statusFromCode(piece[2]);
+        paintSegment(seg);
+        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);
+        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);
+    }
+    logicalRays.push(currentLogicalRay);
+    return currentLogicalRay;
+}
+
+function addCustomRay(x1, y1, x2, y2) {
+    let dx = x2 - x1, dy = y2 - y1;
+    let m = (Math.abs(dx) < 0.01) ? Infinity : dy / dx;
+    if (m === Infinity) {
+        addCustomRayFromEq(null, null, true, x1);
+    } else {
+        let p = y1 - m * x1;
+        addCustomRayFromEq(m, p, false, null, x1);
+    }
+    syncState();
+}
+
+function onPointClick(pt) {
+    board.removeObject(pt);
+    allDrawnElements = allDrawnElements.filter(el => el !== pt);
+    standaloneElements = standaloneElements.filter(el => el !== pt);
+    syncState();
+}
+
+board.on('down', function(evt) {
+    if (evt.target && evt.target.closest && evt.target.closest('.JXG_navigation_button')) return;
+    if (evt.shiftKey) return;
+    let coords = board.getUsrCoordsOfMouse(evt);
+    let x = coords[0], y = coords[1];
+
+    if (toolMode !== '') {
+        let snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;
+
+        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions("RAYON (2/2) : cliquez le 2e point."); }
+        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }
+        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }
+        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions("PARALLÈLE (2/3) : 2e point de direction."); }
+        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions("PARALLÈLE (3/3) : point de passage."); }
+        else if (toolMode === 'par3') {
+            let dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;
+            addCustomRay(x, y, x + dx, y + dy);
+            resetTool();
+        }
+        else if (toolMode === 'inter1') {
+            interSeg1 = getClickedSegment(x, y, 0.4, null);
+            if (interSeg1) { toolMode = 'inter2'; setInstructions("INTERSECTION (2/2) : cliquez le 2e rayon réfléchi."); }
+        }
+        else if (toolMode === 'inter2') {
+            let seg2 = getClickedSegment(x, y, 0.4, interSeg1);
+            if (seg2) {
+                let x1 = interSeg1.point1.X(), y1 = interSeg1.point1.Y(), x2 = interSeg1.point2.X(), y2 = interSeg1.point2.Y();
+                let x3 = seg2.point1.X(), y3 = seg2.point1.Y(), x4 = seg2.point2.X(), y4 = seg2.point2.Y();
+                let m1 = (x2 - x1) === 0 ? Infinity : (y2 - y1) / (x2 - x1);
+                let m2 = (x4 - x3) === 0 ? Infinity : (y4 - y3) / (x4 - x3);
+                if (m1 !== Infinity && m2 !== Infinity && Math.abs(m1 - m2) > 0.001) {
+                    let p1 = y1 - m1 * x1, p2 = y3 - m2 * x3;
+                    let xi = (p2 - p1) / (m1 - m2), yi = m1 * xi + p1;
+                    let in1 = xi >= Math.min(x1, x2) - 0.5 && xi <= Math.max(x1, x2) + 0.5 && yi >= Math.min(y1, y2) - 0.5 && yi <= Math.max(y1, y2) + 0.5;
+                    let in2 = xi >= Math.min(x3, x4) - 0.5 && xi <= Math.max(x3, x4) + 0.5 && yi >= Math.min(y3, y4) - 0.5 && yi <= Math.max(y3, y4) + 0.5;
+                    if (in1 && in2) {
+                        intersectionCounter++;
+                        let name = (intersectionCounter === 1) ? "B'" : "I" + (intersectionCounter - 1);
+                        let pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+                        allDrawnElements.push(pInt); standaloneElements.push(pInt);
+                        syncState();
+                    } else { setInstructions("Les droites se croisent hors des segments."); }
+                } else { setInstructions("Segments parallèles."); }
+                resetTool();
+            }
+        }
+        else if (toolMode === 'perp') {
+            let boundsY = [Y_MIN, 0, y, Y_MAX].sort((a, b) => a - b).filter((v, i, arr) => i === 0 || v !== arr[i - 1]);
+            let pieces = [];
+            for (let i = 0; i < boundsY.length - 1; i++) pieces.push([boundsY[i], boundsY[i + 1]]);
+            addRayFromPieces(null, null, true, x, pieces);
+            let pointAp = board.create('point', [x, 0], { name: "A'", size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+            allDrawnElements.push(pointAp); standaloneElements.push(pointAp);
+            syncState();
+            resetTool();
+        }
+        return;
+    }
+
+    let clickedSeg = getClickedSegment(x, y, 0.3, null);
+    if (clickedSeg) { onSegmentClick(clickedSeg); return; }
+    let clickedPt = getClickedPoint(x, y, 0.5);
+    if (clickedPt) { onPointClick(clickedPt); return; }
+});
+
+addToolButton('Rayon (2 clics)', 'pt1', "RAYON (1/2) : cliquez le point de départ.");
+addToolButton("Rayon // axe (1 clic)", 'axp1', "RAYON PARALLÈLE À L'AXE : cliquez le point de départ (ex : B).");
+addToolButton('Rayon parallèle (3 clics)', 'par1', "PARALLÈLE (1/3) : 1er point de direction.");
+addToolButton("Intersection (2 clics) → point B'", 'inter1', "INTERSECTION (1/2) : cliquez le 1er rayon réfléchi.");
+addToolButton("Tracer A' (perpendiculaire)", 'perp', "PERPENDICULAIRE : cliquez sur B' pour tracer A' (le trait tracé pourra ensuite être marqué réel/virtuel).");
+addToolButton('Effacer le tronçon sélectionné', null, () => deleteSelectedSegment());
+addToolButton('Tout effacer', null, () => {
+    selectedSegment = null;
+    allDrawnElements.forEach(el => board.removeObject(el));
+    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;
+    resetTool();
+    syncState();
+});
+
+document.body.appendChild(toolbarDiv);
+document.body.appendChild(instructionsEl);
+stack_js.resize_containing_frame("46em", document.documentElement.offsetHeight + "px");
+
+const serialiser = () => {
+    let rayList = logicalRays.map(lr => {
+        let pieces = lr.segments.map(seg => {
+            let ends = lr.eq.isVert ? [seg.point1.Y(), seg.point2.Y()] : [seg.point1.X(), seg.point2.X()];
+            return [ends[0], ends[1], statusCode(seg)];
+        });
+        return lr.eq.isVert ? ["vert", lr.eq.x, pieces] : [lr.eq.m, lr.eq.p, pieces];
+    });
+    let ptList = standaloneElements
+        .filter(el => el.elType === 'point' && el.visProp.visible !== false && el.name)
+        .map(el => [el.name, el.X(), el.Y()]);
+    return "miroir_construction(" + JSON.stringify(rayList) + "," + JSON.stringify(ptList) + ")";
+};
+
+function clearAll() {
+    allDrawnElements.forEach(el => board.removeObject(el));
+    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;
+}
+
+const deserialiser = (value) => {
+    clearAll();
+    /* Sécurité : on supprime tous les espaces potentiellement ajoutés par Maxima pour éviter que JSON.parse ne plante */
+    let cleanValue = value.replace('miroir_construction(', '[').replace(/\)\s*$/, ']').replace(/\s+/g, '');
+    let newState = JSON.parse(cleanValue);
+    let rayList = newState[0], ptList = newState[1];
+    for (let eq of rayList) {
+        if (eq[0] === 'vert') addRayFromPieces(null, null, true, eq[1], eq[2] || [[Y_MIN, Y_MAX, 0]]);
+        else addRayFromPieces(eq[0], eq[1], false, null, eq[2] || [[X_MIN, X_MAX, 0]]);
+    }
+    for (let p of ptList) {
+        let pt = board.create('point', [p[1], p[2]], { name: p[0], size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+        allDrawnElements.push(pt);
+        standaloneElements.push(pt);
+    }
+    board.update();
+};
+
+resetTool();
+stack_jxg.custom_bind(state, serialiser, deserialiser, [handlePoint]);
+board.update();
+
+const inputEl = document.getElementById(state);
+function freezeIfReadonly() {
+    if (inputEl && (inputEl.hasAttribute('readonly') || inputEl.hasAttribute('disabled'))) {
+        board.containerObj.style.pointerEvents = 'none';
+        toolbarDiv.querySelectorAll('button').forEach(b => b.disabled = true);
+        setInstructions("Construction validée : la figure est figée.");
+        return true;
+    }
+    return false;
+}
+if (inputEl && !freezeIfReadonly()) {
+    new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });
+}
+[[/jsxgraph]]
+
+<p>[[input:ans1]] [[validation:ans1]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p>Deux quelconques des quatre rayons remarquables suivants permettent de construire B' :</p>
+<ul>
+<li>Le rayon issu de B, parallèle à l'axe, ressort du miroir en passant par le foyer image F'.</li>
+<li>Le rayon issu de B et passant par le centre C atteint le miroir sous incidence normale et repart sur lui-même.</li>
+<li>Le rayon issu de B et passant par le foyer F ressort parallèle à l'axe optique.</li>
+<li>Le rayon issu de B et arrivant au sommet S repart symétriquement par rapport à l'axe optique.</li>
+</ul>
+<p>Leur intersection donne l'image B' = ({@xAp@}&nbsp;;&nbsp;{@ABp@}), d'où A'B' = {@ABp@}&nbsp;cm (image réelle, renversée, car l'objet est placé entre C et F).</p>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024012900</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[f: 3$ SA: rand_with_step(1.2*f, 3.9*f, 0.1)$ AB: 1.5$ xF: -f$ xC: -2*f$ xA: -SA$ xAp: xF*xA/(xA-xF)$ gam: -(xAp/xA)$ ABp: gam*AB$ 
+m1e: -AB/xF$ p1e: AB$ m2e: -AB/(xC-xA)$ p2e: -m2e*xC$ m3e: 0$ p3e: AB*xF/(xF-xA)$ m4e: -AB/xA$ p4e: 0$ 
+m3i: -AB/(xF-xA)$ p3i: -m3i*xF$ m4i: AB/xA$ 
+xmin: -8$ xmax: 8$ xtol: 0.5$ 
+/* Construction dynamique du TANS via des listes Maxima pures */
+ray1_inc: [xA, 0, 1]$ ray1_ref: [xmin, 0, 1]$ ray2_full: [xmin, xmax, 1]$ ray3_inc: [xA, 0, 1]$ ray3_ref: [xmin, 0, 1]$ ray4_inc: [xA, 0, 1]$ ray4_ref: [xmin, 0, 1]$ abp_piece: [0, ABp, 1]$ 
+ray1: [0, AB, [ray1_inc]]$ ray2: [m2e, p2e, [ray2_full]]$ ray3i: [m3i, p3i, [ray3_inc]]$ ray3e: [0, p3e, [ray3_ref]]$ ray4i: [m4i, 0, [ray4_inc]]$ ray4e: [m4e, 0, [ray4_ref]]$ ray1e: [m1e, p1e, [ray1_ref]]$ abp: ["vert", xAp, [abp_piece]]$ 
+rayList_ans: [ray1, ray1e, ray2, ray3i, ray3e, ray4i, ray4e, abp]$ ptList_ans: [["B'", xAp, ABp], ["A'", xAp, 0]]$ 
+TANS: miroir_construction(rayList_ans, ptList_ans)$ 
+found_ray(rayList, mExp, pExp, mtol, ptol) := block([simp, found, r],
+  simp: true,
+  found: false,
+  for r in rayList do (
+    if listp(r) and length(r) >= 2 and numberp(r[1]) and numberp(r[2]) then (
+      if abs(r[1] - mExp) < mtol and abs(r[2] - pExp) < ptol then found: true
+    )
+  ),
+  found
+)$ 
+found_point(ptList, xExp, yExp, tol) := block([simp, found, p],
+  simp: true,
+  found: false,
+  for p in ptList do (
+    if listp(p) and length(p) = 3 and numberp(p[2]) and numberp(p[3]) then (
+      if abs(p[2] - xExp) < tol and abs(p[3] - yExp) < tol then found: true
+    )
+  ),
+  found
+)$ 
+all_pieces_status(pieces, want) := block([simp, ok, pc],
+  simp: true,
+  ok: true,
+  for pc in pieces do (
+    if not (listp(pc) and length(pc) >= 3 and is(pc[3] = want)) then ok: false
+  ),
+  ok
+)$ 
+found_ray_status(rayList, mExp, pExp, mtol, ptol, want) := block([simp, found, r],
+  simp: true,
+  found: false,
+  for r in rayList do (
+    if listp(r) and length(r) >= 3 and numberp(r[1]) and numberp(r[2]) and listp(r[3]) and length(r[3]) > 0 then (
+      if abs(r[1] - mExp) < mtol and abs(r[2] - pExp) < ptol and all_pieces_status(r[3], want) then found: true
+    )
+  ),
+  found
+)$ 
+line_pieces(rayList, m, p, mtol, ptol) := block([simp, result, r],
+  simp: true,
+  result: [],
+  for r in rayList do (
+    if listp(r) and length(r) >= 3 and numberp(r[1]) and numberp(r[2]) and listp(r[3]) then (
+      if abs(r[1] - m) < mtol and abs(r[2] - p) < mtol then result: append(result, r[3])
+    )
+  ),
+  result
+)$ 
+status_covering_x(pieces, x, tol) := block([simp, pc, lo, hi, found],
+  simp: true,
+  found: -1,
+  for pc in pieces do (
+    if listp(pc) and length(pc) >= 3 then (
+      lo: min(pc[1], pc[2]),
+      hi: max(pc[1], pc[2]),
+      if x >= lo - tol and x <= hi + tol then found: pc[3]
+    )
+  ),
+  found
+)$ 
+seg_required_status(rayList, m, p, mtol, ptol, xlo, xhi, tol, want) := block([simp, pieces, s1, s2],
+  simp: true,
+  pieces: line_pieces(rayList, m, p, mtol, ptol),
+  s1: status_covering_x(pieces, xlo + tol, tol),
+  s2: status_covering_x(pieces, xhi - tol, tol),
+  is(s1 = want) and is(s2 = want)
+)$ 
+seg_absent(rayList, m, p, mtol, ptol, xlo, xhi, tol) := block([simp, pieces, s1],
+  simp: true,
+  pieces: line_pieces(rayList, m, p, mtol, ptol),
+  s1: status_covering_x(pieces, (xlo + xhi) / 2, tol),
+  is(s1 = -1)
+)$ 
+seg_optional_status(rayList, m, p, mtol, ptol, xlo, xhi, tol, want) := block([simp],
+  simp: true,
+  seg_absent(rayList, m, p, mtol, ptol, xlo, xhi, tol) or seg_required_status(rayList, m, p, mtol, ptol, xlo, xhi, tol, want)
+)$ 
+found_AB_status(rayList, xExp, y1Exp, y2Exp, xtol, ytol, want) := block([simp, found, r, pc, ylo, yhi, plo, phi],
+  simp: true,
+  found: false,
+  ylo: min(y1Exp, y2Exp),
+  yhi: max(y1Exp, y2Exp),
+  for r in rayList do (
+    if listp(r) and length(r) = 3 and stringp(r[1]) and is(r[1] = "vert") and numberp(r[2])
+       and abs(r[2] - xExp) < xtol and listp(r[3]) then (
+      for pc in r[3] do (
+        if listp(pc) and length(pc) >= 3 then (
+          plo: min(pc[1], pc[2]),
+          phi: max(pc[1], pc[2]),
+          if abs(plo - ylo) < ytol and abs(phi - yhi) < ytol and is(pc[3] = want) then found: true
+        )
+      )
+    )
+  ),
+  found
+)$ 
+require_mc(mc) := block(
+  if not is(safe_op(mc) = "miroir_construction") or not is(length(mc) = 2) then
+    "La réponse doit être générée par la construction graphique ci-dessus (fonction miroir_construction(rayons, points))."
+  else
+    true
+)$ 
+ans1_validator(ex) := stack_seq_validator(ex, [require_mc])$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>TANS</tans>
+      <boxsize>60</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords>miroir_construction</allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options>validator:ans1_validator</options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text>[rayList, ptList]: args(ans1)$ 
+c1: is(found_ray(rayList, 0, AB, 0.05, 0.3) and found_ray(rayList, m1e, p1e, 0.05, 0.3))$ c2: is(found_ray(rayList, m2e, p2e, 0.05, 0.3))$ c3: is(found_ray(rayList, m3i, p3i, 0.05, 0.3) and found_ray(rayList, m3e, p3e, 0.05, 0.3))$ c4: is(found_ray(rayList, m4i, 0, 0.05, 0.3) and found_ray(rayList, m4e, 0, 0.05, 0.3))$ 
+l1_ok: is(seg_optional_status(rayList, 0, AB, 0.05, 0.3, xmin, xA, xtol, 1)
+      and seg_required_status(rayList, 0, AB, 0.05, 0.3, xA, 0, xtol, 1)
+      and seg_optional_status(rayList, 0, AB, 0.05, 0.3, 0, xmax, xtol, 2))$ l2_ok: is(seg_absent(rayList, m1e, p1e, 0.05, 0.3, 0, xmax, xtol)
+      and seg_required_status(rayList, m1e, p1e, 0.05, 0.3, xmin, 0, xtol, 1))$ l3_ok: is(found_ray_status(rayList, m2e, p2e, 0.05, 0.3, 1))$ l4_ok: is(seg_optional_status(rayList, m3i, p3i, 0.05, 0.3, xmin, xA, xtol, 1)
+      and seg_required_status(rayList, m3i, p3i, 0.05, 0.3, xA, 0, xtol, 1)
+      and seg_absent(rayList, m3i, p3i, 0.05, 0.3, 0, xmax, xtol))$ l5_ok: is(seg_required_status(rayList, m3e, p3e, 0.05, 0.3, xmin, 0, xtol, 1)
+      and seg_optional_status(rayList, m3e, p3e, 0.05, 0.3, 0, xmax, xtol, 2))$ l6_ok: is(seg_optional_status(rayList, m4i, 0, 0.05, 0.3, xmin, xA, xtol, 1)
+      and seg_required_status(rayList, m4i, 0, 0.05, 0.3, xA, 0, xtol, 1)
+      and seg_absent(rayList, m4i, 0, 0.05, 0.3, 0, xmax, xtol))$ l7_ok: is(seg_required_status(rayList, m4e, 0, 0.05, 0.3, xmin, 0, xtol, 1)
+      and seg_optional_status(rayList, m4e, 0, 0.05, 0.3, 0, xmax, xtol, 2))$ 
+c1s: is(l1_ok and l2_ok)$ c2s: is(l3_ok)$ c3s: is(l4_ok and l5_ok)$ c4s: is(l6_ok and l7_ok)$ 
+nb_bonnes: (if l1_ok then 1 else 0) + (if l2_ok then 1 else 0) + (if l3_ok then 1 else 0)
+         + (if l4_ok then 1 else 0) + (if l5_ok then 1 else 0) + (if l6_ok then 1 else 0) + (if l7_ok then 1 else 0)$ nb_attempts: length(sublist(rayList, lambda([r], not stringp(r[1]))))$ nb_total: max(nb_attempts, 2)$ score_rayons: min(nb_bonnes / nb_total, 1)$ 
+nb_reflected_ok: (if l2_ok then 1 else 0) + (if l3_ok then 1 else 0) + (if l5_ok then 1 else 0) + (if l7_ok then 1 else 0)$ have2: is(nb_reflected_ok >= 2)$ 
+c_point: is(found_point(ptList, xAp, ABp, 0.3))$ abp_status: is(found_AB_status(rayList, xAp, 0, ABp, 0.3, 0.3, 1))$</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Rayons remarquables — score proportionnel</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>score_rayons*5/7</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><strong>Bilan des rayons remarquables :</strong> chaque rayon compte pour deux droites (la droite incidente,
+issue de B, et la droite réfléchie), sauf le rayon par le centre C qui se réfléchit sur lui-même (une seule droite).
+Chaque droite n'est comptée correcte que si tous ses tronçons ont le bon statut (réel, virtuel, ou enlevé) au bon
+endroit.</p>
+<ul>
+<li>Rayon // axe → F' : [[if test="c1s"]]<span style="color:#1e7e34;">&#10003; les deux droites (incidente et réfléchie) sont correctes</span>[[else]][[if test="c1"]]<span style="color:#c0392b;">les deux droites sont géométriquement bien tracées, mais un ou plusieurs tronçons n'ont pas le bon statut réel/virtuel/enlevé</span>[[else]]<span style="color:#c0392b;">&#10007; pas encore correct</span>[[/if]][[/if]]</li>
+<li>Rayon par le centre C : [[if test="c2s"]]<span style="color:#1e7e34;">&#10003; correct et entièrement réel</span>[[else]][[if test="c2"]]<span style="color:#c0392b;">géométriquement correct, mais pas entièrement marqué réel</span>[[else]]<span style="color:#c0392b;">&#10007; pas encore correct</span>[[/if]][[/if]]</li>
+<li>Rayon par le foyer F : [[if test="c3s"]]<span style="color:#1e7e34;">&#10003; les deux droites (incidente et réfléchie) sont correctes</span>[[else]][[if test="c3"]]<span style="color:#c0392b;">les deux droites sont géométriquement bien tracées, mais un ou plusieurs tronçons n'ont pas le bon statut réel/virtuel/enlevé</span>[[else]]<span style="color:#c0392b;">&#10007; pas encore correct</span>[[/if]][[/if]]</li>
+<li>Rayon arrivant en S : [[if test="c4s"]]<span style="color:#1e7e34;">&#10003; les deux droites (incidente et réfléchie) sont correctes</span>[[else]][[if test="c4"]]<span style="color:#c0392b;">les deux droites sont géométriquement bien tracées, mais un ou plusieurs tronçons n'ont pas le bon statut réel/virtuel/enlevé</span>[[else]]<span style="color:#c0392b;">&#10007; pas encore correct</span>[[/if]][[/if]]</li>
+</ul>
+<p>{@nb_bonnes@} droite(s) correcte(s) sur {@nb_total@} droite(s) tracée(s) et comptabilisée(s) (au moins 2
+comptabilisées, même avec une seule droite tracée). Une droite en trop qui ne correspond à aucune des droites
+attendues fait baisser ce score : mieux vaut tracer exactement les droites demandées plutôt que d'en ajouter au
+hasard.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>+</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p></p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Point image B'</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>c_point</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1/7</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>2</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p>Le point B' est correctement placé à l'intersection des deux rayons réfléchis.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>+</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p>Le point construit n'est pas exactement à l'endroit attendu pour B'. [[if test="have2"]]Vous avez bien
+deux rayons remarquables géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B' est placé
+précisément à l'intersection de leurs <em>tronçons réfléchis</em> (la partie du tracé <em>après</em> le miroir), et
+non ailleurs sur l'un des deux rayons.[[else]]Le point B' ne peut être placé correctement que si deux rayons
+remarquables sont d'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Nature réelle/virtuelle du segment A'B'</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>abp_status</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1/7</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p>Le segment A'B' est correctement marqué réel : l'objet AB étant placé au-delà du foyer F' (SA = {@SA@} cm > f' = {@f@} cm),
+l'image obtenue est bien réelle.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>+</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p>Le segment A'B', représentant l'image, doit être marqué <strong>réel</strong> dans cette configuration :
+l'objet AB est placé au-delà du foyer F' (SA = {@SA@} cm > f' = {@f@} cm), donc l'image obtenue est réelle. Tracez (ou
+retracez) le tronçon entre A' et B' avec l'outil « Tracer A' (perpendiculaire) », puis cliquez dessus pour le
+marquer réel.</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>

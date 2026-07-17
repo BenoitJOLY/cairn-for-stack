@@ -446,6 +446,7 @@ fill="currentColor" stroke="none">
 	</g>
 </g></symbol>
 <symbol id="ico-type-inequation" viewBox="0 0 32 32" fill="currentColor"><path d="M 26 5 L 6 13.21875 L 6 14.78125 L 26 23 L 26 20.84375 L 9.46875 14 L 26 7.15625 Z M 6 25 L 6 27 L 26 27 L 26 25 Z"/></symbol>
+<symbol id="ico-type-equivalence" viewBox="0 0 32 32" fill="currentColor"><path d="M 5 9 L 27 9 L 27 11 L 5 11 Z M 5 15 L 27 15 L 27 17 L 5 17 Z M 5 21 L 27 21 L 27 23 L 5 23 Z"/></symbol>
 <symbol id="ico-type-vf" viewBox="0 0 512 512" fill="currentColor"><rect x="8" y="290.8" style="fill:#FFFFFF" width="213.2" height="213.2"/>
 <path d="M213.2,298.8V496H16V298.8H213.2 M229.2,282.8H0V512h229.2V282.8z"/>
 <rect x="290.8" y="290.8" style="fill:#FFFFFF" width="213.2" height="213.2"/>
@@ -534,6 +535,7 @@ fill="currentColor" stroke="none">
 		C348.17,376.85,346.11,376,344,376z"/>
 </g></symbol>
 <symbol id="ico-type-ord" viewBox="0 0 16 16" fill="currentColor"><path d="m1.75 11 6.25 3.25 6.25-3.25m-12.5-3 6.25 3.25 6.25-3.25m-6.25-6.25-6.25 3.25 6.25 3.25 6.25-3.25z"/></symbol>
+<symbol id="ico-type-geogebra" viewBox="0 0 28 28"><path fill="none" stroke="#666" stroke-width="2.2" d="m15.3,4.7a11.4,9.1-26 1,0 1,0z"/><g stroke-linecap="round"><path stroke="#000" stroke-width="6" d="m13.2,4.9h0M3.8,11.8h0M7.2,22.9h0M20.1,21.2h0M24.4,10.1h0"/><path stroke="#99F" stroke-width="4.3" d="m13.2,4.9h0M3.8,11.8h0M7.2,22.9h0M20.1,21.2h0M24.4,10.1h0"/></g></symbol>
 <symbol id="ico-type-physique" viewBox="0 0 511.999 511.999" fill="currentColor"><g>
 	<g>
 		<path d="M334.618,416.728c-6.521-6.521-17.104-6.521-23.625,0l-38.297,38.279V350.627c0-9.222-7.477-16.694-16.694-16.694
@@ -1053,6 +1055,102 @@ fill="currentColor" stroke="none">
     <div class="field hs-preview-panel" id="jd-preview-panel">
       <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
       <div id="jd-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+    </div>
+    </div>
+  </div>
+
+  <!-- GeoGebra -->
+  <div class="form-panel" id="fp-geogebra">
+    <div class="form-panel-head" style="background:#38761d;color:#fff;">
+      <svg class="hs-ico" style="color:#fff;"><use href="#ico-type-geogebra"></use></svg>
+      <span data-i18n="ggb.title">GeoGebra</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="ggb-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="ggb-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('ggb','cfg',this);if(typeof ggbUpdatePreviewFocus==='function')ggbUpdatePreviewFocus()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('ggb','fb-gen',this);if(typeof ggbUpdatePreviewFocus==='function')ggbUpdatePreviewFocus()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="ggb-cfg">
+      <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-info"></use></svg> <span data-i18n="ggb.info_box">Référencez une activité GeoGebra publiée (geogebra.org/m/XXXX), déclarez les objets d'entrée (paramètres aléatoires injectés) et de sortie (objets lus et notés comme des inputs STACK).</span></div>
+
+      <!-- Modèle -->
+      <div class="field">
+        <label data-i18n="ggb.model_lbl">Modèle</label>
+        <select class="hs-input" id="ggb-model" onchange="ggbApplyModel(this.value);if(typeof ggbRefreshPreview==='function')ggbRefreshPreview()">
+          <option value="expert" data-i18n="ggb.model_expert">Expert (entrées/sorties libres)</option>
+          <option value="deg2" data-i18n="ggb.model_deg2">Tracé de courbe — Degré 2</option>
+          <option value="deg3" data-i18n="ggb.model_deg3">Tracé de courbe — Degré 3</option>
+          <option value="trig" data-i18n="ggb.model_trig">Tracé de courbe — Trigonométrique</option>
+          <option value="exp" data-i18n="ggb.model_exp">Tracé de courbe — Exponentielle</option>
+        </select>
+        <span class="hint" id="ggb-model-hint" data-i18n="ggb.model_hint_expert">Configurez librement les objets d'entrée/sortie.</span>
+      </div>
+
+      <!-- Énoncé -->
+      <div class="field">
+        <label><span data-i18n="ggb.instruction_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('ggb-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
+        <div class="rich-preview" id="prev-ggb-text" data-ph="Cliquez sur Éditeur…" onclick="openRich('ggb-text')"></div>
+        <textarea id="ggb-text" style="display:none"></textarea>
+      </div>
+
+      <!-- Référence de l'activité -->
+      <div class="field">
+        <label data-i18n="ggb.material_lbl">ID du matériel GeoGebra (geogebra.org/m/…) :</label>
+        <input type="text" class="hs-input" id="ggb-material-id" placeholder="xDx295Wu" onchange="if(typeof ggbRefreshPreview==='function')ggbRefreshPreview()">
+      </div>
+      <div class="field" style="display:flex;flex-direction:row;gap:14px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:0 0 140px;">
+          <label data-i18n="ggb.width_lbl">Largeur (px)</label>
+          <input type="number" class="hs-input" id="ggb-width" value="700" min="100" step="10" onchange="if(typeof ggbRefreshPreview==='function')ggbRefreshPreview()">
+        </div>
+        <div style="flex:0 0 140px;">
+          <label data-i18n="ggb.height_lbl">Hauteur (px)</label>
+          <input type="number" class="hs-input" id="ggb-height" value="500" min="100" step="10" onchange="if(typeof ggbRefreshPreview==='function')ggbRefreshPreview()">
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:#374151;">
+          <input type="checkbox" id="ggb-show-toolbar" onchange="if(typeof ggbRefreshPreview==='function')ggbRefreshPreview()">
+          <span data-i18n="ggb.show_toolbar_lbl">Afficher la barre d'outils</span>
+        </label>
+      </div>
+
+      <!-- Variables d'entrée / Coefficients -->
+      <div class="field">
+        <label id="ggb-inputs-label" data-i18n="ggb.inputs_lbl">Objets d'entrée (paramètre Maxima → objet GeoGebra) :</label>
+        <div id="ggb-inputs-list"></div>
+        <button type="button" class="dd-add-prop-btn" id="ggb-add-input-btn" onclick="ggbAddInput()">
+          ＋ <span data-i18n="ggb.add_input_btn">Ajouter une entrée</span>
+        </button>
+      </div>
+
+      <!-- Variables de sortie (masqué en mode préréglé : calculé automatiquement) -->
+      <div class="field" id="ggb-outputs-field">
+        <label data-i18n="ggb.outputs_lbl">Objets de sortie (objet GeoGebra → input STACK noté) :</label>
+        <div id="ggb-outputs-list"></div>
+        <button type="button" class="dd-add-prop-btn" id="ggb-add-output-btn" onclick="ggbAddOutput()">
+          ＋ <span data-i18n="ggb.add_output_btn">Ajouter une sortie</span>
+        </button>
+      </div>
+
+      </div>
+      <div class="mpane" id="ggb-fb-gen">
+        <p style="font-size:.85rem;color:#6b7280;" data-i18n="ggb.fbgen_auto_note">La correction est automatique : un pourcentage d'objets de sortie corrects est calculé, avec rappel de la solution attendue en cas d'erreur.</p>
+        <div class="field">
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('ggb-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
+          <div class="rich-preview" id="prev-ggb-fbgen" data-ph="Cliquez sur Éditeur..." onclick="openRich('ggb-fbgen')"></div>
+          <textarea id="ggb-fbgen" style="display:none"></textarea>
+        </div>
+        <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
+      </div>
+    </div>
+    </div>
+    <div class="field hs-preview-panel" id="ggb-preview-panel">
+      <label data-i18n="ggb.preview_label">Aperçu (applet GeoGebra réelle)</label>
+      <button type="button" class="dd-add-prop-btn" onclick="ggbRefreshPreview()" style="margin-bottom:8px;" data-i18n="ggb.refresh_preview_btn">↻ Rafraîchir l'aperçu</button>
+      <div id="ggb-preview-overrides" style="display:none;margin-bottom:6px;"></div>
+      <div id="ggb-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
     </div>
     </div>
   </div>
@@ -2638,6 +2736,93 @@ fill="currentColor" stroke="none">
   <div class="field hs-preview-panel" id="pol-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
     <div id="pol-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+  </div>
+    </div>
+  </div>
+
+  <!-- RAISONNEMENT PAR ÉQUIVALENCE -->
+  <div class="form-panel" id="fp-equivalence">
+    <div class="form-panel-head" style="background:#5b21b6;color:#fff;">
+      <svg class="hs-ico" style="color:#fff;"><use href="#ico-type-equivalence"></use></svg>
+      <span>Raisonnement par équivalence</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="eq-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="eq-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('eq','cfg',this);if(typeof eqRefreshPreview==='function')eqRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('eq','fb-gen',this);if(typeof eqRefreshPreview==='function')eqRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="eq-cfg">
+      <div class="field">
+        <label data-i18n="ineq.text_lbl">Énoncé</label>
+        <div class="rich-preview" id="prev-eq-text" onclick="openRich('eq-text')" style="min-height:60px;border-color:#5b21b6;background:#f5f3ff;"></div>
+        <textarea id="eq-text" style="display:none"></textarea>
+      </div>
+
+      <div class="g2">
+        <div class="field">
+          <label>Type de raisonnement</label>
+          <select id="eq-scenario" onchange="eqOnScenarioChange()">
+            <option value="developpement">Développement et simplification</option>
+            <option value="equation">Résolution d'équation</option>
+            <option value="factorisation">Factorisation</option>
+            <option value="systeme">Résolution de système d'équations</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Formule de départ (Maxima)</label>
+        <input type="text" id="eq-formule" placeholder="ex : (x-1)^3" oninput="eqFormChange()">
+        <span id="err-eq-formule" class="err-msg" style="display:none;color:#dc2626;font-size:.78rem;">Ce champ est obligatoire.</span>
+      </div>
+
+      <div class="g2">
+        <div class="field" id="eq-variable-block" style="display:none;">
+          <label>Inconnue</label>
+          <input type="text" id="eq-variable" value="x" oninput="eqFormChange()">
+        </div>
+        <div class="field" id="eq-variables-block" style="display:none;">
+          <label>Inconnues (séparées par une virgule)</label>
+          <input type="text" id="eq-variables" value="x,y" oninput="eqFormChange()">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Résultat final <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel — sinon calculé automatiquement par Maxima)</span></label>
+        <input type="text" id="eq-resultat" placeholder="laisser vide pour un calcul automatique" oninput="eqFormChange()">
+      </div>
+
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" id="eq-etape-check" onchange="eqFormChange()"> Ajouter une étape intermédiaire imposée</label>
+      </div>
+      <div id="eq-etape-block" style="display:none;">
+        <div class="field">
+          <label>Étape intermédiaire attendue (Maxima)</label>
+          <input type="text" id="eq-etape-val" placeholder="ex : (x-1)*(x-1)^2" oninput="eqFormChange()">
+        </div>
+      </div>
+
+      <div id="eq-preview" style="background:#f5f3ff;border:1.5px solid #c4b5fd;border-radius:8px;padding:8px 12px;font-size:.85rem;color:#5b21b6;margin:8px 0;"></div>
+
+      <div class="g2">
+        <div class="field"><label data-i18n="ineq.fb_ok_lbl">Message si bonne réponse</label><input type="text" id="eq-fb-ok" placeholder="✅ défaut"></div>
+        <div class="field"><label data-i18n="ineq.fb_wrong_lbl">Message si mauvaise réponse</label><input type="text" id="eq-fb-wrong" placeholder="❌ défaut"></div>
+      </div>
+      </div>
+      <div class="mpane" id="eq-fb-gen">
+        <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+          <textarea id="eq-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..."></textarea></div>
+        <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
+      </div>
+    </div>
+    </div>
+  <div class="field hs-preview-panel" id="eq-preview-panel">
+    <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div id="eq-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
   </div>
@@ -7852,6 +8037,7 @@ E H --</textarea>
 <script src="js/gen-math-probabilites.js"></script>
 <script src="js/gen-math-trigonometrie.js"></script>
 <script src="js/gen-math-polynomes.js"></script>
+<script src="js/gen-math-equivalence.js"></script>
 <script src="js/gen-math-limites.js"></script>
 <script src="js/gen-math-physique.js"></script>
 <script src="js/gen-math-inequation.js"></script>
@@ -7883,6 +8069,7 @@ E H --</textarea>
 <script src="js/inequation-ui.js"></script>
 <script src="js/thermo-ui.js"></script>
 <script src="js/polynomes-ui.js"></script>
+<script src="js/equivalence-ui.js"></script>
 <script src="js/limites-ui.js"></script>
 <script src="js/physique-ui.js"></script>
 <script src="js/suites-ui.js"></script>
@@ -7915,6 +8102,8 @@ E H --</textarea>
 <script src="js/stack-import.js"></script>
 <script src="js/expert-ui.js"></script>
 <script src="js/gen-expert.js"></script>
+<script src="js/gen-geogebra.js"></script>
+<script src="js/geogebra-ui.js"></script>
 <script src="js/a11y-init.js"></script>
 <script src="js/projects.js"></script>
 

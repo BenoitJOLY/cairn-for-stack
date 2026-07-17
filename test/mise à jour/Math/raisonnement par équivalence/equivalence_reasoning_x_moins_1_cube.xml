@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name>
+      <text>Développement d'un cube - raisonnement par équivalence</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Développer {@p@}, en détaillant les étapes de calcul.</p>
+[[input:ans1]]
+[[validation:ans1]]]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p>La forme développée et simplifiée est {@taf@}.</p>]]></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.1000000</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <questionvariables>
+      <text><![CDATA[p:(x-1)^3;
+taf:ev(expand(p),simp);
+ta:[(x-1)^3,stackeq((x-1)*(x-1)^2),stackeq((x-1)*(x^2-2*x+1)),stackeq(x^3-2*x^2+x-x^2+2*x-1),stackeq(taf)];]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[[[feedback:prt1]]]]></text>
+    </specificfeedback>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionnote format="html">
+      <text><![CDATA[{@ta@}]]></text>
+    </questionnote>
+    <questionsimplify>0</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text><![CDATA[<p>Réponse correcte, bien joué.</p>]]></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text><![CDATA[<p>Votre réponse est partiellement correcte.</p>]]></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text><![CDATA[<p>Réponse incorrecte.</p>]]></text>
+    </prtincorrect>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <matrixparens>[</matrixparens>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>equiv</type>
+      <tans>ta</tans>
+      <boxsize>20</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>1</insertstars>
+      <syntaxhint><![CDATA[[(x-1)^3,stackeq(?)]]]></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>1</showvalidation>
+      <options>firstline</options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>0</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <answertest>EquivFirst</answertest>
+        <sans>ans1</sans>
+        <tans>ta</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p>Votre point de départ est correct et toutes les étapes sont algébriquement équivalentes entre elles.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0.0000000</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p>Soit votre première ligne ne correspond pas à l'expression de départ, soit une des étapes suivantes n'est pas équivalente à la précédente. Vérifiez chaque ligne de votre développement.</p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <answertest>EqualComAss</answertest>
+        <sans>last(ans1)</sans>
+        <tans>last(ta)</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1.0000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p>Vous êtes arrivé au résultat final développé et simplifié.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0.5000000</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p>Vos étapes sont valides, mais votre dernière ligne n'est pas la forme développée et simplifiée finale attendue.</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <deployedseed></deployedseed>
+    <qtest>
+      <testcase>1</testcase>
+      <testinput>
+        <name>ans1</name>
+        <value>[(x-1)^3,stackeq((x-1)*(x-1)^2),stackeq((x-1)*(x^2-2*x+1)),stackeq(x^3-2*x^2+x-x^2+2*x-1),stackeq(x^3-3*x^2+3*x-1)]</value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>1.0000000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-0-T|prt1-1-T</expectedanswernote>
+      </expected>
+    </qtest>
+    <qtest>
+      <testcase>2</testcase>
+      <testinput>
+        <name>ans1</name>
+        <value>[(x-1)^3,stackeq(x^3-3*x^2+3*x-1)]</value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>1.0000000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-0-T|prt1-1-T</expectedanswernote>
+      </expected>
+    </qtest>
+    <qtest>
+      <testcase>3</testcase>
+      <testinput>
+        <name>ans1</name>
+        <value>[(x+1)^3,stackeq(x^3+3*x^2+3*x+1)]</value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>0.0000000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-0-F</expectedanswernote>
+      </expected>
+    </qtest>
+    <qtest>
+      <testcase>4</testcase>
+      <testinput>
+        <name>ans1</name>
+        <value>[(x-1)^3,stackeq((x-1)*(x-1)^2),stackeq(x^3-3*x^2+3*x)]</value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>0.0000000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-0-F</expectedanswernote>
+      </expected>
+    </qtest>
+  </question>
+</quiz>

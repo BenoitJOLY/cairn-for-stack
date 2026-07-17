@@ -20,6 +20,7 @@ var PALETTE_TYPES = [
   {type:'jxgdrop',       label:'Glisser-Déposer'},
   {type:'imgclick',      label:'Sélection image'},
   {type:'glr',           label:'Lecture graphique'},
+  {type:'geogebra',      label:'GeoGebra'},
   {type:'rvbcmj',        label:'RVB / CMJN'},
   {type:'optique',       label:'Optique géométrique'},
   {type:'acide-base',   label:'pH-métrie / Titrage'},
@@ -40,6 +41,7 @@ var PALETTE_TYPES = [
   {type:'physique',      label:'Physique (cinématique, énergie mécanique, lois de Newton)'},
   {type:'oscilloscope',  label:'Oscilloscope (signal sinusoïdal, retard, RC)'},
   {type:'inequation',   label:'Inéquations (ensemble-solution, intervalles, AlgEquiv)'},
+  {type:'equivalence',  label:'Raisonnement par équivalence (développement, équation, factorisation, système)'},
   {type:'thermo',       label:'Thermodynamique (gaz parfaits PV=nRT, chaleur, enthalpie)'},
   {type:'diffraction',  label:'Interférences-Diffraction (fente, Young, λ)'},
   {type:'image-mesure', label:'Mesure sur image (spectre, microscope, règle…)'},
@@ -49,7 +51,7 @@ var PALETTE_TYPES = [
 
 var PALETTE_CATEGORIES = [
   {id:'choix',       label:'Choix multiples',       types:['checkbox','radio','dropdown','vf']},
-  {id:'numerique',   label:'Mathématiques',   types:['numerical','algebraic','complexe','calcul','statistiques','matrices','geometrie','suites','probabilites','trigonometrie','polynomes','limites','inequation']},
+  {id:'numerique',   label:'Mathématiques',   types:['numerical','algebraic','complexe','calcul','statistiques','matrices','geometrie','suites','probabilites','trigonometrie','polynomes','limites','inequation','equivalence','geogebra']},
   {id:'physchim',    label:'Physique-Chimie',        types:['units','doi','chemical','chemical_topo','nuclear','optique','acide-base','redox','circuit','physique','oscilloscope','thermo','diffraction','rvbcmj','apn']},
   {id:'info',        label:'Informatique',           types:['basen','logique']},
   {id:'textuelle',   label:'Réponse textuelle',      types:['string','composition']},
@@ -60,6 +62,7 @@ var PALETTE_CATEGORIES = [
 
 /* ── Insertion depuis la palette (clavier ou clic) ── */
 function insertFromPalette(type) {
+  if (!canInsertChipType(type)) return;
   var editor = document.getElementById('v4-editor');
   var qid = nextQid++;
   var chip = createChipEl(qid, type);
