@@ -1657,25 +1657,28 @@ fill="currentColor" stroke="none">
       <div class="field">
         <label data-i18n="opt.scenario_lbl">Scénario</label>
         <select id="opt-scenario" onchange="optScenarioChange()">
-          <optgroup label="Lentilles convergentes">
-            <option value="lentille-image" data-i18n="opt.scenario_lentille_image">Lentille — Trouver l'image (glisser B')</option>
-            <option value="lentille-rayons" data-i18n="opt.scenario_lentille_rayons">Lentille — Tracer les 3 rayons remarquables</option>
-            <option value="lunette" data-i18n="opt.scenario_lunette">Lunette astronomique afocale (2 lentilles)</option>
+          <optgroup label="Lentilles minces">
+            <option value="lentille-convergente" data-i18n="opt.scenario_lentille_convergente">Lentille convergente — construction des 3 rayons</option>
+            <option value="lentille-divergente" data-i18n="opt.scenario_lentille_divergente">Lentille divergente — construction des 3 rayons</option>
           </optgroup>
-          <optgroup label="Miroirs">
-            <option value="miroir-plan" data-i18n="opt.scenario_miroir_plan">Miroir plan — Image symétrique</option>
-            <option value="miroir-spherique" data-i18n="opt.scenario_miroir_spherique">Miroir sphérique — Trouver l'image</option>
-            <option value="telescope" data-i18n="opt.scenario_telescope">Télescope — Miroir concave + oculaire</option>
+          <optgroup label="Miroirs sphériques">
+            <option value="miroir-plan" disabled data-i18n="opt.scenario_miroir_plan">Miroir plan — construction (à venir)</option>
+            <option value="miroir-concave" data-i18n="opt.scenario_miroir_concave">Miroir concave — construction des 4 rayons</option>
+            <option value="miroir-convexe" data-i18n="opt.scenario_miroir_convexe">Miroir convexe — construction des 4 rayons</option>
+          </optgroup>
+          <optgroup label="Instruments composés (bientôt)">
+            <option value="lunette-galilee" disabled data-i18n="opt.scenario_lunette_galilee">Lunette de Galilée — construction complète (à venir)</option>
+            <option value="telescope-newton" disabled data-i18n="opt.scenario_telescope_newton">Télescope de Newton — construction complète (à venir)</option>
           </optgroup>
         </select>
       </div>
 
       <!-- Info-box dynamique -->
       <div id="opt-info-box" class="info-box" style="border-color:#0284c7;background:#f0f9ff;color:#0c4a6e;">
-        🔭 <span data-i18n-html="opt.info_box_html">L'élève positionne l'image A'B' en faisant glisser B'. Validation par la relation de conjugaison <strong>1/OA' − 1/OA = 1/f'</strong>.</span>
+        ✏️ <span data-i18n-html="opt.info_box_html">L'élève trace au moins deux des trois rayons particuliers à l'aide d'une barre d'outils, puis construit l'image B' par intersection. Correction automatique du statut réel/virtuel de chaque tronçon.</span>
       </div>
 
-      <!-- ── SECTION LENTILLE (lentille-image + lentille-rayons) ── -->
+      <!-- ── SECTION LENTILLE (convergente + divergente : mêmes paramètres f'/OA/AB) ── -->
       <div id="opt-sect-lentille">
         <fieldset style="border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;margin:10px 0;">
           <legend style="font-size:.85rem;color:#0369a1;font-weight:600;" data-i18n="opt.params_lentille_legend">Paramètres de la lentille</legend>
@@ -1699,174 +1702,39 @@ fill="currentColor" stroke="none">
             </div>
           </div>
         </fieldset>
-
-        <!-- Tolérance image (lentille-image seulement) -->
-        <div id="opt-tol-image" class="g2">
-          <div class="field">
-            <label data-i18n="opt.tol_oa_prime_lbl">Tolérance Δ(OA') (cm)</label>
-            <input type="number" id="opt-tol-pos" value="2" min="0.5" max="20" step="0.5">
-          </div>
-          <div class="field">
-            <label data-i18n="opt.tol_ab_prime_lbl">Tolérance Δ(A'B') (cm)</label>
-            <input type="number" id="opt-tol-h" value="1" min="0.1" max="10" step="0.1">
-          </div>
-        </div>
-
-        <!-- Tolérance rayons (lentille-rayons seulement) -->
-        <div id="opt-tol-rayons" style="display:none;">
-          <div class="field">
-            <label data-i18n="opt.tol_trace_rayon_lbl">Tolérance de tracé par rayon (cm)</label>
-            <input type="number" id="opt-tol-ray" value="1.5" min="0.1" max="10" step="0.1">
-          </div>
-        </div>
       </div>
 
-      <!-- ── SECTION LUNETTE ── -->
-      <div id="opt-sect-lunette" style="display:none;">
+      <!-- ── SECTION MIROIR (concave + convexe : f/SA/AB) ── -->
+      <div id="opt-sect-miroir" style="display:none;">
         <fieldset style="border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;margin:10px 0;">
-          <legend style="font-size:.85rem;color:#0369a1;font-weight:600;" data-i18n="opt.params_lunette_legend">Paramètres de la lunette</legend>
+          <legend style="font-size:.85rem;color:#0369a1;font-weight:600;" data-i18n="opt.params_miroir_legend">Paramètres du miroir</legend>
           <div class="g2">
             <div class="field">
-              <label data-i18n="opt.focale_objectif_lbl">Focale objectif f'₁ (cm)</label>
-              <input type="number" id="opt-f1" value="40" min="5" max="300" step="1" oninput="optUpdatePreview()">
+              <label data-i18n="opt.focale_f_miroir_lbl">Distance focale f (cm, &gt; 0)</label>
+              <input type="number" id="opt-mir-f" value="3" min="0.5" max="50" step="0.5" oninput="optUpdatePreview()">
             </div>
             <div class="field">
-              <label data-i18n="opt.focale_oculaire_lbl">Focale oculaire f'₂ (cm)</label>
-              <input type="number" id="opt-f2" value="10" min="1" max="100" step="1" oninput="optUpdatePreview()">
+              <label data-i18n-html="opt.position_sa_lbl_html">Position objet SA (cm, &gt; 0)</label>
+              <input type="number" id="opt-mir-sa" value="7" min="0.5" max="200" step="0.5" oninput="optUpdatePreview()">
             </div>
           </div>
           <div class="g2">
             <div class="field">
-              <label data-i18n="opt.angle_incidence_lbl">Angle d'incidence θ (degrés)</label>
-              <input type="number" id="opt-theta" value="3" min="0.5" max="20" step="0.5" oninput="optUpdatePreview()">
+              <label data-i18n-html="opt.hauteur_ab_lbl_html">Hauteur objet AB (cm, &gt; 0)</label>
+              <input type="number" id="opt-mir-ab" value="1.5" min="0.1" max="30" step="0.5" oninput="optUpdatePreview()">
             </div>
-            <div class="field">
-              <label data-i18n="opt.hauteur_faisceau_lbl">Hauteur faisceau h (cm)</label>
-              <input type="number" id="opt-beam-h" value="3" min="0.5" max="15" step="0.5">
+            <div id="opt-mir-preview" style="align-self:center;font-size:.82rem;color:#0369a1;padding:6px 10px;background:#e0f2fe;border-radius:6px;min-height:3em;display:flex;flex-direction:column;justify-content:center;">
+              <em style="color:#6b7280;" data-i18n="ab.apercu_calcule">Aperçu calculé…</em>
             </div>
-          </div>
-          <div id="opt-lunette-preview" style="font-size:.82rem;color:#0369a1;padding:6px 10px;background:#e0f2fe;border-radius:6px;margin-top:6px;">
-            <em style="color:#6b7280;" data-i18n="ab.apercu_calcule">Aperçu calculé…</em>
           </div>
         </fieldset>
-        <div class="g2">
-          <div class="field">
-            <label data-i18n="opt.tol_xb1_lbl">Tolérance Δ(x B₁) (cm)</label>
-            <input type="number" id="opt-tol-b1x" value="1.5" min="0.1" max="10" step="0.5">
-          </div>
-          <div class="field">
-            <label data-i18n="opt.tol_yb1_lbl">Tolérance Δ(y B₁) (cm)</label>
-            <input type="number" id="opt-tol-b1y" value="0.5" min="0.05" max="5" step="0.05">
-          </div>
+      </div>
+
+      <!-- ── SECTIONS À VENIR (miroir plan, lunette, télescope) : générateurs pas encore implémentés ── -->
+      <div id="opt-sect-non-implemente" style="display:none;">
+        <div class="info-box" style="border-color:#f59e0b;background:#fffbeb;color:#92400e;">
+          ⏳ Ce scénario n'est pas encore disponible dans cette version — le moteur de construction sera ajouté prochainement.
         </div>
-      </div>
-
-      <!-- ── SECTION MIROIR PLAN ── -->
-      <div id="opt-sect-miroir-plan" style="display:none;">
-        <fieldset style="border:1.5px solid #fde68a;border-radius:8px;padding:10px 14px;margin:10px 0;">
-          <legend style="font-size:.85rem;color:#b45309;font-weight:600;" data-i18n="opt.params_miroir_plan_legend">Paramètres du miroir plan</legend>
-          <div class="g2">
-            <div class="field">
-              <label data-i18n-html="opt.position_miroir_xm_lbl_html">Position miroir x<sub>M</sub> (cm)</label>
-              <input type="number" id="opt-mp-xm" value="0" step="1">
-            </div>
-            <div class="field">
-              <label data-i18n-html="opt.position_objet_xa_lbl_html">Position objet x<sub>A</sub> (cm, &lt; x<sub>M</sub>)</label>
-              <input type="number" id="opt-mp-xa" value="-20" step="1">
-            </div>
-          </div>
-          <div class="g2">
-            <div class="field">
-              <label data-i18n="opt.hauteur_ab_lbl">Hauteur AB (cm)</label>
-              <input type="number" id="opt-mp-ab" value="2" min="0.5" max="10" step="0.5">
-            </div>
-            <div class="field">
-              <label data-i18n="opt.tolerance_lbl">Tolérance (cm)</label>
-              <input type="number" id="opt-mp-tol" value="1.5" min="0.1" max="5" step="0.1">
-            </div>
-          </div>
-        </fieldset>
-      </div>
-
-      <!-- ── SECTION MIROIR SPHÉRIQUE ── -->
-      <div id="opt-sect-miroir-spherique" style="display:none;">
-        <fieldset style="border:1.5px solid #fde68a;border-radius:8px;padding:10px 14px;margin:10px 0;">
-          <legend style="font-size:.85rem;color:#b45309;font-weight:600;" data-i18n="opt.params_miroir_spherique_legend">Paramètres du miroir sphérique</legend>
-          <div class="field">
-            <label data-i18n="opt.type_miroir_lbl">Type de miroir</label>
-            <select id="opt-ms-type" onchange="optUpdatePreview()">
-              <option value="concave" data-i18n="opt.miroir_concave">Concave (convergent)</option>
-              <option value="convex" data-i18n="opt.miroir_convexe">Convexe (divergent)</option>
-            </select>
-          </div>
-          <div class="g2">
-            <div class="field">
-              <label data-i18n="opt.focale_abs_lbl">Distance focale |f'| (cm)</label>
-              <input type="number" id="opt-ms-f" value="20" min="1" max="200" step="1" oninput="optUpdatePreview()">
-            </div>
-            <div class="field">
-              <label data-i18n-html="opt.distance_objet_sa_lbl_html">Distance objet SA (cm, &gt; 0)</label>
-              <input type="number" id="opt-ms-sa" value="30" min="1" max="300" step="1" oninput="optUpdatePreview()">
-            </div>
-          </div>
-          <div class="g2">
-            <div class="field">
-              <label data-i18n="opt.hauteur_ab_lbl">Hauteur AB (cm)</label>
-              <input type="number" id="opt-ms-ab" value="2" min="0.5" max="10" step="0.5">
-            </div>
-            <div class="field">
-              <label>&nbsp;</label>
-              <div id="opt-ms-preview" style="font-size:.8rem;color:#b45309;padding:5px 8px;background:#fef9c3;border-radius:6px;"><em style="color:#6b7280;" data-i18n="opt.apercu_court">Aperçu…</em></div>
-            </div>
-          </div>
-          <div class="g2" style="margin-top:4px;">
-            <div class="field">
-              <label data-i18n="opt.tol_position_lbl">Tolérance Δ(position) (cm)</label>
-              <input type="number" id="opt-ms-tol-pos" value="2" min="0.1" max="10" step="0.1">
-            </div>
-            <div class="field">
-              <label data-i18n="opt.tol_hauteur_lbl">Tolérance Δ(hauteur) (cm)</label>
-              <input type="number" id="opt-ms-tol-h" value="1" min="0.05" max="5" step="0.05">
-            </div>
-          </div>
-        </fieldset>
-      </div>
-
-      <!-- ── SECTION TÉLESCOPE ── -->
-      <div id="opt-sect-telescope" style="display:none;">
-        <fieldset style="border:1.5px solid #d1fae5;border-radius:8px;padding:10px 14px;margin:10px 0;">
-          <legend style="font-size:.85rem;color:#065f46;font-weight:600;" data-i18n="opt.params_telescope_legend">Paramètres du télescope (miroir concave)</legend>
-          <div class="g2">
-            <div class="field">
-              <label data-i18n="opt.focale_miroir_primaire_lbl">Focale miroir primaire f'₁ (cm)</label>
-              <input type="number" id="opt-tel-f1" value="40" min="5" max="300" step="1" oninput="optUpdatePreview()">
-            </div>
-            <div class="field">
-              <label data-i18n="opt.angle_incidence_lbl">Angle d'incidence θ (degrés)</label>
-              <input type="number" id="opt-tel-theta" value="3" min="0.5" max="20" step="0.5" oninput="optUpdatePreview()">
-            </div>
-          </div>
-          <div class="g2">
-            <div class="field">
-              <label data-i18n="opt.hauteur_faisceau_lbl">Hauteur faisceau h (cm)</label>
-              <input type="number" id="opt-tel-beam-h" value="3" min="0.5" max="15" step="0.5">
-            </div>
-            <div class="field">
-              <label>&nbsp;</label>
-              <div id="opt-tel-preview" style="font-size:.8rem;color:#065f46;padding:5px 8px;background:#d1fae5;border-radius:6px;"><em style="color:#6b7280;" data-i18n="opt.apercu_court">Aperçu…</em></div>
-            </div>
-          </div>
-          <div class="g2" style="margin-top:4px;">
-            <div class="field">
-              <label data-i18n="opt.tol_xb1_lbl">Tolérance Δ(x B₁) (cm)</label>
-              <input type="number" id="opt-tel-tol-x" value="2" min="0.1" max="10" step="0.5">
-            </div>
-            <div class="field">
-              <label data-i18n="opt.tol_yb1_lbl">Tolérance Δ(y B₁) (cm)</label>
-              <input type="number" id="opt-tel-tol-y" value="0.5" min="0.05" max="5" step="0.05">
-            </div>
-          </div>
-        </fieldset>
       </div>
 
       <!-- Dimensions du schéma -->
@@ -1885,17 +1753,6 @@ fill="currentColor" stroke="none">
         <textarea id="opt-text" style="display:none"></textarea>
       </div>
 
-      <!-- Feedback -->
-      <div class="g2" style="margin-top:10px;">
-        <div class="field">
-          <label><span data-i18n="ab.fb_ok_lbl">✅ Message si bonne réponse (opt.)</span></label>
-          <input type="text" id="opt-fb-ok" placeholder="">
-        </div>
-        <div class="field">
-          <label><span data-i18n="ab.fb_wrong_lbl">❌ Message si mauvaise réponse (opt.)</span></label>
-          <input type="text" id="opt-fb-wrong" placeholder="">
-        </div>
-      </div>
       </div>
       <div class="mpane" id="opt-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="opt.fbgen_auto_desc">La correction de la construction géométrique est automatique (tolérances ci-dessus). Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>

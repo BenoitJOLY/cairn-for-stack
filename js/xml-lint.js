@@ -57,5 +57,31 @@ function lintExportedXML(xml) {
     });
   }
 
+  // 6) Limite CHAR(255) côté base Moodle : mdl_qtype_stack_inputs.tans et
+  //    mdl_qtype_stack_qtest_inputs.value sont tous deux des CHAR(255) stricts
+  //    (voir test/moodle-qtype_stack-master/db/install.xml). Un dépassement ne
+  //    remonte PAS via la validation STACK habituelle : Moodle échoue à
+  //    l'écriture en base avec un simple "Erreur d'écriture vers la base de
+  //    données", sans détail (sauf mode debug développeur). Seuil d'alerte à
+  //    220 (marge avant la limite dure de 255) pour laisser de la place à un
+  //    arrondi ultérieur sans repasser par un import raté pour le découvrir.
+  var TANS_LIMIT = 220;
+  var tansRe = /<tans>(?:<!\[CDATA\[([\s\S]*?)\]\]>|([^<]*))<\/tans>/g, tm;
+  while ((tm = tansRe.exec(xml))) {
+    var tansVal = tm[1] !== undefined ? tm[1] : tm[2];
+    if (tansVal && tansVal.length > TANS_LIMIT) {
+      warnings.push('<tans> de ' + tansVal.length + ' caractères (limite base de données : 255) — '
+        + 'raccourcir (arrondir les valeurs numériques dans la tolérance du PRT) pour rester sous ' + TANS_LIMIT + '.');
+    }
+  }
+  var qtestValRe = /<testinput>[\s\S]*?<value>(?:<!\[CDATA\[([\s\S]*?)\]\]>|([^<]*))<\/value>/g, qm;
+  while ((qm = qtestValRe.exec(xml))) {
+    var qtestVal = qm[1] !== undefined ? qm[1] : qm[2];
+    if (qtestVal && qtestVal.length > TANS_LIMIT) {
+      warnings.push('<value> de qtest de ' + qtestVal.length + ' caractères (limite base de données : 255) — '
+        + 'raccourcir de la même façon que <tans>.');
+    }
+  }
+
   return warnings;
 }

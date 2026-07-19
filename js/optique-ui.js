@@ -1,66 +1,64 @@
-// optique-ui.js — UI helpers for the Optique question type (6 scenarios)
+// optique-ui.js — UI helpers for the Optique question type
+// Scénarios cibles : lentille-convergente, lentille-divergente, miroir-concave,
+// miroir-convexe (implémentés), miroir-plan, lunette-galilee, telescope-newton (à venir).
 
 var OPT_SCENARIO_INFO = {
-    "lentille-image":
-        "🔭 L'élève positionne l'image A'B' en faisant glisser le point B'."
-        + " Validation par la relation de conjugaison <strong>1/OA' &minus; 1/OA = 1/f'</strong>.",
-    "lentille-rayons":
-        "✏️ L'élève trace les 3 rayons remarquables en déplaçant les extrémités des rayons émergents."
-        + " Chaque rayon est validé par sa distance perpendiculaire à la droite théorique.",
-    "lunette":
-        "🔭 L'élève place l'image intermédiaire B₁ dans le plan focal commun."
-        + " Les rayons émergents de L₂ s'affichent automatiquement &mdash; ils deviennent"
-        + " <strong>parallèles</strong> quand B₁ est en F'₁.",
+    "lentille-convergente":
+        "✏️ L'élève trace au moins deux des trois rayons particuliers issus de B à l'aide de la barre d'outils"
+        + " (rayon 2 clics, rayon // axe, rayon parallèle 3 clics), puis construit le point B' par intersection"
+        + " des rayons émergents. Le statut réel/virtuel de chaque tronçon est corrigé automatiquement.",
+    "lentille-divergente":
+        "✏️ Comme pour la lentille convergente, mais l'image est <strong>toujours virtuelle</strong> : les rayons"
+        + " émergents divergent après la lentille et doivent être prolongés en arrière (pointillés) pour construire B'.",
     "miroir-plan":
-        "🪞 L'élève place l'image A'B' en faisant glisser B'. Validation par la symétrie par rapport"
-        + " au miroir plan : A'B' est l'image <strong>virtuelle, droite, même taille</strong> de AB.",
-    "miroir-spherique":
-        "🪞 L'élève positionne l'image A'B' d'un miroir sphérique en faisant glisser B'."
-        + " Validation par la relation <strong>1/SA' + 1/SA = 1/f'</strong>.",
-    "telescope":
-        "🔭 L'élève place le foyer image B₁ du miroir concave primaire."
-        + " Les rayons réfléchis s'affichent dynamiquement &mdash; ils <strong>convergent</strong>"
-        + " vers B₁ quand celui-ci est à la position correcte."
+        "⏳ Scénario pas encore implémenté dans cette version.",
+    "miroir-concave":
+        "✏️ L'élève trace au moins deux des quatre rayons remarquables issus de B (// axe, par C, par F, vers S), les"
+        + " fait se réfléchir sur le miroir, puis construit B' par intersection des rayons réfléchis. Selon la position"
+        + " de l'objet (SA &lt; f ou SA &gt; f), l'image est virtuelle ou réelle — le statut réel/virtuel attendu de"
+        + " chaque tronçon est corrigé automatiquement.",
+    "miroir-convexe":
+        "✏️ Comme pour le miroir concave, mais le foyer F et le centre C sont <strong>virtuels</strong> (derrière le"
+        + " miroir) : l'image obtenue est toujours virtuelle, quelle que soit la position de l'objet.",
+    "lunette-galilee":
+        "⏳ Scénario pas encore implémenté dans cette version.",
+    "telescope-newton":
+        "⏳ Scénario pas encore implémenté dans cette version."
 };
 
+var OPT_SCENARIOS_LENTILLE = ["lentille-convergente", "lentille-divergente"];
+var OPT_SCENARIOS_MIROIR   = ["miroir-concave", "miroir-convexe"];
+var OPT_SCENARIOS_A_VENIR  = ["miroir-plan", "lunette-galilee", "telescope-newton"];
+
 function optScenarioChange() {
-    var sc = (document.getElementById("opt-scenario") || {}).value || "lentille-image";
+    var sc = (document.getElementById("opt-scenario") || {}).value || "lentille-convergente";
 
     var infoEl = document.getElementById("opt-info-box");
     if (infoEl) infoEl.innerHTML = OPT_SCENARIO_INFO[sc] || "";
 
-    var isLentille = (sc === "lentille-image" || sc === "lentille-rayons");
+    var isLentille = OPT_SCENARIOS_LENTILLE.indexOf(sc) > -1;
+    var isMiroir   = OPT_SCENARIOS_MIROIR.indexOf(sc) > -1;
+    var isAVenir   = OPT_SCENARIOS_A_VENIR.indexOf(sc) > -1;
 
     var sectLentille = document.getElementById("opt-sect-lentille");
     if (sectLentille) sectLentille.style.display = isLentille ? "" : "none";
 
-    var sectLunette = document.getElementById("opt-sect-lunette");
-    if (sectLunette) sectLunette.style.display = (sc === "lunette") ? "" : "none";
+    var sectMiroir = document.getElementById("opt-sect-miroir");
+    if (sectMiroir) sectMiroir.style.display = isMiroir ? "" : "none";
 
-    var sectMP = document.getElementById("opt-sect-miroir-plan");
-    if (sectMP) sectMP.style.display = (sc === "miroir-plan") ? "" : "none";
-
-    var sectMS = document.getElementById("opt-sect-miroir-spherique");
-    if (sectMS) sectMS.style.display = (sc === "miroir-spherique") ? "" : "none";
-
-    var sectTel = document.getElementById("opt-sect-telescope");
-    if (sectTel) sectTel.style.display = (sc === "telescope") ? "" : "none";
-
-    var tolImage = document.getElementById("opt-tol-image");
-    if (tolImage) tolImage.style.display = (sc === "lentille-image") ? "" : "none";
-
-    var tolRayons = document.getElementById("opt-tol-rayons");
-    if (tolRayons) tolRayons.style.display = (sc === "lentille-rayons") ? "" : "none";
+    var sectAVenir = document.getElementById("opt-sect-non-implemente");
+    if (sectAVenir) sectAVenir.style.display = isAVenir ? "" : "none";
 
     var headEl = document.getElementById("opt-head-label");
     if (headEl) {
         var labels = {
-            "lentille-image":     "Optique — Lentille (image)",
-            "lentille-rayons":    "Optique — Rayons remarquables",
-            "lunette":            "Optique — Lunette astronomique",
-            "miroir-plan":        "Optique — Miroir plan",
-            "miroir-spherique":   "Optique — Miroir sphérique",
-            "telescope":          "Optique — Télescope"
+            "lentille-convergente": "Optique — Lentille convergente",
+            "lentille-divergente":  "Optique — Lentille divergente",
+            "miroir-plan":          "Optique — Miroir plan (à venir)",
+            "miroir-concave":       "Optique — Miroir concave",
+            "miroir-convexe":       "Optique — Miroir convexe",
+            "lunette-galilee":      "Optique — Lunette de Galilée (à venir)",
+            "telescope-newton":     "Optique — Télescope de Newton (à venir)"
         };
         headEl.textContent = labels[sc] || "Optique géométrique";
     }
@@ -69,19 +67,15 @@ function optScenarioChange() {
 }
 
 function optUpdatePreview() {
-    var sc = (document.getElementById("opt-scenario") || {}).value || "lentille-image";
-    if (sc === "lentille-image" || sc === "lentille-rayons") {
-        _optPreviewLentille();
-    } else if (sc === "lunette") {
-        _optPreviewLunette();
-    } else if (sc === "miroir-spherique") {
-        _optPreviewMiroirSph();
-    } else if (sc === "telescope") {
-        _optPreviewTelescope();
+    var sc = (document.getElementById("opt-scenario") || {}).value || "lentille-convergente";
+    if (OPT_SCENARIOS_LENTILLE.indexOf(sc) > -1) {
+        _optPreviewLentille(sc);
+    } else if (OPT_SCENARIOS_MIROIR.indexOf(sc) > -1) {
+        _optPreviewMiroir(sc);
     }
 }
 
-function _optPreviewLentille() {
+function _optPreviewLentille(sc) {
     var el = document.getElementById("opt-image-preview");
     if (!el) return;
     var f  = parseFloat((document.getElementById("opt-f")  || {}).value);
@@ -93,94 +87,66 @@ function _optPreviewLentille() {
     }
     if (f <= 0) { el.innerHTML = "⚠️ f' doit être &gt; 0"; el.style.color = "#dc2626"; return; }
     if (OA >= 0) { el.innerHTML = "⚠️ OA doit être &lt; 0"; el.style.color = "#dc2626"; return; }
-    if (Math.abs(OA + f) < 0.01) {
-        el.innerHTML = "⚠️ OA = −f' → image à l'infini"; el.style.color = "#dc2626"; return;
+
+    var xA = OA;
+    var xAp, gamma;
+    if (sc === "lentille-divergente") {
+        var xFp = -f;
+        if (Math.abs(xA) < 0.01) { el.innerHTML = "⚠️ OA ne peut pas être nul"; el.style.color = "#dc2626"; return; }
+        xAp = 1 / ((1 / xFp) + (1 / xA));
+    } else {
+        if (Math.abs(xA + f) < 0.01) {
+            el.innerHTML = "⚠️ OA = −f' → image à l'infini"; el.style.color = "#dc2626"; return;
+        }
+        xAp = f * xA / (xA + f);
     }
+    gamma = xAp / xA;
+    var ABp = gamma * AB;
 
-    var OAp   = f * OA / (OA + f);
-    var gamma = OAp / OA;
-    var ABp   = gamma * AB;
-
-    var typeImg  = OAp > 0 ? "📍 Réelle, renversée" : "👻 Virtuelle, droite";
-    var colorImg = OAp > 0 ? "#0369a1" : "#7c3aed";
+    var typeImg  = xAp >= 0 ? "📍 Réelle, renversée" : "👻 Virtuelle, droite";
+    var colorImg = xAp >= 0 ? "#0369a1" : "#7c3aed";
     el.style.color = colorImg;
     el.innerHTML = "<strong>" + typeImg + "</strong><br>"
         + "<span style=\"font-size:.75rem;\">"
-        + "OA'&nbsp;=&nbsp;" + OAp.toFixed(1) + "&nbsp;cm,&nbsp;"
+        + "OA'&nbsp;=&nbsp;" + xAp.toFixed(1) + "&nbsp;cm,&nbsp;"
         + "A'B'&nbsp;=&nbsp;" + ABp.toFixed(1) + "&nbsp;cm,&nbsp;"
         + "γ&nbsp;=&nbsp;" + gamma.toFixed(2)
         + "</span>";
 }
 
-function _optPreviewLunette() {
-    var el = document.getElementById("opt-lunette-preview");
+function _optPreviewMiroir(sc) {
+    var el = document.getElementById("opt-mir-preview");
     if (!el) return;
-    var f1    = parseFloat((document.getElementById("opt-f1")    || {}).value);
-    var f2    = parseFloat((document.getElementById("opt-f2")    || {}).value);
-    var theta = parseFloat((document.getElementById("opt-theta") || {}).value);
-
-    if (isNaN(f1) || isNaN(f2) || isNaN(theta)) {
-        el.innerHTML = "<em>Saisir les paramètres…</em>"; return;
-    }
-    if (f1 <= 0 || f2 <= 0) { el.innerHTML = "⚠️ f'₁ et f'₂ doivent être &gt; 0"; return; }
-    if (theta <= 0) { el.innerHTML = "⚠️ θ doit être &gt; 0"; return; }
-
-    var G   = -(f1 / f2);
-    var yB1 = -(f1 * Math.tan(theta * Math.PI / 180));
-    var d   = f1 + f2;
-    var thp = Math.abs(G) * theta;
-
-    el.innerHTML = "G' = −f'₁/f'₂ = <strong>" + G.toFixed(1) + "&times;</strong>"
-        + "&nbsp;&nbsp;d = <strong>" + d.toFixed(0) + "&nbsp;cm</strong><br>"
-        + "y(B₁) ≈ <strong>" + yB1.toFixed(2) + "&nbsp;cm</strong>"
-        + "&nbsp;&nbsp;θ' ≈ <strong>" + thp.toFixed(1) + "&deg;</strong>";
-}
-
-function _optPreviewMiroirSph() {
-    var el = document.getElementById("opt-ms-preview");
-    if (!el) return;
-    var f      = parseFloat((document.getElementById("opt-ms-f")  || {}).value);
-    var SA     = parseFloat((document.getElementById("opt-ms-sa") || {}).value);
-    var AB     = parseFloat((document.getElementById("opt-ms-ab") || {}).value);
-    var msType = (document.getElementById("opt-ms-type") || {}).value || "concave";
+    var f  = parseFloat((document.getElementById("opt-mir-f")  || {}).value);
+    var SA = parseFloat((document.getElementById("opt-mir-sa") || {}).value);
+    var AB = parseFloat((document.getElementById("opt-mir-ab") || {}).value);
+    var convexe = (sc === "miroir-convexe");
 
     if (isNaN(f) || isNaN(SA) || isNaN(AB)) {
-        el.innerHTML = "<em>Saisir les paramètres…</em>"; return;
+        el.innerHTML = "<em>Saisir les paramètres…</em>"; el.style.color = "#6b7280"; return;
     }
-    if (f <= 0 || SA <= 0) { el.innerHTML = "⚠️ f' et SA doivent être &gt; 0"; return; }
-    if (msType === "concave" && Math.abs(SA - f) < 0.01) {
-        el.innerHTML = "⚠️ SA = f' → image à l'infini"; return;
+    if (f <= 0) { el.innerHTML = "⚠️ f doit être &gt; 0"; el.style.color = "#dc2626"; return; }
+    if (SA <= 0) { el.innerHTML = "⚠️ SA doit être &gt; 0"; el.style.color = "#dc2626"; return; }
+    if (!convexe && Math.abs(SA - f) < 0.01) {
+        el.innerHTML = "⚠️ SA = f → image à l'infini"; el.style.color = "#dc2626"; return;
+    }
+    if (!convexe && Math.abs(SA - 2 * f) < 0.01) {
+        el.innerHTML = "⚠️ SA = 2f → objet au centre C (rayon par C indéfini)"; el.style.color = "#dc2626"; return;
     }
 
-    // xF = focal point in diagram coords (negative = in front of mirror for concave)
-    var xF  = (msType === "concave") ? -f : f;
+    var xF  = convexe ? f : -f;
     var xA  = -SA;
     var xAp = xF * xA / (xA - xF);
-    var gam = -(xAp / xA);
-    var ABp = gam * AB;
-    var SAp = -xAp; // SA' in French convention
+    var gamma = -(xAp / xA);
+    var ABp = gamma * AB;
 
-    var nature = xAp < 0 ? "réelle, renversée" : "virtuelle, droite";
-    el.innerHTML = "SA' = <strong>" + SAp.toFixed(1) + "&nbsp;cm</strong>"
-        + " (" + nature + ")<br>"
-        + "A'B' = <strong>" + ABp.toFixed(1) + "&nbsp;cm</strong>"
-        + "&nbsp;&nbsp;γ = <strong>" + gam.toFixed(2) + "</strong>";
-}
-
-function _optPreviewTelescope() {
-    var el = document.getElementById("opt-tel-preview");
-    if (!el) return;
-    var f1    = parseFloat((document.getElementById("opt-tel-f1")    || {}).value);
-    var theta = parseFloat((document.getElementById("opt-tel-theta") || {}).value);
-
-    if (isNaN(f1) || isNaN(theta)) { el.innerHTML = "<em>Saisir les paramètres…</em>"; return; }
-    if (f1 <= 0) { el.innerHTML = "⚠️ f'₁ doit être &gt; 0"; return; }
-    if (theta <= 0) { el.innerHTML = "⚠️ θ doit être &gt; 0"; return; }
-
-    var tanT = Math.tan(theta * Math.PI / 180);
-    var yB1  = -f1 * tanT;
-
-    el.innerHTML = "B₁ attendu : x = <strong>−f'₁ = " + (-f1).toFixed(0) + "&nbsp;cm</strong>"
-        + ", y = <strong>" + yB1.toFixed(2) + "&nbsp;cm</strong><br>"
-        + "<span style=\"font-size:.78rem;\">Les rayons réfléchis convergent vers B₁.</span>";
+    var typeImg  = xAp > 0 ? "👻 Virtuelle, droite" : "📍 Réelle, renversée";
+    var colorImg = xAp > 0 ? "#7c3aed" : "#0369a1";
+    el.style.color = colorImg;
+    el.innerHTML = "<strong>" + typeImg + "</strong><br>"
+        + "<span style=\"font-size:.75rem;\">"
+        + "SA'&nbsp;=&nbsp;" + (-xAp).toFixed(2) + "&nbsp;cm,&nbsp;"
+        + "A'B'&nbsp;=&nbsp;" + ABp.toFixed(2) + "&nbsp;cm,&nbsp;"
+        + "γ&nbsp;=&nbsp;" + gamma.toFixed(2)
+        + "</span>";
 }
