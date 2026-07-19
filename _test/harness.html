@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>harness</title></head>
+<body>
+<div id="results" style="white-space:pre-wrap;font-family:monospace;"></div>
+
+<!-- Form fields the generator reads via v()/richVal() -->
+<input id="opt-bareme" value="1">
+<textarea id="opt-text">Enonce test</textarea>
+<input id="opt-mir-f" value="3">
+<input id="opt-mir-sa" value="7">
+<input id="opt-mir-ab" value="1.5">
+<input id="opt-w" value="700">
+<input id="opt-h" value="380">
+
+<script>
+window.I18N = { t: function(k){ return k; } };
+function v(id){ var el = document.getElementById(id); return el ? el.value : ''; }
+function richVal(id){ var el = document.getElementById(id); return el ? (el.value||'') : ''; }
+window.v = v; window.richVal = richVal;
+window.stack_js = { resize_containing_frame: function(){} };
+var LOG = [];
+function log(s){ LOG.push(s); document.getElementById('results').textContent = LOG.join('\n'); }
+window.onerror = function(msg, src, line, col, err){
+    log('WINDOW ERROR: ' + msg + ' @' + line + ':' + col + (err && err.stack ? '\n' + err.stack : ''));
+    return false;
+};
+</script>
+<script src="../js/gen-math-shared.js"></script>
+<script src="../js/prt-manager.js"></script>
+<script src="../js/gen-optique.js"></script>
+<script src="../lib/jsxgraph/jsxgraphcore.js"></script>
+<script type="module">
+import { stack_jxg } from '../test/moodle-qtype_stack-master/corsscripts/stackjsxgraph.js';
+window.stack_jxg = stack_jxg;
+
+function extractJxg(kbdRaw) {
+    var m = kbdRaw.match(/\]\]\n([\s\S]*)\n\[\[\/jsxgraph\]\]/);
+    return m ? m[1] : null;
+}
+
+function testScenario(label, convexe, inputIdA, inputIdB) {
+    log('=== ' + label + ' ===');
+    var result;
+    try {
+        result = _genOptiqueMiroirCore(1, convexe);
+        log('generation OK');
+    } catch (e) {
+        log('GENERATION THREW: ' + e.message + '\n' + e.stack);
+        return;
+    }
+    var jxg = extractJxg(result.kbdRaw);
+    if (!jxg) { log('COULD NOT EXTRACT jxg FROM kbdRaw'); return; }
+
+    // Build a fresh board container + the two hidden inputs the real question would have.
+    var div = document.createElement('div');
+    div.id = 'jxgbox_' + label;
+    document.body.appendChild(div);
+    var inA = document.createElement('input'); inA.type = 'hidden'; inA.id = inputIdA; document.body.appendChild(inA);
+    var inB = document.createElement('input'); inB.type = 'hidden'; inB.id = inputIdB; document.body.appendChild(inB);
+
+    // Splice an exposure hook right before the custom_bind calls so we can drive
+    // addRayFromPieces / serialisers directly from the test, exactly like the
+    // deserialiser and syncState() do internally.
+    var hookMarker = 'stack_jxg.custom_bind(stateRays';
+    var idx = jxg.indexOf(hookMarker);
+    if (idx === -1) { log('COULD NOT FIND custom_bind ANCHOR'); return; }
+    var expose = 'window.__t_' + label + ' = { addRayFromPieces: addRayFromPieces, serialiserRays: serialiserRays, ' +
+        'serialiserPts: serialiserPts, deserialiserRays: deserialiserRays, deserialiserPts: deserialiserPts, ' +
+        'clearRays: clearRays, clearPts: clearPts, board: board, logicalRaysRef: function(){ return logicalRays; }, ' +
+        'standaloneElementsRef: function(){ return standaloneElements; }, allDrawnElementsRef: function(){ return allDrawnElements; } };\n';
+    var patched = jxg.slice(0, idx) + expose + jxg.slice(idx);
+
+    try {
+        window.divid = div.id;
+        window.stateRays = inputIdA;
+        window.statePts = inputIdB;
+        (0, eval)(patched);
+        log('board init + custom_bind OK');
+    } catch (e) {
+        log('RUNTIME THREW during init: ' + e.message + '\n' + e.stack);
+        return;
+    }
+
+    var t = window['__t_' + label];
+    if (!t) { log('NO HOOK CAPTURED'); return; }
+
+    // Simulate drawing the exact ray the reference <tans> uses: the parallel-to-axis
+    // incident ray from B, reflected through F (the "1e" ray in the core generator).
+    try {
+        t.addRayFromPieces(0.3, 0.9, false, null, [[-6, 0, 1], [0, 6, 1]]);
+        log('addRayFromPieces OK, logicalRays.length=' + t.logicalRaysRef().length);
+    } catch (e) {
+        log('addRayFromPieces THREW: ' + e.message + '\n' + e.stack);
+        return;
+    }
+
+    try {
+        var pB = t.board.create('point', [-5.25, -1.1], { name: "B'", size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+        var pA = t.board.create('point', [-5.25, 0], { name: "A'", size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+        t.standaloneElementsRef().push(pB, pA);
+        t.allDrawnElementsRef().push(pB, pA);
+        t.board.update();
+        log('standalone points added');
+    } catch (e) {
+        log('POINT CREATION THREW: ' + e.message + '\n' + e.stack);
+        return;
+    }
+
+    try {
+        var sRays = t.serialiserRays();
+        var sPts = t.serialiserPts();
+        log('serialiserRays() = ' + sRays);
+        log('serialiserPts()  = ' + sPts);
+    } catch (e) {
+        log('SERIALISER THREW: ' + e.message + '\n' + e.stack);
+        return;
+    }
+
+    // Round-trip: clear, then deserialise what we just serialised, and check it comes back.
+    try {
+        t.clearRays(); t.clearPts();
+        t.deserialiserRays(sRays);
+        t.deserialiserPts(sPts);
+        log('round-trip OK, logicalRays.length after reload=' + t.logicalRaysRef().length + ', standaloneElements.length after reload=' + t.standaloneElementsRef().length);
+        var sRays2 = t.serialiserRays();
+        var sPts2 = t.serialiserPts();
+        log('re-serialised rays = ' + sRays2);
+        log('re-serialised pts  = ' + sPts2);
+        log('RAYS MATCH: ' + (sRays2 === sRays));
+        log('PTS MATCH: ' + (sPts2 === sPts));
+    } catch (e) {
+        log('ROUND-TRIP THREW: ' + e.message + '\n' + e.stack);
+    }
+
+    log('inputA (' + inputIdA + ') value = ' + JSON.stringify(inA.value));
+    log('inputB (' + inputIdB + ') value = ' + JSON.stringify(inB.value));
+}
+
+function run() {
+    testScenario('CONCAVE', false, 'ans1a', 'ans1b');
+    testScenario('CONVEXE', true, 'ans2a', 'ans2b');
+    document.title = 'DONE';
+}
+run();
+</script>
+</body>
+</html>

@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 82  -->
+  <question type="stack">
+    <name>
+      <text>Lunette de Galilée — construction complète (objectif + oculaire)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div class="stack-comment">
+<h2>Construction complète de la lunette (2 lentilles convergentes)</h2>
+<p>La lunette est constituée de deux lentilles convergentes : l'<strong>objectif</strong> (lentille 1, centre O₁,
+distance focale f₁ = O₁F₁ = O₁F₁' = 6 cm) et l'<strong>oculaire</strong> (lentille 2, centre O₂, distance focale
+f₂ = O₂F₂ = O₂F₂' = 2 cm), disposées de sorte que le foyer image de l'objectif F₁' soit <strong>confondu</strong>
+avec le foyer objet de l'oculaire F₂. On observe un objet à l'infini, représenté par un faisceau de rayons
+parallèles inclinés d'un angle α (tan α = 1/2).</p>
+<p><strong>Étape 1 — image intermédiaire A₁B₁ par l'objectif :</strong> tracez le rayon incident (incliné de α) qui
+passe par O₁ (non dévié), puis le rayon incident parallèle au précédent qui passe par F₁ (il émerge parallèle à
+l'axe). Utilisez le bouton <strong>« Rayon parallèle (3 clics) »</strong> pour le second (cliquez deux points sur le
+premier rayon incliné pour sa direction, puis F₁), et le bouton <strong>« Intersection (2 clics) → point A1 »</strong>
+sur les deux rayons émergents pour placer précisément A₁B₁.</p>
+<p><strong>Étape 2 — image finale par l'oculaire :</strong> A₁B₁, réelle, se trouve exactement dans le plan focal
+objet de l'oculaire (puisque F₁' = F₂) : elle sert d'objet réel pour la lentille 2. Tracez le rayon issu de B₁
+(le point A1 que vous venez de placer) passant par O₂ (non dévié), puis le rayon issu de B₁ incident
+parallèlement à l'axe (utilisez la droite de l'axe optique comme référence de direction avec le bouton
+« Rayon parallèle ») : il émerge en passant par F₂'.</p>
+<p>Comme A₁B₁ est exactement dans le plan focal objet de l'oculaire, les deux rayons émergents de la lentille 2
+ressortent <strong>parallèles entre eux</strong> (mais non confondus) : ils ne se croisent jamais. L'image finale
+est donc <strong>rejetée à l'infini</strong> : la lunette est afocale (observation sans fatigue oculaire).</p>
+<p>Toute la construction est réelle : il n'y a en principe rien à marquer virtuel. Cliquez sur un tronçon pour
+basculer son caractère réel/virtuel (par défaut, un tronçon non cliqué est considéré réel) ; cliquez sur un point
+pour le supprimer.</p>
+</div>
+
+[[jsxgraph input-ref-ans1="state" width="52em" aspect-ratio="2.2"]]
+const board = JXG.JSXGraph.initBoard(divid, {
+    boundingbox: [-9, 6, 17, -6],
+    axis: false,
+    keepaspectratio: true,
+    showNavigation: true,
+    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },
+    pan: { enabled: true, needTwoFingers: false, needShift: true }
+});
+
+const f1 = 6, f2 = 2, lensHeight = 5;
+const xO1 = 0, xO2 = 8;
+const X_MIN = -8, X_MAX = 16, Y_MIN = -6, Y_MAX = 6;
+const tanA = 0.5;
+const LENS_X = [xO1, xO2];
+
+let toolMode = '';
+let tempPoint = null, dirPoint1 = null, dirPoint2 = null, interSeg1 = null;
+let selectedSegment = null;
+
+let allDrawnElements = [];
+let raySegments = [];
+let logicalRays = [];
+let standaloneElements = [];
+let intersectionCounter = 0;
+
+board.create('line', [[X_MIN, 0], [X_MAX, 0]], { strokeColor: 'black', strokeWidth: 1, fixed: true, highlight: false, tabindex: null });
+board.create('arrow', [[X_MAX - 0.5, 0], [X_MAX, 0]], { fixed: true, highlight: false, tabindex: null });
+
+function drawLens(x) {
+    board.create('segment', [[x, -lensHeight], [x, lensHeight]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });
+    board.create('segment', [[x, lensHeight], [x - 0.4, lensHeight - 0.4]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });
+    board.create('segment', [[x, lensHeight], [x + 0.4, lensHeight - 0.4]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });
+    board.create('segment', [[x, -lensHeight], [x - 0.4, -lensHeight + 0.4]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });
+    board.create('segment', [[x, -lensHeight], [x + 0.4, -lensHeight + 0.4]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });
+}
+drawLens(xO1);
+drawLens(xO2);
+
+board.create('point', [xO1, 0], { name: 'O₁', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });
+board.create('point', [xO1 - f1, 0], { name: 'F₁', size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });
+board.create('point', [xO1 + f1, 0], { name: "F₁' = F₂", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });
+board.create('point', [xO2, 0], { name: 'O₂', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });
+board.create('point', [xO2 + f2, 0], { name: "F₂'", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });
+
+board.create('segment', [[-1.5, -1.5 * tanA], [-0.5, -0.5 * tanA]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });
+board.create('arrow', [[-1.5, -1.5 * tanA], [-0.5, -0.5 * tanA]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });
+board.create('segment', [[-1.5, 2 - 1.5 * tanA], [-0.5, 2 - 0.5 * tanA]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });
+board.create('arrow', [[-1.5, 2 - 1.5 * tanA], [-0.5, 2 - 0.5 * tanA]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });
+board.create('text', [-6, 1.6, "Objet à l'infini, angle α (tan α = 1/2)"], { fixed: true, fontSize: 12, color: '#c0392b', highlight: false, tabindex: null });
+
+const handlePoint = board.create('point', [0, -5.7], { visible: false, fixed: true, name: '', tabindex: null });
+
+const DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";
+
+const instructionsEl = document.createElement('p');
+instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';
+instructionsEl.textContent = DEFAULT_MSG;
+
+function setInstructions(msg) {
+    instructionsEl.textContent = msg;
+}
+
+const toolbarDiv = document.createElement('div');
+toolbarDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:.4em;margin-top:.6em;';
+const toolButtons = {};
+
+function addToolButton(label, mode, msgOrHandler) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = label;
+    btn.style.cssText = 'padding:.35em .7em;font-size:.85em;cursor:pointer;';
+    if (mode === null) {
+        btn.addEventListener('click', msgOrHandler);
+    } else {
+        btn.addEventListener('click', () => activateTool(mode, msgOrHandler));
+        toolButtons[mode] = btn;
+    }
+    toolbarDiv.appendChild(btn);
+    return btn;
+}
+
+function setActiveButton(mode) {
+    for (let m in toolButtons) {
+        toolButtons[m].style.background = (m === mode) ? '#dbeafe' : '';
+        toolButtons[m].style.fontWeight = (m === mode) ? 'bold' : 'normal';
+    }
+}
+
+function resetTool() {
+    toolMode = '';
+    tempPoint = null; dirPoint1 = null; dirPoint2 = null; interSeg1 = null;
+    board.defaultCursor = 'default';
+    setInstructions(DEFAULT_MSG);
+    setActiveButton(null);
+    deselectSegment();
+}
+
+function paintSegment(seg) {
+    let status = seg.__status || 'defaut';
+    if (status === 'reel') {
+        seg.setAttribute({ strokeColor: '#e67e22', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    } else if (status === 'virtuel') {
+        seg.setAttribute({ strokeColor: '#2980b9', dash: 2, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    } else {
+        seg.setAttribute({ strokeColor: '#555555', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    }
+}
+
+function statusCode(seg) {
+    let s = seg.__status || 'defaut';
+    return s === 'reel' ? 1 : (s === 'virtuel' ? 2 : 0);
+}
+
+function statusFromCode(code) {
+    return code === 1 ? 'reel' : (code === 2 ? 'virtuel' : 'defaut');
+}
+
+function deselectSegment() {
+    let prev = selectedSegment;
+    selectedSegment = null;
+    if (prev) { paintSegment(prev); }
+}
+
+function onSegmentClick(seg) {
+    let status = seg.__status || 'defaut';
+    seg.__status = (status === 'reel') ? 'virtuel' : 'reel';
+    let prev = selectedSegment;
+    selectedSegment = seg;
+    if (prev && prev !== seg) { paintSegment(prev); }
+    paintSegment(seg);
+    setInstructions(DEFAULT_MSG);
+    syncState();
+}
+
+function deleteSelectedSegment() {
+    if (!selectedSegment) { setInstructions("Cliquez d'abord sur un tronçon de rayon pour le sélectionner."); return; }
+    let seg = selectedSegment;
+    selectedSegment = null;
+    board.removeObject(seg);
+    let idx = raySegments.indexOf(seg);
+    if (idx > -1) raySegments.splice(idx, 1);
+    for (let lr of logicalRays) {
+        let sIdx = lr.segments.indexOf(seg);
+        if (sIdx > -1) {
+            lr.segments.splice(sIdx, 1);
+            if (lr.segments.length === 0) {
+                logicalRays = logicalRays.filter(l => l !== lr);
+            }
+            break;
+        }
+    }
+    setInstructions(DEFAULT_MSG);
+    syncState();
+}
+
+function activateTool(mode, msg) {
+    if (toolMode === mode) { resetTool(); return; }
+    resetTool(); toolMode = mode;
+    board.defaultCursor = 'crosshair';
+    setInstructions(msg);
+    setActiveButton(mode);
+}
+
+function syncState() {
+    handlePoint.trigger(['update']);
+    board.update();
+}
+
+function snapToPoint(x, y) {
+    let threshold = 0.6, closestX = x, closestY = y, minDist = Infinity;
+    for (let id in board.objects) {
+        let obj = board.objects[id];
+        if (obj.elType === 'point' && obj.visProp.visible !== false && obj.visProp.hidden !== true) {
+            let dx = obj.X() - x, dy = obj.Y() - y, dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < threshold && dist < minDist) { minDist = dist; closestX = obj.X(); closestY = obj.Y(); }
+        }
+    }
+    return { x: closestX, y: closestY };
+}
+
+function getClickedSegment(x, y, threshold, excludeSeg) {
+    let closestSeg = null, minDist = Infinity;
+    for (let i = 0; i < raySegments.length; i++) {
+        let seg = raySegments[i];
+        if (seg === excludeSeg) continue;
+        if (!seg.point1 || !seg.point2) continue;
+        let x1 = seg.point1.X(), y1 = seg.point1.Y();
+        let x2 = seg.point2.X(), y2 = seg.point2.Y();
+        let dx = x2 - x1, dy = y2 - y1;
+        let lengthSq = dx * dx + dy * dy;
+        if (lengthSq === 0) continue;
+        let t = ((x - x1) * dx + (y - y1) * dy) / lengthSq;
+        t = Math.max(0, Math.min(1, t));
+        let projX = x1 + t * dx, projY = y1 + t * dy;
+        let dist = Math.sqrt((x - projX) ** 2 + (y - projY) ** 2);
+        if (dist < threshold && dist < minDist) { minDist = dist; closestSeg = seg; }
+    }
+    return closestSeg;
+}
+
+function getClickedPoint(x, y, threshold) {
+    let closest = null, minDist = Infinity;
+    for (let el of standaloneElements) {
+        if (el.elType === 'point' && el.visProp.visible !== false) {
+            let d = Math.hypot(el.X() - x, el.Y() - y);
+            if (d < threshold && d < minDist) { minDist = d; closest = el; }
+        }
+    }
+    return closest;
+}
+
+function addCustomRayFromEq(m, p, isVert, xVert, xOrigin) {
+    let currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };
+    if (isVert) {
+        let pA = board.create('point', [xVert, Y_MIN], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        let pB = board.create('point', [xVert, Y_MAX], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        let seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);
+        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);
+    } else {
+        let boundsX = [X_MIN, X_MAX];
+        if (typeof xOrigin === 'number') boundsX.push(xOrigin);
+        for (let lx of LENS_X) {
+            let y = m * lx + p;
+            if (Math.abs(y) <= lensHeight) {
+                boundsX.push(lx);
+                let impactPoint = board.create('point', [lx, y], { name: '', size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+                allDrawnElements.push(impactPoint);
+                currentLogicalRay.points.push(impactPoint);
+            }
+        }
+        boundsX.sort((a, b) => a - b);
+        for (let i = 0; i < boundsX.length - 1; i++) {
+            let xa = boundsX[i], xb = boundsX[i + 1];
+            if (xa === xb) continue;
+            let ya = m * xa + p, yb = m * xb + p;
+            let pA = board.create('point', [xa, ya], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            let pB = board.create('point', [xb, yb], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            let seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+            raySegments.push(seg); allDrawnElements.push(pA, pB, seg);
+            currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);
+        }
+    }
+    logicalRays.push(currentLogicalRay);
+    return currentLogicalRay;
+}
+
+function addRayFromPieces(m, p, isVert, xVert, pieces) {
+    let currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };
+    for (let piece of pieces) {
+        let pA, pB;
+        if (isVert) {
+            pA = board.create('point', [xVert, piece[0]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            pB = board.create('point', [xVert, piece[1]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        } else {
+            pA = board.create('point', [piece[0], m * piece[0] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            pB = board.create('point', [piece[1], m * piece[1] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        }
+        let seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+        seg.__status = statusFromCode(piece[2]);
+        paintSegment(seg);
+        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);
+        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);
+    }
+    logicalRays.push(currentLogicalRay);
+    return currentLogicalRay;
+}
+
+function addCustomRay(x1, y1, x2, y2) {
+    let dx = x2 - x1, dy = y2 - y1;
+    let m = (Math.abs(dx) < 0.01) ? Infinity : dy / dx;
+    if (m === Infinity) {
+        addCustomRayFromEq(null, null, true, x1);
+    } else {
+        let p = y1 - m * x1;
+        addCustomRayFromEq(m, p, false, null, x1);
+    }
+    syncState();
+}
+
+function onPointClick(pt) {
+    board.removeObject(pt);
+    allDrawnElements = allDrawnElements.filter(el => el !== pt);
+    standaloneElements = standaloneElements.filter(el => el !== pt);
+    syncState();
+}
+
+board.on('down', function(evt) {
+    if (evt.target && evt.target.closest && evt.target.closest('.JXG_navigation_button')) return;
+    if (evt.shiftKey) return;
+    let coords = board.getUsrCoordsOfMouse(evt);
+    let x = coords[0], y = coords[1];
+
+    if (toolMode !== '') {
+        let snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;
+
+        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions("RAYON (2/2) : cliquez le 2e point."); }
+        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }
+        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions("PARALLÈLE (2/3) : 2e point de direction."); }
+        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions("PARALLÈLE (3/3) : point de passage."); }
+        else if (toolMode === 'par3') {
+            let dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;
+            addCustomRay(x, y, x + dx, y + dy);
+            resetTool();
+        }
+        else if (toolMode === 'inter1') {
+            interSeg1 = getClickedSegment(x, y, 0.4, null);
+            if (interSeg1) { toolMode = 'inter2'; setInstructions("INTERSECTION (2/2) : cliquez le 2e rayon."); }
+        }
+        else if (toolMode === 'inter2') {
+            let seg2 = getClickedSegment(x, y, 0.4, interSeg1);
+            if (seg2) {
+                let x1 = interSeg1.point1.X(), y1 = interSeg1.point1.Y(), x2 = interSeg1.point2.X(), y2 = interSeg1.point2.Y();
+                let x3 = seg2.point1.X(), y3 = seg2.point1.Y(), x4 = seg2.point2.X(), y4 = seg2.point2.Y();
+                let m1 = (x2 - x1) === 0 ? Infinity : (y2 - y1) / (x2 - x1);
+                let m2 = (x4 - x3) === 0 ? Infinity : (y4 - y3) / (x4 - x3);
+                if (m1 !== Infinity && m2 !== Infinity && Math.abs(m1 - m2) > 0.001) {
+                    let p1 = y1 - m1 * x1, p2 = y3 - m2 * x3;
+                    let xi = (p2 - p1) / (m1 - m2), yi = m1 * xi + p1;
+                    let in1 = xi >= Math.min(x1, x2) - 0.5 && xi <= Math.max(x1, x2) + 0.5 && yi >= Math.min(y1, y2) - 0.5 && yi <= Math.max(y1, y2) + 0.5;
+                    let in2 = xi >= Math.min(x3, x4) - 0.5 && xi <= Math.max(x3, x4) + 0.5 && yi >= Math.min(y3, y4) - 0.5 && yi <= Math.max(y3, y4) + 0.5;
+                    if (in1 && in2) {
+                        intersectionCounter++;
+                        let name = (intersectionCounter === 1) ? "A1" : "I" + (intersectionCounter - 1);
+                        let pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+                        allDrawnElements.push(pInt); standaloneElements.push(pInt);
+                        syncState();
+                    } else { setInstructions("Les droites se croisent hors des segments."); }
+                } else { setInstructions("Segments parallèles : c'est le résultat attendu pour les rayons émergents de l'oculaire (image à l'infini)."); }
+                resetTool();
+            }
+        }
+        return;
+    }
+
+    let clickedSeg = getClickedSegment(x, y, 0.3, null);
+    if (clickedSeg) { onSegmentClick(clickedSeg); return; }
+    let clickedPt = getClickedPoint(x, y, 0.5);
+    if (clickedPt) { onPointClick(clickedPt); return; }
+});
+
+addToolButton('Rayon (2 clics)', 'pt1', "RAYON (1/2) : cliquez le point de départ.");
+addToolButton('Rayon parallèle (3 clics)', 'par1', "PARALLÈLE (1/3) : 1er point de direction.");
+addToolButton("Intersection (2 clics) → point A1", 'inter1', "INTERSECTION (1/2) : cliquez le 1er rayon.");
+addToolButton('Effacer le tronçon sélectionné', null, () => deleteSelectedSegment());
+addToolButton('Tout effacer', null, () => {
+    selectedSegment = null;
+    allDrawnElements.forEach(el => board.removeObject(el));
+    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;
+    resetTool();
+    syncState();
+});
+
+document.body.appendChild(toolbarDiv);
+document.body.appendChild(instructionsEl);
+stack_js.resize_containing_frame("52em", document.documentElement.offsetHeight + "px");
+
+const serialiser = () => {
+    let rayList = logicalRays.map(lr => {
+        let pieces = lr.segments.map(seg => {
+            let ends = lr.eq.isVert ? [seg.point1.Y(), seg.point2.Y()] : [seg.point1.X(), seg.point2.X()];
+            return [ends[0], ends[1], statusCode(seg)];
+        });
+        return lr.eq.isVert ? ["vert", lr.eq.x, pieces] : [lr.eq.m, lr.eq.p, pieces];
+    });
+    let ptList = standaloneElements
+        .filter(el => el.elType === 'point' && el.visProp.visible !== false && el.name)
+        .map(el => [el.name, el.X(), el.Y()]);
+    return "lunette_construction(" + JSON.stringify(rayList) + "," + JSON.stringify(ptList) + ")";
+};
+
+function clearAll() {
+    allDrawnElements.forEach(el => board.removeObject(el));
+    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;
+}
+
+const deserialiser = (value) => {
+    clearAll();
+    let newState = JSON.parse(value.replace('lunette_construction(', '[').replace(/\)\s*$/, ']'));
+    let rayList = newState[0], ptList = newState[1];
+    for (let eq of rayList) {
+        if (eq[0] === 'vert') addRayFromPieces(null, null, true, eq[1], eq[2] || [[Y_MIN, Y_MAX, 0]]);
+        else addRayFromPieces(eq[0], eq[1], false, null, eq[2] || [[X_MIN, X_MAX, 0]]);
+    }
+    for (let p of ptList) {
+        let pt = board.create('point', [p[1], p[2]], { name: p[0], size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+        allDrawnElements.push(pt);
+        standaloneElements.push(pt);
+    }
+    board.update();
+};
+
+resetTool();
+stack_jxg.custom_bind(state, serialiser, deserialiser, [handlePoint]);
+board.update();
+
+const inputEl = document.getElementById(state);
+function freezeIfReadonly() {
+    if (inputEl && (inputEl.hasAttribute('readonly') || inputEl.hasAttribute('disabled'))) {
+        board.containerObj.style.pointerEvents = 'none';
+        toolbarDiv.querySelectorAll('button').forEach(b => b.disabled = true);
+        setInstructions("Construction validée : la figure est figée.");
+        return true;
+    }
+    return false;
+}
+if (inputEl && !freezeIfReadonly()) {
+    new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });
+}
+[[/jsxgraph]]
+
+<p>[[input:ans1]] [[validation:ans1]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p><strong>Étape 1 :</strong> le rayon incident (incliné de α) par O₁ n'est pas dévié ; le rayon incident parallèle
+au précédent, dirigé vers F₁, émerge parallèle à l'axe. Ces deux droites se coupent en A₁B₁ = (6&nbsp;;&nbsp;3), dans
+le plan focal image de l'objectif — image réelle.</p>
+<p><strong>Étape 2 :</strong> A₁B₁ étant exactement dans le plan focal objet de l'oculaire (F₁' = F₂), le rayon issu
+de B₁ par O₂ n'est pas dévié, et le rayon issu de B₁ parallèle à l'axe émerge en passant par F₂'. Ces deux rayons
+émergents ont la même pente (−3/2) : ils sont parallèles entre eux sans se confondre, donc l'image finale est
+rejetée à l'infini. La lunette est afocale.</p>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[f1: 6$
+f2: 2$
+tanA: 1/2$
+xO1: 0$
+xO2: xO1 + f1 + f2$
+lensHeight: 5$
+
+xA1: xO1 + f1$
+yA1: f1*tanA$
+
+m_o1: tanA$
+p_o1: 0$
+m_F1i: tanA$
+p_F1i: f1*tanA$
+m_F1e: 0$
+p_F1e: f1*tanA$
+
+m_o2: (0 - yA1)/(xO2 - xA1)$
+p_o2: 0 - m_o2*xO2$
+m_L2i: 0$
+p_L2i: yA1$
+m_L2e: (0 - yA1)/((xO2+f2) - xO2)$
+p_L2e: yA1 - m_L2e*xO2$
+
+xmin: -8$
+xmax: 16$
+xtol: 0.5$
+
+found_ray(rayList, mExp, pExp, mtol, ptol) := block([simp, found, r],
+  simp: true,
+  found: false,
+  for r in rayList do (
+    if listp(r) and length(r) >= 2 and numberp(r[1]) and numberp(r[2]) then (
+      if abs(r[1] - mExp) < mtol and abs(r[2] - pExp) < ptol then found: true
+    )
+  ),
+  found
+)$
+
+found_point(ptList, xExp, yExp, tol) := block([simp, found, p],
+  simp: true,
+  found: false,
+  for p in ptList do (
+    if listp(p) and length(p) = 3 and numberp(p[2]) and numberp(p[3]) then (
+      if abs(p[2] - xExp) < tol and abs(p[3] - yExp) < tol then found: true
+    )
+  ),
+  found
+)$
+
+line_pieces(rayList, m, p, mtol, ptol) := block([simp, result, r],
+  simp: true,
+  result: [],
+  for r in rayList do (
+    if listp(r) and length(r) >= 3 and numberp(r[1]) and numberp(r[2]) and listp(r[3]) then (
+      if abs(r[1] - m) < mtol and abs(r[2] - p) < ptol then result: append(result, r[3])
+    )
+  ),
+  result
+)$
+
+status_covering_x(pieces, x, tol) := block([simp, pc, lo, hi, found],
+  simp: true,
+  found: -1,
+  for pc in pieces do (
+    if listp(pc) and length(pc) >= 3 then (
+      lo: min(pc[1], pc[2]),
+      hi: max(pc[1], pc[2]),
+      if x >= lo and x <= hi then found: pc[3]
+    )
+  ),
+  if found = -1 then (
+    for pc in pieces do (
+      if listp(pc) and length(pc) >= 3 then (
+        lo: min(pc[1], pc[2]),
+        hi: max(pc[1], pc[2]),
+        if x >= lo - tol and x <= hi + tol then found: pc[3]
+      )
+    )
+  ),
+  found
+)$
+
+eff_status(s) := if s = 0 then 1 else s$
+
+seg_required_status(rayList, m, p, mtol, ptol, xlo, xhi, tol, want) := block([simp, pieces, s1, s2],
+  simp: true,
+  pieces: line_pieces(rayList, m, p, mtol, ptol),
+  s1: status_covering_x(pieces, xlo + tol, tol),
+  s2: status_covering_x(pieces, xhi - tol, tol),
+  is(eff_status(s1) = want) and is(eff_status(s2) = want)
+)$
+
+seg_required_geom(rayList, m, p, mtol, ptol, xlo, xhi, tol) := block([simp, pieces, s1, s2],
+  simp: true,
+  pieces: line_pieces(rayList, m, p, mtol, ptol),
+  s1: status_covering_x(pieces, xlo + tol, tol),
+  s2: status_covering_x(pieces, xhi - tol, tol),
+  is(s1 # -1) and is(s2 # -1)
+)$
+
+require_mc(mc) := block(
+  if not is(safe_op(mc) = "lunette_construction") or not is(length(mc) = 2) then
+    "La réponse doit être générée par la construction graphique ci-dessus (fonction lunette_construction(rayons, points))."
+  else
+    true
+)$
+
+ans1_validator(ex) := stack_seq_validator(ex, [require_mc])$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans><![CDATA[lunette_construction([[1/2,0,[[-8,6,1]]],[1/2,3,[[-8,0,1]]],[0,3,[[0,6,1]]],[-3/2,12,[[6,16,1]]],[0,3,[[6,8,1]]],[-3/2,15,[[8,16,1]]]],[["A1",6,3]])]]></tans>
+      <boxsize>60</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords>lunette_construction</allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options>validator:ans1_validator</options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text>[rayList, ptList]: args(ans1)$
+
+GEOM_WEIGHT: 0.7$
+line_score(full_ok, geom_ok) := if full_ok then 1 else (if geom_ok then GEOM_WEIGHT else 0)$
+
+l1_ok: is(seg_required_status(rayList, m_o1, p_o1, 0.05, 0.3, xmin, xA1, xtol, 1))$
+l1_geom: is(seg_required_geom(rayList, m_o1, p_o1, 0.05, 0.3, xmin, xA1, xtol))$
+l2_ok: is(seg_required_status(rayList, m_F1i, p_F1i, 0.05, 0.3, xmin, xO1, xtol, 1))$
+l2_geom: is(seg_required_geom(rayList, m_F1i, p_F1i, 0.05, 0.3, xmin, xO1, xtol))$
+l3_ok: is(seg_required_status(rayList, m_F1e, p_F1e, 0.05, 0.3, xO1, xA1, xtol, 1))$
+l3_geom: is(seg_required_geom(rayList, m_F1e, p_F1e, 0.05, 0.3, xO1, xA1, xtol))$
+
+l1_score: line_score(l1_ok, l1_geom)$
+l2_score: line_score(l2_ok, l2_geom)$
+l3_score: line_score(l3_ok, l3_geom)$
+score_rayons_L1: min((l1_score + l2_score + l3_score) / 3, 1)$
+
+att1a: is(found_ray(rayList, m_o1, p_o1, 0.05, 0.3))$
+att1b: is(found_ray(rayList, m_F1i, p_F1i, 0.05, 0.3) or found_ray(rayList, m_F1e, p_F1e, 0.05, 0.3))$
+any_attempt1: is(att1a or att1b)$
+c1a: is(l1_ok)$
+c1b: is(l2_ok and l3_ok)$
+
+c_point: is(found_point(ptList, xA1, yA1, 0.3))$
+
+l4_ok: is(seg_required_status(rayList, m_o2, p_o2, 0.05, 0.3, xA1, xmax, xtol, 1))$
+l4_geom: is(seg_required_geom(rayList, m_o2, p_o2, 0.05, 0.3, xA1, xmax, xtol))$
+l5_ok: is(seg_required_status(rayList, m_L2i, p_L2i, 0.05, 0.3, xA1, xO2, xtol, 1))$
+l5_geom: is(seg_required_geom(rayList, m_L2i, p_L2i, 0.05, 0.3, xA1, xO2, xtol))$
+l6_ok: is(seg_required_status(rayList, m_L2e, p_L2e, 0.05, 0.3, xO2, xmax, xtol, 1))$
+l6_geom: is(seg_required_geom(rayList, m_L2e, p_L2e, 0.05, 0.3, xO2, xmax, xtol))$
+
+l4_score: line_score(l4_ok, l4_geom)$
+l5_score: line_score(l5_ok, l5_geom)$
+l6_score: line_score(l6_ok, l6_geom)$
+score_rayons_L2: min((l4_score + l5_score + l6_score) / 3, 1)$
+
+att2a: is(found_ray(rayList, m_o2, p_o2, 0.05, 0.3))$
+att2b: is(found_ray(rayList, m_L2i, p_L2i, 0.05, 0.3) or found_ray(rayList, m_L2e, p_L2e, 0.05, 0.3))$
+any_attempt2: is(att2a or att2b)$
+c2a: is(l4_ok)$
+c2b: is(l5_ok and l6_ok)$</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Étape 1 — rayons particuliers de l'objectif</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>score_rayons_L1*3/10</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><strong>Étape 1 — objectif :</strong></p>
+[[if test="any_attempt1"]]<ul>
+[[if test="att1a"]]<li>Rayon incliné par O₁ : [[if test="c1a"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais pas encore correct</span>[[/if]]</li>[[/if]]
+[[if test="att1b"]]<li>Rayon incliné vers F₁, émergent parallèle à l'axe : [[if test="c1b"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">incomplet ou pas entièrement réel</span>[[/if]]</li>[[/if]]
+</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n'a encore été tracé pour l'objectif.</span></p>[[/if]]]]></text>
+        </truefeedback>
+        <falsescoremode>+</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p></p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Point image intermédiaire A1</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>c_point</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>2/10</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>2</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p>Le point A₁ est correctement placé à l'intersection des deux rayons de l'objectif.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>+</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p>Le point A₁ n'est pas encore placé à l'endroit attendu : tracez les deux rayons de l'objectif puis utilisez le
+bouton « Intersection ».</p>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Étape 2 — rayons particuliers de l'oculaire (résultat afocal)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>score_rayons_L2*5/10</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p><strong>Étape 2 — oculaire :</strong></p>
+[[if test="any_attempt2"]]<ul>
+[[if test="att2a"]]<li>Rayon issu de B₁ par O₂ : [[if test="c2a"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais pas encore correct</span>[[/if]]</li>[[/if]]
+[[if test="att2b"]]<li>Rayon issu de B₁ parallèle à l'axe, émergent vers F₂' : [[if test="c2b"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">incomplet ou pas entièrement réel</span>[[/if]]</li>[[/if]]
+</ul>[[if test="c2a and c2b"]]<p style="color:#1e7e34;">Les deux rayons émergents de l'oculaire sont bien parallèles entre eux (même pente −3/2) : l'image finale est rejetée à l'infini, la lunette est afocale.</p>[[/if]][[else]]<p><span style="color:#c0392b;">Aucun rayon n'a encore été tracé pour l'oculaire.</span></p>[[/if]]]]></text>
+        </truefeedback>
+        <falsescoremode>+</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p></p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <qtest>
+      <testcase>1</testcase>
+      <description>Construction complète et correcte (objectif + point A1 + oculaire) : score plein</description>
+      <testinput>
+        <name>ans1</name>
+        <value><![CDATA[lunette_construction([[1/2,0,[[-8,6,1]]],[1/2,3,[[-8,0,1]]],[0,3,[[0,6,1]]],[-3/2,12,[[6,16,1]]],[0,3,[[6,8,1]]],[-3/2,15,[[8,16,1]]]],[["A1",6,3]])]]></value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>1.0000000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-0-T|prt1-1-T|prt1-2-T</expectedanswernote>
+      </expected>
+    </qtest>
+    <qtest>
+      <testcase>2</testcase>
+      <description>Étape 1 complète mais rien n'est tracé pour l'oculaire</description>
+      <testinput>
+        <name>ans1</name>
+        <value><![CDATA[lunette_construction([[1/2,0,[[-8,6,1]]],[1/2,3,[[-8,0,1]]],[0,3,[[0,6,1]]]],[["A1",6,3]])]]></value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>0.5000000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-0-T|prt1-1-T|prt1-2-F</expectedanswernote>
+      </expected>
+    </qtest>
+    <qtest>
+      <testcase>3</testcase>
+      <description>Construction vide</description>
+      <testinput>
+        <name>ans1</name>
+        <value>lunette_construction([],[])</value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>0.0000000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-0-F|prt1-1-F|prt1-2-F</expectedanswernote>
+      </expected>
+    </qtest>
+    <qtest>
+      <testcase>4</testcase>
+      <description>Tout est correct sauf le rayon par O2 tracé virtuel par erreur (crédit géométrie partiel 70% sur ce tronçon)</description>
+      <testinput>
+        <name>ans1</name>
+        <value><![CDATA[lunette_construction([[1/2,0,[[-8,6,1]]],[1/2,3,[[-8,0,1]]],[0,3,[[0,6,1]]],[-3/2,12,[[6,16,2]]],[0,3,[[6,8,1]]],[-3/2,15,[[8,16,1]]]],[["A1",6,3]])]]></value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>0.9500000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-0-T|prt1-1-T|prt1-2-T</expectedanswernote>
+      </expected>
+    </qtest>
+  </question>
+
+</quiz>

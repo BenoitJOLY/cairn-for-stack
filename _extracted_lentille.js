@@ -1,0 +1,435 @@
+(function(){
+var board = JXG.JSXGraph.initBoard(divid, {
+    boundingbox: [, , , ],
+    axis: false,
+    keepaspectratio: true,
+    showNavigation: true,
+    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },
+    pan: { enabled: true, needTwoFingers: false, needShift: true }
+});
+
+var f = , lensHeight = ;
+var X_MIN = , X_MAX = , Y_MIN = , Y_MAX = ;
+var OA = , AB = ;
+
+var toolMode = '';
+var tempPoint = null, dirPoint1 = null, dirPoint2 = null, interSeg1 = null;
+var selectedSegment = null;
+
+var allDrawnElements = [];
+var raySegments = [];
+var logicalRays = [];
+var standaloneElements = [];
+var intersectionCounter = 0;
+
+board.create('line', [[X_MIN, 0], [X_MAX, 0]], { strokeColor: 'black', strokeWidth: 1, fixed: true, highlight: false, tabindex: null });
+board.create('arrow', [[X_MAX - 0.5, 0], [X_MAX, 0]], { fixed: true, highlight: false, tabindex: null });
+
+
+board.create('point', [0, 0], { name: 'O', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });
+
+var xObj = -OA;
+board.create('point', [xObj, 0], { name: 'A', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });
+board.create('point', [xObj, AB], { name: 'B', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });
+board.create('arrow', [[xObj, 0], [xObj, AB]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });
+
+var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });
+
+var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";
+
+var instructionsEl = document.createElement('p');
+instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';
+instructionsEl.textContent = DEFAULT_MSG;
+
+function setInstructions(msg) { instructionsEl.textContent = msg; }
+
+var toolbarDiv = document.createElement('div');
+toolbarDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:.4em;margin-top:.6em;';
+var toolButtons = {};
+
+function addToolButton(label, mode, msgOrHandler) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = label;
+    btn.style.cssText = 'padding:.35em .7em;font-size:.85em;cursor:pointer;';
+    if (mode === null) {
+        btn.addEventListener('click', msgOrHandler);
+    } else {
+        btn.addEventListener('click', function(){ activateTool(mode, msgOrHandler); });
+        toolButtons[mode] = btn;
+    }
+    toolbarDiv.appendChild(btn);
+    return btn;
+}
+
+function setActiveButton(mode) {
+    for (var m in toolButtons) {
+        toolButtons[m].style.background = (m === mode) ? '#dbeafe' : '';
+        toolButtons[m].style.fontWeight = (m === mode) ? 'bold' : 'normal';
+    }
+}
+
+function resetTool() {
+    toolMode = '';
+    tempPoint = null; dirPoint1 = null; dirPoint2 = null; interSeg1 = null;
+    board.defaultCursor = 'default';
+    setInstructions(DEFAULT_MSG);
+    setActiveButton(null);
+    deselectSegment();
+}
+
+function paintSegment(seg) {
+    var status = seg.__status || 'defaut';
+    if (status === 'reel') {
+        seg.setAttribute({ strokeColor: '#e67e22', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    } else if (status === 'virtuel') {
+        seg.setAttribute({ strokeColor: '#2980b9', dash: 2, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    } else {
+        seg.setAttribute({ strokeColor: '#555555', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });
+    }
+}
+
+function statusCode(seg) {
+    var s = seg.__status || 'defaut';
+    return s === 'reel' ? 1 : (s === 'virtuel' ? 2 : 0);
+}
+
+function statusFromCode(code) {
+    return code === 1 ? 'reel' : (code === 2 ? 'virtuel' : 'defaut');
+}
+
+function deselectSegment() {
+    var prev = selectedSegment;
+    selectedSegment = null;
+    if (prev) { paintSegment(prev); }
+}
+
+function onSegmentClick(seg) {
+    var status = seg.__status || 'defaut';
+    seg.__status = (status === 'reel') ? 'virtuel' : 'reel';
+    var prev = selectedSegment;
+    selectedSegment = seg;
+    if (prev && prev !== seg) { paintSegment(prev); }
+    paintSegment(seg);
+    setInstructions(DEFAULT_MSG);
+    syncState();
+}
+
+function deleteSelectedSegment() {
+    if (!selectedSegment) { setInstructions("Cliquez d'abord sur un tronçon de rayon pour le sélectionner."); return; }
+    var seg = selectedSegment;
+    selectedSegment = null;
+    board.removeObject(seg);
+    var idx = raySegments.indexOf(seg);
+    if (idx > -1) raySegments.splice(idx, 1);
+    for (var i = 0; i < logicalRays.length; i++) {
+        var lr = logicalRays[i];
+        var sIdx = lr.segments.indexOf(seg);
+        if (sIdx > -1) {
+            lr.segments.splice(sIdx, 1);
+            if (lr.segments.length === 0) { logicalRays.splice(i, 1); }
+            break;
+        }
+    }
+    setInstructions(DEFAULT_MSG);
+    syncState();
+}
+
+function activateTool(mode, msg) {
+    if (toolMode === mode) { resetTool(); return; }
+    resetTool(); toolMode = mode;
+    board.defaultCursor = 'crosshair';
+    setInstructions(msg);
+    setActiveButton(mode);
+}
+
+function syncState() {
+    handlePoint.trigger(['update']);
+    board.update();
+}
+
+function snapToPoint(x, y) {
+    var threshold = 0.6, closestX = x, closestY = y, minDist = Infinity;
+    for (var id in board.objects) {
+        var obj = board.objects[id];
+        if (obj.elType === 'point' && obj.visProp.visible !== false && obj.visProp.hidden !== true) {
+            var dx = obj.X() - x, dy = obj.Y() - y, dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < threshold && dist < minDist) { minDist = dist; closestX = obj.X(); closestY = obj.Y(); }
+        }
+    }
+    return { x: closestX, y: closestY };
+}
+
+function getClickedSegment(x, y, threshold, excludeSeg) {
+    var closestSeg = null, minDist = Infinity;
+    for (var i = 0; i < raySegments.length; i++) {
+        var seg = raySegments[i];
+        if (seg === excludeSeg) continue;
+        if (!seg.point1 || !seg.point2) continue;
+        var x1 = seg.point1.X(), y1 = seg.point1.Y();
+        var x2 = seg.point2.X(), y2 = seg.point2.Y();
+        var dx = x2 - x1, dy = y2 - y1;
+        var lengthSq = dx * dx + dy * dy;
+        if (lengthSq === 0) continue;
+        var t = ((x - x1) * dx + (y - y1) * dy) / lengthSq;
+        t = Math.max(0, Math.min(1, t));
+        var projX = x1 + t * dx, projY = y1 + t * dy;
+        var dist = Math.sqrt(Math.pow(x - projX, 2) + Math.pow(y - projY, 2));
+        if (dist < threshold && dist < minDist) { minDist = dist; closestSeg = seg; }
+    }
+    return closestSeg;
+}
+
+function getClickedPoint(x, y, threshold) {
+    var closest = null, minDist = Infinity;
+    for (var i = 0; i < standaloneElements.length; i++) {
+        var el = standaloneElements[i];
+        if (el.elType === 'point' && el.visProp.visible !== false) {
+            var d = Math.hypot(el.X() - x, el.Y() - y);
+            if (d < threshold && d < minDist) { minDist = d; closest = el; }
+        }
+    }
+    return closest;
+}
+
+function addCustomRayFromEq(m, p, isVert, xVert, xOrigin) {
+    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };
+    if (isVert) {
+        var pA = board.create('point', [xVert, Y_MIN], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        var pB = board.create('point', [xVert, Y_MAX], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);
+        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);
+    } else {
+        var boundsX = [X_MIN, X_MAX];
+        if (typeof xOrigin === 'number') boundsX.push(xOrigin);
+        if (Math.abs(p) <= lensHeight) {
+            boundsX.push(0);
+            var impactPoint = board.create('point', [0, p], { name: '', size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+            allDrawnElements.push(impactPoint);
+            currentLogicalRay.points.push(impactPoint);
+        }
+        boundsX.sort(function(a, b){ return a - b; });
+        for (var i = 0; i < boundsX.length - 1; i++) {
+            var xa = boundsX[i], xb = boundsX[i + 1];
+            if (xa === xb) continue;
+            var ya = m * xa + p, yb = m * xb + p;
+            var pA2 = board.create('point', [xa, ya], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            var pB2 = board.create('point', [xb, yb], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            var seg2 = board.create('segment', [pA2, pB2], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+            raySegments.push(seg2); allDrawnElements.push(pA2, pB2, seg2);
+            currentLogicalRay.segments.push(seg2); currentLogicalRay.points.push(pA2, pB2);
+        }
+    }
+    logicalRays.push(currentLogicalRay);
+    return currentLogicalRay;
+}
+
+function addRayFromPieces(m, p, isVert, xVert, pieces) {
+    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };
+    for (var i = 0; i < pieces.length; i++) {
+        var piece = pieces[i];
+        var pA, pB;
+        if (isVert) {
+            pA = board.create('point', [xVert, piece[0]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            pB = board.create('point', [xVert, piece[1]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        } else {
+            pA = board.create('point', [piece[0], m * piece[0] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+            pB = board.create('point', [piece[1], m * piece[1] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });
+        }
+        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });
+        seg.__status = statusFromCode(piece[2]);
+        paintSegment(seg);
+        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);
+        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);
+    }
+    logicalRays.push(currentLogicalRay);
+    return currentLogicalRay;
+}
+
+function addCustomRay(x1, y1, x2, y2) {
+    var dx = x2 - x1, dy = y2 - y1;
+    var m = (Math.abs(dx) < 0.01) ? Infinity : dy / dx;
+    if (m === Infinity) {
+        addCustomRayFromEq(null, null, true, x1);
+    } else {
+        var p = y1 - m * x1;
+        addCustomRayFromEq(m, p, false, null, x1);
+    }
+    syncState();
+}
+
+function onPointClick(pt) {
+    board.removeObject(pt);
+    allDrawnElements = allDrawnElements.filter(function(el){ return el !== pt; });
+    standaloneElements = standaloneElements.filter(function(el){ return el !== pt; });
+    syncState();
+}
+
+board.on('down', function(evt) {
+    if (evt.target && evt.target.closest && evt.target.closest('.JXG_navigation_button')) return;
+    if (evt.shiftKey) return;
+    var coords = board.getUsrCoordsOfMouse(evt);
+    var x = coords[0], y = coords[1];
+
+    if (toolMode !== '') {
+        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;
+
+        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }
+        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }
+        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }
+        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }
+        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }
+        else if (toolMode === 'par3') {
+            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;
+            addCustomRay(x, y, x + dx, y + dy);
+            resetTool();
+        }
+        else if (toolMode === 'inter1') {
+            interSeg1 = getClickedSegment(x, y, 0.4, null);
+            if (interSeg1) { toolMode = 'inter2'; setInstructions("INTERSECTION (2/2) : cliquez le 2e rayon émergent."); }
+        }
+        else if (toolMode === 'inter2') {
+            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);
+            if (seg2) {
+                var x1 = interSeg1.point1.X(), y1 = interSeg1.point1.Y(), x2 = interSeg1.point2.X(), y2 = interSeg1.point2.Y();
+                var x3 = seg2.point1.X(), y3 = seg2.point1.Y(), x4 = seg2.point2.X(), y4 = seg2.point2.Y();
+                var m1 = (x2 - x1) === 0 ? Infinity : (y2 - y1) / (x2 - x1);
+                var m2 = (x4 - x3) === 0 ? Infinity : (y4 - y3) / (x4 - x3);
+                if (m1 !== Infinity && m2 !== Infinity && Math.abs(m1 - m2) > 0.001) {
+                    var p1 = y1 - m1 * x1, p2 = y3 - m2 * x3;
+                    var xi = (p2 - p1) / (m1 - m2), yi = m1 * xi + p1;
+                    var in1 = xi >= Math.min(x1, x2) - 0.5 && xi <= Math.max(x1, x2) + 0.5 && yi >= Math.min(y1, y2) - 0.5 && yi <= Math.max(y1, y2) + 0.5;
+                    var in2 = xi >= Math.min(x3, x4) - 0.5 && xi <= Math.max(x3, x4) + 0.5 && yi >= Math.min(y3, y4) - 0.5 && yi <= Math.max(y3, y4) + 0.5;
+                    if (in1 && in2) {
+                        intersectionCounter++;
+                        var name = (intersectionCounter === 1) ? "B'" : ('I' + (intersectionCounter - 1));
+                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+                        allDrawnElements.push(pInt); standaloneElements.push(pInt);
+                        syncState();
+                    } else { setInstructions("Les droites se croisent hors des segments."); }
+                } else { setInstructions("Segments parallèles."); }
+                resetTool();
+            }
+        }
+        else if (toolMode === 'perp') {
+            addRayFromPieces(null, null, true, x, [[0, y, 1]]);
+            var pointAp = board.create('point', [x, 0], { name: "A'", size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+            allDrawnElements.push(pointAp); standaloneElements.push(pointAp);
+            syncState();
+            resetTool();
+        }
+        return;
+    }
+
+    var clickedSeg = getClickedSegment(x, y, 0.3, null);
+    if (clickedSeg) { onSegmentClick(clickedSeg); return; }
+    var clickedPt = getClickedPoint(x, y, 0.5);
+    if (clickedPt) { onPointClick(clickedPt); return; }
+});
+
+addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');
+addToolButton("Rayon // axe (1 clic)", 'axp1', "RAYON PARALLÈLE À L'AXE : cliquez le point de départ (ex : B).");
+addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');
+addToolButton("Intersection (2 clics) → point B'", 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon émergent.');
+addToolButton("Tracer A' (perpendiculaire)", 'perp', "PERPENDICULAIRE : cliquez sur B' pour tracer A' (le trait tracé pourra ensuite être marqué réel/virtuel).");
+addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });
+addToolButton('Tout effacer', null, function(){
+    selectedSegment = null;
+    allDrawnElements.forEach(function(el){ board.removeObject(el); });
+    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;
+    resetTool();
+    syncState();
+});
+
+document.body.appendChild(toolbarDiv);
+document.body.appendChild(instructionsEl);
+stack_js.resize_containing_frame("px", document.documentElement.offsetHeight + "px");
+
+/* Réponse scindée en 2 inputs (rayons / points) pour rester sous la limite
+   CHAR(255) de mdl_qtype_stack_inputs.tans (voir js/xml-lint.js) : un seul
+   champ combinant les deux dépasserait 255 caractères pour certains f'/OA/AB. */
+function rebuildAllDrawnElements() {
+    var fromRays = [];
+    logicalRays.forEach(function(lr){ fromRays = fromRays.concat(lr.points, lr.segments); });
+    allDrawnElements = fromRays.concat(standaloneElements);
+}
+
+var serialiserRays = function() {
+    var rayList = logicalRays.map(function(lr) {
+        var pieces = lr.segments.map(function(seg) {
+            var ends = lr.eq.isVert ? [seg.point1.Y(), seg.point2.Y()] : [seg.point1.X(), seg.point2.X()];
+            return [ends[0], ends[1], statusCode(seg)];
+        });
+        return lr.eq.isVert ? ['vert', lr.eq.x, pieces] : [lr.eq.m, lr.eq.p, pieces];
+    });
+    return "lentille_rays(" + JSON.stringify(rayList) + ")";
+};
+
+var serialiserPts = function() {
+    var ptList = standaloneElements
+        .filter(function(el){ return el.elType === 'point' && el.name; })
+        .map(function(el){ return [el.name, el.X(), el.Y()]; });
+    return "lentille_pts(" + JSON.stringify(ptList) + ")";
+};
+
+function clearRays() {
+    logicalRays.forEach(function(lr) {
+        lr.points.forEach(function(el){ board.removeObject(el); });
+        lr.segments.forEach(function(el){ board.removeObject(el); });
+    });
+    raySegments = []; logicalRays = [];
+    rebuildAllDrawnElements();
+}
+
+function clearPts() {
+    standaloneElements.forEach(function(el){ board.removeObject(el); });
+    standaloneElements = []; intersectionCounter = 0;
+    rebuildAllDrawnElements();
+}
+
+var deserialiserRays = function(value) {
+    clearRays();
+    var rayList = JSON.parse(value.replace('lentille_rays(', '[').replace(/\)\s*$/, ']'));
+    for (var i = 0; i < rayList.length; i++) {
+        var eq = rayList[i];
+        if (eq[0] === 'vert') addRayFromPieces(null, null, true, eq[1], eq[2] || [[Y_MIN, Y_MAX, 0]]);
+        else addRayFromPieces(eq[0], eq[1], false, null, eq[2] || [[X_MIN, X_MAX, 0]]);
+    }
+    board.update();
+};
+
+var deserialiserPts = function(value) {
+    clearPts();
+    var ptList = JSON.parse(value.replace('lentille_pts(', '[').replace(/\)\s*$/, ']'));
+    for (var j = 0; j < ptList.length; j++) {
+        var pp = ptList[j];
+        var pt = board.create('point', [pp[1], pp[2]], { name: pp[0], size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });
+        allDrawnElements.push(pt);
+        standaloneElements.push(pt);
+    }
+    board.update();
+};
+
+resetTool();
+stack_jxg.custom_bind(stateRays, serialiserRays, deserialiserRays, [handlePoint]);
+stack_jxg.custom_bind(statePts, serialiserPts, deserialiserPts, [handlePoint]);
+board.update();
+
+var inputElA = document.getElementById(stateRays), inputElB = document.getElementById(statePts);
+function freezeIfReadonly() {
+    var ro = (inputElA && (inputElA.hasAttribute('readonly') || inputElA.hasAttribute('disabled')))
+        || (inputElB && (inputElB.hasAttribute('readonly') || inputElB.hasAttribute('disabled')));
+    if (ro) {
+        board.containerObj.style.pointerEvents = 'none';
+        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });
+        setInstructions("Construction validée : la figure est figée.");
+        return true;
+    }
+    return false;
+}
+if (!freezeIfReadonly()) {
+    if (inputElA) new MutationObserver(freezeIfReadonly).observe(inputElA, { attributes: true, attributeFilter: ['readonly', 'disabled'] });
+    if (inputElB) new MutationObserver(freezeIfReadonly).observe(inputElB, { attributes: true, attributeFilter: ['readonly', 'disabled'] });
+}
+})();
