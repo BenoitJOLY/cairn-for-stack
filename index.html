@@ -1662,13 +1662,14 @@ fill="currentColor" stroke="none">
             <option value="lentille-divergente" data-i18n="opt.scenario_lentille_divergente">Lentille divergente — construction des 3 rayons</option>
           </optgroup>
           <optgroup label="Miroirs sphériques">
-            <option value="miroir-plan" disabled data-i18n="opt.scenario_miroir_plan">Miroir plan — construction (à venir)</option>
+            <option value="miroir-plan" data-i18n="opt.scenario_miroir_plan">Miroir plan — construction des 2 rayons</option>
             <option value="miroir-concave" data-i18n="opt.scenario_miroir_concave">Miroir concave — construction des 4 rayons</option>
             <option value="miroir-convexe" data-i18n="opt.scenario_miroir_convexe">Miroir convexe — construction des 4 rayons</option>
           </optgroup>
-          <optgroup label="Instruments composés (bientôt)">
-            <option value="lunette-galilee" disabled data-i18n="opt.scenario_lunette_galilee">Lunette de Galilée — construction complète (à venir)</option>
-            <option value="telescope-newton" disabled data-i18n="opt.scenario_telescope_newton">Télescope de Newton — construction complète (à venir)</option>
+          <optgroup label="Instruments composés">
+            <option value="lunette-galilee" data-i18n="opt.scenario_lunette_galilee">Lunette astronomique — construction complète</option>
+            <option value="telescope-newton" data-i18n="opt.scenario_telescope_newton">Télescope — miroir primaire, construction complète</option>
+            <option value="microscope" data-i18n="opt.scenario_microscope">Microscope — objectif + oculaire, réglage œil normal</option>
           </optgroup>
         </select>
       </div>
@@ -1730,7 +1731,113 @@ fill="currentColor" stroke="none">
         </fieldset>
       </div>
 
-      <!-- ── SECTIONS À VENIR (miroir plan, lunette, télescope) : générateurs pas encore implémentés ── -->
+      <!-- ── SECTION MIROIR PLAN (SA/AB, sans focale) ── -->
+      <div id="opt-sect-miroir-plan" style="display:none;">
+        <fieldset style="border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;margin:10px 0;">
+          <legend style="font-size:.85rem;color:#0369a1;font-weight:600;" data-i18n="opt.params_miroir_plan_legend">Paramètres du miroir plan</legend>
+          <div class="g2">
+            <div class="field">
+              <label data-i18n-html="opt.position_sa_lbl_html">Position objet SA (cm, &gt; 0)</label>
+              <input type="number" id="opt-mp-sa" value="7" min="0.5" max="200" step="0.5" oninput="optUpdatePreview()">
+            </div>
+            <div class="field">
+              <label data-i18n-html="opt.hauteur_ab_lbl_html">Hauteur objet AB (cm, &gt; 0)</label>
+              <input type="number" id="opt-mp-ab" value="1.5" min="0.1" max="30" step="0.5" oninput="optUpdatePreview()">
+            </div>
+          </div>
+          <div id="opt-mp-preview" style="font-size:.82rem;color:#0369a1;padding:6px 10px;background:#e0f2fe;border-radius:6px;min-height:3em;display:flex;flex-direction:column;justify-content:center;">
+            <em style="color:#6b7280;" data-i18n="ab.apercu_calcule">Aperçu calculé…</em>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ── SECTION LUNETTE ASTRONOMIQUE (f1/f2/theta/beamH) ── -->
+      <div id="opt-sect-lunette" style="display:none;">
+        <fieldset style="border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;margin:10px 0;">
+          <legend style="font-size:.85rem;color:#0369a1;font-weight:600;" data-i18n="opt.params_lunette_legend">Paramètres de la lunette</legend>
+          <div class="g2">
+            <div class="field">
+              <label data-i18n="opt.focale_objectif_lbl">Focale objectif f'₁ (cm)</label>
+              <input type="number" id="opt-f1" value="40" min="5" max="200" step="1" oninput="optUpdatePreview()">
+            </div>
+            <div class="field">
+              <label data-i18n="opt.focale_oculaire_lbl">Focale oculaire f'₂ (cm)</label>
+              <input type="number" id="opt-f2" value="10" min="1" max="100" step="1" oninput="optUpdatePreview()">
+            </div>
+          </div>
+          <div class="g2">
+            <div class="field">
+              <label data-i18n="opt.angle_incidence_lbl">Angle d'incidence θ (degrés)</label>
+              <input type="number" id="opt-theta" value="3" min="0.5" max="15" step="0.5" oninput="optUpdatePreview()">
+            </div>
+            <div class="field">
+              <label data-i18n="opt.hauteur_faisceau_lbl">Hauteur faisceau h (cm)</label>
+              <input type="number" id="opt-beam-h" value="3" min="0.5" max="20" step="0.5" oninput="optUpdatePreview()">
+            </div>
+          </div>
+          <div id="opt-lu-preview" style="font-size:.82rem;color:#0369a1;padding:6px 10px;background:#e0f2fe;border-radius:6px;min-height:3em;display:flex;flex-direction:column;justify-content:center;">
+            <em style="color:#6b7280;" data-i18n="ab.apercu_calcule">Aperçu calculé…</em>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ── SECTION TÉLESCOPE (miroir primaire concave : f1/theta/beamH) ── -->
+      <div id="opt-sect-telescope" style="display:none;">
+        <fieldset style="border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;margin:10px 0;">
+          <legend style="font-size:.85rem;color:#0369a1;font-weight:600;" data-i18n="opt.params_telescope_legend">Paramètres du télescope (miroir concave)</legend>
+          <div class="g2">
+            <div class="field">
+              <label data-i18n="opt.focale_f_miroir_lbl">Distance focale f (cm, &gt; 0)</label>
+              <input type="number" id="opt-tel-f1" value="40" min="5" max="200" step="1" oninput="optUpdatePreview()">
+            </div>
+            <div class="field">
+              <label data-i18n="opt.angle_incidence_lbl">Angle d'incidence θ (degrés)</label>
+              <input type="number" id="opt-tel-theta" value="3" min="0.5" max="15" step="0.5" oninput="optUpdatePreview()">
+            </div>
+          </div>
+          <div class="g2">
+            <div class="field">
+              <label data-i18n="opt.hauteur_faisceau_lbl">Hauteur faisceau h (cm)</label>
+              <input type="number" id="opt-tel-beam-h" value="3" min="0.5" max="20" step="0.5" oninput="optUpdatePreview()">
+            </div>
+            <div id="opt-tel-preview" style="align-self:center;font-size:.82rem;color:#0369a1;padding:6px 10px;background:#e0f2fe;border-radius:6px;min-height:3em;display:flex;flex-direction:column;justify-content:center;">
+              <em style="color:#6b7280;" data-i18n="ab.apercu_calcule">Aperçu calculé…</em>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ── SECTION MICROSCOPE (objectif + oculaire : f1/f2/OA/AB) ── -->
+      <div id="opt-sect-microscope" style="display:none;">
+        <fieldset style="border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;margin:10px 0;">
+          <legend style="font-size:.85rem;color:#0369a1;font-weight:600;" data-i18n="opt.params_microscope_legend">Paramètres du microscope (objectif + oculaire)</legend>
+          <div class="g2">
+            <div class="field">
+              <label data-i18n="opt.focale_objectif_lbl">Focale objectif f'₁ (cm)</label>
+              <input type="number" id="opt-mic-f1" value="1" min="0.2" max="20" step="0.1" oninput="optUpdatePreview()">
+            </div>
+            <div class="field">
+              <label data-i18n="opt.focale_oculaire_lbl">Focale oculaire f'₂ (cm)</label>
+              <input type="number" id="opt-mic-f2" value="4" min="0.5" max="50" step="0.5" oninput="optUpdatePreview()">
+            </div>
+          </div>
+          <div class="g2">
+            <div class="field">
+              <label data-i18n-html="opt.position_oa_lbl_html">Position objet OA (cm, &lt; 0)</label>
+              <input type="number" id="opt-mic-oa" value="-1.25" max="-0.3" step="0.05" oninput="optUpdatePreview()">
+            </div>
+            <div class="field">
+              <label data-i18n-html="opt.hauteur_ab_lbl_html">Hauteur objet AB (cm, &gt; 0)</label>
+              <input type="number" id="opt-mic-ab" value="0.08" min="0.01" max="2" step="0.01" oninput="optUpdatePreview()">
+            </div>
+          </div>
+          <div id="opt-mic-preview" style="font-size:.82rem;color:#0369a1;padding:6px 10px;background:#e0f2fe;border-radius:6px;min-height:3em;display:flex;flex-direction:column;justify-content:center;">
+            <em style="color:#6b7280;" data-i18n="ab.apercu_calcule">Aperçu calculé…</em>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ── SECTIONS À VENIR : générateur pas encore implémenté ── -->
       <div id="opt-sect-non-implemente" style="display:none;">
         <div class="info-box" style="border-color:#f59e0b;background:#fffbeb;color:#92400e;">
           ⏳ Ce scénario n'est pas encore disponible dans cette version — le moteur de construction sera ajouté prochainement.

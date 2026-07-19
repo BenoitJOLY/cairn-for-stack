@@ -545,8 +545,10 @@ function genOptique(X) {
     if (scenario === 'lentille-divergente')  return _genOptiqueLentilleDivergente(X);
     if (scenario === 'miroir-concave') return _genOptiqueMiroirConcave(X);
     if (scenario === 'miroir-convexe') return _genOptiqueMiroirConvexe(X);
-    if (scenario === 'miroir-plan' || scenario === 'lunette-galilee' || scenario === 'telescope-newton')
-        throw new Error(I18N.t('opt.err_scenario_a_venir'));
+    if (scenario === 'miroir-plan') return _genOptiqueMiroirPlan(X);
+    if (scenario === 'lunette-galilee') return _genOptiqueLunetteConstruction(X);
+    if (scenario === 'telescope-newton') return _genOptiqueTelescopeConstruction(X);
+    if (scenario === 'microscope') return _genOptiqueMicroscopeConstruction(X);
     throw new Error(I18N.t('msg.optique_err_scenario') + scenario);
 }
 
@@ -2499,164 +2501,540 @@ function _genOptiqueMiroirConcave(X) { return _genOptiqueMiroirCore(X, false); }
 function _genOptiqueMiroirConvexe(X) { return _genOptiqueMiroirCore(X, true); }
 
 /* ── Scénario 3 : Lunette astronomique afocale ── */
-function _genOptiqueLunette(X) {
-    var bareme  = parseFloat(v('opt-bareme'))   || 1;
-    var text    = richVal('opt-text');
-    var f1      = parseFloat(v('opt-f1'))       || 40;
-    var f2      = parseFloat(v('opt-f2'))       || 10;
-    var theta   = parseFloat(v('opt-theta'))    || 3;
-    var beamH   = parseFloat(v('opt-beam-h'))   || 3;
-    var tolB1x  = parseFloat(v('opt-tol-b1x')) || 1.5;
-    var tolB1y  = parseFloat(v('opt-tol-b1y')) || 0.5;
-    var dispW   = parseInt(v('opt-w'))           || 700;
-    var dispH   = parseInt(v('opt-h'))           || 380;
-    var fbOkTxt = v('opt-fb-ok').trim();
-    var fbWrTxt = v('opt-fb-wrong').trim();
+/* ── Moteur JSXGraph : lunette astronomique afocale (construction toolbar) ──
+   Portage de _lentilleConstructionJXG pour un système à DEUX lentilles
+   convergentes (objectif L1 en x=0, oculaire L2 en x=d=f1+f2) : mêmes
+   outils/état/sérialisation génériques, mais les ruptures de pente des
+   rayons (« impact » sur une lentille) sont calculées pour DEUX abscisses
+   (LENS_XS = [[0,lens1H],[d,lens2H]]) au lieu d'une seule. Pas d'outil
+   « Tracer A' » (l'image finale est à l'infini, il n'y a pas de segment
+   A'B' à qualifier réel/virtuel). Le premier point construit par
+   intersection est nommé B1 (image intermédiaire réelle dans le plan
+   focal commun F'1=F2), et la fonction de sérialisation est
+   lunette_construction(rayons, points). */
+function _lunetteConstructionJXG(X, p) {
+    var f1 = p.f1, f2 = p.f2, d = p.d, beamH = p.beamH;
+    var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
+    var lens1H = p.lens1H, lens2H = p.lens2H;
+    var dispW = p.dispW || 700;
+    var lensGlyph1 =
+        "board.create('segment', [[0, -lens1H], [0, lens1H]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, lens1H], [-0.4, lens1H - 0.4]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, lens1H], [0.4, lens1H - 0.4]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, -lens1H], [-0.4, -lens1H + 0.4]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, -lens1H], [0.4, -lens1H + 0.4]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('text', [0, lens1H + 1.1, 'L\\u2081'], { fixed: true, fontSize: 15, fontWeight: 'bold', color: '#1d4ed8', anchorX: 'middle', highlight: false, tabindex: null });\n";
+    var lensGlyph2 =
+        "board.create('segment', [[d, -lens2H], [d, lens2H]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[d, lens2H], [d - 0.4, lens2H - 0.4]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[d, lens2H], [d + 0.4, lens2H - 0.4]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[d, -lens2H], [d - 0.4, -lens2H + 0.4]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[d, -lens2H], [d + 0.4, -lens2H + 0.4]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('text', [d, lens2H + 1.1, 'L\\u2082'], { fixed: true, fontSize: 15, fontWeight: 'bold', color: '#7c3aed', anchorX: 'middle', highlight: false, tabindex: null });\n";
+    return '(function(){\n'
+        + 'var board = JXG.JSXGraph.initBoard(divid, {\n'
+        + '    boundingbox: [' + X_MIN + ', ' + Y_MAX + ', ' + X_MAX + ', ' + Y_MIN + '],\n'
+        + '    axis: false,\n    keepaspectratio: true,\n    showNavigation: true,\n'
+        + '    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },\n'
+        + '    pan: { enabled: true, needTwoFingers: false, needShift: true }\n});\n\n'
+        + 'var f1 = ' + f1 + ', f2 = ' + f2 + ', d = ' + d + ', beamH = ' + beamH + ';\n'
+        + 'var lens1H = ' + lens1H + ', lens2H = ' + lens2H + ';\n'
+        + 'var LENS_XS = [[0, lens1H], [d, lens2H]];\n'
+        + 'var X_MIN = ' + X_MIN + ', X_MAX = ' + X_MAX + ', Y_MIN = ' + Y_MIN + ', Y_MAX = ' + Y_MAX + ';\n\n'
+        + "var toolMode = '';\n"
+        + 'var tempPoint = null, dirPoint1 = null, dirPoint2 = null, interSeg1 = null;\n'
+        + 'var selectedSegment = null;\n\n'
+        + 'var allDrawnElements = [];\n'
+        + 'var raySegments = [];\n'
+        + 'var logicalRays = [];\n'
+        + 'var standaloneElements = [];\n'
+        + 'var intersectionCounter = 0;\n\n'
+        + "board.create('line', [[X_MIN, 0], [X_MAX, 0]], { strokeColor: 'black', strokeWidth: 1, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[X_MAX - 0.5, 0], [X_MAX, 0]], { fixed: true, highlight: false, tabindex: null });\n\n"
+        + lensGlyph1 + '\n' + lensGlyph2 + '\n'
+        + "board.create('point', [0, 0], { name: 'O\\u2081', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });\n"
+        + "board.create('point', [-f1, 0], { name: 'F\\u2081', size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n"
+        + "board.create('point', [f1, 0], { name: \"F'\\u2081=F\\u2082\", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n"
+        + "board.create('point', [d, 0], { name: 'O\\u2082', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });\n"
+        + "board.create('point', [d + f2, 0], { name: \"F'\\u2082\", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n\n"
+        + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
+        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + "var instructionsEl = document.createElement('p');\n"
+        + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
+        + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
+        + 'function setInstructions(msg) { instructionsEl.textContent = msg; }\n\n'
+        + "var toolbarDiv = document.createElement('div');\n"
+        + "toolbarDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:.4em;margin-top:.6em;';\n"
+        + 'var toolButtons = {};\n\n'
+        + 'function addToolButton(label, mode, msgOrHandler) {\n'
+        + "    var btn = document.createElement('button');\n"
+        + "    btn.type = 'button';\n    btn.textContent = label;\n"
+        + "    btn.style.cssText = 'padding:.35em .7em;font-size:.85em;cursor:pointer;';\n"
+        + '    if (mode === null) {\n'
+        + "        btn.addEventListener('click', msgOrHandler);\n"
+        + '    } else {\n'
+        + "        btn.addEventListener('click', function(){ activateTool(mode, msgOrHandler); });\n"
+        + '        toolButtons[mode] = btn;\n    }\n'
+        + '    toolbarDiv.appendChild(btn);\n    return btn;\n}\n\n'
+        + 'function setActiveButton(mode) {\n'
+        + '    for (var m in toolButtons) {\n'
+        + "        toolButtons[m].style.background = (m === mode) ? '#dbeafe' : '';\n"
+        + "        toolButtons[m].style.fontWeight = (m === mode) ? 'bold' : 'normal';\n"
+        + '    }\n}\n\n'
+        + 'function resetTool() {\n'
+        + "    toolMode = '';\n"
+        + '    tempPoint = null; dirPoint1 = null; dirPoint2 = null; interSeg1 = null;\n'
+        + "    board.defaultCursor = 'default';\n"
+        + '    setInstructions(DEFAULT_MSG);\n    setActiveButton(null);\n    deselectSegment();\n}\n\n'
+        + 'function paintSegment(seg) {\n'
+        + "    var status = seg.__status || 'defaut';\n"
+        + "    if (status === 'reel') {\n"
+        + "        seg.setAttribute({ strokeColor: '#e67e22', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + "    } else if (status === 'virtuel') {\n"
+        + "        seg.setAttribute({ strokeColor: '#2980b9', dash: 2, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + '    } else {\n'
+        + "        seg.setAttribute({ strokeColor: '#555555', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + '    }\n}\n\n'
+        + 'function statusCode(seg) {\n'
+        + "    var s = seg.__status || 'defaut';\n"
+        + "    return s === 'reel' ? 1 : (s === 'virtuel' ? 2 : 0);\n}\n\n"
+        + 'function statusFromCode(code) {\n'
+        + "    return code === 1 ? 'reel' : (code === 2 ? 'virtuel' : 'defaut');\n}\n\n"
+        + 'function deselectSegment() {\n'
+        + '    var prev = selectedSegment;\n    selectedSegment = null;\n'
+        + '    if (prev) { paintSegment(prev); }\n}\n\n'
+        + 'function onSegmentClick(seg) {\n'
+        + "    var status = seg.__status || 'defaut';\n"
+        + "    seg.__status = (status === 'reel') ? 'virtuel' : 'reel';\n"
+        + '    var prev = selectedSegment;\n    selectedSegment = seg;\n'
+        + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
+        + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
+        + 'function deleteSelectedSegment() {\n'
+        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
+        + '    board.removeObject(seg);\n'
+        + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
+        + '    for (var i = 0; i < logicalRays.length; i++) {\n'
+        + '        var lr = logicalRays[i];\n'
+        + '        var sIdx = lr.segments.indexOf(seg);\n'
+        + '        if (sIdx > -1) {\n            lr.segments.splice(sIdx, 1);\n'
+        + '            if (lr.segments.length === 0) { logicalRays.splice(i, 1); }\n            break;\n        }\n    }\n'
+        + '    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
+        + 'function activateTool(mode, msg) {\n'
+        + '    if (toolMode === mode) { resetTool(); return; }\n'
+        + '    resetTool(); toolMode = mode;\n'
+        + "    board.defaultCursor = 'crosshair';\n"
+        + '    setInstructions(msg);\n    setActiveButton(mode);\n}\n\n'
+        + 'function syncState() {\n'
+        + "    handlePoint.trigger(['update']);\n    board.update();\n}\n\n"
+        + 'function snapToPoint(x, y) {\n'
+        + '    var threshold = 0.6, closestX = x, closestY = y, minDist = Infinity;\n'
+        + '    for (var id in board.objects) {\n'
+        + '        var obj = board.objects[id];\n'
+        + "        if (obj.elType === 'point' && obj.visProp.visible !== false && obj.visProp.hidden !== true) {\n"
+        + '            var dx = obj.X() - x, dy = obj.Y() - y, dist = Math.sqrt(dx * dx + dy * dy);\n'
+        + '            if (dist < threshold && dist < minDist) { minDist = dist; closestX = obj.X(); closestY = obj.Y(); }\n'
+        + '        }\n    }\n    return { x: closestX, y: closestY };\n}\n\n'
+        + 'function getClickedSegment(x, y, threshold, excludeSeg) {\n'
+        + '    var closestSeg = null, minDist = Infinity;\n'
+        + '    for (var i = 0; i < raySegments.length; i++) {\n'
+        + '        var seg = raySegments[i];\n'
+        + '        if (seg === excludeSeg) continue;\n'
+        + '        if (!seg.point1 || !seg.point2) continue;\n'
+        + '        var x1 = seg.point1.X(), y1 = seg.point1.Y();\n'
+        + '        var x2 = seg.point2.X(), y2 = seg.point2.Y();\n'
+        + '        var dx = x2 - x1, dy = y2 - y1;\n'
+        + '        var lengthSq = dx * dx + dy * dy;\n'
+        + '        if (lengthSq === 0) continue;\n'
+        + '        var t = ((x - x1) * dx + (y - y1) * dy) / lengthSq;\n'
+        + '        t = Math.max(0, Math.min(1, t));\n'
+        + '        var projX = x1 + t * dx, projY = y1 + t * dy;\n'
+        + '        var dist = Math.sqrt(Math.pow(x - projX, 2) + Math.pow(y - projY, 2));\n'
+        + '        if (dist < threshold && dist < minDist) { minDist = dist; closestSeg = seg; }\n'
+        + '    }\n    return closestSeg;\n}\n\n'
+        + 'function getClickedPoint(x, y, threshold) {\n'
+        + '    var closest = null, minDist = Infinity;\n'
+        + '    for (var i = 0; i < standaloneElements.length; i++) {\n'
+        + '        var el = standaloneElements[i];\n'
+        + "        if (el.elType === 'point' && el.visProp.visible !== false) {\n"
+        + '            var d2 = Math.hypot(el.X() - x, el.Y() - y);\n'
+        + '            if (d2 < threshold && d2 < minDist) { minDist = d2; closest = el; }\n'
+        + '        }\n    }\n    return closest;\n}\n\n'
+        + 'function addCustomRayFromEq(m, p, isVert, xVert, xOrigin) {\n'
+        + '    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };\n'
+        + '    if (isVert) {\n'
+        + "        var pA = board.create('point', [xVert, Y_MIN], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "        var pB = board.create('point', [xVert, Y_MAX], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);\n'
+        + '        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);\n'
+        + '    } else {\n'
+        + '        var boundsX = [X_MIN, X_MAX];\n'
+        + "        if (typeof xOrigin === 'number') boundsX.push(xOrigin);\n"
+        + '        for (var li = 0; li < LENS_XS.length; li++) {\n'
+        + '            var lx = LENS_XS[li][0], lh = LENS_XS[li][1];\n'
+        + '            var yAtLx = m * lx + p;\n'
+        + '            if (Math.abs(yAtLx) <= lh) {\n'
+        + '                boundsX.push(lx);\n'
+        + "                var impactPoint = board.create('point', [lx, yAtLx], { name: '', size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '                allDrawnElements.push(impactPoint);\n                currentLogicalRay.points.push(impactPoint);\n            }\n        }\n'
+        + '        boundsX.sort(function(a, b){ return a - b; });\n'
+        + '        for (var i = 0; i < boundsX.length - 1; i++) {\n'
+        + '            var xa = boundsX[i], xb = boundsX[i + 1];\n'
+        + '            if (xa === xb) continue;\n'
+        + '            var ya = m * xa + p, yb = m * xb + p;\n'
+        + "            var pA2 = board.create('point', [xa, ya], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            var pB2 = board.create('point', [xb, yb], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            var seg2 = board.create('segment', [pA2, pB2], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '            raySegments.push(seg2); allDrawnElements.push(pA2, pB2, seg2);\n'
+        + '            currentLogicalRay.segments.push(seg2); currentLogicalRay.points.push(pA2, pB2);\n        }\n    }\n'
+        + '    logicalRays.push(currentLogicalRay);\n    return currentLogicalRay;\n}\n\n'
+        + 'function addRayFromPieces(m, p, isVert, xVert, pieces) {\n'
+        + '    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };\n'
+        + '    for (var i = 0; i < pieces.length; i++) {\n'
+        + '        var piece = pieces[i];\n        var pA, pB;\n'
+        + '        if (isVert) {\n'
+        + "            pA = board.create('point', [xVert, piece[0]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            pB = board.create('point', [xVert, piece[1]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + '        } else {\n'
+        + "            pA = board.create('point', [piece[0], m * piece[0] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            pB = board.create('point', [piece[1], m * piece[1] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + '        }\n'
+        + "        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '        seg.__status = statusFromCode(piece[2]);\n        paintSegment(seg);\n'
+        + '        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);\n'
+        + '        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);\n    }\n'
+        + '    logicalRays.push(currentLogicalRay);\n    return currentLogicalRay;\n}\n\n'
+        + 'function addCustomRay(x1, y1, x2, y2) {\n'
+        + '    var dx = x2 - x1, dy = y2 - y1;\n'
+        + '    var m = (Math.abs(dx) < 0.01) ? Infinity : dy / dx;\n'
+        + '    if (m === Infinity) {\n        addCustomRayFromEq(null, null, true, x1);\n    } else {\n'
+        + '        var p = y1 - m * x1;\n        addCustomRayFromEq(m, p, false, null, x1);\n    }\n'
+        + '    syncState();\n}\n\n'
+        + 'function onPointClick(pt) {\n'
+        + '    board.removeObject(pt);\n'
+        + '    allDrawnElements = allDrawnElements.filter(function(el){ return el !== pt; });\n'
+        + '    standaloneElements = standaloneElements.filter(function(el){ return el !== pt; });\n'
+        + '    syncState();\n}\n\n'
+        + "board.on('down', function(evt) {\n"
+        + "    if (evt.target && evt.target.closest && evt.target.closest('.JXG_navigation_button')) return;\n"
+        + '    if (evt.shiftKey) return;\n'
+        + '    var coords = board.getUsrCoordsOfMouse(evt);\n'
+        + '    var x = coords[0], y = coords[1];\n\n'
+        + "    if (toolMode !== '') {\n"
+        + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
+        + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par3') {\n"
+        + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
+        + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
+        + "        else if (toolMode === 'inter1') {\n"
+        + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon.\"); }\n"
+        + '        }\n'
+        + "        else if (toolMode === 'inter2') {\n"
+        + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
+        + '            if (seg2) {\n'
+        + '                var x1 = interSeg1.point1.X(), y1 = interSeg1.point1.Y(), x2 = interSeg1.point2.X(), y2 = interSeg1.point2.Y();\n'
+        + '                var x3 = seg2.point1.X(), y3 = seg2.point1.Y(), x4 = seg2.point2.X(), y4 = seg2.point2.Y();\n'
+        + '                var m1 = (x2 - x1) === 0 ? Infinity : (y2 - y1) / (x2 - x1);\n'
+        + '                var m2 = (x4 - x3) === 0 ? Infinity : (y4 - y3) / (x4 - x3);\n'
+        + '                if (m1 !== Infinity && m2 !== Infinity && Math.abs(m1 - m2) > 0.001) {\n'
+        + '                    var p1 = y1 - m1 * x1, p2 = y3 - m2 * x3;\n'
+        + '                    var xi = (p2 - p1) / (m1 - m2), yi = m1 * xi + p1;\n'
+        + '                    var in1 = xi >= Math.min(x1, x2) - 0.5 && xi <= Math.max(x1, x2) + 0.5 && yi >= Math.min(y1, y2) - 0.5 && yi <= Math.max(y1, y2) + 0.5;\n'
+        + '                    var in2 = xi >= Math.min(x3, x4) - 0.5 && xi <= Math.max(x3, x4) + 0.5 && yi >= Math.min(y3, y4) - 0.5 && yi <= Math.max(y3, y4) + 0.5;\n'
+        + '                    if (in1 && in2) {\n'
+        + '                        intersectionCounter++;\n'
+        + "                        var name = (intersectionCounter === 1) ? 'B1' : ('I' + (intersectionCounter - 1));\n"
+        + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
+        + '                        syncState();\n'
+        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
+        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                resetTool();\n            }\n        }\n        return;\n    }\n\n'
+        + '    var clickedSeg = getClickedSegment(x, y, 0.3, null);\n'
+        + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
+        + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
+        + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
+        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
+        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ.\");\n"
+        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
+        + "addToolButton('Intersection (2 clics) → point B1', 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon.');\n"
+        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('Tout effacer', null, function(){\n"
+        + '    selectedSegment = null;\n'
+        + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
+        + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
+        + '    resetTool();\n    syncState();\n});\n\n'
+        + 'document.body.appendChild(toolbarDiv);\n'
+        + 'document.body.appendChild(instructionsEl);\n'
+        + 'stack_js.resize_containing_frame("' + dispW + 'px", document.documentElement.offsetHeight + "px");\n\n'
+        + 'function rebuildAllDrawnElements() {\n'
+        + '    var fromRays = [];\n'
+        + '    logicalRays.forEach(function(lr){ fromRays = fromRays.concat(lr.points, lr.segments); });\n'
+        + '    allDrawnElements = fromRays.concat(standaloneElements);\n}\n\n'
+        + 'var serialiser = function() {\n'
+        + '    var rayList = logicalRays.map(function(lr) {\n'
+        + '        var pieces = lr.segments.map(function(seg) {\n'
+        + '            var ends = lr.eq.isVert ? [seg.point1.Y(), seg.point2.Y()] : [seg.point1.X(), seg.point2.X()];\n'
+        + '            return [ends[0], ends[1], statusCode(seg)];\n        });\n'
+        + "        return lr.eq.isVert ? ['vert', lr.eq.x, pieces] : [lr.eq.m, lr.eq.p, pieces];\n    });\n"
+        + '    var ptList = standaloneElements\n'
+        + "        .filter(function(el){ return el.elType === 'point' && el.name; })\n"
+        + '        .map(function(el){ return [el.name, el.X(), el.Y()]; });\n'
+        + '    return "lunette_construction(" + JSON.stringify(rayList) + "," + JSON.stringify(ptList) + ")";\n};\n\n'
+        + 'function clearAll() {\n'
+        + '    logicalRays.forEach(function(lr) {\n'
+        + '        lr.points.forEach(function(el){ board.removeObject(el); });\n'
+        + '        lr.segments.forEach(function(el){ board.removeObject(el); });\n    });\n'
+        + '    standaloneElements.forEach(function(el){ board.removeObject(el); });\n'
+        + '    raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
+        + '    rebuildAllDrawnElements();\n}\n\n'
+        + 'var deserialiser = function(value) {\n'
+        + '    clearAll();\n'
+        + "    var newState = JSON.parse(value.replace('lunette_construction(', '[').replace(/\\)\\s*$/, ']'));\n"
+        + '    var rayList = newState[0], ptList = newState[1];\n'
+        + '    for (var i = 0; i < rayList.length; i++) {\n'
+        + '        var eq = rayList[i];\n'
+        + "        if (eq[0] === 'vert') addRayFromPieces(null, null, true, eq[1], eq[2] || [[Y_MIN, Y_MAX, 0]]);\n"
+        + '        else addRayFromPieces(eq[0], eq[1], false, null, eq[2] || [[X_MIN, X_MAX, 0]]);\n    }\n'
+        + '    for (var j = 0; j < ptList.length; j++) {\n'
+        + '        var pp = ptList[j];\n'
+        + "        var pt = board.create('point', [pp[1], pp[2]], { name: pp[0], size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '        allDrawnElements.push(pt);\n        standaloneElements.push(pt);\n    }\n'
+        + '    board.update();\n};\n\n'
+        + 'resetTool();\n'
+        + 'stack_jxg.custom_bind(state, serialiser, deserialiser, [handlePoint]);\n'
+        + 'board.update();\n\n'
+        + 'var inputEl = document.getElementById(state);\n'
+        + 'function freezeIfReadonly() {\n'
+        + "    var ro = inputEl && (inputEl.hasAttribute('readonly') || inputEl.hasAttribute('disabled'));\n"
+        + '    if (ro) {\n'
+        + "        board.containerObj.style.pointerEvents = 'none';\n"
+        + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
+        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        return true;\n    }\n    return false;\n}\n'
+        + 'if (!freezeIfReadonly()) {\n'
+        + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
+        + '}\n'
+        + '})();';
+}
+
+/* ── Lunette astronomique afocale — système à deux lentilles convergentes
+   (objectif f'1, oculaire f'2, séparées de d=f'1+f'2). L'objet est à
+   l'infini (étoile), repéré par son diamètre apparent θ. Construction en
+   deux temps sur le même canevas/input : (1) deux rayons incidents
+   parallèles (l'un par le centre O1, l'autre décalé de beamH) donnent par
+   intersection le point image intermédiaire B1, réel, dans le plan focal
+   commun F'1=F2 ; (2) deux rayons issus de B1 (l'un par le centre O2,
+   l'autre parallèle à l'axe puis par F'2) donnent le faisceau émergent,
+   parallèle (système afocal, image finale à l'infini — pas de second
+   point à construire). Voir le fichier de référence « Lunette
+   astronomique » pour les formules physiques (reprises à l'identique). */
+function _genOptiqueLunetteConstruction(X) {
+    var bareme = parseFloat(v('opt-bareme')) || 1;
+    var text   = richVal('opt-text');
+    var f1     = parseFloat(v('opt-f1'))     || 40;
+    var f2     = parseFloat(v('opt-f2'))     || 10;
+    var theta  = parseFloat(v('opt-theta'))  || 3;
+    var beamH  = parseFloat(v('opt-beam-h')) || 3;
+    var dispW  = parseInt(v('opt-w')) || 700;
+    var dispH  = parseInt(v('opt-h')) || 380;
 
     if (f1 <= 0) throw new Error(I18N.t('opt.err_f1_positive'));
     if (f2 <= 0) throw new Error(I18N.t('opt.err_f2_positive'));
     if (theta <= 0) throw new Error(I18N.t('opt.err_theta_positive'));
+    if (beamH <= 0) throw new Error(I18N.t('opt.err_theta_positive'));
 
-    var tanT   = Math.tan(theta * Math.PI / 180);
-    var d      = f1 + f2;          // afocal distance
-    var yB1exp = -f1 * tanT;       // expected y-coordinate of B1
+    function _n(val) { var r = Math.round(val * 1e1) / 1e1; return r === 0 ? 0 : r; }
 
-    /* Bounding box */
-    var xLeft  = -(f1 * 0.55);
-    var xRight = d + f2 * 0.8 + 5;
-    var yAmp   = Math.max(Math.abs(yB1exp) + 3, beamH + 3, 5) * 1.55;
-    var lens1H = (yAmp * 0.68).toFixed(3);
-    var lens2H = (yAmp * 0.52).toFixed(3);
-    var tickH  = (yAmp * 0.055).toFixed(3);
+    var tanT = Math.tan(theta * Math.PI / 180);
+    var d    = f1 + f2;
+    var yB1  = -f1 * tanT;
 
-    var incY1  = (-xLeft * tanT).toFixed(4);
-    var incY2  = (-xLeft * tanT + beamH).toFixed(4);
-    var tansB1 = '[' + f1.toFixed(3) + ',' + yB1exp.toFixed(4) + ']';
+    /* Rayons remarquables (voir commentaire du moteur JSXGraph ci-dessus) */
+    var mA = -tanT, pA = 0;                                   // rayon par O1 (incident + émergent confondus)
+    var mBi = -tanT, pBi = beamH;                              // rayon décalé, avant L1
+    var mBe = (yB1 - beamH) / f1, pBe = beamH;                 // … après L1, vers B1
+    var mC = -yB1 / f2, pC = -mC * d;                          // rayon B1 → O2 (non dévié)
+    var mDi = 0, pDi = yB1;                                    // rayon B1 → L2, // axe
+    var mDe = -yB1 / f2, pDe = yB1 - mDe * d;                  // … après L2, vers F'2
 
-    var jxg = '(function(){\n'
-        + '/* Q' + X + ' — Optique : Lunette astronomique afocale */\n'
-        + 'var board=JXG.JSXGraph.initBoard(divid,{\n'
-        + '  boundingbox:[' + xLeft.toFixed(2) + ',' + yAmp.toFixed(2) + ','
-                            + xRight.toFixed(2) + ',' + (-yAmp).toFixed(2) + '],\n'
-        + '  axis:false,grid:false,showCopyright:false,\n'
-        + '  showNavigation:false,pan:{enabled:false},zoom:{enabled:false}\n'
-        + '});\n'
-        + 'board.suspendUpdate();\n'
-        /* optical axis */
-        + 'board.create("line",[[0,0],[1,0]],{strokeColor:"#374151",strokeWidth:1.5,'
-        + 'straightFirst:true,straightLast:true,firstArrow:{type:1,size:4},lastArrow:{type:1,size:4},'
-        + 'fixed:true,highlight:false});\n'
-        /* L1 (objective, blue) */
-        + 'board.create("segment",[[0,-' + lens1H + '],[0,' + lens1H + ']],'
-        + '{strokeColor:"#1d4ed8",strokeWidth:2.5,firstArrow:{type:1,size:8},lastArrow:{type:1,size:8},'
-        + 'fixed:true,highlight:false});\n'
-        + 'board.create("text",[0,' + (parseFloat(lens1H) + 1.4).toFixed(2)
-        + ',"L₁"],{fixed:true,fontSize:15,fontWeight:"bold",color:"#1d4ed8",anchorX:"middle"});\n'
-        /* L2 (eyepiece, purple) */
-        + 'board.create("segment",[[' + d + ',-' + lens2H + '],[' + d + ',' + lens2H + ']],'
-        + '{strokeColor:"#7c3aed",strokeWidth:2.5,firstArrow:{type:1,size:8},lastArrow:{type:1,size:8},'
-        + 'fixed:true,highlight:false});\n'
-        + 'board.create("text",[' + d + ',' + (parseFloat(lens2H) + 1.4).toFixed(2)
-        + ',"L₂"],{fixed:true,fontSize:15,fontWeight:"bold",color:"#7c3aed",anchorX:"middle"});\n'
-        /* F1 */
-        + 'board.create("segment",[[-' + f1 + ',-' + tickH + '],[-' + f1 + ',' + tickH + ']],'
-        + '{strokeColor:"#1d4ed8",strokeWidth:1.5,fixed:true,highlight:false});\n'
-        + 'board.create("point",[-' + f1 + ',0],{name:"F₁",fixed:true,size:2,'
-        + 'strokeColor:"#1d4ed8",fillColor:"#1d4ed8",label:{offset:[4,-14],color:"#1d4ed8",fontSize:12}});\n'
-        /* F'1=F2 at x=f1 (shared focal plane) */
-        + 'board.create("segment",[[' + f1 + ',-' + tickH + '],[' + f1 + ',' + tickH + ']],'
-        + '{strokeColor:"#6d28d9",strokeWidth:1.5,dash:1,fixed:true,highlight:false});\n'
-        + 'board.create("point",[' + f1 + ',0],{name:"F\'₁=F₂",fixed:true,size:2,'
-        + 'strokeColor:"#6d28d9",fillColor:"#6d28d9",label:{offset:[4,-14],color:"#6d28d9",fontSize:11}});\n'
-        /* F'2 */
-        + 'board.create("segment",[[' + (d + f2) + ',-' + tickH + '],[' + (d + f2) + ',' + tickH + ']],'
-        + '{strokeColor:"#7c3aed",strokeWidth:1.5,fixed:true,highlight:false});\n'
-        + 'board.create("point",[' + (d + f2) + ',0],{name:"F\'₂",fixed:true,size:2,'
-        + 'strokeColor:"#7c3aed",fillColor:"#7c3aed",label:{offset:[4,-14],color:"#7c3aed",fontSize:12}});\n'
-        /* Incident rays (2 parallel at slope -tanT) */
-        + 'board.create("segment",[[' + xLeft.toFixed(2) + ',' + incY1 + '],[0,0]],'
-        + '{strokeColor:"#2563eb",strokeWidth:2,lastArrow:{type:1,size:5},fixed:true,highlight:false});\n'
-        + 'board.create("segment",[[' + xLeft.toFixed(2) + ',' + incY2 + '],[0,' + beamH + ']],'
-        + '{strokeColor:"#2563eb",strokeWidth:2,lastArrow:{type:1,size:5},fixed:true,highlight:false});\n'
-        /* Draggable B1 */
-        + 'var B1=board.create("point",[' + (f1 * 0.55).toFixed(3) + ',0],{'
-        + 'name:"B₁",size:9,strokeColor:"#dc2626",fillColor:"#ef4444",'
-        + 'label:{offset:[6,4],color:"#dc2626",fontSize:13,fontWeight:"bold"}});\n'
-        /* A1: foot of B1 on axis */
-        + 'board.create("point",[function(){return B1.X();},0],{'
-        + 'name:"A₁",size:3,strokeColor:"#dc2626",fillColor:"#dc2626",'
-        + 'label:{offset:[4,-14],color:"#dc2626",fontSize:12}});\n'
-        /* Helper fixed points */
-        + 'var _O1=board.create("point",[0,0],{visible:false,fixed:true});\n'
-        + 'var _H1=board.create("point",[0,' + beamH + '],{visible:false,fixed:true});\n'
-        + 'var _O2=board.create("point",[' + d + ',0],{visible:false,fixed:true});\n'
-        + 'var _Fp2=board.create("point",[' + (d + f2) + ',0],{visible:false,fixed:true});\n'
-        /* Rays from L1 converging to B1 */
-        + 'board.create("segment",[_O1,B1],{strokeColor:"#93c5fd",strokeWidth:1.5,'
-        + 'lastArrow:{type:1,size:3},highlight:false});\n'
-        + 'board.create("segment",[_H1,B1],{strokeColor:"#93c5fd",strokeWidth:1.5,'
-        + 'lastArrow:{type:1,size:3},highlight:false});\n'
-        /* hitL2A: point on L2 same y as B1 */
-        + 'var hitL2A=board.create("point",[' + d + ',function(){return B1.Y();}],{visible:false});\n'
-        /* B1 → L2 horizontal segment */
-        + 'board.create("segment",[B1,hitL2A],{strokeColor:"#7c3aed",strokeWidth:1.5,'
-        + 'lastArrow:{type:1,size:3},highlight:false});\n'
-        /* Exit ray A: hitL2A through F'2 (purple ray) */
-        + 'board.create("line",[hitL2A,_Fp2],{straightFirst:false,straightLast:true,'
-        + 'strokeColor:"#7c3aed",strokeWidth:2,lastArrow:{type:1,size:5},highlight:false});\n'
-        /* Exit ray B: B1 through O2 (blue ray) */
-        + 'board.create("line",[B1,_O2],{straightFirst:false,straightLast:true,'
-        + 'strokeColor:"#2563eb",strokeWidth:2,lastArrow:{type:1,size:5},highlight:false});\n'
-        + 'stack_jxg.bind_point(board,ans' + X + ',B1);\n'
-        + 'board.unsuspendUpdate();\n'
-        + 'setTimeout(function(){board.update();},80);\n'
-        + '})();';
+    var xminG = _n(-(f1 * 0.6) - 2);
+    var xmaxG = _n(d + f2 * 1.3 + 3);
+    var yAmp  = Math.max(Math.abs(yB1) + 3, beamH + 3, 5) * 1.3;
+    var lens1H = _n(yAmp * 0.68);
+    var lens2H = _n(yAmp * 0.52);
+    var X_MIN = _n(xminG - 3), X_MAX = _n(xmaxG + 3);
+    var Y_MIN = _n(-yAmp), Y_MAX = _n(yAmp);
+    var xtol  = 0.5;
 
-    /* Maxima feedback variables */
-    var fbVars = 'opt_b1x_' + X + ': if listp(ans' + X + ') and length(ans' + X + ')=2 then float(ans' + X + '[1]) else 9999;\n'
-        + 'opt_b1y_' + X + ': if listp(ans' + X + ') and length(ans' + X + ')=2 then float(ans' + X + '[2]) else 9999;\n'
-        + 'opt_ok_x_' + X + ': is(abs(opt_b1x_' + X + '-(' + f1.toFixed(4) + '))<=' + tolB1x + ');\n'
-        + 'opt_ok_y_' + X + ': is(abs(opt_b1y_' + X + '-(' + yB1exp.toFixed(4) + '))<=' + tolB1y + ');\n'
-        + 'opt_ok_' + X + ': is(opt_ok_x_' + X + ' and opt_ok_y_' + X + ');';
+    /* ── Construction correcte de référence (pour <tans>) ── */
+    var tansRayList = '[[' + _n(mA) + ',' + _n(pA) + ',[[' + xminG + ',' + _n(f1) + ',1]]],'
+        + '[' + _n(mBi) + ',' + _n(pBi) + ',[[' + xminG + ',0,1]]],'
+        + '[' + _n(mBe) + ',' + _n(pBe) + ',[[0,' + _n(f1) + ',1]]],'
+        + '[' + _n(mC) + ',' + _n(pC) + ',[[' + _n(f1) + ',' + xmaxG + ',1]]],'
+        + '[' + _n(mDi) + ',' + _n(pDi) + ',[[' + _n(f1) + ',' + _n(d) + ',1]]],'
+        + '[' + _n(mDe) + ',' + _n(pDe) + ',[[' + _n(d) + ',' + xmaxG + ',1]]]'
+        + ']';
+    var tansPtList = '[["B1",' + _n(f1) + ',' + _n(yB1) + ']]';
+    var tans = 'lunette_construction(' + tansRayList + ',' + tansPtList + ')';
 
-    var fbOk = fbOkTxt
-        || I18N.t('opt.lunette_fbok_title')
-        + I18N.t('opt.lunette_fbok_pos_prefix') + f1 + I18N.t('opt.lunette_fbok_pos_mid') + yB1exp.toFixed(2) + I18N.t('opt.lunette_fbok_pos_suffix');
-    var fbWrong = fbWrTxt
-        || I18N.t('opt.lunette_fbwrong_title')
-        + I18N.t('opt.lunette_fbwrong_li1_prefix') + f1 + I18N.t('opt.lunette_fbwrong_li1_suffix')
-        + I18N.t('opt.lunette_fbwrong_li2_prefix') + yB1exp.toFixed(2) + I18N.t('opt.lunette_fbwrong_li2_suffix')
-        + I18N.t('opt.lunette_fbwrong_li3')
-        + '</ul>';
+    var jxg = _lunetteConstructionJXG(X, {
+        f1: f1, f2: f2, d: _n(d), beamH: beamH,
+        X_MIN: X_MIN, X_MAX: X_MAX, Y_MIN: Y_MIN, Y_MAX: Y_MAX,
+        lens1H: lens1H, lens2H: lens2H, dispW: dispW
+    });
+
+    /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
+    var vars = 'f1: ' + _n(f1) + '$\n'
+        + 'f2: ' + _n(f2) + '$\n'
+        + 'theta: ' + _n(theta) + '$\n'
+        + 'beamH: ' + _n(beamH) + '$\n'
+        + 'd: f1+f2$\n'
+        + 'tanT: tan(theta*%pi/180)$\n'
+        + 'yB1: -f1*tanT$\n\n'
+        + 'mA: -tanT$\n' + 'pA: 0$\n'
+        + 'mBi: -tanT$\n' + 'pBi: beamH$\n'
+        + 'mBe: (yB1-beamH)/f1$\n' + 'pBe: beamH$\n'
+        + 'mC: -yB1/f2$\n' + 'pC: -mC*d$\n'
+        + 'mDi: 0$\n' + 'pDi: yB1$\n'
+        + 'mDe: -yB1/f2$\n' + 'pDe: yB1-mDe*d$\n\n'
+        + 'xmin: ' + xminG + '$\n'
+        + 'xmax: ' + xmaxG + '$\n'
+        + 'xtol: ' + xtol + '$\n\n'
+        + _opticsConstructionMaximaHelpers()
+        + '\nrequire_mc(mc) := block(\n'
+        + '  if not is(safe_op(mc) = "lunette_construction") or not is(length(mc) = 2) then\n'
+        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction lunette_construction(rayons,points))."\n'
+        + '  else\n'
+        + '    true\n'
+        + ')$\n\n'
+        + 'ans' + X + '_validator(ex) := stack_seq_validator(ex, [require_mc])$';
 
     var inputXML = '    <input>\n'
         + '      <name>ans' + X + '</name>\n'
         + '      <type>algebraic</type>\n'
-        + '      <tans>' + tansB1 + '</tans>\n'
-        + '      <boxsize>15</boxsize><strictsyntax>1</strictsyntax>'
+        + '      <tans><![CDATA[' + tans + ']]></tans>\n'
+        + '      <boxsize>60</boxsize><strictsyntax>1</strictsyntax>'
         + '<insertstars>0</insertstars><syntaxhint></syntaxhint>'
         + '<syntaxattribute>0</syntaxattribute><forbidwords></forbidwords>'
-        + '<allowwords></allowwords><forbidfloat>0</forbidfloat>'
+        + '<allowwords>lunette_construction</allowwords><forbidfloat>0</forbidfloat>'
         + '<requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype>'
-        + '<mustverify>0</mustverify><showvalidation>0</showvalidation>'
-        + '<options></options>\n    </input>';
+        + '<mustverify>1</mustverify><showvalidation>2</showvalidation>'
+        + '<options>validator:ans' + X + '_validator</options>\n    </input>';
 
-    var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
-    var canonicalNodes = [{
-        name: '0', description: '', answertest: 'AlgEquiv', sans: 'opt_ok_' + X, tans: 'true',
-        testoptions: '', quiet: '0',
-        truescoremode: '=', truescore: '1', truepenalty: '0', truenextnode: '-1',
-        trueanswernote: 'PRT' + X + '-1-T', truefeedback: fbOk,
-        falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
-        falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
-    }];
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    /* ── PRT : rayons (5/6) + point image intermédiaire B1 (1/6) ──
+       Chaque entrée de rayList (6 au total : rayon par O1, rayon décalé
+       incident/émergent, rayon par O2, rayon // axe incident/émergent)
+       est entièrement réelle — pas de statut virtuel possible ici, à la
+       différence des lentilles/miroirs seuls (l'image intermédiaire B1
+       est toujours réelle, et le faisceau émergent est toujours réel). */
+    var fbVars = '[rayList, ptList]: args(ans' + X + ')$\n\n'
+        + 'att1: is(found_ray(rayList, mA, pA, 0.05, 0.3))$\n'
+        + 'att2: is(found_ray(rayList, mBi, pBi, 0.05, 0.3) or found_ray(rayList, mBe, pBe, 0.05, 0.3))$\n'
+        + 'att3: is(found_ray(rayList, mC, pC, 0.05, 0.3))$\n'
+        + 'att4: is(found_ray(rayList, mDi, pDi, 0.05, 0.3) or found_ray(rayList, mDe, pDe, 0.05, 0.3))$\n'
+        + 'any_attempt: is(att1 or att2 or att3 or att4)$\n\n'
+        + 'l1_ok: is(seg_required_status(rayList, mA, pA, 0.05, 0.3, xmin, ' + _n(f1) + ', xtol, 1))$\n'
+        + 'l2_ok: is(seg_required_status(rayList, mBi, pBi, 0.05, 0.3, xmin, 0, xtol, 1))$\n'
+        + 'l3_ok: is(seg_required_status(rayList, mBe, pBe, 0.05, 0.3, 0, ' + _n(f1) + ', xtol, 1))$\n'
+        + 'l4_ok: is(seg_required_status(rayList, mC, pC, 0.05, 0.3, ' + _n(f1) + ', xmax, xtol, 1))$\n'
+        + 'l5_ok: is(seg_required_status(rayList, mDi, pDi, 0.05, 0.3, ' + _n(f1) + ', ' + _n(d) + ', xtol, 1))$\n'
+        + 'l6_ok: is(seg_required_status(rayList, mDe, pDe, 0.05, 0.3, ' + _n(d) + ', xmax, xtol, 1))$\n\n'
+        + 'c1s: is(l1_ok)$\n'
+        + 'c2s: is(l2_ok and l3_ok)$\n'
+        + 'c3s: is(l4_ok)$\n'
+        + 'c4s: is(l5_ok and l6_ok)$\n\n'
+        + 'GEOM_WEIGHT: 0.7$\n\n'
+        + 'l1_geom: att1$\n'
+        + 'l2_geom: is(seg_required_geom(rayList, mBi, pBi, 0.05, 0.3, xmin, 0, xtol))$\n'
+        + 'l3_geom: is(seg_required_geom(rayList, mBe, pBe, 0.05, 0.3, 0, ' + _n(f1) + ', xtol))$\n'
+        + 'l4_geom: att3$\n'
+        + 'l5_geom: is(seg_required_geom(rayList, mDi, pDi, 0.05, 0.3, ' + _n(f1) + ', ' + _n(d) + ', xtol))$\n'
+        + 'l6_geom: is(seg_required_geom(rayList, mDe, pDe, 0.05, 0.3, ' + _n(d) + ', xmax, xtol))$\n\n'
+        + 'line_score(full_ok, geom_ok) := if full_ok then 1 else (if geom_ok then GEOM_WEIGHT else 0)$\n\n'
+        + 'l1_score: line_score(l1_ok, l1_geom)$\n'
+        + 'l2_score: line_score(l2_ok, l2_geom)$\n'
+        + 'l3_score: line_score(l3_ok, l3_geom)$\n'
+        + 'l4_score: line_score(l4_ok, l4_geom)$\n'
+        + 'l5_score: line_score(l5_ok, l5_geom)$\n'
+        + 'l6_score: line_score(l6_ok, l6_geom)$\n\n'
+        + 'nb_bonnes: l1_score + l2_score + l3_score + l4_score + l5_score + l6_score$\n\n'
+        + 'nb_attempts: length(sublist(rayList, lambda([r], not stringp(r[1]))))$\n'
+        + 'nb_total: max(nb_attempts, 2)$\n'
+        + 'score_rayons: min(nb_bonnes / nb_total, 1)$\n\n'
+        + 'nb_full_ok: (if c1s then 1 else 0) + (if c2s then 1 else 0) + (if c3s then 1 else 0) + (if c4s then 1 else 0)$\n'
+        + 'have2: is(nb_full_ok >= 2)$\n\n'
+        + 'c_point: is(found_point(ptList, ' + _n(f1) + ', ' + _n(yB1) + ', 0.3))$';
+
+    var fbBilan = '<p><strong>Bilan des rayons particuliers :</strong></p>\n'
+        + '[[if test="any_attempt"]]<ul>\n'
+        + '[[if test="att1"]]<li>Rayon issu de l\'infini par le centre O&#8321; (non dévié) : [[if test="c1s"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]]</li>[[/if]]\n'
+        + '[[if test="att2"]]<li>Rayon incident parallèle (décalé de ' + _n(beamH) + ' cm), réfracté vers B&#8321; : [[if test="c2s"]]<span style="color:#1e7e34;">&#10003; correct (incident et émergent)</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais un tronçon n\'a pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n'
+        + '[[if test="att3"]]<li>Rayon issu de B&#8321; par le centre O&#8322; (non dévié) : [[if test="c3s"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]]</li>[[/if]]\n'
+        + '[[if test="att4"]]<li>Rayon issu de B&#8321;, parallèle à l\'axe, émergent par F\'&#8322; : [[if test="c4s"]]<span style="color:#1e7e34;">&#10003; correct (incident et émergent)</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais un tronçon n\'a pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n'
+        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+
+    var canonicalNodes = [
+        {
+            name: '0', description: 'Rayons particuliers — score proportionnel', answertest: 'AlgEquiv',
+            sans: 'true', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: 'score_rayons*5/6', truepenalty: '', truenextnode: '1',
+            trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '1',
+            falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
+        },
+        {
+            name: '1', description: 'Point image intermédiaire B1', answertest: 'AlgEquiv',
+            sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '-1',
+            trueanswernote: 'prt' + X + '-1-T',
+            truefeedback: "<p>Le point B1 est correctement placé à l'intersection des deux rayons issus de l'objectif L&#8321;, dans le plan focal commun F'&#8321;=F&#8322;.</p>",
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
+            falseanswernote: 'prt' + X + '-1-F',
+            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B1. [[if test=\"have2\"]]Vous avez bien"
+                + ' des rayons particuliers géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B1 est placé'
+                + " précisément à l'intersection des deux rayons issus de l'objectif L&#8321; (celui par le centre O&#8321; et celui décalé"
+                + " de " + _n(beamH) + ' cm), dans le plan focal commun (x&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm).[[else]]Le point B1 ne peut être placé'
+                + " correctement que si les deux rayons issus de l'objectif sont d'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>"
+        }
+    ];
+    var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
+    var prtXML  = buildPrtXml(prtMeta, canonicalNodes);
+
+    var genFbDefault = "<p>La lunette astronomique est afocale : l'objectif L&#8321; (f'&#8321;) et l'oculaire L&#8322; (f'&#8322;) sont séparés de"
+        + ' d&nbsp;=&nbsp;f\'&#8321;&nbsp;+&nbsp;f\'&#8322;&nbsp;=&nbsp;' + _n(d) + '&nbsp;cm, de sorte que leurs foyers F\'&#8321; et F&#8322; sont confondus.</p>\n<ul>\n'
+        + "<li>Deux rayons incidents parallèles, inclinés de θ par rapport à l'axe (l'un passant par le centre O&#8321;, l'autre décalé), convergent"
+        + " après l'objectif au même point B1, dans le plan focal commun (x&nbsp;=&nbsp;f'&#8321;&nbsp;=&nbsp;" + _n(f1) + '&nbsp;cm).</li>\n'
+        + '<li>B1 devient alors l\'objet de l\'oculaire L&#8322; : deux rayons issus de B1 (l\'un par le centre O&#8322;, l\'autre parallèle à'
+        + " l'axe puis réfracté par F'&#8322;) ressortent parallèles entre eux : l'image finale est à l'infini (système afocal).</li></ul>";
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> '
-        + 'f\'₁ = ' + f1 + ' cm, '
-        + 'f\'₂ = ' + f2 + ' cm, '
-        + 'θ = ' + theta + '°</p>\n';
+        + '<strong>Données :</strong> f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm, '
+        + 'f\'&#8322;&nbsp;=&nbsp;' + _n(f2) + '&nbsp;cm, θ&nbsp;=&nbsp;' + _n(theta) + '°</p>\n';
+
+    var instructions = '<div class="stack-comment">'
+        + '<h2>Construction — Lunette astronomique afocale</h2>'
+        + '<p>L\'objectif L&#8321; a une distance focale f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm, l\'oculaire L&#8322; a une distance focale'
+        + ' f\'&#8322;&nbsp;=&nbsp;' + _n(f2) + '&nbsp;cm ; ils sont séparés de d&nbsp;=&nbsp;' + _n(d) + '&nbsp;cm (système afocal). L\'objet observé'
+        + ' (une étoile) est à l\'infini, sous un diamètre apparent θ&nbsp;=&nbsp;' + _n(theta) + '°.</p>'
+        + '<p>À l\'aide des outils ci-dessous, <strong>tracez les quatre rayons remarquables</strong> :</p><ul>'
+        + '<li>le rayon incident passant par le centre optique O&#8321; de l\'objectif, non dévié ;</li>'
+        + '<li>un second rayon incident, parallèle au premier, décalé de ' + _n(beamH) + ' cm : après l\'objectif, il doit converger vers le'
+        + ' même point B1 que le premier (dans le plan focal commun F\'&#8321;=F&#8322;) ;</li>'
+        + '<li>le rayon issu de B1 passant par le centre optique O&#8322; de l\'oculaire, non dévié ;</li>'
+        + '<li>le rayon issu de B1, parallèle à l\'axe optique jusqu\'à l\'oculaire, qui émerge en passant par le foyer F\'&#8322;.</li></ul>'
+        + '<p>Une fois les deux premiers rayons tracés, utilisez le bouton <strong>« Intersection (2 clics) &rarr; point B1 »</strong>'
+        + ' pour construire précisément le point B1, puis tracez les deux rayons issus de B1 vers l\'oculaire (le faisceau émergent'
+        + ' est parallèle : il n\'y a pas de second point à construire, l\'image finale étant à l\'infini).</p>'
+        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
+        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
+        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> — c\'est le cas attendu ici pour tous les tronçons.</p></div>';
 
     var textFrag = '<div style="background:#0284c7;border-left:5px solid #0369a1;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -2665,154 +3043,524 @@ function _genOptiqueLunette(X) {
         + ' — ' + I18N.t('opt.title_lunette') + '</strong>'
         + '<span style="background:#0369a1;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
-        + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
+        + '<!-- ENONCE-START -->' + (text || '') + instructions + '<!-- ENONCE-END -->\n'
         + dataRow
-        + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
-        + jxg + '\n[[/jsxgraph]]\n'
-        + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + I18N.t('opt.hint_lunette_1')
-        + I18N.t('opt.hint_lunette_2')
-        + I18N.t('opt.hint_lunette_3') + '</p>\n'
-        + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
+        + '<!--HS-KBD:' + X + '-->';
+
+    var kbdBlock = '[[jsxgraph input-ref-ans' + X + '="state" width="' + dispW + 'px" aspect-ratio="' + (dispW / dispH).toFixed(3) + '"]]\n'
+        + jxg + '\n[[/jsxgraph]]\n\n'
+        + '<div style="display:none">[[input:ans' + X + ']] [[validation:ans' + X + ']]</div>';
 
     return {
         bareme:          bareme,
-        vars:            '',
-        qnote:           'Optique-Lunette Q' + X + ' f1=' + f1 + ' f2=' + f2 + ' th=' + theta,
+        vars:            vars,
+        qnote:           'Optique-Lunette Q' + X + " f1=" + f1 + ' f2=' + f2 + ' th=' + theta,
         textFrag:        textFrag,
+        kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen('', v('opt-fbgen')),
+        generalFeedback: _mkFbGen(genFbDefault, v('opt-fbgen')),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
 }
 
-/* ── Scénario 4 : Miroir plan ── */
+/* ── Moteur JSXGraph : miroir plan (construction toolbar) ──
+   Portage de _miroirConstructionJXG pour un miroir plan : pas de F/C, glyphe
+   plat symétrique, uniquement le point S. Le côté réel/virtuel dépend
+   uniquement de x=0 (le miroir), l'image étant toujours virtuelle. */
+function _miroirPlanConstructionJXG(X, p) {
+    var SA = p.SA, AB = p.AB;
+    var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
+    var mirrorHeight = p.mirrorHeight;
+    var dispW = p.dispW || 700;
+    var mirrorGlyph = "board.create('segment', [[0, -mirrorHeight], [0, mirrorHeight]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n";
+    var mirrorGlyphHatch = "for (var i = -4; i <= 4; i++) {\n"
+        + '    var y = i * (mirrorHeight / 4);\n'
+        + "    board.create('segment', [[0, y], [0.4, y - 0.4]], { strokeColor: 'black', strokeWidth: 1.5, fixed: true, highlight: false, tabindex: null });\n}\n";
+    return '(function(){\n'
+        + 'var board = JXG.JSXGraph.initBoard(divid, {\n'
+        + '    boundingbox: [' + X_MIN + ', ' + Y_MAX + ', ' + X_MAX + ', ' + Y_MIN + '],\n'
+        + '    axis: false,\n    keepaspectratio: true,\n    showNavigation: true,\n'
+        + '    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },\n'
+        + '    pan: { enabled: true, needTwoFingers: false, needShift: true }\n});\n\n'
+        + 'var mirrorHeight = ' + mirrorHeight + ';\n'
+        + 'var X_MIN = ' + X_MIN + ', X_MAX = ' + X_MAX + ', Y_MIN = ' + Y_MIN + ', Y_MAX = ' + Y_MAX + ';\n'
+        + 'var SA = ' + SA + ', AB = ' + AB + ';\n\n'
+        + "var toolMode = '';\n"
+        + 'var tempPoint = null, dirPoint1 = null, dirPoint2 = null, interSeg1 = null;\n'
+        + 'var selectedSegment = null;\n\n'
+        + 'var allDrawnElements = [];\n'
+        + 'var raySegments = [];\n'
+        + 'var logicalRays = [];\n'
+        + 'var standaloneElements = [];\n'
+        + 'var intersectionCounter = 0;\n\n'
+        + "board.create('line', [[X_MIN, 0], [X_MAX, 0]], { strokeColor: 'black', strokeWidth: 1, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[X_MAX - 0.5, 0], [X_MAX, 0]], { fixed: true, highlight: false, tabindex: null });\n\n"
+        + mirrorGlyph + '\n' + mirrorGlyphHatch + '\n'
+        + "board.create('point', [0, 0], { name: 'S', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });\n\n"
+        + 'var xObj = -SA;\n'
+        + "board.create('point', [xObj, 0], { name: 'A', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('point', [xObj, AB], { name: 'B', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[xObj, 0], [xObj, AB]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n\n"
+        + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
+        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + "var instructionsEl = document.createElement('p');\n"
+        + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
+        + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
+        + 'function setInstructions(msg) { instructionsEl.textContent = msg; }\n\n'
+        + "var toolbarDiv = document.createElement('div');\n"
+        + "toolbarDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:.4em;margin-top:.6em;';\n"
+        + 'var toolButtons = {};\n\n'
+        + 'function addToolButton(label, mode, msgOrHandler) {\n'
+        + "    var btn = document.createElement('button');\n"
+        + "    btn.type = 'button';\n    btn.textContent = label;\n"
+        + "    btn.style.cssText = 'padding:.35em .7em;font-size:.85em;cursor:pointer;';\n"
+        + '    if (mode === null) {\n'
+        + "        btn.addEventListener('click', msgOrHandler);\n"
+        + '    } else {\n'
+        + "        btn.addEventListener('click', function(){ activateTool(mode, msgOrHandler); });\n"
+        + '        toolButtons[mode] = btn;\n    }\n'
+        + '    toolbarDiv.appendChild(btn);\n    return btn;\n}\n\n'
+        + 'function setActiveButton(mode) {\n'
+        + '    for (var m in toolButtons) {\n'
+        + "        toolButtons[m].style.background = (m === mode) ? '#dbeafe' : '';\n"
+        + "        toolButtons[m].style.fontWeight = (m === mode) ? 'bold' : 'normal';\n"
+        + '    }\n}\n\n'
+        + 'function resetTool() {\n'
+        + "    toolMode = '';\n"
+        + '    tempPoint = null; dirPoint1 = null; dirPoint2 = null; interSeg1 = null;\n'
+        + "    board.defaultCursor = 'default';\n"
+        + '    setInstructions(DEFAULT_MSG);\n    setActiveButton(null);\n    deselectSegment();\n}\n\n'
+        + 'function paintSegment(seg) {\n'
+        + "    var status = seg.__status || 'defaut';\n"
+        + "    if (status === 'reel') {\n"
+        + "        seg.setAttribute({ strokeColor: '#e67e22', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + "    } else if (status === 'virtuel') {\n"
+        + "        seg.setAttribute({ strokeColor: '#2980b9', dash: 2, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + '    } else {\n'
+        + "        seg.setAttribute({ strokeColor: '#555555', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + '    }\n}\n\n'
+        + 'function statusCode(seg) {\n'
+        + "    var s = seg.__status || 'defaut';\n"
+        + "    return s === 'reel' ? 1 : (s === 'virtuel' ? 2 : 0);\n}\n\n"
+        + 'function statusFromCode(code) {\n'
+        + "    return code === 1 ? 'reel' : (code === 2 ? 'virtuel' : 'defaut');\n}\n\n"
+        + 'function deselectSegment() {\n'
+        + '    var prev = selectedSegment;\n    selectedSegment = null;\n'
+        + '    if (prev) { paintSegment(prev); }\n}\n\n'
+        + 'function onSegmentClick(seg) {\n'
+        + "    var status = seg.__status || 'defaut';\n"
+        + "    seg.__status = (status === 'reel') ? 'virtuel' : 'reel';\n"
+        + '    var prev = selectedSegment;\n    selectedSegment = seg;\n'
+        + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
+        + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
+        + 'function deleteSelectedSegment() {\n'
+        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
+        + '    board.removeObject(seg);\n'
+        + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
+        + '    for (var i = 0; i < logicalRays.length; i++) {\n'
+        + '        var lr = logicalRays[i];\n'
+        + '        var sIdx = lr.segments.indexOf(seg);\n'
+        + '        if (sIdx > -1) {\n            lr.segments.splice(sIdx, 1);\n'
+        + '            if (lr.segments.length === 0) { logicalRays.splice(i, 1); }\n            break;\n        }\n    }\n'
+        + '    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
+        + 'function activateTool(mode, msg) {\n'
+        + '    if (toolMode === mode) { resetTool(); return; }\n'
+        + '    resetTool(); toolMode = mode;\n'
+        + "    board.defaultCursor = 'crosshair';\n"
+        + '    setInstructions(msg);\n    setActiveButton(mode);\n}\n\n'
+        + 'function syncState() {\n'
+        + "    handlePoint.trigger(['update']);\n    board.update();\n}\n\n"
+        + 'function snapToPoint(x, y) {\n'
+        + '    var threshold = 0.6, closestX = x, closestY = y, minDist = Infinity;\n'
+        + '    for (var id in board.objects) {\n'
+        + '        var obj = board.objects[id];\n'
+        + "        if (obj.elType === 'point' && obj.visProp.visible !== false && obj.visProp.hidden !== true) {\n"
+        + '            var dx = obj.X() - x, dy = obj.Y() - y, dist = Math.sqrt(dx * dx + dy * dy);\n'
+        + '            if (dist < threshold && dist < minDist) { minDist = dist; closestX = obj.X(); closestY = obj.Y(); }\n'
+        + '        }\n    }\n    return { x: closestX, y: closestY };\n}\n\n'
+        + 'function getClickedSegment(x, y, threshold, excludeSeg) {\n'
+        + '    var closestSeg = null, minDist = Infinity;\n'
+        + '    for (var i = 0; i < raySegments.length; i++) {\n'
+        + '        var seg = raySegments[i];\n'
+        + '        if (seg === excludeSeg) continue;\n'
+        + '        if (!seg.point1 || !seg.point2) continue;\n'
+        + '        var x1 = seg.point1.X(), y1 = seg.point1.Y();\n'
+        + '        var x2 = seg.point2.X(), y2 = seg.point2.Y();\n'
+        + '        var dx = x2 - x1, dy = y2 - y1;\n'
+        + '        var lengthSq = dx * dx + dy * dy;\n'
+        + '        if (lengthSq === 0) continue;\n'
+        + '        var t = ((x - x1) * dx + (y - y1) * dy) / lengthSq;\n'
+        + '        t = Math.max(0, Math.min(1, t));\n'
+        + '        var projX = x1 + t * dx, projY = y1 + t * dy;\n'
+        + '        var dist = Math.sqrt(Math.pow(x - projX, 2) + Math.pow(y - projY, 2));\n'
+        + '        if (dist < threshold && dist < minDist) { minDist = dist; closestSeg = seg; }\n'
+        + '    }\n    return closestSeg;\n}\n\n'
+        + 'function getClickedPoint(x, y, threshold) {\n'
+        + '    var closest = null, minDist = Infinity;\n'
+        + '    for (var i = 0; i < standaloneElements.length; i++) {\n'
+        + '        var el = standaloneElements[i];\n'
+        + "        if (el.elType === 'point' && el.visProp.visible !== false) {\n"
+        + '            var d = Math.hypot(el.X() - x, el.Y() - y);\n'
+        + '            if (d < threshold && d < minDist) { minDist = d; closest = el; }\n'
+        + '        }\n    }\n    return closest;\n}\n\n'
+        + 'function addCustomRayFromEq(m, p, isVert, xVert, xOrigin) {\n'
+        + '    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };\n'
+        + '    if (isVert) {\n'
+        + "        var pA = board.create('point', [xVert, Y_MIN], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "        var pB = board.create('point', [xVert, Y_MAX], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);\n'
+        + '        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);\n'
+        + '    } else {\n'
+        + '        var boundsX = [X_MIN, X_MAX];\n'
+        + "        if (typeof xOrigin === 'number') boundsX.push(xOrigin);\n"
+        + '        if (Math.abs(p) <= mirrorHeight) {\n'
+        + '            boundsX.push(0);\n'
+        + "            var impactPoint = board.create('point', [0, p], { name: '', size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '            allDrawnElements.push(impactPoint);\n            currentLogicalRay.points.push(impactPoint);\n        }\n'
+        + '        boundsX.sort(function(a, b){ return a - b; });\n'
+        + '        for (var i = 0; i < boundsX.length - 1; i++) {\n'
+        + '            var xa = boundsX[i], xb = boundsX[i + 1];\n'
+        + '            if (xa === xb) continue;\n'
+        + '            var ya = m * xa + p, yb = m * xb + p;\n'
+        + "            var pA2 = board.create('point', [xa, ya], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            var pB2 = board.create('point', [xb, yb], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            var seg2 = board.create('segment', [pA2, pB2], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '            raySegments.push(seg2); allDrawnElements.push(pA2, pB2, seg2);\n'
+        + '            currentLogicalRay.segments.push(seg2); currentLogicalRay.points.push(pA2, pB2);\n        }\n    }\n'
+        + '    logicalRays.push(currentLogicalRay);\n    return currentLogicalRay;\n}\n\n'
+        + 'function addRayFromPieces(m, p, isVert, xVert, pieces) {\n'
+        + '    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };\n'
+        + '    for (var i = 0; i < pieces.length; i++) {\n'
+        + '        var piece = pieces[i];\n        var pA, pB;\n'
+        + '        if (isVert) {\n'
+        + "            pA = board.create('point', [xVert, piece[0]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            pB = board.create('point', [xVert, piece[1]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + '        } else {\n'
+        + "            pA = board.create('point', [piece[0], m * piece[0] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            pB = board.create('point', [piece[1], m * piece[1] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + '        }\n'
+        + "        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '        seg.__status = statusFromCode(piece[2]);\n        paintSegment(seg);\n'
+        + '        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);\n'
+        + '        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);\n    }\n'
+        + '    logicalRays.push(currentLogicalRay);\n    return currentLogicalRay;\n}\n\n'
+        + 'function addCustomRay(x1, y1, x2, y2) {\n'
+        + '    var dx = x2 - x1, dy = y2 - y1;\n'
+        + '    var m = (Math.abs(dx) < 0.01) ? Infinity : dy / dx;\n'
+        + '    if (m === Infinity) {\n        addCustomRayFromEq(null, null, true, x1);\n    } else {\n'
+        + '        var p = y1 - m * x1;\n        addCustomRayFromEq(m, p, false, null, x1);\n    }\n'
+        + '    syncState();\n}\n\n'
+        + 'function onPointClick(pt) {\n'
+        + '    board.removeObject(pt);\n'
+        + '    allDrawnElements = allDrawnElements.filter(function(el){ return el !== pt; });\n'
+        + '    standaloneElements = standaloneElements.filter(function(el){ return el !== pt; });\n'
+        + '    syncState();\n}\n\n'
+        + "board.on('down', function(evt) {\n"
+        + "    if (evt.target && evt.target.closest && evt.target.closest('.JXG_navigation_button')) return;\n"
+        + '    if (evt.shiftKey) return;\n'
+        + '    var coords = board.getUsrCoordsOfMouse(evt);\n'
+        + '    var x = coords[0], y = coords[1];\n\n'
+        + "    if (toolMode !== '') {\n"
+        + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
+        + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par3') {\n"
+        + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
+        + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
+        + "        else if (toolMode === 'sym') { addCustomRay(0, 0, x, -y); resetTool(); }\n"
+        + "        else if (toolMode === 'inter1') {\n"
+        + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon réfléchi.\"); }\n"
+        + '        }\n'
+        + "        else if (toolMode === 'inter2') {\n"
+        + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
+        + '            if (seg2) {\n'
+        + '                var x1 = interSeg1.point1.X(), y1 = interSeg1.point1.Y(), x2 = interSeg1.point2.X(), y2 = interSeg1.point2.Y();\n'
+        + '                var x3 = seg2.point1.X(), y3 = seg2.point1.Y(), x4 = seg2.point2.X(), y4 = seg2.point2.Y();\n'
+        + '                var m1 = (x2 - x1) === 0 ? Infinity : (y2 - y1) / (x2 - x1);\n'
+        + '                var m2 = (x4 - x3) === 0 ? Infinity : (y4 - y3) / (x4 - x3);\n'
+        + '                if (m1 !== Infinity && m2 !== Infinity && Math.abs(m1 - m2) > 0.001) {\n'
+        + '                    var p1 = y1 - m1 * x1, p2 = y3 - m2 * x3;\n'
+        + '                    var xi = (p2 - p1) / (m1 - m2), yi = m1 * xi + p1;\n'
+        + '                    var in1 = xi >= Math.min(x1, x2) - 0.5 && xi <= Math.max(x1, x2) + 0.5 && yi >= Math.min(y1, y2) - 0.5 && yi <= Math.max(y1, y2) + 0.5;\n'
+        + '                    var in2 = xi >= Math.min(x3, x4) - 0.5 && xi <= Math.max(x3, x4) + 0.5 && yi >= Math.min(y3, y4) - 0.5 && yi <= Math.max(y3, y4) + 0.5;\n'
+        + '                    if (in1 && in2) {\n'
+        + '                        intersectionCounter++;\n'
+        + "                        var name = (intersectionCounter === 1) ? \"B'\" : ('I' + (intersectionCounter - 1));\n"
+        + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
+        + '                        syncState();\n'
+        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
+        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                resetTool();\n            }\n        }\n'
+        + "        else if (toolMode === 'perp') {\n"
+        + '            addRayFromPieces(null, null, true, x, [[0, y, 1]]);\n'
+        + "            var pointAp = board.create('point', [x, 0], { name: \"A'\", size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '            allDrawnElements.push(pointAp); standaloneElements.push(pointAp);\n'
+        + '            syncState();\n            resetTool();\n        }\n        return;\n    }\n\n'
+        + '    var clickedSeg = getClickedSegment(x, y, 0.3, null);\n'
+        + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
+        + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
+        + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
+        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
+        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ (ex : B).\");\n"
+        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
+        + "addToolButton(\"Symétrique / axe (1 clic)\", 'sym', \"SYMÉTRIQUE PAR RAPPORT À L'AXE : cliquez un point du rayon incident (vers S) ; le rayon réfléchi symétrique sera tracé depuis S.\");\n"
+        + "addToolButton(\"Intersection (2 clics) → point B'\", 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon réfléchi.');\n"
+        + "addToolButton(\"Tracer A' (perpendiculaire)\", 'perp', \"PERPENDICULAIRE : cliquez sur B' pour tracer A' (le trait tracé pourra ensuite être marqué réel/virtuel).\");\n"
+        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('Tout effacer', null, function(){\n"
+        + '    selectedSegment = null;\n'
+        + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
+        + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
+        + '    resetTool();\n    syncState();\n});\n\n'
+        + 'document.body.appendChild(toolbarDiv);\n'
+        + 'document.body.appendChild(instructionsEl);\n'
+        + 'stack_js.resize_containing_frame("' + dispW + 'px", document.documentElement.offsetHeight + "px");\n\n'
+        + 'function rebuildAllDrawnElements() {\n'
+        + '    var fromRays = [];\n'
+        + '    logicalRays.forEach(function(lr){ fromRays = fromRays.concat(lr.points, lr.segments); });\n'
+        + '    allDrawnElements = fromRays.concat(standaloneElements);\n}\n\n'
+        + 'var serialiser = function() {\n'
+        + '    var rayList = logicalRays.map(function(lr) {\n'
+        + '        var pieces = lr.segments.map(function(seg) {\n'
+        + '            var ends = lr.eq.isVert ? [seg.point1.Y(), seg.point2.Y()] : [seg.point1.X(), seg.point2.X()];\n'
+        + '            return [ends[0], ends[1], statusCode(seg)];\n        });\n'
+        + "        return lr.eq.isVert ? ['vert', lr.eq.x, pieces] : [lr.eq.m, lr.eq.p, pieces];\n    });\n"
+        + '    var ptList = standaloneElements\n'
+        + "        .filter(function(el){ return el.elType === 'point' && el.name; })\n"
+        + '        .map(function(el){ return [el.name, el.X(), el.Y()]; });\n'
+        + '    return "miroirplan_construction(" + JSON.stringify(rayList) + "," + JSON.stringify(ptList) + ")";\n};\n\n'
+        + 'function clearAll() {\n'
+        + '    logicalRays.forEach(function(lr) {\n'
+        + '        lr.points.forEach(function(el){ board.removeObject(el); });\n'
+        + '        lr.segments.forEach(function(el){ board.removeObject(el); });\n    });\n'
+        + '    standaloneElements.forEach(function(el){ board.removeObject(el); });\n'
+        + '    raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
+        + '    rebuildAllDrawnElements();\n}\n\n'
+        + 'var deserialiser = function(value) {\n'
+        + '    clearAll();\n'
+        + "    var newState = JSON.parse(value.replace('miroirplan_construction(', '[').replace(/\\)\\s*$/, ']'));\n"
+        + '    var rayList = newState[0], ptList = newState[1];\n'
+        + '    for (var i = 0; i < rayList.length; i++) {\n'
+        + '        var eq = rayList[i];\n'
+        + "        if (eq[0] === 'vert') addRayFromPieces(null, null, true, eq[1], eq[2] || [[Y_MIN, Y_MAX, 0]]);\n"
+        + '        else addRayFromPieces(eq[0], eq[1], false, null, eq[2] || [[X_MIN, X_MAX, 0]]);\n    }\n'
+        + '    for (var j = 0; j < ptList.length; j++) {\n'
+        + '        var pp = ptList[j];\n'
+        + "        var pt = board.create('point', [pp[1], pp[2]], { name: pp[0], size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '        allDrawnElements.push(pt);\n        standaloneElements.push(pt);\n    }\n'
+        + '    board.update();\n};\n\n'
+        + 'resetTool();\n'
+        + 'stack_jxg.custom_bind(state, serialiser, deserialiser, [handlePoint]);\n'
+        + 'board.update();\n\n'
+        + 'var inputEl = document.getElementById(state);\n'
+        + 'function freezeIfReadonly() {\n'
+        + "    var ro = inputEl && (inputEl.hasAttribute('readonly') || inputEl.hasAttribute('disabled'));\n"
+        + '    if (ro) {\n'
+        + "        board.containerObj.style.pointerEvents = 'none';\n"
+        + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
+        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        return true;\n    }\n    return false;\n}\n'
+        + 'if (!freezeIfReadonly()) {\n'
+        + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
+        + '}\n'
+        + '})();';
+}
+
+/* ── Scénario 4 : Miroir plan (2 rayons remarquables, image toujours virtuelle) ──
+   Rayon "normal" : issu de B perpendiculairement au miroir, se réfléchit sur
+   lui-même (m=0, p=AB, une seule équation pour incident+émergent puisqu'un
+   miroir plan renvoie une incidence normale exactement sur elle-même).
+   Rayon "vers S" : issu de B en direction du sommet S, repart symétriquement
+   par rapport à l'axe optique (pente opposée), comme pour les miroirs
+   sphériques. L'image A'B' est toujours virtuelle et de même taille (gam=1). */
 function _genOptiqueMiroirPlan(X) {
-    var bareme  = parseFloat(v('opt-bareme')) || 1;
-    var text    = richVal('opt-text');
-    var xM      = parseFloat(v('opt-mp-xm')) || 0;
-    var xA      = parseFloat(v('opt-mp-xa')) || -20;
-    var AB      = parseFloat(v('opt-mp-ab')) || 2;
-    var tol     = parseFloat(v('opt-mp-tol')) || 1.5;
-    var fbOk    = v('opt-fb-ok')    || '';
-    var fbWrong = v('opt-fb-wrong') || '';
-    var dispW   = parseInt(v('opt-w')) || 700;
-    var dispH   = parseInt(v('opt-h')) || 380;
+    var bareme = parseFloat(v('opt-bareme')) || 1;
+    var text   = richVal('opt-text');
+    var SA     = parseFloat(v('opt-mp-sa')) || 7;
+    var AB     = parseFloat(v('opt-mp-ab')) || 1.5;
+    var dispW  = parseInt(v('opt-w')) || 700;
+    var dispH  = parseInt(v('opt-h')) || 380;
 
-    // Expected image position (symmetry through mirror at xM)
-    var xAp = 2 * xM - xA;  // image of A through mirror: symmetric
+    if (SA <= 0)
+        throw new Error(I18N.t('opt.err_sa_positive'));
 
-    // Diagram bounds
-    var pad = 6;
-    var bbLeft  = Math.min(xA, xM) - pad;
-    var bbRight = Math.max(xAp, xM) + pad;
-    var bbH     = Math.max(Math.abs(AB) * 2.2, 5);
-    var mirH    = Math.max(Math.abs(AB) * 2.5, 5);
+    var xA  = -SA;
+    var xAp = SA;
+    var ABp = AB;
 
-    // Initial wrong position for B' (displaced)
-    var initBpX = xM + (xAp - xM) * 0.4;
-    var initBpY = AB * 1.6;
+    var mInc = -AB / SA, mEm = AB / SA;
 
-    var jxg = 'var board = JXG.JSXGraph.initBoard(divid, {\n'
-        + '  boundingbox: [' + bbLeft.toFixed(1) + ', ' + bbH.toFixed(1) + ', '
-        + bbRight.toFixed(1) + ', ' + (-bbH).toFixed(1) + '],\n'
-        + '  keepaspectratio: false, axis: false,\n'
-        + '  showCopyright: false, showNavigation: false\n'
-        + '});\n'
-        // Axis
-        + 'board.create("line", [[0,0],[1,0]], {strokeColor:"#d1d5db",strokeWidth:1.5,'
-        + 'straightFirst:true,straightLast:true,fixed:true,highlight:false});\n'
-        // Mirror: vertical line at xM
-        + 'board.create("segment", [[' + xM + ',' + (-mirH) + '],[' + xM + ',' + mirH + ']], '
-        + '{strokeColor:"#374151",strokeWidth:3,fixed:true,highlight:false});\n'
-        // Hatching (on right = back side, for xM on left of image)
-        + (function() {
-            var h = '';
-            var nH = 7;
-            var dx = (xAp > xM) ? 1.2 : -1.2; // hatch away from reflective side
-            for (var i = 0; i <= nH; i++) {
-                var yy = (-mirH + i * (2*mirH/nH)).toFixed(2);
-                var yyEnd = (parseFloat(yy) - 1.2).toFixed(2);
-                h += 'board.create("segment", [[' + xM + ',' + yy + '],['
-                    + (xM + dx).toFixed(2) + ',' + yyEnd + ']], '
-                    + '{strokeColor:"#9ca3af",strokeWidth:1,fixed:true,highlight:false});\n';
-            }
-            return h;
-        })()
-        // Label miroir plan
-        + 'board.create("text", [' + xM + ',' + (mirH + 0.5).toFixed(1) + ',"miroir plan"], '
-        + '{fixed:true,anchorX:"center",fontSize:11,color:"#374151",highlight:false});\n'
-        + 'board.create("text", [' + xM + ',' + (-0.5).toFixed(1) + ',"S"], '
-        + '{fixed:true,anchorX:"center",fontSize:12,color:"#374151",highlight:false});\n'
-        // Object AB (fixed, green)
-        + 'board.create("segment", [[' + xA + ',0],[' + xA + ',' + AB + ']], '
-        + '{strokeColor:"#16a34a",strokeWidth:2.5,fixed:true,highlight:false,'
-        + 'lastArrow:{type:1,size:5}});\n'
-        + 'board.create("point", [' + xA + ',0], {fixed:true,size:3,face:"circle",'
-        + 'fillColor:"#16a34a",strokeColor:"#16a34a",name:"A",'
-        + 'label:{fontSize:13,color:"#16a34a",offset:[5,-15]},highlight:false});\n'
-        + 'board.create("point", [' + xA + ',' + AB + '], {fixed:true,size:4,face:"circle",'
-        + 'fillColor:"#16a34a",strokeColor:"#16a34a",name:"B",'
-        + 'label:{fontSize:13,color:"#16a34a",offset:[5,5]},highlight:false});\n'
-        // Draggable B' (red)
-        + 'var Bp = board.create("point", [' + initBpX.toFixed(2) + ',' + initBpY.toFixed(2) + '], {'
-        + 'size:6,face:"circle",fillColor:"#ef4444",strokeColor:"#b91c1c",'
-        + 'name:"B\\u2019",label:{fontSize:13,color:"#b91c1c",offset:[5,5]}});\n'
-        // Derived A' on axis
-        + 'var Ap = board.create("point", [function(){return Bp.X();},0], {'
-        + 'fixed:false,size:3,face:"circle",fillColor:"#dc2626",strokeColor:"#dc2626",'
-        + 'name:"A\\u2019",label:{fontSize:13,color:"#dc2626",offset:[5,-15]},highlight:false});\n'
-        // Image arrow A'→B' (red)
-        + 'board.create("segment", [Ap,Bp], {strokeColor:"#ef4444",strokeWidth:2,'
-        + 'fixed:false,highlight:false,lastArrow:{type:1,size:5}});\n'
-        // Dashed construction: B to mirror to B' (horizontal dashes)
-        + 'board.create("segment", [[' + xA + ',' + AB + '],[' + xM + ',' + AB + ']], '
-        + '{strokeColor:"#9ca3af",strokeWidth:1,dash:2,fixed:true,highlight:false});\n'
-        + 'board.create("segment", [[' + xM + ',' + AB + '],[' + xAp + ',' + AB + ']], '
-        + '{strokeColor:"#9ca3af",strokeWidth:1,dash:2,fixed:true,highlight:false});\n'
-        // Dot at mirror for perpendicular foot
-        + 'board.create("point", [' + xM + ',' + AB + '], {fixed:true,size:2,'
-        + 'fillColor:"#9ca3af",strokeColor:"#9ca3af",name:"",highlight:false});\n'
-        // STACK bind
-        + 'stack_jxg.bind_point(board, "ans' + X + '", Bp);\n';
+    function _n(val) { var r = Math.round(val * 1e1) / 1e1; return r === 0 ? 0 : r; }
 
-    var inputXML = '<input>\n'
-        + '  <name>ans' + X + '</name>\n'
-        + '  <type>algebraic</type>\n'
-        + '  <tans>[' + xAp.toFixed(2) + ',' + AB.toFixed(2) + ']</tans>\n'
-        + '  <boxsize>5</boxsize>\n'
-        + '  <strictsyntax>1</strictsyntax><insertstars>0</insertstars>\n'
-        + '  <syntaxhint></syntaxhint><syntaxattribute>0</syntaxattribute>\n'
-        + '  <forbidwords></forbidwords><allowwords></allowwords>\n'
-        + '  <forbidfloat>0</forbidfloat><requirelowestterms>0</requirelowestterms>\n'
-        + '  <checkanswertype>0</checkanswertype><mustverify>0</mustverify>\n'
-        + '  <showvalidation>0</showvalidation><options></options>\n'
-        + '</input>';
+    var halfX = Math.max(Math.abs(xA), Math.abs(xAp)) + 4;
+    var mirH  = Math.max(Math.abs(AB), Math.abs(ABp)) * 1.4 + 1.5;
+    var halfY = Math.max(mirH + 1, halfX / 2);
+    var xminG = _n(-halfX + 3);
+    var xmaxG = _n(halfX - 3);
+    var xtol  = 0.5;
 
-    var fbVars = 'opt_bpx_' + X + ': float(ans' + X + '[1]);\n'
-        + 'opt_bpy_' + X + ': float(ans' + X + '[2]);\n'
-        + 'opt_xAp_' + X + ': float(' + xAp.toFixed(4) + ');\n'
-        + 'opt_ok_' + X + ': is(abs(opt_bpx_' + X + ' - opt_xAp_' + X + ') <= '
-        + tol.toFixed(2) + ' and abs(opt_bpy_' + X + ' - ' + AB.toFixed(4) + ') <= '
-        + tol.toFixed(2) + ');\n';
-    var prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var canonicalNodes = [{
-        name: '0', description: 'Image miroir plan', answertest: 'AlgEquiv',
-        sans: 'opt_ok_' + X, tans: 'true', testoptions: '', quiet: '0',
-        truescoremode: '=', truescore: '1', truepenalty: '0', truenextnode: '-1',
-        trueanswernote: 'PRT' + X + '-1-T', truefeedback: fbOk,
-        falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
-        falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
-    }];
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    /* ── Construction correcte de référence (pour <tans>) ── */
+    var tansRayList = '[[0,' + _n(AB) + ',[[' + _n(xA) + ',0,1],[0,' + xmaxG + ',2]]],'
+        + '[' + _n(mInc) + ',0,[[' + _n(xA) + ',0,1]]],'
+        + '[' + _n(mEm) + ',0,[[' + xminG + ',0,1],[0,' + xmaxG + ',2]]]'
+        + ']';
+    var tansPtList = '[["B\'",' + _n(xAp) + ',' + _n(ABp) + '],["A\'",' + _n(xAp) + ',0]]';
+    var tans = 'miroirplan_construction(' + tansRayList + ',' + tansPtList + ')';
+
+    /* ── Moteur JSXGraph ── */
+    var jxg = _miroirPlanConstructionJXG(X, {
+        SA: SA, AB: AB,
+        X_MIN: _n(-halfX), X_MAX: _n(halfX), Y_MIN: _n(-halfY), Y_MAX: _n(halfY),
+        mirrorHeight: _n(mirH), dispW: dispW
+    });
+
+    /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
+    var vars = 'mirrorHeight: ' + _n(mirH) + '$\n'
+        + 'SA: ' + _n(SA) + '$\n'
+        + 'AB: ' + _n(AB) + '$\n'
+        + 'xA: -SA$\n'
+        + 'xAp: SA$\n'
+        + 'ABp: AB$\n\n'
+        + 'mInc: -AB/SA$\n'
+        + 'mEm: AB/SA$\n\n'
+        + 'xmin: ' + xminG + '$\n'
+        + 'xmax: ' + xmaxG + '$\n'
+        + 'xtol: ' + xtol + '$\n\n'
+        + _opticsConstructionMaximaHelpers()
+        + '\nrequire_mc(mc) := block(\n'
+        + '  if not is(safe_op(mc) = "miroirplan_construction") or not is(length(mc) = 2) then\n'
+        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction miroirplan_construction(rayons,points))."\n'
+        + '  else\n'
+        + '    true\n'
+        + ')$\n\n'
+        + 'ans' + X + '_validator(ex) := stack_seq_validator(ex, [require_mc])$';
+
+    var inputXML = '    <input>\n'
+        + '      <name>ans' + X + '</name>\n'
+        + '      <type>algebraic</type>\n'
+        + '      <tans><![CDATA[' + tans + ']]></tans>\n'
+        + '      <boxsize>60</boxsize><strictsyntax>1</strictsyntax>'
+        + '<insertstars>0</insertstars><syntaxhint></syntaxhint>'
+        + '<syntaxattribute>0</syntaxattribute><forbidwords></forbidwords>'
+        + '<allowwords>miroirplan_construction</allowwords><forbidfloat>0</forbidfloat>'
+        + '<requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype>'
+        + '<mustverify>1</mustverify><showvalidation>2</showvalidation>'
+        + '<options>validator:ans' + X + '_validator</options>\n    </input>';
+
+    /* ── PRT : rayons (4/6) + point B' (1/6) + statut réel/virtuel de A'B' (1/6) ── */
+    var fbVars = '[rayList, ptList]: args(ans' + X + ')$\n\n'
+        + 'c1: is(found_ray(rayList, 0, AB, 0.05, 0.3))$\n'
+        + 'c2: is(found_ray(rayList, mInc, 0, 0.05, 0.3) or found_ray(rayList, mEm, 0, 0.05, 0.3))$\n\n'
+        + 'l1_ok: is(seg_required_status(rayList, 0, AB, 0.05, 0.3, xA, 0, xtol, 1)\n'
+        + '      and seg_required_status(rayList, 0, AB, 0.05, 0.3, 0, xmax, xtol, 2))$\n'
+        + 'l2_ok: is(seg_required_status(rayList, mInc, 0, 0.05, 0.3, xA, 0, xtol, 1)\n'
+        + '      and seg_required_status(rayList, mEm, 0, 0.05, 0.3, xmin, 0, xtol, 1)\n'
+        + '      and seg_required_status(rayList, mEm, 0, 0.05, 0.3, 0, xmax, xtol, 2))$\n\n'
+        + 'GEOM_WEIGHT: 0.7$\n\n'
+        + 'l1_geom: is(seg_required_geom(rayList, 0, AB, 0.05, 0.3, xA, 0, xtol)\n'
+        + '      and seg_required_geom(rayList, 0, AB, 0.05, 0.3, 0, xmax, xtol))$\n'
+        + 'l2_geom: is(seg_required_geom(rayList, mInc, 0, 0.05, 0.3, xA, 0, xtol)\n'
+        + '      and seg_required_geom(rayList, mEm, 0, 0.05, 0.3, xmin, 0, xtol)\n'
+        + '      and seg_required_geom(rayList, mEm, 0, 0.05, 0.3, 0, xmax, xtol))$\n\n'
+        + 'line_score(full_ok, geom_ok) := if full_ok then 1 else (if geom_ok then GEOM_WEIGHT else 0)$\n\n'
+        + 'l1_score: line_score(l1_ok, l1_geom)$\n'
+        + 'l2_score: line_score(l2_ok, l2_geom)$\n\n'
+        + 'nb_bonnes: l1_score + l2_score$\n\n'
+        + 'att1: c1$\natt2: c2$\n'
+        + 'any_attempt: is(att1 or att2)$\n\n'
+        + 'nb_attempts: length(sublist(rayList, lambda([r], not stringp(r[1]))))$\n'
+        + 'nb_total: max(nb_attempts, 2)$\n'
+        + 'score_rayons: min(nb_bonnes / nb_total, 1)$\n\n'
+        + 'have2: is(l1_ok and l2_ok)$\n\n'
+        + 'c_point: is(found_point(ptList, xAp, ABp, 0.3))$\n'
+        + 'abp_status: is(found_AB_status(rayList, xAp, 0, ABp, 0.3, 0.3, 2))$';
+
+    var fbBilan = '<p><strong>Bilan des rayons remarquables :</strong></p>\n'
+        + '[[if test="any_attempt"]]<ul>\n'
+        + '[[if test="att1"]]<li>Rayon en incidence normale (perpendiculaire au miroir) : [[if test="l1_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct (statut réel/virtuel ou tronçons)</span>[[/if]]</li>[[/if]]\n'
+        + '[[if test="att2"]]<li>Rayon issu de B arrivant en S : [[if test="l2_ok"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et droite réfléchie)</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct (statut réel/virtuel ou tronçons)</span>[[/if]]</li>[[/if]]\n'
+        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+
+    var canonicalNodes = [
+        {
+            name: '0', description: 'Rayons remarquables — score proportionnel', answertest: 'AlgEquiv',
+            sans: 'true', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: 'score_rayons*4/6', truepenalty: '', truenextnode: '1',
+            trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '1',
+            falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
+        },
+        {
+            name: '1', description: "Point image B'", answertest: 'AlgEquiv',
+            sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '2',
+            trueanswernote: 'prt' + X + '-1-T',
+            truefeedback: "<p>Le point B' est correctement placé à l'intersection des deux rayons réfléchis (prolongés derrière le miroir).</p>",
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '2',
+            falseanswernote: 'prt' + X + '-1-F',
+            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B'. [[if test=\"have2\"]]Vous avez bien"
+                + ' les deux rayons remarquables géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B\' est placé'
+                + ' précisément à l\'intersection de leurs <em>prolongements virtuels</em> (la partie en pointillés, derrière le miroir), et'
+                + ' non ailleurs sur l\'un des deux rayons.[[else]]Le point B\' ne peut être placé correctement que si les deux rayons'
+                + ' remarquables sont d\'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>'
+        },
+        {
+            name: '2', description: "Nature réelle/virtuelle du segment A'B'", answertest: 'AlgEquiv',
+            sans: 'abp_status', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '-1',
+            trueanswernote: 'prt' + X + '-2-T',
+            truefeedback: "<p>Le segment A'B' est correctement marqué virtuel : un miroir plan ne fait jamais converger réellement"
+                + ' les rayons réfléchis devant lui, quelle que soit la position de l\'objet. L\'image ne se forme qu\'en prolongeant'
+                + ' ces rayons derrière le miroir : elle est donc toujours virtuelle (et de même taille que l\'objet).</p>',
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
+            falseanswernote: 'prt' + X + '-2-F',
+            falsefeedback: "<p>Le segment A'B', représentant l'image, doit être marqué <strong>virtuel</strong> : avec un miroir plan,"
+                + ' les rayons réfléchis divergent toujours devant le miroir et l\'image ne se forme qu\'en les prolongeant (en'
+                + ' pointillés) derrière le miroir. Tracez (ou retracez) le tronçon entre A\' et B\' avec l\'outil « Tracer A\''
+                + ' (perpendiculaire) », puis cliquez dessus pour le marquer virtuel.</p>'
+        }
+    ];
+    var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
+    var prtXML  = buildPrtXml(prtMeta, canonicalNodes);
+
+    var raysListHtml = "<li>le rayon issu de B, perpendiculaire au miroir (incidence normale), qui se réfléchit sur lui-même ;</li>\n"
+        + "<li>le rayon issu de B arrivant au sommet S, qui repart symétriquement par rapport à l'axe optique.</li>";
+
+    var genFbDefault = "<p>Les deux rayons remarquables suivants permettent de construire B' :</p>\n<ul>\n"
+        + "<li>Le rayon issu de B, perpendiculaire au miroir, se réfléchit sur lui-même.</li>\n"
+        + "<li>Le rayon issu de B et arrivant au sommet S repart symétriquement par rapport à l'axe optique.</li>\n</ul>\n"
+        + '<p>Un miroir plan ne fait jamais converger réellement les rayons réfléchis : c\'est le prolongement de leurs tronçons'
+        + ' derrière le miroir (virtuel, en pointillés) qui se croise pour donner l\'image B\' = (' + _n(xAp) + '&nbsp;;&nbsp;' + _n(ABp)
+        + '), d\'où A\'B\' = ' + _n(ABp) + '&nbsp;cm (image virtuelle, de même taille que l\'objet).</p>';
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> '
-        + I18N.t('opt.mp_data_miroir') + xM + ' cm, '
-        + I18N.t('opt.mp_data_objet') + xA + ' cm, '
-        + 'AB = ' + AB + ' cm</p>\n';
+        + '<strong>Données :</strong> SA&nbsp;=&nbsp;' + _n(SA) + '&nbsp;cm, AB&nbsp;=&nbsp;' + _n(AB) + '&nbsp;cm</p>\n';
+
+    var instructions = '<div class="stack-comment">'
+        + '<h2>Construction — Miroir plan</h2>'
+        + '<p>L\'objet AB, de taille ' + _n(AB) + ' cm, est placé perpendiculairement à l\'axe optique à SA&nbsp;=&nbsp;' + _n(SA)
+        + ' cm devant le miroir plan (sommet S).</p>'
+        + '<p>À l\'aide des outils ci-dessous, <strong>tracez les deux rayons remarquables issus de B</strong> et faites-les se'
+        + ' réfléchir sur le miroir pour construire l\'image B\' de B. Avec un miroir plan, les rayons réfléchis divergent'
+        + ' toujours devant le miroir : il faut prolonger leur trajet <em>derrière</em> le miroir (en pointillés, virtuel)'
+        + ' pour les faire se croiser et construire l\'image virtuelle B\' :</p>'
+        + '<ul>' + raysListHtml + '</ul>'
+        + '<p>Une fois les deux rayons réfléchis tracés, utilisez le bouton <strong>« Intersection (2 clics) &rarr; point B\' »</strong>'
+        + ' et cliquez successivement sur les deux rayons réfléchis (la partie du tracé <em>après</em> le miroir, en pointillés)'
+        + ' pour construire précisément le point B\'.</p>'
+        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
+        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
+        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> : ne cliquez que pour marquer un tronçon'
+        + ' virtuel, ou pour l\'effacer s\'il ne doit pas apparaître.</p></div>';
 
     var textFrag = '<div style="background:#b45309;border-left:5px solid #92400e;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -2821,23 +3569,23 @@ function _genOptiqueMiroirPlan(X) {
         + ' — ' + I18N.t('opt.title_miroir_plan') + '</strong>'
         + '<span style="background:#92400e;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
-        + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
+        + '<!-- ENONCE-START -->' + (text || '') + instructions + '<!-- ENONCE-END -->\n'
         + dataRow
-        + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
-        + jxg + '\n[[/jsxgraph]]\n'
-        + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + I18N.t('opt.hint_miroir_plan_1')
-        + I18N.t('opt.hint_miroir_plan_2') + '</p>\n'
-        + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
+        + '<!--HS-KBD:' + X + '-->';
+
+    var kbdBlock = '[[jsxgraph input-ref-ans' + X + '="state" width="' + dispW + 'px" aspect-ratio="' + (dispW / dispH).toFixed(3) + '"]]\n'
+        + jxg + '\n[[/jsxgraph]]\n\n'
+        + '<div style="display:none">[[input:ans' + X + ']] [[validation:ans' + X + ']]</div>';
 
     return {
         bareme:          bareme,
-        vars:            '',
-        qnote:           'Optique-MiroirPlan Q' + X + ' xM=' + xM + ' xA=' + xA,
+        vars:            vars,
+        qnote:           'Optique-MiroirPlan Q' + X + ' SA=' + SA,
         textFrag:        textFrag,
+        kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen('', v('opt-fbgen')),
+        generalFeedback: _mkFbGen(genFbDefault, v('opt-fbgen')),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -3035,154 +3783,489 @@ function _genOptiqueMiroirSpherique(X) {
     };
 }
 
-/* ── Scénario 6 : Télescope (miroir concave + image focale B₁) ── */
-function _genOptiqueTelescope(X) {
-    var bareme  = parseFloat(v('opt-bareme'))     || 1;
-    var text    = richVal('opt-text');
-    var f1      = parseFloat(v('opt-tel-f1'))     || 40;
-    var theta   = parseFloat(v('opt-tel-theta'))  || 3;
-    var beamH   = parseFloat(v('opt-tel-beam-h')) || 3;
-    var tolX    = parseFloat(v('opt-tel-tol-x'))  || 2;
-    var tolY    = parseFloat(v('opt-tel-tol-y'))  || 0.5;
-    var fbOk    = v('opt-fb-ok')    || '';
-    var fbWrong = v('opt-fb-wrong') || '';
-    var dispW   = parseInt(v('opt-w')) || 700;
-    var dispH   = parseInt(v('opt-h')) || 380;
+/* ── Moteur JSXGraph : télescope de Newton, miroir primaire seul (construction toolbar) ──
+   Portage de _miroirConstructionJXG pour un objet à l'infini (étoile, diamètre
+   apparent θ) : pas de segment objet AB, pas d'outil « Tracer A' » (l'image B1
+   est le résultat final, formée dans le plan focal du miroir primaire). Deux
+   rayons incidents parallèles inclinés de θ (l'un par le sommet S, l'autre
+   décalé de beamH) se réfléchissent et convergent en B1. Le miroir est
+   toujours concave (miroir primaire convergent). */
+function _telescopeConstructionJXG(X, p) {
+    var f1 = p.f1, beamH = p.beamH;
+    var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
+    var mirrorHeight = p.mirrorHeight;
+    var dispW = p.dispW || 700;
+    var mirrorGlyph =
+        "board.create('segment', [[0, -mirrorHeight], [0, mirrorHeight]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, mirrorHeight], [-0.4, mirrorHeight + 0.4]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, -mirrorHeight], [-0.4, -mirrorHeight - 0.4]], { strokeColor: 'black', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n";
+    var mirrorGlyphHatch = "for (var i = -4; i <= 4; i++) {\n"
+        + '    var y = i * (mirrorHeight / 4);\n'
+        + "    board.create('segment', [[0, y], [0.4, y - 0.4]], { strokeColor: 'black', strokeWidth: 1.5, fixed: true, highlight: false, tabindex: null });\n}\n";
+    var fcPointsGlyph =
+        "board.create('point', [-f1, 0], { name: \"F\\u2081\", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n"
+        + "board.create('point', [-2 * f1, 0], { name: 'C', size: 3, fixed: true, color: 'darkgreen', highlight: false, tabindex: null });\n";
+    return '(function(){\n'
+        + 'var board = JXG.JSXGraph.initBoard(divid, {\n'
+        + '    boundingbox: [' + X_MIN + ', ' + Y_MAX + ', ' + X_MAX + ', ' + Y_MIN + '],\n'
+        + '    axis: false,\n    keepaspectratio: true,\n    showNavigation: true,\n'
+        + '    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },\n'
+        + '    pan: { enabled: true, needTwoFingers: false, needShift: true }\n});\n\n'
+        + 'var f1 = ' + f1 + ', beamH = ' + beamH + ', mirrorHeight = ' + mirrorHeight + ';\n'
+        + 'var X_MIN = ' + X_MIN + ', X_MAX = ' + X_MAX + ', Y_MIN = ' + Y_MIN + ', Y_MAX = ' + Y_MAX + ';\n\n'
+        + "var toolMode = '';\n"
+        + 'var tempPoint = null, dirPoint1 = null, dirPoint2 = null, interSeg1 = null;\n'
+        + 'var selectedSegment = null;\n\n'
+        + 'var allDrawnElements = [];\n'
+        + 'var raySegments = [];\n'
+        + 'var logicalRays = [];\n'
+        + 'var standaloneElements = [];\n'
+        + 'var intersectionCounter = 0;\n\n'
+        + "board.create('line', [[X_MIN, 0], [X_MAX, 0]], { strokeColor: 'black', strokeWidth: 1, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[X_MAX - 0.5, 0], [X_MAX, 0]], { fixed: true, highlight: false, tabindex: null });\n\n"
+        + mirrorGlyph + '\n' + mirrorGlyphHatch + '\n'
+        + "board.create('point', [0, 0], { name: 'S', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });\n"
+        + fcPointsGlyph + '\n'
+        + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
+        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + "var instructionsEl = document.createElement('p');\n"
+        + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
+        + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
+        + 'function setInstructions(msg) { instructionsEl.textContent = msg; }\n\n'
+        + "var toolbarDiv = document.createElement('div');\n"
+        + "toolbarDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:.4em;margin-top:.6em;';\n"
+        + 'var toolButtons = {};\n\n'
+        + 'function addToolButton(label, mode, msgOrHandler) {\n'
+        + "    var btn = document.createElement('button');\n"
+        + "    btn.type = 'button';\n    btn.textContent = label;\n"
+        + "    btn.style.cssText = 'padding:.35em .7em;font-size:.85em;cursor:pointer;';\n"
+        + '    if (mode === null) {\n'
+        + "        btn.addEventListener('click', msgOrHandler);\n"
+        + '    } else {\n'
+        + "        btn.addEventListener('click', function(){ activateTool(mode, msgOrHandler); });\n"
+        + '        toolButtons[mode] = btn;\n    }\n'
+        + '    toolbarDiv.appendChild(btn);\n    return btn;\n}\n\n'
+        + 'function setActiveButton(mode) {\n'
+        + '    for (var m in toolButtons) {\n'
+        + "        toolButtons[m].style.background = (m === mode) ? '#dbeafe' : '';\n"
+        + "        toolButtons[m].style.fontWeight = (m === mode) ? 'bold' : 'normal';\n"
+        + '    }\n}\n\n'
+        + 'function resetTool() {\n'
+        + "    toolMode = '';\n"
+        + '    tempPoint = null; dirPoint1 = null; dirPoint2 = null; interSeg1 = null;\n'
+        + "    board.defaultCursor = 'default';\n"
+        + '    setInstructions(DEFAULT_MSG);\n    setActiveButton(null);\n    deselectSegment();\n}\n\n'
+        + 'function paintSegment(seg) {\n'
+        + "    var status = seg.__status || 'defaut';\n"
+        + "    if (status === 'reel') {\n"
+        + "        seg.setAttribute({ strokeColor: '#e67e22', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + "    } else if (status === 'virtuel') {\n"
+        + "        seg.setAttribute({ strokeColor: '#2980b9', dash: 2, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + '    } else {\n'
+        + "        seg.setAttribute({ strokeColor: '#555555', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + '    }\n}\n\n'
+        + 'function statusCode(seg) {\n'
+        + "    var s = seg.__status || 'defaut';\n"
+        + "    return s === 'reel' ? 1 : (s === 'virtuel' ? 2 : 0);\n}\n\n"
+        + 'function statusFromCode(code) {\n'
+        + "    return code === 1 ? 'reel' : (code === 2 ? 'virtuel' : 'defaut');\n}\n\n"
+        + 'function deselectSegment() {\n'
+        + '    var prev = selectedSegment;\n    selectedSegment = null;\n'
+        + '    if (prev) { paintSegment(prev); }\n}\n\n'
+        + 'function onSegmentClick(seg) {\n'
+        + "    var status = seg.__status || 'defaut';\n"
+        + "    seg.__status = (status === 'reel') ? 'virtuel' : 'reel';\n"
+        + '    var prev = selectedSegment;\n    selectedSegment = seg;\n'
+        + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
+        + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
+        + 'function deleteSelectedSegment() {\n'
+        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
+        + '    board.removeObject(seg);\n'
+        + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
+        + '    for (var i = 0; i < logicalRays.length; i++) {\n'
+        + '        var lr = logicalRays[i];\n'
+        + '        var sIdx = lr.segments.indexOf(seg);\n'
+        + '        if (sIdx > -1) {\n            lr.segments.splice(sIdx, 1);\n'
+        + '            if (lr.segments.length === 0) { logicalRays.splice(i, 1); }\n            break;\n        }\n    }\n'
+        + '    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
+        + 'function activateTool(mode, msg) {\n'
+        + '    if (toolMode === mode) { resetTool(); return; }\n'
+        + '    resetTool(); toolMode = mode;\n'
+        + "    board.defaultCursor = 'crosshair';\n"
+        + '    setInstructions(msg);\n    setActiveButton(mode);\n}\n\n'
+        + 'function syncState() {\n'
+        + "    handlePoint.trigger(['update']);\n    board.update();\n}\n\n"
+        + 'function snapToPoint(x, y) {\n'
+        + '    var threshold = 0.6, closestX = x, closestY = y, minDist = Infinity;\n'
+        + '    for (var id in board.objects) {\n'
+        + '        var obj = board.objects[id];\n'
+        + "        if (obj.elType === 'point' && obj.visProp.visible !== false && obj.visProp.hidden !== true) {\n"
+        + '            var dx = obj.X() - x, dy = obj.Y() - y, dist = Math.sqrt(dx * dx + dy * dy);\n'
+        + '            if (dist < threshold && dist < minDist) { minDist = dist; closestX = obj.X(); closestY = obj.Y(); }\n'
+        + '        }\n    }\n    return { x: closestX, y: closestY };\n}\n\n'
+        + 'function getClickedSegment(x, y, threshold, excludeSeg) {\n'
+        + '    var closestSeg = null, minDist = Infinity;\n'
+        + '    for (var i = 0; i < raySegments.length; i++) {\n'
+        + '        var seg = raySegments[i];\n'
+        + '        if (seg === excludeSeg) continue;\n'
+        + '        if (!seg.point1 || !seg.point2) continue;\n'
+        + '        var x1 = seg.point1.X(), y1 = seg.point1.Y();\n'
+        + '        var x2 = seg.point2.X(), y2 = seg.point2.Y();\n'
+        + '        var dx = x2 - x1, dy = y2 - y1;\n'
+        + '        var lengthSq = dx * dx + dy * dy;\n'
+        + '        if (lengthSq === 0) continue;\n'
+        + '        var t = ((x - x1) * dx + (y - y1) * dy) / lengthSq;\n'
+        + '        t = Math.max(0, Math.min(1, t));\n'
+        + '        var projX = x1 + t * dx, projY = y1 + t * dy;\n'
+        + '        var dist = Math.sqrt(Math.pow(x - projX, 2) + Math.pow(y - projY, 2));\n'
+        + '        if (dist < threshold && dist < minDist) { minDist = dist; closestSeg = seg; }\n'
+        + '    }\n    return closestSeg;\n}\n\n'
+        + 'function getClickedPoint(x, y, threshold) {\n'
+        + '    var closest = null, minDist = Infinity;\n'
+        + '    for (var i = 0; i < standaloneElements.length; i++) {\n'
+        + '        var el = standaloneElements[i];\n'
+        + "        if (el.elType === 'point' && el.visProp.visible !== false) {\n"
+        + '            var d = Math.hypot(el.X() - x, el.Y() - y);\n'
+        + '            if (d < threshold && d < minDist) { minDist = d; closest = el; }\n'
+        + '        }\n    }\n    return closest;\n}\n\n'
+        + 'function addCustomRayFromEq(m, p, isVert, xVert, xOrigin) {\n'
+        + '    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };\n'
+        + '    if (isVert) {\n'
+        + "        var pA = board.create('point', [xVert, Y_MIN], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "        var pB = board.create('point', [xVert, Y_MAX], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);\n'
+        + '        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);\n'
+        + '    } else {\n'
+        + '        var boundsX = [X_MIN, X_MAX];\n'
+        + "        if (typeof xOrigin === 'number') boundsX.push(xOrigin);\n"
+        + '        if (Math.abs(p) <= mirrorHeight) {\n'
+        + '            boundsX.push(0);\n'
+        + "            var impactPoint = board.create('point', [0, p], { name: '', size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '            allDrawnElements.push(impactPoint);\n            currentLogicalRay.points.push(impactPoint);\n        }\n'
+        + '        boundsX.sort(function(a, b){ return a - b; });\n'
+        + '        for (var i = 0; i < boundsX.length - 1; i++) {\n'
+        + '            var xa = boundsX[i], xb = boundsX[i + 1];\n'
+        + '            if (xa === xb) continue;\n'
+        + '            var ya = m * xa + p, yb = m * xb + p;\n'
+        + "            var pA2 = board.create('point', [xa, ya], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            var pB2 = board.create('point', [xb, yb], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            var seg2 = board.create('segment', [pA2, pB2], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '            raySegments.push(seg2); allDrawnElements.push(pA2, pB2, seg2);\n'
+        + '            currentLogicalRay.segments.push(seg2); currentLogicalRay.points.push(pA2, pB2);\n        }\n    }\n'
+        + '    logicalRays.push(currentLogicalRay);\n    return currentLogicalRay;\n}\n\n'
+        + 'function addRayFromPieces(m, p, isVert, xVert, pieces) {\n'
+        + '    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };\n'
+        + '    for (var i = 0; i < pieces.length; i++) {\n'
+        + '        var piece = pieces[i];\n        var pA, pB;\n'
+        + '        if (isVert) {\n'
+        + "            pA = board.create('point', [xVert, piece[0]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            pB = board.create('point', [xVert, piece[1]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + '        } else {\n'
+        + "            pA = board.create('point', [piece[0], m * piece[0] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            pB = board.create('point', [piece[1], m * piece[1] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + '        }\n'
+        + "        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '        seg.__status = statusFromCode(piece[2]);\n        paintSegment(seg);\n'
+        + '        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);\n'
+        + '        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);\n    }\n'
+        + '    logicalRays.push(currentLogicalRay);\n    return currentLogicalRay;\n}\n\n'
+        + 'function addCustomRay(x1, y1, x2, y2) {\n'
+        + '    var dx = x2 - x1, dy = y2 - y1;\n'
+        + '    var m = (Math.abs(dx) < 0.01) ? Infinity : dy / dx;\n'
+        + '    if (m === Infinity) {\n        addCustomRayFromEq(null, null, true, x1);\n    } else {\n'
+        + '        var p = y1 - m * x1;\n        addCustomRayFromEq(m, p, false, null, x1);\n    }\n'
+        + '    syncState();\n}\n\n'
+        + 'function onPointClick(pt) {\n'
+        + '    board.removeObject(pt);\n'
+        + '    allDrawnElements = allDrawnElements.filter(function(el){ return el !== pt; });\n'
+        + '    standaloneElements = standaloneElements.filter(function(el){ return el !== pt; });\n'
+        + '    syncState();\n}\n\n'
+        + "board.on('down', function(evt) {\n"
+        + "    if (evt.target && evt.target.closest && evt.target.closest('.JXG_navigation_button')) return;\n"
+        + '    if (evt.shiftKey) return;\n'
+        + '    var coords = board.getUsrCoordsOfMouse(evt);\n'
+        + '    var x = coords[0], y = coords[1];\n\n'
+        + "    if (toolMode !== '') {\n"
+        + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
+        + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par3') {\n"
+        + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
+        + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
+        + "        else if (toolMode === 'sym') { addCustomRay(0, 0, x, -y); resetTool(); }\n"
+        + "        else if (toolMode === 'inter1') {\n"
+        + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon réfléchi.\"); }\n"
+        + '        }\n'
+        + "        else if (toolMode === 'inter2') {\n"
+        + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
+        + '            if (seg2) {\n'
+        + '                var x1 = interSeg1.point1.X(), y1 = interSeg1.point1.Y(), x2 = interSeg1.point2.X(), y2 = interSeg1.point2.Y();\n'
+        + '                var x3 = seg2.point1.X(), y3 = seg2.point1.Y(), x4 = seg2.point2.X(), y4 = seg2.point2.Y();\n'
+        + '                var m1 = (x2 - x1) === 0 ? Infinity : (y2 - y1) / (x2 - x1);\n'
+        + '                var m2 = (x4 - x3) === 0 ? Infinity : (y4 - y3) / (x4 - x3);\n'
+        + '                if (m1 !== Infinity && m2 !== Infinity && Math.abs(m1 - m2) > 0.001) {\n'
+        + '                    var p1 = y1 - m1 * x1, p2 = y3 - m2 * x3;\n'
+        + '                    var xi = (p2 - p1) / (m1 - m2), yi = m1 * xi + p1;\n'
+        + '                    var in1 = xi >= Math.min(x1, x2) - 0.5 && xi <= Math.max(x1, x2) + 0.5 && yi >= Math.min(y1, y2) - 0.5 && yi <= Math.max(y1, y2) + 0.5;\n'
+        + '                    var in2 = xi >= Math.min(x3, x4) - 0.5 && xi <= Math.max(x3, x4) + 0.5 && yi >= Math.min(y3, y4) - 0.5 && yi <= Math.max(y3, y4) + 0.5;\n'
+        + '                    if (in1 && in2) {\n'
+        + '                        intersectionCounter++;\n'
+        + "                        var name = (intersectionCounter === 1) ? 'B1' : ('I' + (intersectionCounter - 1));\n"
+        + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
+        + '                        syncState();\n'
+        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
+        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                resetTool();\n            }\n        }\n        return;\n    }\n\n'
+        + '    var clickedSeg = getClickedSegment(x, y, 0.3, null);\n'
+        + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
+        + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
+        + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
+        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
+        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ.\");\n"
+        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
+        + "addToolButton(\"Symétrique / axe (1 clic)\", 'sym', \"SYMÉTRIQUE PAR RAPPORT À L'AXE : cliquez un point du rayon incident (vers S) ; le rayon réfléchi symétrique sera tracé depuis S.\");\n"
+        + "addToolButton(\"Intersection (2 clics) → point B1\", 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon réfléchi.');\n"
+        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('Tout effacer', null, function(){\n"
+        + '    selectedSegment = null;\n'
+        + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
+        + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
+        + '    resetTool();\n    syncState();\n});\n\n'
+        + 'document.body.appendChild(toolbarDiv);\n'
+        + 'document.body.appendChild(instructionsEl);\n'
+        + 'stack_js.resize_containing_frame("' + dispW + 'px", document.documentElement.offsetHeight + "px");\n\n'
+        + 'function rebuildAllDrawnElements() {\n'
+        + '    var fromRays = [];\n'
+        + '    logicalRays.forEach(function(lr){ fromRays = fromRays.concat(lr.points, lr.segments); });\n'
+        + '    allDrawnElements = fromRays.concat(standaloneElements);\n}\n\n'
+        + 'var serialiser = function() {\n'
+        + '    var rayList = logicalRays.map(function(lr) {\n'
+        + '        var pieces = lr.segments.map(function(seg) {\n'
+        + '            var ends = lr.eq.isVert ? [seg.point1.Y(), seg.point2.Y()] : [seg.point1.X(), seg.point2.X()];\n'
+        + '            return [ends[0], ends[1], statusCode(seg)];\n        });\n'
+        + "        return lr.eq.isVert ? ['vert', lr.eq.x, pieces] : [lr.eq.m, lr.eq.p, pieces];\n    });\n"
+        + '    var ptList = standaloneElements\n'
+        + "        .filter(function(el){ return el.elType === 'point' && el.name; })\n"
+        + '        .map(function(el){ return [el.name, el.X(), el.Y()]; });\n'
+        + '    return "telescope_construction(" + JSON.stringify(rayList) + "," + JSON.stringify(ptList) + ")";\n};\n\n'
+        + 'function clearAll() {\n'
+        + '    logicalRays.forEach(function(lr) {\n'
+        + '        lr.points.forEach(function(el){ board.removeObject(el); });\n'
+        + '        lr.segments.forEach(function(el){ board.removeObject(el); });\n    });\n'
+        + '    standaloneElements.forEach(function(el){ board.removeObject(el); });\n'
+        + '    raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
+        + '    rebuildAllDrawnElements();\n}\n\n'
+        + 'var deserialiser = function(value) {\n'
+        + '    clearAll();\n'
+        + "    var newState = JSON.parse(value.replace('telescope_construction(', '[').replace(/\\)\\s*$/, ']'));\n"
+        + '    var rayList = newState[0], ptList = newState[1];\n'
+        + '    for (var i = 0; i < rayList.length; i++) {\n'
+        + '        var eq = rayList[i];\n'
+        + "        if (eq[0] === 'vert') addRayFromPieces(null, null, true, eq[1], eq[2] || [[Y_MIN, Y_MAX, 0]]);\n"
+        + '        else addRayFromPieces(eq[0], eq[1], false, null, eq[2] || [[X_MIN, X_MAX, 0]]);\n    }\n'
+        + '    for (var j = 0; j < ptList.length; j++) {\n'
+        + '        var pp = ptList[j];\n'
+        + "        var pt = board.create('point', [pp[1], pp[2]], { name: pp[0], size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '        allDrawnElements.push(pt);\n        standaloneElements.push(pt);\n    }\n'
+        + '    board.update();\n};\n\n'
+        + 'resetTool();\n'
+        + 'stack_jxg.custom_bind(state, serialiser, deserialiser, [handlePoint]);\n'
+        + 'board.update();\n\n'
+        + 'var inputEl = document.getElementById(state);\n'
+        + 'function freezeIfReadonly() {\n'
+        + "    var ro = inputEl && (inputEl.hasAttribute('readonly') || inputEl.hasAttribute('disabled'));\n"
+        + '    if (ro) {\n'
+        + "        board.containerObj.style.pointerEvents = 'none';\n"
+        + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
+        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        return true;\n    }\n    return false;\n}\n'
+        + 'if (!freezeIfReadonly()) {\n'
+        + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
+        + '}\n'
+        + '})();';
+}
 
-    // Physics: expected B₁ position
-    var tanT   = Math.tan(theta * Math.PI / 180);
-    var xB1exp = -f1;              // focal point of primary mirror (in front = to the left)
-    var yB1exp = -f1 * tanT;      // below axis (mirror inverts vertical component)
+/* ── Télescope de Newton — miroir primaire concave seul (objet à l'infini) ──
+   Une étoile à l'infini, de diamètre apparent θ, envoie un faisceau parallèle
+   incliné de θ par rapport à l'axe optique. Deux rayons remarquables :
+   celui qui touche le sommet S (réfléchi symétriquement par rapport à l'axe)
+   et un second, décalé de beamH, qui converge avec le premier au point
+   image B1 dans le plan focal du miroir primaire (x = -f1). Construction en
+   un seul temps : les deux rayons incidents/réfléchis, puis B1 par
+   intersection. (Le télescope de Newton complet ajoute un miroir secondaire
+   plan à 45° et un oculaire ; cette version couvre la formation de l'image
+   par le miroir primaire seul, cohérente avec le scénario proposé.) */
+function _genOptiqueTelescopeConstruction(X) {
+    var bareme = parseFloat(v('opt-bareme'))     || 1;
+    var text   = richVal('opt-text');
+    var f1     = parseFloat(v('opt-tel-f1'))     || 40;
+    var theta  = parseFloat(v('opt-tel-theta'))  || 3;
+    var beamH  = parseFloat(v('opt-tel-beam-h')) || 3;
+    var dispW  = parseInt(v('opt-w')) || 700;
+    var dispH  = parseInt(v('opt-h')) || 380;
 
-    // Mirror arc parameters (visual representation)
-    var mirrorH = Math.max(beamH + 2, 5);
-    var sag = mirrorH / 6;
-    var Rvis = (sag * sag + mirrorH * mirrorH) / (2 * sag);
-    var tMax = Math.asin(mirrorH / Rvis);
+    if (f1 <= 0) throw new Error(I18N.t('opt.err_f1_positive'));
+    if (theta <= 0) throw new Error(I18N.t('opt.err_theta_positive'));
+    if (beamH <= 0) throw new Error(I18N.t('opt.err_theta_positive'));
 
-    // Diagram bounds
-    var xLeft  = -f1 * 2.1;
-    var xRight = f1 * 0.15;
-    var yTop   = Math.max(beamH + tanT * Math.abs(xLeft) + 2, 8);
-    var yBot   = Math.max(Math.abs(yB1exp) * 1.6 + 2, 5);
+    function _n(val) { var r = Math.round(val * 1e1) / 1e1; return r === 0 ? 0 : r; }
 
-    // Incident ray y-values at xLeft (going at slope -tanT, hitting mirror at y=0 and y=beamH)
-    var yRay1Left = tanT * Math.abs(xLeft);       // ray 1 starts above axis at xLeft
-    var yRay2Left = beamH + tanT * Math.abs(xLeft); // ray 2 starts higher
+    var tanT = Math.tan(theta * Math.PI / 180);
+    var yB1  = -f1 * tanT;
 
-    // Initial wrong position for B₁
-    var initB1x = xB1exp * 0.4;
-    var initB1y = 0;
+    /* Rayons remarquables */
+    var mA = -tanT, pA = 0;                        // incident 1, par le sommet S
+    var mAe = tanT, pAe = 0;                        // réfléchi 1, symétrique / axe, vers B1
+    var mBi = -tanT, pBi = beamH;                    // incident 2, décalé de beamH
+    var mBe = (beamH - yB1) / f1, pBe = beamH;       // réfléchi 2, vers B1
 
-    var xFStr   = (-f1).toFixed(1);
-    var xCStr   = (-2*f1).toFixed(1);
-    var xB1Str  = xB1exp.toFixed(3);
-    var yB1Str  = yB1exp.toFixed(3);
-    var RvisStr = Rvis.toFixed(4);
-    var tMaxStr = tMax.toFixed(6);
-    var sagStr  = sag.toFixed(4);
+    var mirrorHeight = Math.max(beamH + 2, 5);
+    var xminG = _n(-(f1 * 2.3) - 3);
+    var xmaxG = _n(f1 * 0.25 + 2);
+    var yAmp  = Math.max(Math.abs(yB1) + 2, mirrorHeight + 2) * 1.3;
+    var X_MIN = _n(xminG - 2), X_MAX = _n(xmaxG + 2);
+    var Y_MIN = _n(-yAmp), Y_MAX = _n(yAmp);
+    var xtol  = 0.5;
 
-    var jxg = 'var board = JXG.JSXGraph.initBoard(divid, {\n'
-        + '  boundingbox: [' + xLeft.toFixed(1) + ',' + yTop.toFixed(1) + ','
-        + xRight.toFixed(1) + ',' + (-yBot).toFixed(1) + '],\n'
-        + '  keepaspectratio: false, axis: false,\n'
-        + '  showCopyright: false, showNavigation: false\n'
-        + '});\n'
-        // Optical axis
-        + 'board.create("line", [[0,0],[1,0]], {strokeColor:"#d1d5db",strokeWidth:1.5,'
-        + 'straightFirst:true,straightLast:true,fixed:true,highlight:false});\n'
-        // Concave mirror arc at x=0: x(t)=Rvis*(cos(t)-1), y(t)=Rvis*sin(t)
-        + 'board.create("curve", [function(t){return ' + RvisStr + '*(Math.cos(t)-1);}, '
-        + 'function(t){return ' + RvisStr + '*Math.sin(t);}, '
-        + '-' + tMaxStr + ', ' + tMaxStr + '], '
-        + '{strokeColor:"#374151",strokeWidth:3.5,fixed:true,highlight:false});\n'
-        // Hatching on right (back of mirror)
-        + (function() {
-            var h = '';
-            var nH = 7;
-            for (var i = 0; i <= nH; i++) {
-                var t = -tMax + i * (2 * tMax / nH);
-                var xHatch = Rvis * (Math.cos(t) - 1);
-                var yHatch = Rvis * Math.sin(t);
-                h += 'board.create("segment", [['
-                    + xHatch.toFixed(3) + ',' + yHatch.toFixed(3) + '],['
-                    + (xHatch + 1.2).toFixed(3) + ',' + (yHatch - 0.9).toFixed(3) + ']], '
-                    + '{strokeColor:"#9ca3af",strokeWidth:1,fixed:true,highlight:false});\n';
-            }
-            return h;
-        })()
-        // Labels: S (vertex), F₁, C
-        + 'board.create("text", [' + sagStr + ',0.45,"S"], '
-        + '{fixed:true,anchorX:"center",fontSize:12,color:"#374151",highlight:false});\n'
-        + 'board.create("point", [' + xFStr + ',0], {fixed:true,size:3,face:"cross",'
-        + 'fillColor:"#0369a1",strokeColor:"#0369a1",name:"F\\u2081",'
-        + 'label:{fontSize:12,color:"#0369a1",offset:[0,8]},highlight:false});\n'
-        + 'board.create("point", [' + xCStr + ',0], {fixed:true,size:3,face:"cross",'
-        + 'fillColor:"#64748b",strokeColor:"#64748b",name:"C",'
-        + 'label:{fontSize:12,color:"#64748b",offset:[0,8]},highlight:false});\n'
-        // Mirror label
-        + 'board.create("text", [0,' + (mirrorH + 0.8).toFixed(1) + ',"miroir concave"], '
-        + '{fixed:true,anchorX:"center",fontSize:11,color:"#374151",highlight:false});\n'
-        // Incident ray 1: from (xLeft, yRay1Left) to hit point S=(0,0)
-        + 'board.create("segment", [[' + xLeft.toFixed(1) + ',' + yRay1Left.toFixed(3) + '],[0,0]], '
-        + '{strokeColor:"#f59e0b",strokeWidth:2,fixed:true,highlight:false,'
-        + 'lastArrow:{type:1,size:4}});\n'
-        // Incident ray 2: from (xLeft, yRay2Left) to hit point (0, beamH)
-        + 'board.create("segment", [[' + xLeft.toFixed(1) + ',' + yRay2Left.toFixed(3) + '],'
-        + '[0,' + beamH.toFixed(2) + ']], '
-        + '{strokeColor:"#f59e0b",strokeWidth:2,fixed:true,highlight:false,'
-        + 'lastArrow:{type:1,size:4}});\n'
-        // Draggable B₁ (red, starts wrong)
-        + 'var B1 = board.create("point", [' + initB1x.toFixed(2) + ',' + initB1y.toFixed(2) + '], {'
-        + 'size:7,face:"circle",fillColor:"#ef4444",strokeColor:"#b91c1c",'
-        + 'name:"B\\u2081",label:{fontSize:14,color:"#b91c1c",offset:[8,6]}});\n'
-        // Hit points on mirror (hidden)
-        + 'var hitS = board.create("point", [0,0], '
-        + '{fixed:true,size:0,face:"circle",name:"",highlight:false,visible:false});\n'
-        + 'var hitH = board.create("point", [0,' + beamH.toFixed(2) + '], '
-        + '{fixed:true,size:0,face:"circle",name:"",highlight:false,visible:false});\n'
-        // Reflected ray 1: from hitS through B1 extending left
-        + 'board.create("line", [hitS, B1], {straightFirst:false, straightLast:true, '
-        + 'strokeColor:"#dc2626",strokeWidth:2,highlight:false,'
-        + 'lastArrow:{type:1,size:5}});\n'
-        // Reflected ray 2: from hitH through B1 extending left
-        + 'board.create("line", [hitH, B1], {straightFirst:false, straightLast:true, '
-        + 'strokeColor:"#dc2626",strokeWidth:2,highlight:false,'
-        + 'lastArrow:{type:1,size:5}});\n'
-        // STACK bind
-        + 'stack_jxg.bind_point(board, "ans' + X + '", B1);\n';
+    /* ── Construction correcte de référence (pour <tans>) ── */
+    var tansRayList = '[[' + _n(mA) + ',' + _n(pA) + ',[[' + xminG + ',0,1]]],'
+        + '[' + _n(mAe) + ',' + _n(pAe) + ',[[' + xminG + ',0,1]]],'
+        + '[' + _n(mBi) + ',' + _n(pBi) + ',[[' + xminG + ',0,1]]],'
+        + '[' + _n(mBe) + ',' + _n(pBe) + ',[[' + xminG + ',0,1]]]'
+        + ']';
+    var tansPtList = '[["B1",' + _n(-f1) + ',' + _n(yB1) + ']]';
+    var tans = 'telescope_construction(' + tansRayList + ',' + tansPtList + ')';
 
-    var inputXML = '<input>\n'
-        + '  <name>ans' + X + '</name>\n'
-        + '  <type>algebraic</type>\n'
-        + '  <tans>[' + xB1Str + ',' + yB1Str + ']</tans>\n'
-        + '  <boxsize>5</boxsize>\n'
-        + '  <strictsyntax>1</strictsyntax><insertstars>0</insertstars>\n'
-        + '  <syntaxhint></syntaxhint><syntaxattribute>0</syntaxattribute>\n'
-        + '  <forbidwords></forbidwords><allowwords></allowwords>\n'
-        + '  <forbidfloat>0</forbidfloat><requirelowestterms>0</requirelowestterms>\n'
-        + '  <checkanswertype>0</checkanswertype><mustverify>0</mustverify>\n'
-        + '  <showvalidation>0</showvalidation><options></options>\n'
-        + '</input>';
+    var jxg = _telescopeConstructionJXG(X, {
+        f1: f1, beamH: beamH,
+        X_MIN: X_MIN, X_MAX: X_MAX, Y_MIN: Y_MIN, Y_MAX: Y_MAX,
+        mirrorHeight: mirrorHeight, dispW: dispW
+    });
 
-    var fbVars = 'opt_b1x_' + X + ': float(ans' + X + '[1]);\n'
-        + 'opt_b1y_' + X + ': float(ans' + X + '[2]);\n'
-        + 'opt_ok_' + X + ': is(abs(opt_b1x_' + X + ' - (' + xB1Str + ')) <= ' + tolX.toFixed(2)
-        + ' and abs(opt_b1y_' + X + ' - (' + yB1Str + ')) <= ' + tolY.toFixed(2) + ');\n';
-    var prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var canonicalNodes = [{
-        name: '0', description: 'Image focale télescope', answertest: 'AlgEquiv',
-        sans: 'opt_ok_' + X, tans: 'true', testoptions: '', quiet: '0',
-        truescoremode: '=', truescore: '1', truepenalty: '0', truenextnode: '-1',
-        trueanswernote: 'PRT' + X + '-1-T', truefeedback: fbOk,
-        falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
-        falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
-    }];
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
+    var vars = 'f1: ' + _n(f1) + '$\n'
+        + 'theta: ' + _n(theta) + '$\n'
+        + 'beamH: ' + _n(beamH) + '$\n'
+        + 'tanT: tan(theta*%pi/180)$\n'
+        + 'yB1: -f1*tanT$\n\n'
+        + 'mA: -tanT$\n' + 'pA: 0$\n'
+        + 'mAe: tanT$\n' + 'pAe: 0$\n'
+        + 'mBi: -tanT$\n' + 'pBi: beamH$\n'
+        + 'mBe: (beamH-yB1)/f1$\n' + 'pBe: beamH$\n\n'
+        + 'xmin: ' + xminG + '$\n'
+        + 'xmax: ' + xmaxG + '$\n'
+        + 'xtol: ' + xtol + '$\n\n'
+        + _opticsConstructionMaximaHelpers()
+        + '\nrequire_mc(mc) := block(\n'
+        + '  if not is(safe_op(mc) = "telescope_construction") or not is(length(mc) = 2) then\n'
+        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction telescope_construction(rayons,points))."\n'
+        + '  else\n'
+        + '    true\n'
+        + ')$\n\n'
+        + 'ans' + X + '_validator(ex) := stack_seq_validator(ex, [require_mc])$';
+
+    var inputXML = '    <input>\n'
+        + '      <name>ans' + X + '</name>\n'
+        + '      <type>algebraic</type>\n'
+        + '      <tans><![CDATA[' + tans + ']]></tans>\n'
+        + '      <boxsize>60</boxsize><strictsyntax>1</strictsyntax>'
+        + '<insertstars>0</insertstars><syntaxhint></syntaxhint>'
+        + '<syntaxattribute>0</syntaxattribute><forbidwords></forbidwords>'
+        + '<allowwords>telescope_construction</allowwords><forbidfloat>0</forbidfloat>'
+        + '<requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype>'
+        + '<mustverify>1</mustverify><showvalidation>2</showvalidation>'
+        + '<options>validator:ans' + X + '_validator</options>\n    </input>';
+
+    /* ── PRT : rayons (5/6... ici 4 rayons) + point image B1 ── */
+    var fbVars = '[rayList, ptList]: args(ans' + X + ')$\n\n'
+        + 'att1: is(found_ray(rayList, mA, pA, 0.05, 0.3))$\n'
+        + 'att2: is(found_ray(rayList, mAe, pAe, 0.05, 0.3))$\n'
+        + 'att3: is(found_ray(rayList, mBi, pBi, 0.05, 0.3))$\n'
+        + 'att4: is(found_ray(rayList, mBe, pBe, 0.05, 0.3))$\n'
+        + 'any_attempt: is(att1 or att2 or att3 or att4)$\n\n'
+        + 'l1_ok: is(seg_required_status(rayList, mA, pA, 0.05, 0.3, xmin, 0, xtol, 1))$\n'
+        + 'l2_ok: is(seg_required_status(rayList, mAe, pAe, 0.05, 0.3, xmin, 0, xtol, 1))$\n'
+        + 'l3_ok: is(seg_required_status(rayList, mBi, pBi, 0.05, 0.3, xmin, 0, xtol, 1))$\n'
+        + 'l4_ok: is(seg_required_status(rayList, mBe, pBe, 0.05, 0.3, xmin, 0, xtol, 1))$\n\n'
+        + 'GEOM_WEIGHT: 0.7$\n\n'
+        + 'l1_geom: att1$\n'
+        + 'l2_geom: att2$\n'
+        + 'l3_geom: att3$\n'
+        + 'l4_geom: att4$\n\n'
+        + 'line_score(full_ok, geom_ok) := if full_ok then 1 else (if geom_ok then GEOM_WEIGHT else 0)$\n\n'
+        + 'l1_score: line_score(l1_ok, l1_geom)$\n'
+        + 'l2_score: line_score(l2_ok, l2_geom)$\n'
+        + 'l3_score: line_score(l3_ok, l3_geom)$\n'
+        + 'l4_score: line_score(l4_ok, l4_geom)$\n\n'
+        + 'nb_bonnes: l1_score + l2_score + l3_score + l4_score$\n\n'
+        + 'nb_attempts: length(sublist(rayList, lambda([r], not stringp(r[1]))))$\n'
+        + 'nb_total: max(nb_attempts, 2)$\n'
+        + 'score_rayons: min(nb_bonnes / nb_total, 1)$\n\n'
+        + 'nb_full_ok: (if l1_ok then 1 else 0) + (if l2_ok then 1 else 0) + (if l3_ok then 1 else 0) + (if l4_ok then 1 else 0)$\n'
+        + 'have2: is(nb_full_ok >= 2)$\n\n'
+        + 'c_point: is(found_point(ptList, ' + _n(-f1) + ', ' + _n(yB1) + ', 0.3))$';
+
+    var fbBilan = '<p><strong>Bilan des rayons particuliers :</strong></p>\n'
+        + '[[if test="any_attempt"]]<ul>\n'
+        + '[[if test="att1"]]<li>Rayon incident touchant le sommet S : [[if test="l1_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
+        + '[[if test="att2"]]<li>Rayon réfléchi symétrique (par S), vers B&#8321; : [[if test="l2_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
+        + '[[if test="att3"]]<li>Rayon incident décalé de ' + _n(beamH) + ' cm : [[if test="l3_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
+        + '[[if test="att4"]]<li>Rayon réfléchi correspondant, vers B&#8321; : [[if test="l4_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
+        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+
+    var canonicalNodes = [
+        {
+            name: '0', description: 'Rayons particuliers — score proportionnel', answertest: 'AlgEquiv',
+            sans: 'true', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: 'score_rayons*5/6', truepenalty: '', truenextnode: '1',
+            trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '1',
+            falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
+        },
+        {
+            name: '1', description: 'Image B1 dans le plan focal', answertest: 'AlgEquiv',
+            sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '-1',
+            trueanswernote: 'prt' + X + '-1-T',
+            truefeedback: "<p>Le point B1 est correctement placé à l'intersection des deux rayons réfléchis, dans le plan focal du miroir primaire (x&nbsp;=&nbsp;-f&#8321;).</p>",
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
+            falseanswernote: 'prt' + X + '-1-F',
+            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B1. [[if test=\"have2\"]]Vos rayons"
+                + ' réfléchis sont géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B1 est placé'
+                + " précisément à leur intersection.[[else]]Le point B1 ne peut être placé correctement que si les rayons réfléchis"
+                + ' sont d\'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>'
+        }
+    ];
+    var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
+    var prtXML  = buildPrtXml(prtMeta, canonicalNodes);
+
+    var genFbDefault = "<p>Le miroir primaire concave du télescope, de distance focale f'&#8321;&nbsp;=&nbsp;" + _n(f1) + '&nbsp;cm, forme'
+        + " l'image d'une étoile à l'infini dans son plan focal (x&nbsp;=&nbsp;-f&#8321;).</p>\n<ul>\n"
+        + "<li>Le rayon incident touchant le sommet S se réfléchit symétriquement par rapport à l'axe optique.</li>\n"
+        + '<li>Un second rayon incident, parallèle au premier, décalé de ' + _n(beamH) + ' cm, se réfléchit également vers le même point.</li>\n'
+        + "<li>Les deux rayons réfléchis se coupent au point B&#8321;, image de l'étoile formée par le miroir primaire.</li></ul>";
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> '
-        + I18N.t('opt.tel_data_miroir') + f1 + ' cm, θ = ' + theta + '°</p>\n';
+        + '<strong>Données :</strong> ' + I18N.t('opt.tel_data_miroir') + _n(f1) + '&nbsp;cm, θ&nbsp;=&nbsp;' + _n(theta) + '°</p>\n';
+
+    var instructions = '<div class="stack-comment">'
+        + '<h2>Construction — Télescope, miroir primaire</h2>'
+        + '<p>Le miroir primaire concave a une distance focale f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm. L\'étoile observée est à l\'infini,'
+        + ' sous un diamètre apparent θ&nbsp;=&nbsp;' + _n(theta) + '°.</p>'
+        + '<p>À l\'aide des outils ci-dessous, <strong>tracez les deux rayons incidents</strong> (l\'un touchant le sommet S du miroir, l\'autre'
+        + ' décalé de ' + _n(beamH) + ' cm) puis leurs <strong>rayons réfléchis</strong> correspondants (utilisez « Symétrique / axe » pour le rayon'
+        + ' réfléchi au sommet S). Une fois les deux rayons réfléchis tracés, utilisez <strong>« Intersection (2 clics) &rarr; point B1 »</strong>'
+        + ' pour construire le point image B1.</p>'
+        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
+        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
+        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> — c\'est le cas attendu ici pour tous les tronçons.</p></div>';
 
     var textFrag = '<div style="background:#065f46;border-left:5px solid #064e3b;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -3191,26 +4274,587 @@ function _genOptiqueTelescope(X) {
         + ' — ' + I18N.t('opt.title_telescope') + '</strong>'
         + '<span style="background:#064e3b;color:#fff;padding:2px 9px;border-radius:20px;'
         + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
-        + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
+        + '<!-- ENONCE-START -->' + (text || '') + instructions + '<!-- ENONCE-END -->\n'
         + dataRow
-        + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
-        + jxg + '\n[[/jsxgraph]]\n'
-        + '<p style="font-size:.82em;color:#6b7280;margin-top:6px;">'
-        + I18N.t('opt.hint_telescope_1')
-        + I18N.t('opt.hint_telescope_2')
-        + I18N.t('opt.hint_telescope_3') + '</p>\n'
-        + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
+        + '<!--HS-KBD:' + X + '-->';
+
+    var kbdBlock = '[[jsxgraph input-ref-ans' + X + '="state" width="' + dispW + 'px" aspect-ratio="' + (dispW / dispH).toFixed(3) + '"]]\n'
+        + jxg + '\n[[/jsxgraph]]\n\n'
+        + '<div style="display:none">[[input:ans' + X + ']] [[validation:ans' + X + ']]</div>';
 
     return {
         bareme:          bareme,
-        vars:            '',
+        vars:            vars,
         qnote:           'Optique-Telescope Q' + X + ' f1=' + f1 + ' th=' + theta,
         textFrag:        textFrag,
+        kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen('', v('opt-fbgen')),
+        generalFeedback: _mkFbGen(genFbDefault, v('opt-fbgen')),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
 }
 
+/* ── Moteur JSXGraph : microscope, objectif + oculaire (construction toolbar) ──
+   Portage combiné de _lentilleConstructionJXG (objectif : objet fini AB,
+   3 rayons remarquables → image réelle intermédiaire A1B1) et de la
+   partie oculaire de _lunetteConstructionJXG (A1B1 exactement dans le
+   plan focal objet F2 de l'oculaire → 2 rayons issus de A1B1 ressortent
+   parallèles, système afocal, image finale à l'infini — réglage pour un
+   œil normal). L'élève trace jusqu'à 5 rayons sur le même schéma : 3 pour
+   l'objectif (convergeant en B1, construit par « Intersection »), puis 2
+   pour l'oculaire (issus de B1, ressortant parallèles). */
+function _microscopeConstructionJXG(X, p) {
+    var f1 = p.f1, f2 = p.f2, d = p.d, xA = p.xA, AB = p.AB;
+    var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
+    var lens1H = p.lens1H, lens2H = p.lens2H;
+    var dispW = p.dispW || 700;
+    var lensGlyph1 =
+        "board.create('segment', [[0, -lens1H], [0, lens1H]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, lens1H], [-0.4, lens1H - 0.4]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, lens1H], [0.4, lens1H - 0.4]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, -lens1H], [-0.4, -lens1H + 0.4]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[0, -lens1H], [0.4, -lens1H + 0.4]], { strokeColor: '#1d4ed8', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('text', [0, lens1H + 1.1, 'L\\u2081'], { fixed: true, fontSize: 15, fontWeight: 'bold', color: '#1d4ed8', anchorX: 'middle', highlight: false, tabindex: null });\n";
+    var lensGlyph2 =
+        "board.create('segment', [[d, -lens2H], [d, lens2H]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[d, lens2H], [d - 0.4, lens2H - 0.4]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[d, lens2H], [d + 0.4, lens2H - 0.4]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[d, -lens2H], [d - 0.4, -lens2H + 0.4]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[d, -lens2H], [d + 0.4, -lens2H + 0.4]], { strokeColor: '#7c3aed', strokeWidth: 3, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('text', [d, lens2H + 1.1, 'L\\u2082'], { fixed: true, fontSize: 15, fontWeight: 'bold', color: '#7c3aed', anchorX: 'middle', highlight: false, tabindex: null });\n";
+    return '(function(){\n'
+        + 'var board = JXG.JSXGraph.initBoard(divid, {\n'
+        + '    boundingbox: [' + X_MIN + ', ' + Y_MAX + ', ' + X_MAX + ', ' + Y_MIN + '],\n'
+        + '    axis: false,\n    keepaspectratio: true,\n    showNavigation: true,\n'
+        + '    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },\n'
+        + '    pan: { enabled: true, needTwoFingers: false, needShift: true }\n});\n\n'
+        + 'var f1 = ' + f1 + ', f2 = ' + f2 + ', d = ' + d + ', xA = ' + xA + ', AB = ' + AB + ';\n'
+        + 'var lens1H = ' + lens1H + ', lens2H = ' + lens2H + ';\n'
+        + 'var X_MIN = ' + X_MIN + ', X_MAX = ' + X_MAX + ', Y_MIN = ' + Y_MIN + ', Y_MAX = ' + Y_MAX + ';\n\n'
+        + "var toolMode = '';\n"
+        + 'var tempPoint = null, dirPoint1 = null, dirPoint2 = null, interSeg1 = null;\n'
+        + 'var selectedSegment = null;\n\n'
+        + 'var allDrawnElements = [];\n'
+        + 'var raySegments = [];\n'
+        + 'var logicalRays = [];\n'
+        + 'var standaloneElements = [];\n'
+        + 'var intersectionCounter = 0;\n\n'
+        + "board.create('line', [[X_MIN, 0], [X_MAX, 0]], { strokeColor: 'black', strokeWidth: 1, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[X_MAX - 0.5, 0], [X_MAX, 0]], { fixed: true, highlight: false, tabindex: null });\n\n"
+        + lensGlyph1 + '\n' + lensGlyph2 + '\n'
+        + "board.create('point', [0, 0], { name: 'O\\u2081', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });\n"
+        + "board.create('point', [-f1, 0], { name: 'F\\u2081', size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n"
+        + "board.create('point', [f1, 0], { name: \"F'\\u2081\", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n"
+        + "board.create('point', [d, 0], { name: 'O\\u2082', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });\n"
+        + "board.create('point', [d - f2, 0], { name: 'F\\u2082', size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n"
+        + "board.create('point', [d + f2, 0], { name: \"F'\\u2082\", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n\n"
+        + "board.create('point', [xA, 0], { name: 'A', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('point', [xA, AB], { name: 'B', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[xA, 0], [xA, AB]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n\n"
+        + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
+        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + "var instructionsEl = document.createElement('p');\n"
+        + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
+        + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
+        + 'function setInstructions(msg) { instructionsEl.textContent = msg; }\n\n'
+        + "var toolbarDiv = document.createElement('div');\n"
+        + "toolbarDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:.4em;margin-top:.6em;';\n"
+        + 'var toolButtons = {};\n\n'
+        + 'function addToolButton(label, mode, msgOrHandler) {\n'
+        + "    var btn = document.createElement('button');\n"
+        + "    btn.type = 'button';\n    btn.textContent = label;\n"
+        + "    btn.style.cssText = 'padding:.35em .7em;font-size:.85em;cursor:pointer;';\n"
+        + '    if (mode === null) {\n'
+        + "        btn.addEventListener('click', msgOrHandler);\n"
+        + '    } else {\n'
+        + "        btn.addEventListener('click', function(){ activateTool(mode, msgOrHandler); });\n"
+        + '        toolButtons[mode] = btn;\n    }\n'
+        + '    toolbarDiv.appendChild(btn);\n    return btn;\n}\n\n'
+        + 'function setActiveButton(mode) {\n'
+        + '    for (var m in toolButtons) {\n'
+        + "        toolButtons[m].style.background = (m === mode) ? '#dbeafe' : '';\n"
+        + "        toolButtons[m].style.fontWeight = (m === mode) ? 'bold' : 'normal';\n"
+        + '    }\n}\n\n'
+        + 'function resetTool() {\n'
+        + "    toolMode = '';\n"
+        + '    tempPoint = null; dirPoint1 = null; dirPoint2 = null; interSeg1 = null;\n'
+        + "    board.defaultCursor = 'default';\n"
+        + '    setInstructions(DEFAULT_MSG);\n    setActiveButton(null);\n    deselectSegment();\n}\n\n'
+        + 'function paintSegment(seg) {\n'
+        + "    var status = seg.__status || 'defaut';\n"
+        + "    if (status === 'reel') {\n"
+        + "        seg.setAttribute({ strokeColor: '#e67e22', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + "    } else if (status === 'virtuel') {\n"
+        + "        seg.setAttribute({ strokeColor: '#2980b9', dash: 2, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + '    } else {\n'
+        + "        seg.setAttribute({ strokeColor: '#555555', dash: 0, strokeWidth: seg === selectedSegment ? 2.5 : 1.5 });\n"
+        + '    }\n}\n\n'
+        + 'function statusCode(seg) {\n'
+        + "    var s = seg.__status || 'defaut';\n"
+        + "    return s === 'reel' ? 1 : (s === 'virtuel' ? 2 : 0);\n}\n\n"
+        + 'function statusFromCode(code) {\n'
+        + "    return code === 1 ? 'reel' : (code === 2 ? 'virtuel' : 'defaut');\n}\n\n"
+        + 'function deselectSegment() {\n'
+        + '    var prev = selectedSegment;\n    selectedSegment = null;\n'
+        + '    if (prev) { paintSegment(prev); }\n}\n\n'
+        + 'function onSegmentClick(seg) {\n'
+        + "    var status = seg.__status || 'defaut';\n"
+        + "    seg.__status = (status === 'reel') ? 'virtuel' : 'reel';\n"
+        + '    var prev = selectedSegment;\n    selectedSegment = seg;\n'
+        + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
+        + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
+        + 'function deleteSelectedSegment() {\n'
+        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
+        + '    board.removeObject(seg);\n'
+        + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
+        + '    for (var i = 0; i < logicalRays.length; i++) {\n'
+        + '        var lr = logicalRays[i];\n'
+        + '        var sIdx = lr.segments.indexOf(seg);\n'
+        + '        if (sIdx > -1) {\n            lr.segments.splice(sIdx, 1);\n'
+        + '            if (lr.segments.length === 0) { logicalRays.splice(i, 1); }\n            break;\n        }\n    }\n'
+        + '    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
+        + 'function activateTool(mode, msg) {\n'
+        + '    if (toolMode === mode) { resetTool(); return; }\n'
+        + '    resetTool(); toolMode = mode;\n'
+        + "    board.defaultCursor = 'crosshair';\n"
+        + '    setInstructions(msg);\n    setActiveButton(mode);\n}\n\n'
+        + 'function syncState() {\n'
+        + "    handlePoint.trigger(['update']);\n    board.update();\n}\n\n"
+        + 'function snapToPoint(x, y) {\n'
+        + '    var threshold = 0.6, closestX = x, closestY = y, minDist = Infinity;\n'
+        + '    for (var id in board.objects) {\n'
+        + '        var obj = board.objects[id];\n'
+        + "        if (obj.elType === 'point' && obj.visProp.visible !== false && obj.visProp.hidden !== true) {\n"
+        + '            var dx = obj.X() - x, dy = obj.Y() - y, dist = Math.sqrt(dx * dx + dy * dy);\n'
+        + '            if (dist < threshold && dist < minDist) { minDist = dist; closestX = obj.X(); closestY = obj.Y(); }\n'
+        + '        }\n    }\n    return { x: closestX, y: closestY };\n}\n\n'
+        + 'function getClickedSegment(x, y, threshold, excludeSeg) {\n'
+        + '    var closestSeg = null, minDist = Infinity;\n'
+        + '    for (var i = 0; i < raySegments.length; i++) {\n'
+        + '        var seg = raySegments[i];\n'
+        + '        if (seg === excludeSeg) continue;\n'
+        + '        if (!seg.point1 || !seg.point2) continue;\n'
+        + '        var x1 = seg.point1.X(), y1 = seg.point1.Y();\n'
+        + '        var x2 = seg.point2.X(), y2 = seg.point2.Y();\n'
+        + '        var dx = x2 - x1, dy = y2 - y1;\n'
+        + '        var lengthSq = dx * dx + dy * dy;\n'
+        + '        if (lengthSq === 0) continue;\n'
+        + '        var t = ((x - x1) * dx + (y - y1) * dy) / lengthSq;\n'
+        + '        t = Math.max(0, Math.min(1, t));\n'
+        + '        var projX = x1 + t * dx, projY = y1 + t * dy;\n'
+        + '        var dist = Math.sqrt(Math.pow(x - projX, 2) + Math.pow(y - projY, 2));\n'
+        + '        if (dist < threshold && dist < minDist) { minDist = dist; closestSeg = seg; }\n'
+        + '    }\n    return closestSeg;\n}\n\n'
+        + 'function getClickedPoint(x, y, threshold) {\n'
+        + '    var closest = null, minDist = Infinity;\n'
+        + '    for (var i = 0; i < standaloneElements.length; i++) {\n'
+        + '        var el = standaloneElements[i];\n'
+        + "        if (el.elType === 'point' && el.visProp.visible !== false) {\n"
+        + '            var d2 = Math.hypot(el.X() - x, el.Y() - y);\n'
+        + '            if (d2 < threshold && d2 < minDist) { minDist = d2; closest = el; }\n'
+        + '        }\n    }\n    return closest;\n}\n\n'
+        + 'function addCustomRayFromEq(m, p, isVert, xVert, xOrigin) {\n'
+        + '    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };\n'
+        + '    if (isVert) {\n'
+        + "        var pA = board.create('point', [xVert, Y_MIN], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "        var pB = board.create('point', [xVert, Y_MAX], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);\n'
+        + '        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);\n'
+        + '    } else {\n'
+        + '        var boundsX = [X_MIN, X_MAX];\n'
+        + "        if (typeof xOrigin === 'number') boundsX.push(xOrigin);\n"
+        + '        boundsX.push(0, d);\n'
+        + '        boundsX.sort(function(a, b){ return a - b; });\n'
+        + '        for (var i = 0; i < boundsX.length - 1; i++) {\n'
+        + '            var xa = boundsX[i], xb = boundsX[i + 1];\n'
+        + '            if (xa === xb) continue;\n'
+        + '            var ya = m * xa + p, yb = m * xb + p;\n'
+        + "            var pA2 = board.create('point', [xa, ya], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            var pB2 = board.create('point', [xb, yb], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            var seg2 = board.create('segment', [pA2, pB2], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '            raySegments.push(seg2); allDrawnElements.push(pA2, pB2, seg2);\n'
+        + '            currentLogicalRay.segments.push(seg2); currentLogicalRay.points.push(pA2, pB2);\n        }\n    }\n'
+        + '    logicalRays.push(currentLogicalRay);\n    return currentLogicalRay;\n}\n\n'
+        + 'function addRayFromPieces(m, p, isVert, xVert, pieces) {\n'
+        + '    var currentLogicalRay = { segments: [], points: [], eq: isVert ? { isVert: true, x: xVert } : { isVert: false, m: m, p: p } };\n'
+        + '    for (var i = 0; i < pieces.length; i++) {\n'
+        + '        var piece = pieces[i];\n        var pA, pB;\n'
+        + '        if (isVert) {\n'
+        + "            pA = board.create('point', [xVert, piece[0]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            pB = board.create('point', [xVert, piece[1]], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + '        } else {\n'
+        + "            pA = board.create('point', [piece[0], m * piece[0] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + "            pB = board.create('point', [piece[1], m * piece[1] + p], { visible: false, fixed: true, highlight: false, name: '', tabindex: null });\n"
+        + '        }\n'
+        + "        var seg = board.create('segment', [pA, pB], { strokeColor: '#555555', strokeWidth: 1.5, fixed: true, highlight: false, dash: 0, tabindex: null });\n"
+        + '        seg.__status = statusFromCode(piece[2]);\n        paintSegment(seg);\n'
+        + '        raySegments.push(seg); allDrawnElements.push(pA, pB, seg);\n'
+        + '        currentLogicalRay.segments.push(seg); currentLogicalRay.points.push(pA, pB);\n    }\n'
+        + '    logicalRays.push(currentLogicalRay);\n    return currentLogicalRay;\n}\n\n'
+        + 'function addCustomRay(x1, y1, x2, y2) {\n'
+        + '    var dx = x2 - x1, dy = y2 - y1;\n'
+        + '    var m = (Math.abs(dx) < 0.01) ? Infinity : dy / dx;\n'
+        + '    if (m === Infinity) {\n        addCustomRayFromEq(null, null, true, x1);\n    } else {\n'
+        + '        var p = y1 - m * x1;\n        addCustomRayFromEq(m, p, false, null, x1);\n    }\n'
+        + '    syncState();\n}\n\n'
+        + 'function onPointClick(pt) {\n'
+        + '    board.removeObject(pt);\n'
+        + '    allDrawnElements = allDrawnElements.filter(function(el){ return el !== pt; });\n'
+        + '    standaloneElements = standaloneElements.filter(function(el){ return el !== pt; });\n'
+        + '    syncState();\n}\n\n'
+        + "board.on('down', function(evt) {\n"
+        + "    if (evt.target && evt.target.closest && evt.target.closest('.JXG_navigation_button')) return;\n"
+        + '    if (evt.shiftKey) return;\n'
+        + '    var coords = board.getUsrCoordsOfMouse(evt);\n'
+        + '    var x = coords[0], y = coords[1];\n\n'
+        + "    if (toolMode !== '') {\n"
+        + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
+        + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par3') {\n"
+        + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
+        + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
+        + "        else if (toolMode === 'inter1') {\n"
+        + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon.\"); }\n"
+        + '        }\n'
+        + "        else if (toolMode === 'inter2') {\n"
+        + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
+        + '            if (seg2) {\n'
+        + '                var x1 = interSeg1.point1.X(), y1 = interSeg1.point1.Y(), x2 = interSeg1.point2.X(), y2 = interSeg1.point2.Y();\n'
+        + '                var x3 = seg2.point1.X(), y3 = seg2.point1.Y(), x4 = seg2.point2.X(), y4 = seg2.point2.Y();\n'
+        + '                var m1 = (x2 - x1) === 0 ? Infinity : (y2 - y1) / (x2 - x1);\n'
+        + '                var m2 = (x4 - x3) === 0 ? Infinity : (y4 - y3) / (x4 - x3);\n'
+        + '                if (m1 !== Infinity && m2 !== Infinity && Math.abs(m1 - m2) > 0.001) {\n'
+        + '                    var p1 = y1 - m1 * x1, p2 = y3 - m2 * x3;\n'
+        + '                    var xi = (p2 - p1) / (m1 - m2), yi = m1 * xi + p1;\n'
+        + '                    var in1 = xi >= Math.min(x1, x2) - 0.5 && xi <= Math.max(x1, x2) + 0.5 && yi >= Math.min(y1, y2) - 0.5 && yi <= Math.max(y1, y2) + 0.5;\n'
+        + '                    var in2 = xi >= Math.min(x3, x4) - 0.5 && xi <= Math.max(x3, x4) + 0.5 && yi >= Math.min(y3, y4) - 0.5 && yi <= Math.max(y3, y4) + 0.5;\n'
+        + '                    if (in1 && in2) {\n'
+        + '                        intersectionCounter++;\n'
+        + "                        var name = (intersectionCounter === 1) ? 'B1' : ('I' + (intersectionCounter - 1));\n"
+        + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
+        + '                        syncState();\n'
+        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
+        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                resetTool();\n            }\n        }\n        return;\n    }\n\n'
+        + '    var clickedSeg = getClickedSegment(x, y, 0.3, null);\n'
+        + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
+        + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
+        + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
+        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
+        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ.\");\n"
+        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
+        + "addToolButton('Intersection (2 clics) → point B1', 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon.');\n"
+        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('Tout effacer', null, function(){\n"
+        + '    selectedSegment = null;\n'
+        + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
+        + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
+        + '    resetTool();\n    syncState();\n});\n\n'
+        + 'document.body.appendChild(toolbarDiv);\n'
+        + 'document.body.appendChild(instructionsEl);\n'
+        + 'stack_js.resize_containing_frame("' + dispW + 'px", document.documentElement.offsetHeight + "px");\n\n'
+        + 'function rebuildAllDrawnElements() {\n'
+        + '    var fromRays = [];\n'
+        + '    logicalRays.forEach(function(lr){ fromRays = fromRays.concat(lr.points, lr.segments); });\n'
+        + '    allDrawnElements = fromRays.concat(standaloneElements);\n}\n\n'
+        + 'var serialiser = function() {\n'
+        + '    var rayList = logicalRays.map(function(lr) {\n'
+        + '        var pieces = lr.segments.map(function(seg) {\n'
+        + '            var ends = lr.eq.isVert ? [seg.point1.Y(), seg.point2.Y()] : [seg.point1.X(), seg.point2.X()];\n'
+        + '            return [ends[0], ends[1], statusCode(seg)];\n        });\n'
+        + "        return lr.eq.isVert ? ['vert', lr.eq.x, pieces] : [lr.eq.m, lr.eq.p, pieces];\n    });\n"
+        + '    var ptList = standaloneElements\n'
+        + "        .filter(function(el){ return el.elType === 'point' && el.name; })\n"
+        + '        .map(function(el){ return [el.name, el.X(), el.Y()]; });\n'
+        + '    return "microscope_construction(" + JSON.stringify(rayList) + "," + JSON.stringify(ptList) + ")";\n};\n\n'
+        + 'function clearAll() {\n'
+        + '    logicalRays.forEach(function(lr) {\n'
+        + '        lr.points.forEach(function(el){ board.removeObject(el); });\n'
+        + '        lr.segments.forEach(function(el){ board.removeObject(el); });\n    });\n'
+        + '    standaloneElements.forEach(function(el){ board.removeObject(el); });\n'
+        + '    raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
+        + '    rebuildAllDrawnElements();\n}\n\n'
+        + 'var deserialiser = function(value) {\n'
+        + '    clearAll();\n'
+        + "    var newState = JSON.parse(value.replace('microscope_construction(', '[').replace(/\\)\\s*$/, ']'));\n"
+        + '    var rayList = newState[0], ptList = newState[1];\n'
+        + '    for (var i = 0; i < rayList.length; i++) {\n'
+        + '        var eq = rayList[i];\n'
+        + "        if (eq[0] === 'vert') addRayFromPieces(null, null, true, eq[1], eq[2] || [[Y_MIN, Y_MAX, 0]]);\n"
+        + '        else addRayFromPieces(eq[0], eq[1], false, null, eq[2] || [[X_MIN, X_MAX, 0]]);\n    }\n'
+        + '    for (var j = 0; j < ptList.length; j++) {\n'
+        + '        var pp = ptList[j];\n'
+        + "        var pt = board.create('point', [pp[1], pp[2]], { name: pp[0], size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
+        + '        allDrawnElements.push(pt);\n        standaloneElements.push(pt);\n    }\n'
+        + '    board.update();\n};\n\n'
+        + 'resetTool();\n'
+        + 'stack_jxg.custom_bind(state, serialiser, deserialiser, [handlePoint]);\n'
+        + 'board.update();\n\n'
+        + 'var inputEl = document.getElementById(state);\n'
+        + 'function freezeIfReadonly() {\n'
+        + "    var ro = inputEl && (inputEl.hasAttribute('readonly') || inputEl.hasAttribute('disabled'));\n"
+        + '    if (ro) {\n'
+        + "        board.containerObj.style.pointerEvents = 'none';\n"
+        + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
+        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        return true;\n    }\n    return false;\n}\n'
+        + 'if (!freezeIfReadonly()) {\n'
+        + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
+        + '}\n'
+        + '})();';
+}
+
+/* ── Microscope — objectif + oculaire, réglage pour un œil normal ──
+   L'objectif L1 (f'1, petite focale) forme, d'un objet réel fini AB placé
+   au-delà de son foyer objet F1, une image réelle intermédiaire A1B1 (par
+   les 3 rayons remarquables habituels). L'oculaire L2 (f'2) est placé de
+   sorte que A1B1 soit exactement dans son plan focal objet F2 (réglage
+   pour un œil normal, système final afocal) : deux rayons issus de A1B1
+   ressortent alors parallèles entre eux, l'image finale étant à l'infini.
+   Un seul point à construire (B1, intersection de deux des trois rayons
+   de l'objectif) ; comme pour la lunette, le faisceau émergent de
+   l'oculaire ne requiert aucun second point. */
+function _genOptiqueMicroscopeConstruction(X) {
+    var bareme = parseFloat(v('opt-bareme'))     || 1;
+    var text   = richVal('opt-text');
+    var f1     = parseFloat(v('opt-mic-f1'))     || 1;
+    var f2     = parseFloat(v('opt-mic-f2'))     || 4;
+    var oaIn   = parseFloat(v('opt-mic-oa'))     || -1.25;
+    var AB     = parseFloat(v('opt-mic-ab'))     || 0.08;
+    var dispW  = parseInt(v('opt-w')) || 700;
+    var dispH  = parseInt(v('opt-h')) || 380;
+
+    if (f1 <= 0) throw new Error(I18N.t('opt.err_f1_positive'));
+    if (f2 <= 0) throw new Error(I18N.t('opt.err_f2_positive'));
+    if (oaIn >= 0) throw new Error(I18N.t('opt.err_oa_negative'));
+    if (Math.abs(oaIn) <= f1) throw new Error(I18N.t('opt.err_oa_lt_f1_microscope'));
+
+    function _n(val) { var r = Math.round(val * 1e2) / 1e2; return r === 0 ? 0 : r; }
+    function _n1(val) { var r = Math.round(val * 1e1) / 1e1; return r === 0 ? 0 : r; }
+
+    var xA  = oaIn;
+    var xA1 = f1 * xA / (xA + f1);
+    var gam = xA1 / xA;
+    var ABp = gam * AB;
+    var d   = xA1 + f2;
+
+    /* Rayons remarquables — objectif (image réelle, mêmes formules que
+       _genOptiqueLentilleRayons, branche réelle uniquement) */
+    var xF1 = -f1, xF1p = f1;
+    var m1e = -AB / xF1p, p1e = AB;
+    var m2  = AB / xA,    p2  = 0;
+    var m3i = AB / (xA - xF1), p3i = -m3i * xF1;
+    var m3e = 0, p3e = p3i;
+
+    /* Rayons remarquables — oculaire (A1B1 exactement au foyer objet F2,
+       mêmes formules que la partie oculaire de _genOptiqueLunetteConstruction,
+       avec ABp/d à la place de yB1/d) */
+    var mC  = -ABp / f2, pC = -mC * d;
+    var mDi = 0, pDi = ABp;
+    var mDe = -ABp / f2, pDe = ABp - mDe * d;
+
+    var halfX1 = Math.max(Math.abs(xA), Math.abs(xA1), 2 * f1) + 3;
+    var xminG  = _n1(-halfX1);
+    var xmaxG  = _n1(d + f2 * 1.3 + 3);
+    var lens1H = _n1(Math.max(Math.abs(AB), Math.abs(ABp)) * 1.4 + 1.2);
+    var lens2H = _n1(lens1H * 0.75);
+    var yAmp   = Math.max(lens1H + 1, Math.abs(ABp) + 1.5, (xmaxG - xminG) / 5);
+    var X_MIN  = _n1(xminG - 2), X_MAX = _n1(xmaxG + 2);
+    var Y_MIN  = _n1(-yAmp), Y_MAX = _n1(yAmp);
+    var xtol   = Math.max(0.05 * f1, 0.05);
+
+    /* ── Construction correcte de référence (pour <tans>) ── */
+    var tansRayList = '[[0,' + _n(AB) + ',[[' + _n(xA) + ',0,1]]],'
+        + '[' + _n(m1e) + ',' + _n(p1e) + ',[[0,' + _n(xA1) + ',1]]],'
+        + '[' + _n(m2) + ',' + _n(p2) + ',[[' + _n(xA) + ',' + _n(xA1) + ',1]]],'
+        + '[' + _n(m3i) + ',' + _n(p3i) + ',[[' + _n(xA) + ',0,1]]],'
+        + '[' + _n(m3e) + ',' + _n(p3e) + ',[[0,' + _n(xA1) + ',1]]],'
+        + '[' + _n(mC) + ',' + _n(pC) + ',[[' + _n(xA1) + ',' + _n(xmaxG) + ',1]]],'
+        + '[' + _n(mDi) + ',' + _n(pDi) + ',[[' + _n(xA1) + ',' + _n(d) + ',1]]],'
+        + '[' + _n(mDe) + ',' + _n(pDe) + ',[[' + _n(d) + ',' + _n(xmaxG) + ',1]]]'
+        + ']';
+    var tansPtList = '[["B1",' + _n(xA1) + ',' + _n(ABp) + ']]';
+    var tans = 'microscope_construction(' + tansRayList + ',' + tansPtList + ')';
+
+    var jxg = _microscopeConstructionJXG(X, {
+        f1: f1, f2: f2, d: _n1(d), xA: xA, AB: AB,
+        X_MIN: X_MIN, X_MAX: X_MAX, Y_MIN: Y_MIN, Y_MAX: Y_MAX,
+        lens1H: lens1H, lens2H: lens2H, dispW: dispW
+    });
+
+    /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
+    var vars = 'f1: ' + _n(f1) + '$\n'
+        + 'f2: ' + _n(f2) + '$\n'
+        + 'xA: ' + _n(xA) + '$\n'
+        + 'AB: ' + _n(AB) + '$\n'
+        + 'xF1: -f1$\n' + 'xF1p: f1$\n'
+        + 'xA1: f1*xA/(xA+f1)$\n'
+        + 'gam: xA1/xA$\n'
+        + 'ABp: gam*AB$\n'
+        + 'd: xA1+f2$\n\n'
+        + 'm1e: -AB/xF1p$\n' + 'p1e: AB$\n'
+        + 'm2: AB/xA$\n' + 'p2: 0$\n'
+        + 'm3i: AB/(xA-xF1)$\n' + 'p3i: -m3i*xF1$\n'
+        + 'm3e: 0$\n' + 'p3e: p3i$\n\n'
+        + 'mC: -ABp/f2$\n' + 'pC: -mC*d$\n'
+        + 'mDi: 0$\n' + 'pDi: ABp$\n'
+        + 'mDe: -ABp/f2$\n' + 'pDe: ABp-mDe*d$\n\n'
+        + 'xmin: ' + xminG + '$\n'
+        + 'xmax: ' + xmaxG + '$\n'
+        + 'xtol: ' + xtol + '$\n\n'
+        + _opticsConstructionMaximaHelpers()
+        + '\nrequire_mc(mc) := block(\n'
+        + '  if not is(safe_op(mc) = "microscope_construction") or not is(length(mc) = 2) then\n'
+        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction microscope_construction(rayons,points))."\n'
+        + '  else\n'
+        + '    true\n'
+        + ')$\n\n'
+        + 'ans' + X + '_validator(ex) := stack_seq_validator(ex, [require_mc])$';
+
+    var inputXML = '    <input>\n'
+        + '      <name>ans' + X + '</name>\n'
+        + '      <type>algebraic</type>\n'
+        + '      <tans><![CDATA[' + tans + ']]></tans>\n'
+        + '      <boxsize>60</boxsize><strictsyntax>1</strictsyntax>'
+        + '<insertstars>0</insertstars><syntaxhint></syntaxhint>'
+        + '<syntaxattribute>0</syntaxattribute><forbidwords></forbidwords>'
+        + '<allowwords>microscope_construction</allowwords><forbidfloat>0</forbidfloat>'
+        + '<requirelowestterms>0</requirelowestterms><checkanswertype>0</checkanswertype>'
+        + '<mustverify>1</mustverify><showvalidation>2</showvalidation>'
+        + '<options>validator:ans' + X + '_validator</options>\n    </input>';
+
+    /* ── PRT : rayons objectif (3, → point B1) + rayons oculaire (2, faisceau émergent) ── */
+    var fbVars = '[rayList, ptList]: args(ans' + X + ')$\n\n'
+        + 'att1: is(found_ray(rayList, m1e, p1e, 0.05, 0.3))$\n'
+        + 'att2: is(found_ray(rayList, m2, p2, 0.05, 0.3))$\n'
+        + 'att3: is(found_ray(rayList, m3i, p3i, 0.05, 0.3) or found_ray(rayList, m3e, p3e, 0.05, 0.3))$\n'
+        + 'att4: is(found_ray(rayList, mC, pC, 0.05, 0.3))$\n'
+        + 'att5: is(found_ray(rayList, mDi, pDi, 0.05, 0.3) or found_ray(rayList, mDe, pDe, 0.05, 0.3))$\n'
+        + 'any_attempt: is(att1 or att2 or att3 or att4 or att5)$\n\n'
+        + 'l1_ok: is(seg_required_status(rayList, m1e, p1e, 0.05, 0.3, 0, xA1, xtol, 1))$\n'
+        + 'l2_ok: is(seg_required_status(rayList, m2, p2, 0.05, 0.3, xA, xA1, xtol, 1))$\n'
+        + 'l3a_ok: is(seg_required_status(rayList, m3i, p3i, 0.05, 0.3, xA, 0, xtol, 1))$\n'
+        + 'l3b_ok: is(seg_required_status(rayList, m3e, p3e, 0.05, 0.3, 0, xA1, xtol, 1))$\n'
+        + 'l3_ok: is(l3a_ok and l3b_ok)$\n'
+        + 'l4_ok: is(seg_required_status(rayList, mC, pC, 0.05, 0.3, xA1, xmax, xtol, 1))$\n'
+        + 'l5a_ok: is(seg_required_status(rayList, mDi, pDi, 0.05, 0.3, xA1, d, xtol, 1))$\n'
+        + 'l5b_ok: is(seg_required_status(rayList, mDe, pDe, 0.05, 0.3, d, xmax, xtol, 1))$\n'
+        + 'l5_ok: is(l5a_ok and l5b_ok)$\n\n'
+        + 'GEOM_WEIGHT: 0.7$\n\n'
+        + 'l1_geom: att1$\n'
+        + 'l2_geom: att2$\n'
+        + 'l3_geom: att3$\n'
+        + 'l4_geom: att4$\n'
+        + 'l5_geom: att5$\n\n'
+        + 'line_score(full_ok, geom_ok) := if full_ok then 1 else (if geom_ok then GEOM_WEIGHT else 0)$\n\n'
+        + 'l1_score: line_score(l1_ok, l1_geom)$\n'
+        + 'l2_score: line_score(l2_ok, l2_geom)$\n'
+        + 'l3_score: line_score(l3_ok, l3_geom)$\n'
+        + 'l4_score: line_score(l4_ok, l4_geom)$\n'
+        + 'l5_score: line_score(l5_ok, l5_geom)$\n\n'
+        + 'nb_bonnes: l1_score + l2_score + l3_score + l4_score + l5_score$\n\n'
+        + 'nb_attempts: length(sublist(rayList, lambda([r], not stringp(r[1]))))$\n'
+        + 'nb_total: max(nb_attempts, 2)$\n'
+        + 'score_rayons: min(nb_bonnes / nb_total, 1)$\n\n'
+        + 'nb_full_ok: (if l1_ok then 1 else 0) + (if l2_ok then 1 else 0) + (if l3_ok then 1 else 0)$\n'
+        + 'have2: is(nb_full_ok >= 2)$\n\n'
+        + 'c_point: is(found_point(ptList, xA1, ABp, ' + xtol + '))$';
+
+    var fbBilan = '<p><strong>Bilan des rayons particuliers :</strong></p>\n'
+        + '[[if test="any_attempt"]]<ul>\n'
+        + "[[if test=\"att1\"]]<li>Rayon issu de B, parallèle à l'axe, émergent par F'&#8321; : [[if test=\"l1_ok\"]]<span style=\"color:#1e7e34;\">&#10003; correct</span>[[else]]<span style=\"color:#d68910;\">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n"
+        + '[[if test="att2"]]<li>Rayon issu de B par le centre O&#8321; (non dévié) : [[if test="l2_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
+        + "[[if test=\"att3\"]]<li>Rayon issu de B par le foyer F&#8321;, émergent parallèle à l'axe : [[if test=\"l3_ok\"]]<span style=\"color:#1e7e34;\">&#10003; correct (incident et émergent)</span>[[else]]<span style=\"color:#d68910;\">le tracé est bien positionné, mais un tronçon n'a pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n"
+        + '[[if test="att4"]]<li>Rayon issu de B&#8321; par le centre O&#8322; (non dévié) : [[if test="l4_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
+        + '[[if test="att5"]]<li>Rayon issu de B&#8321;, parallèle à l\'axe, émergent par F\'&#8322; : [[if test="l5_ok"]]<span style="color:#1e7e34;">&#10003; correct (incident et émergent)</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais un tronçon n\'a pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n'
+        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+
+    var canonicalNodes = [
+        {
+            name: '0', description: 'Rayons particuliers — score proportionnel', answertest: 'AlgEquiv',
+            sans: 'true', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: 'score_rayons*5/6', truepenalty: '', truenextnode: '1',
+            trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '1',
+            falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
+        },
+        {
+            name: '1', description: 'Point image intermédiaire B1', answertest: 'AlgEquiv',
+            sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
+            truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '-1',
+            trueanswernote: 'prt' + X + '-1-T',
+            truefeedback: "<p>Le point B1 est correctement placé à l'intersection des rayons issus de l'objectif L&#8321;, dans le plan focal objet F&#8322; de l'oculaire.</p>",
+            falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
+            falseanswernote: 'prt' + X + '-1-F',
+            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B1. [[if test=\"have2\"]]Vous avez bien"
+                + ' des rayons particuliers géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B1 est placé'
+                + " précisément à l'intersection de deux des trois rayons issus de l'objectif L&#8321;.[[else]]Le point B1 ne peut être placé"
+                + " correctement que si les rayons issus de l'objectif sont d'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>"
+        }
+    ];
+    var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
+    var prtXML  = buildPrtXml(prtMeta, canonicalNodes);
+
+    var genFbDefault = "<p>L'objectif L&#8321; (f'&#8321;&nbsp;=&nbsp;" + _n(f1) + '&nbsp;cm) forme, de l\'objet réel AB (au-delà de son foyer objet F&#8321;),'
+        + ' une image réelle intermédiaire A&#8321;B&#8321;, renversée et agrandie (grandissement γ&nbsp;=&nbsp;' + _n(gam) + ').</p>\n<ul>\n'
+        + "<li>Trois rayons remarquables issus de B convergent après l'objectif au point B&#8321;.</li>\n"
+        + "<li>L'oculaire L&#8322; (f'&#8322;&nbsp;=&nbsp;" + _n(f2) + '&nbsp;cm) est placé de sorte que A&#8321;B&#8321; soit exactement dans son plan focal'
+        + ' objet F&#8322; (réglage pour un œil normal) : les rayons issus de B&#8321; ressortent alors parallèles entre eux, l\'image finale'
+        + ' étant à l\'infini (système afocal).</li></ul>';
+
+    var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
+        + '<strong>Données :</strong> f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm, '
+        + 'f\'&#8322;&nbsp;=&nbsp;' + _n(f2) + '&nbsp;cm, O&#8321;A&nbsp;=&nbsp;' + _n(xA) + '&nbsp;cm, AB&nbsp;=&nbsp;' + _n(AB) + '&nbsp;cm</p>\n';
+
+    var instructions = '<div class="stack-comment">'
+        + '<h2>Construction — Microscope (réglage pour un œil normal)</h2>'
+        + '<p>L\'objectif L&#8321; a une distance focale f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm ; l\'objet AB, de hauteur ' + _n(AB) + '&nbsp;cm, est placé'
+        + ' en O&#8321;A&nbsp;=&nbsp;' + _n(xA) + '&nbsp;cm (au-delà du foyer objet F&#8321;). L\'oculaire L&#8322; a une distance focale f\'&#8322;&nbsp;=&nbsp;'
+        + _n(f2) + '&nbsp;cm.</p>'
+        + '<p>À l\'aide des outils ci-dessous, <strong>tracez d\'abord au moins deux des trois rayons remarquables issus de B</strong>'
+        + ' à travers l\'objectif L&#8321; (parallèle à l\'axe puis par F\'&#8321; ; par le centre O&#8321; ; par F&#8321; puis émergent parallèle'
+        + ' à l\'axe), utilisez <strong>« Intersection (2 clics) &rarr; point B1 »</strong> pour construire le point image intermédiaire B&#8321;,'
+        + ' puis <strong>tracez les deux rayons issus de B&#8321;</strong> à travers l\'oculaire L&#8322; (par le centre O&#8322; ; parallèle à'
+        + ' l\'axe jusqu\'à L&#8322; puis émergent par F\'&#8322;) : le faisceau émergent est parallèle (image finale à l\'infini).</p>'
+        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
+        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
+        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> — c\'est le cas attendu ici pour tous les tronçons.</p></div>';
+
+    var textFrag = '<div style="background:#9333ea;border-left:5px solid #6b21a8;'
+        + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
+        + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
+        + ' — ' + I18N.t('opt.title_microscope') + '</strong>'
+        + '<span style="background:#6b21a8;color:#fff;padding:2px 9px;border-radius:20px;'
+        + 'font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>\n'
+        + '<!-- ENONCE-START -->' + (text || '') + instructions + '<!-- ENONCE-END -->\n'
+        + dataRow
+        + '<!--HS-KBD:' + X + '-->';
+
+    var kbdBlock = '[[jsxgraph input-ref-ans' + X + '="state" width="' + dispW + 'px" aspect-ratio="' + (dispW / dispH).toFixed(3) + '"]]\n'
+        + jxg + '\n[[/jsxgraph]]\n\n'
+        + '<div style="display:none">[[input:ans' + X + ']] [[validation:ans' + X + ']]</div>';
+
+    return {
+        bareme:          bareme,
+        vars:            vars,
+        qnote:           'Optique-Microscope Q' + X + ' f1=' + f1 + ' f2=' + f2 + ' oa=' + oaIn,
+        textFrag:        textFrag,
+        kbdRaw:          kbdBlock,
+        inputXML:        inputXML,
+        prtXML:          prtXML,
+        generalFeedback: _mkFbGen(genFbDefault, v('opt-fbgen')),
+        feedbackRef:     '[[feedback:prt' + X + ']]',
+        prt:             { meta: prtMeta, nodes: canonicalNodes }
+    };
+}
