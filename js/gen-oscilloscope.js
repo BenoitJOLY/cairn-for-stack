@@ -453,21 +453,45 @@ function _oscSimplePair(idPrefix, q1, q2, neutral){
    GÉNÉRATEUR PRINCIPAL — genOscilloscope(X)
    ══════════════════════════════════════════════════════════════ */
 function genOscilloscope(X){
-  var mode    = v('osc-mode') || 'periode_frequence';
-  var pedMode = v('osc-ped-mode') || 'guide';
-  var bareme = parseFloat(v('osc-bareme')) || 1;
-  var text   = richVal('osc-text');
-  var fbGen  = v('osc-fbgen');
-  var shIdx  = parseInt(document.getElementById('osc-sh-idx').value);
-  var svIdx  = parseInt(document.getElementById('osc-sv-idx').value);
+  var p = {
+    mode:    v('osc-mode') || 'periode_frequence',
+    pedMode: v('osc-ped-mode') || 'guide',
+    bareme:  parseFloat(v('osc-bareme')) || 1,
+    text:    richVal('osc-text'),
+    fbGen:   v('osc-fbgen'),
+    shIdx:   parseInt(document.getElementById('osc-sh-idx').value),
+    svIdx:   parseInt(document.getElementById('osc-sv-idx').value),
+    forme:     v('osc-forme') || 'aleatoire',
+    freqMode:  v('osc-freq-mode') || 'fixed',
+    ffreq:     parseFloat(v('osc-ffreq')) || 500,
+    umax:      parseFloat(v('osc-umax'))  || 3,
+    evBase:    parseFloat(v('osc-evolt-base')) || 2000,
+    evRange:   parseFloat(v('osc-evolt-range')) || 1000,
+    tauBase:   parseFloat(v('osc-tau-base')) || 1000,
+    tauRange:  parseFloat(v('osc-tau-range')) || 1000,
+    fCarrier:  parseFloat(v('osc-fcarrier')) || 4000000,
+    fMod:      parseFloat(v('osc-fmod'))     || 2000,
+    dtMin:     parseFloat(v('osc-dt-min'))   || 4,
+    dtMax:     parseFloat(v('osc-dt-max'))   || 8
+  };
+  return genOscilloscopeCore(X, p);
+}
+
+function genOscilloscopeCore(X, p, deps){
+  deps = deps || {};
+  var I18N_D = deps.I18N || I18N;
+  var _oscInputHintsHTML_D = deps._oscInputHintsHTML || _oscInputHintsHTML;
+  var _oscSimplePair_D = deps._oscSimplePair || _oscSimplePair;
+
+  var mode = p.mode, pedMode = p.pedMode, bareme = p.bareme, text = p.text, fbGen = p.fbGen, shIdx = p.shIdx, svIdx = p.svIdx;
 
   var vars='', jsx='', textFrag='', previewFrag='', inputXML='', qnote='', genFb='', canonicalNodes=[], prtValue=bareme;
 
   if(mode==='periode_frequence'){
-    var forme    = v('osc-forme') || 'aleatoire';
-    var freqMode = v('osc-freq-mode') || 'fixed';
-    var ffreq    = parseFloat(v('osc-ffreq')) || 500;
-    var umax     = parseFloat(v('osc-umax'))  || 3;
+    var forme    = p.forme;
+    var freqMode = p.freqMode;
+    var ffreq    = p.ffreq;
+    var umax     = p.umax;
 
     var typeExpr, typeTextExpr;
     if(forme==='sinus'){ typeExpr='1'; }
@@ -500,20 +524,20 @@ function genOscilloscope(X){
       freqExpr: '{#ta'+X+'_f#}', umExpr: '{#ta'+X+'_um#}', typeExpr: '{#ta'+X+'_type_val#}'
     });
 
-    var header = _oscHeader(X, bareme, I18N.t('osc.title_periode_frequence'), {bg:'#0c4a6e',accent:'#0369a1'}, '📏', I18N.t('osc.subtitle_grandeur_physique'));
+    var header = _oscHeader(X, bareme, I18N_D.t('osc.title_periode_frequence'), {bg:'#0c4a6e',accent:'#0369a1'}, '📏', I18N_D.t('osc.subtitle_grandeur_physique'));
     textFrag = header
       + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
-      + '<p><strong>' + I18N.t('osc.consigne_lbl') + '</strong> ' + I18N.t('osc.consigne_periode_frequence', {X: X}) + '</p>'
+      + '<p><strong>' + I18N_D.t('osc.consigne_lbl') + '</strong> ' + I18N_D.t('osc.consigne_periode_frequence', {X: X}) + '</p>'
       + (text||'') + '</div><!-- ENONCE-END -->\n'
       + '<div><!--HS-KBD:'+X+'--></div>\n'
-      + _oscInputHintsHTML('<code>10*ms</code>')
-      + '<p>' + I18N.t('osc.label_periode_mesuree') + '[[input:ans_T'+X+']] [[validation:ans_T'+X+']]</p>\n'
-      + '<p>' + I18N.t('osc.label_frequence_deduite') + '[[input:ans_F'+X+']] [[validation:ans_F'+X+']]</p>';
+      + _oscInputHintsHTML_D('<code>10*ms</code>')
+      + '<p>' + I18N_D.t('osc.label_periode_mesuree') + '[[input:ans_T'+X+']] [[validation:ans_T'+X+']]</p>\n'
+      + '<p>' + I18N_D.t('osc.label_frequence_deduite') + '[[input:ans_F'+X+']] [[validation:ans_F'+X+']]</p>';
 
     previewFrag = header
       + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
       + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#1e3a5f;font-family:monospace;font-size:.85rem;">'
-      + I18N.t('osc.preview_periode_frequence') + forme + I18N.t('osc.preview_frequence_sep') + (freqMode==='alea'?I18N.t('osc.freq_alea_preview'):ffreq+' Hz')
+      + I18N_D.t('osc.preview_periode_frequence') + forme + I18N_D.t('osc.preview_frequence_sep') + (freqMode==='alea'?I18N_D.t('osc.freq_alea_preview'):ffreq+' Hz')
       + '</div>';
 
     inputXML = _oscUnitsInput('ans_T'+X, '1.0*ta'+X+'_T')
@@ -536,39 +560,39 @@ function genOscilloscope(X){
 
     if(pedMode==='guide'){
       canonicalNodes = [
-        _oscNode('0','Vérification de l\'unité de T','UnitsAbsolute','eleve_unit_T'+X,'teacher_unit_T'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N.t('osc.fb_periode_unite_ko',{X:X}))),
-        _oscNode('1','Vérification de la valeur de T (conversion unité)','UnitsRelative','ans_T'+X,'ta'+X+'_T','ta'+X+'_precision_T','+',0.25,2,'prt'+X+'-1-T',_oscOk(I18N.t('osc.fb_periode_ok')),'-',0,4,'prt'+X+'-1-F',_oscKo(I18N.t('osc.fb_periode_valeur_ko'))),
-        _oscNode('2','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_F'+X,'teacher_unit_F'+X,'0','+',0.25,3,'prt'+X+'-2-T','','-',0,-1,'prt'+X+'-2-F',_oscKo(I18N.t('osc.fb_frequence_unite_ko',{X:X}))),
-        _oscNode('3','Vérification de la valeur de f','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0.05','+',0.25,-1,'prt'+X+'-3-T',_oscOk(I18N.t('osc.fb_frequence_ok')),'-',0,-1,'prt'+X+'-3-F',_oscKo(I18N.t('osc.fb_frequence_valeur_ko'))),
-        _oscNode('4','Unité de f dans le cas où T est faux','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0','+',0,5,'prt'+X+'-4-T','','-',0,-1,'prt'+X+'-4-F',_oscKo(I18N.t('osc.fb_frequence_unite_incoherente'))),
-        _oscNode('5','Cohérence f = 1/T (réponse élève)','UnitsRelative','ans_F'+X,'1/ans_T'+X,'0.05','+',0,-1,'prt'+X+'-5-T',_oscTrap(I18N.t('osc.fb_frequence_coherente_trap')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N.t('osc.fb_frequence_incoherente')))
+        _oscNode('0','Vérification de l\'unité de T','UnitsAbsolute','eleve_unit_T'+X,'teacher_unit_T'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_periode_unite_ko',{X:X}))),
+        _oscNode('1','Vérification de la valeur de T (conversion unité)','UnitsRelative','ans_T'+X,'ta'+X+'_T','ta'+X+'_precision_T','+',0.25,2,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_periode_ok')),'-',0,4,'prt'+X+'-1-F',_oscKo(I18N_D.t('osc.fb_periode_valeur_ko'))),
+        _oscNode('2','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_F'+X,'teacher_unit_F'+X,'0','+',0.25,3,'prt'+X+'-2-T','','-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_frequence_unite_ko',{X:X}))),
+        _oscNode('3','Vérification de la valeur de f','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0.05','+',0.25,-1,'prt'+X+'-3-T',_oscOk(I18N_D.t('osc.fb_frequence_ok')),'-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_frequence_valeur_ko'))),
+        _oscNode('4','Unité de f dans le cas où T est faux','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0','+',0,5,'prt'+X+'-4-T','','-',0,-1,'prt'+X+'-4-F',_oscKo(I18N_D.t('osc.fb_frequence_unite_incoherente'))),
+        _oscNode('5','Cohérence f = 1/T (réponse élève)','UnitsRelative','ans_F'+X,'1/ans_T'+X,'0.05','+',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_frequence_coherente_trap')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N_D.t('osc.fb_frequence_incoherente')))
       ];
     } else {
-      canonicalNodes = _oscSimplePair('prt'+X,
-        {label:I18N.t('osc.label_periode'),   sans:'ans_T'+X, tans:'ta'+X+'_T',  testopt:'ta'+X+'_precision_T'},
-        {label:I18N.t('osc.label_frequence'), sans:'ans_F'+X, tans:'ta'+X+'_fq', testopt:'0.05'},
+      canonicalNodes = _oscSimplePair_D('prt'+X,
+        {label:I18N_D.t('osc.label_periode'),   sans:'ans_T'+X, tans:'ta'+X+'_T',  testopt:'ta'+X+'_precision_T'},
+        {label:I18N_D.t('osc.label_frequence'), sans:'ans_F'+X, tans:'ta'+X+'_fq', testopt:'0.05'},
         pedMode==='expert');
     }
 
     qnote = 'Type: {@ta'+X+'_type_text@} | f={@ta'+X+'_f@} Hz, T={@ta'+X+'_T@}, f={@ta'+X+'_fq@}';
     genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-      + '<div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px;">' + I18N.t('osc.genfb_reponses_attendues') + '</div>'
+      + '<div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
-      + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N.t('osc.genfb_q1_periode') + '</span> <p>' + I18N.t('osc.genfb_periode_explanation', {X: X}) + '</p></div>'
+      + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N_D.t('osc.genfb_q1_periode') + '</span> <p>' + I18N_D.t('osc.genfb_periode_explanation', {X: X}) + '</p></div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;">'
-      + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N.t('osc.genfb_q2_frequence') + '</span> <p>' + I18N.t('osc.genfb_frequence_explanation') + '</p>'
-      + '<p>' + I18N.t('osc.genfb_frequence_calcul', {X: X}) + '</p></div></div>';
+      + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N_D.t('osc.genfb_q2_frequence') + '</span> <p>' + I18N_D.t('osc.genfb_frequence_explanation') + '</p>'
+      + '<p>' + I18N_D.t('osc.genfb_frequence_calcul', {X: X}) + '</p></div></div>';
 
     var prtMeta = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv };
-    return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta, canonicalNodes, genFb, fbGen, jsx);
+    return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta, canonicalNodes, genFb, fbGen, jsx, deps);
   }
 
   if(mode==='rc_charge' || mode==='rc_decharge'){
     var decharge = (mode==='rc_decharge');
-    var evBase  = parseFloat(v('osc-evolt-base')) || 2000;
-    var evRange = parseFloat(v('osc-evolt-range')) || 1000;
-    var tauBase = parseFloat(v('osc-tau-base')) || 1000;
-    var tauRange= parseFloat(v('osc-tau-range')) || 1000;
+    var evBase  = p.evBase;
+    var evRange = p.evRange;
+    var tauBase = p.tauBase;
+    var tauRange= p.tauRange;
 
     vars = '/* Q'+X+' : Oscilloscope — '+(decharge?'Décharge':'Charge')+' RC ('+bareme+'pt) */\n'
       + 'ta'+X+'_ev_val: '+evBase+' + rand('+evRange+');\n'
@@ -581,29 +605,29 @@ function genOscilloscope(X){
 
     jsx = buildOscJSXCode_RC({ si: svIdx, ti: shIdx, evExpr:'{#ta'+X+'_ev_val#}', tauExpr:'{#ta'+X+'_tau_val#}', decharge: decharge });
 
-    var titre = decharge ? I18N.t('osc.title_rc_decharge') : I18N.t('osc.title_rc_charge');
-    var header2 = _oscHeader(X, bareme, titre, {bg:'#0c4a6e',accent:'#0369a1'}, '📏', I18N.t('osc.subtitle_grandeur_physique'));
+    var titre = decharge ? I18N_D.t('osc.title_rc_decharge') : I18N_D.t('osc.title_rc_charge');
+    var header2 = _oscHeader(X, bareme, titre, {bg:'#0c4a6e',accent:'#0369a1'}, '📏', I18N_D.t('osc.subtitle_grandeur_physique'));
     var consigneY = decharge
-      ? I18N.t('osc.consigne_y_decharge')
-      : I18N.t('osc.consigne_y_charge');
+      ? I18N_D.t('osc.consigne_y_decharge')
+      : I18N_D.t('osc.consigne_y_charge');
     var consigneTau = decharge
-      ? I18N.t('osc.consigne_tau_decharge')
-      : I18N.t('osc.consigne_tau_charge');
+      ? I18N_D.t('osc.consigne_tau_decharge')
+      : I18N_D.t('osc.consigne_tau_charge');
 
     textFrag = header2
       + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
-      + '<p>' + I18N.t('osc.rc_intro', {mode: decharge ? I18N.t('osc.mot_decharge') : I18N.t('osc.mot_charge')}) + '</p>'
-      + '<p><strong>' + I18N.t('osc.consigne_lbl') + '</strong><ul><li>'+consigneY+'</li><li>'+consigneTau+'</li></ul></p>'
+      + '<p>' + I18N_D.t('osc.rc_intro', {mode: decharge ? I18N_D.t('osc.mot_decharge') : I18N_D.t('osc.mot_charge')}) + '</p>'
+      + '<p><strong>' + I18N_D.t('osc.consigne_lbl') + '</strong><ul><li>'+consigneY+'</li><li>'+consigneTau+'</li></ul></p>'
       + (text||'') + '</div><!-- ENONCE-END -->\n'
       + '<div><!--HS-KBD:'+X+'--></div>\n'
-      + _oscInputHintsHTML('<code>1500*us</code> ' + I18N.t('osc.pour_us'))
-      + '<p>' + I18N.t('osc.label_tau_mesuree') + '[[input:ans_tau'+X+']] [[validation:ans_tau'+X+']]</p>\n'
-      + '<p>' + I18N.t('osc.label_tension_mesuree', {mode: decharge ? I18N.t('osc.mot_initiale') : I18N.t('osc.mot_finale')}) + '[[input:ans_E'+X+']] [[validation:ans_E'+X+']]</p>';
+      + _oscInputHintsHTML_D('<code>1500*us</code> ' + I18N_D.t('osc.pour_us'))
+      + '<p>' + I18N_D.t('osc.label_tau_mesuree') + '[[input:ans_tau'+X+']] [[validation:ans_tau'+X+']]</p>\n'
+      + '<p>' + I18N_D.t('osc.label_tension_mesuree', {mode: decharge ? I18N_D.t('osc.mot_initiale') : I18N_D.t('osc.mot_finale')}) + '[[input:ans_E'+X+']] [[validation:ans_E'+X+']]</p>';
 
     previewFrag = header2
       + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
       + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#1e3a5f;font-family:monospace;font-size:.85rem;">'
-      + I18N.t('osc.preview_rc', {mode: decharge ? I18N.t('osc.mot_decharge') : I18N.t('osc.mot_charge')}) + '</div>';
+      + I18N_D.t('osc.preview_rc', {mode: decharge ? I18N_D.t('osc.mot_decharge') : I18N_D.t('osc.mot_charge')}) + '</div>';
 
     inputXML = _oscUnitsInput('ans_E'+X, 'ta'+X+'_E') + '\n' + _oscUnitsInput('ans_tau'+X, 'ta'+X+'_tau');
 
@@ -623,37 +647,37 @@ function genOscilloscope(X){
 
     if(pedMode==='guide'){
       canonicalNodes = [
-        _oscNode('0','Vérification de l\'unité de tau','UnitsAbsolute','eleve_unit_tau'+X,'teacher_unit_tau'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N.t('osc.fb_tau_unite_ko',{X:X}))),
-        _oscNode('1','Vérification de la valeur de tau','UnitsRelative','ans_tau'+X,'ta'+X+'_tau','ta'+X+'_precision_q','+',0.25,3,'prt'+X+'-1-T',_oscOk(I18N.t('osc.fb_tau_correcte')),'-',0,2,'prt'+X+'-1-F',''),
-        _oscNode('2','Piège Tau — A-t-il mis E ?','UnitsRelative','ans_tau'+X,'ta'+X+'_E','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N.t('osc.fb_tau_trap_e')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N.t('osc.fb_tau_valeur_ko',{pct: decharge?I18N.t('osc.pct_368'):I18N.t('osc.pct_632')}))),
-        _oscNode('3','Vérification de l\'unité de E','UnitsAbsolute','eleve_unit_E'+X,'teacher_unit_E'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N.t('osc.fb_tension_unite_ko',{X:X}))),
-        _oscNode('4','Vérification de la valeur de E','UnitsRelative','ans_E'+X,'ta'+X+'_E','0.05','+',0.25,-1,'prt'+X+'-4-T',_oscOk(I18N.t('osc.fb_tension_correcte')),'-',0,5,'prt'+X+'-4-F',''),
-        _oscNode('5','Piège E — A-t-il mis tau ?','UnitsRelative','ans_E'+X,'ta'+X+'_tau','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N.t('osc.fb_tension_trap_tau')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N.t('osc.fb_tension_valeur_ko')))
+        _oscNode('0','Vérification de l\'unité de tau','UnitsAbsolute','eleve_unit_tau'+X,'teacher_unit_tau'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_tau_unite_ko',{X:X}))),
+        _oscNode('1','Vérification de la valeur de tau','UnitsRelative','ans_tau'+X,'ta'+X+'_tau','ta'+X+'_precision_q','+',0.25,3,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_tau_correcte')),'-',0,2,'prt'+X+'-1-F',''),
+        _oscNode('2','Piège Tau — A-t-il mis E ?','UnitsRelative','ans_tau'+X,'ta'+X+'_E','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N_D.t('osc.fb_tau_trap_e')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_tau_valeur_ko',{pct: decharge?I18N_D.t('osc.pct_368'):I18N_D.t('osc.pct_632')}))),
+        _oscNode('3','Vérification de l\'unité de E','UnitsAbsolute','eleve_unit_E'+X,'teacher_unit_E'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_tension_unite_ko',{X:X}))),
+        _oscNode('4','Vérification de la valeur de E','UnitsRelative','ans_E'+X,'ta'+X+'_E','0.05','+',0.25,-1,'prt'+X+'-4-T',_oscOk(I18N_D.t('osc.fb_tension_correcte')),'-',0,5,'prt'+X+'-4-F',''),
+        _oscNode('5','Piège E — A-t-il mis tau ?','UnitsRelative','ans_E'+X,'ta'+X+'_tau','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_tension_trap_tau')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N_D.t('osc.fb_tension_valeur_ko')))
       ];
     } else {
-      canonicalNodes = _oscSimplePair('prt'+X,
-        {label:I18N.t('osc.label_constante_temps'), sans:'ans_tau'+X, tans:'ta'+X+'_tau', testopt:'ta'+X+'_precision_q'},
-        {label:I18N.t('osc.label_tension'),            sans:'ans_E'+X,   tans:'ta'+X+'_E',   testopt:'0.05'},
+      canonicalNodes = _oscSimplePair_D('prt'+X,
+        {label:I18N_D.t('osc.label_constante_temps'), sans:'ans_tau'+X, tans:'ta'+X+'_tau', testopt:'ta'+X+'_precision_q'},
+        {label:I18N_D.t('osc.label_tension'),            sans:'ans_E'+X,   tans:'ta'+X+'_E',   testopt:'0.05'},
         pedMode==='expert');
     }
 
     qnote = 'E={@ta'+X+'_E@} | tau={@ta'+X+'_tau@}';
     genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-      + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N.t('osc.genfb_reponses_attendues') + '</div>'
+      + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
-      + '<span style="font-weight:bold;color:#0f766e;">' + I18N.t('osc.genfb_q1_tau') + '</span> <p>' + I18N.t('osc.genfb_tau_explanation', {pct: decharge?I18N.t('osc.pct_368'):I18N.t('osc.pct_632'), X: X}) + '</p></div>'
+      + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q1_tau') + '</span> <p>' + I18N_D.t('osc.genfb_tau_explanation', {pct: decharge?I18N_D.t('osc.pct_368'):I18N_D.t('osc.pct_632'), X: X}) + '</p></div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;">'
-      + '<span style="font-weight:bold;color:#0f766e;">' + I18N.t('osc.genfb_q2_tension', {mode: decharge?I18N.t('osc.mot_initiale'):I18N.t('osc.mot_finale')}) + '</span> <p>' + I18N.t('osc.genfb_tension_explanation', {X: X}) + '</p></div></div>';
+      + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q2_tension', {mode: decharge?I18N_D.t('osc.mot_initiale'):I18N_D.t('osc.mot_finale')}) + '</span> <p>' + I18N_D.t('osc.genfb_tension_explanation', {X: X}) + '</p></div></div>';
 
     var prtMeta2 = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv2 };
-    return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta2, canonicalNodes, genFb, fbGen, jsx);
+    return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta2, canonicalNodes, genFb, fbGen, jsx, deps);
   }
 
   /* mode === 'retard' */
-  var fCarrier = parseFloat(v('osc-fcarrier')) || 4000000;
-  var fMod     = parseFloat(v('osc-fmod'))     || 2000;
-  var dtMin    = parseFloat(v('osc-dt-min'))   || 4;
-  var dtMax    = parseFloat(v('osc-dt-max'))   || 8;
+  var fCarrier = p.fCarrier;
+  var fMod     = p.fMod;
+  var dtMin    = p.dtMin;
+  var dtMax    = p.dtMax;
 
   vars = '/* Q'+X+' : Oscilloscope — Retard ultrasonore ('+bareme+'pt) */\n'
     + 'ta'+X+'_f_carrier_val: '+fCarrier+';\n'
@@ -670,21 +694,21 @@ function genOscilloscope(X){
 
   jsx = buildOscJSXCode_Retard({ siA: svIdx, siB: Math.min(OSC_SV.length-1, svIdx+1), ti: shIdx, fcExpr:'{#ta'+X+'_f_carrier_val#}', dtExpr:'{#ta'+X+'_dt_val#}' });
 
-  var header3 = _oscHeader(X, bareme, I18N.t('osc.title_retard'), {bg:'#0f766e',accent:'#14b8a6'}, '📡', I18N.t('osc.subtitle_ondes_mecaniques'));
+  var header3 = _oscHeader(X, bareme, I18N_D.t('osc.title_retard'), {bg:'#0f766e',accent:'#14b8a6'}, '📡', I18N_D.t('osc.subtitle_ondes_mecaniques'));
   textFrag = header3
     + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
-    + '<p><strong>' + I18N.t('osc.consigne_lbl') + '</strong> ' + I18N.t('osc.retard_intro') + '</p>'
-    + '<p>' + I18N.t('osc.retard_determinez') + '</p>'
-    + '<ol style="margin-left:20px;line-height:2;"><li>' + I18N.t('osc.retard_li_frequence') + '</li><li>' + I18N.t('osc.retard_li_delta_t') + '</li></ol>'
+    + '<p><strong>' + I18N_D.t('osc.consigne_lbl') + '</strong> ' + I18N_D.t('osc.retard_intro') + '</p>'
+    + '<p>' + I18N_D.t('osc.retard_determinez') + '</p>'
+    + '<ol style="margin-left:20px;line-height:2;"><li>' + I18N_D.t('osc.retard_li_frequence') + '</li><li>' + I18N_D.t('osc.retard_li_delta_t') + '</li></ol>'
     + (text||'') + '</div><!-- ENONCE-END -->\n'
     + '<div><!--HS-KBD:'+X+'--></div>\n'
-    + _oscInputHintsHTML('<code>25*us</code> ' + I18N.t('osc.pour_us'))
-    + '<p>' + I18N.t('osc.label_frequence_ultrasons') + '[[input:ans_fc'+X+']] [[validation:ans_fc'+X+']]</p>\n'
-    + '<p>' + I18N.t('osc.label_retard_temporel') + '[[input:ans_dt'+X+']] [[validation:ans_dt'+X+']]</p>';
+    + _oscInputHintsHTML_D('<code>25*us</code> ' + I18N_D.t('osc.pour_us'))
+    + '<p>' + I18N_D.t('osc.label_frequence_ultrasons') + '[[input:ans_fc'+X+']] [[validation:ans_fc'+X+']]</p>\n'
+    + '<p>' + I18N_D.t('osc.label_retard_temporel') + '[[input:ans_dt'+X+']] [[validation:ans_dt'+X+']]</p>';
 
   previewFrag = header3
     + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
-    + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#0f766e;font-family:monospace;font-size:.85rem;">' + I18N.t('osc.preview_retard') + '</div>';
+    + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#0f766e;font-family:monospace;font-size:.85rem;">' + I18N_D.t('osc.preview_retard') + '</div>';
 
   inputXML = _oscUnitsInput('ans_dt'+X, 'ta'+X+'_dt') + '\n' + _oscUnitsInput('ans_fc'+X, 'ta'+X+'_fc');
 
@@ -705,31 +729,31 @@ function genOscilloscope(X){
 
   if(pedMode==='guide'){
     canonicalNodes = [
-      _oscNode('0','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_f'+X,'teacher_unit_f'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N.t('osc.fb_freq_unite_ko_retard',{X:X}))),
-      _oscNode('1','Vérification de la valeur de f','UnitsRelative','ans_fc'+X,'ta'+X+'_fc','ta'+X+'_precision_q','+',0.75,3,'prt'+X+'-1-T',_oscOk(I18N.t('osc.fb_freq_correcte_retard')),'-',0,2,'prt'+X+'-1-F',''),
-      _oscNode('2','Piège — Mesure de la fréquence de la salve','UnitsRelative','ans_fc'+X,'ta'+X+'_fm','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N.t('osc.fb_freq_trap_salve')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N.t('osc.fb_freq_valeur_ko_retard'))),
-      _oscNode('3','Vérification de l\'unité du retard','UnitsAbsolute','eleve_unit_dt'+X,'teacher_unit_dt'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N.t('osc.fb_retard_unite_ko',{X:X}))),
-      _oscNode('4','Vérification de la valeur du retard','UnitsRelative','ans_dt'+X,'ta'+X+'_dt','0.05','+',0.75,-1,'prt'+X+'-4-T',_oscOk(I18N.t('osc.fb_retard_correct')),'-',0,5,'prt'+X+'-4-F',''),
-      _oscNode('5','Piège Retard — A-t-il mis la période du signal ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_periode','0.05','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N.t('osc.fb_retard_trap_periode')),'-',0,6,'prt'+X+'-5-F',''),
-      _oscNode('6','Piège Retard — A-t-il mis T/2 ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_demi_periode','0.05','-',0,-1,'prt'+X+'-6-T',_oscTrap(I18N.t('osc.fb_retard_trap_demi_periode')),'-',0,-1,'prt'+X+'-6-F',_oscKo(I18N.t('osc.fb_retard_valeur_ko')))
+      _oscNode('0','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_f'+X,'teacher_unit_f'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_freq_unite_ko_retard',{X:X}))),
+      _oscNode('1','Vérification de la valeur de f','UnitsRelative','ans_fc'+X,'ta'+X+'_fc','ta'+X+'_precision_q','+',0.75,3,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_freq_correcte_retard')),'-',0,2,'prt'+X+'-1-F',''),
+      _oscNode('2','Piège — Mesure de la fréquence de la salve','UnitsRelative','ans_fc'+X,'ta'+X+'_fm','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N_D.t('osc.fb_freq_trap_salve')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_freq_valeur_ko_retard'))),
+      _oscNode('3','Vérification de l\'unité du retard','UnitsAbsolute','eleve_unit_dt'+X,'teacher_unit_dt'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_retard_unite_ko',{X:X}))),
+      _oscNode('4','Vérification de la valeur du retard','UnitsRelative','ans_dt'+X,'ta'+X+'_dt','0.05','+',0.75,-1,'prt'+X+'-4-T',_oscOk(I18N_D.t('osc.fb_retard_correct')),'-',0,5,'prt'+X+'-4-F',''),
+      _oscNode('5','Piège Retard — A-t-il mis la période du signal ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_periode','0.05','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_retard_trap_periode')),'-',0,6,'prt'+X+'-5-F',''),
+      _oscNode('6','Piège Retard — A-t-il mis T/2 ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_demi_periode','0.05','-',0,-1,'prt'+X+'-6-T',_oscTrap(I18N_D.t('osc.fb_retard_trap_demi_periode')),'-',0,-1,'prt'+X+'-6-F',_oscKo(I18N_D.t('osc.fb_retard_valeur_ko')))
     ];
   } else {
-    canonicalNodes = _oscSimplePair('prt'+X,
-      {label:I18N.t('osc.label_frequence'), sans:'ans_fc'+X, tans:'ta'+X+'_fc', testopt:'ta'+X+'_precision_q'},
-      {label:I18N.t('osc.label_retard'),    sans:'ans_dt'+X, tans:'ta'+X+'_dt', testopt:'0.05'},
+    canonicalNodes = _oscSimplePair_D('prt'+X,
+      {label:I18N_D.t('osc.label_frequence'), sans:'ans_fc'+X, tans:'ta'+X+'_fc', testopt:'ta'+X+'_precision_q'},
+      {label:I18N_D.t('osc.label_retard'),    sans:'ans_dt'+X, tans:'ta'+X+'_dt', testopt:'0.05'},
       pedMode==='expert');
   }
 
   qnote = 'f={@ta'+X+'_f_carrier_val@} Hz | dt={@ta'+X+'_dt@}';
   genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-    + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N.t('osc.genfb_reponses_attendues') + '</div>'
+    + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
     + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
-    + '<span style="font-weight:bold;color:#0f766e;">' + I18N.t('osc.genfb_q1_frequence_retard') + '</span> <p>' + I18N.t('osc.genfb_frequence_retard_explanation', {X: X}) + '</p></div>'
+    + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q1_frequence_retard') + '</span> <p>' + I18N_D.t('osc.genfb_frequence_retard_explanation', {X: X}) + '</p></div>'
     + '<div style="margin-bottom:8px;font-size:.9rem;">'
-    + '<span style="font-weight:bold;color:#0f766e;">' + I18N.t('osc.genfb_q2_retard') + '</span> <p>' + I18N.t('osc.genfb_retard_explanation', {X: X}) + '</p></div></div>';
+    + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q2_retard') + '</span> <p>' + I18N_D.t('osc.genfb_retard_explanation', {X: X}) + '</p></div></div>';
 
   var prtMeta3 = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv3 };
-  return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta3, canonicalNodes, genFb, fbGen, jsx);
+  return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta3, canonicalNodes, genFb, fbGen, jsx, deps);
 }
 
 function _oscUnitsInput(name, tans){
@@ -753,14 +777,24 @@ function _oscUnitsInput(name, tans){
     + '    </input>';
 }
 
-function _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta, canonicalNodes, genFb, fbGen, kbdRaw){
-  var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+function _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta, canonicalNodes, genFb, fbGen, kbdRaw, deps){
+  deps = deps || {};
+  var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+  var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
   return {
     bareme: bareme, vars: vars, qnote: qnote, textFrag: textFrag, previewFrag: previewFrag,
     inputXML: inputXML, prtXML: prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
-    generalFeedback: _mkFbGen(genFb, fbGen),
+    generalFeedback: _mkFbGen_D(genFb, fbGen),
     feedbackRef: '[[feedback:'+prtMeta.name+']]',
     kbdRaw: kbdRaw
+  };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    genOscilloscope: genOscilloscope,
+    genOscilloscopeCore: genOscilloscopeCore
   };
 }
