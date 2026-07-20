@@ -19,7 +19,7 @@ function genRedox(X) {
         tolVol:      parseFloat(v('rx-tol-vol')) || 0.5,
         tolE:        parseFloat(v('rx-tol-e'))   || 0.05,
         tolC:        parseFloat(v('rx-tol-c'))   || 0.005,
-        W:           parseInt(v('rx-w'))     || 500,
+        W:           parseInt(v('rx-w'))     || 750,
         H:           parseInt(v('rx-h'))     || 400,
         bareme:      parseFloat(v('rx-bareme')) || 1,
         fbOk:        v('rx-fb-ok'),
@@ -44,6 +44,15 @@ function genRedoxCore(X, p, deps) {
     var e1 = p.e1, n1 = p.n1, e2 = p.e2, n2 = p.n2;
     var c1 = p.c1, c2 = p.c2, v2 = p.v2;
     var titrantName = p.titrantName;
+    // Échappe apostrophes + tout caractère non-ASCII (\uXXXX) pour une chaîne JS
+    // insérée littéralement dans un bloc [[jsxgraph]] : voir Problème connu #38,
+    // un caractère Unicode littéral (ex: "₄" dans "KMnO₄") casse le rendu réel
+    // Moodle 4.5.12/qtype_stack 4.11.1 ("SyntaxError: missing ) in parenthetical").
+    function jsxEscape(s) {
+        return String(s).replace(/[\\']/g, '\\$&').replace(/[^\x00-\x7F]/g, function(c) {
+            return '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0');
+        });
+    }
     var tolVol = p.tolVol, tolE = p.tolE, tolC = p.tolC;
     var W = p.W, H = p.H, bareme = p.bareme;
     var fbOk = p.fbOk, fbWrong = p.fbWrong, textFrag = p.textFrag;
@@ -92,21 +101,21 @@ function genRedoxCore(X, p, deps) {
     var cursorCode = '';
     if (cursorMode === 'x') {
         cursorCode = [
-'var cur=board.create("point",[' + cursorInitX.toFixed(3) + ',' + yLow.toFixed(3) + '],{size:8,fillColor:"' + curCol + '",strokeColor:"' + curColD + '",name:"▶",label:{offset:[0,10],fontSize:12,fontWeight:"bold",color:"' + curCol + '"}});',
+'var cur=board.create("point",[' + cursorInitX.toFixed(3) + ',' + yLow.toFixed(3) + '],{size:8,fillColor:"' + curCol + '",strokeColor:"' + curColD + '",name:"\\u25b6",label:{offset:[0,10],fontSize:12,fontWeight:"bold",color:"' + curCol + '"}});',
 'cur.on("drag",function(){this.setPosition(JXG.COORDS_BY_USER,[Math.max(0.001,Math.min(Vmax*1.05,this.X())),' + yLow.toFixed(3) + ']);});',
 'var cTop=board.create("point",[function(){return cur.X();},yHigh+0.03],{visible:false,fixed:false});',
 'board.create("segment",[cur,cTop],{strokeColor:"' + curCol + '",dash:2,strokeWidth:1.8,highlight:false});'
         ].join('\n');
     } else if (cursorMode === 'y') {
         cursorCode = [
-'var cur=board.create("point",[0,' + cursorInitY.toFixed(3) + '],{size:8,fillColor:"' + curCol + '",strokeColor:"' + curColD + '",name:"▶",label:{offset:[10,0],fontSize:12,fontWeight:"bold",color:"' + curCol + '"}});',
+'var cur=board.create("point",[0,' + cursorInitY.toFixed(3) + '],{size:8,fillColor:"' + curCol + '",strokeColor:"' + curColD + '",name:"\\u25b6",label:{offset:[10,0],fontSize:12,fontWeight:"bold",color:"' + curCol + '"}});',
 'cur.on("drag",function(){this.setPosition(JXG.COORDS_BY_USER,[0,Math.max(' + (yLow).toFixed(3) + ',Math.min(' + (yHigh).toFixed(3) + ',this.Y()))]);});',
 'var cRight=board.create("point",[Vmax*1.05,function(){return cur.Y();}],{visible:false,fixed:false});',
 'board.create("segment",[cur,cRight],{strokeColor:"' + curCol + '",dash:2,strokeWidth:1.8,highlight:false});'
         ].join('\n');
     } else if (cursorMode === 'xy') {
         cursorCode = [
-'var cur=board.create("point",[' + cursorInitX.toFixed(3) + ',' + cursorInitY.toFixed(3) + '],{size:8,fillColor:"' + curCol + '",strokeColor:"' + curColD + '",name:"✛",label:{offset:[8,8],fontSize:12,fontWeight:"bold",color:"' + curCol + '"}});',
+'var cur=board.create("point",[' + cursorInitX.toFixed(3) + ',' + cursorInitY.toFixed(3) + '],{size:8,fillColor:"' + curCol + '",strokeColor:"' + curColD + '",name:"\\u271b",label:{offset:[8,8],fontSize:12,fontWeight:"bold",color:"' + curCol + '"}});',
 'cur.on("drag",function(){this.setPosition(JXG.COORDS_BY_USER,[Math.max(0.001,Math.min(Vmax*1.05,this.X())),Math.max(' + yLow.toFixed(3) + ',Math.min(' + yHigh.toFixed(3) + ',this.Y()))]);});',
 'var cTop=board.create("point",[function(){return cur.X();},yHigh+0.03],{visible:false,fixed:false});',
 'var cRight=board.create("point",[Vmax*1.05,function(){return cur.Y();}],{visible:false,fixed:false});',
@@ -120,10 +129,10 @@ function genRedoxCore(X, p, deps) {
 '  boundingbox:[' + bb0 + ',' + bb1 + ',' + bb2 + ',' + bb3 + '],',
 '  axis:false,keepAspectRatio:false,showCopyright:false,showNavigation:false',
 '});',
-'var xAxis=board.create("axis",[[-0.01,0],[1,0]],{ticks:{insertTicks:true,minTicksDistance:30},label:{position:"rt",offset:[-5,-12],fontSize:11}});',
+'var xAxis=board.create("axis",[[-0.01,' + yLow.toFixed(4) + '],[1,' + yLow.toFixed(4) + ']],{ticks:{insertTicks:true,minTicksDistance:30},label:{position:"rt",offset:[-5,-12],fontSize:11}});',
 'var yAxis=board.create("axis",[[0,-0.5],[0,1]],{ticks:{insertTicks:true,minTicksDistance:30},label:{position:"rt",offset:[8,0],fontSize:11}});',
-'board.create("text",[' + (Vmax*0.52).toFixed(2) + ',' + (yLow - 0.03).toFixed(3) + ',"V(' + titrantName.replace(/'/g,"\\'") + ') (mL)",{anchorX:"middle",fontSize:11}]);',
-'board.create("text",[' + (Vmax*0.015).toFixed(3) + ',' + (yHigh + 0.02).toFixed(3) + ',"E (V)",{anchorX:"left",fontSize:11}]);',
+'board.create("text",[' + (Vmax*0.52).toFixed(2) + ',' + (yLow - 0.03).toFixed(3) + ',function(){return "V(' + jsxEscape(titrantName) + ') (mL)";}],{anchorX:"middle",fontSize:11});',
+'board.create("text",[' + (Vmax*0.015).toFixed(3) + ',' + (yHigh + 0.02).toFixed(3) + ',function(){return "E (V)";}],{anchorX:"left",fontSize:11});',
 'var Veq=' + Veq.toFixed(4) + ';',
 'var e1=' + e1.toFixed(4) + ';var n1=' + n1 + ';',
 'var e2=' + e2.toFixed(4) + ';var n2=' + n2 + ';',
@@ -131,9 +140,9 @@ function genRedoxCore(X, p, deps) {
 'var yLow=' + yLow.toFixed(4) + ';var yHigh=' + yHigh.toFixed(4) + ';',
 'var eps=Veq*0.003;',
 // Branche avant Veq
-'board.create("curve",[function(t){return t;},function(t){var r=t/(Veq-t);return(r<=0)?NaN:e2+(0.06/n2)*Math.log10(r);},eps,Veq-eps],{strokeColor:"#2563eb",strokeWidth:2.5,highlight:false,recursionDepthHigh:5,numberPointsHigh:300});',
+'board.create("curve",[function(t){return t;},function(t){var r=t/(Veq-t);return(Math.sign(r)===1)?e2+(0.06/n2)*Math.log10(r):NaN;},eps,Veq-eps],{strokeColor:"#2563eb",strokeWidth:2.5,highlight:false,recursionDepthHigh:5,numberPointsHigh:300});',
 // Branche après Veq
-'board.create("curve",[function(t){return t;},function(t){var r=(t-Veq)/Veq;return(r<=0)?NaN:e1+(0.06/n1)*Math.log10(r);},Veq+eps,Vmax],{strokeColor:"#2563eb",strokeWidth:2.5,highlight:false,recursionDepthHigh:5,numberPointsHigh:300});',
+'board.create("curve",[function(t){return t;},function(t){var r=(t-Veq)/Veq;return(Math.sign(r)===1)?e1+(0.06/n1)*Math.log10(r):NaN;},Veq+eps,Vmax],{strokeColor:"#2563eb",strokeWidth:2.5,highlight:false,recursionDepthHigh:5,numberPointsHigh:300});',
 'var Eeq=' + Eeq.toFixed(4) + ';',
 // Repère (Veq,Eeq) : masqué si la question demande justement ces coordonnées (fuite de réponse)
 (showVeqMarker ? [
@@ -141,12 +150,19 @@ function genRedoxCore(X, p, deps) {
 'board.create("segment",[[Veq,yLow-0.02],[Veq,Eeq]],{strokeColor:"#94a3b8",dash:2,strokeWidth:1.2,highlight:false});'
 ].join('\n') : ''),
 cursorCode,
-(cursorMode !== 'none' ? 'stack_jxg.bind_point(board,"ans' + X + '",cur);' : ''),
+(cursorMode !== 'none' ? 'stack_jxg.bind_point(ans' + X + 'Ref,cur);' : ''),
 'board.update();'
     ].filter(Boolean).join('\n');
 
     // ── Encodage XML ──────────────────────────────────────────────────────
-    var jxgXML = '[[jsxgraph width="' + W + 'px" height="' + H + 'px"]]' + jxgCode + '[[/jsxgraph]]';
+    // input-ref-ansX="ansXRef" : nécessaire pour que stack_jxg.bind_point()
+    // puisse lier le curseur au champ de saisie STACK (voir Problème connu #38) :
+    // le graphe s'exécute dans un iframe sandboxé, document.getElementById()
+    // n'y voit pas le champ <input>, qui vit dans la page Moodle parente.
+    // input-ref-* déclenche côté serveur STACK un stack_js.request_access_to_input(...)
+    // (voir jsxgraph.block.php) qui résout la référence via postMessage inter-frame.
+    var inputRefAttr = (cursorMode !== 'none') ? ' input-ref-ans' + X + '="ans' + X + 'Ref"' : '';
+    var jxgXML = '[[jsxgraph width="' + W + 'px" height="' + H + 'px"' + inputRefAttr + ']]' + jxgCode + '[[/jsxgraph]]';
 
     // ── Boîtes de feedback colorées (mêmes codes couleur que gen-acidebase.js) ──
     function fbBox(color, bg, html) {
@@ -208,8 +224,7 @@ cursorCode,
 
         var questionLabel = I18Nd.t('rx.qnote_calc_fallback', {n: String(X)});
         var questionText  = '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML
-            + '<p>[[input:ans' + X + ']][[validation:ans' + X + ']]</p>'
-            + '[[feedback:prt' + X + ']]';
+            + '<p>[[input:ans' + X + ']][[validation:ans' + X + ']]</p>';
 
         return {
             type:            'redox',
@@ -339,8 +354,7 @@ cursorCode,
 
     var questionLabel = I18Nd.t('rx.qnote_fallback', {n: String(X)});
     var questionText  = '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML
-        + '[[input:ans' + X + ']][[validation:ans' + X + ']]'
-        + '[[feedback:prt' + X + ']]';
+        + '[[input:ans' + X + ']][[validation:ans' + X + ']]';
 
     return {
         type:            'redox',

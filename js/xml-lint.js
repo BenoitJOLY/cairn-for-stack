@@ -83,5 +83,38 @@ function lintExportedXML(xml) {
     }
   }
 
+  // 7) "<"/">" littéraux dans du JS embarqué (bloc [[jsxgraph]]...[[/jsxgraph]] ou
+  //    <script>...</script>) : ce texte passe par js/app.js:stripMathDivs(), qui fait
+  //    un aller-retour div.innerHTML = html; ...; return div.innerHTML pour nettoyer les
+  //    artefacts KaTeX. Or la sérialisation HTML standard (WHATWG) échappe TOUT "<" et
+  //    ">" présent dans un nœud texte (pas seulement "<") en "&lt;"/"&gt;" — et sur
+  //    Moodle 4.5.12/qtype_stack 4.11.1 ces entités ne sont pas redécodées au rendu :
+  //    le navigateur reçoit "&lt;"/"&gt;" tel quel dans le script et plante avec
+  //    "SyntaxError: missing ) in parenthetical" (découvert en auditant Redox le
+  //    2026-07-20, voir PLAN.md #38 — le premier correctif "r<=0" → "r>0" s'est révélé
+  //    insuffisant car ">" est échappé exactement comme "<"). Contournement : écrire le
+  //    JS généré sans aucun caractère "<" ni ">" (ex: "r>0" → "Math.sign(r)===1").
+  function scanForEscapedComparison(block, label, idx) {
+    var ltCount = (block.match(/&lt;/g) || []).length;
+    var gtCount = (block.match(/&gt;/g) || []).length;
+    if (ltCount) {
+      warnings.push('"&lt;" trouvé dans ' + label + (idx ? ' #' + idx : '') + ' (' + ltCount + ') — '
+        + 'un "<" littéral dans le JS généré sera envoyé tel quel au navigateur par '
+        + 'Moodle 4.5.12/qtype_stack 4.11.1 et cassera le script. '
+        + 'Réécrire pour n\'utiliser ni "<" ni ">" (ex: "r>0" → "Math.sign(r)===1").');
+    }
+    if (gtCount) {
+      warnings.push('"&gt;" trouvé dans ' + label + (idx ? ' #' + idx : '') + ' (' + gtCount + ') — '
+        + 'un ">" littéral dans le JS généré sera envoyé tel quel au navigateur par '
+        + 'Moodle 4.5.12/qtype_stack 4.11.1 et cassera le script (même mécanisme que "&lt;", '
+        + 'stripMathDivs() échappe les deux). '
+        + 'Réécrire pour n\'utiliser ni "<" ni ">" (ex: "r>0" → "Math.sign(r)===1").');
+    }
+  }
+  var jsxRe = /\[\[jsxgraph[^\]]*\]\]([\s\S]*?)\[\[\/jsxgraph\]\]/g, jm, jidx = 0;
+  while ((jm = jsxRe.exec(xml))) { jidx++; scanForEscapedComparison(jm[1], 'un bloc [[jsxgraph]]', jidx); }
+  var scriptRe = /<script[^>]*>([\s\S]*?)<\/script>/g, sm, sidx = 0;
+  while ((sm = scriptRe.exec(xml))) { sidx++; scanForEscapedComparison(sm[1], 'un bloc <script>', sidx); }
+
   return warnings;
 }
