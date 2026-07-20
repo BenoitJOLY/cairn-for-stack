@@ -358,7 +358,7 @@ function captureState() {
       s.e2=v('rx-e2');s.n2=v('rx-n2');
       s.c1=v('rx-c1');s.c2=v('rx-c2');s.v2=v('rx-v2');
       s.titrantName=v('rx-titrant-name');
-      s.tolVol=v('rx-tol-vol');s.tolE=v('rx-tol-e');
+      s.tolVol=v('rx-tol-vol');s.tolE=v('rx-tol-e');s.tolC=v('rx-tol-c');
       s.w=v('rx-w');s.h=v('rx-h');
       s.fbOk=v('rx-fb-ok');s.fbWrong=v('rx-fb-wrong');s.fbGen=v('rx-fbgen');
       break;
@@ -849,6 +849,7 @@ function restoreState(s) {
       document.getElementById('rx-titrant-name').value=s.titrantName||'KMnO₄';
       document.getElementById('rx-tol-vol').value=s.tolVol||0.5;
       document.getElementById('rx-tol-e').value=s.tolE||0.05;
+      var _rxTolC=document.getElementById('rx-tol-c');if(_rxTolC)_rxTolC.value=s.tolC||0.005;
       document.getElementById('rx-w').value=s.w||500;
       document.getElementById('rx-h').value=s.h||400;
       document.getElementById('rx-fb-ok').value=s.fbOk||'';
@@ -1471,6 +1472,7 @@ function resetFormForType(type) {
       document.getElementById('rx-titrant-name').value='KMnO₄';
       document.getElementById('rx-tol-vol').value=0.5;
       document.getElementById('rx-tol-e').value=0.05;
+      var _rxTolCReset=document.getElementById('rx-tol-c');if(_rxTolCReset)_rxTolCReset.value=0.005;
       document.getElementById('rx-w').value=500;
       document.getElementById('rx-h').value=400;
       document.getElementById('rx-fb-ok').value='';

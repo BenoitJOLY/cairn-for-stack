@@ -6,23 +6,54 @@
    ══════════════════════════════════════════════════════ */
 
 function genAcideBase(X) {
+    var p = {
+        abMethod: v('ab-method') || 'colorimetrie',
+        abType:   v('ab-type')  || 'af-bf',
+        abFind:   v('ab-find')  || 'equivalence',
+        nProtons: parseInt(v('ab-n-protons') || '1'),
+        c1:       parseFloat(v('ab-c1'))   || 0.1,
+        v1:       parseFloat(v('ab-v1'))   || 20,
+        c2:       parseFloat(v('ab-c2'))   || 0.1,
+        pka:      parseFloat(v('ab-pka'))  || 4.8,
+        pka2:     parseFloat(v('ab-pka2')) || 9.2,
+        pka3:     parseFloat(v('ab-pka3')) || 12.35,
+        tolVol:   parseFloat(v('ab-tol-vol')) || 0.5,
+        dispW:    parseInt(v('ab-w'))  || 500,
+        dispH:    parseInt(v('ab-h'))  || 400,
+        bareme:   parseFloat(v('ab-bareme')) || 1,
+        text:     richVal('ab-text'),
+        fbGenExtra: v('ab-fbgen') || '',
+        indKeys:  Array.prototype.slice.call(document.querySelectorAll('.ab-ind-chk:checked'))
+            .map(function(el) { return el.dataset.ind; })
+    };
+    return genAcideBaseCore(X, p);
+}
+
+/* genAcideBaseCore : fonction pure (aucun accès DOM), voir js/gen-redox.js pour
+   le pattern (deps injectables pour les tests Node — test/unit/gen-acidebase.test.js). */
+function genAcideBaseCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D        = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkFbGen_D     = deps.mkFbGen || _mkFbGen;
+
     var S = '_' + X;  // suffixe Maxima/inputs pour éviter les collisions entre sous-questions
-    var abMethod = v('ab-method') || 'colorimetrie';
-    var abType   = v('ab-type')  || 'af-bf';
-    var abFind   = v('ab-find')  || 'equivalence';
-    var nProtons = parseInt(v('ab-n-protons') || '1');
-    var c1       = parseFloat(v('ab-c1'))   || 0.1;
-    var v1       = parseFloat(v('ab-v1'))   || 20;
-    var c2       = parseFloat(v('ab-c2'))   || 0.1;
-    var pka      = parseFloat(v('ab-pka'))  || 4.8;
-    var pka2     = parseFloat(v('ab-pka2')) || 9.2;
-    var pka3     = parseFloat(v('ab-pka3')) || 12.35;
-    var tolVol   = parseFloat(v('ab-tol-vol')) || 0.5;
-    var dispW    = parseInt(v('ab-w'))  || 500;
-    var dispH    = parseInt(v('ab-h'))  || 400;
-    var bareme   = parseFloat(v('ab-bareme')) || 1;
-    var text     = richVal('ab-text');
-    var fbGenExtra = v('ab-fbgen') || '';
+    var abMethod = p.abMethod;
+    var abType   = p.abType;
+    var abFind   = p.abFind;
+    var nProtons = p.nProtons;
+    var c1       = p.c1;
+    var v1       = p.v1;
+    var c2       = p.c2;
+    var pka      = p.pka;
+    var pka2     = p.pka2;
+    var pka3     = p.pka3;
+    var tolVol   = p.tolVol;
+    var dispW    = p.dispW;
+    var dispH    = p.dispH;
+    var bareme   = p.bareme;
+    var text     = p.text;
+    var fbGenExtra = p.fbGenExtra;
 
     // ── Physique ───────────────────────────────────────────────────────
     var isBfAf = (abType === 'bf-af');
@@ -109,7 +140,7 @@ function genAcideBase(X) {
     var pHeq = phAtVolume(targetVol);
 
     // ── Données et bandeau communs ────────────────────────────────────
-    var typeMap = {'af-bf':I18N.t('ab.typemap_af_bf'),'bf-af':I18N.t('ab.typemap_bf_af'),'af-fort-bf':I18N.t('ab.typemap_af_fort_bf')};
+    var typeMap = {'af-bf':I18N_D.t('ab.typemap_af_bf'),'bf-af':I18N_D.t('ab.typemap_bf_af'),'af-fort-bf':I18N_D.t('ab.typemap_af_fort_bf')};
     var pKa1_exp = isBfAf ? (14 - pka) : pka;
     var pkaStr = '';
     if (abType !== 'af-fort-bf') {
@@ -119,7 +150,7 @@ function genAcideBase(X) {
     }
     var nStr = nProtons > 1 ? ' (H₂A, n=' + nProtons + ')' : '';
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>' + I18N.t('ab.donnees_lbl') + '</strong> '
+        + '<strong>' + I18N_D.t('ab.donnees_lbl') + '</strong> '
         + (typeMap[abType] || abType) + nStr
         + ' &mdash; C₁&nbsp;=&nbsp;' + c1 + '&nbsp;mol/L,'
         + ' V₁&nbsp;=&nbsp;' + v1 + '&nbsp;mL,'
@@ -151,9 +182,7 @@ function genAcideBase(X) {
             phph: { label: 'Phénolphtaléine',      pL: 8.2,  pH: 10.0, cL: [240,240,240], cH: [255,20,147] },
             ja:   { label: "Jaune d'alizarine",    pL: 10.1, pH: 12.0, cL: [255,255,0],   cH: [255,140,0] }
         };
-        var indKeys = Array.prototype.slice.call(document.querySelectorAll('.ab-ind-chk:checked'))
-            .map(function(el) { return el.dataset.ind; })
-            .filter(function(k) { return ALL_INDICATORS[k]; });
+        var indKeys = (p.indKeys || []).filter(function(k) { return ALL_INDICATORS[k]; });
         if (!indKeys.length) indKeys = ['hel', 'bbt', 'phph'];
         var INDICATORS = {};
         indKeys.forEach(function(k) { INDICATORS[k] = ALL_INDICATORS[k]; });
@@ -647,8 +676,8 @@ function genAcideBase(X) {
             + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">V_eq = ' + targetVol.toFixed(1) + ' mL</code></div></div>';
     }
 
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
-    var generalFeedback = _mkFbGen(generalFeedbackAuto, fbGenExtra);
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    var generalFeedback = mkFbGen_D(generalFeedbackAuto, fbGenExtra);
     var diagNodes = canonicalNodes.map(function(n) {
         return { desc: n.description || '', fb: n.truefeedback || n.falsefeedback || '' };
     });
@@ -682,3 +711,9 @@ function genAcideBase(X) {
 //    À Veq     : E_eq = (n₁·E°₁ + n₂·E°₂)/(n₁+n₂)
 //  Veq = n₂·C₂·V₂ / (n₁·C₁)
 // ══════════════════════════════════════════════════════════════
+
+// Export CommonJS pour les tests Node (test/unit/*.test.js) : seule la fonction
+// pure (aucune dépendance au DOM) est exposée. Sans effet dans le navigateur.
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genAcideBase: genAcideBase, genAcideBaseCore: genAcideBaseCore };
+}

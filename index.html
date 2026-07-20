@@ -2331,6 +2331,10 @@ fill="currentColor" stroke="none">
           <option value="equivalence" data-i18n="rx.find_veq">Volume équivalent Veq — curseur vertical</option>
           <option value="eo1" data-i18n="rx.find_eo1">E°₁ du titrant (plateau après Veq) — curseur horizontal</option>
           <option value="eo2" data-i18n="rx.find_eo2">E°₂ de l'espèce titrée (plateau avant Veq) — curseur horizontal</option>
+          <option value="demi" data-i18n="rx.find_demi">Point de demi-équivalence (V=Veq/2, E=E°₂) — curseur libre</option>
+          <option value="double" data-i18n="rx.find_double">Point à double équivalence (V=2·Veq, E=E°₁) — curseur libre</option>
+          <option value="eeq" data-i18n="rx.find_eeq">Point d'équivalence exact (V=Veq, E=Eeq) — curseur libre</option>
+          <option value="calc" data-i18n="rx.find_calc">Calcul de C₂ à partir de Veq lu sur le graphe — réponse numérique</option>
         </select>
       </div>
 
@@ -2401,6 +2405,10 @@ fill="currentColor" stroke="none">
         <div class="field" id="rx-tol-e-row" style="display:none;">
           <label data-i18n="rx.tol_e_lbl">Tolérance E° (V)</label>
           <input type="number" id="rx-tol-e" value="0.05" min="0.005" max="0.5" step="0.005">
+        </div>
+        <div class="field" id="rx-tol-c-row" style="display:none;">
+          <label data-i18n="rx.tol_c_lbl">Tolérance C₂ (mol/L)</label>
+          <input type="number" id="rx-tol-c" value="0.005" min="0.0001" max="1" step="0.0001">
         </div>
       </div>
 

@@ -29,11 +29,15 @@ function rxApplyPreset() {
 
 function rxFormChange() {
     var rxFind   = (document.getElementById('rx-find') || {}).value || 'equivalence';
-    var isVol    = (rxFind === 'equivalence');
+    var showVol  = (rxFind === 'equivalence' || rxFind === 'demi' || rxFind === 'double' || rxFind === 'eeq' || rxFind === 'calc');
+    var showE    = (rxFind === 'eo1' || rxFind === 'eo2' || rxFind === 'demi' || rxFind === 'double' || rxFind === 'eeq');
+    var showC    = (rxFind === 'calc');
     var tolVolRow = document.getElementById('rx-tol-vol-row');
     var tolERow   = document.getElementById('rx-tol-e-row');
-    if (tolVolRow) tolVolRow.style.display = isVol ? '' : 'none';
-    if (tolERow)   tolERow.style.display   = isVol ? 'none' : '';
+    var tolCRow   = document.getElementById('rx-tol-c-row');
+    if (tolVolRow) tolVolRow.style.display = showVol ? '' : 'none';
+    if (tolERow)   tolERow.style.display   = showE   ? '' : 'none';
+    if (tolCRow)   tolCRow.style.display   = showC   ? '' : 'none';
     rxUpdatePreview();
 }
 

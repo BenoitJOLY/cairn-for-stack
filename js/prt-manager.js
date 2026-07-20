@@ -1195,3 +1195,9 @@ function _prtResizeEnd() {
   var h = document.getElementById('prt-resize-handle');
   if (h) h.classList.remove('prt-resizing');
 }
+
+// Export CommonJS pour les tests Node (test/unit/*.test.js) : seules les fonctions
+// pures (aucune dépendance au DOM) sont exposées. Sans effet dans le navigateur.
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { buildPrtXml: buildPrtXml, parsePrtXml: parsePrtXml };
+}

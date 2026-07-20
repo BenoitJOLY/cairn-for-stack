@@ -2200,18 +2200,30 @@ function _rxBuildCurve(state) {
   const e2 = parseFloat(state.e2) || 0.77, n2 = parseInt(state.n2) || 1;
   const c1 = parseFloat(state.c1) || 0.02, c2 = parseFloat(state.c2) || 0.1, v2 = parseFloat(state.v2) || 20;
   const rxFind = state.rxFind || 'equivalence';
-  const isVolCursor = rxFind === 'equivalence';
 
   const Veq = n2 * c2 * v2 / (n1 * c1);
   const Eeq = (n1 * e1 + n2 * e2) / (n1 + n2);
-  const Vmax = Veq * 1.65;
+  const Vmax = Veq * (rxFind === 'double' ? 2.3 : 1.65);
   const yLow = Math.min(e1, e2) - 0.40;
   const yHigh = Math.max(e1, e2) + 0.30;
-  const targetE = rxFind === 'eo1' ? e1 : e2;
-  const cursorInitX = isVolCursor ? Veq * 0.55 : 0;
-  const cursorInitY = isVolCursor ? yLow : (yLow + yHigh) / 2;
 
-  return { e1, n1, e2, n2, Veq, Eeq, Vmax, yLow, yHigh, isVolCursor, targetE, cursorInitX, cursorInitY };
+  let cursorMode = 'none', Vt = null, Et = null;
+  if (rxFind === 'equivalence') { cursorMode = 'x'; Vt = Veq; }
+  else if (rxFind === 'eo1')    { cursorMode = 'y'; Et = e1; }
+  else if (rxFind === 'eo2')    { cursorMode = 'y'; Et = e2; }
+  else if (rxFind === 'demi')   { cursorMode = 'xy'; Vt = Veq / 2; Et = e2; }
+  else if (rxFind === 'double') { cursorMode = 'xy'; Vt = Veq * 2;  Et = e1; }
+  else if (rxFind === 'eeq')    { cursorMode = 'xy'; Vt = Veq;      Et = Eeq; }
+
+  const isVolCursor = cursorMode === 'x';
+  const targetE = Et;
+  let cursorInitX, cursorInitY;
+  if (cursorMode === 'x')       { cursorInitX = Veq * 0.55; cursorInitY = yLow; }
+  else if (cursorMode === 'y')  { cursorInitX = 0; cursorInitY = (yLow + yHigh) / 2; }
+  else if (cursorMode === 'xy') { cursorInitX = Vmax * 0.12; cursorInitY = yHigh - 0.05; }
+  else                          { cursorInitX = 0; cursorInitY = yLow; }
+
+  return { e1, n1, e2, n2, c1, c2, v2, Veq, Eeq, Vmax, yLow, yHigh, cursorMode, isVolCursor, Vt, Et, targetE, cursorInitX, cursorInitY };
 }
 
 function renderPreviewHTML_redox(state) {
@@ -2220,6 +2232,8 @@ function renderPreviewHTML_redox(state) {
   const titrantName = state.titrantName || 'titrant';
   const tolVol = parseFloat(state.tolVol) || 0.5;
   const tolE = parseFloat(state.tolE) || 0.05;
+  const tolC = parseFloat(state.tolC) || 0.005;
+  const rxFind = state.rxFind || 'equivalence';
   const g = _rxBuildCurve(state);
 
   const W = 460, H = 320, pad = 34;
@@ -2244,9 +2258,28 @@ function renderPreviewHTML_redox(state) {
 
   const curX = sx(g.cursorInitX), curY = sy(g.cursorInitY);
 
-  const targetLabel = g.isVolCursor
-    ? `Veq = ${g.Veq.toFixed(2)} mL (± ${tolVol} mL)`
-    : `${(state.rxFind === 'eo1' ? 'E°₁' : 'E°₂')} = ${g.targetE.toFixed(3)} V (± ${tolE} V)`;
+  let targetLabel;
+  if (rxFind === 'calc') {
+    const c2Target = (g.n1 * g.c1 * g.Veq) / (g.n2 * g.v2);
+    targetLabel = `Veq (lu sur le graphe, ± ${tolVol} mL) puis C₂ = ${c2Target.toFixed(4)} mol/L (± ${tolC} mol/L)`;
+  } else if (g.cursorMode === 'x') {
+    targetLabel = `Veq = ${g.Veq.toFixed(2)} mL (± ${tolVol} mL)`;
+  } else if (g.cursorMode === 'y') {
+    targetLabel = `${(rxFind === 'eo1' ? 'E°₁' : 'E°₂')} = ${g.targetE.toFixed(3)} V (± ${tolE} V)`;
+  } else {
+    targetLabel = `V = ${g.Vt.toFixed(2)} mL (± ${tolVol} mL), E = ${g.Et.toFixed(3)} V (± ${tolE} V)`;
+  }
+
+  // Le repère (Veq,Eeq) donnerait la réponse pour 'equivalence', 'eeq' et 'calc' (l'élève doit lire Veq lui-même) : on le masque alors (cf. genRedox()).
+  const showVeqMarker = (rxFind === 'eo1' || rxFind === 'eo2' || rxFind === 'demi' || rxFind === 'double');
+  const veqMarkerSvg = showVeqMarker ? `
+      <line x1="${sx(g.Veq).toFixed(1)}" y1="${sy(g.Eeq).toFixed(1)}" x2="${sx(g.Veq).toFixed(1)}" y2="${H - pad}" stroke="#94a3b8" stroke-dasharray="4,3"/>
+      <circle cx="${sx(g.Veq).toFixed(1)}" cy="${sy(g.Eeq).toFixed(1)}" r="3.5" fill="#2563eb"/>` : '';
+  const curCol  = g.cursorMode === 'x' ? '#ef4444' : g.cursorMode === 'y' ? '#7c3aed' : '#ea580c';
+  const curColD = g.cursorMode === 'x' ? '#b91c1c' : g.cursorMode === 'y' ? '#5b21b6' : '#9a3412';
+  const cursorSvg = g.cursorMode !== 'none' ? `
+      <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="6" fill="${curCol}" stroke="${curColD}" stroke-width="1.5"/>
+      <text x="${curX.toFixed(1)}" y="${(curY - 10).toFixed(1)}" font-size="11" font-weight="bold" fill="${curCol}" text-anchor="middle">▶ curseur (élève)</text>` : '';
 
   const svg = `
     <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;background:#fff;border:1px solid #fecaca;border-radius:8px;">
@@ -2256,10 +2289,8 @@ function renderPreviewHTML_redox(state) {
       <text x="${pad + 4}" y="${pad / 2 + 4}" font-size="11" fill="#475569">E (V)</text>
       <polyline points="${beforePts}" fill="none" stroke="#2563eb" stroke-width="2.2"/>
       <polyline points="${afterPts}" fill="none" stroke="#2563eb" stroke-width="2.2"/>
-      <line x1="${sx(g.Veq).toFixed(1)}" y1="${sy(g.Eeq).toFixed(1)}" x2="${sx(g.Veq).toFixed(1)}" y2="${H - pad}" stroke="#94a3b8" stroke-dasharray="4,3"/>
-      <circle cx="${sx(g.Veq).toFixed(1)}" cy="${sy(g.Eeq).toFixed(1)}" r="3.5" fill="#2563eb"/>
-      <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="6" fill="${g.isVolCursor ? '#ef4444' : '#7c3aed'}" stroke="${g.isVolCursor ? '#b91c1c' : '#5b21b6'}" stroke-width="1.5"/>
-      <text x="${curX.toFixed(1)}" y="${(curY - 10).toFixed(1)}" font-size="11" font-weight="bold" fill="${g.isVolCursor ? '#ef4444' : '#7c3aed'}" text-anchor="middle">▶ curseur (élève)</text>
+      ${veqMarkerSvg}
+      ${cursorSvg}
     </svg>`;
 
   const fbHTML = `
