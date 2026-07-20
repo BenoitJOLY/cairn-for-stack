@@ -62,24 +62,44 @@ function _geoDiagNodes(specs) {
 
 function genGeometrie(X) {
     var gs = function (id) { var e = document.getElementById(id); return e ? e.value : ''; };
-    var gn = function (id, def) { var v = parseFloat(gs(id)); return isNaN(v) ? def : v; };
-    var bareme = parseFloat(gs('geo-bareme')) || 1;
-    var scenario = gs('geo-scenario') || 'distance';
-    var mode = gs('geo-mode') || 'aleatoire';
-    var dimSel = gs('geo-dim') || '2d';
-    var fbOk = gs('geo-fb-ok'), fbWrong = gs('geo-fb-wrong');
-    var custText = gs('geo-text').trim();
+    var gnRaw = function (id) { return parseFloat(gs(id)); };
+    var p = {
+        bareme: parseFloat(gs('geo-bareme')) || 1,
+        scenario: gs('geo-scenario') || 'distance',
+        mode: gs('geo-mode') || 'aleatoire',
+        dimSel: gs('geo-dim') || '2d',
+        fbOk: gs('geo-fb-ok'), fbWrong: gs('geo-fb-wrong'),
+        custText: gs('geo-text').trim(),
+        fbGenRaw: gs('geo-fbgen'),
+        p1x: gnRaw('geo-p1x'), p1y: gnRaw('geo-p1y'), p1z: gnRaw('geo-p1z'),
+        p2x: gnRaw('geo-p2x'), p2y: gnRaw('geo-p2y'), p2z: gnRaw('geo-p2z'),
+        p3x: gnRaw('geo-p3x'), p3y: gnRaw('geo-p3y'), p3z: gnRaw('geo-p3z')
+    };
+    return genGeometrieCore(X, p);
+}
+
+function genGeometrieCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var mkInput_D = deps._mkInput || _mkInput;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var geoSeqPrt_D = deps._geoSeqPrt || _geoSeqPrt;
+    var geoGenFbBox_D = deps._geoGenFbBox || _geoGenFbBox;
+
+    var gn = function (v, def) { return isNaN(v) ? def : v; };
+    var bareme = p.bareme, scenario = p.scenario, mode = p.mode, dimSel = p.dimSel;
+    var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
     var vars, qnote, textFrag, inputXML, prtXML, generalFeedback, canonicalNodes, prtMeta, diagNodes;
 
-    var HDR = `<div style="background:#059669;border-left:5px solid #047857;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('geo.banniere')}</strong> <span style="background:#047857;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
+    var HDR = `<div style="background:#059669;border-left:5px solid #047857;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('geo.banniere')}</strong> <span style="background:#047857;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
 
     if (scenario === 'distance' || scenario === 'milieu') {
         var d3dm = dimSel === '3d';
-        var repere = d3dm ? I18N.t('geo.repere_espace') : I18N.t('geo.repere_plan');
+        var repere = d3dm ? I18N_D.t('geo.repere_espace') : I18N_D.t('geo.repere_plan');
         var declA, declB;
         if (mode === 'fixe') {
-            declA = `q${X}_xa:${gn('geo-p1x', 1)};q${X}_ya:${gn('geo-p1y', 2)};q${X}_za:${d3dm ? gn('geo-p1z', 0) : 0};`;
-            declB = `q${X}_xb:${gn('geo-p2x', 4)};q${X}_yb:${gn('geo-p2y', 6)};q${X}_zb:${d3dm ? gn('geo-p2z', 1) : 0};`;
+            declA = `q${X}_xa:${gn(p.p1x, 1)};q${X}_ya:${gn(p.p1y, 2)};q${X}_za:${d3dm ? gn(p.p1z, 0) : 0};`;
+            declB = `q${X}_xb:${gn(p.p2x, 4)};q${X}_yb:${gn(p.p2y, 6)};q${X}_zb:${d3dm ? gn(p.p2z, 1) : 0};`;
         } else {
             declA = `q${X}_xa:ri(-5,5);q${X}_ya:ri(-5,5);q${X}_za:${d3dm ? 'ri(-5,5)' : '0'};`;
             declB = `q${X}_xb:ri(-5,5);q${X}_yb:ri(-5,5);q${X}_zb:${d3dm ? 'ri(-5,5)' : '0'};\n`
@@ -98,31 +118,31 @@ q${X}_err_nosqrt:q${X}_somme;
 q${X}_err_manhattan:abs(q${X}_dx)+abs(q${X}_dy)+abs(q${X}_dz);
 q${X}_err_origine:abs(sqrt(q${X}_xb^2+q${X}_yb^2+q${X}_zb^2)-sqrt(q${X}_xa^2+q${X}_ya^2+q${X}_za^2));`;
             qnote = `A=${d3dm ? '(x,y,z)' : '(x,y)'}, B=${d3dm ? '(x,y,z)' : '(x,y)'}, AB={@q${X}_ta@}`;
-            textFrag = `${HDR}${custText}<p>${I18N.t('geo.dist_enonce1', {repere: repere, A: _geoPointTex(X, 'xa', 'ya', 'za', d3dm), B: _geoPointTex(X, 'xb', 'yb', 'zb', d3dm)})}</p>
-<p>${I18N.t('geo.dist_enonce2')}</p>
-<p>${I18N.t('geo.dist_ab_lbl')} [[input:ans_dist${X}]] [[validation:ans_dist${X}]]</p>`;
-            inputXML = _mkInput({ name: `ans_dist${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
+            textFrag = `${HDR}${custText}<p>${I18N_D.t('geo.dist_enonce1', {repere: repere, A: _geoPointTex(X, 'xa', 'ya', 'za', d3dm), B: _geoPointTex(X, 'xb', 'yb', 'zb', d3dm)})}</p>
+<p>${I18N_D.t('geo.dist_enonce2')}</p>
+<p>${I18N_D.t('geo.dist_ab_lbl')} [[input:ans_dist${X}]] [[validation:ans_dist${X}]]</p>`;
+            inputXML = mkInput_D({ name: `ans_dist${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
 
             var specsDist = [
                 { description: 'Réponse correcte (tolérance arrondi)', answertest: 'NumAbsolute', sans: `ans_dist${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
-                    feedback: fbOk || _geoBox('ok', `<strong>${I18N.t('mat.fb_ok_parfait')}</strong> ${I18N.t('geo.dist_ok_desc')}`) },
+                    feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.dist_ok_desc')}`) },
                 { description: "Erreur : a oublié la racine carrée", sans: `ans_dist${X}`, tans: `q${X}_err_nosqrt`, score: 0,
-                    feedback: _geoBox('warn', `<strong>${I18N.t('geo.oubli_racine_title')}</strong> ${I18N.t('geo.dist_racine_desc')}`) },
+                    feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.oubli_racine_title')}</strong> ${I18N_D.t('geo.dist_racine_desc')}`) },
                 { description: 'Erreur : distance de Manhattan (somme des écarts)', sans: `ans_dist${X}`, tans: `q${X}_err_manhattan`, score: 0,
-                    feedback: _geoBox('warn', `<strong>${I18N.t('geo.mauvaise_formule_title')}</strong> ${I18N.t('geo.dist_manhattan_desc')}`) },
+                    feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.mauvaise_formule_title')}</strong> ${I18N_D.t('geo.dist_manhattan_desc')}`) },
                 { description: "Erreur : soustraction des distances à l'origine", sans: `ans_dist${X}`, tans: `q${X}_err_origine`, score: 0,
-                    feedback: _geoBox('warn', `<strong>${I18N.t('geo.erreur_methode_title')}</strong> ${I18N.t('geo.dist_origine_desc')}`) },
+                    feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.erreur_methode_title')}</strong> ${I18N_D.t('geo.dist_origine_desc')}`) },
                 { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                    feedback: fbWrong || _geoBox('bad', `<strong>${I18N.t('apn.fb_wrong_incorrect')}</strong> ${I18N.t('geo.dist_fallback_desc', {zterm: d3dm ? '+(z_B-z_A)^2' : ''})}`) }
+                    feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.dist_fallback_desc', {zterm: d3dm ? '+(z_B-z_A)^2' : ''})}`) }
             ];
             diagNodes = _geoDiagNodes(specsDist);
-            var builtDist = _geoSeqPrt(X, bareme, specsDist);
+            var builtDist = geoSeqPrt_D(X, bareme, specsDist);
             prtMeta = builtDist.prtMeta; canonicalNodes = builtDist.canonicalNodes; prtXML = builtDist.prtXML;
-            generalFeedback = _mkFbGen(_geoGenFbBox(I18N.t('geo.dist_correction_desc', {
+            generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.dist_correction_desc', {
                 repere: repere, zterm: d3dm ? '+(z_B-z_A)^2' : '',
                 dx: `{@q${X}_dx@}`, dy: `{@q${X}_dy@}`, dzterm: d3dm ? `+{@q${X}_dz@}^2` : '',
                 somme: `{@q${X}_somme@}`, ta: `{@q${X}_ta@}`
-            })), gs('geo-fbgen'));
+            })), p.fbGenRaw);
 
         } else { // milieu
             var mat2or3 = function (x, y, z) { return d3dm ? `matrix([${x}],[${y}],[${z}])` : `matrix([${x}],[${y}])`; };
@@ -139,42 +159,42 @@ q${X}_err_diff:${mat2or3(`(q${X}_xa-q${X}_xb)/2`, `(q${X}_ya-q${X}_yb)/2`, `(q${
 q${X}_err_nodiv:${errNodiv};`;
             qnote = `A=${d3dm ? '(x,y,z)' : '(x,y)'}, B=${d3dm ? '(x,y,z)' : '(x,y)'}, I={@q${X}_ta@}`;
             var hintMid = d3dm ? 'matrix([x],[y],[z])' : 'matrix([x],[y])';
-            textFrag = `${HDR}${custText}<p>${I18N.t('geo.dist_enonce1', {repere: repere, A: _geoPointTex(X, 'xa', 'ya', 'za', d3dm), B: _geoPointTex(X, 'xb', 'yb', 'zb', d3dm)})}</p>
-<p>${I18N.t('geo.milieu_enonce2')}</p>
-<p style="font-size:.85rem;color:#64748b;">${I18N.t('geo.milieu_hint_desc', {hint: hintMid})}</p>
-<p>${I18N.t('geo.milieu_i_open')} [[input:ans_mid${X}]] [[validation:ans_mid${X}]] ${I18N.t('geo.milieu_i_close')}</p>`;
-            inputXML = _mkInput({ name: `ans_mid${X}`, tans: `q${X}_ta`, type: 'matrix', boxsize: 15, hint: hintMid, mustverify: 0, showvalidation: 2 });
+            textFrag = `${HDR}${custText}<p>${I18N_D.t('geo.dist_enonce1', {repere: repere, A: _geoPointTex(X, 'xa', 'ya', 'za', d3dm), B: _geoPointTex(X, 'xb', 'yb', 'zb', d3dm)})}</p>
+<p>${I18N_D.t('geo.milieu_enonce2')}</p>
+<p style="font-size:.85rem;color:#64748b;">${I18N_D.t('geo.milieu_hint_desc', {hint: hintMid})}</p>
+<p>${I18N_D.t('geo.milieu_i_open')} [[input:ans_mid${X}]] [[validation:ans_mid${X}]] ${I18N_D.t('geo.milieu_i_close')}</p>`;
+            inputXML = mkInput_D({ name: `ans_mid${X}`, tans: `q${X}_ta`, type: 'matrix', boxsize: 15, hint: hintMid, mustverify: 0, showvalidation: 2 });
 
             var specsMid = [
                 { description: 'Réponse correcte', sans: `ans_mid${X}`, tans: `q${X}_ta`, score: 1,
-                    feedback: fbOk || _geoBox('ok', `<strong>${I18N.t('mat.fb_ok_parfait')}</strong> ${I18N.t('geo.milieu_ok_desc')}`) },
+                    feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.milieu_ok_desc')}`) },
                 { description: 'Erreur : inversion de x et y', sans: `ans_mid${X}`, tans: `q${X}_err_swap`, score: 0,
-                    feedback: _geoBox('warn', `<strong>${I18N.t('geo.milieu_swap_title')}</strong> ${I18N.t('geo.milieu_swap_desc')}`) },
+                    feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.milieu_swap_title')}</strong> ${I18N_D.t('geo.milieu_swap_desc')}`) },
                 { description: 'Erreur : différence au lieu de la somme', sans: `ans_mid${X}`, tans: `q${X}_err_diff`, score: 0,
-                    feedback: _geoBox('warn', `<strong>${I18N.t('geo.erreur_signe_title')}</strong> ${I18N.t('geo.milieu_diff_desc')}`) },
+                    feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.erreur_signe_title')}</strong> ${I18N_D.t('geo.milieu_diff_desc')}`) },
                 { description: 'Erreur : oubli de la division par 2 sur la dernière coordonnée', sans: `ans_mid${X}`, tans: `q${X}_err_nodiv`, score: 0,
-                    feedback: _geoBox('warn', `<strong>${I18N.t('geo.calcul_incomplet_title')}</strong> ${I18N.t('geo.milieu_nodiv_desc')}`) },
+                    feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.calcul_incomplet_title')}</strong> ${I18N_D.t('geo.milieu_nodiv_desc')}`) },
                 { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                    feedback: fbWrong || _geoBox('bad', `<strong>${I18N.t('apn.fb_wrong_incorrect')}</strong> ${I18N.t('geo.milieu_fallback_desc', {zterm: d3dm ? '\\;;\\;\\frac{z_A+z_B}{2}' : ''})}`) }
+                    feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.milieu_fallback_desc', {zterm: d3dm ? '\\;;\\;\\frac{z_A+z_B}{2}' : ''})}`) }
             ];
             diagNodes = _geoDiagNodes(specsMid);
-            var builtMid = _geoSeqPrt(X, bareme, specsMid);
+            var builtMid = geoSeqPrt_D(X, bareme, specsMid);
             prtMeta = builtMid.prtMeta; canonicalNodes = builtMid.canonicalNodes; prtXML = builtMid.prtXML;
-            generalFeedback = _mkFbGen(_geoGenFbBox(I18N.t('geo.milieu_correction_desc', {
+            generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.milieu_correction_desc', {
                 zterm1: d3dm ? '\\;;\\;\\frac{z_A+z_B}{2}' : '',
                 xa: `{@q${X}_xa@}`, xb: `{@q${X}_xb@}`, xm: `{@q${X}_xm@}`,
                 ya: `{@q${X}_ya@}`, yb: `{@q${X}_yb@}`, ym: `{@q${X}_ym@}`,
                 zterm2: d3dm ? `<br>\\[z_I=\\frac{{@q${X}_za@}+({@q${X}_zb@})}{2}={@q${X}_zm@}\\]` : '',
                 I: _geoPointTex(X, 'xm', 'ym', 'zm', d3dm)
-            })), gs('geo-fbgen'));
+            })), p.fbGenRaw);
         }
 
     } else if (scenario === 'norme') {
         var d3n = dimSel === '3d';
-        var repereN = d3n ? I18N.t('geo.repere_espace') : I18N.t('geo.repere_plan');
+        var repereN = d3n ? I18N_D.t('geo.repere_espace') : I18N_D.t('geo.repere_plan');
         var declU;
         if (mode === 'fixe') {
-            declU = `q${X}_ux:${gn('geo-p1x', 3)};q${X}_uy:${gn('geo-p1y', 4)};q${X}_uz:${d3n ? gn('geo-p1z', 0) : 0};`;
+            declU = `q${X}_ux:${gn(p.p1x, 3)};q${X}_uy:${gn(p.p1y, 4)};q${X}_uz:${d3n ? gn(p.p1z, 0) : 0};`;
         } else {
             declU = `q${X}_ux:ri(-5,5);q${X}_uy:ri(-5,5);q${X}_uz:${d3n ? 'ri(-5,5)' : '0'};\n`
                 + `while q${X}_ux=0 and q${X}_uy=0 and q${X}_uz=0 do (q${X}_ux:ri(-5,5),q${X}_uy:ri(-5,5)${d3n ? `,q${X}_uz:ri(-5,5)` : ''});`;
@@ -188,38 +208,38 @@ q${X}_err_nosqrt:q${X}_somme;
 q${X}_err_manhattan:abs(q${X}_ux)+abs(q${X}_uy)+abs(q${X}_uz);
 q${X}_err_sub:${d3n ? `sqrt(abs(q${X}_ux^2+q${X}_uy^2-q${X}_uz^2))` : `sqrt(abs(q${X}_ux^2-q${X}_uy^2))`};`;
         qnote = `u=${d3n ? '(x,y,z)' : '(x,y)'}, ||u||={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('geo.norme_enonce1', {repere: repereN, uvec: _geoVecTex(X, 'ux', 'uy', 'uz', d3n)})}</p>
-<p>${I18N.t('geo.norme_enonce2')}</p>
-<p>${I18N.t('geo.norme_lbl')} [[input:ans_norm${X}]] [[validation:ans_norm${X}]]</p>`;
-        inputXML = _mkInput({ name: `ans_norm${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('geo.norme_enonce1', {repere: repereN, uvec: _geoVecTex(X, 'ux', 'uy', 'uz', d3n)})}</p>
+<p>${I18N_D.t('geo.norme_enonce2')}</p>
+<p>${I18N_D.t('geo.norme_lbl')} [[input:ans_norm${X}]] [[validation:ans_norm${X}]]</p>`;
+        inputXML = mkInput_D({ name: `ans_norm${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
 
         var specsNorm = [
             { description: 'Réponse correcte (tolérance arrondi)', answertest: 'NumAbsolute', sans: `ans_norm${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
-                feedback: fbOk || _geoBox('ok', `<strong>${I18N.t('mat.fb_ok_parfait')}</strong> ${I18N.t('geo.norme_ok_desc')}`) },
+                feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.norme_ok_desc')}`) },
             { description: "Erreur : a oublié la racine carrée", sans: `ans_norm${X}`, tans: `q${X}_err_nosqrt`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.oubli_racine_title')}</strong> ${I18N.t('geo.norme_racine_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.oubli_racine_title')}</strong> ${I18N_D.t('geo.norme_racine_desc')}`) },
             { description: 'Erreur : somme des valeurs absolues', sans: `ans_norm${X}`, tans: `q${X}_err_manhattan`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.mauvaise_formule_title')}</strong> ${I18N.t('geo.norme_manhattan_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.mauvaise_formule_title')}</strong> ${I18N_D.t('geo.norme_manhattan_desc')}`) },
             { description: 'Erreur : soustraction des carrés sous la racine', sans: `ans_norm${X}`, tans: `q${X}_err_sub`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.norme_sub_title')}</strong> ${I18N.t('geo.norme_sub_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.norme_sub_title')}</strong> ${I18N_D.t('geo.norme_sub_desc')}`) },
             { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _geoBox('bad', `<strong>${I18N.t('apn.fb_wrong_incorrect')}</strong> ${I18N.t('geo.norme_fallback_desc', {zterm: d3n ? '+z^2' : ''})}`) }
+                feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.norme_fallback_desc', {zterm: d3n ? '+z^2' : ''})}`) }
         ];
         diagNodes = _geoDiagNodes(specsNorm);
-        var builtNorm = _geoSeqPrt(X, bareme, specsNorm);
+        var builtNorm = geoSeqPrt_D(X, bareme, specsNorm);
         prtMeta = builtNorm.prtMeta; canonicalNodes = builtNorm.canonicalNodes; prtXML = builtNorm.prtXML;
-        generalFeedback = _mkFbGen(_geoGenFbBox(I18N.t('geo.norme_correction_desc', {
+        generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.norme_correction_desc', {
             zterm1: d3n ? '+z^2' : '',
             ux: `{@q${X}_ux@}`, uy: `{@q${X}_uy@}`,
             zterm2: d3n ? `+{@q${X}_uz@}^2` : '',
             somme: `{@q${X}_somme@}`, ta: `{@q${X}_ta@}`
-        })), gs('geo-fbgen'));
+        })), p.fbGenRaw);
 
     } else if (scenario === 'pente') {
         var declPente;
         if (mode === 'fixe') {
-            declPente = `q${X}_xa:${gn('geo-p1x', 0)};q${X}_ya:${gn('geo-p1y', 0)};q${X}_za:${gn('geo-p1z', 0)};
-q${X}_a:${gn('geo-p2x', 2)};q${X}_b:${gn('geo-p2y', 3)};q${X}_c:${gn('geo-p2z', 1)};
+            declPente = `q${X}_xa:${gn(p.p1x, 0)};q${X}_ya:${gn(p.p1y, 0)};q${X}_za:${gn(p.p1z, 0)};
+q${X}_a:${gn(p.p2x, 2)};q${X}_b:${gn(p.p2y, 3)};q${X}_c:${gn(p.p2z, 1)};
 if q${X}_a=0 then q${X}_a:1;`;
         } else {
             declPente = `q${X}_xa:ri(-4,4);q${X}_ya:ri(-4,4);q${X}_za:ri(-4,4);
@@ -233,36 +253,36 @@ q${X}_err_inv:q${X}_a/q${X}_b;
 q${X}_err_z:q${X}_c/q${X}_a;
 q${X}_err_moins:-q${X}_b/q${X}_a;`;
         qnote = `A=({@q${X}_xa@},{@q${X}_ya@},{@q${X}_za@}), u=({@q${X}_a@},{@q${X}_b@},{@q${X}_c@}), pente={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('geo.pente_enonce1', {xa: `{@q${X}_xa@}`, ya: `{@q${X}_ya@}`, za: `{@q${X}_za@}`, a: `{@q${X}_a@}`, b: `{@q${X}_b@}`, c: `{@q${X}_c@}`})}</p>
-<p>${I18N.t('geo.pente_enonce2')}</p>
-<p style="font-size:.85rem;color:#64748b;">${I18N.t('geo.pente_hint_desc')}</p>
-<p>${I18N.t('geo.pente_lbl')} [[input:ans_pente${X}]] [[validation:ans_pente${X}]]</p>`;
-        inputXML = _mkInput({ name: `ans_pente${X}`, tans: `q${X}_ta`, type: 'algebraic', boxsize: 10, forbidfloat: 1, mustverify: 0, showvalidation: 2 });
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('geo.pente_enonce1', {xa: `{@q${X}_xa@}`, ya: `{@q${X}_ya@}`, za: `{@q${X}_za@}`, a: `{@q${X}_a@}`, b: `{@q${X}_b@}`, c: `{@q${X}_c@}`})}</p>
+<p>${I18N_D.t('geo.pente_enonce2')}</p>
+<p style="font-size:.85rem;color:#64748b;">${I18N_D.t('geo.pente_hint_desc')}</p>
+<p>${I18N_D.t('geo.pente_lbl')} [[input:ans_pente${X}]] [[validation:ans_pente${X}]]</p>`;
+        inputXML = mkInput_D({ name: `ans_pente${X}`, tans: `q${X}_ta`, type: 'algebraic', boxsize: 10, forbidfloat: 1, mustverify: 0, showvalidation: 2 });
 
         var specsPente = [
             { description: 'Réponse correcte', sans: `ans_pente${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _geoBox('ok', `<strong>${I18N.t('mat.fb_ok_parfait')}</strong> ${I18N.t('geo.pente_ok_desc')}`) },
+                feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.pente_ok_desc')}`) },
             { description: 'Erreur : fraction inversée', sans: `ans_pente${X}`, tans: `q${X}_err_inv`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.pente_inv_title')}</strong> ${I18N.t('geo.pente_inv_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.pente_inv_title')}</strong> ${I18N_D.t('geo.pente_inv_desc')}`) },
             { description: 'Erreur : a utilisé la composante z', sans: `ans_pente${X}`, tans: `q${X}_err_z`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.pente_z_title')}</strong> ${I18N.t('geo.pente_z_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.pente_z_title')}</strong> ${I18N_D.t('geo.pente_z_desc')}`) },
             { description: 'Erreur : erreur de signe', sans: `ans_pente${X}`, tans: `q${X}_err_moins`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.erreur_signe_title')}</strong> ${I18N.t('geo.pente_moins_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.erreur_signe_title')}</strong> ${I18N_D.t('geo.pente_moins_desc')}`) },
             { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _geoBox('bad', `<strong>${I18N.t('apn.fb_wrong_incorrect')}</strong> ${I18N.t('geo.pente_fallback_desc')}`) }
+                feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.pente_fallback_desc')}`) }
         ];
         diagNodes = _geoDiagNodes(specsPente);
-        var builtPente = _geoSeqPrt(X, bareme, specsPente);
+        var builtPente = geoSeqPrt_D(X, bareme, specsPente);
         prtMeta = builtPente.prtMeta; canonicalNodes = builtPente.canonicalNodes; prtXML = builtPente.prtXML;
-        generalFeedback = _mkFbGen(_geoGenFbBox(I18N.t('geo.pente_correction_desc', {
+        generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.pente_correction_desc', {
             xa: `{@q${X}_xa@}`, ya: `{@q${X}_ya@}`, za: `{@q${X}_za@}`,
             a: `{@q${X}_a@}`, b: `{@q${X}_b@}`, c: `{@q${X}_c@}`, ta: `{@q${X}_ta@}`
-        })), gs('geo-fbgen'));
+        })), p.fbGenRaw);
 
     } else if (scenario === 'ordonnee') {
         var declOao;
         if (mode === 'fixe') {
-            declOao = `q${X}_a:${gn('geo-p1x', 2)};q${X}_b:${gn('geo-p1y', -3)};q${X}_c:${gn('geo-p1z', 6)};
+            declOao = `q${X}_a:${gn(p.p1x, 2)};q${X}_b:${gn(p.p1y, -3)};q${X}_c:${gn(p.p1z, 6)};
 if q${X}_b=0 then q${X}_b:1;`;
         } else {
             declOao = `q${X}_a:rnz(-5,5);q${X}_b:rnz(-5,5);q${X}_c:ri(-5,5);`;
@@ -276,42 +296,42 @@ q${X}_err_sansmoins:q${X}_c/q${X}_b;
 q${X}_err_pente:-q${X}_a/q${X}_b;
 q${X}_err_absc:-q${X}_c/q${X}_a;`;
         qnote = `Eq: {@q${X}_a@}x+{@q${X}_b@}y+{@q${X}_c@}=0, OAO={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('geo.ordonnee_enonce1', {eq: `{@q${X}_a*x+q${X}_b*y+q${X}_c@}`})}</p>
-<p>${I18N.t('geo.ordonnee_enonce2')}</p>
-<p style="font-size:.85rem;color:#64748b;">${I18N.t('geo.ordonnee_hint_desc')}</p>
-<p>${I18N.t('geo.ordonnee_lbl')} [[input:ans_oao${X}]] [[validation:ans_oao${X}]]</p>`;
-        inputXML = _mkInput({ name: `ans_oao${X}`, tans: `q${X}_ta`, type: 'algebraic', boxsize: 10, forbidfloat: 1, mustverify: 0, showvalidation: 2 });
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('geo.ordonnee_enonce1', {eq: `{@q${X}_a*x+q${X}_b*y+q${X}_c@}`})}</p>
+<p>${I18N_D.t('geo.ordonnee_enonce2')}</p>
+<p style="font-size:.85rem;color:#64748b;">${I18N_D.t('geo.ordonnee_hint_desc')}</p>
+<p>${I18N_D.t('geo.ordonnee_lbl')} [[input:ans_oao${X}]] [[validation:ans_oao${X}]]</p>`;
+        inputXML = mkInput_D({ name: `ans_oao${X}`, tans: `q${X}_ta`, type: 'algebraic', boxsize: 10, forbidfloat: 1, mustverify: 0, showvalidation: 2 });
 
         var specsOao = [
             { description: 'Réponse correcte', sans: `ans_oao${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _geoBox('ok', `<strong>${I18N.t('mat.fb_ok_parfait')}</strong> ${I18N.t('geo.ordonnee_ok_desc')}`) },
+                feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.ordonnee_ok_desc')}`) },
             { description: 'Erreur : a juste lu la constante c', sans: `ans_oao${X}`, tans: `q${X}_err_const`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.ordonnee_const_title')}</strong> ${I18N.t('geo.ordonnee_const_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.ordonnee_const_title')}</strong> ${I18N_D.t('geo.ordonnee_const_desc')}`) },
             { description: 'Erreur : oubli du signe moins', sans: `ans_oao${X}`, tans: `q${X}_err_sansmoins`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.erreur_signe_title')}</strong> ${I18N.t('geo.ordonnee_sansmoins_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.erreur_signe_title')}</strong> ${I18N_D.t('geo.ordonnee_sansmoins_desc')}`) },
             { description: 'Erreur : a calculé le coefficient directeur', sans: `ans_oao${X}`, tans: `q${X}_err_pente`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.ordonnee_pente_title')}</strong> ${I18N.t('geo.ordonnee_pente_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.ordonnee_pente_title')}</strong> ${I18N_D.t('geo.ordonnee_pente_desc')}`) },
             { description: "Erreur : a calculé l'abscisse à l'origine", sans: `ans_oao${X}`, tans: `q${X}_err_absc`, score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.ordonnee_axe_title')}</strong> ${I18N.t('geo.ordonnee_axe_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.ordonnee_axe_title')}</strong> ${I18N_D.t('geo.ordonnee_axe_desc')}`) },
             { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _geoBox('bad', `<strong>${I18N.t('apn.fb_wrong_incorrect')}</strong> ${I18N.t('geo.ordonnee_fallback_desc')}`) }
+                feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.ordonnee_fallback_desc')}`) }
         ];
         diagNodes = _geoDiagNodes(specsOao);
-        var builtOao = _geoSeqPrt(X, bareme, specsOao);
+        var builtOao = geoSeqPrt_D(X, bareme, specsOao);
         prtMeta = builtOao.prtMeta; canonicalNodes = builtOao.canonicalNodes; prtXML = builtOao.prtXML;
-        generalFeedback = _mkFbGen(_geoGenFbBox(I18N.t('geo.ordonnee_correction_desc', {
+        generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.ordonnee_correction_desc', {
             eq: `{@q${X}_a*x+q${X}_b*y+q${X}_c@}`,
             a: `{@q${X}_a@}`, b: `{@q${X}_b@}`, c: `{@q${X}_c@}`, ta: `{@q${X}_ta@}`
-        })), gs('geo-fbgen'));
+        })), p.fbGenRaw);
 
     } else { /* aire */
         var d3a = dimSel === '3d';
-        var repereA = d3a ? I18N.t('geo.repere_espace') : I18N.t('geo.repere_plan');
+        var repereA = d3a ? I18N_D.t('geo.repere_espace') : I18N_D.t('geo.repere_plan');
         var declTri;
         if (mode === 'fixe') {
-            declTri = `q${X}_xa:${gn('geo-p1x', 0)};q${X}_ya:${gn('geo-p1y', 0)};q${X}_za:${d3a ? gn('geo-p1z', 0) : 0};
-q${X}_xb:${gn('geo-p2x', 3)};q${X}_yb:${gn('geo-p2y', 0)};q${X}_zb:${d3a ? gn('geo-p2z', 0) : 0};
-q${X}_xc:${gn('geo-p3x', 0)};q${X}_yc:${gn('geo-p3y', 4)};q${X}_zc:${d3a ? gn('geo-p3z', 0) : 0};`;
+            declTri = `q${X}_xa:${gn(p.p1x, 0)};q${X}_ya:${gn(p.p1y, 0)};q${X}_za:${d3a ? gn(p.p1z, 0) : 0};
+q${X}_xb:${gn(p.p2x, 3)};q${X}_yb:${gn(p.p2y, 0)};q${X}_zb:${d3a ? gn(p.p2z, 0) : 0};
+q${X}_xc:${gn(p.p3x, 0)};q${X}_yc:${gn(p.p3y, 4)};q${X}_zc:${d3a ? gn(p.p3z, 0) : 0};`;
         } else {
             declTri = `q${X}_xa:ri(-3,3);q${X}_ya:ri(-3,3);q${X}_za:${d3a ? 'ri(-3,3)' : '0'};
 q${X}_xb:ri(-3,3);q${X}_yb:ri(-3,3);q${X}_zb:${d3a ? 'ri(-3,3)' : '0'};
@@ -339,39 +359,39 @@ q${X}_err_norac:round(float(q${X}_normc/2)*100)/100;
 q${X}_aire2d:abs(q${X}_ux*q${X}_vy-q${X}_uy*q${X}_vx)/2;
 q${X}_err_2d:round(float(q${X}_aire2d)*100)/100;`;
         qnote = `A${d3a ? '(x,y,z)' : '(x,y)'}, B${d3a ? '(x,y,z)' : '(x,y)'}, C${d3a ? '(x,y,z)' : '(x,y)'}, Aire={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('geo.aire_enonce1', {repere: repereA, A: _geoPointTex(X, 'xa', 'ya', 'za', d3a), B: _geoPointTex(X, 'xb', 'yb', 'zb', d3a), C: _geoPointTex(X, 'xc', 'yc', 'zc', d3a)})}</p>
-<p>${I18N.t('geo.aire_enonce2')}</p>
-<p>${I18N.t('geo.aire_lbl')} [[input:ans_aire${X}]] [[validation:ans_aire${X}]]</p>`;
-        inputXML = _mkInput({ name: `ans_aire${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('geo.aire_enonce1', {repere: repereA, A: _geoPointTex(X, 'xa', 'ya', 'za', d3a), B: _geoPointTex(X, 'xb', 'yb', 'zb', d3a), C: _geoPointTex(X, 'xc', 'yc', 'zc', d3a)})}</p>
+<p>${I18N_D.t('geo.aire_enonce2')}</p>
+<p>${I18N_D.t('geo.aire_lbl')} [[input:ans_aire${X}]] [[validation:ans_aire${X}]]</p>`;
+        inputXML = mkInput_D({ name: `ans_aire${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
 
         var specsAire = [
             { description: 'Réponse correcte', answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
-                feedback: fbOk || _geoBox('ok', `<strong>${I18N.t('mat.fb_ok_parfait')}</strong> ${I18N.t('geo.aire_ok_desc')}`) },
+                feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.aire_ok_desc')}`) },
             { description: 'Erreur : aire du parallélogramme (oubli du /2)', answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_para`, testoptions: '0.005', score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.aire_para_title')}</strong> ${I18N.t('geo.aire_para_desc')}`) },
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.aire_para_title')}</strong> ${I18N_D.t('geo.aire_para_desc')}`) },
             { description: 'Erreur : a oublié la racine carrée', answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_norac`, testoptions: '0.005', score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.oubli_racine_title')}</strong> ${I18N.t('geo.aire_norac_desc')}`) }
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.oubli_racine_title')}</strong> ${I18N_D.t('geo.aire_norac_desc')}`) }
         ];
         if (d3a) {
             specsAire.push({ description: "Erreur : a calculé l'aire en 2D (projection)", answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_2d`, testoptions: '0.005', score: 0,
-                feedback: _geoBox('warn', `<strong>${I18N.t('geo.aire_2d_title')}</strong> ${I18N.t('geo.aire_2d_desc')}`) });
+                feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.aire_2d_title')}</strong> ${I18N_D.t('geo.aire_2d_desc')}`) });
         }
         specsAire.push({ description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-            feedback: fbWrong || _geoBox('bad', `<strong>${I18N.t('apn.fb_wrong_incorrect')}</strong> ${d3a ? I18N.t('geo.aire_fallback_3d_desc') : I18N.t('geo.aire_fallback_2d_desc')}`) });
+            feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${d3a ? I18N_D.t('geo.aire_fallback_3d_desc') : I18N_D.t('geo.aire_fallback_2d_desc')}`) });
         diagNodes = _geoDiagNodes(specsAire);
-        var builtAire = _geoSeqPrt(X, bareme, specsAire);
+        var builtAire = geoSeqPrt_D(X, bareme, specsAire);
         prtMeta = builtAire.prtMeta; canonicalNodes = builtAire.canonicalNodes; prtXML = builtAire.prtXML;
-        generalFeedback = _mkFbGen(_geoGenFbBox(d3a
-            ? I18N.t('geo.aire_correction_3d', {
+        generalFeedback = mkFbGen_D(geoGenFbBox_D(d3a
+            ? I18N_D.t('geo.aire_correction_3d', {
                 ux: `{@q${X}_ux@}`, uy: `{@q${X}_uy@}`, uz: `{@q${X}_uz@}`,
                 vx: `{@q${X}_vx@}`, vy: `{@q${X}_vy@}`, vz: `{@q${X}_vz@}`,
                 cx: `{@q${X}_cx@}`, cy: `{@q${X}_cy@}`, cz: `{@q${X}_cz@}`,
                 sqrt_arr: `{@q${X}_sqrt_arr@}`, ta: `{@q${X}_ta@}`
               })
-            : I18N.t('geo.aire_correction_2d', {
+            : I18N_D.t('geo.aire_correction_2d', {
                 ux: `{@q${X}_ux@}`, uy: `{@q${X}_uy@}`,
                 vx: `{@q${X}_vx@}`, vy: `{@q${X}_vy@}`, ta: `{@q${X}_ta@}`
-              })), gs('geo-fbgen'));
+              })), p.fbGenRaw);
     }
 
     return {
@@ -380,6 +400,10 @@ q${X}_err_2d:round(float(q${X}_aire2d)*100)/100;`;
         generalFeedback, feedbackRef: `[[feedback:prt${X}]]`,
         diagNodes: diagNodes || []
     };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genGeometrie: genGeometrie, genGeometrieCore: genGeometrieCore };
 }
 
 // ─── SUITES ──────────────────────────────────────────────────
