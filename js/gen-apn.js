@@ -45,9 +45,26 @@ function genApn(X) {
     var nChanged = (changed.D ? 1 : 0) + (changed.V ? 1 : 0) + (changed.I ? 1 : 0);
     if (nChanged < 1) throw new Error(I18N.t('msg.err_apn_param_modifie'));
 
+    var p = {
+        bareme: bareme, text: text, fbOk: fbOk, fbWrong: fbWrong,
+        unknown: unknown, changed: changed, nChanged: nChanged,
+        fbGen: gv('apn-fbgen')
+    };
+    return genApnCore(X, p);
+}
+
+function genApnCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+
+    var bareme = p.bareme, text = p.text, fbOk = p.fbOk, fbWrong = p.fbWrong;
+    var unknown = p.unknown, changed = p.changed, nChanged = p.nChanged;
+
     var P = 'q' + X + '_'; // préfixe Maxima : évite toute collision entre plusieurs questions APN du même document
 
-    var unknownLabel = unknown === 'V' ? I18N.t('apn.lbl_vitesse_mid') : unknown === 'D' ? I18N.t('apn.lbl_diaphragme_mid') : I18N.t('apn.lbl_iso_mid');
+    var unknownLabel = unknown === 'V' ? I18N_D.t('apn.lbl_vitesse_mid') : unknown === 'D' ? I18N_D.t('apn.lbl_diaphragme_mid') : I18N_D.t('apn.lbl_iso_mid');
     var cibleDisplay = unknown === 'V' ? ('{@' + P + 'V2@} s') : unknown === 'D' ? ('f/{@' + P + 'D2a@}') : ('{@' + P + 'I2@} ISO');
 
     // ── Listes fixes (identiques aux exports validés) ──
@@ -183,35 +200,35 @@ function genApn(X) {
 
     // ── Énoncé (bandeau + texte enseignant ou paragraphe par défaut) ──
     var HDR = '<div style="background:#1e3a8a;border-left:5px solid #1d4ed8;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">' + I18N.t('apn.banniere') + '</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">' + I18N_D.t('apn.banniere') + '</strong>'
         + ' <span style="background:#1d4ed8;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>';
 
     var dPart = unknown === 'D' ? '?' : ('f/{@' + P + 'D2a@}');
     var vPart = unknown === 'V' ? '?' : ('{@' + P + 'V2@} s');
     var iPart = unknown === 'I' ? '?' : ('{@' + P + 'I2@} ISO');
 
-    var defaultText = '<p>' + I18N.t('apn.default_intro') + '</p>'
-        + '<ul><li>' + I18N.t('apn.default_diaphragme_lbl') + ' <strong>f/{@' + P + 'D1a@}</strong></li>'
-        + '<li>' + I18N.t('apn.default_vitesse_lbl') + ' <strong>{@' + P + 'V1@} s</strong></li>'
-        + '<li>' + I18N.t('apn.default_iso_lbl') + ' <strong>{@' + P + 'I1@} ISO</strong></li></ul>'
-        + '<p>' + I18N.t('apn.default_modif', {dPart: dPart, vPart: vPart, iPart: iPart}) + '</p>'
-        + '<p>' + I18N.t('apn.default_question', {label: unknownLabel}) + '</p>';
+    var defaultText = '<p>' + I18N_D.t('apn.default_intro') + '</p>'
+        + '<ul><li>' + I18N_D.t('apn.default_diaphragme_lbl') + ' <strong>f/{@' + P + 'D1a@}</strong></li>'
+        + '<li>' + I18N_D.t('apn.default_vitesse_lbl') + ' <strong>{@' + P + 'V1@} s</strong></li>'
+        + '<li>' + I18N_D.t('apn.default_iso_lbl') + ' <strong>{@' + P + 'I1@} ISO</strong></li></ul>'
+        + '<p>' + I18N_D.t('apn.default_modif', {dPart: dPart, vPart: vPart, iPart: iPart}) + '</p>'
+        + '<p>' + I18N_D.t('apn.default_question', {label: unknownLabel}) + '</p>';
 
     var instrText = HDR + (text || defaultText);
 
     var questionText = instrText + '[[input:ans' + X + ']][[validation:ans' + X + ']]';
 
     // ── Feedback général automatique (analyse des changements, castext [[if]]) ──
-    var autoFb = '<p>' + I18N.t('apn.fbgen_config_initiale') + ' f/{@' + P + 'D1a@}, {@' + P + 'V1@} s, {@' + P + 'I1@} ISO<br>'
-        + I18N.t('apn.fbgen_config_cible') + ' f/{@' + P + 'D2a@}, {@' + P + 'V2@} s, {@' + P + 'I2@} ISO<br>'
-        + I18N.t('apn.fbgen_reponse_correcte') + ' <strong>' + cibleDisplay + '</strong></p>'
-        + '[[if test="' + P + 'dchange"]]<p><strong>' + I18N.t('apn.fbgen_diaphragme_lbl') + '</strong> f/{@' + P + 'D1a@} → f/{@' + P + 'D2a@}<br>'
-        + '[[if test="' + P + 'dferme"]]' + I18N.t('apn.fbgen_diaphragme_ferme', {napf: P + 'napf'}) + '[[else]]' + I18N.t('apn.fbgen_diaphragme_ouvre', {napo: P + 'napo'}) + '[[/if]]</p>[[/if]]'
-        + '[[if test="' + P + 'ichange"]]<p><strong>' + I18N.t('apn.fbgen_iso_lbl') + '</strong> {@' + P + 'I1@} → {@' + P + 'I2@} ISO<br>'
-        + '[[if test="' + P + 'iaug"]]' + I18N.t('apn.fbgen_iso_aug', {nisou: P + 'nisou'}) + '[[else]]' + I18N.t('apn.fbgen_iso_dim', {nisod: P + 'nisod'}) + '[[/if]]</p>[[/if]]'
-        + '[[if test="' + P + 'vchange"]]<p><strong>' + I18N.t('apn.fbgen_vitesse_lbl') + '</strong> {@' + P + 'V1@} s → {@' + P + 'V2@} s<br>'
-        + '[[if test="' + P + 'vlent"]]' + I18N.t('apn.fbgen_vitesse_lent', {nvR: P + 'nvR'}) + '[[else]]' + I18N.t('apn.fbgen_vitesse_rapide', {nvR: P + 'nvR'}) + '[[/if]]</p>[[/if]]'
-        + '<p>' + I18N.t('apn.fbgen_conclusion', {cible: cibleDisplay}) + '</p>';
+    var autoFb = '<p>' + I18N_D.t('apn.fbgen_config_initiale') + ' f/{@' + P + 'D1a@}, {@' + P + 'V1@} s, {@' + P + 'I1@} ISO<br>'
+        + I18N_D.t('apn.fbgen_config_cible') + ' f/{@' + P + 'D2a@}, {@' + P + 'V2@} s, {@' + P + 'I2@} ISO<br>'
+        + I18N_D.t('apn.fbgen_reponse_correcte') + ' <strong>' + cibleDisplay + '</strong></p>'
+        + '[[if test="' + P + 'dchange"]]<p><strong>' + I18N_D.t('apn.fbgen_diaphragme_lbl') + '</strong> f/{@' + P + 'D1a@} → f/{@' + P + 'D2a@}<br>'
+        + '[[if test="' + P + 'dferme"]]' + I18N_D.t('apn.fbgen_diaphragme_ferme', {napf: P + 'napf'}) + '[[else]]' + I18N_D.t('apn.fbgen_diaphragme_ouvre', {napo: P + 'napo'}) + '[[/if]]</p>[[/if]]'
+        + '[[if test="' + P + 'ichange"]]<p><strong>' + I18N_D.t('apn.fbgen_iso_lbl') + '</strong> {@' + P + 'I1@} → {@' + P + 'I2@} ISO<br>'
+        + '[[if test="' + P + 'iaug"]]' + I18N_D.t('apn.fbgen_iso_aug', {nisou: P + 'nisou'}) + '[[else]]' + I18N_D.t('apn.fbgen_iso_dim', {nisod: P + 'nisod'}) + '[[/if]]</p>[[/if]]'
+        + '[[if test="' + P + 'vchange"]]<p><strong>' + I18N_D.t('apn.fbgen_vitesse_lbl') + '</strong> {@' + P + 'V1@} s → {@' + P + 'V2@} s<br>'
+        + '[[if test="' + P + 'vlent"]]' + I18N_D.t('apn.fbgen_vitesse_lent', {nvR: P + 'nvR'}) + '[[else]]' + I18N_D.t('apn.fbgen_vitesse_rapide', {nvR: P + 'nvR'}) + '[[/if]]</p>[[/if]]'
+        + '<p>' + I18N_D.t('apn.fbgen_conclusion', {cible: cibleDisplay}) + '</p>';
 
     // ── Input : bouton radio, options calculées côté Maxima ──
     var inputXML = '<input><name>ans' + X + '</name><type>radio</type><tans>' + P + 'ta</tans>'
@@ -224,8 +241,8 @@ function genApn(X) {
 
     // ── PRT : plusieurs nœuds de diagnostic (valeur non recalculée, sens de
     // compensation inversé, paramètre changé ignoré), puis nœud générique final ──
-    var fbOkFinal = fbOk || ('<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>' + I18N.t('apn.fb_ok_title') + '</strong> ' + I18N.t('apn.fb_ok_desc') + '</div>');
-    var fbWrongFinal = fbWrong || ('<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N.t('apn.fb_wrong_correction', {cible: cibleDisplay}) + '</div>');
+    var fbOkFinal = fbOk || ('<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>' + I18N_D.t('apn.fb_ok_title') + '</strong> ' + I18N_D.t('apn.fb_ok_desc') + '</div>');
+    var fbWrongFinal = fbWrong || ('<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('apn.fb_wrong_correction', {cible: cibleDisplay}) + '</div>');
 
     // Comparaison sur chaîne de caractères pour l'inconnue "diaphragme" (les valeurs
     // d'affichage comme 1.4/2.8 doivent matcher exactement la chaîne soumise par le
@@ -234,13 +251,13 @@ function genApn(X) {
 
     var oldValueVar = unknown === 'V' ? (P + 'V1') : unknown === 'D' ? (P + 'D1a') : (P + 'I1');
     var ignoredLabels = unknown === 'V'
-        ? { wig1: I18N.t('apn.lbl_diaphragme_art'), wig2: I18N.t('apn.lbl_iso_art') }
+        ? { wig1: I18N_D.t('apn.lbl_diaphragme_art'), wig2: I18N_D.t('apn.lbl_iso_art') }
         : unknown === 'D'
-        ? { wig1: I18N.t('apn.lbl_vitesse_art'), wig2: I18N.t('apn.lbl_iso_art') }
-        : { wig1: I18N.t('apn.lbl_diaphragme_art'), wig2: I18N.t('apn.lbl_vitesse_art') };
+        ? { wig1: I18N_D.t('apn.lbl_vitesse_art'), wig2: I18N_D.t('apn.lbl_iso_art') }
+        : { wig1: I18N_D.t('apn.lbl_diaphragme_art'), wig2: I18N_D.t('apn.lbl_vitesse_art') };
 
     var fbBox = function(msg) {
-        return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + msg + ' ' + I18N.t('apn.fb_wrong_correction', {cible: cibleDisplay}) + '</div>';
+        return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + msg + ' ' + I18N_D.t('apn.fb_wrong_correction', {cible: cibleDisplay}) + '</div>';
     };
 
     var nodes = [];
@@ -250,20 +267,20 @@ function genApn(X) {
     });
     nodes.push({
         desc: 'Valeur non recalculée', test: 'AlgEquiv', tans: tansOf(oldValueVar),
-        fb: fbBox(I18N.t('apn.msg_valeur_non_recalculee', {label: unknownLabel}))
+        fb: fbBox(I18N_D.t('apn.msg_valeur_non_recalculee', {label: unknownLabel}))
     });
     nodes.push({
         desc: 'Sens de compensation inversé', test: 'AlgEquiv', tans: tansOf(P + 'winv'),
-        fb: fbBox(I18N.t('apn.msg_sens_inverse', {label: unknownLabel}))
+        fb: fbBox(I18N_D.t('apn.msg_sens_inverse', {label: unknownLabel}))
     });
     if (nChanged === 2) {
         nodes.push({
             desc: 'Paramètre 1 ignoré', test: 'AlgEquiv', tans: tansOf(P + 'wig1'),
-            fb: fbBox(I18N.t('apn.msg_parametre_ignore', {label: ignoredLabels.wig1}))
+            fb: fbBox(I18N_D.t('apn.msg_parametre_ignore', {label: ignoredLabels.wig1}))
         });
         nodes.push({
             desc: 'Paramètre 2 ignoré', test: 'AlgEquiv', tans: tansOf(P + 'wig2'),
-            fb: fbBox(I18N.t('apn.msg_parametre_ignore', {label: ignoredLabels.wig2}))
+            fb: fbBox(I18N_D.t('apn.msg_parametre_ignore', {label: ignoredLabels.wig2}))
         });
     }
     nodes.push({
@@ -296,7 +313,7 @@ function genApn(X) {
         };
     });
     var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: '' };
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
     var diagNodes = [];
     for (var di = 1; di < nodes.length; di++) {
@@ -314,8 +331,12 @@ function genApn(X) {
         inputXML:        inputXML,
         prtXML:          prtXML,
         prt:             { meta: prtMeta, nodes: canonicalNodes },
-        generalFeedback: _mkFbGen(autoFb, gv('apn-fbgen')),
+        generalFeedback: mkFbGen_D(autoFb, p.fbGen),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         diagNodes:       diagNodes
     };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genApn: genApn, genApnCore: genApnCore };
 }
