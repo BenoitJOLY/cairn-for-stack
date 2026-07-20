@@ -1,10 +1,30 @@
 function genTrigonometrie(X) {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
-    var bareme = parseFloat(gs('trig-bareme')) || 1;
-    var scenario = gs('trig-scenario') || 'valeur-exacte';
-    var mode = (document.querySelector('input[name="trig-mode-r"]:checked')||{}).value || gs('trig-mode') || 'aleatoire';
-    var fbOk = gs('trig-fb-ok').trim(), fbWrong = gs('trig-fb-wrong').trim();
-    var custText = gs('trig-text').trim();
+    var p = {
+        bareme: parseFloat(gs('trig-bareme')) || 1,
+        scenario: gs('trig-scenario') || 'valeur-exacte',
+        mode: (document.querySelector('input[name="trig-mode-r"]:checked')||{}).value || gs('trig-mode') || 'aleatoire',
+        fbOk: gs('trig-fb-ok').trim(), fbWrong: gs('trig-fb-wrong').trim(),
+        custText: gs('trig-text').trim(),
+        fn: gs('trig-fn') || 'sin',
+        angle: gs('trig-angle').trim() || '%pi/6',
+        expr: gs('trig-expr').trim() || 'sin(x)^2 + cos(x)^2',
+        fbGenExtra: gs('trig-fbgen')
+    };
+    return genTrigonometrieCore(X, p);
+}
+
+/* genTrigonometrieCore : fonction pure (aucun accès DOM), voir js/gen-redox.js
+   pour le pattern (deps injectables — test/unit/gen-math-trigonometrie.test.js). */
+function genTrigonometrieCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkFbGen_D = deps.mkFbGen || _mkFbGen;
+    var mkInput_D = deps.mkInput || _mkInput;
+
+    var bareme = p.bareme, scenario = p.scenario, mode = p.mode;
+    var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
     var vars, qnote, textFrag, inputXML, prtXML, generalFeedback, canonicalNodes;
 
     function trigNode(desc, sans, tans, falseFb) {
@@ -12,43 +32,43 @@ function genTrigonometrie(X) {
             name: '0', description: desc, answertest: 'AlgEquiv', sans: sans, tans: tans,
             testoptions: '', quiet: '0',
             truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
-            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>'+I18N.t('trig.correct')+'</strong></div>',
+            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>'+I18N_D.t('trig.correct')+'</strong></div>',
             falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'PRT-'+X+'-NOK', falsefeedback: fbWrong || falseFb
         };
     }
 
-    var HDR = `<div style="background:#dc2626;border-left:5px solid #b91c1c;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('trig.title')}</strong> <span style="background:#b91c1c;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
+    var HDR = `<div style="background:#dc2626;border-left:5px solid #b91c1c;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('trig.title')}</strong> <span style="background:#b91c1c;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
 
     if (mode === 'fixe' && scenario === 'valeur-exacte') {
-        var fn = gs('trig-fn') || 'sin';
-        var angle = gs('trig-angle').trim() || '%pi/6';
+        var fn = p.fn;
+        var angle = p.angle;
         vars = `/* Q${X} Trig — Valeur exacte (fixe) */
 q${X}_fname:"${fn}";
 q${X}_angle:${angle};
 q${X}_ta:${fn}(${angle});`;
         qnote = `{@q${X}_fname@}({@q${X}_angle@})={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('trig.calc_valeur_exacte')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('trig.calc_valeur_exacte')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.2rem;">\\( {@q${X}_fname@}\\left({@q${X}_angle@}\\right) \\)</div>
-<p>${I18N.t('trig.reponse_lbl')}[[input:ans_trig${X}]] [[validation:ans_trig${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_trig${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
+<p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_trig${X}]] [[validation:ans_trig${X}]]</p>`;
+        inputXML = mkInput_D({name:`ans_trig${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
         canonicalNodes = [trigNode('Valeur exacte correcte ?', `ans_trig${X}`, `q${X}_ta`,
-            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('trig.fb_wrong_cercle_prefix')}${I18N.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).</div>`;
+            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_cercle_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).</div>`;
 
     } else if (mode === 'fixe') { /* fixe + identite */
-        var expr = gs('trig-expr').trim() || 'sin(x)^2 + cos(x)^2';
+        var expr = p.expr;
         vars = `/* Q${X} Trig — Simplifier expression (fixe) */
 q${X}_expr:${expr};
 q${X}_ta:trigreduce(trigsimp(q${X}_expr));`;
         qnote = `expr={@q${X}_expr@}={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('trig.simplifier_expr')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('trig.simplifier_expr')}</p>
 <div style="text-align:center;margin:15px 0;">\\( {@q${X}_expr@} \\)</div>
-<p>${I18N.t('trig.reponse_lbl')}[[input:ans_simp${X}]] [[validation:ans_simp${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_simp${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
+<p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_simp${X}]] [[validation:ans_simp${X}]]</p>`;
+        inputXML = mkInput_D({name:`ans_simp${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
         canonicalNodes = [trigNode('Simplification correcte ?', `ans_simp${X}`, `q${X}_ta`,
-            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\).</div>`;
+            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\).</div>`;
 
     } else if (scenario === 'valeur-exacte') {
         vars = `/* Q${X} Trig — Valeur exacte */
@@ -60,13 +80,13 @@ q${X}_funcs:[sin,cos,tan];
 q${X}_fname:["sin","cos","tan"][q${X}_r_func+1];
 q${X}_ta:if q${X}_r_func=0 then sin(q${X}_angle) elseif q${X}_r_func=1 then cos(q${X}_angle) else tan(q${X}_angle);`;
         qnote = `{@q${X}_fname@}({@q${X}_angle@})={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('trig.calc_valeur_exacte')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('trig.calc_valeur_exacte')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.2rem;">\\( {@q${X}_fname@}\\left({@q${X}_angle@}\\right) \\)</div>
-<p>${I18N.t('trig.reponse_lbl')}[[input:ans_trig${X}]] [[validation:ans_trig${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_trig${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
+<p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_trig${X}]] [[validation:ans_trig${X}]]</p>`;
+        inputXML = mkInput_D({name:`ans_trig${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
         canonicalNodes = [trigNode('Valeur exacte correcte ?', `ans_trig${X}`, `q${X}_ta`,
-            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('trig.fb_wrong_cercle_prefix')}${I18N.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).</div>`;
+            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_cercle_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).</div>`;
 
     } else { /* aleatoire + identite */
         vars = `/* Q${X} Trig — Simplifier expression */
@@ -86,24 +106,28 @@ q${X}_expr:if q${X}_r_tpl=0 then cos(q${X}_p+q${X}_q)+cos(q${X}_p-q${X}_q)
       elseif q${X}_r_tpl=2 then sin(q${X}_p+q${X}_q)+sin(q${X}_p-q${X}_q)
       else sin(q${X}_p+q${X}_q)-sin(q${X}_p-q${X}_q);`;
         qnote = `expr={@q${X}_expr@}={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('trig.simplifier_expr')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('trig.simplifier_expr')}</p>
 <div style="text-align:center;margin:15px 0;">\\( {@q${X}_expr@} \\)</div>
-<p>${I18N.t('trig.reponse_lbl')}[[input:ans_simp${X}]] [[validation:ans_simp${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_simp${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
+<p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_simp${X}]] [[validation:ans_simp${X}]]</p>`;
+        inputXML = mkInput_D({name:`ans_simp${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
         canonicalNodes = [trigNode('Simplification correcte ?', `ans_simp${X}`, `q${X}_ta`,
-            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('trig.fb_wrong_simpson_prefix')}${I18N.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\) ${I18N.t('trig.simpson_note')}.</div>`;
+            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_simpson_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\) ${I18N_D.t('trig.simpson_note')}.</div>`;
     }
 
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-    prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
-    generalFeedback = _mkFbGen(generalFeedback, gs('trig-fbgen'));
+    generalFeedback = mkFbGen_D(generalFeedback, p.fbGenExtra);
 
     return {type:'trigonometrie', bareme, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },
         generalFeedback, feedbackRef:`[[feedback:prt${X}]]`,
         diagNodes: []};
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genTrigonometrie: genTrigonometrie, genTrigonometrieCore: genTrigonometrieCore };
 }
 
 // ─── POLYNÔMES ───────────────────────────────────────────────
