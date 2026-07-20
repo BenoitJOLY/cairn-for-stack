@@ -87,6 +87,30 @@ function genJxgDrop(X) {
     var zonesVisible = document.getElementById('jd-zones-visible')
         ? document.getElementById('jd-zones-visible').checked : true;
 
+    var solutionImgData = jxgDropBuildSolutionImage(st);
+
+    var p = {
+        bareme: bareme, instruction: instruction, zonesVisible: zonesVisible,
+        bgW: st.bgW, bgH: st.bgH, bgData: st.bgData,
+        zones: st.zones, proposals: st.proposals,
+        solutionImgData: solutionImgData,
+        fbGen: v('jd-fbgen')
+    };
+    return genJxgDropCore(X, p);
+}
+
+function genJxgDropCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var htmlEsc_D = deps.htmlEsc || htmlEsc;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
+    var jxgDropChunkedRaw_D = deps.jxgDropChunkedRaw || jxgDropChunkedRaw;
+
+    var bareme = p.bareme, instruction = p.instruction, zonesVisible = p.zonesVisible;
+    var st = { bgW: p.bgW, bgH: p.bgH, bgData: p.bgData, zones: p.zones, proposals: p.proposals };
+
     var BGW = st.bgW, BGH = st.bgH;
     var PAL_H  = 84;       // hauteur de la palette en unités image
     var TOTAL_H = BGH + PAL_H;
@@ -176,7 +200,7 @@ function genJxgDrop(X) {
 
     var propItems = st.proposals.map(function (p, i) {
         var px = initPos[i][0], py = initPos[i][1];
-        var label = (p.text || I18N.t('tpl.vf_prop_fallback', {n: p.id})).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        var label = (p.text || I18N_D.t('tpl.vf_prop_fallback', {n: p.id})).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         return "board.create('point',[" + px + ',' + py + "],"
             + "{name:'" + label + "',size:11,face:'circle',fixed:IS_RO_" + X + ',highlight:!IS_RO_' + X + ','
             + "strokeColor:'#fff',strokeWidth:3,fillColor:'#2563eb',shadow:true,"
@@ -211,7 +235,7 @@ function genJxgDrop(X) {
         + "board.create('point',[" + BGW + "," + PAL_H + "],{visible:false}),"
         + "board.create('point',[0," + PAL_H + "],{visible:false})],"
         + "{fixed:true,highlight:false,borders:{strokeColor:'none'},fillColor:'#f1f5f9',fillOpacity:1});\n"
-        + "board.create('image',[" + jxgDropChunkedJsString(st.bgData, 2000) + ",[0," + PAL_H + "],[" + BGW + "," + BGH + "]],"
+        + "board.create('image',[" + jxgDropChunkedJsString_D(st.bgData, 2000) + ",[0," + PAL_H + "],[" + BGW + "," + BGH + "]],"
         + "{fixed:true,highlight:false});\n"
         + "board.create('segment',[\n"
         + "  board.create('point',[0," + PAL_H + "],{visible:false}),\n"
@@ -306,21 +330,21 @@ function genJxgDrop(X) {
         var assignments = z.assignments && z.assignments.length ? z.assignments : (z.assignment ? [z.assignment] : []);
         var lbls = assignments.map(function (id) {
             var prop = st.proposals.find(function (p) { return p.id === id; });
-            return prop ? htmlEsc(prop.text || I18N.t('tpl.vf_prop_fallback', {n: prop.id})) : '?';
+            return prop ? htmlEsc_D(prop.text || I18N_D.t('tpl.vf_prop_fallback', {n: prop.id})) : '?';
         });
-        return '<li>' + I18N.t('jd.zone_label', {n: i + 1}) + ' → ' + (lbls.join(' <em>ou</em> ') || '?') + '</li>';
+        return '<li>' + I18N_D.t('jd.zone_label', {n: i + 1}) + ' → ' + (lbls.join(' <em>ou</em> ') || '?') + '</li>';
     }).join('');
-    var trueFb  = '<p>✅ <strong>' + I18N.t('jd.fb_ok_title') + '</strong> ' + I18N.t('jd.fb_ok_detail') + '</p>';
-    var falseFb = '<p>❌ ' + I18N.t('jd.fb_wrong', {pctvar: 'pct_' + X}) + '</p><ul>' + solutionLines + '</ul>';
+    var trueFb  = '<p>✅ <strong>' + I18N_D.t('jd.fb_ok_title') + '</strong> ' + I18N_D.t('jd.fb_ok_detail') + '</p>';
+    var falseFb = '<p>❌ ' + I18N_D.t('jd.fb_wrong', {pctvar: 'pct_' + X}) + '</p><ul>' + solutionLines + '</ul>';
 
     // L'image-solution va dans le feedback général (generalfeedback), affiché
     // à tous les élèves après validation quel que soit leur score — c'est
     // l'emplacement STACK prévu pour montrer le corrigé, pas les feedbacks
     // vrai/faux du PRT (qui restent du texte pour ne pas dupliquer l'image
     // deux fois dans le XML).
-    var solutionImgData = jxgDropBuildSolutionImage(st);
+    var solutionImgData = p.solutionImgData;
     var solutionImgHtml = solutionImgData
-        ? '<p style="margin-top:10px;"><img src="' + jxgDropChunkedRaw(solutionImgData, 2000)
+        ? '<p style="margin-top:10px;"><img src="' + jxgDropChunkedRaw_D(solutionImgData, 2000)
           + '" style="max-width:100%;border-radius:8px;border:1px solid #e2e8f0;" alt="Solution"></p>'
         : '';
 
@@ -333,7 +357,7 @@ function genJxgDrop(X) {
         falsescoremode: '=', falsescore: 'sc_' + X, falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: falseFb
     }];
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
     // ── textFrag ──────────────────────────────────────────────────
 
@@ -345,7 +369,7 @@ function genJxgDrop(X) {
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X
-        + ' — ' + I18N.t('jd.banniere') + '</strong>'
+        + ' — ' + I18N_D.t('jd.banniere') + '</strong>'
         + '<span style="background:#92400e;color:#fff;padding:2px 9px;'
         + 'border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
@@ -365,11 +389,15 @@ function genJxgDrop(X) {
         kbdRaw:          jxgCode,
         inputXML:        inputsXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen(solutionImgHtml, v('jd-fbgen')),
+        generalFeedback: mkFbGen_D(solutionImgHtml, p.fbGen),
         solutionImg:     solutionImgHtml,
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genJxgDrop: genJxgDrop, genJxgDropCore: genJxgDropCore, jxgDropChunkedJsString: jxgDropChunkedJsString, jxgDropChunkedRaw: jxgDropChunkedRaw };
 }
 
 // ══════════════════════════════════════════════════════
