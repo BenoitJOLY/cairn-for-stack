@@ -84,9 +84,45 @@ function genComplexe(X) {
     var fc = gn('cpx-c') || 1,  fd = gn('cpx-d') || -1;
     var feqb = gn('cpx-eq-b') || -2, feqc = gn('cpx-eq-c') || 5;
 
+    var fbOverrides = {};
+    Object.keys(CPX_FB_DEFS).forEach(function (scn) {
+        CPX_FB_DEFS[scn].forEach(function (d) {
+            var el = document.getElementById(_cpxFbId(scn, d.key));
+            fbOverrides[scn + '|' + d.key] = (el && el.value.trim()) ? el.value : undefined;
+        });
+    });
+
+    var p = {
+        bareme: bareme, scenario: scenario, complexno: complexno, mode: mode, op: op,
+        randMin: randMin, randMax: randMax, custText: custText, custFbgen: custFbgen,
+        fa: fa, fb: fb, fc: fc, fd: fd, feqb: feqb, feqc: feqc,
+        fbOverrides: fbOverrides
+    };
+    return genComplexeCore(X, p);
+}
+
+function genComplexeCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkInput_D = deps._mkInput || _mkInput;
+    var cpxGenFbgen_D = deps._cpxGenFbgen || _cpxGenFbgen;
+
+    function _cpxFb_D(scenario, key, X, pmap) {
+        var defs = CPX_FB_DEFS[scenario] || [];
+        var d = defs.find(function (x) { return x.key === key; });
+        var fallback = d ? I18N_D.t(d.defKey) : '';
+        var raw = p.fbOverrides[scenario + '|' + key] || fallback;
+        return _cpxReplace(raw, X, pmap);
+    }
+
+    var bareme = p.bareme, scenario = p.scenario, complexno = p.complexno, mode = p.mode, op = p.op;
+    var randMin = p.randMin, randMax = p.randMax, custText = p.custText, custFbgen = p.custFbgen;
+    var fa = p.fa, fb = p.fb, fc = p.fc, fd = p.fd, feqb = p.feqb, feqc = p.feqc;
+
     var HDR = '<div style="background:#06b6d4;border-left:5px solid #0891b2;border-radius:0 8px 8px 0;'
             + 'padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-            + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t('tpl.cpx_banniere') + '</strong> '
+            + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N_D.t('tpl.cpx_banniere') + '</strong> '
             + '<span style="background:#0891b2;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">'
             + '/ ' + bareme + ' pt</span></div>';
 
@@ -109,7 +145,7 @@ function genComplexe(X) {
                 + 'q'+X+'_ta_conj:realpart(q'+X+'_ta)-imagpart(q'+X+'_ta)*%i;\n'
                 + 'q'+X+'_ta_re:realpart(q'+X+'_ta);\n'
                 + 'q'+X+'_ta_im:imagpart(q'+X+'_ta);';
-            qnote = 'z1={@q'+X+'_z1@}, z2={@q'+X+'_z2@}, ' + I18N.t('tpl.cpx_qnote_resultat') + '={@q'+X+'_ta@}';
+            qnote = 'z1={@q'+X+'_z1@}, z2={@q'+X+'_z2@}, ' + I18N_D.t('tpl.cpx_qnote_resultat') + '={@q'+X+'_ta@}';
         } else {
             vars = 'q'+X+'_z1:('+fa+')+('+fb+')*%i;\n'
                  + 'q'+X+'_z2:('+fc+')+('+fd+')*%i;\n'
@@ -117,7 +153,7 @@ function genComplexe(X) {
                  + 'q'+X+'_ta_conj:realpart(q'+X+'_ta)-imagpart(q'+X+'_ta)*%i;\n'
                  + 'q'+X+'_ta_re:realpart(q'+X+'_ta);\n'
                  + 'q'+X+'_ta_im:imagpart(q'+X+'_ta);';
-            qnote = I18N.t('tpl.cpx_qnote_resultat_cap') + ': {@q'+X+'_ta@}';
+            qnote = I18N_D.t('tpl.cpx_qnote_resultat_cap') + ': {@q'+X+'_ta@}';
         }
 
         var z1v = '{@q'+X+'_z1@}', z2v = '{@q'+X+'_z2@}';
@@ -128,10 +164,10 @@ function genComplexe(X) {
                    :              lp+z1v+rp+'+'+lp+z2v+rp;
 
         inputLine       = '<p>\\( z = \\) [[input:ans1'+X+']] [[validation:ans1'+X+']]</p>'
-                        + '<p><em>'+I18N.t('tpl.cpx_hint_forme',{c:complexno})+'</em></p>';
-        textDescDefault = '<p>'+I18N.t('tpl.cpx_text_formealg',{c:complexno})+'</p>'
+                        + '<p><em>'+I18N_D.t('tpl.cpx_hint_forme',{c:complexno})+'</em></p>';
+        textDescDefault = '<p>'+I18N_D.t('tpl.cpx_text_formealg',{c:complexno})+'</p>'
                         + '<div style="text-align:center;margin:15px 0;">\\[ '+opDisp+' \\]</div>';
-        inputXML        = _mkInput({name:'ans1'+X, tans:'q'+X+'_ta', boxsize:20,
+        inputXML        = mkInput_D({name:'ans1'+X, tans:'q'+X+'_ta', boxsize:20,
                             hint:'a+b*%'+complexno, checkanswertype:1, mustverify:1, showvalidation:2});
         pmap            = {'Z1':z1v, 'Z2':z2v, 'RESULT':'{@q'+X+'_ta@}', 'Z':'{@q'+X+'_ta@}'};
 
@@ -139,29 +175,29 @@ function genComplexe(X) {
                   : op === '*' ? '\\left({@q'+X+'_z1@}\\right)\\times\\left({@q'+X+'_z2@}\\right)'
                   : op === '-' ? '\\left({@q'+X+'_z1@}\\right)-\\left({@q'+X+'_z2@}\\right)'
                   :              '\\left({@q'+X+'_z1@}\\right)+\\left({@q'+X+'_z2@}\\right)';
-        var _fbHint = op === '/' ? I18N.t('tpl.cpx_hint_op_div')
-                    : op === '*' ? I18N.t('tpl.cpx_hint_op_mul')
-                    : op === '-' ? I18N.t('tpl.cpx_hint_op_sub')
-                    :              I18N.t('tpl.cpx_hint_op_add');
+        var _fbHint = op === '/' ? I18N_D.t('tpl.cpx_hint_op_div')
+                    : op === '*' ? I18N_D.t('tpl.cpx_hint_op_mul')
+                    : op === '-' ? I18N_D.t('tpl.cpx_hint_op_sub')
+                    :              I18N_D.t('tpl.cpx_hint_op_add');
         generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N.t('tpl.cpx_correction_titre') + '</div>'
+            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
             + '<div style="font-size:.9rem;">'
             + _fbHint + '<br><br>'
             + '\\[' + _fbOp + ' = {@q'+X+'_ta@}\\]'
-            + I18N.t('tpl.cpx_partie_reelle') + ' : \\({@q'+X+'_ta_re@}\\) &nbsp;—&nbsp; ' + I18N.t('tpl.cpx_partie_imaginaire') + ' : \\({@q'+X+'_ta_im@}\\)'
+            + I18N_D.t('tpl.cpx_partie_reelle') + ' : \\({@q'+X+'_ta_re@}\\) &nbsp;—&nbsp; ' + I18N_D.t('tpl.cpx_partie_imaginaire') + ' : \\({@q'+X+'_ta_im@}\\)'
             + '</div></div>';
 
         // PRT 3 nœuds
         canonicalNodes = [
-            _cpxNode(0, I18N.t('tpl.cpx_node_formealg_ok'), 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta',
-                -1, 1, 'PRT-'+X+'-OK', _cpxFb('forme-alg','ok',X,pmap),
+            _cpxNode(0, I18N_D.t('tpl.cpx_node_formealg_ok'), 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta',
+                -1, 1, 'PRT-'+X+'-OK', _cpxFb_D('forme-alg','ok',X,pmap),
                 1, 0, 'PRT-'+X+'-NOK', ''),
-            _cpxNode(1, I18N.t('tpl.cpx_node_formealg_conj'), 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta_conj',
-                -1, 0.5, 'PRT-'+X+'-CONJ', _cpxFb('forme-alg','conj',X,pmap),
+            _cpxNode(1, I18N_D.t('tpl.cpx_node_formealg_conj'), 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta_conj',
+                -1, 0.5, 'PRT-'+X+'-CONJ', _cpxFb_D('forme-alg','conj',X,pmap),
                 2, 0, 'PRT-'+X+'-NOK2', ''),
-            _cpxNode(2, I18N.t('tpl.cpx_node_formealg_err'), 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta',
-                -1, 1, 'PRT-'+X+'-OK2', _cpxFb('forme-alg','ok2',X,pmap),
-                -1, 0, 'PRT-'+X+'-ERR', _cpxFb('forme-alg','err',X,pmap))
+            _cpxNode(2, I18N_D.t('tpl.cpx_node_formealg_err'), 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta',
+                -1, 1, 'PRT-'+X+'-OK2', _cpxFb_D('forme-alg','ok2',X,pmap),
+                -1, 0, 'PRT-'+X+'-ERR', _cpxFb_D('forme-alg','err',X,pmap))
         ];
 
     // ── Module et Argument ──
@@ -184,34 +220,34 @@ function genComplexe(X) {
 
         inputLine       = '<p>\\(|z|=\\) [[input:ans_mod'+X+']] [[validation:ans_mod'+X+']]</p>\n'
                         + '<p>\\(\\arg(z)=\\) [[input:ans_arg'+X+']] [[validation:ans_arg'+X+']]</p>\n'
-                        + '<p><em>'+I18N.t('tpl.cpx_hint_mod_arg')+'</em></p>';
-        textDescDefault = '<p>'+I18N.t('tpl.cpx_text_modarg',{zval:'{@q'+X+'_z@}'})+'</p>';
-        inputXML        = _mkInput({name:'ans_mod'+X, tans:'q'+X+'_ta_mod', boxsize:15,
+                        + '<p><em>'+I18N_D.t('tpl.cpx_hint_mod_arg')+'</em></p>';
+        textDescDefault = '<p>'+I18N_D.t('tpl.cpx_text_modarg',{zval:'{@q'+X+'_z@}'})+'</p>';
+        inputXML        = mkInput_D({name:'ans_mod'+X, tans:'q'+X+'_ta_mod', boxsize:15,
                             hint:'sqrt(...)', checkanswertype:1, mustverify:1, showvalidation:2})
-                        + '\n' + _mkInput({name:'ans_arg'+X, tans:'q'+X+'_ta_arg', boxsize:15,
+                        + '\n' + mkInput_D({name:'ans_arg'+X, tans:'q'+X+'_ta_arg', boxsize:15,
                             hint:'%pi/4', checkanswertype:1, mustverify:1, showvalidation:2});
         pmap            = {'Z':'{@q'+X+'_z@}', 'MOD':'{@q'+X+'_ta_mod@}', 'ARG':'{@q'+X+'_ta_arg@}'};
         generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N.t('tpl.cpx_correction_titre') + '</div>'
+            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
             + '<div style="font-size:.9rem;">'
-            + I18N.t('tpl.cpx_formule_modarg') + '<br><br>'
-            + I18N.t('tpl.cpx_module') + ' : \\({@q'+X+'_ta_mod@}\\) &nbsp;—&nbsp; ' + I18N.t('tpl.cpx_argument') + ' : \\({@q'+X+'_ta_arg@}\\)'
+            + I18N_D.t('tpl.cpx_formule_modarg') + '<br><br>'
+            + I18N_D.t('tpl.cpx_module') + ' : \\({@q'+X+'_ta_mod@}\\) &nbsp;—&nbsp; ' + I18N_D.t('tpl.cpx_argument') + ' : \\({@q'+X+'_ta_arg@}\\)'
             + '</div></div>';
 
         // PRT 4 nœuds
         canonicalNodes = [
-            _cpxNode(0, I18N.t('tpl.cpx_node_modarg_mod'), 'AlgEquiv', 'ans_mod'+X, 'q'+X+'_ta_mod',
+            _cpxNode(0, I18N_D.t('tpl.cpx_node_modarg_mod'), 'AlgEquiv', 'ans_mod'+X, 'q'+X+'_ta_mod',
                 1, 1, 'PRT-'+X+'-MOD-OK', '',
                 2, 0, 'PRT-'+X+'-MOD-NOK', ''),
-            _cpxNode(1, I18N.t('tpl.cpx_node_modarg_modok_argok'), 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg',
-                -1, 1, 'PRT-'+X+'-ARG-OK', _cpxFb('module-arg','perfect',X,pmap),
+            _cpxNode(1, I18N_D.t('tpl.cpx_node_modarg_modok_argok'), 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg',
+                -1, 1, 'PRT-'+X+'-ARG-OK', _cpxFb_D('module-arg','perfect',X,pmap),
                 3, 0.5, 'PRT-'+X+'-ARG-NOK', ''),
-            _cpxNode(2, I18N.t('tpl.cpx_node_modarg_modnok_argok'), 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg',
-                -1, 0.5, 'PRT-'+X+'-MOD-NOK-ARG-OK', _cpxFb('module-arg','argok-modnok',X,pmap),
-                -1, 0, 'PRT-'+X+'-TOUT-NOK', _cpxFb('module-arg','toutnok',X,pmap)),
-            _cpxNode(3, I18N.t('tpl.cpx_node_modarg_quadrant'), 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg_neg',
-                -1, 0.25, 'PRT-'+X+'-QUADRANT', _cpxFb('module-arg','quadrant',X,pmap),
-                -1, 0, 'PRT-'+X+'-ARG-ERR', _cpxFb('module-arg','argerr',X,pmap))
+            _cpxNode(2, I18N_D.t('tpl.cpx_node_modarg_modnok_argok'), 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg',
+                -1, 0.5, 'PRT-'+X+'-MOD-NOK-ARG-OK', _cpxFb_D('module-arg','argok-modnok',X,pmap),
+                -1, 0, 'PRT-'+X+'-TOUT-NOK', _cpxFb_D('module-arg','toutnok',X,pmap)),
+            _cpxNode(3, I18N_D.t('tpl.cpx_node_modarg_quadrant'), 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg_neg',
+                -1, 0.25, 'PRT-'+X+'-QUADRANT', _cpxFb_D('module-arg','quadrant',X,pmap),
+                -1, 0, 'PRT-'+X+'-ARG-ERR', _cpxFb_D('module-arg','argerr',X,pmap))
         ];
 
     // ── Équation du 2nd degré ──
@@ -241,12 +277,12 @@ function genComplexe(X) {
 
         inputLine       = '<p>\\(z_1=\\) [[input:ans_z1'+X+']] [[validation:ans_z1'+X+']]</p>\n'
                         + '<p>\\(z_2=\\) [[input:ans_z2'+X+']] [[validation:ans_z2'+X+']]</p>\n'
-                        + '<p><em>'+I18N.t('tpl.cpx_hint_eq',{c:complexno})+'</em></p>';
-        textDescDefault = '<p>'+I18N.t('tpl.cpx_text_eq')+'</p>'
+                        + '<p><em>'+I18N_D.t('tpl.cpx_hint_eq',{c:complexno})+'</em></p>';
+        textDescDefault = '<p>'+I18N_D.t('tpl.cpx_text_eq')+'</p>'
                         + '<div style="text-align:center;margin:15px 0;">\\[ {@q'+X+'_eq@}=0 \\]</div>';
-        inputXML        = _mkInput({name:'ans_z1'+X, tans:'q'+X+'_ta1', boxsize:15,
+        inputXML        = mkInput_D({name:'ans_z1'+X, tans:'q'+X+'_ta1', boxsize:15,
                             hint:'a+b*%'+complexno, checkanswertype:1, mustverify:1, showvalidation:2})
-                        + '\n' + _mkInput({name:'ans_z2'+X, tans:'q'+X+'_ta2', boxsize:15,
+                        + '\n' + mkInput_D({name:'ans_z2'+X, tans:'q'+X+'_ta2', boxsize:15,
                             hint:'a-b*%'+complexno, checkanswertype:1, mustverify:1, showvalidation:2});
         pmap            = {
             'EQB':'{@q'+X+'_eqb@}', 'EQC':'{@q'+X+'_eqc@}',
@@ -254,26 +290,26 @@ function genComplexe(X) {
             'DELTA':'{@q'+X+'_delta@}'
         };
         generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N.t('tpl.cpx_correction_titre') + '</div>'
+            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
             + '<div style="font-size:.9rem;">'
-            + I18N.t('tpl.cpx_discriminant') + ' : \\({@q'+X+'_delta@}\\)<br><br>'
+            + I18N_D.t('tpl.cpx_discriminant') + ' : \\({@q'+X+'_delta@}\\)<br><br>'
             + '\\(z_1 = {@q'+X+'_ta1@}\\) &nbsp;—&nbsp; \\(z_2 = {@q'+X+'_ta2@}\\)'
             + '</div></div>';
 
         // PRT 4 nœuds
         canonicalNodes = [
-            _cpxNode(0, I18N.t('tpl.cpx_node_eq_z1'), 'AlgEquiv', 'ans_z1'+X, 'q'+X+'_ta1',
+            _cpxNode(0, I18N_D.t('tpl.cpx_node_eq_z1'), 'AlgEquiv', 'ans_z1'+X, 'q'+X+'_ta1',
                 1, 1, 'PRT-'+X+'-Z1-OK', '',
                 2, 0, 'PRT-'+X+'-Z1-NOK', ''),
-            _cpxNode(1, I18N.t('tpl.cpx_node_eq_z1ok_z2'), 'AlgEquiv', 'ans_z2'+X, 'q'+X+'_ta2',
-                -1, 1, 'PRT-'+X+'-Z2-OK', _cpxFb('equation-2deg','perfect',X,pmap),
-                -1, 0.5, 'PRT-'+X+'-Z2-NOK', _cpxFb('equation-2deg','z2wrong',X,pmap)),
-            _cpxNode(2, I18N.t('tpl.cpx_node_eq_swap'), 'AlgEquiv', 'ans_z1'+X, 'q'+X+'_ta2',
+            _cpxNode(1, I18N_D.t('tpl.cpx_node_eq_z1ok_z2'), 'AlgEquiv', 'ans_z2'+X, 'q'+X+'_ta2',
+                -1, 1, 'PRT-'+X+'-Z2-OK', _cpxFb_D('equation-2deg','perfect',X,pmap),
+                -1, 0.5, 'PRT-'+X+'-Z2-NOK', _cpxFb_D('equation-2deg','z2wrong',X,pmap)),
+            _cpxNode(2, I18N_D.t('tpl.cpx_node_eq_swap'), 'AlgEquiv', 'ans_z1'+X, 'q'+X+'_ta2',
                 3, 1, 'PRT-'+X+'-SWAP', '',
-                -1, 0, 'PRT-'+X+'-TOUT-NOK', _cpxFb('equation-2deg','toutnok',X,pmap)),
-            _cpxNode(3, I18N.t('tpl.cpx_node_eq_swap_confirm'), 'AlgEquiv', 'ans_z2'+X, 'q'+X+'_ta1',
-                -1, 0.5, 'PRT-'+X+'-SWAP-TOTAL', _cpxFb('equation-2deg','swaptotal',X,pmap),
-                -1, 0.25, 'PRT-'+X+'-SWAP-PARTIAL', _cpxFb('equation-2deg','swappartial',X,pmap))
+                -1, 0, 'PRT-'+X+'-TOUT-NOK', _cpxFb_D('equation-2deg','toutnok',X,pmap)),
+            _cpxNode(3, I18N_D.t('tpl.cpx_node_eq_swap_confirm'), 'AlgEquiv', 'ans_z2'+X, 'q'+X+'_ta1',
+                -1, 0.5, 'PRT-'+X+'-SWAP-TOTAL', _cpxFb_D('equation-2deg','swaptotal',X,pmap),
+                -1, 0.25, 'PRT-'+X+'-SWAP-PARTIAL', _cpxFb_D('equation-2deg','swappartial',X,pmap))
         ];
 
     // ── Géométrie : milieu et distance (affixes) ──
@@ -296,32 +332,32 @@ function genComplexe(X) {
 
         inputLine       = '<p>\\(z_I=\\) [[input:ans_zi'+X+']] [[validation:ans_zi'+X+']]</p>\n'
                         + '<p>\\(AB=\\) [[input:ans_ab'+X+']] [[validation:ans_ab'+X+']]</p>\n'
-                        + '<p><em>'+I18N.t('tpl.cpx_hint_affixes',{c:complexno})+'</em></p>';
-        textDescDefault = '<p>'+I18N.t('tpl.cpx_text_affixes1',{za:'{@q'+X+'_za@}', zb:'{@q'+X+'_zb@}'})+'</p>'
-                        + '<p>'+I18N.t('tpl.cpx_text_affixes2')+'</p>';
-        inputXML        = _mkInput({name:'ans_zi'+X, tans:'q'+X+'_zi', boxsize:15,
+                        + '<p><em>'+I18N_D.t('tpl.cpx_hint_affixes',{c:complexno})+'</em></p>';
+        textDescDefault = '<p>'+I18N_D.t('tpl.cpx_text_affixes1',{za:'{@q'+X+'_za@}', zb:'{@q'+X+'_zb@}'})+'</p>'
+                        + '<p>'+I18N_D.t('tpl.cpx_text_affixes2')+'</p>';
+        inputXML        = mkInput_D({name:'ans_zi'+X, tans:'q'+X+'_zi', boxsize:15,
                             hint:'a+b*%'+complexno, checkanswertype:1, mustverify:1, showvalidation:2})
-                        + '\n' + _mkInput({name:'ans_ab'+X, tans:'q'+X+'_ab', boxsize:15,
+                        + '\n' + mkInput_D({name:'ans_ab'+X, tans:'q'+X+'_ab', boxsize:15,
                             hint:'sqrt(...)', checkanswertype:1, mustverify:1, showvalidation:2});
         pmap            = {'ZA':'{@q'+X+'_za@}', 'ZB':'{@q'+X+'_zb@}', 'ZI':'{@q'+X+'_zi@}', 'AB':'{@q'+X+'_ab@}'};
         generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N.t('tpl.cpx_correction_titre') + '</div>'
+            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
             + '<div style="font-size:.9rem;">'
-            + I18N.t('tpl.cpx_milieu') + ' : \\(z_I=\\dfrac{z_A+z_B}{2}\\) &nbsp;—&nbsp; ' + I18N.t('tpl.cpx_distance') + ' : \\(AB=|z_B-z_A|\\)<br><br>'
+            + I18N_D.t('tpl.cpx_milieu') + ' : \\(z_I=\\dfrac{z_A+z_B}{2}\\) &nbsp;—&nbsp; ' + I18N_D.t('tpl.cpx_distance') + ' : \\(AB=|z_B-z_A|\\)<br><br>'
             + '\\(z_I={@q'+X+'_zi@}\\) &nbsp;—&nbsp; \\(AB={@q'+X+'_ab@}\\)'
             + '</div></div>';
 
         // PRT 3 nœuds
         canonicalNodes = [
-            _cpxNode(0, I18N.t('tpl.cpx_node_affixes_zi'), 'AlgEquiv', 'ans_zi'+X, 'q'+X+'_zi',
+            _cpxNode(0, I18N_D.t('tpl.cpx_node_affixes_zi'), 'AlgEquiv', 'ans_zi'+X, 'q'+X+'_zi',
                 1, 1, 'PRT-'+X+'-ZI-OK', '',
                 2, 0, 'PRT-'+X+'-ZI-NOK', ''),
-            _cpxNode(1, I18N.t('tpl.cpx_node_affixes_ziok_ab'), 'AlgEquiv', 'ans_ab'+X, 'q'+X+'_ab',
-                -1, 1, 'PRT-'+X+'-AB-OK', _cpxFb('affixes','perfect',X,pmap),
-                -1, 0.5, 'PRT-'+X+'-AB-NOK', _cpxFb('affixes','ziok-abwrong',X,pmap)),
-            _cpxNode(2, I18N.t('tpl.cpx_node_affixes_zinok_ab'), 'AlgEquiv', 'ans_ab'+X, 'q'+X+'_ab',
-                -1, 0.5, 'PRT-'+X+'-ZI-NOK-AB-OK', _cpxFb('affixes','ziwrong-abok',X,pmap),
-                -1, 0, 'PRT-'+X+'-TOUT-NOK', _cpxFb('affixes','toutnok',X,pmap))
+            _cpxNode(1, I18N_D.t('tpl.cpx_node_affixes_ziok_ab'), 'AlgEquiv', 'ans_ab'+X, 'q'+X+'_ab',
+                -1, 1, 'PRT-'+X+'-AB-OK', _cpxFb_D('affixes','perfect',X,pmap),
+                -1, 0.5, 'PRT-'+X+'-AB-NOK', _cpxFb_D('affixes','ziok-abwrong',X,pmap)),
+            _cpxNode(2, I18N_D.t('tpl.cpx_node_affixes_zinok_ab'), 'AlgEquiv', 'ans_ab'+X, 'q'+X+'_ab',
+                -1, 0.5, 'PRT-'+X+'-ZI-NOK-AB-OK', _cpxFb_D('affixes','ziwrong-abok',X,pmap),
+                -1, 0, 'PRT-'+X+'-TOUT-NOK', _cpxFb_D('affixes','toutnok',X,pmap))
         ];
 
     // ── Conjugué de z ──
@@ -339,41 +375,45 @@ function genComplexe(X) {
         }
 
         inputLine       = '<p>\\(\\bar{z}=\\) [[input:ans_zbar'+X+']] [[validation:ans_zbar'+X+']]</p>'
-                        + '<p><em>'+I18N.t('tpl.cpx_hint_forme_conj',{c:complexno})+'</em></p>';
-        textDescDefault = '<p>'+I18N.t('tpl.cpx_text_conjugue',{zval:'{@q'+X+'_z@}'})+'</p>';
-        inputXML        = _mkInput({name:'ans_zbar'+X, tans:'q'+X+'_zbar', boxsize:20,
+                        + '<p><em>'+I18N_D.t('tpl.cpx_hint_forme_conj',{c:complexno})+'</em></p>';
+        textDescDefault = '<p>'+I18N_D.t('tpl.cpx_text_conjugue',{zval:'{@q'+X+'_z@}'})+'</p>';
+        inputXML        = mkInput_D({name:'ans_zbar'+X, tans:'q'+X+'_zbar', boxsize:20,
                             hint:'a+b*%'+complexno, checkanswertype:1, mustverify:1, showvalidation:2});
         pmap            = {'Z':'{@q'+X+'_z@}', 'ZBAR':'{@q'+X+'_zbar@}'};
         generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N.t('tpl.cpx_correction_titre') + '</div>'
+            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
             + '<div style="font-size:.9rem;">'
-            + I18N.t('tpl.cpx_text_conj_formule',{c:complexno}) + '<br><br>'
+            + I18N_D.t('tpl.cpx_text_conj_formule',{c:complexno}) + '<br><br>'
             + '\\(z={@q'+X+'_z@}\\) &nbsp;→&nbsp; \\(\\bar z={@q'+X+'_zbar@}\\)'
             + '</div></div>';
 
         // PRT 2 nœuds
         canonicalNodes = [
-            _cpxNode(0, I18N.t('tpl.cpx_node_conj_exact'), 'AlgEquiv', 'ans_zbar'+X, 'q'+X+'_zbar',
-                -1, 1, 'PRT-'+X+'-OK', _cpxFb('conjugue','perfect',X,pmap),
+            _cpxNode(0, I18N_D.t('tpl.cpx_node_conj_exact'), 'AlgEquiv', 'ans_zbar'+X, 'q'+X+'_zbar',
+                -1, 1, 'PRT-'+X+'-OK', _cpxFb_D('conjugue','perfect',X,pmap),
                 1, 0, 'PRT-'+X+'-NOK', ''),
-            _cpxNode(1, I18N.t('tpl.cpx_node_conj_forgot'), 'AlgEquiv', 'ans_zbar'+X, 'q'+X+'_z',
-                -1, 0.5, 'PRT-'+X+'-FORGOT', _cpxFb('conjugue','forgot',X,pmap),
-                -1, 0, 'PRT-'+X+'-ERR', _cpxFb('conjugue','wrong',X,pmap))
+            _cpxNode(1, I18N_D.t('tpl.cpx_node_conj_forgot'), 'AlgEquiv', 'ans_zbar'+X, 'q'+X+'_z',
+                -1, 0.5, 'PRT-'+X+'-FORGOT', _cpxFb_D('conjugue','forgot',X,pmap),
+                -1, 0, 'PRT-'+X+'-ERR', _cpxFb_D('conjugue','wrong',X,pmap))
         ];
     }
 
     var prtMeta = { name: 'prt'+X, value: b7, autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-    prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
     var textDesc = custText ? _cpxReplace(custText, X, pmap) : textDescDefault;
     var textFrag = HDR + textDesc + '\n' + inputLine;
 
     // La correction détaillée (cpx-fbgen) est éditable par l'enseignant et préremplie
-    // par _cpxGenFbgen() ; sans quoi genComplexe() renvoyait un résumé bien plus succinct.
-    var fbgenDetailed = (typeof _cpxGenFbgen === 'function') ? _cpxGenFbgen(scenario, op, complexno) : generalFeedback;
+    // par cpxGenFbgen_D() ; sans quoi genComplexe() renvoyait un résumé bien plus succinct.
+    var fbgenDetailed = (typeof _cpxGenFbgen === 'function') ? cpxGenFbgen_D(scenario, op, complexno) : generalFeedback;
     generalFeedback = _cpxReplace(custFbgen || fbgenDetailed, X, pmap);
 
     return {type:'complexe', bareme, complexno, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },
         generalFeedback, feedbackRef:'[[feedback:prt'+X+']]'};
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genComplexe: genComplexe, genComplexeCore: genComplexeCore };
 }
