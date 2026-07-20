@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 152  -->
+  <question type="stack">
+    <name>
+      <text>avancement (copie)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>On réalise la combustion complète du méthane : \( CH_4 + 2O_2 \rightarrow CO_2 + 2H_2O \)</p>
+<p>On dispose de {@a@} mol de méthane et de {@b@} mol de dioxygène.</p>
+<p>Complétez le tableau (utilisez la variable <b>x</b> pour la ligne "En cours", ex: 8-2*x). Ne mettez pas d'unités.</p>
+
+<table border="1" style="text-align: center; margin: auto; border-collapse: collapse;">
+  <tr style="background-color: #f2f2f2;">
+    <th style="padding: 8px;">État</th>
+    <th style="padding: 8px;">\(n(CH_4)\)</th>
+    <th style="padding: 8px;">\(n(O_2)\)</th>
+    <th style="padding: 8px;">\(n(CO_2)\)</th>
+    <th style="padding: 8px;">\(n(H_2O)\)</th>
+  </tr>
+  <tr>
+    <td style="padding: 8px;">Initial</td>
+    <td style="padding: 8px;">[[input:i1]]</td>
+    <td style="padding: 8px;">[[input:i2]]</td>
+    <td style="padding: 8px;">[[input:i3]]</td>
+    <td style="padding: 8px;">[[input:i4]]</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px;">En cours</td>
+    <td style="padding: 8px;">[[input:c1]]</td>
+    <td style="padding: 8px;">[[input:c2]]</td>
+    <td style="padding: 8px;">[[input:c3]]</td>
+    <td style="padding: 8px;">[[input:c4]]</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px;">Final</td>
+    <td style="padding: 8px;">[[input:f1]]</td>
+    <td style="padding: 8px;">[[input:f2]]</td>
+    <td style="padding: 8px;">[[input:f3]]</td>
+    <td style="padding: 8px;">[[input:f4]]</td>
+  </tr>
+</table>
+
+<p>Avancement maximal \(x_{max}\) = [[input:xmax]]</p>
+
+<div>[[validation:i1]] [[validation:i2]] [[validation:i3]] [[validation:i4]] 
+[[validation:c1]] [[validation:c2]] [[validation:c3]] [[validation:c4]] 
+[[validation:f1]] [[validation:f2]] [[validation:f3]] [[validation:f4]] [[validation:xmax]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p>Le méthane est le réactif limitant car {@b@} > 2 * {@a@}.</p>
+<p>L'avancement maximal est atteint quand \(n(CH_4) = 0\), soit {@a@} - \(x_{max} = 0\). Donc \(x_{max} = {@a@}\) mol.</p>
+<p>À l'état final :</p>
+<ul>
+  <li>\(n_f(CH_4) = 0\) mol</li>
+  <li>\(n_f(O_2) = {@b@} - 2({@a@}) = {@b - 2*a@}\) mol</li>
+  <li>\(n_f(CO_2) = {@a@}\) mol</li>
+  <li>\(n_f(H_2O) = 2({@a@}) = {@2*a@}\) mol</li>
+</ul>]]></text>
+    </generalfeedback>
+    <defaultgrade>4</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>a : rand(4) + 2;
+b : 2*a + rand(3) + 1;
+
+/* Etat initial */
+ni_ch4 : a;
+ni_o2 : b;
+ni_co2 : 0;
+ni_h2o : 0;
+
+/* Etat en cours (litteral avec x) */
+nc_ch4 : a - x;
+nc_o2 : b - 2*x;
+nc_co2 : x;
+nc_h2o : 2*x;
+
+/* Avancement maximal */
+val_xmax : a;
+
+/* Etat final (calculé en remplaçant x par val_xmax) */
+nf_ch4 : ev(nc_ch4, x = val_xmax);
+nf_o2 : ev(nc_o2, x = val_xmax);
+nf_co2 : ev(nc_co2, x = val_xmax);
+nf_h2o : ev(nc_h2o, x = val_xmax);</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@ta1@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:green;"><i class="fa fa-check"></i></span> Réponse correcte, bravo !]]></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:orange;"><i class="fa fa-adjust"></i></span> Réponse partiellement correcte.]]></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:red;"><i class="fa fa-times"></i></span> Réponse incorrecte.]]></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>c1</name>
+      <type>algebraic</type>
+      <tans>nc_ch4</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>c2</name>
+      <type>algebraic</type>
+      <tans>nc_o2</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>c3</name>
+      <type>algebraic</type>
+      <tans>nc_co2</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>c4</name>
+      <type>algebraic</type>
+      <tans>nc_h2o</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>f1</name>
+      <type>numerical</type>
+      <tans>nf_ch4</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>f2</name>
+      <type>numerical</type>
+      <tans>nf_o2</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>f3</name>
+      <type>numerical</type>
+      <tans>nf_co2</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>f4</name>
+      <type>numerical</type>
+      <tans>nf_h2o</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>i1</name>
+      <type>numerical</type>
+      <tans>ni_ch4</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>i2</name>
+      <type>numerical</type>
+      <tans>ni_o2</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>i3</name>
+      <type>numerical</type>
+      <tans>ni_co2</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>i4</name>
+      <type>numerical</type>
+      <tans>ni_h2o</tans>
+      <boxsize>8</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>xmax</name>
+      <type>numerical</type>
+      <tans>val_xmax</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>ligne initiale</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>[i1, i2, i3, i4]</sans>
+        <tans>[ni_ch4, ni_o2, ni_co2, ni_h2o]</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1/3</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<b>Ligne "Initial" correcte.</b>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<b>Ligne "Initial" incorrecte.</b>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>ligne intermédiaire</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>[c1, c2, c3, c4]</sans>
+        <tans>[nc_ch4, nc_o2, nc_co2, nc_h2o]</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1/3</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>2</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<b>Ligne "En cours"correcte.</b>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<b>Ligne "En cours" incorrecte.</b> Utilisez bien la variable x et les coefficients stœchiométriques.]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Ligne Finale</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>[f1, f2, f3, f4]</sans>
+        <tans>[nf_ch4, nf_o2, nf_co2, nf_h2o]</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1/3</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>3</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<b>Ligne "Final"correcte.</b>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<b>Ligne "Final" incorrecte.</b> Avez-vous bien remplacé x par sa valeur maximale ?]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>xmax</sans>
+        <tans>val_xmax</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-4-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<b>x_max correct.</b>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-4-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<b>x_max incorrect.</b>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>
