@@ -386,7 +386,20 @@ function genComposition(X) {
     throw new Error(I18N.t('msg.err_comp_enonce', {n: X}));
   }
 
-  var jsxCode = buildCompositionJSX(height, X);
+  var p = { bareme: bareme, text: text, height: height, msg: msg, fbGenRaw: v('comp-fbgen') };
+  return genCompositionCore(X, p);
+}
+
+function genCompositionCore(X, p, deps) {
+  deps = deps || {};
+  var I18N_D = deps.I18N || I18N;
+  var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+  var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  var buildCompositionJSX_D = deps.buildCompositionJSX || buildCompositionJSX;
+
+  var bareme = p.bareme, text = p.text, height = p.height, msg = p.msg;
+
+  var jsxCode = buildCompositionJSX_D(height, X);
   var vars  = '/* Q' + X + ' : Composition libre (correction manuelle STACK — manualgraded) */';
   var qnote = 'Composition Q' + X;
 
@@ -460,11 +473,11 @@ function genComposition(X) {
     answertest: 'AlgEquiv', sans: '1', tans: '1', testoptions: '', quiet: '0',
     truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
     trueanswernote: 'PRT-' + X + '-1-T',
-    truefeedback: '<p style="padding:10px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:4px;color:#166534;">✅ ' + I18N.t('comp.fb_enregistre') + '</p>',
+    truefeedback: '<p style="padding:10px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:4px;color:#166534;">✅ ' + I18N_D.t('comp.fb_enregistre') + '</p>',
     falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
     falseanswernote: 'PRT-' + X + '-1-F', falsefeedback: ''
   }];
-  var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+  var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
   return {
     bareme     : bareme,
@@ -474,11 +487,15 @@ function genComposition(X) {
     previewFrag: previewFrag,
     inputXML   : inputXML,
     prtXML     : prtXML,
-    generalFeedback: _mkFbGen('', v('comp-fbgen')),
+    generalFeedback: mkFbGen_D('', p.fbGenRaw),
     feedbackRef: '[[feedback:prt' + X + ']]',
     kbdRaw     : jsxCode,
     prt        : { meta: prtMeta, nodes: canonicalNodes }
   };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { genComposition: genComposition, genCompositionCore: genCompositionCore, buildCompositionJSX: buildCompositionJSX };
 }
 
 // ════════════════════════════════════════════════════════
