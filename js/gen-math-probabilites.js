@@ -47,14 +47,49 @@ function _probDiagNodes(specs) {
 
 function genProbabilites(X) {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
-    var gn = function(id, def){ var v = parseFloat(gs(id)); return isNaN(v) ? def : v; };
-    var gi = function(id, def){ var v = parseInt(gs(id)); return isNaN(v) ? def : v; };
-    var bareme = parseFloat(gs('prob-bareme')) || 1;
-    var scenario = gs('prob-scenario') || 'combinaison';
-    var mode = gs('prob-mode') || 'aleatoire';
-    var fbOk = gs('prob-fb-ok'), fbWrong = gs('prob-fb-wrong');
-    var custText = gs('prob-text').trim();
+    var raw = {};
+    ['prob-n', 'prob-n-min', 'prob-n-max', 'prob-k', 'prob-k-min', 'prob-k-max',
+     'prob-p', 'prob-p-min', 'prob-p-max',
+     'prob-pa', 'prob-pa-min', 'prob-pa-max',
+     'prob-pb', 'prob-pb-min', 'prob-pb-max',
+     'prob-pab', 'prob-pab-min', 'prob-pab-max'].forEach(function(id){ raw[id] = gs(id); });
+    var p = {
+        bareme: parseFloat(gs('prob-bareme')) || 1,
+        scenario: gs('prob-scenario') || 'combinaison',
+        mode: gs('prob-mode') || 'aleatoire',
+        fbOk: gs('prob-fb-ok'), fbWrong: gs('prob-fb-wrong'),
+        custText: gs('prob-text').trim(),
+        fbGen: gs('prob-fbgen'),
+        raw: raw
+    };
+    return genProbabilitesCore(X, p);
+}
+
+function genProbabilitesCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkInput_D = deps._mkInput || _mkInput;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+
+    var bareme = p.bareme, scenario = p.scenario, mode = p.mode;
+    var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
+    var raw = p.raw || {};
+    var gn = function(id, def){ var v = parseFloat(raw[id]); return isNaN(v) ? def : v; };
+    var gi = function(id, def){ var v = parseInt(raw[id]); return isNaN(v) ? def : v; };
     var vars, qnote, textFrag, inputXML, prtXML, generalFeedback, canonicalNodes, prtMeta, diagNodes;
+
+    function _probSeqPrt_D(X, bareme, specs) {
+        var fallback = null, built = specs, lastSpec = specs[specs.length - 1];
+        if (specs.length >= 2 && lastSpec.sans === 'true' && lastSpec.tans === 'true') {
+            fallback = lastSpec;
+            built = specs.slice(0, -1);
+        }
+        var nodes = built.map(function (spec, idx) { return _probSeqNode(X, idx, idx === built.length - 1, spec); });
+        if (fallback) nodes[nodes.length - 1].falsefeedback = fallback.feedback || '';
+        var prtMeta = { name: 'prt' + X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
+        return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml_D(prtMeta, nodes) };
+    }
 
     // ── déclarations Maxima : valeurs fixes (saisies) ou aléatoires (bornes saisies) ──
     // Les probabilités sont toujours des fractions exactes de dénominateur 20 (pas de
@@ -91,7 +126,7 @@ function genProbabilites(X) {
         return `max(1,min(ri(${mn20},${mx20}),19))/20`;
     }
 
-    var HDR = `<div style="background:#d97706;border-left:5px solid #b45309;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('prob.title')}</strong> <span style="background:#b45309;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
+    var HDR = `<div style="background:#d97706;border-left:5px solid #b45309;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('prob.title')}</strong> <span style="background:#b45309;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
 
     if (scenario === 'combinaison') {
         vars = `/* Q${X} Proba — Coefficient binomial */
@@ -100,20 +135,20 @@ ${declN(10)}
 ${declK('comb', 3)}
 q${X}_ta:binomial(q${X}_n,q${X}_k);`;
         qnote = `C({@q${X}_n@},{@q${X}_k@})={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('prob.q_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k'})}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('prob.q_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k'})}</p>
 <p>\\( C_{{@q${X}_n@}}^{{@q${X}_k@}} = \\) [[input:ans_ck${X}]] [[validation:ans_ck${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_ck${X}`,tans:`q${X}_ta`,boxsize:10,forbidfloat:1,mustverify:0,showvalidation:2});
+        inputXML = mkInput_D({name:`ans_ck${X}`,tans:`q${X}_ta`,boxsize:10,forbidfloat:1,mustverify:0,showvalidation:2});
 
         var specsComb = [
             { description: 'C(n,k) correct ?', sans: `ans_ck${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N.t('mat.fb_ok_correct')}</strong>`) },
+                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N.t('prob.fb_wrong_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k', tavar:'q'+X+'_ta'})) }
+                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k', tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsComb);
-        var builtComb = _probSeqPrt(X, bareme, specsComb);
+        var builtComb = _probSeqPrt_D(X, bareme, specsComb);
         prtMeta = builtComb.prtMeta; canonicalNodes = builtComb.canonicalNodes; prtXML = builtComb.prtXML;
-        generalFeedback = _probGenFbBox(I18N.t('prob.fbgen_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k', tavar:'q'+X+'_ta'}));
+        generalFeedback = _probGenFbBox(I18N_D.t('prob.fbgen_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k', tavar:'q'+X+'_ta'}));
 
     } else if (scenario === 'binom-pk') {
         vars = `/* Q${X} Proba — Loi binomiale P(X=k) */
@@ -126,24 +161,24 @@ q${X}_ta:binomial(q${X}_n,q${X}_k)*q${X}_p^q${X}_k*q${X}_q^(q${X}_n-q${X}_k);
 q${X}_err_swap:binomial(q${X}_n,q${X}_k)*q${X}_q^q${X}_k*q${X}_p^(q${X}_n-q${X}_k);
 q${X}_err_nocoef:q${X}_p^q${X}_k*q${X}_q^(q${X}_n-q${X}_k);`;
         qnote = `n={@q${X}_n@}, k={@q${X}_k@}, p={@q${X}_p@}, P(X=k)={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('prob.q_binom_pk', {nvar:'q'+X+'_n', pvar:'q'+X+'_p', kvar:'q'+X+'_k'})}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('prob.q_binom_pk', {nvar:'q'+X+'_n', pvar:'q'+X+'_p', kvar:'q'+X+'_k'})}</p>
 <p>\\(P(X={@q${X}_k@})=\\) [[input:ans_prob${X}]] [[validation:ans_prob${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_prob${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
+        inputXML = mkInput_D({name:`ans_prob${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsBinom = [
             { description: 'P(X=k) correct ?', sans: `ans_prob${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N.t('mat.fb_ok_correct')}</strong>`) },
+                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
             { description: 'Erreur : p et (1-p) invers\xe9s', sans: `ans_prob${X}`, tans: `q${X}_err_swap`, score: 0,
-                feedback: _probBox('warn', I18N.t('prob.err_p_inverse', {pvar:'q'+X+'_p'})) },
+                feedback: _probBox('warn', I18N_D.t('prob.err_p_inverse', {pvar:'q'+X+'_p'})) },
             { description: 'Erreur : oubli du coefficient binomial', sans: `ans_prob${X}`, tans: `q${X}_err_nocoef`, score: 0,
-                feedback: _probBox('warn', I18N.t('prob.err_oubli_coef')) },
+                feedback: _probBox('warn', I18N_D.t('prob.err_oubli_coef')) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N.t('prob.fb_wrong_binom_pk', {tavar:'q'+X+'_ta'})) }
+                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_pk', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsBinom);
-        var builtBinom = _probSeqPrt(X, bareme, specsBinom);
+        var builtBinom = _probSeqPrt_D(X, bareme, specsBinom);
         prtMeta = builtBinom.prtMeta; canonicalNodes = builtBinom.canonicalNodes; prtXML = builtBinom.prtXML;
-        generalFeedback = _probGenFbBox(I18N.t('prob.fbgen_binom_pk', {kvar:'q'+X+'_k', nvar:'q'+X+'_n', pvar:'q'+X+'_p', qvar:'q'+X+'_q', tavar:'q'+X+'_ta'}));
+        generalFeedback = _probGenFbBox(I18N_D.t('prob.fbgen_binom_pk', {kvar:'q'+X+'_k', nvar:'q'+X+'_n', pvar:'q'+X+'_p', qvar:'q'+X+'_q', tavar:'q'+X+'_ta'}));
 
     } else if (scenario === 'binom-esp') {
         vars = `/* Q${X} Proba — Esp\xe9rance binomiale */
@@ -152,20 +187,20 @@ ${declN(30)}
 q${X}_p:${declFrac('prob-p', 0.4)};
 q${X}_ta:q${X}_n*q${X}_p;`;
         qnote = `E(X)=np={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('prob.q_binom_esp', {nvar:'q'+X+'_n', pvar:'q'+X+'_p'})}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('prob.q_binom_esp', {nvar:'q'+X+'_n', pvar:'q'+X+'_p'})}</p>
 <p>\\(E(X)=\\) [[input:ans_ex${X}]] [[validation:ans_ex${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_ex${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
+        inputXML = mkInput_D({name:`ans_ex${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsEsp = [
             { description: 'E(X) correct ?', sans: `ans_ex${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N.t('mat.fb_ok_correct')}</strong>`) },
+                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N.t('prob.fb_wrong_binom_esp', {tavar:'q'+X+'_ta'})) }
+                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_esp', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsEsp);
-        var builtEsp = _probSeqPrt(X, bareme, specsEsp);
+        var builtEsp = _probSeqPrt_D(X, bareme, specsEsp);
         prtMeta = builtEsp.prtMeta; canonicalNodes = builtEsp.canonicalNodes; prtXML = builtEsp.prtXML;
-        generalFeedback = _probGenFbBox(I18N.t('prob.fbgen_binom_esp', {nvar:'q'+X+'_n', pvar:'q'+X+'_p', tavar:'q'+X+'_ta'}));
+        generalFeedback = _probGenFbBox(I18N_D.t('prob.fbgen_binom_esp', {nvar:'q'+X+'_n', pvar:'q'+X+'_p', tavar:'q'+X+'_ta'}));
 
     } else if (scenario === 'binom-var') {
         vars = `/* Q${X} Proba — Variance binomiale */
@@ -175,20 +210,20 @@ q${X}_p:${declFrac('prob-p', 0.4)};
 q${X}_q:1-q${X}_p;
 q${X}_ta:q${X}_n*q${X}_p*q${X}_q;`;
         qnote = `V(X)=npq={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('prob.q_binom_var', {nvar:'q'+X+'_n', pvar:'q'+X+'_p'})}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('prob.q_binom_var', {nvar:'q'+X+'_n', pvar:'q'+X+'_p'})}</p>
 <p>\\(V(X)=\\) [[input:ans_vx${X}]] [[validation:ans_vx${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_vx${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
+        inputXML = mkInput_D({name:`ans_vx${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsVar = [
             { description: 'V(X) correct ?', sans: `ans_vx${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N.t('mat.fb_ok_correct')}</strong>`) },
+                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N.t('prob.fb_wrong_binom_var', {tavar:'q'+X+'_ta'})) }
+                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_var', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsVar);
-        var builtVar = _probSeqPrt(X, bareme, specsVar);
+        var builtVar = _probSeqPrt_D(X, bareme, specsVar);
         prtMeta = builtVar.prtMeta; canonicalNodes = builtVar.canonicalNodes; prtXML = builtVar.prtXML;
-        generalFeedback = _probGenFbBox(I18N.t('prob.fbgen_binom_var', {nvar:'q'+X+'_n', pvar:'q'+X+'_p', qvar:'q'+X+'_q', tavar:'q'+X+'_ta'}));
+        generalFeedback = _probGenFbBox(I18N_D.t('prob.fbgen_binom_var', {nvar:'q'+X+'_n', pvar:'q'+X+'_p', qvar:'q'+X+'_q', tavar:'q'+X+'_ta'}));
 
     } else if (scenario === 'proba-cond') {
         vars = `/* Q${X} Proba — Probabilit\xe9 conditionnelle (Bayes) */
@@ -201,21 +236,21 @@ q${X}_pD:q${X}_pA*q${X}_pD_A+q${X}_pB*q${X}_pD_B;
 q${X}_pAD:q${X}_pA*q${X}_pD_A;
 q${X}_ta:q${X}_pAD/q${X}_pD;`;
         qnote = `P(A|D)={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('prob.q_cond_contexte', {pAvar:'q'+X+'_pA', pBvar:'q'+X+'_pB', 'pD_Avar':'q'+X+'_pD_A', 'pD_Bvar':'q'+X+'_pD_B'})}</p>
-<p>${I18N.t('prob.q_cond_ask')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('prob.q_cond_contexte', {pAvar:'q'+X+'_pA', pBvar:'q'+X+'_pB', 'pD_Avar':'q'+X+'_pD_A', 'pD_Bvar':'q'+X+'_pD_B'})}</p>
+<p>${I18N_D.t('prob.q_cond_ask')}</p>
 <p>\\(P(A|D)=\\) [[input:ans_cond${X}]] [[validation:ans_cond${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_cond${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
+        inputXML = mkInput_D({name:`ans_cond${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsCond = [
             { description: 'P(A|D) correct ?', sans: `ans_cond${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N.t('mat.fb_ok_correct')}</strong>`) },
+                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N.t('prob.fb_wrong_cond', {tavar:'q'+X+'_ta'})) }
+                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_cond', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsCond);
-        var builtCond = _probSeqPrt(X, bareme, specsCond);
+        var builtCond = _probSeqPrt_D(X, bareme, specsCond);
         prtMeta = builtCond.prtMeta; canonicalNodes = builtCond.canonicalNodes; prtXML = builtCond.prtXML;
-        generalFeedback = _probGenFbBox(I18N.t('prob.fbgen_cond', {pDvar:'q'+X+'_pD', pADvar:'q'+X+'_pAD', tavar:'q'+X+'_ta'}));
+        generalFeedback = _probGenFbBox(I18N_D.t('prob.fbgen_cond', {pDvar:'q'+X+'_pD', pADvar:'q'+X+'_pAD', tavar:'q'+X+'_ta'}));
 
     } else { /* proba-union */
         vars = `/* Q${X} Proba — Union */
@@ -225,29 +260,33 @@ q${X}_pB:${declFrac('prob-pb', 0.35)};
 q${X}_pI:${declFrac('prob-pab', 0.15)};
 q${X}_ta:q${X}_pA+q${X}_pB-q${X}_pI;`;
         qnote = `P(A∪B)={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('prob.q_union_contexte', {pAvar:'q'+X+'_pA', pBvar:'q'+X+'_pB', pIvar:'q'+X+'_pI'})}</p>
-<p>${I18N.t('prob.q_union_ask')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('prob.q_union_contexte', {pAvar:'q'+X+'_pA', pBvar:'q'+X+'_pB', pIvar:'q'+X+'_pI'})}</p>
+<p>${I18N_D.t('prob.q_union_ask')}</p>
 <p>\\(P(A\\cup B)=\\) [[input:ans_union${X}]] [[validation:ans_union${X}]]</p>`;
-        inputXML = _mkInput({name:`ans_union${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
+        inputXML = mkInput_D({name:`ans_union${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsUnion = [
             { description: 'P(A∪B) correct ?', sans: `ans_union${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N.t('mat.fb_ok_correct')}</strong>`) },
+                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
             { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N.t('prob.fb_wrong_union', {tavar:'q'+X+'_ta'})) }
+                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_union', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsUnion);
-        var builtUnion = _probSeqPrt(X, bareme, specsUnion);
+        var builtUnion = _probSeqPrt_D(X, bareme, specsUnion);
         prtMeta = builtUnion.prtMeta; canonicalNodes = builtUnion.canonicalNodes; prtXML = builtUnion.prtXML;
-        generalFeedback = _probGenFbBox(I18N.t('prob.fbgen_union', {pAvar:'q'+X+'_pA', pBvar:'q'+X+'_pB', pIvar:'q'+X+'_pI', tavar:'q'+X+'_ta'}));
+        generalFeedback = _probGenFbBox(I18N_D.t('prob.fbgen_union', {pAvar:'q'+X+'_pA', pBvar:'q'+X+'_pB', pIvar:'q'+X+'_pI', tavar:'q'+X+'_ta'}));
     }
 
-    generalFeedback = _mkFbGen(generalFeedback, gs('prob-fbgen'));
+    generalFeedback = mkFbGen_D(generalFeedback, p.fbGen);
 
     return {type:'probabilites', bareme, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },
         generalFeedback, feedbackRef:`[[feedback:prt${X}]]`,
         diagNodes: diagNodes || []};
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genProbabilites: genProbabilites, genProbabilitesCore: genProbabilitesCore };
 }
 
 // ─── TRIGONOMÉTRIE ───────────────────────────────────────────
