@@ -101,7 +101,7 @@ function genAcideBaseCore(X, p, deps) {
         + '  var h = Math.pow(10, -pH), oh = Kw / h;\n'
         + curveFnBody
         + '  var x = vv1 * num / den;\n'
-        + '  return (x < 0 || !isFinite(x) || isNaN(x)) ? NaN : x;\n'
+        + '  return (Math.sign(x)===-1 || !isFinite(x) || isNaN(x)) ? NaN : x;\n'
         + '}\n';
 
     // Évaluateur numérique côté génération (même algèbre) — sert à choisir
@@ -222,9 +222,9 @@ function genAcideBaseCore(X, p, deps) {
             + calcVFnJs + '\n'
             + 'function calcPh(V) {\n'
             + '  var lo = 0.05, hi = 13.95, flo = calcV(lo) - V;\n'
-            + '  for (var i = 0; i < 60; i++) {\n'
+            + '  for (var i = 60; i--;) {\n'
             + '    var mid = (lo + hi) / 2, fm = calcV(mid) - V;\n'
-            + '    if ((fm < 0) === (flo < 0)) { lo = mid; flo = fm; } else { hi = mid; }\n'
+            + '    if (Math.sign(fm) === Math.sign(flo)) { lo = mid; flo = fm; } else { hi = mid; }\n'
             + '  }\n'
             + '  return (lo + hi) / 2;\n'
             + '}\n\n'
@@ -232,8 +232,8 @@ function genAcideBaseCore(X, p, deps) {
             + 'function getColor(pH) {\n'
             + '    if(!curInd) return "#F0F0F0";\n'
             + '    var i = ind[curInd];\n'
-            + '    if(pH <= i.pL) return "rgb("+i.cL.join(",")+")";\n'
-            + '    if(pH >= i.pH) return "rgb("+i.cH.join(",")+")";\n'
+            + '    if(Math.sign(pH-i.pL)!==1) return "rgb("+i.cL.join(",")+")";\n'
+            + '    if(Math.sign(pH-i.pH)!==-1) return "rgb("+i.cH.join(",")+")";\n'
             + '    var t = (pH - i.pL) / (i.pH - i.pL);\n'
             + '    return "rgb("+Math.round(i.cL[0]+(i.cH[0]-i.cL[0])*t)+","+Math.round(i.cL[1]+(i.cH[1]-i.cL[1])*t)+","+Math.round(i.cL[2]+(i.cH[2]-i.cL[2])*t)+")";\n'
             + '}\n\n'
@@ -246,7 +246,7 @@ function genAcideBaseCore(X, p, deps) {
             + '    curVol = parseFloat(inputVol.value) || 0;\n'
             + '    curInd = inputInd.value || "";\n'
             + '    tries = parseInt(inputTries.value) || 1;\n'
-            + '    if (curVol > 0) dosageStarted = true;\n'
+            + '    if (Math.sign(curVol) === 1) dosageStarted = true;\n'
             + '    updateUI();\n'
             + '    attachEvents();\n'
             + '}\n\n'
@@ -280,7 +280,7 @@ function genAcideBaseCore(X, p, deps) {
             + '    });\n'
             + '}\n\n'
             + 'function addVol() {\n'
-            + '    if(curVol >= ' + (vbMax * 1.2).toFixed(0) + ') return;\n'
+            + '    if(Math.sign(curVol-' + (vbMax * 1.2).toFixed(0) + ')!==-1) return;\n'
             + '    curVol = Math.round((curVol + volStep) * 100) / 100;\n'
             + '    if (!dosageStarted) {\n'
             + '        dosageStarted = true;\n'
@@ -438,7 +438,7 @@ function genAcideBaseCore(X, p, deps) {
     //  MÉTHODE 2 — Méthode des tangentes (JSXGraph)
     // ═══════════════════════════════════════════════════════════════
     } else {
-        var name1 = 'ans1' + S, name2 = 'ans2' + S, refSlopes = 'refSlopes' + S;
+        var name1 = 'ans1' + S, name2 = 'ans2' + S, refSlopes = 'refSlopes' + S, refCursor = 'refCursor' + S;
         var qKa1 = 'Ka1' + S, qKa2 = 'Ka2' + S, qKa3 = 'Ka3' + S, qV1 = 'V1' + S, qC1 = 'C1' + S, qC2 = 'C2' + S, qTaVeq = 'ta_veq' + S;
         var hF = 'h' + S, ohF = 'oh' + S, aF = 'A' + S, bF = 'B' + S, dAF = 'dAdpH' + S, dBF = 'dBdpH' + S;
         var mF = 'm_tang' + S, dmF = 'dm_tang' + S, rv1 = 'raw_v1' + S, rv2 = 'raw_v2' + S, ve1 = 'v_extremum1' + S, ve2 = 'v_extremum2' + S;
@@ -567,7 +567,7 @@ function genAcideBaseCore(X, p, deps) {
             + '  function() {\n'
             + '      var v1c = c1f(), v2c = c2f();\n'
             + '      var b1 = v1c[1], b2 = v2c[1];\n'
-            + '      if (Math.abs(b1) < 1e-9 || Math.abs(b2) < 1e-9) return [0,0];\n'
+            + '      if (Math.sign(Math.abs(b1)-1e-9)===-1 || Math.sign(Math.abs(b2)-1e-9)===-1) return [0,0];\n'
             + '      var pH1 = -(v1c[0] * V0_ref + v1c[2]) / b1;\n'
             + '      var pH2 = -(v2c[0] * V0_ref + v2c[2]) / b2;\n'
             + '      return [V0_ref, (pH1 + pH2) / 2];\n'
@@ -577,7 +577,7 @@ function genAcideBaseCore(X, p, deps) {
             + '      var a_eq = (v1c[0] + v2c[0]) / 2;\n'
             + '      var b_eq = (v1c[1] + v2c[1]) / 2;\n'
             + '      var b1 = v1c[1], b2 = v2c[1];\n'
-            + '      if (Math.abs(b1) < 1e-9 || Math.abs(b2) < 1e-9) return [1,0];\n'
+            + '      if (Math.sign(Math.abs(b1)-1e-9)===-1 || Math.sign(Math.abs(b2)-1e-9)===-1) return [1,0];\n'
             + '      var Y0_ref = (-(v1c[0]*V0_ref + v1c[2])/b1 + -(v2c[0]*V0_ref + v2c[2])/b2) / 2;\n'
             + '      return [V0_ref - b_eq, Y0_ref + a_eq];\n'
             + '  }\n'
@@ -587,8 +587,8 @@ function genAcideBaseCore(X, p, deps) {
             + 'function updateSlopes() {\n'
             + '    if (isFrozen || !inputSlopes) return;\n'
             + '    var v1c = c1f(), v2c = c2f();\n'
-            + '    var m1 = (Math.abs(v1c[1]) < 1e-9) ? 9999 : -(v1c[0] / v1c[1]);\n'
-            + '    var m2 = (Math.abs(v2c[1]) < 1e-9) ? 9999 : -(v2c[0] / v2c[1]);\n'
+            + '    var m1 = (Math.sign(Math.abs(v1c[1])-1e-9)===-1) ? 9999 : -(v1c[0] / v1c[1]);\n'
+            + '    var m2 = (Math.sign(Math.abs(v2c[1])-1e-9)===-1) ? 9999 : -(v2c[0] / v2c[1]);\n'
             + '    if (!isFinite(m1)) m1 = 0;\n'
             + '    if (!isFinite(m2)) m2 = 0;\n'
             + '    inputSlopes.value = "[" + m1.toFixed(4) + ", " + m2.toFixed(4) + "]";\n'
@@ -600,7 +600,7 @@ function genAcideBaseCore(X, p, deps) {
             + '});\n\n'
             + 'var cursor = board.create("glider", [' + (targetVol * 1.25).toFixed(1) + ', 7, guideLine], {\n'
             + '  size:8, face:"circle", fillColor:"#ef4444", strokeColor:"#b91c1c",\n'
-            + '  name:"Votre réponse", label:{fontSize:12, color:"#b91c1c", offset:[10,-15]}\n'
+            + '  name:"Votre r\\u00e9ponse", label:{fontSize:12, color:"#b91c1c", offset:[10,-15]}\n'
             + '});\n\n'
             + 'var cursorLine = board.create("line", [\n'
             + '    function(){ return [cursor.X(), -0.5]; },\n'
@@ -614,14 +614,14 @@ function genAcideBaseCore(X, p, deps) {
             + '  [function(){return cursor.X()+0.8;}, 14.0,\n'
             + '   function(){return "V="+cursor.X().toFixed(1)+" mL";}],\n'
             + '  {fixed:false, fontSize:12, color:"#ef4444", highlight:false});\n'
-            + 'stack_jxg.bind_point(board, "' + name2 + '", cursor);\n';
+            + 'stack_jxg.bind_point(' + refCursor + ', cursor);\n';
 
         textFrag = banner('pH-métrie')
             + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;">On réalise le dosage ' + (typeMap[abType] || abType) + nStr + '. La courbe de dosage pH-métrique est tracée ci-dessous.</p>\n'
             + dataRow
             + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;"><strong>Consigne :</strong> Appliquez la <strong>méthode des tangentes</strong>. Déplacez les points <span style="color:#f97316;font-weight:bold;">T<sub>1</sub></span> et <span style="color:#a855f7;font-weight:bold;">T<sub>2</sub></span> à l\'endroit où la courbe est la plus incurvée. Le graphique tracera la droite équidistante (en vert). Déplacez le curseur rouge à l\'abscisse du point d\'intersection trouvé pour lire le volume équivalent.</p>\n'
             + '<div style="display:none">[[input:' + name1 + ']][[validation:' + name1 + ']]</div>\n\n'
-            + '[[jsxgraph input-ref-' + name1 + '="' + refSlopes + '" width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
+            + '[[jsxgraph input-ref-' + name1 + '="' + refSlopes + '" input-ref-' + name2 + '="' + refCursor + '" width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
             + jxg + '\n[[/jsxgraph]]\n'
             + '<div style="margin-top:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">\n'
             + '    <label for="' + name2 + '" style="font-weight:bold; font-size:0.95em; color:#1e3a5f;">Volume équivalent lu sur le graphique (en mL) :</label>\n'
