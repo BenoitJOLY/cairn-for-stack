@@ -213,13 +213,34 @@ async function genGeoGebra(qid) {
   var rememberAttr = String(st.remember || '').trim();
   var modelPreset = (typeof GGB_MODELS !== 'undefined') ? GGB_MODELS[st.model] : null;
 
+  var p = {
+    bareme: bareme, instruction: instruction,
+    materialId: materialId, width: width, height: height, showToolbar: showToolbar,
+    inputs: inputs, outputs: outputs, rememberAttr: rememberAttr,
+    modelPreset: modelPreset,
+    fbGen: v('ggb-fbgen')
+  };
+  return genGeoGebraCore(qid, p);
+}
+
+function genGeoGebraCore(X, p, deps) {
+  deps = deps || {};
+  var I18N_D = deps.I18N || I18N;
+  var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+  var ggbBuildFilterTag_D = deps.ggbBuildFilterTag || ggbBuildFilterTag;
+  var ggbBuildOutputFeedback_D = deps.ggbBuildOutputFeedback || ggbBuildOutputFeedback;
+
+  var bareme = p.bareme, instruction = p.instruction;
+  var materialId = p.materialId, width = p.width, height = p.height, showToolbar = p.showToolbar;
+  var inputs = p.inputs, outputs = p.outputs, rememberAttr = p.rememberAttr, modelPreset = p.modelPreset;
+
   var stateForBuild = {
     materialId: materialId, width: width, height: height, showToolbar: showToolbar,
     inputs: inputs, outputs: outputs, remember: rememberAttr
   };
 
-  var X = qid;
-  var built = ggbBuildFilterTag(X, stateForBuild);
+  var built = ggbBuildFilterTag_D(X, stateForBuild);
 
   var varsMaxima = inputs.map(function (r) {
     return r.ggbName + ': ' + (r.expr || '0') + ';';
@@ -317,10 +338,10 @@ async function genGeoGebra(qid) {
   var N = outputs.length;
   var scorePerNode = String(Math.round((1 / N) * 1e10) / 1e10);
   var canonicalNodes = outputs.map(function (o, i) {
-    var fb = ggbBuildOutputFeedback(o);
+    var fb = ggbBuildOutputFeedback_D(o);
     var isLast = i === N - 1;
     var nextNode = isLast ? '-1' : String(i + 1);
-    var desc = o.desc || I18N.t('ggb.prt_node0_desc') + ' (' + o.ggbName + ')';
+    var desc = o.desc || I18N_D.t('ggb.prt_node0_desc') + ' (' + o.ggbName + ')';
     return {
       name: String(i), description: desc, answertest: 'AlgEquiv',
       sans: 'ggb_ok_' + X + '[' + (i + 1) + ']', tans: '1',
@@ -332,11 +353,11 @@ async function genGeoGebra(qid) {
     };
   });
   var prtMeta = {name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVarsMaxima};
-  var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+  var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
   var formulaHtml = '';
   if (modelPreset && modelPreset.texFx) {
-    formulaHtml = '<p>' + I18N.t('ggb.tracez_courbe_lbl') + ' \\[' + modelPreset.texFx + '\\]</p>';
+    formulaHtml = '<p>' + I18N_D.t('ggb.tracez_courbe_lbl') + ' \\[' + modelPreset.texFx + '\\]</p>';
   }
 
   /* Instance GeoGebra dédiée au feedback général : rechargée avec les mêmes
@@ -348,11 +369,11 @@ async function genGeoGebra(qid) {
   var correctionHtml = '';
   if (modelPreset) {
     var fbInputs = inputs.concat([{ggbName: 'afficherCorrige', expr: 'true'}]);
-    var fbBuilt = ggbBuildFilterTag(X + 'fb', {
+    var fbBuilt = ggbBuildFilterTag_D(X + 'fb', {
       materialId: materialId, width: width, height: height, showToolbar: false,
       inputs: fbInputs, outputs: [], remember: ''
     });
-    correctionHtml = '<p>' + I18N.t('ggb.correction_lbl') + '</p>\n' + fbBuilt.block;
+    correctionHtml = '<p>' + I18N_D.t('ggb.correction_lbl') + '</p>\n' + fbBuilt.block;
   }
 
   var textFrag = '<!-- ENONCE-START -->' + (instruction || '') + formulaHtml + '<!-- ENONCE-END -->\n'
@@ -366,8 +387,12 @@ async function genGeoGebra(qid) {
     textFrag: textFrag,
     inputXML: inputsXML,
     prtXML: prtXML,
-    generalFeedback: _mkFbGen(correctionHtml, v('ggb-fbgen')),
+    generalFeedback: mkFbGen_D(correctionHtml, p.fbGen),
     feedbackRef: '[[feedback:prt' + X + ']]',
     prt: {meta: prtMeta, nodes: canonicalNodes}
   };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genGeoGebra: genGeoGebra, genGeoGebraCore: genGeoGebraCore };
 }
