@@ -36,27 +36,38 @@ async function genExpert(qid){
   var s=q._expertState;
   if(!s) throw new Error(I18N.t('msg.err_expert_state'));
 
+  return genExpertCore(s);
+}
+
+/* genExpertCore : fonction pure (aucun accès DOM ni au store `questions`),
+   voir js/gen-redox.js pour le pattern (deps injectables pour les tests
+   Node — test/unit/gen-expert.test.js). */
+function genExpertCore(s, deps){
+  deps = deps || {};
+  var I18N_D = deps.I18N || I18N;
+  var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+
   var inputs=s.inputs||[];
   var prts=s.prts||[];
 
-  if(!inputs.length) throw new Error(I18N.t('msg.err_expert_input_requis'));
-  if(!prts.length)   throw new Error(I18N.t('msg.err_expert_prt_requis'));
+  if(!inputs.length) throw new Error(I18N_D.t('msg.err_expert_input_requis'));
+  if(!prts.length)   throw new Error(I18N_D.t('msg.err_expert_prt_requis'));
 
   /* Validate inputs */
   for(var i=0;i<inputs.length;i++){
     if(!String(inputs[i].name||'').match(/^[a-zA-Z][a-zA-Z0-9_]*$/))
-      throw new Error(I18N.t('msg.err_expert_input_nom', {name: inputs[i].name}));
+      throw new Error(I18N_D.t('msg.err_expert_input_nom', {name: inputs[i].name}));
     if(!String(inputs[i].tans||'').trim())
-      throw new Error(I18N.t('msg.err_expert_tans', {name: inputs[i].name}));
+      throw new Error(I18N_D.t('msg.err_expert_tans', {name: inputs[i].name}));
   }
 
   /* Validate PRTs */
   for(var j=0;j<prts.length;j++){
     var prt=prts[j];
     if(!String(prt.name||'').match(/^[a-zA-Z][a-zA-Z0-9_]*$/))
-      throw new Error(I18N.t('msg.err_expert_prt_nom', {name: prt.name}));
+      throw new Error(I18N_D.t('msg.err_expert_prt_nom', {name: prt.name}));
     if(!(prt.nodes&&prt.nodes.length))
-      throw new Error(I18N.t('msg.err_expert_prt_noeud', {name: prt.name}));
+      throw new Error(I18N_D.t('msg.err_expert_prt_noeud', {name: prt.name}));
     /* Détection de boucle infinie : DFS depuis le nœud 0 */
     var nodeIds=prt.nodes.map(function(n){return String(n.id||n.name||n.nodeid);});
     var adjTrue={}, adjFalse={};
@@ -92,16 +103,16 @@ async function genExpert(qid){
         if(adjTrue[cur2]) subStack.push(adjTrue[cur2]);
         if(adjFalse[cur2]) subStack.push(adjFalse[cur2]);
       }
-      if(cycleFound) throw new Error(I18N.t('msg.err_expert_boucle', {name: prt.name, nid: nid}));
+      if(cycleFound) throw new Error(I18N_D.t('msg.err_expert_boucle', {name: prt.name, nid: nid}));
     }
     /* Vérifier que les nœuds référencés existent */
     prt.nodes.forEach(function(n){
       var id=String(n.id||n.name||n.nodeid);
       var tNext=adjTrue[id]; var fNext=adjFalse[id];
       if(tNext&&tNext!=='END'&&tNext!=='-1'&&nodeIds.indexOf(tNext)<0)
-        throw new Error(I18N.t('msg.err_expert_succ_vrai', {name: prt.name, id: id, tnext: tNext}));
+        throw new Error(I18N_D.t('msg.err_expert_succ_vrai', {name: prt.name, id: id, tnext: tNext}));
       if(fNext&&fNext!=='END'&&fNext!=='-1'&&nodeIds.indexOf(fNext)<0)
-        throw new Error(I18N.t('msg.err_expert_succ_faux', {name: prt.name, id: id, fnext: fNext}));
+        throw new Error(I18N_D.t('msg.err_expert_succ_faux', {name: prt.name, id: id, fnext: fNext}));
     });
     /* Vérifier que tous les nœuds sont atteignables depuis le nœud racine (0) */
     var rootId=nodeIds[0];
@@ -115,13 +126,13 @@ async function genExpert(qid){
     }
     var orphans=nodeIds.filter(function(id){ return !reachable[id]; });
     if(orphans.length)
-      throw new Error(I18N.t('msg.err_expert_orphelins', {name: prt.name, orphans: orphans.join(', ')}));
+      throw new Error(I18N_D.t('msg.err_expert_orphelins', {name: prt.name, orphans: orphans.join(', ')}));
   }
 
   var inputXML = inputs.map(buildInputXml).join('\n');
 
   var prtXML = prts.map(function(prt){
-    return buildPrtXml(
+    return buildPrtXml_D(
       { name:prt.name, value:String(prt.value||1),
         autosimplify:String(prt.autosimplify===0?0:1),
         feedbackstyle:String(prt.feedbackstyle||2),
@@ -146,4 +157,8 @@ async function genExpert(qid){
     qnote:     s.questionnote||'',
     name:      s.name||''
   };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genExpert: genExpert, genExpertCore: genExpertCore, buildInputXml: buildInputXml };
 }
