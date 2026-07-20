@@ -703,6 +703,21 @@ I18N.add("en", {
   "match.annuler_selection":    "Clear selection",
   "match.effacer_tout":         "Clear all",
   "btn.exporter_xml":           "Export XML",
+  "btn.tester_maxima":          "Test with Maxima",
+
+  /* ── Real Maxima connection (STACK-API) ── */
+  "footer.maxima":              "Maxima server",
+  "maxima.titre_reglages":      "Maxima server (STACK-API)",
+  "maxima.explication":         "Enter the address of your own STACK-API server to test generated questions against a real Maxima. This address is specific to your installation and is never shared or stored anywhere but in your browser.",
+  "maxima.label_url":           "STACK-API server URL",
+  "maxima.btn_tester":          "Test connection",
+  "maxima.msg_config_enregistree": "Maxima server address saved.",
+  "maxima.msg_config_effacee":  "Maxima server address cleared.",
+  "maxima.msg_test_en_cours":   "Testing connection…",
+  "maxima.msg_connexion_ok":    "Successfully connected to the Maxima server.",
+  "maxima.msg_rendu_ok":        "The question was successfully validated by Maxima.",
+  "maxima.err_non_configure":   "No Maxima server configured. Open settings (⚙️ Maxima server) to enter its address.",
+  "maxima.err_connexion":       "Could not reach the Maxima server ({msg}).",
 
   /* ── Common buttons ── */
   "common.supprimer":           "Delete",

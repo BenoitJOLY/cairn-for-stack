@@ -7493,8 +7493,10 @@ E H --</textarea>
       <div id="tm-recap"></div>
     </div>
     <div class="tm-error" id="tm-error" data-i18n="modal.tag_erreur">❌ Complétez toutes les catégories obligatoires.</div>
+    <span id="tm-maxima-result" style="font-size:.8rem;display:block;text-align:right;margin-bottom:6px;"></span>
     <div class="tm-footer">
       <button class="hs-bg-slate" onclick="closeTagModal()" data-i18n="btn.annuler">Annuler</button>
+      <button id="tm-maxima-btn" onclick="testTagsXMLWithMaxima()" style="background:#0e7490;color:#fff;" disabled>🧪 <span data-i18n="btn.tester_maxima">Tester avec Maxima</span></button>
       <button id="tm-confirm-btn" onclick="confirmAndPreview()" style="background:#7c3aed;color:#fff;" disabled><svg class="hs-ico"><use href="#ico-action-search"></use></svg> <span data-i18n="modal.tag_confirmer">Confirmer et prévisualiser</span></button>
       <button id="tm-deposit-btn" onclick="depositForReview()" style="background:#0e7490;color:#fff;" disabled title="Envoie le XML dans le dossier a_verifier/ du dépôt GitHub, pour relecture avant publication"><svg class="hs-ico"><use href="#ico-file-import"></use></svg> Déposer pour validation</button>
     </div>
@@ -7527,6 +7529,28 @@ E H --</textarea>
     </div>
     <div style="margin-top:18px;">
       <button style="background:var(--navy);color:white;width:100%;padding:11px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.9rem;" onclick="document.getElementById('copyModal').style.display='none'" data-i18n="btn.fermer">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- MODALE — RÉGLAGES SERVEUR MAXIMA (STACK-API)      -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="maximaConfigModal" class="modal-backdrop" onclick="closeMaximaConfigModal(event)" style="z-index:2000;display:none;">
+  <div class="calc-box" style="width:480px;max-width:95vw;" onclick="event.stopPropagation()">
+    <h2 style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);font-size:1rem;">⚙️ <span data-i18n="maxima.titre_reglages">Serveur Maxima (STACK-API)</span></h2>
+    <div style="font-size:.85rem;color:var(--navy2);line-height:1.6;margin-bottom:12px;" data-i18n="maxima.explication">
+      Renseignez l'adresse de votre propre serveur STACK-API pour tester les questions générées sur un vrai Maxima. Cette adresse est propre à votre installation et n'est jamais partagée ni enregistrée ailleurs que dans votre navigateur.
+    </div>
+    <label style="display:block;font-size:.8rem;font-weight:700;color:var(--navy2);margin-bottom:6px;" for="maxima-url-input" data-i18n="maxima.label_url">URL du serveur STACK-API</label>
+    <input id="maxima-url-input" type="text" placeholder="http://192.168.1.10:8082" style="width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;margin-bottom:8px;">
+    <div id="maxima-config-status" style="font-size:.8rem;min-height:1.2em;margin-bottom:10px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button style="flex:1;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:10px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.85rem;" onclick="testMaximaConnectionFromUI()" data-i18n="maxima.btn_tester">Tester la connexion</button>
+      <button style="flex:1;background:var(--navy);color:white;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.85rem;" onclick="saveMaximaConfigFromUI()" data-i18n="btn.save">Enregistrer</button>
+    </div>
+    <div style="margin-top:10px;">
+      <button style="background:none;color:var(--slate);width:100%;padding:8px;border:none;cursor:pointer;font-size:.8rem;" onclick="closeMaximaConfigModal()" data-i18n="btn.fermer">Fermer</button>
     </div>
   </div>
 </div>
@@ -7749,6 +7773,8 @@ E H --</textarea>
       <a href="javascript:void(0)" onclick="openCopyModal()"><svg class="hs-ico"><use href="#ico-footer-legal"></use></svg> <span data-i18n="footer.legal">Mentions légales &amp; Droits d'utilisation</span></a>
       <span class="sep">|</span>
       <a href="javascript:void(0)" onclick="openContactModal()"><svg class="hs-ico"><use href="#ico-footer-contact"></use></svg> <span data-i18n="footer.contact">Contact &amp; Support</span></a>
+      <span class="sep">|</span>
+      <a href="javascript:void(0)" onclick="openMaximaConfigModal()">⚙️ <span data-i18n="footer.maxima">Serveur Maxima</span></a>
       <span class="sep">|</span>
       <a href="https://github.com/BJ44-phy/H-stack.git" target="_blank" rel="noopener noreferrer"><svg class="hs-ico"><use href="#ico-footer-docs"></use></svg> <span data-i18n="footer.docs">Documentation</span></a>
     </nav>
@@ -8057,6 +8083,7 @@ E H --</textarea>
 <script src="js/circuit-ui.js"></script>
 <script src="js/basen-ui.js"></script>
 <script src="js/verif.js"></script>
+<script src="js/maxima-client.js"></script>
 <script src="js/doi.js"></script>
 <script src="lang/help.fr.js"></script>
 <script src="lang/help.en.js"></script>

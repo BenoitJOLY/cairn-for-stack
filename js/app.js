@@ -636,6 +636,8 @@ function updateTagRecap() {
   if (btn) btn.disabled = disabled;
   var depositBtn = document.getElementById('tm-deposit-btn');
   if (depositBtn) depositBtn.disabled = disabled;
+  var maximaBtn = document.getElementById('tm-maxima-btn');
+  if (maximaBtn) maximaBtn.disabled = disabled;
 }
 
 // ── DÉPÔT POUR VALIDATION (GitHub Contents API, sans backend) ────

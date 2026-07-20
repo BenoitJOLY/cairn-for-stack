@@ -705,6 +705,21 @@ I18N.add("fr", {
   "match.annuler_selection":    "Annuler la sélection",
   "match.effacer_tout":         "Effacer tout",
   "btn.exporter_xml":           "Exporter le XML",
+  "btn.tester_maxima":          "Tester avec Maxima",
+
+  /* ── Connexion Maxima réelle (STACK-API) ── */
+  "footer.maxima":              "Serveur Maxima",
+  "maxima.titre_reglages":      "Serveur Maxima (STACK-API)",
+  "maxima.explication":         "Renseignez l'adresse de votre propre serveur STACK-API pour tester les questions générées sur un vrai Maxima. Cette adresse est propre à votre installation et n'est jamais partagée ni enregistrée ailleurs que dans votre navigateur.",
+  "maxima.label_url":           "URL du serveur STACK-API",
+  "maxima.btn_tester":          "Tester la connexion",
+  "maxima.msg_config_enregistree": "Adresse du serveur Maxima enregistrée.",
+  "maxima.msg_config_effacee":  "Adresse du serveur Maxima effacée.",
+  "maxima.msg_test_en_cours":   "Test de connexion en cours…",
+  "maxima.msg_connexion_ok":    "Connexion au serveur Maxima réussie.",
+  "maxima.msg_rendu_ok":        "La question a été validée avec succès par Maxima.",
+  "maxima.err_non_configure":   "Aucun serveur Maxima configuré. Ouvrez les réglages (⚙️ Serveur Maxima) pour renseigner son adresse.",
+  "maxima.err_connexion":       "Impossible de contacter le serveur Maxima ({msg}).",
 
   /* ── Boutons communs ── */
   "common.supprimer":           "Supprimer",
