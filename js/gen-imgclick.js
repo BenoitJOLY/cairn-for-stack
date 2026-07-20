@@ -14,8 +14,26 @@ function genImgClick(X) {
     if (!st.bgData)                    throw new Error(I18N.t('ic.err_no_image'));
     if (!st.zones || !st.zones.length) throw new Error(I18N.t('ic.err_no_zone'));
 
-    var BGW = st.bgW, BGH = st.bgH;
-    var z = st.zones[0];
+    var p = {
+        bareme: bareme, text: text, fbOkTxt: fbOkTxt, fbWrTxt: fbWrTxt,
+        bgData: st.bgData, bgW: st.bgW, bgH: st.bgH, zone: st.zones[0],
+        fbGen: v('ic-fbgen')
+    };
+    return genImgClickCore(X, p);
+}
+
+function genImgClickCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var wrapFb_D = deps.wrapFb || wrapFb;
+    var htmlEsc_D = deps.htmlEsc || htmlEsc;
+    var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
+
+    var bareme = p.bareme, text = p.text, fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
+    var BGW = p.bgW, BGH = p.bgH;
+    var z = p.zone;
     var zoneLabel = (z.label || '').trim();
 
     /* ── Zone definition & feedbackvariables (espace pixel image, y math = BGH - y image) ── */
@@ -60,11 +78,11 @@ function genImgClick(X) {
         + '    </input>';
 
     /* ── Feedback ── */
-    var labelPart = zoneLabel ? ' <em>' + htmlEsc(zoneLabel) + '</em>' : '';
-    var fbOk    = wrapFb('<p>✅ <strong>' + I18N.t('ic.fb_ok_title') + '</strong>' + labelPart + '</p>'
-                       + (fbOkTxt ? '<p>' + htmlEsc(fbOkTxt) + '</p>' : ''), true);
-    var fbWrong = wrapFb('<p>❌ <strong>' + I18N.t('ic.fb_wrong_title') + '</strong>'
-                       + (fbWrTxt ? ' ' + htmlEsc(fbWrTxt) : '') + '</p>', false);
+    var labelPart = zoneLabel ? ' <em>' + htmlEsc_D(zoneLabel) + '</em>' : '';
+    var fbOk    = wrapFb_D('<p>✅ <strong>' + I18N_D.t('ic.fb_ok_title') + '</strong>' + labelPart + '</p>'
+                       + (fbOkTxt ? '<p>' + htmlEsc_D(fbOkTxt) + '</p>' : ''), true);
+    var fbWrong = wrapFb_D('<p>❌ <strong>' + I18N_D.t('ic.fb_wrong_title') + '</strong>'
+                       + (fbWrTxt ? ' ' + htmlEsc_D(fbWrTxt) : '') + '</p>', false);
 
     /* ── PRT ── */
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
@@ -76,7 +94,7 @@ function genImgClick(X) {
         falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
     }];
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
     /* ── JSXGraph code ── */
     /* Coordinate system: boundingbox [0,BGH,BGW,0] pixels image, y math up (convention gen-jxgdrop.js/genImgClickSequence) */
@@ -88,7 +106,7 @@ function genImgClick(X) {
         + '  showNavigation:false,pan:{enabled:false},zoom:{enabled:false}\n'
         + '});\n'
         + 'board.suspendUpdate();\n'
-        + "board.create('image',[" + jxgDropChunkedJsString(st.bgData, 2000) + ",[0,0],[" + BGW + ',' + BGH + "]],{fixed:true,highlight:false});\n"
+        + "board.create('image',[" + jxgDropChunkedJsString_D(p.bgData, 2000) + ",[0,0],[" + BGW + ',' + BGH + "]],{fixed:true,highlight:false});\n"
         + "var tracker=board.create('point',[-1," + (BGH / 2) + "],{visible:false});\n"
         + 'stack_jxg.bind_point(board,ans' + X + ',tracker);\n'
         + "var marker=board.create('point',[-1," + (BGH / 2) + "],{\n"
@@ -122,7 +140,7 @@ function genImgClick(X) {
     var textFrag = '<div style="background:#0d9488;border-left:5px solid #0f766e;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t('ic.banniere') + '</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N_D.t('ic.banniere') + '</strong>'
         + '<span style="background:#0f766e;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -139,7 +157,7 @@ function genImgClick(X) {
         textFrag:        textFrag,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen('', v('ic-fbgen')),
+        generalFeedback: mkFbGen_D('', p.fbGen),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -155,10 +173,29 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
     var st = window._icState || {};
     if (!st.bgData)              throw new Error(I18N.t('ic.err_no_image'));
     if (!st.zones || !st.zones.length) throw new Error(I18N.t('ic.err_seq_zones'));
+    var p = {
+        bareme: bareme, text: text, fbOkTxt: fbOkTxt, fbWrTxt: fbWrTxt,
+        seqTime: seqTime, bgData: st.bgData, bgW: st.bgW, bgH: st.bgH, zones: st.zones,
+        fbGen: v('ic-fbgen')
+    };
+    return genImgClickSequenceCore(X, p);
+}
 
-    var BGW = st.bgW, BGH = st.bgH;
-    var zones = st.zones.map(function (z, i) {
-        var label = (z.label || '').trim() || I18N.t('jd.zone_label', {n: i + 1});
+function genImgClickSequenceCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var wrapFb_D = deps.wrapFb || wrapFb;
+    var htmlEsc_D = deps.htmlEsc || htmlEsc;
+    var rawEsc_D = deps.rawEsc || rawEsc;
+    var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
+
+    var bareme = p.bareme, text = p.text, fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
+    var seqTime = p.seqTime;
+    var BGW = p.bgW, BGH = p.bgH;
+    var zones = p.zones.map(function (z, i) {
+        var label = (z.label || '').trim() || I18N_D.t('jd.zone_label', {n: i + 1});
         return { id: 'z' + i, label: label, shape: z.shape, x: z.x, y: z.y, r: z.r, w: z.w, h: z.h };
     });
 
@@ -183,10 +220,10 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         + '    </input>';
 
     /* ── Feedback ── */
-    var fbOk    = wrapFb('<p>✅ <strong>' + I18N.t('ic.fb_ok_seq') + '</strong></p>'
-                       + (fbOkTxt ? '<p>' + htmlEsc(fbOkTxt) + '</p>' : ''), true);
-    var fbWrong = wrapFb('<p>❌ <strong>' + I18N.t('ic.fb_wrong_seq_title') + '</strong> ' + I18N.t('ic.fb_wrong_seq_detail') + '</p>'
-                       + (fbWrTxt ? '<p>' + htmlEsc(fbWrTxt) + '</p>' : ''), false);
+    var fbOk    = wrapFb_D('<p>✅ <strong>' + I18N_D.t('ic.fb_ok_seq') + '</strong></p>'
+                       + (fbOkTxt ? '<p>' + htmlEsc_D(fbOkTxt) + '</p>' : ''), true);
+    var fbWrong = wrapFb_D('<p>❌ <strong>' + I18N_D.t('ic.fb_wrong_seq_title') + '</strong> ' + I18N_D.t('ic.fb_wrong_seq_detail') + '</p>'
+                       + (fbWrTxt ? '<p>' + htmlEsc_D(fbWrTxt) + '</p>' : ''), false);
 
     /* ── PRT ── */
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
@@ -198,7 +235,7 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
     }];
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
     /* ── Dimensions d'affichage (l'image peut être plus grande que l'écran) ── */
     var MAX_DISP_W = 700;
@@ -215,10 +252,10 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
     function toMathY(imgY) { return BGH - imgY; }
     var ciblesJS = zones.map(function (z) {
         if (z.shape === 'circle') {
-            return '{id:"' + z.id + '",label:"' + rawEsc(z.label) + '",shape:"circle",cx:' + z.x + ',cy:' + toMathY(z.y) + ',r:' + z.r + '}';
+            return '{id:"' + z.id + '",label:"' + rawEsc_D(z.label) + '",shape:"circle",cx:' + z.x + ',cy:' + toMathY(z.y) + ',r:' + z.r + '}';
         }
         var y1 = toMathY(z.y + z.h), y2 = toMathY(z.y);
-        return '{id:"' + z.id + '",label:"' + rawEsc(z.label) + '",shape:"rect",x1:' + z.x + ',y1:' + y1 + ',x2:' + (z.x + z.w) + ',y2:' + y2 + '}';
+        return '{id:"' + z.id + '",label:"' + rawEsc_D(z.label) + '",shape:"rect",x1:' + z.x + ',y1:' + y1 + ',x2:' + (z.x + z.w) + ',y2:' + y2 + '}';
     }).join(',\n            ');
 
     var jxgCode = '(function(){\n'
@@ -231,7 +268,7 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         + '  showNavigation:false,pan:{enabled:false},zoom:{enabled:false}\n'
         + '});\n'
         + 'board.suspendUpdate();\n'
-        + "board.create('image',[" + jxgDropChunkedJsString(st.bgData, 2000) + ",[0,0],[" + BGW + ',' + BGH + "]],{fixed:true,highlight:false});\n"
+        + "board.create('image',[" + jxgDropChunkedJsString_D(p.bgData, 2000) + ",[0,0],[" + BGW + ',' + BGH + "]],{fixed:true,highlight:false});\n"
         + 'var cibles=[\n            ' + ciblesJS + '\n        ];\n'
         + 'for(var _s=cibles.length-1;_s>0;_s--){var _r=Math.floor(Math.random()*(_s+1));var _t=cibles[_s];cibles[_s]=cibles[_r];cibles[_r]=_t;}\n'
         + 'var TEMPS=' + seqTime + ';\n'
@@ -249,15 +286,15 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         + 'var _boardCont=document.getElementById(divid);\n'
         + "var instrEl=document.createElement('div');\n"
         + "instrEl.style.cssText='display:block;margin-top:10px;text-align:center;font-size:1.15rem;font-weight:800;color:#0f766e;';\n"
-        + "instrEl.textContent=" + JSON.stringify(I18N.t('ic.instr_template', {sec: seqTime})) + ";\n"
+        + "instrEl.textContent=" + JSON.stringify(I18N_D.t('ic.instr_template', {sec: seqTime})) + ";\n"
         + "if(_boardCont&&_boardCont.parentNode)_boardCont.parentNode.insertBefore(instrEl,_boardCont.nextSibling);\n"
         + "var startBtn=document.createElement('button');\n"
         + "startBtn.type='button';\n"
-        + "startBtn.textContent=" + JSON.stringify(I18N.t('ic.start_btn')) + ";\n"
+        + "startBtn.textContent=" + JSON.stringify(I18N_D.t('ic.start_btn')) + ";\n"
         + "startBtn.style.cssText='display:block;margin:10px auto 0;padding:10px 22px;font-size:1.05rem;font-weight:800;color:#fff;background:#0f766e;border:none;border-radius:8px;cursor:pointer;';\n"
         + "if(instrEl.parentNode)instrEl.parentNode.insertBefore(startBtn,instrEl.nextSibling);\n"
         + 'var etatActuel=0,tempsRestant=TEMPS,estFini=false,gameStarted=false,compteur;\n'
-        + 'function majConsigne(){if(instrEl)instrEl.textContent=' + JSON.stringify(I18N.t('ic.find_prefix')) + '+cibles[etatActuel].label;}\n'
+        + 'function majConsigne(){if(instrEl)instrEl.textContent=' + JSON.stringify(I18N_D.t('ic.find_prefix')) + '+cibles[etatActuel].label;}\n'
         + 'function lancerTimer(){\n'
         + '  clearInterval(compteur);\n'
         + '  tempsRestant=TEMPS;\n'
@@ -275,9 +312,9 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         + '  clearInterval(compteur);\n'
         + '  var inputEl=document.getElementById(refAns' + X + ');\n'
         + '  if(statut==="reussi"){\n'
-        + "    if(instrEl){instrEl.textContent=" + JSON.stringify(I18N.t('ic.win_msg')) + ";instrEl.style.color='#15803d';}\n"
+        + "    if(instrEl){instrEl.textContent=" + JSON.stringify(I18N_D.t('ic.win_msg')) + ";instrEl.style.color='#15803d';}\n"
         + '  } else {\n'
-        + "    if(instrEl){instrEl.textContent=" + JSON.stringify(I18N.t('ic.timeout_msg')) + ";instrEl.style.color='#dc2626';}\n"
+        + "    if(instrEl){instrEl.textContent=" + JSON.stringify(I18N_D.t('ic.timeout_msg')) + ";instrEl.style.color='#dc2626';}\n"
         + '  }\n'
         + '  timerTxt.setText("");\n'
         + '  inputEl.value=statut;\n'
@@ -316,7 +353,7 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
     var textFrag = '<div style="background:#0d9488;border-left:5px solid #0f766e;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t('ic.banniere_seq') + '</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N_D.t('ic.banniere_seq') + '</strong>'
         + '<span style="background:#0f766e;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -335,10 +372,14 @@ function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
         kbdRaw:          jxgCode,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen('', v('ic-fbgen')),
+        generalFeedback: mkFbGen_D('', p.fbGen),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genImgClick: genImgClick, genImgClickCore: genImgClickCore, genImgClickSequence: genImgClickSequence, genImgClickSequenceCore: genImgClickSequenceCore };
 }
 
 // ══════════════════════════════════════════════════════
