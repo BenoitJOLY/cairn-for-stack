@@ -1,4 +1,53 @@
 async function genChemicalTopo(X){
+  const bareme=parseFloat(v('topo-bareme'))||2;
+  const text=richVal('topo-text');
+  const equation=document.getElementById('topo-editor').innerText.trim();
+  if(!equation) throw new Error(I18N.t('msg.err_topo_eq_vide', {n: X}));
+
+  // Scores depuis l'UI
+  const w_prt1=(parseInt(document.getElementById('topo-w_prt1').value)||0)/100;
+  const w_n0=(parseInt(document.getElementById('topo-w_n0').value)||0)/100;
+  const w_n1=(parseInt(document.getElementById('topo-w_n1').value)||0)/100;
+  const w_n2=(parseInt(document.getElementById('topo-w_n2').value)||0)/100;
+  const w_n3=(parseInt(document.getElementById('topo-w_n3').value)||0)/100;
+  const w_n4=(parseInt(document.getElementById('topo-w_n4').value)||0)/100;
+  const w_n5=(parseInt(document.getElementById('topo-w_n5').value)||0)/100;
+  const fctDefault=(document.getElementById('topo-fct-name')?.value||'').trim()||'aucune';
+  const typeReac=(document.getElementById('topo-type-reac')?.value||'').trim()||'';
+  const fbGenRaw=v('topo-fbgen');
+
+  // Capturer le preview avec délai pour SmilesDrawer
+  const capturedHtml = await new Promise(resolve => {
+    const pa = document.getElementById('topo-preview-area');
+    if (!pa) { resolve(''); return; }
+    setTimeout(() => {
+      const cl = pa.cloneNode(true);
+      const canvases = pa.querySelectorAll('canvas');
+      const cloneCanvases = cl.querySelectorAll('canvas');
+      canvases.forEach((cv, i) => {
+        try {
+          const img = document.createElement('img');
+          img.src = cv.toDataURL('image/png');
+          img.width = cv.width; img.height = cv.height;
+          cloneCanvases[i].replaceWith(img);
+        } catch(e) {}
+      });
+      resolve(cl.innerHTML);
+    }, 350);
+  });
+
+  return genChemicalTopoCore(X, {
+    bareme, text, equation, w_prt1, w_n0, w_n1, w_n2, w_n3, w_n4, w_n5,
+    fctDefault, typeReac, fbGenRaw, capturedHtml
+  });
+}
+
+function genChemicalTopoCore(X, p, deps){
+  deps = deps || {};
+  const I18N_D = deps.I18N || I18N;
+  const buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  const _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+
   const toML=(arr)=>`[${arr.map(x=>`"${x}"`).join(',')}]`;
   const toNL=(arr)=>`[${arr.map(x=>`${x}`).join(',')}]`;
   const parseSideJS=(txt)=>{
@@ -15,25 +64,15 @@ async function genChemicalTopo(X){
     return {f,c,s};
   };
 
-  const bareme=parseFloat(v('topo-bareme'))||2;
-  const text=richVal('topo-text');
-  const equation=document.getElementById('topo-editor').innerText.trim();
-  if(!equation) throw new Error(I18N.t('msg.err_topo_eq_vide', {n: X}));
-
-  // Scores depuis l'UI
-  const w_prt1=(parseInt(document.getElementById('topo-w_prt1').value)||0)/100;
-  const w_n0=(parseInt(document.getElementById('topo-w_n0').value)||0)/100;
-  const w_n1=(parseInt(document.getElementById('topo-w_n1').value)||0)/100;
-  const w_n2=(parseInt(document.getElementById('topo-w_n2').value)||0)/100;
-  const w_n3=(parseInt(document.getElementById('topo-w_n3').value)||0)/100;
-  const w_n4=(parseInt(document.getElementById('topo-w_n4').value)||0)/100;
-  const w_n5=(parseInt(document.getElementById('topo-w_n5').value)||0)/100;
+  const bareme=p.bareme, text=p.text, equation=p.equation;
+  const w_prt1=p.w_prt1, w_n0=p.w_n0, w_n1=p.w_n1, w_n2=p.w_n2, w_n3=p.w_n3, w_n4=p.w_n4, w_n5=p.w_n5;
+  const capturedHtml=p.capturedHtml;
 
   const sep=equation.includes('<=>')?'<=>':equation.includes('->')?'->':'=';
   const sides=equation.split(sep);
-  const r=parseSideJS(sides[0]||''), p=parseSideJS(sides[1]||'');
-  const fctDefault=(document.getElementById('topo-fct-name')?.value||'').trim()||'aucune';
-  const typeReac=(document.getElementById('topo-type-reac')?.value||'').trim()||'';
+  const r=parseSideJS(sides[0]||''), p_=parseSideJS(sides[1]||'');
+  const fctDefault=p.fctDefault;
+  const typeReac=p.typeReac;
 
   // Noms des inputs (identiques à la référence)
   const iRf =`ans_reaformul${X}`, iRc=`ans_reacoef${X}`,  iRch=`ans_reacharge${X}`;
@@ -53,9 +92,9 @@ is_arrow_any${X}: false;
 ${vRf}: ${toML(r.f)};
 ${vRc}: ${toNL(r.s)};
 ${vRch}: ${toNL(r.c)};
-${vPf}: ${toML(p.f)};
-${vPc}: ${toNL(p.s)};
-${vPch}: ${toNL(p.c)};
+${vPf}: ${toML(p_.f)};
+${vPc}: ${toNL(p_.s)};
+${vPch}: ${toNL(p_.c)};
 ${vFr}: "";
 ${vFp}: "${fctDefault}";
 type_reaction${X}: "${typeReac}";
@@ -83,16 +122,16 @@ tans_raw${X}: "${equation.replace(/ /g,' ').replace(/\s+/g,' ').trim().replace(
 </style>
 <div id="jsme_modal_{#qid#}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,.55); z-index: 9999; align-items: center; justify-content: center;">
 <div class="jsme-modal-box">
-<h3>${I18N.t('tpl.topo_jsme_modal_title')}</h3>
+<h3>${I18N_D.t('tpl.topo_jsme_modal_title')}</h3>
 <div id="jsme_{#qid#}" class="jsme-canvas"></div>
-<div style="display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end;"><button class="btn-stk" style="background: #94a3b8;" type="button" onclick="document.getElementById('jsme_modal_{#qid#}').style.display='none'">${I18N.t('tpl.topo_btn_cancel')}</button> <button class="btn-stk" style="background: #4338ca;" type="button" onclick="window['insertJsme_{#qid#}']()">${I18N.t('tpl.topo_btn_insert')}</button></div>
+<div style="display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end;"><button class="btn-stk" style="background: #94a3b8;" type="button" onclick="document.getElementById('jsme_modal_{#qid#}').style.display='none'">${I18N_D.t('tpl.topo_btn_cancel')}</button> <button class="btn-stk" style="background: #4338ca;" type="button" onclick="window['insertJsme_{#qid#}']()">${I18N_D.t('tpl.topo_btn_insert')}</button></div>
 </div>
 </div>
 <div class="toolbar" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
-<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('->')">${I18N.t('tpl.topo_btn_total')}</button>
-<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('<=>')">${I18N.t('tpl.topo_btn_equilibrium')}</button>
-<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('+')">${I18N.t('tpl.topo_btn_add')}</button>
-<button class="btn-stk" style="background: #8e44ad;" type="button" onclick="window['openJsme_{#qid#}']()">${I18N.t('tpl.topo_btn_molecule')}</button>
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('->')">${I18N_D.t('tpl.topo_btn_total')}</button>
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('<=>')">${I18N_D.t('tpl.topo_btn_equilibrium')}</button>
+<button class="btn-stk" type="button" onclick="window['api_{#qid#}'].ins('+')">${I18N_D.t('tpl.topo_btn_add')}</button>
+<button class="btn-stk" style="background: #8e44ad;" type="button" onclick="window['openJsme_{#qid#}']()">${I18N_D.t('tpl.topo_btn_molecule')}</button>
 </div>
 <div id="ed_{#qid#}" style="border: 2px solid #3498db; min-height: 45px; font-size: 1.15rem; padding: 12px; outline: none; border-radius: 5px; margin-bottom: 15px; font-family: monospace; background: #fdfdfd;" contenteditable="true"></div>
 <div id="viz_{#qid#}" style="background: #fcfcfc; border: 1px solid #eee; border-radius: 5px; padding: 12px; min-height: 100px; overflow-x: auto;">
@@ -299,33 +338,13 @@ tans_raw${X}: "${equation.replace(/ /g,' ').replace(/\s+/g,' ').trim().replace(
 </p>`;
 
   // ── textFrag / previewFrag ────────────────────────
-  const textFrag=`<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('tpl.topo_title')}</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>
+  const textFrag=`<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('tpl.topo_title')}</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>
 <!-- ENONCE-START -->
 <div style="margin-bottom:12px;">${text||''}</div>
 <!-- ENONCE-END -->
 ${htmlBlock}`;
 
-  // Capturer le preview avec délai pour SmilesDrawer
-  const capturedHtml = await new Promise(resolve => {
-    const pa = document.getElementById('topo-preview-area');
-    if (!pa) { resolve(''); return; }
-    setTimeout(() => {
-      const cl = pa.cloneNode(true);
-      const canvases = pa.querySelectorAll('canvas');
-      const cloneCanvases = cl.querySelectorAll('canvas');
-      canvases.forEach((cv, i) => {
-        try {
-          const img = document.createElement('img');
-          img.src = cv.toDataURL('image/png');
-          img.width = cv.width; img.height = cv.height;
-          cloneCanvases[i].replaceWith(img);
-        } catch(e) {}
-      });
-      resolve(cl.innerHTML);
-    }, 350);
-  });
-
-  const previewFrag=`<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} ${I18N.t('tpl.topo_title')}</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>
+  const previewFrag=`<div style="background:#B5464D;border-left:5px solid #8f2b33;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} ${I18N_D.t('tpl.topo_title')}</strong> <span style="background:#8f2b33;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>
 <!-- ENONCE-START --><div>${text||''}</div><!-- ENONCE-END -->
 <div style="padding:10px;background:#f8f8f8;border:1px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">${capturedHtml}</div>`;
 
@@ -424,7 +443,7 @@ is_proportional${X}: if length(full_ans_map${X})=0 then false else is(length(sub
       `<p><span style="color: red;">✗ Les charges ne sont pas conservées dans votre réaction.</span> Réactifs : {@charge_rea_s${X}@}, Produits : {@charge_pro_s${X}@}</p>`),
     mkCanonNode(3,'Formules','AlgEquiv',`formulas_ok${X}`,'true',w_n2.toFixed(7),5,0,4,
       `<p><span style="color: green;">✓ Vos formules sont correctes !</span></p>`,
-      `<p><span style="color: red;">✗ Vos formules sont incorrectes.</span> Réactifs : {@nb_rea_s${X}@}/${r.f.length}, Produits : {@nb_pro_s${X}@}/${p.f.length}</p>`),
+      `<p><span style="color: red;">✗ Vos formules sont incorrectes.</span> Réactifs : {@nb_rea_s${X}@}/${r.f.length}, Produits : {@nb_pro_s${X}@}/${p_.f.length}</p>`),
     mkCanonNode(4,'Groupes','AlgEquiv',`fct_pro_ok${X}`,'true',w_n3.toFixed(7),5,0,5,
       `<p><span style="color: orange;">⚠ Bonne compréhension du type de réaction.</span></p>`,
       `<p><span style="color: red;">✗ Groupes fonctionnels non reconnus.</span></p>`),
@@ -436,14 +455,14 @@ is_proportional${X}: if length(full_ans_map${X})=0 then false else is(length(sub
       `<p><span style="color: red;">✗ Coefficients non proportionnels.</span></p>`)
   ];
   const prtMeta = { name:`prt${X}`, value:'1.0000000', autosimplify:'1', feedbackstyle:'2', feedbackvariables: fbVars };
-  const prtXML = buildPrtXml(prtMeta, canonicalNodes);
+  const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
   // Encart "réaction attendue" injecté dans generalFeedback, même principe que
   // chemAnswerBox pour genChemical() ci-dessous : reprend les structures moléculaires
   // déjà capturées dans capturedHtml (canvases SmilesDrawer convertis en <img>).
   const topoAnswerBox = capturedHtml ? `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
-    <span style="font-weight:bold;color:#1e293b;">${I18N.t('tpl.topo_title')}</span>
-    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N.t('tpl.vf_sol_reaction_was')}</span>
+    <span style="font-weight:bold;color:#1e293b;">${I18N_D.t('tpl.topo_title')}</span>
+    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N_D.t('tpl.vf_sol_reaction_was')}</span>
     <div style="margin-top:10px;padding:10px;background:#f8f8f8;border:1px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">${capturedHtml}</div>
   </div>` : '';
 
@@ -455,7 +474,7 @@ is_proportional${X}: if length(full_ans_map${X})=0 then false else is(length(sub
     inputXML,
     prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
-    generalFeedback: _mkFbGen(topoAnswerBox, v('topo-fbgen')),
+    generalFeedback: _mkFbGen_D(topoAnswerBox, p.fbGenRaw),
     feedbackRef:`[[feedback:prt${X}]]`
   };
 }
@@ -467,16 +486,34 @@ function genChemical(X){
   if(!editorEl || !editorEl.innerText.trim()) throw new Error(I18N.t('msg.err_chem_vide', {n: X}));
   const editorHTML  = editorEl.innerHTML;
   const editorPlain = editorEl.innerText.trim();
+  const fbGenRaw = v('chem-fbgen');
 
   // Normaliser subscripts Unicode → chiffres ASCII
   function normSub(s){ return s.replace(/[₀₁₂₃₄₅₆₇₈₉]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x2080+48)); }
 
-  // htmlToLatex : SUB collé, SUP exposant, → normalisé
+  // htmlToLatex : SUB collé, SUP exposant, → normalisé — nécessite un vrai DOM
+  // (document.createElement) pour parcourir editorHTML, donc calculé ici plutôt
+  // que dans le cœur pur : seul le résultat (latex, une chaîne) est transmis.
   function htmlToLatex(html){
     const d=document.createElement('div'); d.innerHTML=html;
     function cv(n){ let r=''; for(let c of n.childNodes){ if(c.nodeType===3)r+=c.textContent; else if(c.nodeName==='SUB')r+=cv(c); else if(c.nodeName==='SUP')r+=`^{${cv(c)}}`; else r+=cv(c); } return r; }
-    return normSub(cv(d).replace(/\u00a0/g,' ').replace(/→/g,'->').replace(/⇌/g,'<=>').trim());
+    return normSub(cv(d).replace(/ /g,' ').replace(/→/g,'->').replace(/⇌/g,'<=>').trim());
   }
+  const latex = htmlToLatex(editorHTML);
+
+  return genChemicalCore(X, { bareme, text, editorHTML, editorPlain, latex, fbGenRaw });
+}
+
+function genChemicalCore(X, p, deps){
+  deps = deps || {};
+  const I18N_D = deps.I18N || I18N;
+  const buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  const _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+
+  const bareme = p.bareme, text = p.text, editorHTML = p.editorHTML, editorPlain = p.editorPlain, latex = p.latex;
+
+  // Normaliser subscripts Unicode → chiffres ASCII
+  function normSub(s){ return s.replace(/[₀₁₂₃₄₅₆₇₈₉]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x2080+48)); }
 
   // Parser une formule brute en composants [[n,"X"],...]
   // CO2 est EXCLU de FG ici — il doit être parsé comme C + 2O (atomes), pas comme groupe fonctionnel
@@ -486,7 +523,7 @@ function genChemical(X){
     let c=normSub(mol).replace(/\^?\{([^}]+)\}/g,'$1').replace(/-/g,'');
     let hasC=/(^|[^a-z])C([^a-z]|$)/.test(c);
     for(let g of FG){
-      let re=new RegExp(g+'(\\d*)','g'),m;
+      let re=new RegExp(g+'(\d*)','g'),m;
       while((m=re.exec(c))!==null){
         if(g==='OH'&&!hasC)break;
         let gn=(g==='CO2')?'COO':g; det.push(gn);
@@ -516,10 +553,9 @@ function genChemical(X){
     return{mols,ch,fcts,co};
   }
 
-  const latex = htmlToLatex(editorHTML);
   const sides = latex.split(/->|<=>|<->/);
   const r = parseSide(sides[0]||'');
-  const p = parseSide(sides[1]||'');
+  const p_ = parseSide(sides[1]||'');
   const arrow = latex.indexOf('<=>') !== -1 ? '<=>'
               : latex.indexOf('<->') !== -1 ? '<->'
               : latex.indexOf('->') !== -1  ? '->'
@@ -559,10 +595,10 @@ trf${X}:${toMLL(r.mols)};
 trk${X}:[${r.co.join(',')}];
 trc${X}:[${r.ch.join(',')}];
 trg${X}:[${r.fcts.map(f=>JSON.stringify(f)).join(',')}];
-tpf${X}:${toMLL(p.mols)};
-tpk${X}:[${p.co.join(',')}];
-tpc${X}:[${p.ch.join(',')}];
-tpg${X}:[${p.fcts.map(f=>JSON.stringify(f)).join(',')}];
+tpf${X}:${toMLL(p_.mols)};
+tpk${X}:[${p_.co.join(',')}];
+tpc${X}:[${p_.ch.join(',')}];
+tpg${X}:[${p_.fcts.map(f=>JSON.stringify(f)).join(',')}];
 has_rg${X}:is(length(trg${X})>0);
 has_pg${X}:is(length(tpg${X})>0);`;
 
@@ -766,7 +802,7 @@ if (editor.innerHTML !== '') { update(); }`;
 
   // ── textFrag / previewFrag ────────────────────────
   const textFrag=`<div style="background:#53B57C;border-left:5px solid #2F855E;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-  <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('tpl.chem_title')}</strong>
+  <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('tpl.chem_title')}</strong>
   <span style="background:#2F855E;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div style="margin-bottom:12px;">${text||''}</div><!-- ENONCE-END -->
@@ -788,7 +824,7 @@ ${jsxOpen}
 </div>`;
 
   const previewFrag=`<div style="background:#53B57C;border-left:5px solid #2F855E;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-  <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} ${I18N.t('tpl.chem_title_preview')}</strong>
+  <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} ${I18N_D.t('tpl.chem_title_preview')}</strong>
   <span style="background:#2F855E;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div>${text||''}</div><!-- ENONCE-END -->
@@ -895,7 +931,7 @@ stpf${X}: sort(map(sort,tpf${X}));`;
   `${fe}<strong>✗ Groupes caractéristiques incorrects</strong> — [[if test="not ok_rg${X}"]]\u26a0\ufe0f Réactifs, il manque : <strong>{#mq_rg${X}#}</strong>[[/if]] [[if test="not ok_pg${X}"]]\u26a0\ufe0f Produits, il manque : <strong>{#mq_pg${X}#}</strong>[[/if]]</div>`)
   ];
   const prtMeta = { name:`prt${X}`, value:'1.0000000', autosimplify:'1', feedbackstyle:'2', feedbackvariables: fbVars };
-  const prtXML = buildPrtXml(prtMeta, canonicalNodes);
+  const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
   // Tous les feedbacks des 8 nœuds, sans doublon avec les boîtes Ok/Faux génériques
   // de _hsPrtBoxes (qui prend déjà : truefeedback du nœud 0 comme "Ok",
@@ -924,14 +960,14 @@ stpf${X}: sort(map(sort,tpf${X}));`;
   // l'enseignant a tapé/collé sans espace après la flèche (ex: "->H3O+" au lieu de
   // "-> H3O+") — déjà la même technique que l'aperçu Config (_chemHtmlToLatexDisplay).
   const chemAnswerBox = `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
-    <span style="font-weight:bold;color:#1e293b;">${I18N.t('tpl.chem_title')}</span>
-    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N.t('chem.answerbox_expected')}</span>
-    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\ce{${encodeURIComponent(latex)}}" alt="${I18N.t('chem.answerbox_alt')}" style="max-height:60px;max-width:100%;"></div>
+    <span style="font-weight:bold;color:#1e293b;">${I18N_D.t('tpl.chem_title')}</span>
+    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N_D.t('chem.answerbox_expected')}</span>
+    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\ce{${encodeURIComponent(latex)}}" alt="${I18N_D.t('chem.answerbox_alt')}" style="max-height:60px;max-width:100%;"></div>
   </div>`;
 
   return {bareme, vars, qnote:editorPlain, textFrag, previewFrag, inputXML, prtXML, kbdRaw,
     prt: { meta: prtMeta, nodes: canonicalNodes }, diagNodes,
-    generalFeedback: _mkFbGen(chemAnswerBox, v('chem-fbgen')), feedbackRef:`[[feedback:prt${X}]]`};
+    generalFeedback: _mkFbGen_D(chemAnswerBox, p.fbGenRaw), feedbackRef:`[[feedback:prt${X}]]`};
 }
 
 // ══════════════════════════════════════════════════════
@@ -965,9 +1001,11 @@ function chemUpdateLock() {
   if (toolbar) toolbar.querySelectorAll('button').forEach(b => { b.disabled = !hasText; });
   if (hint) hint.style.display = hasText ? 'none' : 'block';
 }
-document.addEventListener('DOMContentLoaded', function () {
-  if (typeof chemUpdateLock === 'function') chemUpdateLock();
-});
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof chemUpdateLock === 'function') chemUpdateLock();
+  });
+}
 
 function _chemRestoreSel() {
   const editor = _chemEditor();
@@ -1175,14 +1213,16 @@ function chemParseAndPreview() {
   if (typeof chemRefreshPreview === 'function') chemRefreshPreview();
 }
 
-(function () {
-  function _chemInit() {
-    const editor = _chemEditor();
-    if (editor) { _chemWireEditor(editor); chemOnInput(); }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _chemInit);
-  else _chemInit();
-})();
+if (typeof document !== 'undefined') {
+  (function () {
+    function _chemInit() {
+      const editor = _chemEditor();
+      if (editor) { _chemWireEditor(editor); chemOnInput(); }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _chemInit);
+    else _chemInit();
+  })();
+}
 
 // ── JSME modal (teacher panel) ────────────────────────────────────────────
 var _jsmeGenApplet = null;
@@ -1324,11 +1364,22 @@ function topoRenderPreview() {
   }, 350);
 }
 
-(function () {
-  function _topoInit() {
-    const editor = document.getElementById('topo-editor');
-    if (editor) topoOnInput();
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _topoInit);
-  else _topoInit();
-})();
+if (typeof document !== 'undefined') {
+  (function () {
+    function _topoInit() {
+      const editor = document.getElementById('topo-editor');
+      if (editor) topoOnInput();
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _topoInit);
+    else _topoInit();
+  })();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    genChemicalTopo: genChemicalTopo,
+    genChemicalTopoCore: genChemicalTopoCore,
+    genChemical: genChemical,
+    genChemicalCore: genChemicalCore
+  };
+}
