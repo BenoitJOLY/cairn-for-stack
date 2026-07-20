@@ -4,18 +4,34 @@ function genCircuit(X) {
     var gv = function(id) { var el=document.getElementById(id); return el?parseFloat(el.value)||0:0; };
     var gs = function(id) { var el=document.getElementById(id); return el?el.value:""; };
 
-    var scenario = gs("cir-scenario") || "loi-ohm";
-    var ask      = gs("cir-ask")      || "i";
-    var e        = gv("cir-e")  || 9;
-    var r1       = gv("cir-r1") || 100;
-    var r2       = gv("cir-r2") || 220;
-    var r3       = gv("cir-r3") || 0;
-    var iKnown   = gv("cir-i-known") / 1000;
-    var tol      = gv("cir-tol") || 5;
-    var bareme   = parseFloat(gv("cir-bareme")) || 1;
-    var fbOk     = gs("cir-fb-ok");
-    var fbWrong  = gs("cir-fb-wrong");
-    var text     = richVal("cir-text");
+    var p = {
+        scenario: gs("cir-scenario") || "loi-ohm",
+        ask:      gs("cir-ask")      || "i",
+        e:        gv("cir-e")  || 9,
+        r1:       gv("cir-r1") || 100,
+        r2:       gv("cir-r2") || 220,
+        r3:       gv("cir-r3") || 0,
+        iKnown:   gv("cir-i-known") / 1000,
+        tol:      gv("cir-tol") || 5,
+        bareme:   parseFloat(gv("cir-bareme")) || 1,
+        fbOk:     gs("cir-fb-ok"),
+        fbWrong:  gs("cir-fb-wrong"),
+        text:     richVal("cir-text"),
+        fbGen:    gs("cir-fbgen")
+    };
+    return genCircuitCore(X, p);
+}
+
+/* genCircuitCore : fonction pure (aucun accès DOM), voir js/gen-redox.js
+   pour le pattern (deps injectables — test/unit/gen-circuit.test.js). */
+function genCircuitCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+
+    var scenario = p.scenario, ask = p.ask, e = p.e, r1 = p.r1, r2 = p.r2, r3 = p.r3;
+    var iKnown = p.iKnown, tol = p.tol, bareme = p.bareme, fbOk = p.fbOk, fbWrong = p.fbWrong, text = p.text;
 
     var req = 0, I = 0, I1 = 0, I2 = 0, tansJS = 0;
     if (scenario === "loi-ohm") {
@@ -107,8 +123,8 @@ function genCircuit(X) {
         + "cir_err:if is(tans = 0) then abs(ans" + X + ") else abs((ans" + X + " - tans)/tans);\n"
         + "cir_ok:is(cir_err < cir_tol_frac);\n";
 
-    var fbOkFinal    = fbOk    || "<p>&#10003; <strong>" + I18N.t('cir.fb_ok_default') + "</strong> " + tansStr + "</p>";
-    var fbWrongFinal = fbWrong || ("<p>&#10007; <strong>" + I18N.t('cir.fb_wrong_default') + "</strong> " + I18N.t('cir.fb_wrong_valeur_attendue') + tansStr + " (+-" + tol + "%).</p>");
+    var fbOkFinal    = fbOk    || "<p>&#10003; <strong>" + I18N_D.t('cir.fb_ok_default') + "</strong> " + tansStr + "</p>";
+    var fbWrongFinal = fbWrong || ("<p>&#10007; <strong>" + I18N_D.t('cir.fb_wrong_default') + "</strong> " + I18N_D.t('cir.fb_wrong_valeur_attendue') + tansStr + " (+-" + tol + "%).</p>");
 
     var prtMeta = { name: "prt" + X, value: "1", autosimplify: "1", feedbackstyle: "1", feedbackvariables: feedVars };
     var canonicalNodes = [{
@@ -119,18 +135,18 @@ function genCircuit(X) {
         falsescoremode: "=", falsescore: "0", falsepenalty: "0", falsenextnode: "-1",
         falseanswernote: "PRT" + X + "-1-F", falsefeedback: fbWrongFinal
     }];
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
-    var scenarioLabel = scenario === "loi-ohm" ? I18N.t('cir.scenario_label_ohm') : I18N.t('cir.scenario_label_prefix') + scenario;
+    var scenarioLabel = scenario === "loi-ohm" ? I18N_D.t('cir.scenario_label_ohm') : I18N_D.t('cir.scenario_label_prefix') + scenario;
     var askLabels = {
-        i: I18N.t('cir.ask_lbl_i'), r: I18N.t('cir.ask_lbl_r'), u: I18N.t('cir.ask_lbl_u'),
-        "r-eq": I18N.t('cir.ask_lbl_r_eq'), "i-total": I18N.t('cir.ask_lbl_i_total'),
-        u1: I18N.t('cir.ask_lbl_u1'), u2: I18N.t('cir.ask_lbl_u2'), u3: I18N.t('cir.ask_lbl_u3'),
-        i1: I18N.t('cir.ask_lbl_i1'), i2: I18N.t('cir.ask_lbl_i2')
+        i: I18N_D.t('cir.ask_lbl_i'), r: I18N_D.t('cir.ask_lbl_r'), u: I18N_D.t('cir.ask_lbl_u'),
+        "r-eq": I18N_D.t('cir.ask_lbl_r_eq'), "i-total": I18N_D.t('cir.ask_lbl_i_total'),
+        u1: I18N_D.t('cir.ask_lbl_u1'), u2: I18N_D.t('cir.ask_lbl_u2'), u3: I18N_D.t('cir.ask_lbl_u3'),
+        i1: I18N_D.t('cir.ask_lbl_i1'), i2: I18N_D.t('cir.ask_lbl_i2')
     };
     var askLabel = askLabels[ask] || ask;
-    var instrText = text || ("<p>" + I18N.t('cir.instr_line1', {scenario: scenarioLabel, ask: askLabel, unit: unit}) + "</p>"
-        + "<p style=\"font-size:.85em;color:#6b7280;\">" + I18N.t('cir.instr_line2', {unit: unit, tol: String(tol)}) + "</p>");
+    var instrText = text || ("<p>" + I18N_D.t('cir.instr_line1', {scenario: scenarioLabel, ask: askLabel, unit: unit}) + "</p>"
+        + "<p style=\"font-size:.85em;color:#6b7280;\">" + I18N_D.t('cir.instr_line2', {unit: unit, tol: String(tol)}) + "</p>");
 
     var questionText = instrText
         + "[[input:ans" + X + "]][[validation:ans" + X + "]]"
@@ -144,10 +160,14 @@ function genCircuit(X) {
         textFrag:        questionText,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen("", gs("cir-fbgen")),
+        generalFeedback: mkFbGen_D("", p.fbGen),
         feedbackRef:     "[[feedback:prt" + X + "]]",
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genCircuit: genCircuit, genCircuitCore: genCircuitCore };
 }
 
 // ==============================================================
