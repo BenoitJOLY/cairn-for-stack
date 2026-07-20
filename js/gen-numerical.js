@@ -30,12 +30,11 @@ function genNumericalCore(X, p, deps){
   var I18N_D = deps.I18N || I18N;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var wrapFb_D = deps.wrapFb || wrapFb;
-  var buildKbdStackHTML_D = deps.buildKbdStackHTML || buildKbdStackHTML;
 
   const bareme=p.bareme, text=p.text, val=p.val, n=p.n, isR=p.isR;
   const fbc=p.fbc, fbe=p.fbe, tolType=p.tolType, tolVal=p.tolVal, forbid=p.forbid;
   const numFbGen=p.numFbGen, aide=p.aide, useKbd=p.useKbd;
-  const kbdHtml=useKbd?buildKbdStackHTML_D(X):'';
+  const kbdHtml=useKbd?(deps.buildKbdStackHTML || buildKbdStackHTML)(X):'';
   const qv=isR?`ta${X}:float(round(${val}*10^(${n}-1-floor(log(abs(${val}))/log(10))))/10^(${n}-1-floor(log(abs(${val}))/log(10))));`:`ta${X}:${val};`;
   const vars=`/* Q${X} : Arithmétique (${bareme}pt) */\n${qv}`;
   const qnote=`{@ta${X}@}`;
@@ -59,7 +58,7 @@ function genNumericalCore(X, p, deps){
       </div>
       <!-- ENONCE-START -->${text||''}<!-- ENONCE-END -->
       ${inputLine}
-
+	  
     `,
     inputXML:`    <input>
       <name>ans${X}</name>

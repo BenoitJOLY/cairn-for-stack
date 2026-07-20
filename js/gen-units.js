@@ -1,6 +1,12 @@
 // ── XML GENERATORS: unités ──
 
 function genUnits(X){
+  // un-tol/un-fbc/un-fbe ne sont pas utilisés par le calcul, mais resolveFb() a l'effet de
+  // bord de pré-remplir les textarea un-fbc/un-fbe si vides — comportement du code d'origine
+  // à préserver même si ces valeurs ne servent pas au cœur pur.
+  v('un-tol');
+  resolveFb('un-fbc',FB_JUSTE_DEFAULT);
+  resolveFb('un-fbe',FB_FAUX_DEFAULT);
   const p={
     bareme: parseFloat(v('un-bareme'))||1,
     text: richVal('un-text'),
@@ -20,8 +26,6 @@ function genUnitsCore(X, p, deps){
   var I18N_D = deps.I18N || I18N;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var mkFbGen_D = deps.mkFbGen || _mkFbGen;
-  var buildKbdStackHTML_D = deps.buildKbdStackHTML || buildKbdStackHTML;
-
   const bareme=p.bareme;
   const text=p.text;
   const val=p.val;
@@ -29,7 +33,7 @@ function genUnitsCore(X, p, deps){
   const fbGen=p.fbGen;
   const aide=p.aide;
   const useKbd=p.useKbd;
-  const kbdHtml=useKbd?buildKbdStackHTML_D(X):'';
+  const kbdHtml=useKbd?(deps.buildKbdStackHTML || buildKbdStackHTML)(X):'';
   const vars=`/* Q${X} : Unité (${bareme}pt) */\nta${X}:${val}*${unit};`;
   const qnote=`{@ta${X}@}`;
   const inputLine=useKbd?`${aide}<!--HS-KBD:${X}-->`:`${aide}<p>[[input:ans${X}]] [[validation:ans${X}]]</p>`;

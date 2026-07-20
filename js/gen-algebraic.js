@@ -43,12 +43,11 @@ function genAlgebraicCore(X, p, deps){
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var wrapFb_D = deps.wrapFb || wrapFb;
   var algPrtNodeCanonical_D = deps.algPrtNodeCanonical || algPrtNodeCanonical;
-  var buildKbdStackHTML_D = deps.buildKbdStackHTML || buildKbdStackHTML;
 
   const bareme=p.bareme, text=p.text, formula=p.formula, mode=p.mode;
   const exprDisplay=p.exprDisplay, errorExpr=p.errorExpr;
   const fbc=p.fbc, fbe=p.fbe, sol=p.sol, aide=p.aide, useKbd=p.useKbd;
-  const kbdHtml=useKbd?buildKbdStackHTML_D(X):'';
+  const kbdHtml=useKbd?(deps.buildKbdStackHTML || buildKbdStackHTML)(X):'';
   const allowWords=[...new Set([...p.formVars,...p.poolVars])].join(',');
   const mainVar=p.formVars[0]||'x';
   // Maxima variables block
