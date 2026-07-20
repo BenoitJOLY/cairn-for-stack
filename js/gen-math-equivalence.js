@@ -3,16 +3,40 @@
 
 function genEquivalence(X) {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
-    var bareme = parseFloat(gs('eq-bareme')) || 1;
-    var scenario = gs('eq-scenario') || 'developpement';
-    var custText = gs('eq-text').trim();
-    var formule = (gs('eq-formule').trim() || 'x');
-    var variable = gs('eq-variable').trim() || 'x';
-    var variables = gs('eq-variables').trim() || 'x,y';
-    var resultatOverride = gs('eq-resultat').trim();
     var etapeChecked = !!(document.getElementById('eq-etape-check') || {}).checked;
-    var etapeVal = etapeChecked ? gs('eq-etape-val').trim() : '';
-    var fbOk = gs('eq-fb-ok').trim(), fbWrong = gs('eq-fb-wrong').trim();
+    var p = {
+        bareme: parseFloat(gs('eq-bareme')) || 1,
+        scenario: gs('eq-scenario') || 'developpement',
+        custText: gs('eq-text').trim(),
+        formule: (gs('eq-formule').trim() || 'x'),
+        variable: gs('eq-variable').trim() || 'x',
+        variables: gs('eq-variables').trim() || 'x,y',
+        resultatOverride: gs('eq-resultat').trim(),
+        etapeChecked: etapeChecked,
+        etapeVal: etapeChecked ? gs('eq-etape-val').trim() : '',
+        fbOk: gs('eq-fb-ok').trim(), fbWrong: gs('eq-fb-wrong').trim(),
+        fbGenExtra: gs('eq-fbgen')
+    };
+    return genEquivalenceCore(X, p);
+}
+
+/* genEquivalenceCore : fonction pure (aucun accès DOM), voir js/gen-redox.js pour
+   le pattern (deps injectables pour les tests Node — test/unit/gen-math-equivalence.test.js). */
+function genEquivalenceCore(X, p, deps) {
+    deps = deps || {};
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkFbGen_D      = deps.mkFbGen || _mkFbGen;
+
+    var bareme = p.bareme;
+    var scenario = p.scenario;
+    var custText = p.custText;
+    var formule = p.formule;
+    var variable = p.variable;
+    var variables = p.variables;
+    var resultatOverride = p.resultatOverride;
+    var etapeChecked = p.etapeChecked;
+    var etapeVal = p.etapeVal;
+    var fbOk = p.fbOk, fbWrong = p.fbWrong;
 
     function eqNode(name, desc, test, sans, tans, trueNext, trueScore, trueNote, trueFb, falseNext, falseScore, falseNote, falseFb, trueMode, falseMode) {
         return {
@@ -132,10 +156,10 @@ function genEquivalence(X) {
     }
 
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '0', feedbackstyle: '1', feedbackvariables: '' };
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
     var generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>Correction :</strong><br>La forme finale attendue est {@q${X}_resultat@}.</div>`;
-    generalFeedback = _mkFbGen(generalFeedback, gs('eq-fbgen'));
+    generalFeedback = mkFbGen_D(generalFeedback, p.fbGenExtra);
 
     return {
         type: 'equivalence', bareme, vars, qnote, textFrag, inputXML, prtXML,
@@ -143,4 +167,8 @@ function genEquivalence(X) {
         generalFeedback, feedbackRef: `[[feedback:prt${X}]]`,
         diagNodes: diagNodes
     };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genEquivalence: genEquivalence, genEquivalenceCore: genEquivalenceCore };
 }
