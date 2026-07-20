@@ -154,26 +154,47 @@ function _lgSeqPrt(X, bareme, specs) {
 
 function genLogique(X) {
     var gs = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
-    var scenario = gs('lg-scenario') || 'table';
     var nbVars = parseInt(gs('lg-nb-vars')) || 2;
+    var nRows = Math.pow(2, _lgVars(nbVars).length);
+    var p = {
+        scenario: gs('lg-scenario') || 'table',
+        nbVars: nbVars,
+        expr: gs('lg-expr') || '(P and Q) or not(P)',
+        expr2: gs('lg-expr2') || '',
+        expr3: gs('lg-expr3') || '',
+        expr4: gs('lg-expr4') || '',
+        subexpr1: gs('lg-subexpr1') || '',
+        subexpr2: gs('lg-subexpr2') || '',
+        tansForm: gs('lg-tans') || '',
+        nbBlanks: Math.min(nRows, Math.max(1, parseInt(gs('lg-nb-blanks')) || 2)),
+        bareme: parseFloat(gs('lg-bareme')) || 1,
+        fbOk: gs('lg-fb-ok'),
+        fbWrong: gs('lg-fb-wrong'),
+        fbGen: gs('lg-fbgen'),
+        text: richVal('lg-text')
+    };
+    return genLogiqueCore(X, p);
+}
+
+function genLogiqueCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var mkInput_D = deps._mkInput || _mkInput;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var lgSeqPrt_D = deps._lgSeqPrt || _lgSeqPrt;
+    var lgGenFbBox_D = deps._lgGenFbBox || _lgGenFbBox;
+
+    var scenario = p.scenario, nbVars = p.nbVars;
     var vars = _lgVars(nbVars);
     var nRows = Math.pow(2, vars.length);
-    var expr = gs('lg-expr') || '(P and Q) or not(P)';
-    var expr2 = gs('lg-expr2') || '';
-    var expr3 = gs('lg-expr3') || '';
-    var expr4 = gs('lg-expr4') || '';
-    var subexpr1 = gs('lg-subexpr1') || '';
-    var subexpr2 = gs('lg-subexpr2') || '';
-    var tansForm = gs('lg-tans') || '';
-    var nbBlanks = Math.min(nRows, Math.max(1, parseInt(gs('lg-nb-blanks')) || 2));
-    var bareme = parseFloat(gs('lg-bareme')) || 1;
-    var fbOk = gs('lg-fb-ok');
-    var fbWrong = gs('lg-fb-wrong');
-    var fbGen = gs('lg-fbgen');
-    var text = richVal('lg-text');
+    var expr = p.expr, expr2 = p.expr2, expr3 = p.expr3, expr4 = p.expr4;
+    var subexpr1 = p.subexpr1, subexpr2 = p.subexpr2, tansForm = p.tansForm;
+    var nbBlanks = p.nbBlanks, bareme = p.bareme;
+    var fbOk = p.fbOk, fbWrong = p.fbWrong, fbGen = p.fbGen, text = p.text;
 
     var HDR = '<div style="background:#7c3aed;border-left:5px solid #5b21b6;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">' + I18N.t('log.title') + '</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">' + I18N_D.t('log.title') + '</strong>'
         + '<span style="background:#5b21b6;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>';
 
     var inputXML = '', prtXML = '', prtMeta, canonicalNodes, questionText, qnote, generalFeedback;
@@ -221,34 +242,34 @@ function genLogique(X) {
             {
                 description: isCases ? 'Cases correctes' : 'Tableau correct',
                 sans: sansList, tans: tansMain, score: 1,
-                feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N.t(isCases ? 'log.cases_ok_title' : 'log.table_ok_title') + '</strong> ' + I18N.t(isCases ? 'log.cases_ok_desc' : 'log.table_ok_desc'))
+                feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N_D.t(isCases ? 'log.cases_ok_title' : 'log.table_ok_title') + '</strong> ' + I18N_D.t(isCases ? 'log.cases_ok_desc' : 'log.table_ok_desc'))
             },
             {
                 description: 'Négation calculée',
                 sans: sansList, tans: tansNeg, score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.presque_ca_title') + '</strong> ' + I18N.t('log.neg_desc', {expr: _lgToLatex(expr)}))
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.presque_ca_title') + '</strong> ' + I18N_D.t('log.neg_desc', {expr: _lgToLatex(expr)}))
             }
         ];
         if (items.length >= 2) {
             specs.push({
                 description: 'Ordre inversé',
                 sans: sansList, tans: tansRev, score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.ordre_title') + '</strong> ' + I18N.t(nbVars === 3 ? 'log.ordre_3vars_desc' : 'log.ordre_2vars_desc'))
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.ordre_title') + '</strong> ' + I18N_D.t(nbVars === 3 ? 'log.ordre_3vars_desc' : 'log.ordre_2vars_desc'))
             });
         }
         specs.push({
             description: isCases ? 'Cases incorrectes' : 'Tableau incorrect',
             sans: 'true', tans: 'true', score: 0, quiet: true,
-            feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N.t('log.table_fallback_desc'))
+            feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.table_fallback_desc'))
         });
 
-        var built = _lgSeqPrt(X, bareme, specs);
+        var built = lgSeqPrt_D(X, bareme, specs);
         prtMeta = built.prtMeta; canonicalNodes = built.canonicalNodes; prtXML = built.prtXML;
 
-        var instrText = text || '<p>' + I18N.t(isCases ? 'log.cases_instr' : 'log.table_instr') + '</p>';
+        var instrText = text || '<p>' + I18N_D.t(isCases ? 'log.cases_instr' : 'log.table_instr') + '</p>';
         questionText = HDR + instrText + tbl;
         qnote = 'Logique Q' + X + ' ' + scenario + ' ' + expr.substring(0, 20);
-        generalFeedback = _mkFbGen(_lgGenFbBox('<p>' + I18N.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes)), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes)), fbGen);
 
     } else if (scenario === 'identifier') {
         var choices = [
@@ -275,7 +296,7 @@ function genLogique(X) {
             return '["' + c.key + '", ' + (c.key === 'A') + ', "' + _lgToUnicode(c.ex) + '"]';
         }).join(', ');
         var ansName = 'ans' + X;
-        inputXML = _mkInput({ name: ansName, type: 'dropdown', tans: '<![CDATA[[' + choiceList + ']]]>', boxsize: 15, showvalidation: 0 });
+        inputXML = mkInput_D({ name: ansName, type: 'dropdown', tans: '<![CDATA[[' + choiceList + ']]]>', boxsize: 15, showvalidation: 0 });
 
         var negChoice = choices.find(function (c) {
             return c.key !== 'A' && _lgAreEquiv(c.ex, 'not(' + expr + ')', vars, nRows);
@@ -284,29 +305,29 @@ function genLogique(X) {
         var specsI = [{
             description: 'Bonne expression',
             answertest: 'String', sans: ansName, tans: '"A"', score: 1,
-            feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N.t('log.cases_ok_title') + '</strong> ' + I18N.t('log.identifier_ok_desc'))
+            feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N_D.t('log.cases_ok_title') + '</strong> ' + I18N_D.t('log.identifier_ok_desc'))
         }];
         if (negChoice) {
             specsI.push({
                 description: 'A choisi la négation de l\'expression',
                 answertest: 'String', sans: ansName, tans: '"' + negChoice.key + '"', score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.presque_ca_title') + '</strong> ' + I18N.t('log.identifier_neg_desc'))
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.presque_ca_title') + '</strong> ' + I18N_D.t('log.identifier_neg_desc'))
             });
         }
         specsI.push({
             description: 'Expression incorrecte',
             sans: 'true', tans: 'true', score: 0, quiet: true,
-            feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N.t('log.identifier_fallback_desc'))
+            feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.identifier_fallback_desc'))
         });
 
-        var builtI = _lgSeqPrt(X, bareme, specsI);
+        var builtI = lgSeqPrt_D(X, bareme, specsI);
         prtMeta = builtI.prtMeta; canonicalNodes = builtI.canonicalNodes; prtXML = builtI.prtXML;
 
-        var instrText2 = text || '<p>' + I18N.t('log.identifier_instr') + '</p>';
+        var instrText2 = text || '<p>' + I18N_D.t('log.identifier_instr') + '</p>';
         questionText = HDR + instrText2 + tbl2
-            + '<div style="text-align:center;margin:16px 0;"><p><strong>' + I18N.t('log.expr_correspondante_lbl') + '</strong></p>[[input:' + ansName + ']][[validation:' + ansName + ']]</div>';
+            + '<div style="text-align:center;margin:16px 0;"><p><strong>' + I18N_D.t('log.expr_correspondante_lbl') + '</strong></p>[[input:' + ansName + ']][[validation:' + ansName + ']]</div>';
         qnote = 'Logique Q' + X + ' identifier ' + expr.substring(0, 20);
-        generalFeedback = _mkFbGen(_lgGenFbBox(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI)), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI)), fbGen);
 
     } else if (scenario === 'equivalence') {
         var items3 = [];
@@ -356,40 +377,40 @@ function genLogique(X) {
                 sans: eqName, tans: equiv ? 'true' : 'false', testoptions: '', quiet: '0',
                 truescoremode: '+', truescore: '0.5', truepenalty: '0', truenextnode: '-1',
                 trueanswernote: 'PRT' + X + '-1-T',
-                truefeedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N.t('mat.fb_ok_parfait') + '</strong> ' + I18N.t('log.equiv_ok_desc')),
+                truefeedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N_D.t('mat.fb_ok_parfait') + '</strong> ' + I18N_D.t('log.equiv_ok_desc')),
                 falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
                 falseanswernote: 'PRT' + X + '-1-F',
-                falsefeedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.equiv_partial_title') + '</strong> ' + I18N.t('log.equiv_partial_desc'))
+                falsefeedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.equiv_partial_title') + '</strong> ' + I18N_D.t('log.equiv_partial_desc'))
             },
             {
                 name: '2', description: 'Tables incorrectes', answertest: 'AlgEquiv',
                 sans: 'true', tans: 'true', testoptions: '', quiet: '1',
                 truescoremode: '=', truescore: '0', truepenalty: '0', truenextnode: '-1',
                 trueanswernote: 'PRT' + X + '-2-T',
-                truefeedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N.t('log.equiv_wrong_title') + '</strong> ' + I18N.t('log.equiv_wrong_desc')),
+                truefeedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('log.equiv_wrong_title') + '</strong> ' + I18N_D.t('log.equiv_wrong_desc')),
                 falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
                 falseanswernote: 'PRT' + X + '-2-F', falsefeedback: ''
             }
         ];
         prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVarsEq };
-        prtXML = buildPrtXml(prtMeta, canonicalNodes);
+        prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
-        var instrText3 = text || '<p>' + I18N.t('log.equiv_instr') + '</p>';
+        var instrText3 = text || '<p>' + I18N_D.t('log.equiv_instr') + '</p>';
         questionText = HDR + instrText3
             + '<div style="display:flex;gap:24px;flex-wrap:wrap;">'
-            + '<div><p><strong>' + I18N.t('log.e1_lbl') + '</strong> \\(' + _lgToLatex(expr) + '\\)</p>' + tblE1 + '</div>'
-            + '<div><p><strong>' + I18N.t('log.e2_lbl') + '</strong> ' + (expr2 ? '\\(' + _lgToLatex(expr2) + '\\)' : '—') + '</p>' + tblE2 + '</div>'
+            + '<div><p><strong>' + I18N_D.t('log.e1_lbl') + '</strong> \\(' + _lgToLatex(expr) + '\\)</p>' + tblE1 + '</div>'
+            + '<div><p><strong>' + I18N_D.t('log.e2_lbl') + '</strong> ' + (expr2 ? '\\(' + _lgToLatex(expr2) + '\\)' : '—') + '</p>' + tblE2 + '</div>'
             + '</div>'
-            + '<div style="margin-top:12px;"><p><strong>' + I18N.t('log.equivalentes_lbl') + '</strong> [[input:' + eqName + ']][[validation:' + eqName + ']]</p></div>';
+            + '<div style="margin-top:12px;"><p><strong>' + I18N_D.t('log.equivalentes_lbl') + '</strong> [[input:' + eqName + ']][[validation:' + eqName + ']]</p></div>';
         qnote = 'Logique Q' + X + ' equivalence ' + expr.substring(0, 15) + ' vs ' + (expr2 || '').substring(0, 15);
 
-        var eqGenBody = '<p style="text-align:center;margin-bottom:15px;font-size:1.05rem;"><strong>' + I18N.t('log.equiv_result_prefix') + ' ' + I18N.t(equiv ? 'log.equiv_yes' : 'log.equiv_no') + '</strong></p>'
+        var eqGenBody = '<p style="text-align:center;margin-bottom:15px;font-size:1.05rem;"><strong>' + I18N_D.t('log.equiv_result_prefix') + ' ' + I18N_D.t(equiv ? 'log.equiv_yes' : 'log.equiv_no') + '</strong></p>'
             + '<div style="overflow-x:auto;width:fit-content;margin:0 auto;"><table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">'
             + '<thead><tr style="background:#f1f5f9;">'
             + vars.map(function (v) { return '<th style="border:1px solid #94a3b8;padding:8px 18px;">' + v + '</th>'; }).join('')
             + '<th style="border:1px solid #94a3b8;padding:8px 18px;background:#dbeafe;">\\(' + _lgToLatex(expr) + '\\)</th>'
             + '<th style="border:1px solid #94a3b8;padding:8px 18px;background:#fef3c7;">\\(' + _lgToLatex(expr2 || expr) + '\\)</th>'
-            + '<th style="border:1px solid #94a3b8;padding:8px 18px;">' + I18N.t('log.identique_lbl') + '</th></tr></thead><tbody>';
+            + '<th style="border:1px solid #94a3b8;padding:8px 18px;">' + I18N_D.t('log.identique_lbl') + '</th></tr></thead><tbody>';
         for (var qj = 0; qj < nRows; qj++) {
             var valsQ = _lgBuildRow(qj, vars);
             var vA = allResE['e1r'][qj], vB = allResE['e2r'][qj];
@@ -400,7 +421,7 @@ function genLogique(X) {
                 + '<td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-size:1.2rem;">' + (vA === vB ? '✅' : '❌') + '</td></tr>';
         }
         eqGenBody += '</tbody></table></div>';
-        generalFeedback = _mkFbGen(_lgGenFbBox(eqGenBody), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D(eqGenBody), fbGen);
 
     } else if (scenario === 'intermediaire') {
         var se1 = subexpr1 || '(P and Q)';
@@ -440,28 +461,28 @@ function genLogique(X) {
             {
                 description: 'Tout correct',
                 sans: '[' + allNames.join(',') + ']', tans: '[' + allTargets.join(',') + ']', score: 1,
-                feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N.t('mat.fb_ok_parfait') + '</strong> ' + I18N.t('log.inter_ok_desc'))
+                feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N_D.t('mat.fb_ok_parfait') + '</strong> ' + I18N_D.t('log.inter_ok_desc'))
             },
             {
                 description: 'Sous-expressions correctes, finale fausse',
                 sans: '[' + interNames.join(',') + ']', tans: '[' + interTargets.join(',') + ']', score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.inter_partial1_title') + '</strong> ' + I18N.t('log.inter_partial1_desc'))
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.inter_partial1_title') + '</strong> ' + I18N_D.t('log.inter_partial1_desc'))
             },
             {
                 description: 'Seule la finale est correcte',
                 sans: '[' + nfNames.join(',') + ']', tans: '[' + allResFin.join(',') + ']', score: 0.3,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N.t('log.inter_partial2_title') + '</strong> ' + I18N.t('log.inter_partial2_desc'))
+                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.inter_partial2_title') + '</strong> ' + I18N_D.t('log.inter_partial2_desc'))
             },
             {
                 description: 'Tout incorrect',
                 sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N.t('log.inter_fallback_desc'))
+                feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.inter_fallback_desc'))
             }
         ];
-        var built3 = _lgSeqPrt(X, bareme, specs4);
+        var built3 = lgSeqPrt_D(X, bareme, specs4);
         prtMeta = built3.prtMeta; canonicalNodes = built3.canonicalNodes; prtXML = built3.prtXML;
 
-        var instrText4 = text || '<p>' + I18N.t('log.inter_instr') + '</p>';
+        var instrText4 = text || '<p>' + I18N_D.t('log.inter_instr') + '</p>';
         questionText = HDR + instrText4 + _lgMathBox(expr) + tbl4;
         qnote = 'Logique Q' + X + ' intermediaire ' + expr.substring(0, 15);
 
@@ -480,7 +501,7 @@ function genLogique(X) {
                 + '<td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">' + allResFin[qk] + '</td></tr>';
         }
         interBody += '</tbody></table></div>';
-        generalFeedback = _mkFbGen(_lgGenFbBox(interBody), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D(interBody), fbGen);
 
     } else { // simplif
         var tansMaxima = tansForm || expr;
@@ -494,8 +515,8 @@ function genLogique(X) {
             + '<checkanswertype>0</checkanswertype><mustverify>0</mustverify>'
             + '<showvalidation>0</showvalidation><options></options></input>';
 
-        fbOkFinal = fbOk || '<p>✅ ' + I18N.t('log.simplif_ok_desc', {tans: tansMaxima}) + '</p>';
-        fbWrongFinal = fbWrong || '<p>❌ ' + I18N.t('log.simplif_wrong_desc', {tans: tansMaxima}) + '</p>';
+        fbOkFinal = fbOk || '<p>✅ ' + I18N_D.t('log.simplif_ok_desc', {tans: tansMaxima}) + '</p>';
+        fbWrongFinal = fbWrong || '<p>❌ ' + I18N_D.t('log.simplif_wrong_desc', {tans: tansMaxima}) + '</p>';
         canonicalNodes = [{
             name: '0', description: '', answertest: 'PropLogic', sans: ansName2, tans: tansMaxima,
             testoptions: '', quiet: '0',
@@ -505,14 +526,14 @@ function genLogique(X) {
             falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrongFinal
         }];
         prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-        prtXML = buildPrtXml(prtMeta, canonicalNodes);
+        prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
-        var instrText5 = text || ('<p>' + I18N.t('log.simplif_instr1') + '</p>'
+        var instrText5 = text || ('<p>' + I18N_D.t('log.simplif_instr1') + '</p>'
             + _lgMathBox(expr)
-            + '<p>' + I18N.t('log.simplif_instr2') + '</p>');
+            + '<p>' + I18N_D.t('log.simplif_instr2') + '</p>');
         questionText = HDR + instrText5 + '[[input:' + ansName2 + ']][[validation:' + ansName2 + ']]';
         qnote = 'Logique Q' + X + ' simplif ' + expr.substring(0, 20);
-        generalFeedback = _mkFbGen(_lgGenFbBox('<p>' + I18N.t('log.simplif_genfb_line1', {tans: _lgToLatex(tansMaxima)}) + '</p><p>' + I18N.t('log.simplif_genfb_line2', {expr: _lgToLatex(expr)}) + '</p>'), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.simplif_genfb_line1', {tans: _lgToLatex(tansMaxima)}) + '</p><p>' + I18N_D.t('log.simplif_genfb_line2', {expr: _lgToLatex(expr)}) + '</p>'), fbGen);
     }
 
     questionText += '[[feedback:prt' + X + ']]';
@@ -524,6 +545,10 @@ function genLogique(X) {
         prt: { meta: prtMeta, nodes: canonicalNodes },
         generalFeedback: generalFeedback, feedbackRef: '[[feedback:prt' + X + ']]'
     };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genLogique: genLogique, genLogiqueCore: genLogiqueCore };
 }
 
 // ==============================================================
