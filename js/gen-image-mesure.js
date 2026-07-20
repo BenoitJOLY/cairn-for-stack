@@ -327,6 +327,28 @@ function genImageMesure(X) {
   if (targets.length === 0) { alert(I18N.t('imm.alert_ajouter_mesure')); return ''; }
   if (isNaN(imgW) || isNaN(imgH)) { alert(I18N.t('imm.alert_erreur_dimensions')); return ''; }
 
+  var p = {
+    bareme: bareme, text: text, imgData: imgData, imgW: imgW, imgH: imgH,
+    r1x: r1x, r1y: r1y, r1v: r1v, r2x: r2x, r2y: r2y, r2v: r2v,
+    unit: unit, tol: tol, mode: mode, fbOk: fbOk, fbWrong: fbWrong,
+    fbGenRaw: fbGenEl ? fbGenEl.value : '',
+    targets: targets
+  };
+  return genImageMesureCore(X, p);
+}
+
+function genImageMesureCore(X, p, deps) {
+  deps = deps || {};
+  var I18N_D = deps.I18N || I18N;
+  var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+  var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  var htmlEsc_D = deps.htmlEsc || htmlEsc;
+
+  var bareme = p.bareme, text = p.text, imgData = p.imgData, imgW = p.imgW, imgH = p.imgH;
+  var r1x = p.r1x, r1y = p.r1y, r1v = p.r1v, r2x = p.r2x, r2y = p.r2y, r2v = p.r2v;
+  var unit = p.unit, tol = p.tol, mode = p.mode, fbOk = p.fbOk, fbWrong = p.fbWrong;
+  var targets = p.targets;
+
   var N   = targets.length;
 
   // ── Maxima variable prefix ──
@@ -355,25 +377,25 @@ function genImageMesure(X) {
   // pédagogique (même l'Expert, qui ne donne aucun indice pendant la tentative, doit
   // pouvoir comprendre APRÈS coup comment on obtient la bonne réponse). ──
   var fbAuto = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-    + '<div style="font-weight:bold;color:#0c4a6e;margin-bottom:10px;">' + I18N.t('imm.methode_corrige_lbl') + '</div>'
+    + '<div style="font-weight:bold;color:#0c4a6e;margin-bottom:10px;">' + I18N_D.t('imm.methode_corrige_lbl') + '</div>'
     + '<div style="margin-bottom:10px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:8px;">'
-    + '<strong>' + I18N.t('imm.echelle_lbl') + '</strong> — ' + I18N.t('imm.echelle_full_desc', {r2v: r2v, r1v: r1v, calibDistPx: Math.round(calibDistPx), echelleRounded: echelleRounded, unit: htmlEsc(unit)}) + '</div>';
+    + '<strong>' + I18N_D.t('imm.echelle_lbl') + '</strong> — ' + I18N_D.t('imm.echelle_full_desc', {r2v: r2v, r1v: r1v, calibDistPx: Math.round(calibDistPx), echelleRounded: echelleRounded, unit: htmlEsc_D(unit)}) + '</div>';
   targets.forEach(function(t, i) {
     var n = i + 1;
     var isLast = i === targets.length - 1;
     fbAuto += '<div style="margin-bottom:8px;font-size:.9rem;' + (isLast ? '' : 'border-bottom:1px dashed #e2e8f0;padding-bottom:8px;') + '">';
-    fbAuto += '<span style="font-weight:bold;color:#0c4a6e;">' + n + '. ' + htmlEsc(t.desc) + ' :</span> ';
+    fbAuto += '<span style="font-weight:bold;color:#0c4a6e;">' + n + '. ' + htmlEsc_D(t.desc) + ' :</span> ';
     if (!t.hasPx) {
-      fbAuto += '<p>' + I18N.t('imm.valeur_attendue_simple', {val: t.val, unit: htmlEsc(unit)}) + '</p>';
+      fbAuto += '<p>' + I18N_D.t('imm.valeur_attendue_simple', {val: t.val, unit: htmlEsc_D(unit)}) + '</p>';
     } else if (t.type === 'ecart') {
-      fbAuto += '<p>' + I18N.t('imm.methode_ecart_desc', {pxDist: t.pxDist, echelleRounded: echelleRounded, val: t.val, unit: htmlEsc(unit)}) + '</p>';
+      fbAuto += '<p>' + I18N_D.t('imm.methode_ecart_desc', {pxDist: t.pxDist, echelleRounded: echelleRounded, val: t.val, unit: htmlEsc_D(unit)}) + '</p>';
     } else {
-      fbAuto += '<p>' + I18N.t('imm.methode_position_desc', {pxDist: t.pxDist, echelleRounded: echelleRounded, rawDist: t.rawDist, r1v: r1v, val: t.val, unit: htmlEsc(unit)}) + '</p>';
+      fbAuto += '<p>' + I18N_D.t('imm.methode_position_desc', {pxDist: t.pxDist, echelleRounded: echelleRounded, rawDist: t.rawDist, r1v: r1v, val: t.val, unit: htmlEsc_D(unit)}) + '</p>';
     }
     fbAuto += '</div>';
   });
   fbAuto += '</div>';
-  var generalFeedback = _mkFbGen(fbAuto, fbGenEl ? fbGenEl.value : '');
+  var generalFeedback = mkFbGen_D(fbAuto, p.fbGenRaw);
 
   // ── Répartition du barème selon le mode ──
   if (mode === 'guide') {
@@ -412,36 +434,36 @@ function genImageMesure(X) {
   // Aucune valeur/description de repère n'est injectée automatiquement ici :
   // le professeur les rédige lui-même dans le champ Énoncé (ci-dessus, "text").
   var textFrag = '<div style="background:#0e7490;border-left:5px solid #164e63;padding:8px 14px;margin:0 0 10px 0;border-radius:6px;color:#fff;font-family:sans-serif;">'
-      + '<strong style="font-size:1rem;">Q' + X + ' — ' + I18N.t('imm.banniere') + '</strong>'
+      + '<strong style="font-size:1rem;">Q' + X + ' — ' + I18N_D.t('imm.banniere') + '</strong>'
       + '<span style="float:right;opacity:.85;">/ ' + bareme + ' pt</span></div>\n';
   if (text) textFrag += '<div>' + text + '</div>\n';
   textFrag += '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n';
   textFrag += '<!--HS-KBD:' + X + '-->\n';
   textFrag += '[[/jsxgraph]]\n';
 
-  var modeLabel = mode === 'expert' ? I18N.t('imm.mode_expert_lbl') : (mode === 'autonome' ? I18N.t('imm.mode_autonome_lbl') : I18N.t('imm.mode_guide_lbl'));
-  textFrag += '<p style="font-size:.78rem;color:#6b7280;margin:0 0 6px 0;">' + I18N.t('imm.mode_prefix') + ' <strong>' + modeLabel + '</strong></p>\n';
+  var modeLabel = mode === 'expert' ? I18N_D.t('imm.mode_expert_lbl') : (mode === 'autonome' ? I18N_D.t('imm.mode_autonome_lbl') : I18N_D.t('imm.mode_guide_lbl'));
+  textFrag += '<p style="font-size:.78rem;color:#6b7280;margin:0 0 6px 0;">' + I18N_D.t('imm.mode_prefix') + ' <strong>' + modeLabel + '</strong></p>\n';
 
   if (mode === 'guide') {
     textFrag += '<p style="background:#ecfeff;border:1px solid #a5f3fc;border-radius:6px;padding:8px 12px;font-size:.92rem;">'
-        + '<strong>' + I18N.t('imm.etalonnage_lbl') + '</strong> — ' + I18N.t('imm.etalonnage_guide_desc') + '<br>'
-        + I18N.t('imm.echelle_deduite_lbl', {unit: htmlEsc(unit)}) + ' [[input:' + P + 'ec]] [[validation:' + P + 'ec]]</p>\n';
+        + '<strong>' + I18N_D.t('imm.etalonnage_lbl') + '</strong> — ' + I18N_D.t('imm.etalonnage_guide_desc') + '<br>'
+        + I18N_D.t('imm.echelle_deduite_lbl', {unit: htmlEsc_D(unit)}) + ' [[input:' + P + 'ec]] [[validation:' + P + 'ec]]</p>\n';
   } else if (mode === 'autonome') {
     textFrag += '<p style="background:#ecfeff;border:1px solid #a5f3fc;border-radius:6px;padding:8px 12px;font-size:.92rem;">'
-        + '<strong>' + I18N.t('imm.etalonnage_lbl') + '</strong> — ' + I18N.t('imm.etalonnage_autonome_desc') + '<br>'
-        + I18N.t('imm.echelle_calculee_lbl', {unit: htmlEsc(unit)}) + ' [[input:' + P + 'ec]] [[validation:' + P + 'ec]]</p>\n';
+        + '<strong>' + I18N_D.t('imm.etalonnage_lbl') + '</strong> — ' + I18N_D.t('imm.etalonnage_autonome_desc') + '<br>'
+        + I18N_D.t('imm.echelle_calculee_lbl', {unit: htmlEsc_D(unit)}) + ' [[input:' + P + 'ec]] [[validation:' + P + 'ec]]</p>\n';
   }
 
   targets.forEach(function(t, i) {
     var n = i + 1;
-    textFrag += '<p><strong>' + n + '. ' + htmlEsc(t.desc) + '</strong><br>';
+    textFrag += '<p><strong>' + n + '. ' + htmlEsc_D(t.desc) + '</strong><br>';
     if (mode === 'guide' && t.hasPx && t.type !== 'ecart') {
-      textFrag += I18N.t('imm.distance_brute_lbl', {unit: htmlEsc(unit)}) + ' [[input:' + P + 'r' + n + ']] [[validation:' + P + 'r' + n + ']]<br>';
+      textFrag += I18N_D.t('imm.distance_brute_lbl', {unit: htmlEsc_D(unit)}) + ' [[input:' + P + 'r' + n + ']] [[validation:' + P + 'r' + n + ']]<br>';
     }
     var finalLabel = t.type === 'ecart'
-      ? I18N.t('imm.valeur_mesuree_ecart_lbl')
-      : I18N.t('imm.valeur_finale_lbl');
-    textFrag += finalLabel + '&nbsp;: [[input:' + P + 'a' + n + ']] (' + htmlEsc(unit) + ') [[validation:' + P + 'a' + n + ']]</p>\n';
+      ? I18N_D.t('imm.valeur_mesuree_ecart_lbl')
+      : I18N_D.t('imm.valeur_finale_lbl');
+    textFrag += finalLabel + '&nbsp;: [[input:' + P + 'a' + n + ']] (' + htmlEsc_D(unit) + ') [[validation:' + P + 'a' + n + ']]</p>\n';
   });
 
   var kbdRaw = jxg;
@@ -483,7 +505,7 @@ function genImageMesure(X) {
   function _immKo(txt)   { return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ ' + txt + '</div>'; }
   function _immTrap(txt) { return '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 ' + txt + '</div>'; }
 
-  // Nœud PRT générique (même forme que buildPrtXml() de prt-manager.js, avec description)
+  // Nœud PRT générique (même forme que buildPrtXml_D() de prt-manager.js, avec description)
   function _immNode(name, desc, test, sans, tans, testopt, tScoreMode, tScore, tNext, tNote, tFb, fScoreMode, fScore, fNext, fNote, fFb) {
     return {
       name: name, description: desc, answertest: test, sans: sans, tans: tans,
@@ -505,15 +527,15 @@ function genImageMesure(X) {
     var nodes = [
       _immNode('0', 'Vérification de l\'échelle de conversion (pixels → ' + unit + ')',
         'NumRelative', sans, tans, tol,
-        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N.t('imm.echelle_correcte_lbl') + '</strong> ' + fbOk),
+        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N_D.t('imm.echelle_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
       _immNode('1', 'Piège : repères 1 et 2 inversés (signe de l\'échelle)',
         'NumRelative', sans, pieges, tol,
-        '=', 0, -1, prtName + '-1-T', _immTrap(I18N.t('imm.piege_signe_desc')),
-        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N.t('imm.echelle_incorrecte_lbl') + '</strong> ' + fbWrong + '<p>' + I18N.t('imm.echelle_rappel_desc') + '</p>')
+        '=', 0, -1, prtName + '-1-T', _immTrap(I18N_D.t('imm.piege_signe_desc')),
+        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N_D.t('imm.echelle_incorrecte_lbl') + '</strong> ' + fbWrong + '<p>' + I18N_D.t('imm.echelle_rappel_desc') + '</p>')
       )
     ];
-    return buildPrtXml(_immMeta(prtName, value), nodes);
+    return buildPrtXml_D(_immMeta(prtName, value), nodes);
   }
 
   // PRT Guidé — Distance brute (avant origine), cibles de type Position uniquement :
@@ -523,15 +545,15 @@ function genImageMesure(X) {
     var nodes = [
       _immNode('0', 'Vérification de la distance convertie (avant ajout de l\'origine)',
         'NumRelative', sans, tans, tol,
-        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N.t('imm.distance_correcte_lbl') + '</strong> ' + fbOk),
+        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N_D.t('imm.distance_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
       _immNode('1', 'Piège : distance laissée en pixels (oubli de la conversion par l\'échelle)',
         'NumRelative', sans, piege, tol,
-        '=', 0, -1, prtName + '-1-T', _immTrap(I18N.t('imm.piege_pixels_desc', {unit: unit})),
-        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N.t('imm.distance_incorrecte_lbl') + '</strong> ' + fbWrong + '<p>' + I18N.t('imm.distance_rappel_desc') + '</p>')
+        '=', 0, -1, prtName + '-1-T', _immTrap(I18N_D.t('imm.piege_pixels_desc', {unit: unit})),
+        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N_D.t('imm.distance_incorrecte_lbl') + '</strong> ' + fbWrong + '<p>' + I18N_D.t('imm.distance_rappel_desc') + '</p>')
       )
     ];
-    return buildPrtXml(_immMeta(prtName, value), nodes);
+    return buildPrtXml_D(_immMeta(prtName, value), nodes);
   }
 
   // PRT Guidé — Valeur finale : nœud principal + nœud piège différencié Position/Écart
@@ -539,23 +561,23 @@ function genImageMesure(X) {
   function immPrtFinalGuideXML(prtName, value, sans, tans, targetType, altLit) {
     var piege = String(altLit);
     var trapTxt = targetType === 'ecart'
-      ? I18N.t('imm.piege_origine_ajoutee_desc')
-      : I18N.t('imm.piege_origine_manquante_desc');
+      ? I18N_D.t('imm.piege_origine_ajoutee_desc')
+      : I18N_D.t('imm.piege_origine_manquante_desc');
     var koHint = targetType === 'ecart'
-      ? '<p>' + I18N.t('imm.kohint_ecart') + '</p>'
-      : '<p>' + I18N.t('imm.kohint_position') + '</p>';
+      ? '<p>' + I18N_D.t('imm.kohint_ecart') + '</p>'
+      : '<p>' + I18N_D.t('imm.kohint_position') + '</p>';
     var nodes = [
       _immNode('0', 'Vérification de la valeur finale',
         'NumRelative', sans, tans, tol,
-        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N.t('imm.valeur_finale_correcte_lbl') + '</strong> ' + fbOk),
+        '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N_D.t('imm.valeur_finale_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
       _immNode('1', targetType === 'ecart' ? 'Piège : origine ajoutée à tort à un écart' : 'Piège : origine (repère 1) non ajoutée',
         'NumRelative', sans, piege, tol,
         '=', 0, -1, prtName + '-1-T', _immTrap(trapTxt),
-        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N.t('imm.valeur_finale_incorrecte_lbl') + '</strong> ' + fbWrong + koHint)
+        '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N_D.t('imm.valeur_finale_incorrecte_lbl') + '</strong> ' + fbWrong + koHint)
       )
     ];
-    return buildPrtXml(_immMeta(prtName, value), nodes);
+    return buildPrtXml_D(_immMeta(prtName, value), nodes);
   }
 
   // PRT Autonome — 2 nœuds : seule la valeur finale rapporte le plein score ;
@@ -563,9 +585,9 @@ function genImageMesure(X) {
   // sans révéler la nature exacte de l'erreur finale (tier intentionnellement générique).
   function immPrtAutonomeXML(prtName, value, sansFinal, tansFinal, targetType) {
     var hintFb = targetType === 'ecart'
-      ? _immTrap(I18N.t('imm.hint_autonome_ecart'))
-      : _immTrap(I18N.t('imm.hint_autonome_position'));
-    var failFb = _immKo(I18N.t('imm.fail_autonome_desc'));
+      ? _immTrap(I18N_D.t('imm.hint_autonome_ecart'))
+      : _immTrap(I18N_D.t('imm.hint_autonome_position'));
+    var failFb = _immKo(I18N_D.t('imm.fail_autonome_desc'));
     var nodes = [
       _immNode('0', 'Vérification de la valeur finale attendue',
         'NumRelative', sansFinal, tansFinal, tol,
@@ -576,20 +598,20 @@ function genImageMesure(X) {
         '+', 0.5, -1, prtName + '-1-T', hintFb,
         '=', 0, -1, prtName + '-1-F', failFb)
     ];
-    return buildPrtXml(_immMeta(prtName, value), nodes);
+    return buildPrtXml_D(_immMeta(prtName, value), nodes);
   }
 
   // PRT Expert — 1 nœud, feedback neutre, aucune indication sur la localisation
   // de l'erreur (étalonnage / conversion / origine) : tier intentionnellement neutre.
   function immPrtExpertXML(prtName, value, sansFinal, tansFinal) {
-    var neutralFail = _immKo(I18N.t('imm.neutral_fail_expert_desc'));
+    var neutralFail = _immKo(I18N_D.t('imm.neutral_fail_expert_desc'));
     var nodes = [
       _immNode('0', 'Vérification de la valeur finale (sans indication de la nature de l\'erreur)',
         'NumRelative', sansFinal, tansFinal, tol,
         '+', 1, -1, prtName + '-0-T', _immOk(fbOk),
         '=', 0, -1, prtName + '-0-F', neutralFail)
     ];
-    return buildPrtXml(_immMeta(prtName, value), nodes);
+    return buildPrtXml_D(_immMeta(prtName, value), nodes);
   }
 
   // ── Inputs + PRTs selon le mode ──
@@ -643,4 +665,8 @@ function genImageMesure(X) {
     generalFeedback: generalFeedback,
     feedbackRef:     fbRef
   };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { genImageMesure: genImageMesure, genImageMesureCore: genImageMesureCore };
 }
