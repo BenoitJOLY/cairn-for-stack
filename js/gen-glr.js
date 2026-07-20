@@ -16,22 +16,41 @@ function glrPrepareFn(expr) {
 }
 
 function genGLR(X) {
-    var bareme  = parseFloat(v('glr-bareme'))  || 1;
-    var text    = richVal('glr-text');
-    var fnRaw   = v('glr-fn').trim();
-    var xMin    = parseFloat(v('glr-xmin'))    || -5;
-    var xMax    = parseFloat(v('glr-xmax'))    || 5;
-    var yMin    = parseFloat(v('glr-ymin'))    || -5;
-    var yMax    = parseFloat(v('glr-ymax'))    || 5;
-    var x0      = parseFloat(v('glr-x0'));
-    var tol     = parseFloat(v('glr-tol'))     || 0.25;
-    var dispW   = parseInt(v('glr-w'))         || 600;
-    var dispH   = parseInt(v('glr-h'))         || 400;
-    var fbOkTxt = v('glr-fb-ok').trim();
-    var fbWrTxt = v('glr-fb-wrong').trim();
+    var p = {
+        bareme:  parseFloat(v('glr-bareme'))  || 1,
+        text:    richVal('glr-text'),
+        fnRaw:   v('glr-fn').trim(),
+        xMin:    parseFloat(v('glr-xmin'))    || -5,
+        xMax:    parseFloat(v('glr-xmax'))    || 5,
+        yMin:    parseFloat(v('glr-ymin'))    || -5,
+        yMax:    parseFloat(v('glr-ymax'))    || 5,
+        x0:      parseFloat(v('glr-x0')),
+        tol:     parseFloat(v('glr-tol'))     || 0.25,
+        dispW:   parseInt(v('glr-w'))         || 600,
+        dispH:   parseInt(v('glr-h'))         || 400,
+        fbOkTxt: v('glr-fb-ok').trim(),
+        fbWrTxt: v('glr-fb-wrong').trim(),
+        fbGen:   v('glr-fbgen')
+    };
+    if (!p.fnRaw) throw new Error(I18N.t('glr.err_fn'));
+    if (isNaN(p.x0)) throw new Error(I18N.t('glr.err_x0'));
+    return genGLRCore(X, p);
+}
 
-    if (!fnRaw) throw new Error(I18N.t('glr.err_fn'));
-    if (isNaN(x0)) throw new Error(I18N.t('glr.err_x0'));
+/* genGLRCore : fonction pure (aucun accès DOM), voir js/gen-redox.js
+   pour le pattern (deps injectables — test/unit/gen-glr.test.js). */
+function genGLRCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var wrapFb_D = deps.wrapFb || wrapFb;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+
+    var bareme = p.bareme, text = p.text, fnRaw = p.fnRaw;
+    var xMin = p.xMin, xMax = p.xMax, yMin = p.yMin, yMax = p.yMax;
+    var tol = p.tol, dispW = p.dispW, dispH = p.dispH;
+    var fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
+    var x0 = p.x0;
 
     /* ── Convert expression to JS + evaluate y₀ ── */
     var fnJs = glrPrepareFn(fnRaw);
@@ -41,7 +60,7 @@ function genGLR(X) {
         y0 = (new Function('x', 'return (' + fnJs + ');'))(x0);
         if (!isFinite(y0)) throw new Error('f(x₀) non fini');
     } catch (e) {
-        throw new Error(I18N.t('glr.err_fn_eval') + ' : ' + e.message);
+        throw new Error(I18N_D.t('glr.err_fn_eval') + ' : ' + e.message);
     }
     y0 = parseFloat(y0.toFixed(6));
     x0 = parseFloat(x0.toFixed(6));
@@ -74,12 +93,12 @@ function genGLR(X) {
         + '    </input>';
 
     /* ── Feedback ── */
-    var fbOk    = wrapFb('<p>✅ <strong>' + I18N.t('glr.fb_ok_title') + '</strong>'
+    var fbOk    = wrapFb_D('<p>✅ <strong>' + I18N_D.t('glr.fb_ok_title') + '</strong>'
                        + (fbOkTxt ? ' ' + htmlEsc(fbOkTxt) : '')
-                       + '</p><p style="font-size:.9em">' + I18N.t('glr.fb_ok_detail', {qid: X, x0: x0}) + '</p>', true);
-    var fbWrong = wrapFb('<p>❌ <strong>' + I18N.t('glr.fb_wrong_title') + '</strong>'
+                       + '</p><p style="font-size:.9em">' + I18N_D.t('glr.fb_ok_detail', {qid: X, x0: x0}) + '</p>', true);
+    var fbWrong = wrapFb_D('<p>❌ <strong>' + I18N_D.t('glr.fb_wrong_title') + '</strong>'
                        + (fbWrTxt ? ' ' + htmlEsc(fbWrTxt) : '')
-                       + '</p><p style="font-size:.9em">' + I18N.t('glr.fb_wrong_detail', {qid: X, tol: tol}) + '</p>', false);
+                       + '</p><p style="font-size:.9em">' + I18N_D.t('glr.fb_wrong_detail', {qid: X, tol: tol}) + '</p>', false);
 
     /* ── PRT ── */
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
@@ -91,7 +110,7 @@ function genGLR(X) {
         falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
     }];
-    var prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
     /* ── JSXGraph code ── */
     /* The click snaps to the curve: stores [x, f(x)] → y-axis check not needed */
@@ -151,7 +170,7 @@ function genGLR(X) {
     var textFrag = '<div style="background:#0369A1;border-left:5px solid #075985;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
         + 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t('glr.banniere') + '</strong>'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N_D.t('glr.banniere') + '</strong>'
         + '<span style="background:#075985;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
@@ -167,9 +186,13 @@ function genGLR(X) {
         textFrag:        textFrag,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen('', v('glr-fbgen')),
+        generalFeedback: mkFbGen_D('', p.fbGen),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genGLR: genGLR, genGLRCore: genGLRCore, glrPrepareFn: glrPrepareFn };
 }
 
