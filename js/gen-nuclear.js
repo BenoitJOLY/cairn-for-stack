@@ -22,9 +22,11 @@ function nucUpdateLock() {
   if (toolbar) toolbar.querySelectorAll('button').forEach(b => { b.disabled = !hasText; });
   if (hint) hint.style.display = hasText ? 'none' : 'block';
 }
-document.addEventListener('DOMContentLoaded', function () {
-  if (typeof nucUpdateLock === 'function') nucUpdateLock();
-});
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof nucUpdateLock === 'function') nucUpdateLock();
+  });
+}
 
 function nucInsert(text) {
   const editor = document.getElementById('nuc-editor');
@@ -193,6 +195,16 @@ function nucEquationToLatex(reactants, products) {
   return reactants.map(nucParticleToLatex).join(' + ')
        + ' \\rightarrow '
        + products.map(nucParticleToLatex).join(' + ');
+}
+
+// KaTeX (bibliothèque de rendu externe, globale bare) : encapsulé pour être
+// injecté comme un tout via deps._nucRenderKatex plutôt que réécrit en interne.
+function _nucRenderKatex(latex) {
+  try {
+    return katex.renderToString(latex, { throwOnError: false, displayMode: true });
+  } catch (e) {
+    return '<code>' + latex.replace(/</g, '&lt;') + '</code>';
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -378,18 +390,30 @@ if(savedVal && savedVal.value && savedVal.value.trim()!==''){
 function genNuclear(X) {
   const bareme = parseFloat(v('nuc-bareme')) || 1;
   const text   = richVal('nuc-text');
-  if (!text || !text.trim()) throw new Error(I18N.t('msg.err_nuc_enonce_vide', {n: X}));
   const editor = document.getElementById('nuc-editor');
   const rawEq  = editor ? editor.innerText.trim() : '';
+  const p = { bareme, text, rawEq, fbGenRaw: v('nuc-fbgen') };
+  return genNuclearCore(X, p);
+}
 
-  if (!rawEq) throw new Error(I18N.t('msg.err_nuc_vide', {n: X}));
+function genNuclearCore(X, p, deps) {
+  deps = deps || {};
+  const I18N_D = deps.I18N || I18N;
+  const buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  const mkFbGen_D = deps._mkFbGen || _mkFbGen;
+  const nucRenderKatex_D = deps._nucRenderKatex || _nucRenderKatex;
+
+  const bareme = p.bareme, text = p.text, rawEq = p.rawEq;
+
+  if (!text || !text.trim()) throw new Error(I18N_D.t('msg.err_nuc_enonce_vide', {n: X}));
+  if (!rawEq) throw new Error(I18N_D.t('msg.err_nuc_vide', {n: X}));
   if (!rawEq.includes('->') && !rawEq.includes('\\rightarrow') && !rawEq.includes('→')) {
-    throw new Error(I18N.t('msg.err_nuc_fleche', {n: X}));
+    throw new Error(I18N_D.t('msg.err_nuc_fleche', {n: X}));
   }
 
   const parsed = nucParseEquation(rawEq);
   if (!parsed || !parsed.reactants.length || !parsed.products.length) {
-    throw new Error(I18N.t('msg.err_nuc_parse', {n: X}));
+    throw new Error(I18N_D.t('msg.err_nuc_parse', {n: X}));
   }
 
   const ta3Str = nucToMaximaList(parsed.reactants);
@@ -399,12 +423,7 @@ function genNuclear(X) {
   const latexEq = nucEquationToLatex(parsed.reactants, parsed.products);
 
   // Render KaTeX pour previewFrag
-  let katexHtml = '';
-  try {
-    katexHtml = katex.renderToString(latexEq, { throwOnError: false, displayMode: true });
-  } catch(e) {
-    katexHtml = `<code>${latexEq.replace(/</g,'&lt;')}</code>`;
-  }
+  const katexHtml = nucRenderKatex_D(latexEq);
 
   // Escape pour la chaîne Maxima (guillemets et antislashs)
   const latexForMaxima = latexEq.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -426,7 +445,7 @@ nuc${X}_latex: "${latexForMaxima}"`;
 
   const textFrag =
 `<div style="background:#EAB308;border-left:5px solid #676863;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-  <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — ${I18N.t('tpl.nuc_title')}</strong>
+  <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — ${I18N_D.t('tpl.nuc_title')}</strong>
   <span style="background:#676863;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div style="margin-bottom:14px;">${text || ''}</div><!-- ENONCE-END -->
@@ -443,7 +462,7 @@ ${jsxOpen}
   // ── previewFrag (dans Stackforge) ────────────────────
   const previewFrag =
 `<div style="background:#EAB308;border-left:5px solid #676863;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-  <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — ${I18N.t('tpl.nuc_title')}</strong>
+  <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — ${I18N_D.t('tpl.nuc_title')}</strong>
   <span style="background:#676863;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
 </div>
 <!-- ENONCE-START --><div style="margin-bottom:10px;">${text || ''}</div><!-- ENONCE-END -->
@@ -680,7 +699,7 @@ fb_asterisk${X}: sconcat(
       0,-1,0,-1, `{@fb_success${X}@}`, '')
   ];
   const prtMeta = { name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables: fbVars };
-  const prtXML = buildPrtXml(prtMeta, canonicalNodes);
+  const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
   // Feedbacks de tous les nœuds intermédiaires (hors "Ok" du nœud 0 et "Faux" du
   // dernier nœud, déjà repris par _hsPrtBoxes) — sans cette liste, la moitié des
@@ -692,12 +711,12 @@ fb_asterisk${X}: sconcat(
   // message réel (voir fbVars ci-dessus), uniquement pour l'onglet Config — l'export
   // XML utilise toujours le vrai jeton via canonicalNodes/prtXML, inchangé.
   const diagPreviewText = {
-    '0f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>${I18N.t('nuc.fb_reactants_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_reactants')}</span></div>`,
-    '1f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>${I18N.t('nuc.fb_products_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_products')}</span></div>`,
-    '3f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N.t('nuc.fb_coeffs_reactants_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_coeffs')}</span></div>`,
-    '4f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N.t('nuc.fb_coeffs_products_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_coeffs')}</span></div>`,
-    '5f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N.t('nuc.fb_asterisk_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N.t('nuc.diag_hint_asterisk')}</span></div>`,
-    '6t': `<div style="padding:10px 14px;background:#f0fff4;border-radius:8px;border-left:4px solid #27ae60;color:#166534;"><strong>${I18N.t('nuc.fb_success_title')} ${I18N.t('nuc.fb_success_text')}</strong></div>`
+    '0f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>${I18N_D.t('nuc.fb_reactants_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N_D.t('nuc.diag_hint_reactants')}</span></div>`,
+    '1f': `<div style="padding:10px 14px;background:#fff5f5;border-radius:8px;border-left:4px solid #e74c3c;color:#c0392b;"><strong>${I18N_D.t('nuc.fb_products_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N_D.t('nuc.diag_hint_products')}</span></div>`,
+    '3f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N_D.t('nuc.fb_coeffs_reactants_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N_D.t('nuc.diag_hint_coeffs')}</span></div>`,
+    '4f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N_D.t('nuc.fb_coeffs_products_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N_D.t('nuc.diag_hint_coeffs')}</span></div>`,
+    '5f': `<div style="padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:4px solid #f39c12;color:#d35400;"><strong>${I18N_D.t('nuc.fb_asterisk_title')}</strong><br><span style="font-size:.85rem;color:#64748b;">${I18N_D.t('nuc.diag_hint_asterisk')}</span></div>`,
+    '6t': `<div style="padding:10px 14px;background:#f0fff4;border-radius:8px;border-left:4px solid #27ae60;color:#166534;"><strong>${I18N_D.t('nuc.fb_success_title')} ${I18N_D.t('nuc.fb_success_text')}</strong></div>`
   };
   const diagNodes = [];
   canonicalNodes.forEach((n, i) => {
@@ -710,9 +729,9 @@ fb_asterisk${X}: sconcat(
   // une question nucléaire sans commentaire manuel exportait un <generalfeedback>
   // totalement vide (même fix que genChemical/chemAnswerBox, voir gen-topo.js).
   const nucAnswerBox = `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
-    <span style="font-weight:bold;color:#1e293b;">${I18N.t('nuc.answerbox_label')}</span>
-    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N.t('nuc.answerbox_expected')}</span>
-    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\displaystyle%20${encodeURIComponent(latexEq)}" alt="${I18N.t('nuc.answerbox_alt')}" style="max-height:60px;max-width:100%;"></div>
+    <span style="font-weight:bold;color:#1e293b;">${I18N_D.t('nuc.answerbox_label')}</span>
+    <span style="color:#64748b;font-size:.85rem;margin-left:6px;">${I18N_D.t('nuc.answerbox_expected')}</span>
+    <div style="margin-top:8px;text-align:center;"><img src="https://latex.codecogs.com/svg.image?\\displaystyle%20${encodeURIComponent(latexEq)}" alt="${I18N_D.t('nuc.answerbox_alt')}" style="max-height:60px;max-width:100%;"></div>
   </div>`;
 
   return {
@@ -727,7 +746,11 @@ fb_asterisk${X}: sconcat(
     prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
     diagNodes,
-    generalFeedback: _mkFbGen(nucAnswerBox, v('nuc-fbgen')),
+    generalFeedback: mkFbGen_D(nucAnswerBox, p.fbGenRaw),
     feedbackRef: `[[feedback:prt${X}]]`
   };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { genNuclear: genNuclear, genNuclearCore: genNuclearCore, nucParseEquation: nucParseEquation, nucToMaximaList: nucToMaximaList, nucEquationToLatex: nucEquationToLatex };
 }
