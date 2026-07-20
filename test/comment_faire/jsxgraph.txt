@@ -38,6 +38,34 @@ J'ai appris la mécanique interne de ce type de réponse très récent :
      Couper une courbe (Clip) : Au lieu de faire des maths complexes pour empêcher un functiongraph de dépasser, il suffit de régler le boundingbox de JSXGraph exactement aux mêmes dimensions que le dessin de l'écran noir. Le moteur SVG/Canvas de l'iframe s'occupe du reste.
      Plein écran en iframe : La commande element.requestFullscreen() bloque si on la lance sur un conteneur interne dans un srcdoc. Il faut obligatoirement l'appeler sur la racine de l'iframe : document.documentElement.requestFullscreen().
 
+## 6. Piège : un texte `create("text",...)` n'est pas du texte, c'est du code (JessieCode)
+
+`board.create("text",[x,y,"une chaîne littérale",{...}])` ne traite **pas** le 3e argument comme du texte affiché tel quel. JSXGraph l'enveloppe en interne dans `function(){return <chaîne>;}` et le fait analyser par son propre moteur d'expressions (**JessieCode**), pour permettre du texte dynamiquement lié à d'autres objets (ex: `"V="+point.X()`).
+
+Si la chaîne ressemble à du code — un identifiant suivi de parenthèses puis d'un autre groupe entre parenthèses, ex. `"V(KMnO₄) (mL)"` — JessieCode lève une `Parse error` synchrone, **non interceptée**. Or ce texte s'exécute typiquement à l'intérieur du `Promise.all(...).then(...)` que STACK génère pour `input-ref-*` (voir point 7 ci-dessous), qui n'a **pas** de `.catch()` — l'exception stoppe donc tout le reste du script (courbe, curseur, `bind_point`...), sans forcément afficher d'erreur console visible (rejet de promesse non géré dans un iframe sandboxé cross-origin, selon le navigateur). Symptôme typique : les éléments créés *avant* le texte fautif s'affichent (ex: les axes), rien après ne s'affiche, et la console peut rester silencieuse.
+
+**Solution systématique** : ne jamais passer une chaîne littérale à `create("text",...)`. Toujours passer une **fonction** : `function(){return "V(KMnO₄) (mL)";}`. Une fonction n'est jamais parsée par JessieCode, sa valeur de retour est utilisée directement comme texte.
+
+*(Découvert le 2026-07-20/21 en auditant `gen-redox.js` de StackForge — voir PLAN.md #38. Reproduit et confirmé via un harnais Node+jsdom exécutant la vraie bibliothèque JSXGraph vendée, pas une supposition.)*
+
+## 7. Lier un point à un `<input>` STACK (`bind_point`) depuis un iframe sandboxé
+
+La signature réelle de `stack_jxg.bind_point` (voir `corsscripts/stackjsxgraph.js` du plugin STACK) est `bind_point(inputRef, point)` — **deux** arguments, pas trois. `inputRef` doit être une référence déjà résolue vers l'`<input>` réel, jamais une chaîne de nom d'input brute ni un objet `board`.
+
+Le piège : le graphe JSXGraph s'exécute dans un `<iframe srcdoc>` isolé. `document.getElementById("ansX")` à l'intérieur de cet iframe **ne peut pas** voir le champ `<input>` réel, qui vit dans la page Moodle parente — un appel du type `bind_point(board,"ansX",cur)` échoue silencieusement ou plante.
+
+**Solution** : déclarer `input-ref-ansX="ansXRef"` en attribut d'ouverture du bloc, ex. `[[jsxgraph width="500px" height="400px" input-ref-ans1="ans1Ref"]]`. Côté serveur, STACK enveloppe alors **tout le contenu du bloc** dans `Promise.all([stack_js.request_access_to_input("ans1", true)]).then(([ans1Ref]) => { ...tout le bloc... });` — `ans1Ref` devient une référence résolue par communication inter-frame (`postMessage`), utilisable directement comme 1er argument : `stack_jxg.bind_point(ans1Ref, cur);`.
+
+**Attention** : ce wrapper `.then()` n'a pas de `.catch()` — toute exception ailleurs dans le bloc (voir point 6) empêche silencieusement tout le reste de s'exécuter, y compris ce `bind_point`.
+
+## 8. Un axe créé avec `axis:false` doit rester dans le `boundingbox`
+
+Quand on désactive les axes automatiques (`axis:false`) pour en dessiner un sur mesure via `board.create("axis",[[x1,y1],[x2,y2]],...)`, la ligne créée passe par les deux points donnés. Si ces points sont fixés par habitude (ex. `y=0`) sans vérifier que cette valeur est bien à l'intérieur du `boundingbox` réel du graphe — typiquement quand les grandeurs tracées sont toujours positives (ex. un potentiel redox entre 0.3 V et 1.8 V) — l'axe existe et se dessine, mais **hors du cadre visible** : aucune erreur, juste un axe invisible à l'écran.
+
+**Solution** : caler l'axe sur une valeur réellement présente dans la plage visible du `boundingbox` (ex. le bord bas `yLow` du graphe), jamais sur `0` par défaut sans vérification.
+
+*(Points 6 à 8 découverts et corrigés le 2026-07-20/21 lors de l'audit de `gen-redox.js`, voir PLAN.md #38 pour le détail complet des correctifs appliqués.)*
+
 En résumé pour l'avenir :
 
 Désormais, lorsque tu voudras ajouter de l'interactivité complexe (boutons, sliders, menus) à un graphique JSXGraph dans STACK sur Elea, je saurai qu'il faut tout construire en JS pur à l'intérieur de [[jsxgraph]] et utiliser l'overlay absolu sur le divid. C'est la seule faille propre dans cette forteresse !
