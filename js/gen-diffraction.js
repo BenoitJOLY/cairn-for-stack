@@ -1031,6 +1031,21 @@ function genDiffraction(X) {
   var DFix = parseFloat(v("diff-d")) || 2;
   var bFix = parseFloat(v("diff-b")) || 200;
   var lambdaFix = parseFloat(v("diff-lambda")) || 532;
+  var fbGenRaw = v("diff-fbgen");
+  return genDiffractionCore(X, {
+    type: type, mode: mode, bareme: bareme, text: text, isRnd: isRnd,
+    aFix: aFix, DFix: DFix, bFix: bFix, lambdaFix: lambdaFix, fbGenRaw: fbGenRaw
+  });
+}
+
+function genDiffractionCore(X, p, deps) {
+  deps = deps || {};
+  var I18N_D = deps.I18N || I18N;
+  var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+  var _diffBuildSvgPreview_D = deps._diffBuildSvgPreview || _diffBuildSvgPreview;
+
+  var type = p.type, mode = p.mode, bareme = p.bareme, text = p.text, isRnd = p.isRnd,
+    aFix = p.aFix, DFix = p.DFix, bFix = p.bFix, lambdaFix = p.lambdaFix;
   var needsB = _diffNeedsB(type);
   var nPRT = (type === "young") ? 6 : 7;
   var bpp = Math.round(bareme / nPRT * 100) / 100;
@@ -1095,18 +1110,18 @@ function genDiffraction(X) {
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
     consigneJsx = mode === "ecran"
-      ? I18N.t("diff.consigne_diffraction_l_ecran")
-      : I18N.t("diff.consigne_diffraction_l_capteur");
-    consigneMes = I18N.t("diff.mesincert_l");
+      ? I18N_D.t("diff.consigne_diffraction_l_ecran")
+      : I18N_D.t("diff.consigne_diffraction_l_capteur");
+    consigneMes = I18N_D.t("diff.mesincert_l");
 
     subQs = "<ol>"
-      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
-      + "<li>" + I18N.t("diff.subq_tan_ld") + inp(2) + "</li>"
-      + "<li>" + I18N.t("diff.subq_angle") + inp(3) + "</li>"
-      + "<li>" + I18N.t("diff.subq_lambda_ex") + inp(4) + "</li>"
-      + "<li>" + I18N.t("diff.subq_incertitude_l") + inp(5) + "</li>"
-      + "<li>" + I18N.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
-      + "<li>" + I18N.t("diff.subq_encadrement") + inp(7) + I18N.t("diff.lt_lambda_lt") + inp(8) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_tan_ld") + inp(2) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_angle") + inp(3) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_lambda_ex") + inp(4) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_incertitude_l") + inp(5) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_encadrement") + inp(7) + I18N_D.t("diff.lt_lambda_lt") + inp(8) + "</li>"
       + "</ol>";
 
     var fv6a = "gl" + X + ": mcq_correct(" + t(6) + "); rp6" + X + ": if(" + t(6) + "[ans6" + X + "][1]=gl" + X + "[1]) then 1 else 0;";
@@ -1135,47 +1150,47 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, fv2a, [
         _diffNode(0, "AlgEquiv", "ans2" + X, t(2), "", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_tan_l_ok") + _diffEnd,
+          _diffOK + I18N_D.t("diff.fb_tan_l_ok") + _diffEnd,
           "=", 0, 1, "", "prt2" + X),
         _diffNode(1, "AlgEquiv", "ans2" + X, "1/(" + t(2) + ")", "", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_tan_l_inverted") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_tan_l_ko") + _diffEnd, "prt2" + X)
+          _diffOK + I18N_D.t("diff.fb_tan_l_inverted") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_tan_l_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, fv3a, [
         _diffNode(0, "NumRelative", "ans3" + X, t(3), "0.05", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
+          _diffOK + I18N_D.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
         _diffNode(1, "NumRelative", "verif1" + X, "verif2" + X, "0.05", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_angle_ko_std").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
+          _diffOK + I18N_D.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_angle_ko_std").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, fv4a, [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
+          _diffOK + I18N_D.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
         _diffNode(1, "UnitsRelative", "verif3" + X, "verif4" + X, "0.05", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_lambda_ko_l") + _diffEnd, "prt4" + X)
+          _diffOK + I18N_D.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_lambda_ko_l") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans5" + X, t(5), "0.15", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
-          _diffKO + I18N.t("diff.fb_incertitude_ko_l") + _diffEnd, "prt5" + X)
+          _diffOK + I18N_D.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
+          _diffKO + I18N_D.t("diff.fb_incertitude_ko_l") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, fv6a, [
         _diffNode(0, "NumRelative", "rp6" + X, "1", "0", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_comparer_l") + _diffEnd, "prt6" + X)
+          _diffOK + I18N_D.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_comparer_l") + _diffEnd, "prt6" + X)
       ]),
       _diffPRT("prt7" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans7" + X, t(7), "0.05", "=", 1, 1, "", "=", 0, 2, "", "prt7" + X),
         _diffNode(1, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          I18N.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
+          I18N_D.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
         _diffNode(2, "UnitsRelative", "ans7" + X, t(8), "0.05", "+", 0.5, 3, "", "-", 0, 3, "", "prt7" + X),
         _diffNode(3, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + I18N.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
+          _diffOK + I18N_D.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
         _diffNode(4, "UnitsRelative", "ans8" + X, t(7), "0.05", "+", 0.5, -1,
-          I18N.t("diff.fb_bornes_interverties") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
+          I18N_D.t("diff.fb_bornes_interverties") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1197,18 +1212,18 @@ function genDiffraction(X) {
     vars += t(7) + ": float((round(100*" + A + "))/100*1E-6)*m;";
 
     consigneJsx = mode === "ecran"
-      ? I18N.t("diff.consigne_franges_ecran")
-      : I18N.t("diff.consigne_franges_capteur");
+      ? I18N_D.t("diff.consigne_franges_ecran")
+      : I18N_D.t("diff.consigne_franges_capteur");
     consigneMes = "";
 
     subQs = "<ol>"
-      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
-      + "<li>" + I18N.t("diff.subq_interfrange_i") + inp(2) + "</li>"
-      + "<li>" + I18N.t("diff.subq_expr_b") + inp(3) + "</li>"
-      + "<li>" + I18N.t("diff.subq_calc_b") + inp(4) + "</li>"
-      + "<li>" + I18N.t("diff.subq_mesurer_l") + inp(5) + "</li>"
-      + "<li>" + I18N.t("diff.subq_expr_a") + inp(6) + "</li>"
-      + "<li>" + I18N.t("diff.subq_calc_a") + inp(7) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_interfrange_i") + inp(2) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_expr_b") + inp(3) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_calc_b") + inp(4) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_mesurer_l") + inp(5) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_expr_a") + inp(6) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_calc_a") + inp(7) + "</li>"
       + "</ol>";
 
     var fv1b = "repq1" + X + ": difffb1" + X + "[ans1" + X + "]; text1" + X + ": repq1" + X + ";";
@@ -1228,33 +1243,33 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans2" + X, t(2), "0.05", "=", 1, -1,
-          I18N.t("diff.fb_interfrange_ok").split("{V}").join("{@" + t(2) + "@}") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_interfrange_ko") + _diffEnd, "prt2" + X)
+          I18N_D.t("diff.fb_interfrange_ok").split("{V}").join("{@" + t(2) + "@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_interfrange_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, "", [
         _diffNode(0, "AlgEquiv", "ans3" + X, t(3), "", "=", 1, -1,
-          I18N.t("diff.fb_formule_b_ok") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_formule_b_ko") + _diffEnd, "prt3" + X)
+          I18N_D.t("diff.fb_formule_b_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_formule_b_ko") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          I18N.t("diff.fb_valeur_b_ok") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_valeur_b_ko") + _diffEnd, "prt4" + X)
+          I18N_D.t("diff.fb_valeur_b_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_valeur_b_ko") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans5" + X, t(5), "0.05", "=", 1, -1,
-          I18N.t("diff.fb_largeur_l_ok") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_largeur_l_ko") + _diffEnd, "prt5" + X)
+          I18N_D.t("diff.fb_largeur_l_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_largeur_l_ko") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, "", [
         _diffNode(0, "AlgEquiv", "ans6" + X, t(6), "", "=", 1, -1,
-          I18N.t("diff.fb_formule_a_ok") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_formule_a_ko") + _diffEnd, "prt6" + X)
+          I18N_D.t("diff.fb_formule_a_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_formule_a_ko") + _diffEnd, "prt6" + X)
       ]),
       _diffPRT("prt7" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans7" + X, t(7), "0.05", "=", 1, -1,
-          I18N.t("diff.fb_valeur_a_ok") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_valeur_a_ko") + _diffEnd, "prt7" + X)
+          I18N_D.t("diff.fb_valeur_a_ok") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_valeur_a_ko") + _diffEnd, "prt7" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1285,18 +1300,18 @@ function genDiffraction(X) {
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
     consigneJsx = mode === "ecran"
-      ? I18N.t("diff.consigne_airy_circ_ecran")
-      : I18N.t("diff.consigne_airy_circ_capteur");
-    consigneMes = I18N.t("diff.mesincert_r");
+      ? I18N_D.t("diff.consigne_airy_circ_ecran")
+      : I18N_D.t("diff.consigne_airy_circ_capteur");
+    consigneMes = I18N_D.t("diff.mesincert_r");
 
     subQs = "<ol>"
-      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
-      + "<li>" + I18N.t("diff.subq_tan_rd") + inp(2) + "</li>"
-      + "<li>" + I18N.t("diff.subq_angle_airy") + inp(3) + "</li>"
-      + "<li>" + I18N.t("diff.subq_lambda_ex") + inp(4) + "</li>"
-      + "<li>" + I18N.t("diff.subq_incertitude_r") + inp(5) + "</li>"
-      + "<li>" + I18N.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
-      + "<li>" + I18N.t("diff.subq_encadrement") + inp(7) + I18N.t("diff.lt_lambda_lt") + inp(8) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_tan_rd") + inp(2) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_angle_airy") + inp(3) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_lambda_ex") + inp(4) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_incertitude_r") + inp(5) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_encadrement") + inp(7) + I18N_D.t("diff.lt_lambda_lt") + inp(8) + "</li>"
       + "</ol>";
 
     var fv6d = "gl" + X + ": mcq_correct(" + t(6) + "); rp6" + X + ": if(" + t(6) + "[ans6" + X + "][1]=gl" + X + "[1]) then 1 else 0;";
@@ -1325,47 +1340,47 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, fv2d, [
         _diffNode(0, "AlgEquiv", "ans2" + X, t(2), "", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_tan_r_ok") + _diffEnd,
+          _diffOK + I18N_D.t("diff.fb_tan_r_ok") + _diffEnd,
           "=", 0, 1, "", "prt2" + X),
         _diffNode(1, "AlgEquiv", "ans2" + X, "1/(" + t(2) + ")", "", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_tan_r_inverted") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_tan_r_ko") + _diffEnd, "prt2" + X)
+          _diffOK + I18N_D.t("diff.fb_tan_r_inverted") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_tan_r_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, fv3d, [
         _diffNode(0, "NumRelative", "ans3" + X, t(3), "0.05", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
+          _diffOK + I18N_D.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
         _diffNode(1, "NumRelative", "verif1" + X, "verif2" + X, "0.05", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_angle_ko_airy").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
+          _diffOK + I18N_D.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_angle_ko_airy").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, fv4d, [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
+          _diffOK + I18N_D.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
         _diffNode(1, "UnitsRelative", "verif3" + X, "verif4" + X, "0.05", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_lambda_ko_r") + _diffEnd, "prt4" + X)
+          _diffOK + I18N_D.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_lambda_ko_r") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans5" + X, t(5), "0.15", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
-          _diffKO + I18N.t("diff.fb_incertitude_ko_r") + _diffEnd, "prt5" + X)
+          _diffOK + I18N_D.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
+          _diffKO + I18N_D.t("diff.fb_incertitude_ko_r") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, fv6d, [
         _diffNode(0, "NumRelative", "rp6" + X, "1", "0", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_comparer_r") + _diffEnd, "prt6" + X)
+          _diffOK + I18N_D.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_comparer_r") + _diffEnd, "prt6" + X)
       ]),
       _diffPRT("prt7" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans7" + X, t(7), "0.05", "=", 1, 1, "", "=", 0, 2, "", "prt7" + X),
         _diffNode(1, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          I18N.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
+          I18N_D.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
         _diffNode(2, "UnitsRelative", "ans7" + X, t(8), "0.05", "+", 0.5, 3, "", "-", 0, 3, "", "prt7" + X),
         _diffNode(3, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + I18N.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
+          _diffOK + I18N_D.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
         _diffNode(4, "UnitsRelative", "ans8" + X, t(7), "0.05", "+", 0.5, -1,
-          I18N.t("diff.fb_bornes_interverties") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
+          I18N_D.t("diff.fb_bornes_interverties") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1396,18 +1411,18 @@ function genDiffraction(X) {
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
     consigneJsx = mode === "ecran"
-      ? I18N.t("diff.consigne_diffraction_carre_ecran")
-      : I18N.t("diff.consigne_diffraction_l_capteur");
-    consigneMes = I18N.t("diff.mesincert_l");
+      ? I18N_D.t("diff.consigne_diffraction_carre_ecran")
+      : I18N_D.t("diff.consigne_diffraction_l_capteur");
+    consigneMes = I18N_D.t("diff.mesincert_l");
 
     subQs = "<ol>"
-      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
-      + "<li>" + I18N.t("diff.subq_tan_ld") + inp(2) + "</li>"
-      + "<li>" + I18N.t("diff.subq_angle") + inp(3) + "</li>"
-      + "<li>" + I18N.t("diff.subq_lambda_ex") + inp(4) + "</li>"
-      + "<li>" + I18N.t("diff.subq_incertitude_l") + inp(5) + "</li>"
-      + "<li>" + I18N.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
-      + "<li>" + I18N.t("diff.subq_encadrement") + inp(7) + I18N.t("diff.lt_lambda_lt") + inp(8) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_tan_ld") + inp(2) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_angle") + inp(3) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_lambda_ex") + inp(4) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_incertitude_l") + inp(5) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_parametre_ameliorer") + inp(6) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_encadrement") + inp(7) + I18N_D.t("diff.lt_lambda_lt") + inp(8) + "</li>"
       + "</ol>";
 
     var fv6e = "gl" + X + ": mcq_correct(" + t(6) + "); rp6" + X + ": if(" + t(6) + "[ans6" + X + "][1]=gl" + X + "[1]) then 1 else 0;";
@@ -1436,47 +1451,47 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, fv2e, [
         _diffNode(0, "AlgEquiv", "ans2" + X, t(2), "", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_tan_l_ok") + _diffEnd,
+          _diffOK + I18N_D.t("diff.fb_tan_l_ok") + _diffEnd,
           "=", 0, 1, "", "prt2" + X),
         _diffNode(1, "AlgEquiv", "ans2" + X, "1/(" + t(2) + ")", "", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_tan_l_inverted") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_tan_l_ko") + _diffEnd, "prt2" + X)
+          _diffOK + I18N_D.t("diff.fb_tan_l_inverted") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_tan_l_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, fv3e, [
         _diffNode(0, "NumRelative", "ans3" + X, t(3), "0.05", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
+          _diffOK + I18N_D.t("diff.fb_angle_ok") + _diffEnd, "=", 0, 1, "", "prt3" + X),
         _diffNode(1, "NumRelative", "verif1" + X, "verif2" + X, "0.05", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_angle_ko_std").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
+          _diffOK + I18N_D.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_angle_ko_std").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, fv4e, [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
+          _diffOK + I18N_D.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(4) + "@}") + _diffEnd, "=", 0, 1, "", "prt4" + X),
         _diffNode(1, "UnitsRelative", "verif3" + X, "verif4" + X, "0.05", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_lambda_ko_l") + _diffEnd, "prt4" + X)
+          _diffOK + I18N_D.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_lambda_ko_l") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans5" + X, t(5), "0.15", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
-          _diffKO + I18N.t("diff.fb_incertitude_ko_l") + _diffEnd, "prt5" + X)
+          _diffOK + I18N_D.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, -1,
+          _diffKO + I18N_D.t("diff.fb_incertitude_ko_l") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, fv6e, [
         _diffNode(0, "NumRelative", "rp6" + X, "1", "0", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_comparer_l") + _diffEnd, "prt6" + X)
+          _diffOK + I18N_D.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(6) + "[ans6" + X + "][3]@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_comparer_l") + _diffEnd, "prt6" + X)
       ]),
       _diffPRT("prt7" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans7" + X, t(7), "0.05", "=", 1, 1, "", "=", 0, 2, "", "prt7" + X),
         _diffNode(1, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          I18N.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
+          I18N_D.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(8) + "@}").split("{V2}").join("{@" + t(7) + "@}") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(8) + "@}") + _diffEnd, "prt7" + X),
         _diffNode(2, "UnitsRelative", "ans7" + X, t(8), "0.05", "+", 0.5, 3, "", "-", 0, 3, "", "prt7" + X),
         _diffNode(3, "UnitsRelative", "ans8" + X, t(8), "0.05", "+", 1, -1,
-          _diffOK + I18N.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
+          _diffOK + I18N_D.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt7" + X),
         _diffNode(4, "UnitsRelative", "ans8" + X, t(7), "0.05", "+", 0.5, -1,
-          I18N.t("diff.fb_bornes_interverties") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
+          I18N_D.t("diff.fb_bornes_interverties") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt7" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1505,17 +1520,17 @@ function genDiffraction(X) {
     vars += t(7) + ": float((" + L + "-" + t(4) + "/nm))*nm;";
 
     consigneJsx = mode === "ecran"
-      ? I18N.t("diff.consigne_young_ecran")
-      : I18N.t("diff.consigne_young_capteur");
-    consigneMes = I18N.t("diff.mesincert_interfrange").split("{V}").join("{@" + UI_ + "@}");
+      ? I18N_D.t("diff.consigne_young_ecran")
+      : I18N_D.t("diff.consigne_young_capteur");
+    consigneMes = I18N_D.t("diff.mesincert_interfrange").split("{V}").join("{@" + UI_ + "@}");
 
     subQs = "<ol>"
-      + "<li>" + I18N.t("diff.subq_phenomene") + inp(1) + "</li>"
-      + "<li>" + I18N.t("diff.subq_interfrange_i") + inp(2) + "</li>"
-      + "<li>" + I18N.t("diff.subq_determiner_lambda_young") + inp(3) + "</li>"
-      + "<li>" + I18N.t("diff.subq_incertitude_young") + inp(4) + "</li>"
-      + "<li>" + I18N.t("diff.subq_parametre_ameliorer") + inp(5) + "</li>"
-      + "<li>" + I18N.t("diff.subq_encadrement") + inp(6) + I18N.t("diff.lt_lambda_lt") + inp(7) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_phenomene") + inp(1) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_interfrange_i") + inp(2) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_determiner_lambda_young") + inp(3) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_incertitude_young") + inp(4) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_parametre_ameliorer") + inp(5) + "</li>"
+      + "<li>" + I18N_D.t("diff.subq_encadrement") + inp(6) + I18N_D.t("diff.lt_lambda_lt") + inp(7) + "</li>"
       + "</ol>";
 
     var fv1c = "repq1" + X + ": difffb1" + X + "[ans1" + X + "]; text1" + X + ": repq1" + X + ";";
@@ -1541,39 +1556,39 @@ function genDiffraction(X) {
       ]),
       _diffPRT("prt2" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans2" + X, t(2), "0.05", "=", 1, -1,
-          I18N.t("diff.fb_interfrange_ok").split("{V}").join("{@" + t(2) + "@}") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_interfrange_ko") + _diffEnd, "prt2" + X)
+          I18N_D.t("diff.fb_interfrange_ok").split("{V}").join("{@" + t(2) + "@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_interfrange_ko") + _diffEnd, "prt2" + X)
       ]),
       _diffPRT("prt3" + X, bpp, fv3c, [
         _diffNode(0, "UnitsRelative", "ans3" + X, t(3), "0.05", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "=", 0, 1, "", "prt3" + X),
+          _diffOK + I18N_D.t("diff.fb_lambda_ok").split("{V}").join("{@" + t(3) + "@}") + _diffEnd, "=", 0, 1, "", "prt3" + X),
         _diffNode(1, "NumRelative", "verif1" + X, "verif2" + X, "0.05", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_lambda_ko_young") + _diffEnd, "prt3" + X)
+          _diffOK + I18N_D.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_lambda_ko_young") + _diffEnd, "prt3" + X)
       ]),
       _diffPRT("prt4" + X, bpp, fv4c, [
         _diffNode(0, "UnitsRelative", "ans4" + X, t(4), "0.05", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, 1, "", "prt4" + X),
+          _diffOK + I18N_D.t("diff.fb_incertitude_ok") + _diffEnd, "=", 0, 1, "", "prt4" + X),
         _diffNode(1, "UnitsRelative", "verif3" + X, "verif4" + X, "0.05", "+", 0.25, -1,
-          _diffOK + I18N.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_incertitude_ko_young") + _diffEnd, "prt4" + X)
+          _diffOK + I18N_D.t("diff.fb_ordre_grandeur_ok") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_incertitude_ko_young") + _diffEnd, "prt4" + X)
       ]),
       _diffPRT("prt5" + X, bpp, fv5c, [
         _diffNode(0, "NumRelative", "rp5" + X, "1", "0", "=", 1, -1,
-          _diffOK + I18N.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(5) + "[ans5" + X + "][3]@}") + _diffEnd,
-          "=", 0, -1, _diffKO + I18N.t("diff.fb_comparer_young") + _diffEnd, "prt5" + X)
+          _diffOK + I18N_D.t("diff.fb_ameliorer_ok").split("{V}").join("{@" + t(5) + "[ans5" + X + "][3]@}") + _diffEnd,
+          "=", 0, -1, _diffKO + I18N_D.t("diff.fb_comparer_young") + _diffEnd, "prt5" + X)
       ]),
       _diffPRT("prt6" + X, bpp, "", [
         _diffNode(0, "UnitsRelative", "ans6" + X, t(6), "0.05", "=", 1, 1, "", "=", 0, 2, "", "prt6" + X),
         _diffNode(1, "UnitsRelative", "ans7" + X, t(7), "0.05", "+", 1, -1,
-          I18N.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(7) + "@}").split("{V2}").join("{@" + t(6) + "@}") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt6" + X),
+          I18N_D.t("diff.fb_encadrement_ok").split("{V1}").join("{@" + t(7) + "@}").split("{V2}").join("{@" + t(6) + "@}") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_borne_inf_ko").split("{V}").join("{@" + t(7) + "@}") + _diffEnd, "prt6" + X),
         _diffNode(2, "UnitsRelative", "ans6" + X, t(7), "0.05", "+", 0.5, 3, "", "-", 0, 3, "", "prt6" + X),
         _diffNode(3, "NumRelative", "ans7" + X, t(7), "0.05", "+", 1, -1,
-          _diffOK + I18N.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt6" + X),
+          _diffOK + I18N_D.t("diff.fb_borne_basse_ok") + _diffEnd, "-", 0, 4, "", "prt6" + X),
         _diffNode(4, "UnitsRelative", "ans7" + X, t(6), "0.05", "+", 0.5, -1,
-          I18N.t("diff.fb_bornes_interverties") + _diffEnd,
-          "-", 0, -1, _diffKO + I18N.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(6) + "@}") + _diffEnd, "prt6" + X)
+          I18N_D.t("diff.fb_bornes_interverties") + _diffEnd,
+          "-", 0, -1, _diffKO + I18N_D.t("diff.fb_borne_sup_ko").split("{V}").join("{@" + t(6) + "@}") + _diffEnd, "prt6" + X)
       ])
     ].join("\n\n");
     feedbackRef = [1, 2, 3, 4, 5, 6].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
@@ -1587,7 +1602,7 @@ function genDiffraction(X) {
 
   var header = '<div style="background:#4338ca;border-left:5px solid #312e81;border-radius:0 8px 8px 0;'
     + 'padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-    + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N.t("diff.header_title") + '</strong>'
+    + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N_D.t("diff.header_title") + '</strong>'
     + '<span style="background:#312e81;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
     + '<span style="background:#fff;color:#312e81;border:1px solid #312e81;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">' + type + ' / ' + mode + '</span>'
     + "</div>";
@@ -1598,7 +1613,7 @@ function genDiffraction(X) {
     + consigneJsx + consigneMes + "\n"
     + subQs;
 
-  var demo = _diffBuildSvgPreview(type, mode,
+  var demo = _diffBuildSvgPreview_D(type, mode,
     isRnd ? DIFF_A_LIST[3] : aFix,
     isRnd ? DIFF_D_LIST[2] : DFix,
     isRnd ? DIFF_B_LIST[2] : bFix,
@@ -1609,15 +1624,22 @@ function genDiffraction(X) {
     + '<p style="font-size:.85rem;color:#475569;">' + demo.meas + " – " + nPRT + " sous-questions</p>"
     + params + subQs.replace(/\[\[input:[^\]]+\]\] \[\[validation:[^\]]+\]\]/g, "<em style=\"color:#6b7280;\">[reponse]</em>");
 
-  var recap = I18N.t("diff.recap_prefix") + ((type === "fente_simple" || type === "trou_circulaire" || type === "trou_carre") ? I18N.t("diff.recap_diffraction") : I18N.t("diff.recap_interferences")) + I18N.t("diff.recap_lambda_suffix")
+  var recap = I18N_D.t("diff.recap_prefix") + ((type === "fente_simple" || type === "trou_circulaire" || type === "trou_carre") ? I18N_D.t("diff.recap_diffraction") : I18N_D.t("diff.recap_interferences")) + I18N_D.t("diff.recap_lambda_suffix")
     + "{@" + L + "@} nm.</p>";
 
   return {
     bareme: bareme, vars: vars, qnote: "{@" + L + "@} nm",
     textFrag: textFrag, previewFrag: previewFrag,
     inputXML: inputXML, prtXML: prtXML,
-    generalFeedback: _mkFbGen(recap, v('diff-fbgen')),
+    generalFeedback: _mkFbGen_D(recap, p.fbGenRaw),
     feedbackRef: feedbackRef,
     kbdRaw: jsx
+  };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    genDiffraction: genDiffraction,
+    genDiffractionCore: genDiffractionCore
   };
 }
