@@ -97,6 +97,7 @@ function lintExportedXML(xml) {
   function scanForEscapedComparison(block, label, idx) {
     var ltCount = (block.match(/&lt;/g) || []).length;
     var gtCount = (block.match(/&gt;/g) || []).length;
+    var ampCount = (block.match(/&amp;/g) || []).length;
     if (ltCount) {
       warnings.push('"&lt;" trouvé dans ' + label + (idx ? ' #' + idx : '') + ' (' + ltCount + ') — '
         + 'un "<" littéral dans le JS généré sera envoyé tel quel au navigateur par '
@@ -109,6 +110,13 @@ function lintExportedXML(xml) {
         + 'Moodle 4.5.12/qtype_stack 4.11.1 et cassera le script (même mécanisme que "&lt;", '
         + 'stripMathDivs() échappe les deux). '
         + 'Réécrire pour n\'utiliser ni "<" ni ">" (ex: "r>0" → "Math.sign(r)===1").');
+    }
+    if (ampCount) {
+      warnings.push('"&amp;" trouvé dans ' + label + (idx ? ' #' + idx : '') + ' (' + ampCount + ') — '
+        + 'un "&" littéral (ex: "&&") dans le JS généré sera envoyé tel quel au navigateur par '
+        + 'Moodle 4.5.12/qtype_stack 4.11.1 et cassera le script (même mécanisme que "&lt;"/"&gt;", '
+        + 'stripMathDivs() échappe aussi "&"). '
+        + 'Réécrire pour n\'utiliser aucun "&" littéral (ex: "a && b" → if imbriqués, ou "a || !x return" reste sûr).');
     }
   }
   var jsxRe = /\[\[jsxgraph[^\]]*\]\]([\s\S]*?)\[\[\/jsxgraph\]\]/g, jm, jidx = 0;
