@@ -91,18 +91,35 @@ function genString(X){
   const paletteHtml=aideOn?genStrPaletteHTML(X):'';
   const levenOn=document.getElementById('str-leven-on').checked;
   const solH=sol?`<hr style="margin:8px 0"/><div style="padding:8px;background:#f8f9fa;border-radius:4px;">${sol}</div>`:'';
-
-  if(levenOn)return genStringLevenshtein(X,bareme,text,ansPlain,paletteHtml,size,solH,fbGen);
-
   const altsRaw=(document.getElementById('str-alts')||{value:''}).value.trim();
   const altsArr=altsRaw?altsRaw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;}) : [];
-  const vars=`/* Q${X} : String (${bareme}pt) */\nta${X}:"${rawEsc(ansPlain)}";`;
+  const p={bareme,text,ansPlain,size,test,fbc,fbe,fbGen,solH,paletteHtml,levenOn,altsArr};
+  return genStringCore(X,p);
+}
+
+/* genStringCore : fonction pure (aucun accès DOM), voir js/gen-redox.js
+   pour le pattern (deps injectables — test/unit/gen-string.test.js). */
+function genStringCore(X,p,deps){
+  deps=deps||{};
+  const I18N_D=deps.I18N||I18N;
+  const buildPrtXml_D=deps.buildPrtXml||buildPrtXml;
+  const mkFbGen_D=deps._mkFbGen||_mkFbGen;
+  const wrapFb_D=deps.wrapFb||wrapFb;
+  const rawEsc_D=deps.rawEsc||rawEsc;
+  const htmlEsc_D=deps.htmlEsc||htmlEsc;
+
+  const bareme=p.bareme, text=p.text, ansPlain=p.ansPlain, size=p.size, test=p.test;
+  const fbc=p.fbc, fbe=p.fbe, fbGen=p.fbGen, solH=p.solH, paletteHtml=p.paletteHtml, altsArr=p.altsArr;
+
+  if(p.levenOn)return genStringLevenshteinCore(X,bareme,text,ansPlain,paletteHtml,size,solH,fbGen,altsArr,deps);
+
+  const vars=`/* Q${X} : String (${bareme}pt) */\nta${X}:"${rawEsc_D(ansPlain)}";`;
   const qnote=`{@ta${X}@}`;
   const textFrag=`
       <div style="background:#dc2626;border-left:5px solid #991b1b;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('tpl.str_banniere')}</strong>
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('tpl.str_banniere')}</strong>
         <span style="background:#991b1b;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
-        <span style="background:#ffffff;color:#991b1b;border:1px solid #991b1b;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">${I18N.t('tpl.str_badge_texte')}</span>
+        <span style="background:#ffffff;color:#991b1b;border:1px solid #991b1b;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">${I18N_D.t('tpl.str_badge_texte')}</span>
       </div>
       <!-- ENONCE-START -->${text||''}<!-- ENONCE-END -->${paletteHtml}<p>[[input:ans${X}]] [[validation:ans${X}]]</p>
     `;
@@ -112,34 +129,40 @@ function genString(X){
     name:'0', description:'', answertest:testName, sans:sansExpr, tans:tansExpr,
     testoptions:'', quiet:'0',
     truescoremode:'=', truescore:'1', truepenalty:'', truenextnode:'-1',
-    trueanswernote:`PRT-${X}-1-T`, truefeedback:wrapFb(fbc, true),
+    trueanswernote:`PRT-${X}-1-T`, truefeedback:wrapFb_D(fbc, true),
     falsescoremode:'=', falsescore:'0', falsepenalty:'', falsenextnode:'-1',
-    falseanswernote:`PRT-${X}-1-F`, falsefeedback:wrapFb(fbe, false)+solH
+    falseanswernote:`PRT-${X}-1-F`, falsefeedback:wrapFb_D(fbe, false)+solH
   };};
   if(!altsArr.length){
     const canonicalNodes=[mkNode(test,'ans'+X,'ta'+X)];
     const prtMeta={name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:''};
-    const prtXML=buildPrtXml(prtMeta, canonicalNodes);
-    return{bareme,vars,qnote,generalFeedback:_mkFbGen('',fbGen),textFrag,inputXML,
+    const prtXML=buildPrtXml_D(prtMeta, canonicalNodes);
+    return{bareme,vars,qnote,generalFeedback:mkFbGen_D('',fbGen),textFrag,inputXML,
       prtXML,feedbackRef,prt:{meta:prtMeta,nodes:canonicalNodes}};
   }
   const sloppy=test!=='String';
-  const normFn=sloppy?function(s){return rawEsc(s.toLowerCase().trim());}:function(s){return rawEsc(s.trim());};
+  const normFn=sloppy?function(s){return rawEsc_D(s.toLowerCase().trim());}:function(s){return rawEsc_D(s.trim());};
   const allAnsList=[ansPlain].concat(altsArr).map(function(a){return '"'+normFn(a)+'"';}).join(',');
   const studentNorm=sloppy?'stud_norm_'+X+': sdowncase(strim(" ", ans'+X+'))$':'stud_norm_'+X+': strim(" ", ans'+X+')$';
   const fbVars=studentNorm+'\nvalid_norms_'+X+': ['+allAnsList+']$\nis_correct_'+X+': member(stud_norm_'+X+', valid_norms_'+X+')$ ';
   const canonicalNodes=[mkNode('AlgEquiv','is_correct_'+X,'true')];
   const prtMeta={name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:fbVars};
-  const prtXML=buildPrtXml(prtMeta, canonicalNodes);
-  return{bareme,vars,qnote,generalFeedback:_mkFbGen('',fbGen),textFrag,inputXML,
+  const prtXML=buildPrtXml_D(prtMeta, canonicalNodes);
+  return{bareme,vars,qnote,generalFeedback:mkFbGen_D('',fbGen),textFrag,inputXML,
     prtXML,feedbackRef,prt:{meta:prtMeta,nodes:canonicalNodes}};
 }
 
-function genStringLevenshtein(X,bareme,text,ansPlain,paletteHtml,size,solH,fbGen){
-  const ta=rawEsc(ansPlain);
-  const altsRaw=(document.getElementById('str-alts')||{value:''}).value.trim();
-  const altsArr=altsRaw?altsRaw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;}):[];
-  const repValItems=[ansPlain].concat(altsArr).map(function(a){return 'supprimer_articles(sdowncase("'+rawEsc(a)+'"))';}).join(',');
+function genStringLevenshteinCore(X,bareme,text,ansPlain,paletteHtml,size,solH,fbGen,altsArr,deps){
+  deps=deps||{};
+  const I18N_D=deps.I18N||I18N;
+  const buildPrtXml_D=deps.buildPrtXml||buildPrtXml;
+  const mkFbGen_D=deps._mkFbGen||_mkFbGen;
+  const wrapFb_D=deps.wrapFb||wrapFb;
+  const rawEsc_D=deps.rawEsc||rawEsc;
+  const htmlEsc_D=deps.htmlEsc||htmlEsc;
+
+  const ta=rawEsc_D(ansPlain);
+  const repValItems=[ansPlain].concat(altsArr).map(function(a){return 'supprimer_articles(sdowncase("'+rawEsc_D(a)+'"))';}).join(',');
   const vars=`/* Q${X} : String Levenshtein (${bareme}pt) */
 levenshtein(s,t) := block(
   [m,n,prev,curr,i,j,c],
@@ -183,13 +206,13 @@ ta${X}: "${ta}";`;
   const fbVars=`rep_norm_${X}:strim(" ",sdowncase(ans${X}))$ rep_core_${X}:supprimer_articles(rep_norm_${X})$ if rep_core_${X}="" then rep_core_${X}:" "$
 res_${X}:meilleur_match(rep_core_${X},reponses_valides_${X})$ dist_min_${X}:res_${X}[1]$ best_${X}:res_${X}[2]$ est_exact_${X}:member(rep_core_${X},reponses_valides_${X})$
 a_plu_${X}:slength(rep_core_${X})>1 and charat(rep_core_${X},slength(rep_core_${X}))="s"$ rep_ss_${X}:if a_plu_${X} then substring(rep_core_${X},1,slength(rep_core_${X})-1) else rep_core_${X}$ d_ss_${X}:if a_plu_${X} then levenshtein(rep_ss_${X},best_${X}) else 100$ plu_seul_${X}:a_plu_${X} and d_ss_${X}=0$ plu_f1_${X}:a_plu_${X} and d_ss_${X}=1$
-fb0_${X}:"${wrapFb('<p>❌ <strong>'+I18N.t('tpl.str_fb_vide')+'</strong></p>', false).replace(/"/g,'\\"')}"$
-fb1_${X}:"${wrapFb('<p>✅ <strong>'+I18N.t('tpl.str_fb_parfait')+'</strong></p>', true).replace(/"/g,'\\"')}"$
-fb2_${X}:sconcat("${I18N.t('tpl.str_fb2_pre').replace(/"/g,'\\"')}",best_${X},"${I18N.t('tpl.str_fb2_post').replace(/"/g,'\\"')}")$
-fb3_${X}:sconcat("${I18N.t('tpl.str_fb3_pre').replace(/"/g,'\\"')}",best_${X},"${I18N.t('tpl.str_fb3_post').replace(/"/g,'\\"')}")$
-fb4_${X}:sconcat("${I18N.t('tpl.str_fb4_pre').replace(/"/g,'\\"')}",best_${X},"${I18N.t('tpl.str_fb4_post').replace(/"/g,'\\"')}")$
-fb5_${X}:sconcat("${I18N.t('tpl.str_fb5_pre').replace(/"/g,'\\"')}",best_${X},"${I18N.t('tpl.str_fb5_post').replace(/"/g,'\\"')}")$
-fb6_${X}:"${wrapFb(I18N.t('tpl.str_fb6', {rep: htmlEsc(ansPlain)})+solH, false).replace(/"/g,'\\"')}"$`;
+fb0_${X}:"${wrapFb_D('<p>❌ <strong>'+I18N_D.t('tpl.str_fb_vide')+'</strong></p>', false).replace(/"/g,'\\"')}"$
+fb1_${X}:"${wrapFb_D('<p>✅ <strong>'+I18N_D.t('tpl.str_fb_parfait')+'</strong></p>', true).replace(/"/g,'\\"')}"$
+fb2_${X}:sconcat("${I18N_D.t('tpl.str_fb2_pre').replace(/"/g,'\\"')}",best_${X},"${I18N_D.t('tpl.str_fb2_post').replace(/"/g,'\\"')}")$
+fb3_${X}:sconcat("${I18N_D.t('tpl.str_fb3_pre').replace(/"/g,'\\"')}",best_${X},"${I18N_D.t('tpl.str_fb3_post').replace(/"/g,'\\"')}")$
+fb4_${X}:sconcat("${I18N_D.t('tpl.str_fb4_pre').replace(/"/g,'\\"')}",best_${X},"${I18N_D.t('tpl.str_fb4_post').replace(/"/g,'\\"')}")$
+fb5_${X}:sconcat("${I18N_D.t('tpl.str_fb5_pre').replace(/"/g,'\\"')}",best_${X},"${I18N_D.t('tpl.str_fb5_post').replace(/"/g,'\\"')}")$
+fb6_${X}:"${wrapFb_D(I18N_D.t('tpl.str_fb6', {rep: htmlEsc_D(ansPlain)})+solH, false).replace(/"/g,'\\"')}"$`;
 
   const mkCanonNode=(name,sans,tans,trueScore,trueFbVar,falseNext)=>({
     name:String(name), description:'', answertest:'AlgEquiv', sans:sans, tans:tans,
@@ -210,24 +233,28 @@ fb6_${X}:"${wrapFb(I18N.t('tpl.str_fb6', {rep: htmlEsc(ansPlain)})+solH, false).
     mkCanonNode(6,'true','true',0,`fb6_${X}`,-1)
   ];
   const prtMeta={name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbVars};
-  const prtXML=buildPrtXml(prtMeta, canonicalNodes);
+  const prtXML=buildPrtXml_D(prtMeta, canonicalNodes);
 
   const inputXML=`    <input>\n      <name>ans${X}</name><type>string</type><tans>ta${X}</tans>\n      <boxsize>${size}</boxsize><mustverify>0</mustverify><showvalidation>0</showvalidation>\n    </input>`;
 
   const qnote=`{@ta${X}@}`;
-  const generalFeedback=_mkFbGen(I18N.t('tpl.str_reponse_attendue', {rep: htmlEsc(ansPlain)}), fbGen);
+  const generalFeedback=mkFbGen_D(I18N_D.t('tpl.str_reponse_attendue', {rep: htmlEsc_D(ansPlain)}), fbGen);
 
   return{bareme,vars,qnote,generalFeedback,
     textFrag:`
       <div style="background:#dc2626;border-left:5px solid #991b1b;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('tpl.str_banniere')}</strong>
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('tpl.str_banniere')}</strong>
         <span style="background:#991b1b;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
-        <span style="background:#ffffff;color:#991b1b;border:1px solid #991b1b;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">${I18N.t('tpl.str_badge_texte_leven')}</span>
+        <span style="background:#ffffff;color:#991b1b;border:1px solid #991b1b;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">${I18N_D.t('tpl.str_badge_texte_leven')}</span>
       </div>
       <!-- ENONCE-START -->${text||''}<!-- ENONCE-END -->${paletteHtml}<p>[[input:ans${X}]] [[validation:ans${X}]]</p>
     `,
     inputXML,prtXML,
   feedbackRef:`[[feedback:prt${X}]]`,prt:{meta:prtMeta,nodes:canonicalNodes}};
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genString: genString, genStringCore: genStringCore, genStringLevenshteinCore: genStringLevenshteinCore };
 }
 
 
