@@ -2513,7 +2513,7 @@ function _genOptiqueMiroirConvexe(X) { return _genOptiqueMiroirCore(X, true); }
    focal commun F'1=F2), et la fonction de sérialisation est
    lunette_construction(rayons, points). */
 function _lunetteConstructionJXG(X, p) {
-    var f1 = p.f1, f2 = p.f2, d = p.d, beamH = p.beamH;
+    var f1 = p.f1, f2 = p.f2, d = p.d, beamH = p.beamH, tanA = p.tanA;
     var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
     var lens1H = p.lens1H, lens2H = p.lens2H;
     var dispW = p.dispW || 700;
@@ -2537,7 +2537,7 @@ function _lunetteConstructionJXG(X, p) {
         + '    axis: false,\n    keepaspectratio: true,\n    showNavigation: true,\n'
         + '    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },\n'
         + '    pan: { enabled: true, needTwoFingers: false, needShift: true }\n});\n\n'
-        + 'var f1 = ' + f1 + ', f2 = ' + f2 + ', d = ' + d + ', beamH = ' + beamH + ';\n'
+        + 'var f1 = ' + f1 + ', f2 = ' + f2 + ', d = ' + d + ', beamH = ' + beamH + ', tanA = ' + tanA + ';\n'
         + 'var lens1H = ' + lens1H + ', lens2H = ' + lens2H + ';\n'
         + 'var LENS_XS = [[0, lens1H], [d, lens2H]];\n'
         + 'var X_MIN = ' + X_MIN + ', X_MAX = ' + X_MAX + ', Y_MIN = ' + Y_MIN + ', Y_MAX = ' + Y_MAX + ';\n\n'
@@ -2557,6 +2557,12 @@ function _lunetteConstructionJXG(X, p) {
         + "board.create('point', [f1, 0], { name: \"F'\\u2081=F\\u2082\", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n"
         + "board.create('point', [d, 0], { name: 'O\\u2082', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });\n"
         + "board.create('point', [d + f2, 0], { name: \"F'\\u2082\", size: 3, fixed: true, color: 'green', highlight: false, tabindex: null });\n\n"
+        + 'var segX1 = X_MIN * 0.12, segX2 = X_MIN * 0.02;\n'
+        + "board.create('segment', [[segX1, -tanA*segX1], [segX2, -tanA*segX2]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[segX1, -tanA*segX1], [segX2, -tanA*segX2]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[segX1, -tanA*segX1+beamH], [segX2, -tanA*segX2+beamH]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[segX1, -tanA*segX1+beamH], [segX2, -tanA*segX2+beamH]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('text', [segX1, -tanA*segX1+beamH+0.8, \"Objet \\u00e0 l'infini : rayons incidents parall\\u00e8les (angle \\u03b1)\"], { fixed: true, fontSize: 11, color: '#c0392b', highlight: false, tabindex: null });\n\n"
         + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
         + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
         + "var instructionsEl = document.createElement('p');\n"
@@ -2885,7 +2891,7 @@ function _genOptiqueLunetteConstruction(X) {
     var tans = 'lunette_construction(' + tansRayList + ',' + tansPtList + ')';
 
     var jxg = _lunetteConstructionJXG(X, {
-        f1: f1, f2: f2, d: _n(d), beamH: beamH,
+        f1: f1, f2: f2, d: _n(d), beamH: beamH, tanA: _n(tanT),
         X_MIN: X_MIN, X_MAX: X_MAX, Y_MIN: Y_MIN, Y_MAX: Y_MAX,
         lens1H: lens1H, lens2H: lens2H, dispW: dispW
     });
@@ -3791,7 +3797,7 @@ function _genOptiqueMiroirSpherique(X) {
    décalé de beamH) se réfléchissent et convergent en B1. Le miroir est
    toujours concave (miroir primaire convergent). */
 function _telescopeConstructionJXG(X, p) {
-    var f1 = p.f1, beamH = p.beamH;
+    var f1 = p.f1, beamH = p.beamH, tanA = p.tanA;
     var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
     var mirrorHeight = p.mirrorHeight;
     var dispW = p.dispW || 700;
@@ -3811,7 +3817,7 @@ function _telescopeConstructionJXG(X, p) {
         + '    axis: false,\n    keepaspectratio: true,\n    showNavigation: true,\n'
         + '    zoom: { enabled: true, wheel: true, needShift: false, factorX: 1.25, factorY: 1.25 },\n'
         + '    pan: { enabled: true, needTwoFingers: false, needShift: true }\n});\n\n'
-        + 'var f1 = ' + f1 + ', beamH = ' + beamH + ', mirrorHeight = ' + mirrorHeight + ';\n'
+        + 'var f1 = ' + f1 + ', beamH = ' + beamH + ', mirrorHeight = ' + mirrorHeight + ', tanA = ' + tanA + ';\n'
         + 'var X_MIN = ' + X_MIN + ', X_MAX = ' + X_MAX + ', Y_MIN = ' + Y_MIN + ', Y_MAX = ' + Y_MAX + ';\n\n'
         + "var toolMode = '';\n"
         + 'var tempPoint = null, dirPoint1 = null, dirPoint2 = null, interSeg1 = null;\n'
@@ -3826,6 +3832,12 @@ function _telescopeConstructionJXG(X, p) {
         + mirrorGlyph + '\n' + mirrorGlyphHatch + '\n'
         + "board.create('point', [0, 0], { name: 'S', size: 3, fixed: true, color: 'black', highlight: false, tabindex: null });\n"
         + fcPointsGlyph + '\n'
+        + 'var segX1 = X_MIN * 0.12, segX2 = X_MIN * 0.02;\n'
+        + "board.create('segment', [[segX1, -tanA*segX1], [segX2, -tanA*segX2]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[segX1, -tanA*segX1], [segX2, -tanA*segX2]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('segment', [[segX1, -tanA*segX1+beamH], [segX2, -tanA*segX2+beamH]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('arrow', [[segX1, -tanA*segX1+beamH], [segX2, -tanA*segX2+beamH]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
+        + "board.create('text', [segX1, -tanA*segX1+beamH+0.8, \"Objet \\u00e0 l'infini : rayons incidents parall\\u00e8les (angle \\u03b1)\"], { fixed: true, fontSize: 11, color: '#c0392b', highlight: false, tabindex: null });\n\n"
         + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
         + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
         + "var instructionsEl = document.createElement('p');\n"
@@ -4144,7 +4156,7 @@ function _genOptiqueTelescopeConstruction(X) {
     var tans = 'telescope_construction(' + tansRayList + ',' + tansPtList + ')';
 
     var jxg = _telescopeConstructionJXG(X, {
-        f1: f1, beamH: beamH,
+        f1: f1, beamH: beamH, tanA: _n(tanT),
         X_MIN: X_MIN, X_MAX: X_MAX, Y_MIN: Y_MIN, Y_MAX: Y_MAX,
         mirrorHeight: mirrorHeight, dispW: dispW
     });
