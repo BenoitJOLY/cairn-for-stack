@@ -87,11 +87,34 @@ q${X}_tastr:block([_parts,_i,_n,_s,_op,_lo,_hi,_lb,_rb],
 
 function genInequation(X) {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
-    var bareme = parseFloat(gs('ineq-bareme')) || 1;
-    var scenario = gs('ineq-scenario') || 'lineaire';
-    var mode = (document.querySelector('input[name="ineq-mode-r"]:checked')||{}).value || gs('ineq-mode') || 'aleatoire';
-    var fbOk = gs('ineq-fb-ok').trim(), fbWrong = gs('ineq-fb-wrong').trim();
-    var custText = gs('ineq-text').trim();
+    var p = {
+        bareme: parseFloat(gs('ineq-bareme')) || 1,
+        scenario: gs('ineq-scenario') || 'lineaire',
+        mode: (document.querySelector('input[name="ineq-mode-r"]:checked')||{}).value || gs('ineq-mode') || 'aleatoire',
+        fbOk: gs('ineq-fb-ok').trim(),
+        fbWrong: gs('ineq-fb-wrong').trim(),
+        custText: gs('ineq-text').trim(),
+        fa: gs('ineq-a').trim() || '2',
+        fb: gs('ineq-b').trim() || '-6',
+        fc: gs('ineq-c').trim() || '0',
+        fop: gs('ineq-op') || '>',
+        ftans: gs('ineq-tans').trim() || 'oo(3,inf)',
+        fbGen: gs('ineq-fbgen')
+    };
+    return genInequationCore(X, p);
+}
+
+/* genInequationCore : fonction pure (aucun accès DOM), voir js/gen-redox.js
+   pour le pattern (deps injectables — test/unit/gen-math-inequation.test.js). */
+function genInequationCore(X, p, deps) {
+    deps = deps || {};
+    var I18N_D = deps.I18N || I18N;
+    var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+    var mkInput_D = deps._mkInput || _mkInput;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+
+    var bareme = p.bareme, scenario = p.scenario, mode = p.mode;
+    var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
     var vars, qnote, textFrag, inputXML, prtXML, generalFeedback, canonicalNodes;
 
     function ineqNode(falseFb) {
@@ -99,27 +122,27 @@ function genInequation(X) {
             name: '0', description: 'Solution correcte ?', answertest: 'AlgEquiv', sans: `_ic${X}`, tans: `q${X}_ta`,
             testoptions: '', quiet: '0',
             truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
-            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N.t('mat.fb_ok_correct')}</strong></div>`,
+            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
             falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'PRT-'+X+'-NOK', falsefeedback: fbWrong || falseFb
         };
     }
 
-    var HDR = `<div style="background:#8b5cf6;border-left:5px solid #7c3aed;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N.t('ineq.banniere')}</strong> <span style="background:#7c3aed;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
-    var NOTE = `<p><em>${I18N.t('ineq.note_notation')}</em></p>`;
+    var HDR = `<div style="background:#8b5cf6;border-left:5px solid #7c3aed;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('ineq.banniere')}</strong> <span style="background:#7c3aed;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
+    var NOTE = `<p><em>${I18N_D.t('ineq.note_notation')}</em></p>`;
 
     if (mode === 'fixe') {
-        var fa = gs('ineq-a').trim() || '2', fb = gs('ineq-b').trim() || '-6', fc = gs('ineq-c').trim() || '0';
-        var op = gs('ineq-op') || '>';
-        var tans = (gs('ineq-tans').trim() || 'oo(3,inf)').replace(/(?<!%)\bunion\(/g, '%union(');
+        var fa = p.fa, fb = p.fb, fc = p.fc;
+        var op = p.fop;
+        var tans = p.ftans.replace(/(?<!%)\bunion\(/g, '%union(');
         if (scenario === 'lineaire') {
             vars = `/* Q${X} In\xe9q — Degr\xe9 1 (fixe) */
 q${X}_a:${fa};q${X}_b:${fb};q${X}_op:"${op}";
 q${X}_ta:${tans};${ineqPrettyVarStmt(X)}`;
             qnote = `{@q${X}_a@}x+{@q${X}_b@}{@q${X}_op@}0, sol={@q${X}_ta@}`;
-            textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
+            textFrag = `${HDR}${custText}<p>${I18N_D.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( {@q${X}_a@}x + {@q${X}_b@} {@q${X}_op@} 0 \\)</div>
-<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N_D.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         } else if (scenario === 'trinome') {
             vars = `/* Q${X} In\xe9q — Degr\xe9 2 (fixe) */
@@ -127,23 +150,23 @@ q${X}_a:${fa};q${X}_b:${fb};q${X}_c:${fc};q${X}_op:"${op}";
 q${X}_poly:q${X}_a*x^2+q${X}_b*x+q${X}_c;
 q${X}_ta:${tans};${ineqPrettyVarStmt(X)}`;
             qnote = `sol={@q${X}_ta@}`;
-            textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
+            textFrag = `${HDR}${custText}<p>${I18N_D.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( {@q${X}_poly@} {@q${X}_op@} 0 \\)</div>
-<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N_D.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         } else { /* valeur-abs */
             vars = `/* Q${X} In\xe9q — Valeur absolue (fixe) */
 q${X}_a:${fa};q${X}_b:${fb};q${X}_c:${fc};q${X}_op:"${op}";
 q${X}_ta:${tans};${ineqPrettyVarStmt(X)}`;
             qnote = `|{@q${X}_a@}x+{@q${X}_b@}|{@q${X}_op@}{@q${X}_c@}, sol={@q${X}_ta@}`;
-            textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
+            textFrag = `${HDR}${custText}<p>${I18N_D.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( |{@q${X}_a@}x + {@q${X}_b@}| {@q${X}_op@} {@q${X}_c@} \\)</div>
-<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N_D.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
         }
-        inputXML = _mkInput({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
-        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('ineq.fb_wrong_reponse', {tavar:'q'+X+'_ta'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>${I18N.t('ineq.fbgen_fixe', {tavar:'q'+X+'_ta'})}</div>`;
+        inputXML = mkInput_D({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
+        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('ineq.fb_wrong_reponse', {tavar:'q'+X+'_ta'})}</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('ineq.fbgen_fixe', {tavar:'q'+X+'_ta'})}</div>`;
 
     } else if (scenario === 'lineaire') {
         vars = `/* Q${X} In\xe9q — Degr\xe9 1 */
@@ -159,13 +182,13 @@ q${X}_ta:if q${X}_op=">" then (if q${X}_a>0 then oo(q${X}_sol,inf) else oo(-inf,
      elseif q${X}_op="<" then (if q${X}_a>0 then oo(-inf,q${X}_sol) else oo(q${X}_sol,inf))
      else (if q${X}_a>0 then cc(-inf,q${X}_sol) else cc(q${X}_sol,inf));${ineqPrettyVarStmt(X)}`;
         qnote = `{@q${X}_a@}x+{@q${X}_b@}{@q${X}_op@}0, sol={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( {@q${X}_a@}x + {@q${X}_b@} {@q${X}_op@} 0 \\)</div>
-<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N_D.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
-        inputXML = _mkInput({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
-        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('ineq.fb_wrong_lineaire', {tavar:'q'+X+'_ta'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>${I18N.t('ineq.fbgen_lineaire', {avar:'q'+X+'_a', opvar:'q'+X+'_op', bvar:'q'+X+'_b', solvar:'q'+X+'_sol', tavar:'q'+X+'_ta'})}</div>`;
+        inputXML = mkInput_D({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
+        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('ineq.fb_wrong_lineaire', {tavar:'q'+X+'_ta'})}</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('ineq.fbgen_lineaire', {avar:'q'+X+'_a', opvar:'q'+X+'_op', bvar:'q'+X+'_b', solvar:'q'+X+'_sol', tavar:'q'+X+'_ta'})}</div>`;
 
     } else if (scenario === 'trinome') {
         vars = `/* Q${X} In\xe9q — Degr\xe9 2 */
@@ -182,13 +205,13 @@ q${X}_op:q${X}_ops[1+rand(4)];
 q${X}_ta:if q${X}_a>0 then (if q${X}_op=">" or q${X}_op=">=" then %union(oo(-inf,q${X}_x1),oo(q${X}_x2,inf)) else oo(q${X}_x1,q${X}_x2))
      else (if q${X}_op="<" or q${X}_op="<=" then %union(oo(-inf,q${X}_x1),oo(q${X}_x2,inf)) else oo(q${X}_x1,q${X}_x2));${ineqPrettyVarStmt(X)}`;
         qnote = `sol={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( {@q${X}_poly@} {@q${X}_op@} 0 \\)</div>
-<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N_D.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
-        inputXML = _mkInput({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
-        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('ineq.fb_wrong_trinome', {x1var:'q'+X+'_x1', x2var:'q'+X+'_x2', avar:'q'+X+'_a', tavar:'q'+X+'_ta'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>${I18N.t('ineq.fbgen_trinome', {x1var:'q'+X+'_x1', x2var:'q'+X+'_x2', avar:'q'+X+'_a', tavar:'q'+X+'_ta'})}</div>`;
+        inputXML = mkInput_D({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
+        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('ineq.fb_wrong_trinome', {x1var:'q'+X+'_x1', x2var:'q'+X+'_x2', avar:'q'+X+'_a', tavar:'q'+X+'_ta'})}</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('ineq.fbgen_trinome', {x1var:'q'+X+'_x1', x2var:'q'+X+'_x2', avar:'q'+X+'_a', tavar:'q'+X+'_ta'})}</div>`;
 
     } else { /* valeur-abs */
         vars = `/* Q${X} In\xe9q — Valeur absolue */
@@ -205,24 +228,28 @@ q${X}_sl:min(q${X}_s1,q${X}_s2);q${X}_su:max(q${X}_s1,q${X}_s2);
 q${X}_ta:if q${X}_op=">" or q${X}_op=">=" then %union(oo(-inf,q${X}_sl),oo(q${X}_su,inf))
      else oo(q${X}_sl,q${X}_su);${ineqPrettyVarStmt(X)}`;
         qnote = `|{@q${X}_a@}x+{@q${X}_b@}|{@q${X}_op@}{@q${X}_c@}, sol={@q${X}_ta@}`;
-        textFrag = `${HDR}${custText}<p>${I18N.t('ineq.resoudre_reel')}</p>
+        textFrag = `${HDR}${custText}<p>${I18N_D.t('ineq.resoudre_reel')}</p>
 <div style="text-align:center;margin:15px 0;font-size:1.1rem;">\\( |{@q${X}_a@}x + {@q${X}_b@}| {@q${X}_op@} {@q${X}_c@} \\)</div>
-<p>${I18N.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
+<p>${I18N_D.t('ineq.ensemble_solution_lbl')}[[input:ans_ineq${X}]] [[validation:ans_ineq${X}]]</p>
 ${NOTE}`;
-        inputXML = _mkInput({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
-        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N.t('ineq.fb_wrong_valeur_abs', {tavar:'q'+X+'_ta'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N.t('trig.correction_title')}</strong><br>${I18N.t('ineq.fbgen_valeur_abs', {avar:'q'+X+'_a', bvar:'q'+X+'_b', opvar:'q'+X+'_op', cvar:'q'+X+'_c', tavar:'q'+X+'_ta'})}</div>`;
+        inputXML = mkInput_D({name:`ans_ineq${X}`,type:'string',tans:`q${X}_tastr`,boxsize:28,mustverify:0,showvalidation:2});
+        canonicalNodes = [ineqNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('ineq.fb_wrong_valeur_abs', {tavar:'q'+X+'_ta'})}</div>`)];
+        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('ineq.fbgen_valeur_abs', {avar:'q'+X+'_a', bvar:'q'+X+'_b', opvar:'q'+X+'_op', cvar:'q'+X+'_c', tavar:'q'+X+'_ta'})}</div>`;
     }
 
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: ineqIntervalFeedbackVars(X) };
-    prtXML = buildPrtXml(prtMeta, canonicalNodes);
+    prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
-    generalFeedback = _mkFbGen(generalFeedback, gs('ineq-fbgen'));
+    generalFeedback = mkFbGen_D(generalFeedback, p.fbGen);
 
     return {type:'inequation', bareme, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },
         generalFeedback, feedbackRef:`[[feedback:prt${X}]]`,
         diagNodes: []};
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genInequation: genInequation, genInequationCore: genInequationCore, ineqIntervalFeedbackVars: ineqIntervalFeedbackVars, ineqPrettyVarStmt: ineqPrettyVarStmt };
 }
 
 // ─── THERMO (stub) ───────────────────────────────────────────
