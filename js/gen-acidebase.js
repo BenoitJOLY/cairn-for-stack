@@ -438,7 +438,7 @@ function genAcideBaseCore(X, p, deps) {
     //  MÉTHODE 2 — Méthode des tangentes (JSXGraph)
     // ═══════════════════════════════════════════════════════════════
     } else {
-        var name1 = 'ans1' + S, name2 = 'ans2' + S, refSlopes = 'refSlopes' + S, refCursor = 'refCursor' + S;
+        var name1 = 'ans1' + S, name2 = 'ans2' + S, refSlopes = 'refSlopes' + S;
         var qKa1 = 'Ka1' + S, qKa2 = 'Ka2' + S, qKa3 = 'Ka3' + S, qV1 = 'V1' + S, qC1 = 'C1' + S, qC2 = 'C2' + S, qTaVeq = 'ta_veq' + S;
         var hF = 'h' + S, ohF = 'oh' + S, aF = 'A' + S, bF = 'B' + S, dAF = 'dAdpH' + S, dBF = 'dBdpH' + S;
         var mF = 'm_tang' + S, dmF = 'dm_tang' + S, rv1 = 'raw_v1' + S, rv2 = 'raw_v2' + S, ve1 = 'v_extremum1' + S, ve2 = 'v_extremum2' + S;
@@ -613,15 +613,14 @@ function genAcideBaseCore(X, p, deps) {
             + 'board.create("text",\n'
             + '  [function(){return cursor.X()+0.8;}, 14.0,\n'
             + '   function(){return "V="+cursor.X().toFixed(1)+" mL";}],\n'
-            + '  {fixed:false, fontSize:12, color:"#ef4444", highlight:false});\n'
-            + 'stack_jxg.bind_point(' + refCursor + ', cursor);\n';
+            + '  {fixed:false, fontSize:12, color:"#ef4444", highlight:false});\n';
 
         textFrag = banner('pH-métrie')
             + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;">On réalise le dosage ' + (typeMap[abType] || abType) + nStr + '. La courbe de dosage pH-métrique est tracée ci-dessous.</p>\n'
             + dataRow
             + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;"><strong>Consigne :</strong> Appliquez la <strong>méthode des tangentes</strong>. Déplacez les points <span style="color:#f97316;font-weight:bold;">T<sub>1</sub></span> et <span style="color:#a855f7;font-weight:bold;">T<sub>2</sub></span> à l\'endroit où la courbe est la plus incurvée. Le graphique tracera la droite équidistante (en vert). Déplacez le curseur rouge à l\'abscisse du point d\'intersection trouvé pour lire le volume équivalent.</p>\n'
             + '<div style="display:none">[[input:' + name1 + ']][[validation:' + name1 + ']]</div>\n\n'
-            + '[[jsxgraph input-ref-' + name1 + '="' + refSlopes + '" input-ref-' + name2 + '="' + refCursor + '" width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
+            + '[[jsxgraph input-ref-' + name1 + '="' + refSlopes + '" width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
             + jxg + '\n[[/jsxgraph]]\n'
             + '<div style="margin-top:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">\n'
             + '    <label for="' + name2 + '" style="font-weight:bold; font-size:0.95em; color:#1e3a5f;">Volume équivalent lu sur le graphique (en mL) :</label>\n'
