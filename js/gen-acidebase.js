@@ -130,7 +130,13 @@ function genAcideBaseCore(X, p, deps) {
         return (x < 0 || !isFinite(x) || isNaN(x)) ? NaN : x;
     }
     function phAtVolume(Vtarget) {
-        var lo = 0.05, hi = 13.95, flo = vAtPh(lo) - Vtarget;
+        var lo = 0.05, hi = 13.95;
+        for (var w = 1390; w--;) {
+            if (isNaN(vAtPh(lo))) lo += 0.01;
+        }
+        var floorV = vAtPh(lo);
+        if (floorV >= Vtarget) return lo;
+        var flo = floorV - Vtarget;
         for (var i = 0; i < 60; i++) {
             var mid = (lo + hi) / 2, fm = vAtPh(mid) - Vtarget;
             if ((fm < 0) === (flo < 0)) { lo = mid; flo = fm; } else { hi = mid; }
@@ -221,7 +227,13 @@ function genAcideBaseCore(X, p, deps) {
             + 'const Kw = 1e-14;\n\n'
             + calcVFnJs + '\n'
             + 'function calcPh(V) {\n'
-            + '  var lo = 0.05, hi = 13.95, flo = calcV(lo) - V;\n'
+            + '  var lo = 0.05, hi = 13.95;\n'
+            + '  for (var w = 1390; w--;) {\n'
+            + '    if (isNaN(calcV(lo))) { lo += 0.01; }\n'
+            + '  }\n'
+            + '  var floorV = calcV(lo);\n'
+            + '  if (Math.sign(floorV - V) !== -1) return lo;\n'
+            + '  var flo = floorV - V;\n'
             + '  for (var i = 60; i--;) {\n'
             + '    var mid = (lo + hi) / 2, fm = calcV(mid) - V;\n'
             + '    if (Math.sign(fm) === Math.sign(flo)) { lo = mid; flo = fm; } else { hi = mid; }\n'
