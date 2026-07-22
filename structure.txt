@@ -1,0 +1,2409 @@
+Structure du dossier
+Le numéro de série du volume est 000000F2 2404:746E
+C:.
+|   .gitignore
+|   arborescence du projet.py
+|   audit-palette.html
+|   audit-panels.html
+|   CHANGELOG.md
+|   COMMERCIAL-LICENSE.md
+|   creer_taxonomy.py
+|   depot.html
+|   diag-context.html
+|   diag-ico.html
+|   diag-icons.html
+|   HANDOFF_PREVIEW.md
+|   ico-reference.html
+|   icons-preview.html
+|   index.html
+|   LICENSE.md
+|   package.json
+|   PLAN.md
+|   recupérer_tags.py
+|   ROADMAP_INSTITUTIONNALISATION.md
+|   structure.txt
+|   SUIVI.md
+|   test-smiles-isole.html
+|   VERSION
+|   _balance.py
+|   _extract.py
+|   _extract2.py
+|   _extracted_lentille.js
+|   _extracted_miroir.js
+|   _ref_concave.html
+|   _ref_concave.xml
+|   _ref_convexe.html
+|   _sprite_inline.txt
+|   _test_err.txt
+|   
++---.claude
+|   |   settings.json
+|   |   settings.local.json
+|   |   
+|   \---worktrees
++---.github
+|   \---workflows
+|           test.yml
+|           
++---assets
+|       crossword.png
+|       ddd.svg
+|       DOI.png
+|       favicon.ico
+|       icone_18x18.png
+|       icone_48x48.png
+|       icons.svg
+|       stackforge.png
+|       topologique.png
+|       
++---chimie-svg
+|       agitateur_chauffant.svg
+|       agitateur_magnetique.svg
+|       ampoule_a_decanter.svg
+|       ampoule_coulee.svg
+|       aspi_pipette.svg
+|       balance.svg
+|       ballon.svg
+|       ballon_bicol.svg
+|       ballon_bicol2.svg
+|       ballon_bouchon.svg
+|       ballon_distiller.svg
+|       ballon_plat.svg
+|       ballon_plat_bouchon.svg
+|       ballon_tricol.svg
+|       becher.svg
+|       becher_rempli.svg
+|       bec_bunsen.svg
+|       bouchon.svg
+|       bouchon2.svg
+|       bouchon_troue.svg
+|       bouchon_troué.svg
+|       bouchon_troué2.svg
+|       buchner.svg
+|       burette remplie.svg
+|       Burette.svg
+|       CCM.svg
+|       chauffage_air.svg
+|       chauffage_bec_bunsen.svg
+|       Chauffe_ballon.svg
+|       chem-catalog.json
+|       chem-symbols.svg
+|       cloche.svg
+|       colonne_vigreux.svg
+|       col_distillation.svg
+|       coupelle.svg
+|       cristalisoir.svg
+|       Dean-Stark.svg
+|       dessicateur.svg
+|       electrolyseur.svg
+|       elevateur.svg
+|       entonnoir.svg
+|       eprouvette.svg
+|       erlenmeyer.svg
+|       erlen_bouchon.svg
+|       fiole_a_vide.svg
+|       fiole_bouchon.svg
+|       fiole_jaugée.svg
+|       pince_3_doigts.svg
+|       pipette.svg
+|       pipette_gradue.svg
+|       pipette_jaugée.svg
+|       pissette.svg
+|       plaque_test.svg
+|       poire_aspi.svg
+|       porte_filtre.svg
+|       potence.svg
+|       refrigerant_boule.svg
+|       refrigerant_droit.svg
+|       serringue.svg
+|       sonde_thermomètre.svg
+|       spatule.svg
+|       support_ballon.svg
+|       thermometre-numerique.svg
+|       thermometre-numerique2.svg
+|       thermometre.svg
+|       trompe_a_vide.svg
+|       tube_a_essais.svg
+|       tube_essais.svg
+|       tuyau.svg
+|       tuyau2.svg
+|       Verre_a_pied.svg
+|       verre_de_montre.svg
+|       
++---css
+|       assistant.css
+|       darkmode.css
+|       style.css
+|       
++---doc
+|       announcement-draft-stack-community.md
+|       guide-enseignant.html
+|       inpi-depot-marque.md
+|       
++---js
+|   |   a11y-init.js
+|   |   acide-base-ui.js
+|   |   ai-docs.js
+|   |   app.js
+|   |   assistant.js
+|   |   basen-ui.js
+|   |   calcul-ui.js
+|   |   chemical-helpers.js
+|   |   circuit-ui.js
+|   |   complexe-ui.js
+|   |   config-panel.js
+|   |   crossword-ui.js
+|   |   crossword-ui.min.js
+|   |   data.js
+|   |   ddmarker-assist.js
+|   |   doi.js
+|   |   editor.js
+|   |   equivalence-ui.js
+|   |   expert-ui.js
+|   |   focus-trap.js
+|   |   gen-acidebase.js
+|   |   gen-algebraic.js
+|   |   gen-apn.js
+|   |   gen-basen.js
+|   |   gen-checkbox.js
+|   |   gen-circuit.js
+|   |   gen-composition.js
+|   |   gen-crossword.js
+|   |   gen-diffraction.js
+|   |   gen-diffraction.js.bak
+|   |   gen-expert.js
+|   |   gen-geogebra.js
+|   |   gen-glr.js
+|   |   gen-image-mesure.js
+|   |   gen-imgclick.js
+|   |   gen-jxgdrop.js
+|   |   gen-logique.js
+|   |   gen-match.js
+|   |   gen-math-calcul.js
+|   |   gen-math-complexe.js
+|   |   gen-math-equivalence.js
+|   |   gen-math-geometrie.js
+|   |   gen-math-inequation.js
+|   |   gen-math-limites.js
+|   |   gen-math-matrices.js
+|   |   gen-math-physique.js
+|   |   gen-math-polynomes.js
+|   |   gen-math-probabilites.js
+|   |   gen-math-shared.js
+|   |   gen-math-statistiques.js
+|   |   gen-math-suites.js
+|   |   gen-math-thermo.js
+|   |   gen-math-trigonometrie.js
+|   |   gen-nuclear.js
+|   |   gen-numerical.js
+|   |   gen-optique.js
+|   |   gen-ord.js
+|   |   gen-oscilloscope.js
+|   |   gen-pool.js
+|   |   gen-redox.js
+|   |   gen-string.js
+|   |   gen-topo.js
+|   |   gen-units.js
+|   |   gen-vf.js
+|   |   generators.js
+|   |   geo2d.js
+|   |   geo3d.js
+|   |   geogebra-ui.js
+|   |   geometrie-ui.js
+|   |   help.js
+|   |   i18n-content.js
+|   |   i18n-walk.js
+|   |   i18n.js
+|   |   icons.js
+|   |   imgclick-ui.js
+|   |   inequation-ui.js
+|   |   json-import.js
+|   |   jsxgraph-assist.js
+|   |   jxgdrop-ui.js
+|   |   keyboard.js
+|   |   limites-ui.js
+|   |   logique-ui.js
+|   |   match-ui.js
+|   |   matrices-ui.js
+|   |   maxima-client.js
+|   |   options.js
+|   |   optique-ui.js
+|   |   palette.js
+|   |   physique-ui.js
+|   |   polynomes-ui.js
+|   |   preview.js
+|   |   probabilites-ui.js
+|   |   projects.js
+|   |   prompt.js
+|   |   prop-rows.js
+|   |   prt-manager.js
+|   |   redox-ui.js
+|   |   relance.js
+|   |   rich.js
+|   |   scorm.js
+|   |   stack-import.js
+|   |   statistiques-ui.js
+|   |   suites-ui.js
+|   |   thermo-ui.js
+|   |   trigonometrie-ui.js
+|   |   verif.js
+|   |   version.js
+|   |   xml-lint.js
+|   |   
+|   \---tags-data
+|           fr.js
+|           registry.js
+|           _modele.js
+|           
++---lang
+|       assistant.en.js
+|       assistant.fr.js
+|       en.js
+|       fr.js
+|       help.en.js
+|       help.fr.js
+|       
++---lib
+|   +---fflate
+|   |   |   fflate.min.js
+|   |   |   
+|   |   \---fflate
+|   |           fflate.min.js
+|   |           
+|   +---jsme
+|   |   \---dist
+|   |       |   bootstrap.css
+|   |       |   bootstrap.html
+|   |       |   doc.html
+|   |       |   index.html
+|   |       |   JME_to_JSME.html
+|   |       |   JME_to_JSME_simple.html
+|   |       |   JSME_access_internal_data.html
+|   |       |   JSME_additional_data.html
+|   |       |   JSME_alternative_look.html
+|   |       |   JSME_atom_highlight_demo.html
+|   |       |   JSME_autoresize.html
+|   |       |   JSME_callback_and_mark.html
+|   |       |   JSME_chemical_resolver_demo.html
+|   |       |   JSME_custom_x_shortcuts.html
+|   |       |   JSME_depict.html
+|   |       |   JSME_depict_action.html
+|   |       |   JSME_depict_edit_toggle.html
+|   |       |   JSME_depict_smiles.html
+|   |       |   JSME_depict_with_callbacks.html
+|   |       |   JSME_dnd_demo.html
+|   |       |   JSME_dojo.html
+|   |       |   JSME_editor_plus_SVG.html
+|   |       |   JSME_functional_group_coloring.html
+|   |       |   JSME_hidden.html
+|   |       |   JSME_inchi_direct.html
+|   |       |   JSME_inchi_direct_interactive.html
+|   |       |   JSME_minimal.html
+|   |       |   JSME_parent_and_metabolites.html
+|   |       |   JSME_resize.html
+|   |       |   JSME_Rgroups.html
+|   |       |   JSME_smiles_atom_highlight.html
+|   |       |   JSME_SVG.html
+|   |       |   JSME_template.html
+|   |       |   JSME_template_aminoacids.html
+|   |       |   JSME_template_cysteine_lesson.html
+|   |       |   JSME_test.html
+|   |       |   JSME_test_api.html
+|   |       |   license.txt
+|   |       |   release_notes.txt
+|   |       |   standard_scripts.js
+|   |       |   style.min.css
+|   |       |   test_bootstrap.html
+|   |       |   test_depict_fragments.html
+|   |       |   test_depict_many.html
+|   |       |   test_depict_many_smiles.html
+|   |       |   test_depict_many_smiles_in_table.html
+|   |       |   test_depict_one_smiles_in_table.html
+|   |       |   test_depict_patent_reactions_smirks.html
+|   |       |   test_hidden_iframe.html
+|   |       |   test_pubchem_aspirin_depict.html
+|   |       |   test_resize_and_replace_jme.html
+|   |       |   
+|   |       +---api_javadoc
+|   |       |   |   allclasses-frame.html
+|   |       |   |   allclasses-noframe.html
+|   |       |   |   constant-values.html
+|   |       |   |   deprecated-list.html
+|   |       |   |   help-doc.html
+|   |       |   |   index-all.html
+|   |       |   |   index.html
+|   |       |   |   overview-tree.html
+|   |       |   |   package-list
+|   |       |   |   script.js
+|   |       |   |   stylesheet.css
+|   |       |   |   
+|   |       |   \---export
+|   |       |       \---client
+|   |       |               JSME.html
+|   |       |               package-frame.html
+|   |       |               package-summary.html
+|   |       |               package-tree.html
+|   |       |               Utils.html
+|   |       |               
+|   |       \---jsme
+|   |           |   0ADE505A5718D4BE2E0EE1B7C54CC163.cache.js
+|   |           |   40BAF81124143A595056A9CCA0E9DBBA.cache.png
+|   |           |   4277561D0E87B89F4DFCCC3A712D5B19.cache.js
+|   |           |   96E40B969193BD74B8A621486920E79C.cache.js
+|   |           |   clear.cache.gif
+|   |           |   compilation-mappings.txt
+|   |           |   jsa.css
+|   |           |   jsme.devmode.js
+|   |           |   jsme.nocache.js
+|   |           |   package.json
+|   |           |   
+|   |           +---deferredjs
+|   |           |   +---0ADE505A5718D4BE2E0EE1B7C54CC163
+|   |           |   |       1.cache.js
+|   |           |   |       10.cache.js
+|   |           |   |       11.cache.js
+|   |           |   |       2.cache.js
+|   |           |   |       3.cache.js
+|   |           |   |       4.cache.js
+|   |           |   |       5.cache.js
+|   |           |   |       6.cache.js
+|   |           |   |       7.cache.js
+|   |           |   |       8.cache.js
+|   |           |   |       9.cache.js
+|   |           |   |       
+|   |           |   \---4277561D0E87B89F4DFCCC3A712D5B19
+|   |           |           1.cache.js
+|   |           |           10.cache.js
+|   |           |           11.cache.js
+|   |           |           2.cache.js
+|   |           |           3.cache.js
+|   |           |           4.cache.js
+|   |           |           5.cache.js
+|   |           |           6.cache.js
+|   |           |           7.cache.js
+|   |           |           8.cache.js
+|   |           |           9.cache.js
+|   |           |           
+|   |           \---gwt
+|   |               \---chrome
+|   |                   |   chrome.css
+|   |                   |   chrome_rtl.css
+|   |                   |   mosaic.css
+|   |                   |   mosaic_rtl.css
+|   |                   |   
+|   |                   \---images
+|   |                       |   corner.png
+|   |                       |   corner_ie6.png
+|   |                       |   hborder.png
+|   |                       |   hborder_ie6.png
+|   |                       |   splitPanelThumb.png
+|   |                       |   vborder.png
+|   |                       |   vborder_ie6.png
+|   |                       |   
+|   |                       +---button
+|   |                       |       menu-button-arrow-disabled.png
+|   |                       |       menu-button-arrow.png
+|   |                       |       split-button-arrow-active.png
+|   |                       |       split-button-arrow-disabled.png
+|   |                       |       split-button-arrow-focus.png
+|   |                       |       split-button-arrow-hover.png
+|   |                       |       split-button-arrow.png
+|   |                       |       
+|   |                       +---combobox
+|   |                       |       arrow-down-disabled.png
+|   |                       |       arrow-down.png
+|   |                       |       ellipsis-disabled.png
+|   |                       |       ellipsis.png
+|   |                       |       
+|   |                       +---fastree
+|   |                       |       selectionBar.gif
+|   |                       |       treeClosed.gif
+|   |                       |       treeLoading.gif
+|   |                       |       treeOpen.gif
+|   |                       |       
+|   |                       +---glasspanel
+|   |                       |       blue_ridge.png
+|   |                       |       
+|   |                       +---ie6
+|   |                       |       corner_dialog_topleft.png
+|   |                       |       corner_dialog_topright.png
+|   |                       |       hborder_blue_shadow.png
+|   |                       |       hborder_gray_shadow.png
+|   |                       |       vborder_blue_shadow.png
+|   |                       |       vborder_gray_shadow.png
+|   |                       |       
+|   |                       +---scrolltable
+|   |                       |       bg_header_gradient.gif
+|   |                       |       
+|   |                       \---valuespinner
+|   |                               bg_textbox.png
+|   |                               
+|   +---jsxgraph
+|   |       jsxgraph.css
+|   |       jsxgraphcore.js
+|   |       
+|   +---katex
+|   |   |   katex-swap.css
+|   |   |   katex-swap.min.css
+|   |   |   katex.css
+|   |   |   katex.js
+|   |   |   katex.min.css
+|   |   |   katex.min.js
+|   |   |   katex.mjs
+|   |   |   README.md
+|   |   |   
+|   |   +---contrib
+|   |   |       auto-render.js
+|   |   |       auto-render.min.js
+|   |   |       auto-render.mjs
+|   |   |       copy-tex.js
+|   |   |       copy-tex.min.js
+|   |   |       copy-tex.mjs
+|   |   |       mathtex-script-type.js
+|   |   |       mathtex-script-type.min.js
+|   |   |       mathtex-script-type.mjs
+|   |   |       mhchem.js
+|   |   |       mhchem.min.js
+|   |   |       mhchem.mjs
+|   |   |       render-a11y-string.js
+|   |   |       render-a11y-string.min.js
+|   |   |       render-a11y-string.mjs
+|   |   |       
+|   |   \---fonts
+|   |           KaTeX_AMS-Regular.ttf
+|   |           KaTeX_AMS-Regular.woff
+|   |           KaTeX_AMS-Regular.woff2
+|   |           KaTeX_Caligraphic-Bold.ttf
+|   |           KaTeX_Caligraphic-Bold.woff
+|   |           KaTeX_Caligraphic-Bold.woff2
+|   |           KaTeX_Caligraphic-Regular.ttf
+|   |           KaTeX_Caligraphic-Regular.woff
+|   |           KaTeX_Caligraphic-Regular.woff2
+|   |           KaTeX_Fraktur-Bold.ttf
+|   |           KaTeX_Fraktur-Bold.woff
+|   |           KaTeX_Fraktur-Bold.woff2
+|   |           KaTeX_Fraktur-Regular.ttf
+|   |           KaTeX_Fraktur-Regular.woff
+|   |           KaTeX_Fraktur-Regular.woff2
+|   |           KaTeX_Main-Bold.ttf
+|   |           KaTeX_Main-Bold.woff
+|   |           KaTeX_Main-Bold.woff2
+|   |           KaTeX_Main-BoldItalic.ttf
+|   |           KaTeX_Main-BoldItalic.woff
+|   |           KaTeX_Main-BoldItalic.woff2
+|   |           KaTeX_Main-Italic.ttf
+|   |           KaTeX_Main-Italic.woff
+|   |           KaTeX_Main-Italic.woff2
+|   |           KaTeX_Main-Regular.ttf
+|   |           KaTeX_Main-Regular.woff
+|   |           KaTeX_Main-Regular.woff2
+|   |           KaTeX_Math-BoldItalic.ttf
+|   |           KaTeX_Math-BoldItalic.woff
+|   |           KaTeX_Math-BoldItalic.woff2
+|   |           KaTeX_Math-Italic.ttf
+|   |           KaTeX_Math-Italic.woff
+|   |           KaTeX_Math-Italic.woff2
+|   |           KaTeX_SansSerif-Bold.ttf
+|   |           KaTeX_SansSerif-Bold.woff
+|   |           KaTeX_SansSerif-Bold.woff2
+|   |           KaTeX_SansSerif-Italic.ttf
+|   |           KaTeX_SansSerif-Italic.woff
+|   |           KaTeX_SansSerif-Italic.woff2
+|   |           KaTeX_SansSerif-Regular.ttf
+|   |           KaTeX_SansSerif-Regular.woff
+|   |           KaTeX_SansSerif-Regular.woff2
+|   |           KaTeX_Script-Regular.ttf
+|   |           KaTeX_Script-Regular.woff
+|   |           KaTeX_Script-Regular.woff2
+|   |           KaTeX_Size1-Regular.ttf
+|   |           KaTeX_Size1-Regular.woff
+|   |           KaTeX_Size1-Regular.woff2
+|   |           KaTeX_Size2-Regular.ttf
+|   |           KaTeX_Size2-Regular.woff
+|   |           KaTeX_Size2-Regular.woff2
+|   |           KaTeX_Size3-Regular.ttf
+|   |           KaTeX_Size3-Regular.woff
+|   |           KaTeX_Size3-Regular.woff2
+|   |           KaTeX_Size4-Regular.ttf
+|   |           KaTeX_Size4-Regular.woff
+|   |           KaTeX_Size4-Regular.woff2
+|   |           KaTeX_Typewriter-Regular.ttf
+|   |           KaTeX_Typewriter-Regular.woff
+|   |           KaTeX_Typewriter-Regular.woff2
+|   |           
+|   +---pdfjs
+|   |   |   pdf.min.js
+|   |   |   pdf.worker.min.js
+|   |   |   
+|   |   \---pdfjs
+|   |           pdf.min.js
+|   |           pdf.worker.min.js
+|   |           
+|   \---smiles-drawer
+|       |   smiles-drawer.min.js
+|       |   
+|       \---smiles-drawer
+|               smiles-drawer.min.js
+|               
++---newico
+|       audio.svg
+|       binary.svg
+|       boat-length.svg
+|       boolean.svg
+|       check-circle.svg
+|       chevron-down-circle.svg
+|       chevron-up-circle.svg
+|       complexe.svg
+|       copy.svg
+|       drag.svg
+|       edit-fill.svg
+|       electricity.svg
+|       error.svg
+|       feedback.svg
+|       figma.svg
+|       glr.svg
+|       graph-monitoring.svg
+|       graph2.svg
+|       gravity.svg
+|       i.svg
+|       image.svg
+|       imgclick.svg
+|       import-content.svg
+|       import.svg
+|       info.svg
+|       input-tablet.svg
+|       integral.svg
+|       laser.svg
+|       less-than-equal-solid.svg
+|       matrix.svg
+|       microscope.svg
+|       ord.svg
+|       oscilloscope.svg
+|       ox_red.svg
+|       pin.svg
+|       project-diagram-solid.svg
+|       recycle-svgrepo-com.svg
+|       reset.svg
+|       rvbcmj.svg
+|       science.svg
+|       statistics-2.svg
+|       success.svg
+|       sum-sign-.svg
+|       superscript.svg
+|       thermometer.svg
+|       topo.svg
+|       tree-branch.svg
+|       triangle-round-rectangle.svg
+|       trigo.svg
+|       user-expert.svg
+|       variable.svg
+|       variables-xs.svg
+|       vf.svg
+|       warning.svg
+|       word-gs-chimie.docx
+|       wrench-hammer.svg
+|       
++---test
+|   |   arborescence.txt
+|   |   bug.xml
+|   |   index.json
+|   |   regression.html
+|   |   rvb_ref_trunc.txt
+|   |   SPÉCIFICATION TECHNIQUE UNIQUE.txt
+|   |   taxonomy.js
+|   |   voir en dépot.html
+|   |   
+|   +---comment_faire
+|   |       comment faire un parson.txt
+|   |       jsxgraph.txt
+|   |       Nouveau Document texte (2).txt
+|   |       Nouveau Document texte.txt
+|   |       reparation.odt
+|   |       Sans nom 2.odt
+|   |       Sans nom 3.odt
+|   |       Sans nom 4.odt
+|   |       Sans nom 5.odt
+|   |       Sans nom 6.odt
+|   |       Sans nom 7.odt
+|   |       Sans nom 8.odt
+|   |       
+|   +---mise à jour
+|   |   +---Choix multiples
+|   |   |   +---cases à cocher
+|   |   |   |       Choix multiples-cases-cocher-1.xml
+|   |   |   |       
+|   |   |   +---Menu déroulant
+|   |   |   |       Choix multiples-menu déroulant -aléatoire1.xml
+|   |   |   |       
+|   |   |   +---radio
+|   |   |   |       Choix multiples-radio-1.xml
+|   |   |   |       
+|   |   |   \---Vrai Faux
+|   |   |           Choix multiples-Vrai Faux-1.xml
+|   |   |           
+|   |   +---Informatique
+|   |   |   +---Conversion base N
+|   |   |   |       Informatique-conversion-base10-vers-base16.xml
+|   |   |   |       Informatique-conversion-base10-vers-base2-strict.xml
+|   |   |   |       Informatique-conversion-base10-vers-basen-aleatoire.xml
+|   |   |   |       Informatique-conversion-base16-vers-base10.xml
+|   |   |   |       Informatique-conversion-base2-vers-base10.xml
+|   |   |   |       Informatique-conversion-basen-vers-base10-aleatoire.xml
+|   |   |   |       
+|   |   |   \---tableau logique
+|   |   |           Informatique-logique tableau- Identifier lexpression daprès sa table.xml
+|   |   |           Informatique-logique tableau- Table de vérité à 3 variables.xml
+|   |   |           Informatique-logique tableau- Équivalence de deux propositions.xml
+|   |   |           Informatique-logique tableau-Déduire des cases manquantes.xml
+|   |   |           Informatique-logique tableau-Logique Propositionnelle - Tableau à compléter.xml
+|   |   |           Informatique-logique tableau-Table avec colonnes intermédiaires.xml
+|   |   |           Informatique-logique tableau-Tableau à compléter.xml
+|   |   |           
+|   |   +---Interactif visuel
+|   |   |   +---Glisser deposer
+|   |   |   |       jxgdrop-rebuild-test.xml
+|   |   |   |       questions-parcours-69b486eebfaad-Exercice_sans_titre_2026_07_02_17h34-20260702-2200.xml
+|   |   |   |       
+|   |   |   +---image-clic
+|   |   |   |       questions-parcours-69b486eebfaad-JSXGraph 3 Carrés Séquentiels-20260707-1627.xml
+|   |   |   |       
+|   |   |   +---mesure doc
+|   |   |   |       questions-parcours-69552c495bebf-longueur dondes de raies-20260710-0919.xml
+|   |   |   |       
+|   |   |   \---sélection sur image
+|   |   |           questions-parcours-69552c495bebf-longueur dondes de raies-20260702-1716.xml
+|   |   |           
+|   |   +---Math
+|   |   |   +---Algebre
+|   |   |   |       Math-algebre-developpement-prt-expert.xml
+|   |   |   |       Math-algebre-factorisation-maximale.xml
+|   |   |   |       Math-algebre-fractions-simplification.xml
+|   |   |   |       Math-algebre-puissances-regles-calcul.xml
+|   |   |   |       Math-algebre-systemes-2-inconnues.xml
+|   |   |   |       
+|   |   |   +---Complexes
+|   |   |   |       Math-complexes-equation-2nd-degre.xml
+|   |   |   |       Math-complexes-forme-algebrique.xml
+|   |   |   |       Math-complexes-forme-exponentielle.xml
+|   |   |   |       Math-complexes-geometrie-affixes.xml
+|   |   |   |       Math-complexes-module-argument.xml
+|   |   |   |       Math-complexes-parties-reelle-imaginaire.xml
+|   |   |   |       
+|   |   |   +---derivée-primitive
+|   |   |   |       Math-analyse-aire-courbes.xml
+|   |   |   |       Math-analyse-convexite-tangente-exponentielle.xml
+|   |   |   |       Math-analyse-derivee-piege-produit-exponentielle.xml
+|   |   |   |       Math-analyse-encadrement-tvi-dichotomie.xml
+|   |   |   |       Math-analyse-integrale-definie-exponentielle.xml
+|   |   |   |       Math-analyse-primitive-exponentielle.xml
+|   |   |   |       Math-analyse-tangente-point-exterieur.xml
+|   |   |   |       
+|   |   |   +---geogebra
+|   |   |   |   |   créée dans stackforge.xml
+|   |   |   |   |   fonctionnelle.xml
+|   |   |   |   |   Geogebra.svg
+|   |   |   |   |   tracer courbe.ggb
+|   |   |   |   |   
+|   |   |   |   \---presets
+|   |   |   |           deg2.ggb
+|   |   |   |           deg3.ggb
+|   |   |   |           exp.ggb
+|   |   |   |           trig.ggb
+|   |   |   |           
+|   |   |   +---Geometrie
+|   |   |   |       Math-geometrie-aire-triangle.xml
+|   |   |   |       Math-geometrie-distance-points.xml
+|   |   |   |       Math-geometrie-milieu-segment.xml
+|   |   |   |       Math-geometrie-norme-vecteur.xml
+|   |   |   |       Math-geometrie-ordonnee-origine-droite.xml
+|   |   |   |       Math-geometrie-pente-droite.xml
+|   |   |   |       
+|   |   |   +---inéquation
+|   |   |   |       Math-inequations-1er-degre.xml
+|   |   |   |       Math-inequations-2nd-degre.xml
+|   |   |   |       Math-inequations-absolu-ax-b.xml
+|   |   |   |       
+|   |   |   +---Limites
+|   |   |   |       Math-limites-droite-racine-carree.xml
+|   |   |   |       Math-limites-gauche-racine-carree.xml
+|   |   |   |       Math-limites-moins-infini-fraction.xml
+|   |   |   |       Math-limites-plus-infini-fraction.xml
+|   |   |   |       Math-limites-point-fini.xml
+|   |   |   |       
+|   |   |   +---Matrices
+|   |   |   |       Math-matrices-determinant-2x2.xml
+|   |   |   |       Math-matrices-determinant-3x3.xml
+|   |   |   |       Math-matrices-produit-2x2.xml
+|   |   |   |       Math-matrices-systeme-lineaire-2x2.xml
+|   |   |   |       Math-matrices-trace-3x3.xml
+|   |   |   |       Math-matrices-transposee-3x3.xml
+|   |   |   |       
+|   |   |   +---numérique
+|   |   |   |       Math-numerique-clavier.xml
+|   |   |   |       
+|   |   |   +---Polynomes
+|   |   |   |       Math-polynome-discriminant.xml
+|   |   |   |       Math-polynome-grande-racine.xml
+|   |   |   |       Math-polynome-nombre-racines.xml
+|   |   |   |       Math-polynome-petite-racine.xml
+|   |   |   |       Math-polynome-produit-racines-viete.xml
+|   |   |   |       Math-polynome-racines-2nd-degre.xml
+|   |   |   |       Math-polynome-somme-racines-viete.xml
+|   |   |   |       
+|   |   |   +---Probabilités
+|   |   |   |       Math-probabilites-combinatoire-coefficient.xml
+|   |   |   |       Math-probabilites-conditionnelle-arbre.xml
+|   |   |   |       Math-probabilites-esperance-binomiale.xml
+|   |   |   |       Math-probabilites-loi-binomiale.xml
+|   |   |   |       Math-probabilites-union.xml
+|   |   |   |       Math-probabilites-variance-binomiale.xml
+|   |   |   |       
+|   |   |   +---raisonnement par équivalence
+|   |   |   |       equivalence_reasoning_x_moins_1_cube.xml
+|   |   |   |       
+|   |   |   +---Statistiques
+|   |   |   |       Math-statistiques-ecart-type.xml
+|   |   |   |       Math-statistiques-etendue.xml
+|   |   |   |       Math-statistiques-mediane-pair.xml
+|   |   |   |       Math-statistiques-moyenne-ponderee.xml
+|   |   |   |       Math-statistiques-moyenne.xml
+|   |   |   |       Math-statistiques-quartile-q1.xml
+|   |   |   |       Math-statistiques-quartile-q3.xml
+|   |   |   |       Math-statistiques-variance.xml
+|   |   |   |       
+|   |   |   +---suites
+|   |   |   |       Math-suites-expression-arithmetique.xml
+|   |   |   |       Math-suites-limite-geometrique.xml
+|   |   |   |       Math-suites-somme-arithmetique.xml
+|   |   |   |       Math-suites-somme-geometrique.xml
+|   |   |   |       Math-suites-terme-general-arithmetique.xml
+|   |   |   |       Math-suites-terme-general-geometrique.xml
+|   |   |   |       
+|   |   |   \---trigonométrie
+|   |   |           Math-trigonometrie-simplifier.xml
+|   |   |           Math-trigonometrie-valeur-exacte.xml
+|   |   |           
+|   |   +---Organisation
+|   |   |   +---Classement
+|   |   |   |       Organisation-classement-moyenne.xml
+|   |   |   |       Organisation-classement-parcours-air.xml
+|   |   |   |       
+|   |   |   +---Mots croisés
+|   |   |   |       Organisation-mots croisés-1.xml
+|   |   |   |       
+|   |   |   \---Relier
+|   |   |           Organisation-relier-1.xml
+|   |   |           
+|   |   +---Physique-chimie
+|   |   |   +---APN
+|   |   |   |       1298736.svg
+|   |   |   |       APN-diaph de prise de vue iso changé-.xml
+|   |   |   |       APN-diaph de prise de vue iso et vitesse changés-.xml
+|   |   |   |       APN-diaph de prise de vue vitesse changée.xml
+|   |   |   |       APN-iso de prise de vue diaph et vitesse changés .xml
+|   |   |   |       APN-Vitesse de prise de vue diaph changé-.xml
+|   |   |   |       APN-Vitesse de prise de vue diaph et iso changés-.xml
+|   |   |   |       APN-Vitesse de prise de vue iso changé.xml
+|   |   |   |       
+|   |   |   +---chimie topologique
+|   |   |   |       questions-parcours-69b486eebfaad-Rentrez_le_nom_de_votre_exercice-20260701-1527.xml
+|   |   |   |       
+|   |   |   +---DOI
+|   |   |   |       questions-parcours-69553ad46164e-DOI Bille aimant-20260708-1022.xml
+|   |   |   |       questions-parcours-69553ad46164e-DOI chien-20260708-1022.xml
+|   |   |   |       questions-parcours-69553ad46164e-DOI satellite-20260708-1022.xml
+|   |   |   |       questions-parcours-69553ad46164e-DOI Voiture - qui roule-20260708-1022.xml
+|   |   |   |       
+|   |   |   +---equation chimique
+|   |   |   |       questions-parcours-69b486eebfaad-Rentrez_le_nom_de_votre_exercice-20260701-1530.xml
+|   |   |   |       
+|   |   |   +---Interférences Diffraction
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par 2 fentes avec capteur détermination de la largeur et de lécartement-20260702-0002.xml
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par trous de young détermination de la longueur donde-20260702-0002.xml
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par un trou avec écran détermination de la longueur donde-20260702-0002.xml
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par une fente avec capteur détermination longueur donde-20260702-0002.xml
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par une fente avec écran détermination longueur donde-20260702-0002.xml
+|   |   |   |       
+|   |   |   +---lentille
+|   |   |   |       miroir-plan.xml
+|   |   |   |       questions-kjkj-Lentille convergente — AB entre -infini et F (image réelle)-20260717-1700.xml
+|   |   |   |       questions-kjkj-Lentille convergente — AB entre F et O (image virtuelle)-20260717-1711.xml
+|   |   |   |       questions-kjkj-Lentille divergente — image virtuelle-20260717-1731.xml
+|   |   |   |       questions-kjkj-Lunette de Galilée — construction complète (objectif + oculaire)-20260718-0924.xml
+|   |   |   |       questions-kjkj-Miroir concave — AB entre F et S (image virtuelle)-20260717-1546.xml
+|   |   |   |       questions-kjkj-Miroir concave —AB entre -inf et F(image réelle)-20260717-1517.xml
+|   |   |   |       questions-kjkj-Miroir convexe — image virtuelle-20260717-1642.xml
+|   |   |   |       questions-kjkj-Télescope de Newton — construction complète (miroir primaire + miroir secondaire + oculaire)-20260718-1125.xml
+|   |   |   |       questions-kjkj-Télescope de Newton — construction complète (miroir primaire + miroir secondaire + oculaire)-20260718-1413.xml
+|   |   |   |       
+|   |   |   +---nucléaire
+|   |   |   |       Nucléaire-fission de l uranium 235.xml
+|   |   |   |       
+|   |   |   +---Oscilloscope
+|   |   |   |       Physique-oscilloscope-charge-rc.xml
+|   |   |   |       Physique-oscilloscope-clair-aleatoire-complet.xml
+|   |   |   |       Physique-oscilloscope-clair-carree-aleatoire.xml
+|   |   |   |       Physique-oscilloscope-clair-frequence-aleatoire.xml
+|   |   |   |       Physique-oscilloscope-clair-periode-frequence-aleatoire.xml
+|   |   |   |       Physique-oscilloscope-clair-triangle-aleatoire.xml
+|   |   |   |       Physique-oscilloscope-decharge-rc.xml
+|   |   |   |       Physique-oscilloscope-retard-ultrasonore.xml
+|   |   |   |       
+|   |   |   +---pH-métrie — Titrage
+|   |   |   |       pH-métrie — Titrage-colorimétrie.xml
+|   |   |   |       pH-métrie — Titrage-methode_tangentes.xml
+|   |   |   |       
+|   |   |   +---polarimétrie
+|   |   |   |       polarimetrie.svg
+|   |   |   |       
+|   |   |   +---RVB
+|   |   |   |       questions-parcours-69b486eebfaad-rvb reste general fb et image-20260702-1305.xml
+|   |   |   |       
+|   |   |   +---tableau d'avancement
+|   |   |   |       questions-kjkj-avancement (copie)-20260719-1616.xml
+|   |   |   |       questions-kjkj-avancement-20260719-1616.xml
+|   |   |   |       table-svgrepo-com(1).svg
+|   |   |   |       
+|   |   |   \---unités
+|   |   |           Unités-conversion d unités- autogénérées-.xml
+|   |   |           Unités-noter une valeur.xml
+|   |   |           
+|   |   \---Réponse textuelle
+|   |           export_stackforge.xml
+|   |           fonctionne.xml
+|   |           Réponse textuelle-string-levenshtein-multiple.xml
+|   |           Réponse textuelle-string-levenshtein.xml
+|   |           Réponse textuelle-string-synonymes.xml
+|   |           valide_mais_pas_correction.xml
+|   |           
+|   +---moodle-qtype_stack-master
+|   |   |   .gitignore
+|   |   |   .gitlab-ci.yml
+|   |   |   COPYING.txt
+|   |   |   deploy.php
+|   |   |   edit_stack_form.php
+|   |   |   environment.xml
+|   |   |   lib.php
+|   |   |   locallib.php
+|   |   |   mkdocs.yml
+|   |   |   mobile.css
+|   |   |   plot.php
+|   |   |   question.php
+|   |   |   questionbulktest.php
+|   |   |   questiondisplayoptions.php
+|   |   |   questioneditlatest.php
+|   |   |   questionlibrary.php
+|   |   |   questiontestdelete.php
+|   |   |   questiontestedit.php
+|   |   |   questiontestform.php
+|   |   |   questiontestreport.php
+|   |   |   questiontestrun.php
+|   |   |   questiontype.php
+|   |   |   questionxmledit.php
+|   |   |   questionxmlform.php
+|   |   |   Readme.md
+|   |   |   renderer.php
+|   |   |   requirements.txt
+|   |   |   settings.php
+|   |   |   settingslib.php
+|   |   |   styles.css
+|   |   |   textdownload.php
+|   |   |   thirdpartylibs.xml
+|   |   |   tidyquestion.php
+|   |   |   tidyquestionform.php
+|   |   |   version.php
+|   |   |   vle_specific.php
+|   |   |   
+|   |   +---.github
+|   |   |   \---workflows
+|   |   |           deploy_website.yml
+|   |   |           moodle-ci.yml
+|   |   |           
+|   |   +---adminui
+|   |   |       answertests.php
+|   |   |       bulktest.php
+|   |   |       bulktestall.php
+|   |   |       bulktestindex.php
+|   |   |       bulktestquiz.php
+|   |   |       cascacheview.php
+|   |   |       caschat.php
+|   |   |       compiledquestion.php
+|   |   |       dependencies.php
+|   |   |       equivdemo.php
+|   |   |       healthcheck.php
+|   |   |       index.php
+|   |   |       parsertest.php
+|   |   |       Readme.md
+|   |   |       replacedollars.php
+|   |   |       replacedollarsindex.php
+|   |   |       studentinputs.php
+|   |   |       subscripts.php
+|   |   |       todo.php
+|   |   |       
+|   |   +---amd
+|   |   |   +---build
+|   |   |   |       input.min.js
+|   |   |   |       input.min.js.map
+|   |   |   |       library.min.js
+|   |   |   |       library.min.js.map
+|   |   |   |       stackjsvle.min.js
+|   |   |   |       stackjsvle.min.js.map
+|   |   |   |       
+|   |   |   \---src
+|   |   |           input.js
+|   |   |           library.js
+|   |   |           stackjsvle.js
+|   |   |           
+|   |   +---api
+|   |   |   |   composer.json
+|   |   |   |   composer.lock
+|   |   |   |   config_sample.txt
+|   |   |   |   questiondefaults.yml
+|   |   |   |   README.md
+|   |   |   |   
+|   |   |   +---controller
+|   |   |   |       DiffController.php
+|   |   |   |       DownloadController.php
+|   |   |   |       GradingController.php
+|   |   |   |       RenderController.php
+|   |   |   |       TestController.php
+|   |   |   |       ValidationController.php
+|   |   |   |       
+|   |   |   +---docker
+|   |   |   |   |   docker-compose.demo.yml
+|   |   |   |   |   docker-compose.dev.yml
+|   |   |   |   |   docker-compose.stack.prod.yml
+|   |   |   |   |   docker-compose.yml
+|   |   |   |   |   Dockerfile
+|   |   |   |   |   DockerfileDemo
+|   |   |   |   |   
+|   |   |   |   \---files
+|   |   |   |       |   installlanguages.php
+|   |   |   |       |   opcache.ini
+|   |   |   |       |   stackfooter.html
+|   |   |   |       |   xdebug-profile.ini
+|   |   |   |       |   xdebug.ini
+|   |   |   |       |   
+|   |   |   |       +---letsencrypt
+|   |   |   |       |       README.txt
+|   |   |   |       |       
+|   |   |   |       \---sites
+|   |   |   |               000-default.conf
+|   |   |   |               
+|   |   |   +---dtos
+|   |   |   |       StackDiffResponse.php
+|   |   |   |       StackGradingResponse.php
+|   |   |   |       StackRenderResponse.php
+|   |   |   |       StackTestResponse.php
+|   |   |   |       StackValidationResponse.php
+|   |   |   |       
+|   |   |   +---emulation
+|   |   |   |   |   Constants.php
+|   |   |   |   |   HtmlWriter.php
+|   |   |   |   |   Language.php
+|   |   |   |   |   Localization.php
+|   |   |   |   |   MoodleEmulation.php
+|   |   |   |   |   Renderer.php
+|   |   |   |   |   
+|   |   |   |   \---libdir
+|   |   |   |           questionlib.php
+|   |   |   |           weblib.php
+|   |   |   |           
+|   |   |   +---public
+|   |   |   |       .htaccess
+|   |   |   |       api.css
+|   |   |   |       bulktest.php
+|   |   |   |       cors.php
+|   |   |   |       favicon.ico
+|   |   |   |       index.php
+|   |   |   |       logo_large.png
+|   |   |   |       sample.php
+|   |   |   |       stack.php
+|   |   |   |       stackfooter.html
+|   |   |   |       stackhead.html
+|   |   |   |       stackjsvle.js
+|   |   |   |       stackshared.js
+|   |   |   |       styles.css
+|   |   |   |       
+|   |   |   +---util
+|   |   |   |       ErrorRenderer.php
+|   |   |   |       StackIframeHolder.php
+|   |   |   |       StackPlotReplacer.php
+|   |   |   |       StackQuestionLoader.php
+|   |   |   |       StackSeedHelper.php
+|   |   |   |       
+|   |   |   \---vendor
+|   |   |           .gitignore
+|   |   |           
+|   |   +---backup
+|   |   |   \---moodle2
+|   |   |           backup_qtype_stack_plugin.class.php
+|   |   |           restore_qtype_stack_plugin.class.php
+|   |   |           
+|   |   +---classes
+|   |   |   |   external.php
+|   |   |   |   fake_render.php
+|   |   |   |   library_import.php
+|   |   |   |   library_render.php
+|   |   |   |   
+|   |   |   +---check
+|   |   |   |       casconnection_check.php
+|   |   |   |       stack_version_check.php
+|   |   |   |       
+|   |   |   +---form
+|   |   |   |       category_form.php
+|   |   |   |       
+|   |   |   +---output
+|   |   |   |       mobile.php
+|   |   |   |       
+|   |   |   \---privacy
+|   |   |           provider.php
+|   |   |           
+|   |   +---cli
+|   |   |       answertests_docs.php
+|   |   |       ast_filter_tester.php
+|   |   |       ast_test_generator.php
+|   |   |       build_maxima_optimised.php
+|   |   |       bulkseed.php
+|   |   |       bulktestall.php
+|   |   |       castextcompiler.php
+|   |   |       clearcascache.php
+|   |   |       getversionstring.php
+|   |   |       langstrings.php
+|   |   |       maximaidentifierupdater.php
+|   |   |       maximalibcheck.php
+|   |   |       maximasecuritymapupdater.php
+|   |   |       parsercompare.php
+|   |   |       stacklibrarycheck.php
+|   |   |       stack_maxima_compiler.php
+|   |   |       unicode_data_process.php
+|   |   |       
+|   |   +---corsscripts
+|   |   |   |   cors.php
+|   |   |   |   geogebracore.js
+|   |   |   |   jsxgraph.min.css
+|   |   |   |   jsxgraphcore.min.js
+|   |   |   |   README
+|   |   |   |   sortable.css
+|   |   |   |   sortable.min.css
+|   |   |   |   sortablecore.min.js
+|   |   |   |   stackcssutils.js
+|   |   |   |   stackcssutils.min.js
+|   |   |   |   stackgeogebra.js
+|   |   |   |   stackjsiframe.js
+|   |   |   |   stackjsiframe.min.js
+|   |   |   |   stackjsxgraph.js
+|   |   |   |   stackjsxgraph.min.js
+|   |   |   |   stackmplite.js
+|   |   |   |   stackmplite.min.js
+|   |   |   |   stacksortable.js
+|   |   |   |   stacksortable.min.js
+|   |   |   |   
+|   |   |   +---jsxgraphstyles
+|   |   |   |       empty.css
+|   |   |   |       
+|   |   |   \---parsonsstyles
+|   |   |           compact.css
+|   |   |           compact.min.css
+|   |   |           
+|   |   +---db
+|   |   |       access.php
+|   |   |       caches.php
+|   |   |       install.php
+|   |   |       install.xml
+|   |   |       mobile.php
+|   |   |       services.php
+|   |   |       upgrade.php
+|   |   |       
+|   |   +---doc
+|   |   |   |   CNAME
+|   |   |   |   COPYING.txt
+|   |   |   |   custom.css
+|   |   |   |   doc.php
+|   |   |   |   docslib.php
+|   |   |   |   maintenance.php
+|   |   |   |   meta_en.json
+|   |   |   |   
+|   |   |   +---content
+|   |   |   |   |   2018-STACK.pdf
+|   |   |   |   |   2019-cate-case-studies.pdf
+|   |   |   |   |   access_the_question_bank.png
+|   |   |   |   |   adding_question_text.png
+|   |   |   |   |   addnewnode.png
+|   |   |   |   |   add_new_node.png
+|   |   |   |   |   answer_note.png
+|   |   |   |   |   banner.png
+|   |   |   |   |   by-sa-88.png
+|   |   |   |   |   by-sa.png
+|   |   |   |   |   CAACover.jpg
+|   |   |   |   |   CATE.png
+|   |   |   |   |   CATE_large.png
+|   |   |   |   |   configured_node.png
+|   |   |   |   |   CreatePubs.bat
+|   |   |   |   |   DeMorgan1836-induction.jpeg
+|   |   |   |   |   Diagnostic.png
+|   |   |   |   |   email.png
+|   |   |   |   |   external.png
+|   |   |   |   |   Geogebra_applet.png
+|   |   |   |   |   IntegrationExercises.jpg
+|   |   |   |   |   JSXGraph_sketching.png
+|   |   |   |   |   logo-sm.png
+|   |   |   |   |   logo-trans.png
+|   |   |   |   |   logo.png
+|   |   |   |   |   logoJB.jpg
+|   |   |   |   |   logo_large.png
+|   |   |   |   |   logo_large.svg
+|   |   |   |   |   logo_sm.png
+|   |   |   |   |   MCQ_curves.png
+|   |   |   |   |   model_answer.png
+|   |   |   |   |   NakamuraCover.jpg
+|   |   |   |   |   preview_button.png
+|   |   |   |   |   PRT_messy.png
+|   |   |   |   |   PRT_tidy.png
+|   |   |   |   |   question_bank_page.png
+|   |   |   |   |   readme.txt
+|   |   |   |   |   select_STACK_question.png
+|   |   |   |   |   STACK-screenshot.png
+|   |   |   |   |   stack.bib
+|   |   |   |   |   stack_publications.pdf
+|   |   |   |   |   stack_publications.tex
+|   |   |   |   |   student_written_response.png
+|   |   |   |   |   syntax_tutorial.pdf
+|   |   |   |   |   syntax_tutorial.tex
+|   |   |   |   |   Tidy_inputs.png
+|   |   |   |   |   WildCover.jpg
+|   |   |   |   |   yx22x2.svg
+|   |   |   |   |   yx24x4.svg
+|   |   |   |   |   yx25x3.svg
+|   |   |   |   |   
+|   |   |   |   +---2018-proceedings
+|   |   |   |   |       altieri_mike_2019_2564881.pdf
+|   |   |   |   |       bach_stephan_2019_2563803.pdf
+|   |   |   |   |       bird_anja_2019_2563076.pdf
+|   |   |   |   |       eckhoff_malte_2019_2561190.pdf
+|   |   |   |   |       fath_julia_2019_2565860.pdf
+|   |   |   |   |       harterich_jorg_2019_2582874.pdf
+|   |   |   |   |       kinnear_george_2019_2565969.pdf
+|   |   |   |   |       klischat_cosima_2019_2577116.pdf
+|   |   |   |   |       mai_tobias_2019_2582427.pdf
+|   |   |   |   |       miriam_weigel_2019_2563656.pdf
+|   |   |   |   |       zerva_konstantina_2019_2585816.pdf
+|   |   |   |   |       
+|   |   |   |   \---es
+|   |   |   |           2019-STACK-Guide.pdf
+|   |   |   |           
+|   |   |   +---dev
+|   |   |   |       CASText2_lifecycle.md
+|   |   |   |       CAS_evaluatable.md
+|   |   |   |       Census.md
+|   |   |   |       Creating_an_input_type.md
+|   |   |   |       Extracting_test_questions.md
+|   |   |   |       Future_input_processing.md
+|   |   |   |       index.md
+|   |   |   |       Moodle_app.md
+|   |   |   |       Optimising_STACK_for_large_Maxima_variables.md
+|   |   |   |       Parser.md
+|   |   |   |       PHP-CAS.md
+|   |   |   |       Question_profiling.md
+|   |   |   |       question_profiling.wxmx
+|   |   |   |       Question_state_caching.md
+|   |   |   |       STACK_library.md
+|   |   |   |       Syntax_Future.md
+|   |   |   |       Updating_JSXGraph.md
+|   |   |   |       
+|   |   |   +---en
+|   |   |   |   |   index.md
+|   |   |   |   |   Site_map.md
+|   |   |   |   |   
+|   |   |   |   +---AbInitio
+|   |   |   |   |       Authoring_quick_start_1.md
+|   |   |   |   |       Authoring_quick_start_2.md
+|   |   |   |   |       Authoring_quick_start_3.md
+|   |   |   |   |       Authoring_quick_start_4.md
+|   |   |   |   |       Authoring_quick_start_5.md
+|   |   |   |   |       Authoring_quick_start_6.md
+|   |   |   |   |       Authoring_quick_start_7.md
+|   |   |   |   |       Authoring_quick_start_8.md
+|   |   |   |   |       Authoring_quick_start_9.md
+|   |   |   |   |       index.md
+|   |   |   |   |       
+|   |   |   |   +---About
+|   |   |   |   |       Credits.md
+|   |   |   |   |       index.md
+|   |   |   |   |       License.md
+|   |   |   |   |       Logo.md
+|   |   |   |   |       Publications.md
+|   |   |   |   |       The_philosophy_of_STACK.md
+|   |   |   |   |       
+|   |   |   |   +---Authoring
+|   |   |   |   |   |   Accessibility?.md
+|   |   |   |   |   |   Author_FAQ.md
+|   |   |   |   |   |   CASText.md
+|   |   |   |   |   |   Errors.md
+|   |   |   |   |   |   Error_trapping.md
+|   |   |   |   |   |   Expression_tree_display.md
+|   |   |   |   |   |   Feedback.md
+|   |   |   |   |   |   Inclusions.md
+|   |   |   |   |   |   index.md
+|   |   |   |   |   |   Languages.md
+|   |   |   |   |   |   Potential_response_trees.md
+|   |   |   |   |   |   Question_note.md
+|   |   |   |   |   |   Question_options.md
+|   |   |   |   |   |   Serving_out_data.md
+|   |   |   |   |   |   Tables.md
+|   |   |   |   |   |   Variables.md
+|   |   |   |   |   |   
+|   |   |   |   |   +---Answer_Tests
+|   |   |   |   |   |   |   Calculus.md
+|   |   |   |   |   |   |   Equivalence.md
+|   |   |   |   |   |   |   Form.md
+|   |   |   |   |   |   |   index.md
+|   |   |   |   |   |   |   Numerical.md
+|   |   |   |   |   |   |   Other.md
+|   |   |   |   |   |   |   Rule_based.md
+|   |   |   |   |   |   |   String.md
+|   |   |   |   |   |   |   
+|   |   |   |   |   |   \---Results
+|   |   |   |   |   |           AddConst.md
+|   |   |   |   |   |           AlgEquiv.md
+|   |   |   |   |   |           AlgEquivNouns.md
+|   |   |   |   |   |           Antidiff.md
+|   |   |   |   |   |           CasEqual.md
+|   |   |   |   |   |           CompSquare.md
+|   |   |   |   |   |           Diff.md
+|   |   |   |   |   |           EqualComAss.md
+|   |   |   |   |   |           EqualComAssRules.md
+|   |   |   |   |   |           Equiv.md
+|   |   |   |   |   |           EquivFirst.md
+|   |   |   |   |   |           Expanded.md
+|   |   |   |   |   |           FacForm.md
+|   |   |   |   |   |           GT.md
+|   |   |   |   |   |           GTE.md
+|   |   |   |   |   |           index.md
+|   |   |   |   |   |           Int.md
+|   |   |   |   |   |           Levenshtein.md
+|   |   |   |   |   |           LowestTerms.md
+|   |   |   |   |   |           NumAbsolute.md
+|   |   |   |   |   |           NumDecPlaces.md
+|   |   |   |   |   |           NumDecPlacesWrong.md
+|   |   |   |   |   |           NumRelative.md
+|   |   |   |   |   |           NumSigFigs.md
+|   |   |   |   |   |           PartFrac.md
+|   |   |   |   |   |           PropLogic.md
+|   |   |   |   |   |           SameType.md
+|   |   |   |   |   |           Sets.md
+|   |   |   |   |   |           SigFigsStrict.md
+|   |   |   |   |   |           SingleFrac.md
+|   |   |   |   |   |           SRegExp.md
+|   |   |   |   |   |           String.md
+|   |   |   |   |   |           StringSloppy.md
+|   |   |   |   |   |           SubstEquiv.md
+|   |   |   |   |   |           SysEquiv.md
+|   |   |   |   |   |           Units.md
+|   |   |   |   |   |           UnitsAbsolute.md
+|   |   |   |   |   |           UnitsRelative.md
+|   |   |   |   |   |           UnitsStrict.md
+|   |   |   |   |   |           UnitsStrictAbsolute.md
+|   |   |   |   |   |           UnitsStrictRelative.md
+|   |   |   |   |   |           Validator.md
+|   |   |   |   |   |           
+|   |   |   |   |   +---Inputs
+|   |   |   |   |   |       index.md
+|   |   |   |   |   |       Input_options.md
+|   |   |   |   |   |       Input_syntax.md
+|   |   |   |   |   |       Matrix_input.md
+|   |   |   |   |   |       Multiline_input.md
+|   |   |   |   |   |       Multiple_choice_input.md
+|   |   |   |   |   |       Multiple_choice_plots.md
+|   |   |   |   |   |       Numerical_input.md
+|   |   |   |   |   |       Text_input.md
+|   |   |   |   |   |       
+|   |   |   |   |   \---Question_blocks
+|   |   |   |   |           Conditional_blocks.md
+|   |   |   |   |           Dynamic_blocks.md
+|   |   |   |   |           Fact_sheets.md
+|   |   |   |   |           Iframe_blocks.md
+|   |   |   |   |           index.md
+|   |   |   |   |           Static_blocks.md
+|   |   |   |   |           System_blocks.md
+|   |   |   |   |           
+|   |   |   |   +---CAS
+|   |   |   |   |   |   Buggy_rules.md
+|   |   |   |   |   |   Complex_numbers.md
+|   |   |   |   |   |   Equations.md
+|   |   |   |   |   |   Geometry.md
+|   |   |   |   |   |   Greek_letters.md
+|   |   |   |   |   |   index.md
+|   |   |   |   |   |   Inequalities.md
+|   |   |   |   |   |   Matrix.md
+|   |   |   |   |   |   Maxima_background.md
+|   |   |   |   |   |   Maxima_plot.md
+|   |   |   |   |   |   Numbers.md
+|   |   |   |   |   |   Numerical_rounding.md
+|   |   |   |   |   |   Permutations.md
+|   |   |   |   |   |   Predicate_functions.md
+|   |   |   |   |   |   Random.md
+|   |   |   |   |   |   Real_Intervals.md
+|   |   |   |   |   |   Rules.md
+|   |   |   |   |   |   Simplification.md
+|   |   |   |   |   |   STACK-Maxima_sandbox.md
+|   |   |   |   |   |   Statistics.md
+|   |   |   |   |   |   Strings.md
+|   |   |   |   |   |   Subscripts.md
+|   |   |   |   |   |   Validator.md
+|   |   |   |   |   |   
+|   |   |   |   |   \---Library
+|   |   |   |   |       |   alphabetical.md
+|   |   |   |   |       |   index.md
+|   |   |   |   |       |   
+|   |   |   |   |       +---basen
+|   |   |   |   |       |   |   index.md
+|   |   |   |   |       |   |   
+|   |   |   |   |       |   \---binary
+|   |   |   |   |       |           index.md
+|   |   |   |   |       |           
+|   |   |   |   |       +---expressions
+|   |   |   |   |       |   |   index.md
+|   |   |   |   |       |   |   
+|   |   |   |   |       |   \---extraction
+|   |   |   |   |       |           index.md
+|   |   |   |   |       |           
+|   |   |   |   |       +---stackunits
+|   |   |   |   |       |       index.md
+|   |   |   |   |       |       
+|   |   |   |   |       \---strings
+|   |   |   |   |           |   index.md
+|   |   |   |   |           |   
+|   |   |   |   |           \---escapes
+|   |   |   |   |                   index.md
+|   |   |   |   |                   
+|   |   |   |   +---Developer
+|   |   |   |   |       Development_history.md
+|   |   |   |   |       Development_track.md
+|   |   |   |   |       Documentation.md
+|   |   |   |   |       Documentation_maximasrc.md
+|   |   |   |   |       Future_plans.md
+|   |   |   |   |       index.md
+|   |   |   |   |       Language_packs.md
+|   |   |   |   |       Maxima_packages.md
+|   |   |   |   |       Releasing.md
+|   |   |   |   |       Releasing_ILIAS.md
+|   |   |   |   |       Security_map.md
+|   |   |   |   |       STACK-JS.md
+|   |   |   |   |       STACK-Maxima-Library.md
+|   |   |   |   |       Syntax_numbers.md
+|   |   |   |   |       Unit_tests.md
+|   |   |   |   |       Website.md
+|   |   |   |   |       
+|   |   |   |   +---Installation
+|   |   |   |   |       API.md
+|   |   |   |   |       index.md
+|   |   |   |   |       LTI.md
+|   |   |   |   |       Mathjax.md
+|   |   |   |   |       Maxima_installation.md
+|   |   |   |   |       Migration.md
+|   |   |   |   |       Optimising_Maxima.md
+|   |   |   |   |       Release_notes_4_4_x.md
+|   |   |   |   |       STACK_versions.md
+|   |   |   |   |       Testing_installation.md
+|   |   |   |   |       
+|   |   |   |   +---Moodle
+|   |   |   |   |       Import_Export.md
+|   |   |   |   |       index.md
+|   |   |   |   |       Question_bank.md
+|   |   |   |   |       Semi-automatic_Marking.md
+|   |   |   |   |       
+|   |   |   |   +---Reference
+|   |   |   |   |       Actuarial.md
+|   |   |   |   |       HELM.md
+|   |   |   |   |       HTML.md
+|   |   |   |   |       index.md
+|   |   |   |   |       Latex.md
+|   |   |   |   |       
+|   |   |   |   +---Specialist_tools
+|   |   |   |   |   |   Graphics.md
+|   |   |   |   |   |   index.md
+|   |   |   |   |   |   Unsorted_multi_input.md
+|   |   |   |   |   |   
+|   |   |   |   |   +---Drag_and_drop
+|   |   |   |   |   |       Grid.md
+|   |   |   |   |   |       Grouping.md
+|   |   |   |   |   |       index.md
+|   |   |   |   |   |       Parsons.md
+|   |   |   |   |   |       Question_block.md
+|   |   |   |   |   |       Troubleshooting.md
+|   |   |   |   |   |       
+|   |   |   |   |   +---Equivalence_reasoning
+|   |   |   |   |   |       Equivalence_assessment.md
+|   |   |   |   |   |       Equivalence_input.md
+|   |   |   |   |   |       Equivalence_reasoning.md
+|   |   |   |   |   |       index.md
+|   |   |   |   |   |       
+|   |   |   |   |   +---GeoGebra
+|   |   |   |   |   |       GeoGebra.md
+|   |   |   |   |   |       index.md
+|   |   |   |   |   |       Question_block.md
+|   |   |   |   |   |       
+|   |   |   |   |   +---JSXGraph
+|   |   |   |   |   |       Advanced_JSXGraph.md
+|   |   |   |   |   |       Author_quickstart.md
+|   |   |   |   |   |       Basic_plots.md
+|   |   |   |   |   |       Binding.md
+|   |   |   |   |   |       Example_plots.md
+|   |   |   |   |   |       index.md
+|   |   |   |   |   |       Question_block.md
+|   |   |   |   |   |       Update_with_PRTs.md
+|   |   |   |   |   |       
+|   |   |   |   |   \---STACK-JS
+|   |   |   |   |           index.md
+|   |   |   |   |           STACK_MP_LITE.md
+|   |   |   |   |           Validation_state_listener.md
+|   |   |   |   |           
+|   |   |   |   +---STACK_question_admin
+|   |   |   |   |   |   Advanced_reporting.md
+|   |   |   |   |   |   Authoring_workflow.md
+|   |   |   |   |   |   Bulk_testing.md
+|   |   |   |   |   |   Deploying.md
+|   |   |   |   |   |   Deploying_matched_variants.md
+|   |   |   |   |   |   Deploying_systematically.md
+|   |   |   |   |   |   Fixing_broken_questions.md
+|   |   |   |   |   |   Future_proof.md
+|   |   |   |   |   |   index.md
+|   |   |   |   |   |   Notes_about_performance.md
+|   |   |   |   |   |   Reporting.md
+|   |   |   |   |   |   Testing.md
+|   |   |   |   |   |   Testing_questions_on_other_sites.md
+|   |   |   |   |   |   Tidy_Tool.md
+|   |   |   |   |   |   
+|   |   |   |   |   \---Library
+|   |   |   |   |           Algebra_refresher.md
+|   |   |   |   |           HELM.md
+|   |   |   |   |           index.md
+|   |   |   |   |           
+|   |   |   |   +---Students
+|   |   |   |   |       Accessibility.md
+|   |   |   |   |       Answer_assessment.md
+|   |   |   |   |       Answer_input.md
+|   |   |   |   |       Equivalence_reasoning.md
+|   |   |   |   |       FAQ.md
+|   |   |   |   |       index.md
+|   |   |   |   |       
+|   |   |   |   \---Topics
+|   |   |   |       |   Curve_sketching.md
+|   |   |   |       |   Discrete_mathematics.md
+|   |   |   |       |   index.md
+|   |   |   |       |   Levenshtein_distance.md
+|   |   |   |       |   Propositional_Logic.md
+|   |   |   |       |   Statistics.md
+|   |   |   |       |   Units.md
+|   |   |   |       |   Vector_Calculus.md
+|   |   |   |       |   
+|   |   |   |       +---Chemistry
+|   |   |   |       |       index.md
+|   |   |   |       |       
+|   |   |   |       +---Differential_equations
+|   |   |   |       |       Assessing_Responses.md
+|   |   |   |       |       index.md
+|   |   |   |       |       Notation.md
+|   |   |   |       |       Question_Variables.md
+|   |   |   |       |       
+|   |   |   |       +---Linear_algebra
+|   |   |   |       |       Answer_tests.md
+|   |   |   |       |       Eigen.md
+|   |   |   |       |       index.md
+|   |   |   |       |       Linear_algebra_core.md
+|   |   |   |       |       Matrix_factorisation.md
+|   |   |   |       |       Matrix_library.md
+|   |   |   |       |       Random_Matrices.md
+|   |   |   |       |       Vectors.md
+|   |   |   |       |       Vector_geometry.md
+|   |   |   |       |       Vector_space.md
+|   |   |   |       |       
+|   |   |   |       \---Proof
+|   |   |   |               index.md
+|   |   |   |               Proof_assessment.md
+|   |   |   |               Proof_CAS_library.md
+|   |   |   |               Proof_Parsons_workflow.md
+|   |   |   |               Proof_samples.md
+|   |   |   |               Proof_styles.md
+|   |   |   |               
+|   |   |   +---ja
+|   |   |   |   |   index.md
+|   |   |   |   |   
+|   |   |   |   \---AbInitio
+|   |   |   |           Authoring_quick_start_1.md
+|   |   |   |           Authoring_quick_start_2.md
+|   |   |   |           Authoring_quick_start_3.md
+|   |   |   |           Authoring_quick_start_4.md
+|   |   |   |           Authoring_quick_start_5.md
+|   |   |   |           Authoring_quick_start_6.md
+|   |   |   |           Authoring_quick_start_7.md
+|   |   |   |           Authoring_quick_start_8.md
+|   |   |   |           index.md
+|   |   |   |           
+|   |   |   \---static
+|   |   |           2019-STACK-Guide.pdf
+|   |   |           Barnard.pdf
+|   |   |           Barnard.tex
+|   |   |           final0502-calc-ref-ukmlsc.pdf
+|   |   |           minimal-maxima.pdf
+|   |   |           
+|   |   +---jmeter
+|   |   |       stack101.jmx
+|   |   |       user-example.properties
+|   |   |       
+|   |   +---lang
+|   |   |   |   multilang.php
+|   |   |   |   
+|   |   |   \---en
+|   |   |           qtype_stack.php
+|   |   |           
+|   |   +---mobile
+|   |   |       stack.html
+|   |   |       stack.js
+|   |   |       stack.min.js
+|   |   |       
+|   |   +---pix
+|   |   |       findforgraph1.png
+|   |   |       icon.png
+|   |   |       icon.svg
+|   |   |       loading_small.gif
+|   |   |       logo-long.png
+|   |   |       logo-sm.png
+|   |   |       logo-trans.png
+|   |   |       x.png
+|   |   |       
+|   |   +---samplequestions
+|   |   |   |   COPYING.txt
+|   |   |   |   JSXGraph-behat.xml
+|   |   |   |   STACK-demo.mbz
+|   |   |   |   STACK-reveal-test.mbz
+|   |   |   |   STACK-syntax-quiz.mbz
+|   |   |   |   variant_matching.mbz
+|   |   |   |   
+|   |   |   +---importtest
+|   |   |   |   +---Course1
+|   |   |   |   |   \---top
+|   |   |   |   |       \---CR_Diff_01
+|   |   |   |   |               CR-Diff-01-basic-1-b.xml
+|   |   |   |   |               CR-Diff-01-basic-1-e.xml
+|   |   |   |   |               CR-Diff-01-basic-1-f.xml
+|   |   |   |   |               CR-Diff-01-basic-1-h.xml
+|   |   |   |   |               CR-Diff-01-basic-1-j.xml
+|   |   |   |   |               CR-Diff-01-basic-1-k.xml
+|   |   |   |   |               CR-Diff-01-basic-2-b.xml
+|   |   |   |   |               CR-Diff-01-basic-2-d.xml
+|   |   |   |   |               CR-Diff-01-basic-2-f.xml
+|   |   |   |   |               CR-Diff-01-basic-2-g.xml
+|   |   |   |   |               CR-Diff-01-basic-2-h.xml
+|   |   |   |   |               CR-Diff-01-basic-2-i.xml
+|   |   |   |   |               CR-Diff-01-basic-3-b.xml
+|   |   |   |   |               CR-Diff-01-basic-3-c.xml
+|   |   |   |   |               CR-Diff-01-basic-3-d.xml
+|   |   |   |   |               CR-Diff-01-basic-3-e.xml
+|   |   |   |   |               CR-Diff-01-basic-4-b.xml
+|   |   |   |   |               CR-Diff-01-basic-4-c.xml
+|   |   |   |   |               gitsync_category.xml
+|   |   |   |   |               
+|   |   |   |   \---Course1_quiz_quiz-1
+|   |   |   |       |   quiz-1_quiz.json
+|   |   |   |       |   quiz-no-sections_quiz.json
+|   |   |   |       |   quiz-require-prev_quiz.json
+|   |   |   |       |   
+|   |   |   |       \---top
+|   |   |   |           \---Default-for-Quiz-1
+|   |   |   |               |   Algebraic-input-(with-simplification).xml
+|   |   |   |               |   Checkbox-(no-body-LaTeX).xml
+|   |   |   |               |   Dropdown-(shuffle).xml
+|   |   |   |               |   Equiv-input-test-(compact).xml
+|   |   |   |               |   gitsync_category.xml
+|   |   |   |               |   Matrix.xml
+|   |   |   |               |   Radio-(compact).xml
+|   |   |   |               |   Single-char.xml
+|   |   |   |               |   
+|   |   |   |               \---Sub-for-quiz-1
+|   |   |   |                       Algebraic-input.xml
+|   |   |   |                       Checkbox.xml
+|   |   |   |                       gitsync_category.xml
+|   |   |   |                       
+|   |   |   +---stack-js
+|   |   |   |       stack-js-issue-specific-example-938.xml
+|   |   |   |       
+|   |   |   +---stackdemo
+|   |   |   |       10_integration_with_feedback.xml
+|   |   |   |       20_multiple_properties.xml
+|   |   |   |       30_units_and_lab_data.xml
+|   |   |   |       35_odd_even_functions.xml
+|   |   |   |       40-JSX_graph_interactive.xml
+|   |   |   |       50_equivelence_reasoning.xml
+|   |   |   |       60_logic.xml
+|   |   |   |       70_Drag_drop_Using_images.xml
+|   |   |   |       90-Parsons-Proof-odd-iff-square-odd.xml
+|   |   |   |       readme.md
+|   |   |   |       
+|   |   |   \---stacklibrary
+|   |   |       \---HELM
+|   |   |           +---Course_quiz_10_4-de-moivre’s-theorem
+|   |   |           |   |   10_4-de-moivre’s-theorem_quiz.json
+|   |   |           |   |   
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-10-4
+|   |   |           |               10-4-1-1-De-Moivre’s-theorem.xml
+|   |   |           |               10-4-2-1-Finding-the-roots-of-complex-numbers.xml
+|   |   |           |               10-4-2-2-Root-finding.xml
+|   |   |           |               10-4-2-3-Roots-of-a-complex-number.xml
+|   |   |           |               10-4-3-1-Complex-roots-of-a-simple-quartic.xml
+|   |   |           |               gitsync_category.xml
+|   |   |           |               
+|   |   |           +---Course_quiz_12_3-the-newton–raphson-method
+|   |   |           |   |   12_3-the-newton–raphson-method_quiz.json
+|   |   |           |   |   
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-12-3
+|   |   |           |               12-3-1-1-The-Newton-Raphson-Method.xml
+|   |   |           |               12-3-1-2-Classify-roots.xml
+|   |   |           |               12-3-2-1-Finding-the-roots-of-the-equation-f(x)-=-0.xml
+|   |   |           |               12-3-2-2-One-iteration-of-Newton-Raphson.xml
+|   |   |           |               12-3-2-3-Find-root-to-2-d-p-.xml
+|   |   |           |               12-3-3-1-Engineering-Example.xml
+|   |   |           |               12-3-4-1-Exercise-1.xml
+|   |   |           |               12-3-4-2-Exercise-2.xml
+|   |   |           |               gitsync_category.xml
+|   |   |           |               
+|   |   |           +---Course_quiz_23_6-the-complex-form
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-23-6
+|   |   |           |               23-6-4-1-Parseval’s-theorem.xml
+|   |   |           |               23-6-4-2-Parseval’s-theorem-in-FS-coeffs.xml
+|   |   |           |               23-6-4-3-Parseval’s-theorem-example.xml
+|   |   |           |               
+|   |   |           +---Course_quiz_25_2-applications-of-pdes
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-25-2
+|   |   |           |               25-2-4-Laplace’s-equation.xml
+|   |   |           |               
+|   |   |           +---Course_quiz_29_3-integral-vector-theorems
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-29-3
+|   |   |           |               29-3-2-1-Gauss’-Theorem.xml
+|   |   |           |               29-3-2-2-Gauss’-theorem-engineering-examples.xml
+|   |   |           |               29-3-3-1-Green’s-Identities-(3D).xml
+|   |   |           |               29-3-3-2-Green’s-Theorem-in-the-Plane.xml
+|   |   |           |               
+|   |   |           +---Course_quiz_35_4-total-probability-and-bayes’-theorem
+|   |   |           |   |   35_4-total-probability-and-bayes’-theorem_quiz.json
+|   |   |           |   |   
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-35-4
+|   |   |           |               35-4-1-1-The-theorem-of-total-probability.xml
+|   |   |           |               35-4-2-1-Bayes-theorem.xml
+|   |   |           |               35-4-3-1-Special-cases.xml
+|   |   |           |               35-4-3-2-Bayes-theorem-special-case.xml
+|   |   |           |               35-4-3-3-Jobs.xml
+|   |   |           |               35-4-4-1-Four-coin-tosses.xml
+|   |   |           |               35-4-4-2-Duration-of-employment.xml
+|   |   |           |               35-4-4-3-Indepent-events-and-complements.xml
+|   |   |           |               35-4-4-4-Independent-vs-mutually-exclusive-events.xml
+|   |   |           |               35-4-4-5-Current-flow-through-relays-(NOT-IN-QUIZ).xml
+|   |   |           |               35-4-4-6-Defective-items-in-a-batch-(NOT-IN-QUIZ).xml
+|   |   |           |               35-4-4-7-Conditional-outcomes-in-a-coin-toss.xml
+|   |   |           |               35-4-4-8-Defective-items-from-a-production-line.xml
+|   |   |           |               gitsync_category.xml
+|   |   |           |               
+|   |   |           +---Course_quiz_43_2-correlation
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-43-2
+|   |   |           |               43-2-04-Significance-of-Pearson’s-r.xml
+|   |   |           |               43-2-07-Spearman’s-coefficient-of-correlation.xml
+|   |   |           |               43-2-08-The-calculation-of-Spearman’s-R.xml
+|   |   |           |               
+|   |   |           +---Course_quiz_6_4-the-logarithmic-function
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-6-4
+|   |   |           |               6-4-2-5-Solve-ae^{2x}---be^x-+-c-=-0.xml
+|   |   |           |               
+|   |   |           +---Course_quiz_7_4-the-inverse-of-a-matrix
+|   |   |           |   \---top
+|   |   |           |       \---Default-for-7-4
+|   |   |           |               7-4-2-2-Key-point---The-inverse-of-a-2-x-2-matrix.xml
+|   |   |           |               7-4-3-2-Inverse-of-3-x-3-matrix---Gauss-elimination-method.xml
+|   |   |           |               7-4-4-1-The-inverse-of-a-3x3-matrix---determinant-method.xml
+|   |   |           |               7-4-4-2-Inverse-of-a-3-x-3-matrix---determinant-method.xml
+|   |   |           |               7-4-5-2-(not-in-quiz)-Gauss-elimination-method---inverse-of-3-x-3-matrix.xml
+|   |   |           |               7-4-5-3-(not-in-quiz)-Determinant-method---Inverse-of-a-3-x-3-matrix.xml
+|   |   |           |               
+|   |   |           \---Course_quiz_8_1-solution-by-cramer-s-rule
+|   |   |               \---top
+|   |   |                   \---Default-for-8-1
+|   |   |                           8-1-3-1-Engineering-Example-1---Stresses-and-strains-on-a-section-of-material.xml
+|   |   |                           
+|   |   +---site_overrides
+|   |   |   |   main.html
+|   |   |   |   
+|   |   |   +---img
+|   |   |   |       favicon.ico
+|   |   |   |       img_sm.png
+|   |   |   |       
+|   |   |   \---partials
+|   |   |           logo.html
+|   |   |           nav-item.html
+|   |   |           
+|   |   +---stack
+|   |   |   |   bulktester.class.php
+|   |   |   |   options.class.php
+|   |   |   |   potentialresponsetreestate.class.php
+|   |   |   |   prt.class.php
+|   |   |   |   prt.evaluatable.class.php
+|   |   |   |   questionlibrary.class.php
+|   |   |   |   questionreport.class.php
+|   |   |   |   questiontest.php
+|   |   |   |   questiontestresult.php
+|   |   |   |   utils.class.php
+|   |   |   |   
+|   |   |   +---answertest
+|   |   |   |       anstest.class.php
+|   |   |   |       at_general_cas.class.php
+|   |   |   |       at_general_cas_preprepare.class.php
+|   |   |   |       controller.class.php
+|   |   |   |       
+|   |   |   +---cas
+|   |   |   |   |   ast.container.class.php
+|   |   |   |   |   ast.container.conditional.class.php
+|   |   |   |   |   ast.container.silent.class.php
+|   |   |   |   |   base-identifier-map.json
+|   |   |   |   |   caserror.class.php
+|   |   |   |   |   cassecurity.class.php
+|   |   |   |   |   cassession2.class.php
+|   |   |   |   |   casstring.units.class.php
+|   |   |   |   |   connector.class.php
+|   |   |   |   |   connector.dbcache.class.php
+|   |   |   |   |   connector.healthcheck.class.php
+|   |   |   |   |   connector.interface.php
+|   |   |   |   |   connector.linux.class.php
+|   |   |   |   |   connector.server.class.php
+|   |   |   |   |   connector.server_proxy.class.php
+|   |   |   |   |   connector.windows.class.php
+|   |   |   |   |   connectorhelper.class.php
+|   |   |   |   |   evaluatable_object.interfaces.php
+|   |   |   |   |   installhelper.class.php
+|   |   |   |   |   keyval.class.php
+|   |   |   |   |   secure_loader.class.php
+|   |   |   |   |   security-map.json
+|   |   |   |   |   
+|   |   |   |   +---castext2
+|   |   |   |   |   |   block.factory.php
+|   |   |   |   |   |   block.interface.php
+|   |   |   |   |   |   castext2_evaluatable.class.php
+|   |   |   |   |   |   castext2_placeholder_holder.class.php
+|   |   |   |   |   |   castext2_static_replacer.class.php
+|   |   |   |   |   |   CTP_classes.php
+|   |   |   |   |   |   processor.class.php
+|   |   |   |   |   |   README
+|   |   |   |   |   |   utils.php
+|   |   |   |   |   |   
+|   |   |   |   |   +---autogen
+|   |   |   |   |   |       parser-grammar.pegjs
+|   |   |   |   |   |       parser.mbstring.php
+|   |   |   |   |   |       
+|   |   |   |   |   \---blocks
+|   |   |   |   |           adapt.block.php
+|   |   |   |   |           adaptauto.block.php
+|   |   |   |   |           adaptbutton.block.php
+|   |   |   |   |           body.block.php
+|   |   |   |   |           castext.block.php
+|   |   |   |   |           comment.block.php
+|   |   |   |   |           commonstring.block.php
+|   |   |   |   |           cors.block.php
+|   |   |   |   |           debug.block.php
+|   |   |   |   |           define.block.php
+|   |   |   |   |           demarkdown.block.php
+|   |   |   |   |           demoodle.block.php
+|   |   |   |   |           entityescape.block.php
+|   |   |   |   |           escape.block.php
+|   |   |   |   |           foreach.block.php
+|   |   |   |   |           geogebra.block.php
+|   |   |   |   |           hint.block.php
+|   |   |   |   |           htmlformat.block.php
+|   |   |   |   |           if.block.php
+|   |   |   |   |           iframe.block.php
+|   |   |   |   |           include.block.php
+|   |   |   |   |           ioblock.specialblock.php
+|   |   |   |   |           javascript.block.php
+|   |   |   |   |           jsstring.block.php
+|   |   |   |   |           jsxgraph.block.php
+|   |   |   |   |           lang.block.php
+|   |   |   |   |           latex.block.php
+|   |   |   |   |           markdownformat.block.php
+|   |   |   |   |           moodleformat.block.php
+|   |   |   |   |           parsons.block.php
+|   |   |   |   |           pfs.specialblock.php
+|   |   |   |   |           placeholder.specialblock.php
+|   |   |   |   |           quid.block.php
+|   |   |   |   |           raw.block.php
+|   |   |   |   |           raw.specialblock.php
+|   |   |   |   |           reveal.block.php
+|   |   |   |   |           root.specialblock.php
+|   |   |   |   |           script.block.php
+|   |   |   |   |           smlt.specialblock.php
+|   |   |   |   |           stack_translate.specialblock.php
+|   |   |   |   |           style.block.php
+|   |   |   |   |           template.block.php
+|   |   |   |   |           textdownload.block.php
+|   |   |   |   |           todo.block.php
+|   |   |   |   |           unknown.block.php
+|   |   |   |   |           
+|   |   |   |   \---parsingrules
+|   |   |   |           001_fix_call_of_a_group_or_function.filter.php
+|   |   |   |           002_log_candy.filter.php
+|   |   |   |           003_no_dot_dot.filter.php
+|   |   |   |           005_i_is_never_a_function.filter.php
+|   |   |   |           022_trig_replace_synonyms.filter.php
+|   |   |   |           025_no_trig_power.filter.php
+|   |   |   |           030_no_trig_space.filter.php
+|   |   |   |           031_no_trig_brackets.filter.php
+|   |   |   |           033_no_extra_evaluation.filter.php
+|   |   |   |           050_no_chained_inequalities.filter.php
+|   |   |   |           090_special_forbidden_characters.filter.php
+|   |   |   |           101_no_floats.filter.php
+|   |   |   |           102_no_strings.filter.php
+|   |   |   |           103_no_lists.filter.php
+|   |   |   |           104_no_sets.filter.php
+|   |   |   |           105_no_grouppings.filter.php
+|   |   |   |           106_no_control_flow.filter.php
+|   |   |   |           115_lexer_post_process_stackbasen.filter.php
+|   |   |   |           120_no_arc.filter.php
+|   |   |   |           150_replace_unicode_letters.filter.php
+|   |   |   |           180_char_based_superscripts.filter.php
+|   |   |   |           201_sig_figs_validation.filter.php
+|   |   |   |           202_decimal_places_validation.filter.php
+|   |   |   |           210_x_used_as_multiplication.filter.php
+|   |   |   |           402_split_prefix_from_common_function_name.filter.php
+|   |   |   |           403_split_at_number_letter_boundary.filter.php
+|   |   |   |           404_split_at_number_letter_number_boundary.filter.php
+|   |   |   |           406_split_implied_variable_names.filter.php
+|   |   |   |           407_split_unknown_functions.filter.php
+|   |   |   |           410_single_char_vars.filter.php
+|   |   |   |           420_consolidate_subscripts.filter.php
+|   |   |   |           442_split_all_functions.filter.php
+|   |   |   |           450_split_floats.filter.php
+|   |   |   |           502_replace_pm.filter.php
+|   |   |   |           504_insert_tuples_for_groups.php
+|   |   |   |           505_no_evaluation_groups.filter.php
+|   |   |   |           520_no_equality_with_logic.filter.php
+|   |   |   |           541_no_unknown_functions.filter.php
+|   |   |   |           542_no_functions_at_all.filter.php
+|   |   |   |           545_wrong_decimal_separator_validation.filter.php
+|   |   |   |           601_castext.filter.php
+|   |   |   |           602_castext_simplifier.filter.php
+|   |   |   |           610_castext_static_string_extractor.filter.php
+|   |   |   |           650_string_protect_slash.filter.php
+|   |   |   |           680_gcl_sconcat.filter.php
+|   |   |   |           801_singleton_numeric.filter.php
+|   |   |   |           802_singleton_units.filter.php
+|   |   |   |           901_remove_comments.filter.php
+|   |   |   |           908_parsons_decode_state_for_display.filter.php
+|   |   |   |           909_parsons_get_final_submission.filter.php
+|   |   |   |           910_inert_float_for_display.filter.php
+|   |   |   |           912_inert_string_for_display.filter.php
+|   |   |   |           990_no_fixing_spaces.filter.php
+|   |   |   |           991_no_fixing_stars.filter.php
+|   |   |   |           995_ev_modification.filter.php
+|   |   |   |           996_call_modification.filter.php
+|   |   |   |           997_string_security.filter.php
+|   |   |   |           998_security.filter.php
+|   |   |   |           999_strict.filter.php
+|   |   |   |           filter.interface.php
+|   |   |   |           parsingrule.factory.php
+|   |   |   |           pipeline.class.php
+|   |   |   |           README
+|   |   |   |           
+|   |   |   +---graphlayout
+|   |   |   |       displayexamples.php
+|   |   |   |       displayprts.php
+|   |   |   |       graph.php
+|   |   |   |       graphclump.php
+|   |   |   |       graphnode.php
+|   |   |   |       prtnode.php
+|   |   |   |       svgrenderer.php
+|   |   |   |       textrenderer.php
+|   |   |   |       
+|   |   |   +---input
+|   |   |   |   |   factory.class.php
+|   |   |   |   |   inputbase.class.php
+|   |   |   |   |   inputstate.class.php
+|   |   |   |   |   
+|   |   |   |   +---algebraic
+|   |   |   |   |       algebraic.class.php
+|   |   |   |   |       
+|   |   |   |   +---boolean
+|   |   |   |   |       boolean.class.php
+|   |   |   |   |       
+|   |   |   |   +---checkbox
+|   |   |   |   |       checkbox.class.php
+|   |   |   |   |       
+|   |   |   |   +---dropdown
+|   |   |   |   |       dropdown.class.php
+|   |   |   |   |       
+|   |   |   |   +---equiv
+|   |   |   |   |       equiv.class.php
+|   |   |   |   |       
+|   |   |   |   +---geogebra
+|   |   |   |   |       geogebra.class.php
+|   |   |   |   |       
+|   |   |   |   +---json
+|   |   |   |   |       json.class.php
+|   |   |   |   |       
+|   |   |   |   +---matrix
+|   |   |   |   |       matrix.class.php
+|   |   |   |   |       
+|   |   |   |   +---notes
+|   |   |   |   |       notes.class.php
+|   |   |   |   |       
+|   |   |   |   +---numerical
+|   |   |   |   |       numerical.class.php
+|   |   |   |   |       
+|   |   |   |   +---parsons
+|   |   |   |   |       parsons.class.php
+|   |   |   |   |       
+|   |   |   |   +---radio
+|   |   |   |   |       radio.class.php
+|   |   |   |   |       
+|   |   |   |   +---singlechar
+|   |   |   |   |       singlechar.class.php
+|   |   |   |   |       
+|   |   |   |   +---string
+|   |   |   |   |       string.class.php
+|   |   |   |   |       
+|   |   |   |   +---textarea
+|   |   |   |   |       textarea.class.php
+|   |   |   |   |       
+|   |   |   |   +---units
+|   |   |   |   |       units.class.php
+|   |   |   |   |       
+|   |   |   |   \---varmatrix
+|   |   |   |           varmatrix.class.php
+|   |   |   |           
+|   |   |   +---mathsoutput
+|   |   |   |       fact_sheets.class.php
+|   |   |   |       mathsoutput.class.php
+|   |   |   |       mathsoutputapi.class.php
+|   |   |   |       mathsoutputbase.class.php
+|   |   |   |       mathsoutputfilterbase.class.php
+|   |   |   |       mathsoutputmathjax.class.php
+|   |   |   |       mathsoutputmaths.class.php
+|   |   |   |       mathsoutputoumaths.class.php
+|   |   |   |       mathsoutputtex.class.php
+|   |   |   |       
+|   |   |   +---maxima
+|   |   |   |   |   assessment.mac
+|   |   |   |   |   assessment.texi
+|   |   |   |   |   elementary.mac
+|   |   |   |   |   errortostring.lisp
+|   |   |   |   |   expandfeedback.mac
+|   |   |   |   |   experimental.mac
+|   |   |   |   |   fboundp.mac
+|   |   |   |   |   geometry.mac
+|   |   |   |   |   inequalities.mac
+|   |   |   |   |   intervals.mac
+|   |   |   |   |   Ksimplifier.lisp
+|   |   |   |   |   linearalgebra_core.mac
+|   |   |   |   |   linearalgebra_core_test.mac
+|   |   |   |   |   local.mac
+|   |   |   |   |   maximasrccompiled.mac
+|   |   |   |   |   maximasrccompiled_tests.mac
+|   |   |   |   |   noun_arith.lisp
+|   |   |   |   |   noun_simp.mac
+|   |   |   |   |   numericaltest.mac
+|   |   |   |   |   print-comma.lisp
+|   |   |   |   |   proof.mac
+|   |   |   |   |   rtest_assessment_simpboth.mac
+|   |   |   |   |   rtest_assessment_simpfalse.mac
+|   |   |   |   |   rtest_assessment_simptrue.mac
+|   |   |   |   |   rtest_experimental.mac
+|   |   |   |   |   rtest_inequalities.mac
+|   |   |   |   |   rtest_intervals.mac
+|   |   |   |   |   rtest_noun_simp.mac
+|   |   |   |   |   sandbox.wxm
+|   |   |   |   |   stack44.mac
+|   |   |   |   |   stacklocallinux.mac
+|   |   |   |   |   stacklocalwin.mac
+|   |   |   |   |   stackmaxima.mac
+|   |   |   |   |   stackreporting.mac
+|   |   |   |   |   stackstrings.mac
+|   |   |   |   |   stacktex.lisp
+|   |   |   |   |   stacktex40.lisp
+|   |   |   |   |   stackunits.mac
+|   |   |   |   |   stack_logic.lisp
+|   |   |   |   |   s_test_case.lisp
+|   |   |   |   |   s_test_case.mac
+|   |   |   |   |   testPlotLinux.wxm
+|   |   |   |   |   testPlotWin.wxm
+|   |   |   |   |   to_poly_solve_extra_5.38.1.lisp
+|   |   |   |   |   trigrat.lisp
+|   |   |   |   |   unittests_load.mac
+|   |   |   |   |   utils.mac
+|   |   |   |   |   validator.mac
+|   |   |   |   |   
+|   |   |   |   \---contrib
+|   |   |   |       |   builder.mac
+|   |   |   |       |   chemistry.mac
+|   |   |   |       |   eigenlib.mac
+|   |   |   |       |   eigenlib_test.mac
+|   |   |   |       |   linearalgebra_contrib.mac
+|   |   |   |       |   matchlib.mac
+|   |   |   |       |   matrix.mac
+|   |   |   |       |   matrixfactorizations.mac
+|   |   |   |       |   matrixfactorizations_test.mac
+|   |   |   |       |   matrix_test.mac
+|   |   |   |       |   prooflib.mac
+|   |   |   |       |   prooflib_test.mac
+|   |   |   |       |   rand_matrix.mac
+|   |   |   |       |   rand_matrix_test.mac
+|   |   |   |       |   validators.mac
+|   |   |   |       |   validators_test.mac
+|   |   |   |       |   vectorcalculus.mac
+|   |   |   |       |   vectorcalculus_test.mac
+|   |   |   |       |   vectorgeometry.mac
+|   |   |   |       |   vectorgeometry_test.mac
+|   |   |   |       |   vectorspaces.mac
+|   |   |   |       |   vectorspaces_test.mac
+|   |   |   |       |   
+|   |   |   |       \---proofsamples
+|   |   |   |               analysis-sequence-sum-diverge.mac
+|   |   |   |               harmonic-series.mac
+|   |   |   |               index.md
+|   |   |   |               inf-primes.mac
+|   |   |   |               irrational-power-irrational.mac
+|   |   |   |               log-two-three-irrational.mac
+|   |   |   |               odd-squaredodd.mac
+|   |   |   |               root-two-irrational.mac
+|   |   |   |               set-equality.mac
+|   |   |   |               sum-cube-int.mac
+|   |   |   |               sum-odd-int.mac
+|   |   |   |               
+|   |   |   +---maximaparser
+|   |   |   |   |   basen.lexer.class.php
+|   |   |   |   |   corrective_parser.php
+|   |   |   |   |   decimal.comma.lexer.class.php
+|   |   |   |   |   error.interpreter.class.php
+|   |   |   |   |   lexer.base.class.php
+|   |   |   |   |   MP_classes.php
+|   |   |   |   |   parser.common.classes.php
+|   |   |   |   |   parser.options.class.php
+|   |   |   |   |   preparser.class.php
+|   |   |   |   |   utils.php
+|   |   |   |   |   
+|   |   |   |   +---autogen
+|   |   |   |   |       gen.js
+|   |   |   |   |       lalr-equivline.json
+|   |   |   |   |       lalr-root.json
+|   |   |   |   |       notes.txt
+|   |   |   |   |       parser-equivline.php
+|   |   |   |   |       parser-grammar.pegjs
+|   |   |   |   |       parser-root.php
+|   |   |   |   |       parser.mbstring.php
+|   |   |   |   |       
+|   |   |   |   \---unicode
+|   |   |   |           letters-stack.json
+|   |   |   |           subscript-stack.json
+|   |   |   |           superscript-stack.json
+|   |   |   |           symbols-stack.json
+|   |   |   |           
+|   |   |   \---maximasrc
+|   |   |       |   NOTES.txt
+|   |   |       |   
+|   |   |       +---basen
+|   |   |       |   |   description.md
+|   |   |       |   |   sbasen_char_to_digit.mac
+|   |   |       |   |   sbasen_convert.mac
+|   |   |       |   |   sbasen_create.mac
+|   |   |       |   |   sbasen_texput.mac
+|   |   |       |   |   sbasen_validate.mac
+|   |   |       |   |   stackbasen.mac
+|   |   |       |   |   
+|   |   |       |   \---binary
+|   |   |       |           description.md
+|   |   |       |           sbasen_binary_convert.mac
+|   |   |       |           sbasen_binary_logic.mac
+|   |   |       |           sbasen_binary_padding.mac
+|   |   |       |           sbasen_bitwidth.mac
+|   |   |       |           sbasen_is_cs.mac
+|   |   |       |           
+|   |   |       +---expressions
+|   |   |       |   |   description.md
+|   |   |       |   |   
+|   |   |       |   \---extraction
+|   |   |       |           description.md
+|   |   |       |           extract_matching_parts.mac
+|   |   |       |           
+|   |   |       +---stackunits
+|   |   |       |       stackunits_NULLNUM_NULLUNITS.mac
+|   |   |       |       stack_unit_si_to_si_base.mac
+|   |   |       |       
+|   |   |       \---strings
+|   |   |           \---escapes
+|   |   |                   str_to_html.mac
+|   |   |                   str_to_html_char.mac
+|   |   |                   str_to_js.mac
+|   |   |                   str_to_js_char.mac
+|   |   |                   
+|   |   +---templates
+|   |   |       questionbulktest.mustache
+|   |   |       questionfolder.mustache
+|   |   |       questionlibrary.mustache
+|   |   |       questionreport.mustache
+|   |   |       
+|   |   \---tests
+|   |       |   answertest_general_cas_test.php
+|   |       |   answertest_general_fixtures_test.php
+|   |       |   api_controller_test.php
+|   |       |   api_language_test.php
+|   |       |   api_stackquestionloader_test.php
+|   |       |   api_tests_stateful_test.php
+|   |       |   ast_container_test.php
+|   |       |   ast_filter_000_099_common_core_auto_generated_test.php
+|   |       |   ast_filter_001_fix_call_of_a_group_or_function_auto_generated_test.php
+|   |       |   ast_filter_002_log_candy_auto_generated_test.php
+|   |       |   ast_filter_003_no_dot_dot_auto_generated_test.php
+|   |       |   ast_filter_005_i_is_never_a_function_auto_generated_test.php
+|   |       |   ast_filter_022_trig_replace_synonyms_auto_generated_test.php
+|   |       |   ast_filter_025_no_trig_power_auto_generated_test.php
+|   |       |   ast_filter_030_no_trig_space_auto_generated_test.php
+|   |       |   ast_filter_031_no_trig_brackets_auto_generated_test.php
+|   |       |   ast_filter_033_no_extra_evaluation_auto_generated_test.php
+|   |       |   ast_filter_050_no_chained_inequalities_auto_generated_test.php
+|   |       |   ast_filter_090_special_forbidden_characters_auto_generated_test.php
+|   |       |   ast_filter_101_no_floats_auto_generated_test.php
+|   |       |   ast_filter_102_no_strings_auto_generated_test.php
+|   |       |   ast_filter_103_no_lists_auto_generated_test.php
+|   |       |   ast_filter_104_no_sets_auto_generated_test.php
+|   |       |   ast_filter_105_no_grouppings_auto_generated_test.php
+|   |       |   ast_filter_106_no_control_flow_auto_generated_test.php
+|   |       |   ast_filter_115_lexer_post_process_stackbasen_auto_generated_test.php
+|   |       |   ast_filter_120_no_arc_auto_generated_test.php
+|   |       |   ast_filter_150_replace_unicode_letters_auto_generated_test.php
+|   |       |   ast_filter_180_char_based_superscripts_auto_generated_test.php
+|   |       |   ast_filter_201_sig_figs_validation_auto_generated_test.php
+|   |       |   ast_filter_202_decimal_places_validation_auto_generated_test.php
+|   |       |   ast_filter_210_x_used_as_multiplication_auto_generated_test.php
+|   |       |   ast_filter_402_split_prefix_from_common_function_name_auto_generated_test.php
+|   |       |   ast_filter_403_split_at_number_letter_boundary_auto_generated_test.php
+|   |       |   ast_filter_404_split_at_number_letter_number_boundary_auto_generated_test.php
+|   |       |   ast_filter_406_split_implied_variable_names_auto_generated_test.php
+|   |       |   ast_filter_407_split_unknown_functions_auto_generated_test.php
+|   |       |   ast_filter_410_single_char_vars_auto_generated_test.php
+|   |       |   ast_filter_420_consolidate_subscripts_auto_generated_test.php
+|   |       |   ast_filter_442_split_all_functions_auto_generated_test.php
+|   |       |   ast_filter_450_split_floats_auto_generated_test.php
+|   |       |   ast_filter_502_replace_pm_auto_generated_test.php
+|   |       |   ast_filter_504_insert_tuples_for_groups_auto_generated_test.php
+|   |       |   ast_filter_505_no_evaluation_groups_auto_generated_test.php
+|   |       |   ast_filter_520_no_equality_with_logic_auto_generated_test.php
+|   |       |   ast_filter_541_no_unknown_functions_auto_generated_test.php
+|   |       |   ast_filter_542_no_functions_at_all_auto_generated_test.php
+|   |       |   ast_filter_545_wrong_decimal_separator_validation_auto_generated_test.php
+|   |       |   ast_filter_601_castext_auto_generated_test.php
+|   |       |   ast_filter_602_castext_simplifier_auto_generated_test.php
+|   |       |   ast_filter_610_castext_static_string_extractor_auto_generated_test.php
+|   |       |   ast_filter_650_string_protect_slash_auto_generated_test.php
+|   |       |   ast_filter_680_gcl_sconcat_auto_generated_test.php
+|   |       |   ast_filter_801_singleton_numeric_auto_generated_test.php
+|   |       |   ast_filter_802_singleton_units_auto_generated_test.php
+|   |       |   ast_filter_901_remove_comments_auto_generated_test.php
+|   |       |   ast_filter_908_parsons_decode_state_for_display_auto_generated_test.php
+|   |       |   ast_filter_909_parsons_get_final_submission_auto_generated_test.php
+|   |       |   ast_filter_910_inert_float_for_display_auto_generated_test.php
+|   |       |   ast_filter_912_inert_string_for_display_auto_generated_test.php
+|   |       |   ast_filter_990_no_fixing_spaces_auto_generated_test.php
+|   |       |   ast_filter_991_no_fixing_stars_auto_generated_test.php
+|   |       |   ast_filter_995_ev_modification_auto_generated_test.php
+|   |       |   ast_filter_996_call_modification_auto_generated_test.php
+|   |       |   ast_filter_997_string_security_auto_generated_test.php
+|   |       |   ast_filter_998_security_auto_generated_test.php
+|   |       |   ast_filter_999_strict_auto_generated_test.php
+|   |       |   bulktester_test.php
+|   |       |   caskeyval_exception_test.php
+|   |       |   caskeyval_test.php
+|   |       |   cassession2_exception_test.php
+|   |       |   cassession2_test.php
+|   |       |   castext2_internals_test.php
+|   |       |   castext2_test.php
+|   |       |   castext_exception_test.php
+|   |       |   castext_test.php
+|   |       |   cas_noun_simp_test.php
+|   |       |   connection_test.php
+|   |       |   docslib_test.php
+|   |       |   editform_test.php
+|   |       |   fact_sheets_test.php
+|   |       |   graphlayout_test.php
+|   |       |   helper.php
+|   |       |   inputstate_test.php
+|   |       |   input_algebraic_test.php
+|   |       |   input_boolean_rendering_test.php
+|   |       |   input_boolean_validation_test.php
+|   |       |   input_checkbox_test.php
+|   |       |   input_dropdown_exception_test.php
+|   |       |   input_dropdown_test.php
+|   |       |   input_equiv_test.php
+|   |       |   input_json_test.php
+|   |       |   input_matrix_test.php
+|   |       |   input_notes_test.php
+|   |       |   input_numerical_test.php
+|   |       |   input_parsons_test.php
+|   |       |   input_radio_test.php
+|   |       |   input_singlechar_test.php
+|   |       |   input_singlechar_validation_test.php
+|   |       |   input_string_test.php
+|   |       |   input_textarea_test.php
+|   |       |   input_units_test.php
+|   |       |   input_varmatrix_test.php
+|   |       |   library_import_test.php
+|   |       |   library_render_test.php
+|   |       |   mathsoutputmathjax_test.php
+|   |       |   mathsoutputmaths_test.php
+|   |       |   mathsoutputtex_test.php
+|   |       |   mathsoutput_test.php
+|   |       |   maxima_corrective_parser_test.php
+|   |       |   maxima_replication_test.php
+|   |       |   multilang_test.php
+|   |       |   parser_rule_201_test.php
+|   |       |   parser_rule_202_test.php
+|   |       |   parser_rule_410_test.php
+|   |       |   parser_rule_541_test.php
+|   |       |   parser_rule_542_test.php
+|   |       |   parser_rule_801_test.php
+|   |       |   parser_tests.php
+|   |       |   parsons_block_test.php
+|   |       |   prt_test.php
+|   |       |   qtype_stack_test_base_test.php
+|   |       |   questionlibrary_test.php
+|   |       |   questiontype_test.php
+|   |       |   question_test.php
+|   |       |   responseanalysis_test.php
+|   |       |   restore_logic_test.php
+|   |       |   restore_test.php
+|   |       |   stack_options_test.php
+|   |       |   stack_utils_test.php
+|   |       |   studentinput_test.php
+|   |       |   subscript_test.php
+|   |       |   vle_specific_test.php
+|   |       |   walkthrough_adaptive_test.php
+|   |       |   walkthrough_deferred_cbm_test.php
+|   |       |   walkthrough_deferred_feedback_test.php
+|   |       |   walkthrough_immediate_feedback_test.php
+|   |       |   walkthrough_interactive_test.php
+|   |       |   walkthrough_survey_test.php
+|   |       |   
+|   |       +---behat
+|   |       |       adaptblock_test.feature
+|   |       |       adaptdelay_test.feature
+|   |       |       analysis.feature
+|   |       |       analysis52.feature
+|   |       |       app.feature
+|   |       |       backup.feature
+|   |       |       behat_qtype_stack.php
+|   |       |       broken_question.xml
+|   |       |       caschat.feature
+|   |       |       create_preview_edit.feature
+|   |       |       create_prt_node.feature
+|   |       |       documentation.feature
+|   |       |       editxml.feature
+|   |       |       healthcheck.feature
+|   |       |       input_test.feature
+|   |       |       jsx_test.feature
+|   |       |       jsx_test_app.feature
+|   |       |       library.feature
+|   |       |       old_question.xml
+|   |       |       preview.feature
+|   |       |       restore_demo.feature
+|   |       |       restore_reveal_question.feature
+|   |       |       sample_questions.xml
+|   |       |       validation_lang.feature
+|   |       |       validation_no_maths_in_question.feature
+|   |       |       very_broken_question.xml
+|   |       |       xml_import.feature
+|   |       |       
+|   |       +---fixtures
+|   |       |       answertestfixtures.class.php
+|   |       |       apifixtures.class.php
+|   |       |       ast_filter_test_base.php
+|   |       |       equivfixtures.class.php
+|   |       |       inputfixtures.class.php
+|   |       |       maximacorrectiveparser.class.php
+|   |       |       noun_simpfixtures.class.php
+|   |       |       numbersfixtures.class.php
+|   |       |       questiondefaultssugar.yml
+|   |       |       questionyml.yml
+|   |       |       questionymlpartial.yml
+|   |       |       subscriptsfixtures.class.php
+|   |       |       test_base.php
+|   |       |       test_maxima_configuration.php
+|   |       |       test_strings.json
+|   |       |       
+|   |       \---generator
+|   |               behat_qtype_stack_generator.php
+|   |               lib.php
+|   |               
+|   \---unit
+|           gen-acidebase.test.js
+|           gen-algebraic.test.js
+|           gen-apn.test.js
+|           gen-basen.test.js
+|           gen-checkbox.test.js
+|           gen-circuit.test.js
+|           gen-composition.test.js
+|           gen-crossword.test.js
+|           gen-diffraction.test.js
+|           gen-expert.test.js
+|           gen-geogebra.test.js
+|           gen-glr.test.js
+|           gen-image-mesure.test.js
+|           gen-imgclick.test.js
+|           gen-jxgdrop.test.js
+|           gen-logique.test.js
+|           gen-match.test.js
+|           gen-math-calcul.test.js
+|           gen-math-complexe.test.js
+|           gen-math-equivalence.test.js
+|           gen-math-geometrie.test.js
+|           gen-math-inequation.test.js
+|           gen-math-limites.test.js
+|           gen-math-matrices.test.js
+|           gen-math-polynomes.test.js
+|           gen-math-probabilites.test.js
+|           gen-math-statistiques.test.js
+|           gen-math-suites.test.js
+|           gen-math-trigonometrie.test.js
+|           gen-nuclear.test.js
+|           gen-numerical.test.js
+|           gen-optique.test.js
+|           gen-ord.test.js
+|           gen-oscilloscope.test.js
+|           gen-pool.test.js
+|           gen-redox.test.js
+|           gen-string.test.js
+|           gen-topo.test.js
+|           gen-units.test.js
+|           gen-vf.test.js
+|           
++---tools
+|       import-vers-moodle.ps1
+|       Importer vers Moodle.bat
+|       moodle-import-test.ps1
+|       moodle-local.config.example.ps1
+|       moodle-local.config.ps1
+|       
+\---_test
+        convexe_kbd.txt
+        dump.html
+        dump2.html
+        dump3.html
+        dump4.html
+        dump5.html
+        err3.txt
+        err4.txt
+        err5.txt
+        gen_harness.py
+        harness.html
+        harness2.html
+        

@@ -1,3 +1,0 @@
-# A list of extensions required for readthedocs to install.
-python-markdown-math
-mkdocs-bootstrap

@@ -1,4 +1,0 @@
-﻿Copyright (c) 2011 Alain HAGUET
-Traducciones y ayuda: Gisbert FRIEGE - Hélio GUILHERME - Andrea GATTO - Didier DORANGE-PATTORET
-
-Esta extensión se integra en WRITER y DRAW y permite de dibujar fácilmente, y en las dimensiones deseadas, objectos en 3D o en perspectiva, y los modelos que se puede cortar y pegar.

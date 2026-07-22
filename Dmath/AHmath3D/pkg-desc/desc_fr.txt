@@ -1,4 +1,0 @@
-﻿Copyright (c) 2011 Alain HAGUET
-Traductions et aides : Gisbert FRIEGE - Hélio GUILHERME - Andrea GATTO - Didier DORANGE-PATTORET
-
-Cette extension s'intègre à WRITER et DRAW et permet de créer facilement et dans les dimensions voulues des solides en 3D ou en perpective cavalière, et des patrons pouvant être découpés et collés.
