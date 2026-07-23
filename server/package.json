@@ -2,15 +2,18 @@
   "name": "stackforge-server",
   "private": true,
   "version": "1.0.0",
-  "description": "Serveur de service pour StackForge (étape 1 : sert l'app statique telle quelle, sans authentification).",
+  "description": "Serveur de service pour StackForge (authentification par session + app statique protégée derrière un login).",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "create-account": "node create-account.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0"
   }
 }

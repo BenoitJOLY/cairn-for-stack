@@ -3,3 +3,7 @@ tools/moodle-local.config.ps1
 
 # Dépendances installées (server/, chantier backend NAS — voir PLAN.md)
 node_modules/
+
+# Comptes utilisateurs (hash de mots de passe) — jamais commités, gérés
+# uniquement sur le NAS via server/create-account.js (voir PLAN.md)
+server/data/

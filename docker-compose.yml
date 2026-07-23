@@ -6,4 +6,6 @@ services:
     container_name: stackforge
     ports:
       - "3000:3000"
+    volumes:
+      - ./server/data:/app/server/data
     restart: unless-stopped
