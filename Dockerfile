@@ -1,4 +1,4 @@
-# Build depuis la racine du dépôt : docker build -f server/Dockerfile -t stackforge-server .
+# Build depuis la racine du dépôt : docker build -t stackforge-server .
 FROM node:20-alpine
 WORKDIR /app
 
