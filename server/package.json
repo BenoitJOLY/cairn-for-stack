@@ -1,0 +1,16 @@
+{
+  "name": "stackforge-server",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Serveur de service pour StackForge (étape 1 : sert l'app statique telle quelle, sans authentification).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

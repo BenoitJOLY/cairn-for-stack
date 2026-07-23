@@ -1,2 +1,5 @@
 # Identifiants Moodle locaux (jamais commités) — voir tools/moodle-local.config.example.ps1
 tools/moodle-local.config.ps1
+
+# Dépendances installées (server/, chantier backend NAS — voir PLAN.md)
+node_modules/
