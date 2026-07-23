@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   HÉSTACK — RELANCE D'AJOUT
+   STACKFORGE — RELANCE D'AJOUT
    Transforme le toast « ✅ Qn (...) — Xpt ajoutée ! » en une relance
    factuelle-encourageante qui invite à enchaîner. Drop-in, bilingue.
    Charger APRÈS i18n-walk.js (et après app.js) :

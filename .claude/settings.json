@@ -2,26 +2,15 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:docs.stack-assessment.org)",
-      "Bash(grep -n \"</div>$\" \"c:/Users/phy_j/Downloads/hestackV4/index.html\")",
       "Bash(awk -F: '$1 > 4455 && $1 < 4500')",
-      "Bash(node --check \"c:/Users/phy_j/Downloads/hestackV4/js/geo2d.js\")",
-      "PowerShell(node --check \"c:\\\\Users\\\\phy_j\\\\Downloads\\\\hestackV4\\\\js\\\\geo2d.js\")",
       "PowerShell(if \\($?\\) { \"OK\" } else { \"ERREUR\" })",
       "Bash(python3)",
-      "Bash(python \"C:\\\\Users\\\\phy_j\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-phy-j-Downloads-hestackV4\\\\7271ee3e-22fa-46bc-bd99-de61b27dd13a\\\\scratchpad\\\\balance_check.py\" js/preview.js)",
       "Bash(sed -n '1,39p;257,298p' js/generators.js)",
       "Read(//tmp/**)",
-      "Bash(cd \"C:/Users/phy_j/Downloads/hestackV4\" && cp /tmp/generators.js.new js/generators.js && wc -l js/generators.js && grep -n \"^function \\\\|^const \\\\|^let \\\\|^var \" js/generators.js)",
       "PowerShell(node --check \"js\\\\gen-numerical.js\")",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(python drive4.py)",
-      "Bash(python \"C:\\\\Users\\\\phy_j\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-phy-j-Downloads-hestackV4\\\\ee999917-59bb-49f8-a4a0-10c00298ca54\\\\scratchpad\\\\drive8.py\")",
-      "Bash(python \"C:\\\\Users\\\\phy_j\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-phy-j-Downloads-hestackV4\\\\ee999917-59bb-49f8-a4a0-10c00298ca54\\\\scratchpad\\\\drive9.py\")",
-      "Bash(python \"C:\\\\Users\\\\phy_j\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-phy-j-Downloads-hestackV4\\\\ee999917-59bb-49f8-a4a0-10c00298ca54\\\\scratchpad\\\\drive10.py\")",
-      "Bash(python \"C:\\\\Users\\\\phy_j\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-phy-j-Downloads-hestackV4\\\\ee999917-59bb-49f8-a4a0-10c00298ca54\\\\scratchpad\\\\drive11.py\")",
-      "Bash(python \"C:\\\\Users\\\\phy_j\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-phy-j-Downloads-hestackV4\\\\ee999917-59bb-49f8-a4a0-10c00298ca54\\\\scratchpad\\\\drive14.py\")",
-      "Bash(\"C:/Users/phy_j/AppData/Local/ms-playwright-go/1.57.0/node.exe\" \"C:\\\\Users\\\\phy_j\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-phy-j-Downloads-hestackV4\\\\a5dcbc24-a696-4662-9b62-12ca2096a5ba\\\\scratchpad\\\\test_export_regression.js\")"
+      "Bash(python drive4.py)"
     ],
     "additionalDirectories": [
       "\\tmp"

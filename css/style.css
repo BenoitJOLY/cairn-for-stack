@@ -92,8 +92,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .type-btn[data-t="ord"]      .hs-ico {color:#7C6A5E;}
 .type-btn[data-t="imgclick"].active {background:#047C6A;}
 .type-btn[data-t="imgclick"] .hs-ico {color:#047C6A;}
-.type-btn[data-t="glr"].active {background:#0369A1;}
-.type-btn[data-t="glr"] .hs-ico {color:#0369A1;}
 .type-btn[data-t="rvbcmj"].active {background:#7E22CE;}
 .type-btn[data-t="rvbcmj"] .hs-ico {color:#7E22CE;}
 /* form panels */
@@ -3026,7 +3024,6 @@ html[data-theme="dark"] .hs-preview-panel {
 #q-config-modal:has(#fp-calcul[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-physique[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-logique[style*="display: block"]) .q-config-modal-box,
-#q-config-modal:has(#fp-thermo[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-circuit[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-basen[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-acide-base[style*="display: block"]) .q-config-modal-box,
@@ -3035,7 +3032,6 @@ html[data-theme="dark"] .hs-preview-panel {
 #q-config-modal:has(#fp-optique[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-rvbcmj[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-imgclick[style*="display: block"]) .q-config-modal-box,
-#q-config-modal:has(#fp-glr[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-jxgdrop[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-ord[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-chemical[style*="display: block"]) .q-config-modal-box,
@@ -3057,9 +3053,9 @@ html[data-theme="dark"] .hs-preview-panel {
   #fp-complexe[style*="display: block"], #fp-redox[style*="display: block"],
   #fp-inequation[style*="display: block"], #fp-polynomes[style*="display: block"], #fp-limites[style*="display: block"], #fp-suites[style*="display: block"], #fp-probabilites[style*="display: block"],
   #fp-trigonometrie[style*="display: block"], #fp-statistiques[style*="display: block"], #fp-matrices[style*="display: block"], #fp-geometrie[style*="display: block"], #fp-calcul[style*="display: block"],
-  #fp-physique[style*="display: block"], #fp-logique[style*="display: block"], #fp-thermo[style*="display: block"], #fp-circuit[style*="display: block"], #fp-basen[style*="display: block"],
+  #fp-physique[style*="display: block"], #fp-logique[style*="display: block"], #fp-circuit[style*="display: block"], #fp-basen[style*="display: block"],
   #fp-acide-base[style*="display: block"], #fp-diffraction[style*="display: block"], #fp-oscilloscope[style*="display: block"], #fp-optique[style*="display: block"],
-  #fp-rvbcmj[style*="display: block"], #fp-imgclick[style*="display: block"], #fp-glr[style*="display: block"], #fp-jxgdrop[style*="display: block"], #fp-ord[style*="display: block"],
+  #fp-rvbcmj[style*="display: block"], #fp-imgclick[style*="display: block"], #fp-jxgdrop[style*="display: block"], #fp-ord[style*="display: block"],
   #fp-chemical[style*="display: block"], #fp-chemical_topo[style*="display: block"], #fp-nuclear[style*="display: block"], #fp-composition[style*="display: block"],
   #fp-crossword[style*="display: block"], #fp-doi[style*="display: block"], #fp-image-mesure[style*="display: block"], #fp-apn[style*="display: block"],
   #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"] { display: block !important; }

@@ -252,5 +252,3 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = { genInequation: genInequation, genInequationCore: genInequationCore, ineqIntervalFeedbackVars: ineqIntervalFeedbackVars, ineqPrettyVarStmt: ineqPrettyVarStmt };
 }
 
-// ─── THERMO (stub) ───────────────────────────────────────────
-

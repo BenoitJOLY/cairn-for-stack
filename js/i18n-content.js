@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   HÉSTACK — i18n LOT 2 : chaînes fixes des modules JS
+   STACKFORGE — i18n LOT 2 : chaînes fixes des modules JS
    (toasts, écran de vérification/export, titres d'aide, messages
     de validation, import). S'ajoute au marcheur.
    Charger APRÈS i18n-walk.js :

@@ -239,7 +239,6 @@
     "Physique (cinématique, énergie mécanique, lois de Newton)":"Physics (kinematics, mechanical energy, Newton's laws)",
     "Oscilloscope (signal sinusoïdal, retard, RC)":"Oscilloscope (sinusoidal signal, delay, RC)",
     "Inéquations (ensemble-solution, intervalles, AlgEquiv)":"Inequalities (solution set, intervals, AlgEquiv)",
-    "Thermodynamique (gaz parfaits PV=nRT, chaleur, enthalpie)":"Thermodynamics (ideal gases PV=nRT, heat, enthalpy)",
     // — Lot 2 : en-têtes de panels (spans hardcodés sans data-i18n) —
     "Générer XML":"Generate XML",
     "Types de questions":"Question types",
@@ -259,7 +258,6 @@
     "Probabilités":"Probabilities",
     "Statistiques":"Statistics",
     "Suites numériques":"Numerical sequences",
-    "Thermodynamique — Gaz parfaits & Chaleur":"Thermodynamics — Ideal gases & Heat",
     "Trigonométrie":"Trigonometry",
     // — Lot 2 : jxgdrop zone editor —
     "Zones de dépôt :":"Drop zones:",
@@ -428,17 +426,13 @@
     "10 — Décimal":"10 — Decimal",
     "12 — Duodécimal":"12 — Duodecimal",
     "16 — Hexadécimal":"16 — Hexadecimal",
-    // — Lot 2 : physique / thermodynamique —
+    // — Lot 2 : physique —
     "Énergie cinétique Ec = ½mv²":"Kinetic energy Ec = ½mv²",
     "Énergie potentielle Ep = mgh (g = 9.81)":"Potential energy Ep = mgh (g = 9.81)",
     "Conservation énergie mécanique : v à partir de h":"Conservation of mechanical energy: v from h",
     "Deuxième loi de Newton : F = ma":"Newton's second law: F = ma",
     "Chute libre : temps de chute t = √(2h/g)":"Free fall: fall time t = √(2h/g)",
     "Chute libre : hauteur de chute h = ½gt²":"Free fall: height h = ½gt²",
-    "Loi de Mariotte P₁V₁ = P₂V₂ → V₂":"Boyle's law P₁V₁ = P₂V₂ → V₂",
-    "Loi de Charles V₁/T₁ = V₂/T₂ → V₂":"Charles's law V₁/T₁ = V₂/T₂ → V₂",
-    "Température T = PV/(nR)":"Temperature T = PV/(nR)",
-    "Quantité n = PV/(RT)":"Quantity n = PV/(RT)",
     // — Lot 2 : complexes —
     "Forme algébrique z₁ ○ z₂ = a + bi":"Algebraic form z₁ ○ z₂ = a + bi",
     "Module de 3+4i → |z|":"Modulus of 3+4i → |z|",

@@ -282,27 +282,6 @@ const HELP_CONTENT = {
       ])) + _HELP_COMMON
   },
 
-  // ───────────────────────────────────────── THERMODYNAMIQUE
-  thermo: {
-    title: '<svg class="hs-ico"><use href="#ico-type-thermo"></use></svg> Thermodynamique — Aide',
-    body:
-      _hSection('À quoi ça sert',
-        '<p>Calculs de <b>thermodynamique</b> : loi des gaz parfaits <b>PV = nRT</b>, chaleur sensible <b>Q = m·cp·ΔT</b>, loi de Mariotte et loi de Charles. Réponse numérique vérifiée à 1 % (NumRelative).</p>') +
-      _hSection('Comment remplir', _hList([
-        '<b>Préréglage</b> : choisissez un scénario type.',
-        '<b>Type de question</b> : calcul de P, V, T ou n (gaz parfaits), Q (chaleur), V₂ (Mariotte ou Charles).',
-        '<b>Paramètres gaz</b> : P (en Pa), V (en m³), n (en mol), T (en <b>Kelvin</b>).',
-        '<b>Paramètres chaleur</b> : m (kg), cp (J/kg/K), ΔT (K).',
-        '<b>L\'aperçu</b> calcule automatiquement le résultat attendu avec R = 8.314 J/(mol·K).',
-        '<b>Consigne</b> : via « ✏️ Éditeur ».'
-      ])) +
-      _hSection('Constante et unités', _hList([
-        '<b>R = 8.314 J/(mol·K)</b> codé en dur.',
-        'P en Pa (1 atm ≈ 101 325 Pa), V en m³ (22,4 L = 0,0224 m³), T en K (0 °C = 273,15 K).',
-        'Tolérance 1 % : arrondis raisonnables acceptés.'
-      ])) + _HELP_COMMON
-  },
-
   // ───────────────────────────────────────── BASE N
   basen: {
     title: '<svg class="hs-ico"><use href="#ico-type-basen"></use></svg> Conversion Base N — Aide',
@@ -603,24 +582,6 @@ const HELP_CONTENT = {
       ])) +
       _hSection('Coordonnées en %',
         '<p>0 % = bord gauche (ou haut), 100 % = bord droit (ou bas). Un cercle centré au milieu avec rayon 10 % : X=50, Y=50, R=10.</p>') + _HELP_COMMON
-  },
-
-  // ───────────────────────────────────────── LECTURE GRAPHIQUE
-  glr: {
-    title: '<svg class="hs-ico"><use href="#ico-type-glr"></use></svg> Lecture graphique — Aide',
-    body:
-      _hSection('À quoi ça sert',
-        '<p>L\'élève <b>clique sur la courbe au point x demandé</b> pour lire la valeur f(x₀). La courbe est tracée dynamiquement avec JSXGraph dans STACK.</p>') +
-      _hSection('Comment remplir', _hList([
-        '<b>Fonction f(x)</b> : syntaxe Maxima, ex. <code>sin(x)</code>, <code>x^2-1</code>, <code>2*x+1</code>.',
-        '<b>Fenêtre</b> : x min/max et y min/max définissent la vue du graphique.',
-        '<b>x₀</b> : abscisse du point à lire (doit être dans la fenêtre x).',
-        '<b>Tolérance</b> : marge d\'erreur acceptable en pixels sur l\'axe y.',
-        '<b>Largeur / Hauteur</b> : dimensions du graphique en pixels (défaut 500 × 400).',
-        '<b>Consigne</b> : rédiger la question, ex. « Cliquez sur la courbe en x = 2 ».'
-      ])) +
-      _hSection('Astuce',
-        '<p>Choisissez une tolérance cohérente avec la précision attendue. Une valeur de 0.5 correspond à ½ unité sur l\'axe y — augmentez-la pour les fonctions à forte pente.</p>') + _HELP_COMMON
   },
 
   // ───────────────────────────────────────── GLISSER-DÉPOSER JSXGRAPH

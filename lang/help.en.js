@@ -282,27 +282,6 @@ const HELP_CONTENT = {
       ])) + _HELP_COMMON
   },
 
-  // ───────────────────────────────────────── THERMODYNAMICS
-  thermo: {
-    title: '<svg class="hs-ico"><use href="#ico-type-thermo"></use></svg> Thermodynamics — Help',
-    body:
-      _hSection('What it is for',
-        '<p>Thermodynamics calculations: ideal gas law <b>PV = nRT</b>, sensible heat <b>Q = m·cp·ΔT</b>, Boyle\'s law and Charles\'s law. Numerical answer verified at 1% (NumRelative).</p>') +
-      _hSection('How to fill', _hList([
-        '<b>Preset</b>: choose a scenario.',
-        '<b>Question type</b>: compute P, V, T or n (ideal gas), Q (heat), V₂ (Boyle or Charles).',
-        '<b>Gas parameters</b>: P (in Pa), V (in m³), n (in mol), T (in <b>Kelvin</b>).',
-        '<b>Heat parameters</b>: m (kg), cp (J/kg/K), ΔT (K).',
-        '<b>The preview</b> automatically computes the expected result using R = 8.314 J/(mol·K).',
-        '<b>Question text</b>: via ✏️ Editor.'
-      ])) +
-      _hSection('Constant and units', _hList([
-        '<b>R = 8.314 J/(mol·K)</b> is hard-coded.',
-        'P in Pa (1 atm ≈ 101,325 Pa), V in m³ (22.4 L = 0.0224 m³), T in K (0 °C = 273.15 K).',
-        '1% tolerance: reasonable rounding is accepted.'
-      ])) + _HELP_COMMON
-  },
-
   // ───────────────────────────────────────── BASE N
   basen: {
     title: '<svg class="hs-ico"><use href="#ico-type-basen"></use></svg> Base-N Conversion — Help',
@@ -595,24 +574,6 @@ const HELP_CONTENT = {
       ])) +
       _hSection('Coordinates in %',
         '<p>0 % = left (or top) edge, 100 % = right (or bottom) edge. A centred circle with radius 10 %: X=50, Y=50, R=10.</p>') + _HELP_COMMON
-  },
-
-  // ───────────────────────────────────────── GRAPH READING
-  glr: {
-    title: '<svg class="hs-ico"><use href="#ico-type-glr"></use></svg> Graph Reading — Help',
-    body:
-      _hSection('What it is for',
-        '<p>The student <b>clicks on the curve at the requested x value</b> to read f(x₀). The curve is drawn dynamically with JSXGraph inside STACK.</p>') +
-      _hSection('How to fill', _hList([
-        '<b>Function f(x)</b>: Maxima syntax, e.g. <code>sin(x)</code>, <code>x^2-1</code>, <code>2*x+1</code>.',
-        '<b>Window</b>: x min/max and y min/max define the graph view.',
-        '<b>x₀</b>: x-coordinate of the point to read (must be within the x window).',
-        '<b>Tolerance</b>: acceptable error in pixels on the y-axis.',
-        '<b>Width / Height</b>: graph dimensions in pixels (default 500 × 400).',
-        '<b>Instruction</b>: write the question, e.g. "Click on the curve at x = 2".'
-      ])) +
-      _hSection('Tip',
-        '<p>Choose a tolerance consistent with the expected precision. A value of 0.5 means ½ unit on the y-axis — increase it for steep functions.</p>') + _HELP_COMMON
   },
 
   // ───────────────────────────────────────── JSXGRAPH DRAG-AND-DROP

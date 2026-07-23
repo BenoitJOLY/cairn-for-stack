@@ -381,7 +381,3 @@ function genImgClickSequenceCore(X, p, deps) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { genImgClick: genImgClick, genImgClickCore: genImgClickCore, genImgClickSequence: genImgClickSequence, genImgClickSequenceCore: genImgClickSequenceCore };
 }
-
-// ══════════════════════════════════════════════════════
-//  GLR — Lecture Graphique (JSXGraph, snap to curve)
-// ══════════════════════════════════════════════════════

@@ -101,7 +101,7 @@
       chemical: "Chimie — équation", chemical_topo: "Chimie topologique",
       nuclear: "Réaction nucléaire", composition: "Composition",
       jxgdrop: "Glisser-Déposer (JSXGraph)", vf: "Vrai / Faux", ord: "Classement",
-      imgclick: "Sélection sur image", glr: "Lecture graphique", rvbcmj: "RVB / CMJN",
+      imgclick: "Sélection sur image", rvbcmj: "RVB / CMJN",
       optique: "Optique géométrique", "acide-base": "pH-métrie / Titrage", redox: "Dosage redox",
       basen: "Conversion de base N", circuit: "Circuits électriques",
       logique: "Logique booléenne", complexe: "Nombres complexes",
@@ -110,7 +110,7 @@
       suites: "Suites numériques", probabilites: "Probabilités",
       trigonometrie: "Trigonométrie", polynomes: "Polynômes du 2nd degré",
       limites: "Limites de fonctions", physique: "Physique — Mécanique",
-      inequation: "Inéquations (ensemble-solution)", thermo: "Thermodynamique (gaz parfaits, chaleur)"
+      inequation: "Inéquations (ensemble-solution)"
     },
 
     /* ── Guidage détaillé de l'étape 3, champ par champ, par type ── */
@@ -417,19 +417,6 @@
           "<strong>Feedback</strong> correct / incorrect."
         ],
         tip: "STACK accepte oo/oc/co/cc pour les intervalles et union() pour les unions. Ajouter inf et -inf pour les demi-droites."
-      },
-      thermo: {
-        intro: "Thermodynamique : loi des gaz parfaits PV=nRT, chaleur sensible Q=mcΔT, lois de Mariotte et de Charles. NumRelative 1%.",
-        fields: [
-          "<strong>Préréglage</strong> — choisissez un scénario.",
-          "<strong>Type de question</strong> — P, V, T, n (gaz parfaits) ou Q (chaleur) ou loi de Mariotte/Charles.",
-          "<strong>Paramètres gaz</strong> — P (Pa), V (m³), n (mol), T (K).",
-          "<strong>Paramètres chaleur</strong> — m (kg), cp (J/kg/K), ΔT (K).",
-          "<strong>L'aperçu</strong> calcule le résultat attendu.",
-          "<strong>Consigne</strong> — via « ✏️ Éditeur ».",
-          "<strong>Feedback</strong> correct / incorrect."
-        ],
-        tip: "R = 8.314 J/(mol·K). Vérifiez les unités : P en Pa, V en m³, T en Kelvin."
       }
     }
   };

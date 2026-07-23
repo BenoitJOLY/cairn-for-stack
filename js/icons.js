@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════
-   HÉSTACK — Aide à l'insertion d'icônes SVG (sprite)
+   STACKFORGE — Aide à l'insertion d'icônes SVG (sprite)
    Prérequis : le sprite (icons.svg) doit être inliné en haut du <body>
    (les <use href="#id"> ne fonctionnent de façon fiable en file:// que si
    le sprite est dans la même page).
@@ -49,7 +49,6 @@
     vf:            "type-vf",
     ord:           "type-ord",
     imgclick:      "type-imgclick",
-    glr:           "type-glr",
     rvbcmj:        "type-rvbcmj",
     optique:       "type-optique",
     "acide-base":  "type-acide-base",
@@ -69,7 +68,6 @@
     limites:       "type-limites",
     physique:      "type-physique",
     inequation:    "type-inequation",
-    thermo:        "type-thermo",
     oscilloscope:  "type-oscilloscope",
     diffraction:   "type-diffraction",
     expert:        "type-expert",

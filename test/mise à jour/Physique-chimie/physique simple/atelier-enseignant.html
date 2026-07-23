@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Atelier circuits - generateur de circuit cible (enseignant)</title>
+<style>
+:root{ --ink:#1f2937; --ok:#15803d; --bad:#dc2626; --info:#1e40af; --line:#e5e7eb; } *{box-sizing:border-box;} body{ margin:0; font-family:"Segoe UI",system-ui,Arial,sans-serif; color:var(--ink); padding:10px; } h1.sc{font-size:18px;margin:0 0 4px;} h2.sc{font-size:13px;margin:0 0 8px;color:#475569;text-transform:uppercase;letter-spacing:.04em;} p.sub{margin:0 0 14px;color:#64748b;font-size:14px;} .layout{display:flex;gap:18px;align-items:flex-start;} .left{flex:1 1 auto;min-width:0;} .right{flex:0 0 260px;border-left:1px solid var(--line);padding-left:18px;} .toolbar{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;} button{border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:transform .08s ease;} button:active{transform:scale(.97);} #btnReset{background:#e2e8f0;color:var(--ink);} #btnUndo{background:#fef3c7;color:#92400e;} #btnScissors{background:#e2e8f0;color:var(--ink);} #btnScissors.active{background:#dc2626;color:#fff;} #board.cutting{cursor:crosshair;} #btnExport{background:var(--ok);color:#fff;width:100%;margin-bottom:10px;} #board{width:100%;height:520px;background:#fff;border:1px solid var(--line);border-radius:10px;touch-action:none;} #feedback{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;background:#f1f5f9;color:#475569;border:1px solid var(--line);} .palette{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;} #valBox{margin-bottom:18px;} #valName{font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:6px;} .valrow{display:flex;gap:7px;align-items:center;} #valInput{flex:1;min-width:0;padding:7px 9px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;font-family:inherit;} #valInput:disabled{background:#f1f5f9;color:#94a3b8;} #valUnit{font-size:13px;font-weight:600;color:#475569;min-width:24px;} #valHint{font-size:11.5px;color:#64748b;margin-top:6px;line-height:1.4;} .card{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:7px;cursor:pointer;background:#fff;transition:box-shadow .15s,border-color .15s;} .card:hover{border-color:#94a3b8;box-shadow:0 1px 4px rgba(0,0,0,.08);} .card img{width:50px;height:26px;object-fit:contain;flex-shrink:0;} .card span{font-size:12.5px;font-weight:600;color:var(--ink);}
+.teacher{margin-top:14px;padding:12px 14px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:10px;}
+.teacher h3{margin:0 0 8px;font-size:14px;color:#1e40af;}
+.teacher label{display:block;font-size:12px;font-weight:600;margin:8px 0 3px;color:#334155;}
+.teacher input[type=text]{width:100%;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;padding:7px 9px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;}
+.teacher p.hint{font-size:12px;color:#475569;margin:10px 0 0;line-height:1.55;}
+.teacher code{background:#fff;padding:1px 4px;border-radius:3px;}
+</style>
+</head>
+<body>
+<h1 class="sc">Atelier circuits &mdash; version enseignant</h1>
+<p class="sub">Construisez le <strong>circuit attendu</strong> et reglez les valeurs. Cliquez sur un composant pour le selectionner : le repere carre apparait et le panneau de droite permet d'en changer la valeur. Les trois chaines se mettent a jour en direct.</p>
+<div class="layout">
+  <div class="left">
+    <div class="toolbar">
+      <button id="btnScissors" type="button">&#9986; Ciseau</button>
+      <button id="btnUndo" type="button">&larr; Annuler point</button>
+      <button id="btnReset" type="button">&#8634; Vider tout</button>
+    </div>
+    <div id="board"></div>
+    <div id="feedback">Choisis un composant a droite pour commencer.</div>
+    <div class="teacher">
+      <h3>A recopier dans les Variables de la question</h3>
+      <label for="compOut">ta_components</label>
+      <input type="text" id="compOut" readonly onclick="this.select()">
+      <label for="sigOut">ta_signature</label>
+      <input type="text" id="sigOut" readonly onclick="this.select()">
+      <label for="valOut">ta_values</label>
+      <input type="text" id="valOut" readonly onclick="this.select()">
+      <p class="hint">Dans STACK :<br>
+      <code>ta_components: "gen,lamp"$</code><br>
+      <code>ta_signature:&nbsp; "C1|loop{gen+lamp/0:0}|"$</code><br>
+      <code>ta_values:&nbsp;&nbsp;&nbsp;&nbsp; "gen=9"$</code><br>
+      Guillemets et <code>$</code> final obligatoires. Mettre
+      <code>verifier_valeurs: false$</code> pour ne noter que le cablage.<br>
+      L'etat des interrupteurs n'influe pas sur la signature ; le sens d'une
+      LED, si.</p>
+    </div>
+  </div>
+  <div class="right">
+    <h2 class="sc">Composants</h2>
+    <div class="palette" id="palette"></div>
+    <h2 class="sc">Valeur</h2>
+    <div id="valBox">
+      <div id="valName">Aucun composant selectionne</div>
+      <div class="valrow">
+        <input id="valInput" type="number" step="any" min="0" disabled>
+        <span id="valUnit"></span>
+      </div>
+      <div id="valHint">Clique sur un composant du schema pour regler sa valeur.</div>
+    </div>
+  </div>
+</div>
+<script type="module">
+
+
+
+var LT = String.fromCharCode(60), GT = String.fromCharCode(62);
+function detag(str){ return str.split('@LT@').join(LT).split('@GT@').join(GT); }
+
+var isValidated = false;
+var inputAns1 = null;
+var inputAns2 = null;
+var inputAns3 = null;
+var inputAns4 = null;
+
+function initApp() {
+  var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-1, 7.5, 14.5, -1.5], axis:false, grid:false, showNavigation:false, showCopyright:false, keepaspectratio:true, pan:{enabled:false}, zoom:{enabled:false} });
+  function dataUri(svg){ return 'data:image/svg+xml,' + encodeURIComponent(svg); }
+  function term(dx, dy, role, color){ return {dx:dx, dy:dy, role:role, color:color || '#6b7280'}; }
+  function wrapSvg(innerBody, innerH, deg){ var canvas = Math.max(200, innerH); var dy = (canvas - innerH) / 2; var c = canvas / 2; return detag('@LT@svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + canvas + ' ' + canvas + '"@GT@@LT@g transform="rotate(' + deg + ' ' + c + ' ' + c + ') translate(0 ' + dy + ')"@GT@') + innerBody + detag('@LT@/g@GT@@LT@/svg@GT@'); }
+
+  var battInner = detag('@LT@line x1="0" y1="50" x2="70" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@line x1="75" y1="22" x2="75" y2="78" stroke="#1f2937" stroke-width="8"/@GT@@LT@line x1="125" y1="8" x2="125" y2="92" stroke="#1f2937" stroke-width="3"/@GT@@LT@line x1="130" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@text x="75" y="16" font-size="20" fill="#2563eb" text-anchor="middle" font-family="Arial" font-weight="bold"@GT@−@LT@/text@GT@@LT@text x="125" y="16" font-size="20" fill="#dc2626" text-anchor="middle" font-family="Arial" font-weight="bold"@GT@+@LT@/text@GT@');
+  var resInner = detag('@LT@line x1="0" y1="50" x2="55" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@rect x="55" y="25" width="90" height="50" rx="6" fill="#ecfdf5" stroke="#15803d" stroke-width="3"/@GT@@LT@line x1="145" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@');
+  var switchOpenInner = detag('@LT@line x1="0" y1="50" x2="60" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@circle cx="65" cy="50" r="6" fill="#1f2937"/@GT@@LT@line x1="65" y1="50" x2="128" y2="20" stroke="#1f2937" stroke-width="4"/@GT@@LT@circle cx="135" cy="50" r="5" fill="#ffffff" stroke="#1f2937" stroke-width="2"/@GT@@LT@line x1="135" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@');
+  var switchClosedInner = detag('@LT@line x1="0" y1="50" x2="60" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@circle cx="65" cy="50" r="6" fill="#15803d"/@GT@@LT@line x1="65" y1="50" x2="135" y2="50" stroke="#15803d" stroke-width="4"/@GT@@LT@circle cx="135" cy="50" r="5" fill="#15803d" stroke="#15803d" stroke-width="2"/@GT@@LT@line x1="135" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@');
+  var lampOffInner = detag('@LT@line x1="0" y1="100" x2="45" y2="100" stroke="#1f2937" stroke-width="4"/@GT@@LT@line x1="155" y1="100" x2="200" y2="100" stroke="#1f2937" stroke-width="4"/@GT@@LT@circle cx="100" cy="100" r="52" fill="#fff7d6" stroke="#a16207" stroke-width="3"/@GT@@LT@line x1="78" y1="78" x2="122" y2="122" stroke="#a16207" stroke-width="3"/@GT@@LT@line x1="78" y1="122" x2="122" y2="78" stroke="#a16207" stroke-width="3"/@GT@');
+  var lampOnInner = detag('@LT@circle cx="100" cy="100" r="85" fill="#fde047" opacity="0.35"/@GT@@LT@line x1="0" y1="100" x2="45" y2="100" stroke="#1f2937" stroke-width="4"/@GT@@LT@line x1="155" y1="100" x2="200" y2="100" stroke="#1f2937" stroke-width="4"/@GT@@LT@circle cx="100" cy="100" r="52" fill="#fde047" stroke="#ca8a04" stroke-width="3"/@GT@@LT@line x1="78" y1="78" x2="122" y2="122" stroke="#92400e" stroke-width="3"/@GT@@LT@line x1="78" y1="122" x2="122" y2="78" stroke="#92400e" stroke-width="3"/@GT@');
+
+  var capInner = detag('@LT@line x1="0" y1="50" x2="82" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@line x1="82" y1="16" x2="82" y2="84" stroke="#1f2937" stroke-width="7"/@GT@@LT@line x1="118" y1="16" x2="118" y2="84" stroke="#1f2937" stroke-width="7"/@GT@@LT@line x1="118" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@');
+  var coilInner = detag('@LT@line x1="0" y1="50" x2="45" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@path d="M45,50 a13,13 0 0 1 26,0 a13,13 0 0 1 26,0 a13,13 0 0 1 26,0 a13,13 0 0 1 26,0" fill="none" stroke="#1f2937" stroke-width="4"/@GT@@LT@line x1="149" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@');
+  var motorInner = detag('@LT@line x1="0" y1="50" x2="52" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@circle cx="100" cy="50" r="46" fill="#eef2ff" stroke="#4338ca" stroke-width="3"/@GT@@LT@text x="100" y="66" font-size="46" fill="#4338ca" text-anchor="middle" font-family="Arial" font-weight="bold"@GT@M@LT@/text@GT@@LT@line x1="148" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@');
+  var sw3aInner = detag('@LT@line x1="0" y1="50" x2="58" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@circle cx="63" cy="50" r="6" fill="#15803d"/@GT@@LT@line x1="63" y1="50" x2="138" y2="20" stroke="#15803d" stroke-width="4"/@GT@@LT@circle cx="143" cy="20" r="5" fill="#15803d" stroke="#15803d" stroke-width="2"/@GT@@LT@circle cx="143" cy="80" r="5" fill="#ffffff" stroke="#1f2937" stroke-width="2"/@GT@@LT@line x1="143" y1="20" x2="200" y2="20" stroke="#1f2937" stroke-width="4"/@GT@@LT@line x1="143" y1="80" x2="200" y2="80" stroke="#1f2937" stroke-width="4"/@GT@@LT@text x="188" y="14" font-size="17" fill="#64748b" text-anchor="middle" font-family="Arial"@GT@1@LT@/text@GT@@LT@text x="188" y="99" font-size="17" fill="#64748b" text-anchor="middle" font-family="Arial"@GT@2@LT@/text@GT@');
+  var sw3bInner = detag('@LT@line x1="0" y1="50" x2="58" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@circle cx="63" cy="50" r="6" fill="#15803d"/@GT@@LT@line x1="63" y1="50" x2="138" y2="80" stroke="#15803d" stroke-width="4"/@GT@@LT@circle cx="143" cy="20" r="5" fill="#ffffff" stroke="#1f2937" stroke-width="2"/@GT@@LT@circle cx="143" cy="80" r="5" fill="#15803d" stroke="#15803d" stroke-width="2"/@GT@@LT@line x1="143" y1="20" x2="200" y2="20" stroke="#1f2937" stroke-width="4"/@GT@@LT@line x1="143" y1="80" x2="200" y2="80" stroke="#1f2937" stroke-width="4"/@GT@@LT@text x="188" y="14" font-size="17" fill="#64748b" text-anchor="middle" font-family="Arial"@GT@1@LT@/text@GT@@LT@text x="188" y="99" font-size="17" fill="#64748b" text-anchor="middle" font-family="Arial"@GT@2@LT@/text@GT@');
+
+  var ledOffInner = detag('@LT@line x1="0" y1="50" x2="62" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@polygon points="62,22 62,78 118,50" fill="#fee2e2" stroke="#b91c1c" stroke-width="3" stroke-linejoin="round"/@GT@@LT@line x1="118" y1="20" x2="118" y2="80" stroke="#b91c1c" stroke-width="5"/@GT@@LT@line x1="118" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@path d="M128,30 L142,16" stroke="#b91c1c" stroke-width="2.5" fill="none"/@GT@@LT@path d="M138,34 L152,20" stroke="#b91c1c" stroke-width="2.5" fill="none"/@GT@');
+  var ledOnInner = detag('@LT@circle cx="90" cy="50" r="72" fill="#fca5a5" opacity="0.35"/@GT@@LT@line x1="0" y1="50" x2="62" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@polygon points="62,22 62,78 118,50" fill="#f87171" stroke="#b91c1c" stroke-width="3" stroke-linejoin="round"/@GT@@LT@line x1="118" y1="20" x2="118" y2="80" stroke="#b91c1c" stroke-width="5"/@GT@@LT@line x1="118" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/@GT@@LT@path d="M128,30 L146,12" stroke="#dc2626" stroke-width="3" fill="none"/@GT@@LT@path d="M140,36 L158,18" stroke="#dc2626" stroke-width="3" fill="none"/@GT@');
+
+  var RECT = {w:2.2, h:1.1}; var SQUARE = {w:1.7, h:1.7}; var TH = 0.33;
+  /* conducts : paires de bornes qui laissent passer le courant continu.
+     Sert uniquement a l'animation (lampe allumee ou non), pas a la notation.
+     Le condensateur bloque le continu, sa liste est donc vide. */
+  var CATALOG = [
+    {key:'gen', label:'Générateur (pile)', w:RECT.w, h:RECT.h, innerH:100, svg:battInner, hasValue:true, unit:'V', defaultValue:9, conducts:[], terminals:[term(-RECT.w/2,0,'moins','#2563eb'), term(RECT.w/2,0,'plus','#dc2626')]},
+    {key:'lamp', label:'Lampe', w:SQUARE.w, h:SQUARE.h, innerH:200, svgOff:lampOffInner, svgOn:lampOnInner, conducts:[[0,1]], terminals:[term(-SQUARE.w/2,0,'a'), term(SQUARE.w/2,0,'b')]},
+    {key:'led', label:'LED', w:RECT.w, h:RECT.h, innerH:100, svgOff:ledOffInner, svgOn:ledOnInner, polarise:true, conducts:[[0,1]], terminals:[term(-RECT.w/2,0,'anode','#dc2626'), term(RECT.w/2,0,'cathode','#1f2937')]},
+    {key:'res', label:'Résistance', w:RECT.w, h:RECT.h, innerH:100, svg:resInner, hasValue:true, unit:'Ω', defaultValue:220, conducts:[[0,1]], terminals:[term(-RECT.w/2,0,'a'), term(RECT.w/2,0,'b')]},
+    {key:'cap', label:'Condensateur', w:RECT.w, h:RECT.h, innerH:100, svg:capInner, hasValue:true, unit:'µF', defaultValue:100, conducts:[], terminals:[term(-RECT.w/2,0,'a'), term(RECT.w/2,0,'b')]},
+    {key:'coil', label:'Bobine', w:RECT.w, h:RECT.h, innerH:100, svg:coilInner, hasValue:true, unit:'mH', defaultValue:10, conducts:[[0,1]], terminals:[term(-RECT.w/2,0,'a'), term(RECT.w/2,0,'b')]},
+    {key:'motor', label:'Moteur', w:RECT.w, h:RECT.h, innerH:100, svg:motorInner, conducts:[[0,1]], terminals:[term(-RECT.w/2,0,'a'), term(RECT.w/2,0,'b')]},
+    {key:'switch2', label:'Interrupteur (2 pts)', w:RECT.w, h:RECT.h, innerH:100, terminals:[term(-RECT.w/2,0,'a'), term(RECT.w/2,0,'b')], states:[{svg:switchOpenInner, connections:[], label:'ouvert'},{svg:switchClosedInner, connections:[[0,1]], label:'fermé'}]},
+    {key:'switch3', label:'Interrupteur (3 pts)', w:RECT.w, h:1.45, innerH:100, terminals:[term(-RECT.w/2,0,'c','#7c3aed'), term(RECT.w/2,TH,'t1'), term(RECT.w/2,-TH,'t2')], states:[{svg:sw3aInner, connections:[[0,1]], label:'position 1'},{svg:sw3bInner, connections:[[0,2]], label:'position 2'}]}
+  ];
+  CATALOG.forEach(function(c){ c.boxSize = Math.max(c.w, c.h); });
+  var CATALOG_BY_KEY = {}; CATALOG.forEach(function(c){ CATALOG_BY_KEY[c.key] = c; });
+
+  var instances = [], instCounter = 0, cables = [], pending = null, selectedInst = null, pathPoints = [], pathSegs = [], ANCHOR_HIT = 0.4, CONTACT_DIST = 0.45;
+  var fb = document.getElementById('feedback');
+
+  /* Le repere carre gris ne s'affiche que sur le composant selectionne.
+     On selectionne en cliquant sur le dessin du composant ; on deselectionne
+     en cliquant dans une zone vide de la planche. */
+  function refreshSelection(){
+    instances.forEach(function(inst){
+      if (inst.H) inst.H.setAttribute({visible: inst === selectedInst});
+    });
+    updateValuePanel();
+    board.update();
+  }
+
+  function updateValuePanel(){
+    var box = document.getElementById('valBox');
+    if (!box) return;
+    var nameEl = document.getElementById('valName'), inp = document.getElementById('valInput');
+    var unitEl = document.getElementById('valUnit'), hintEl = document.getElementById('valHint');
+    if (!selectedInst){
+      nameEl.textContent = 'Aucun composant sélectionné';
+      inp.value = ''; inp.disabled = true; unitEl.textContent = '';
+      hintEl.textContent = 'Clique sur un composant du schéma pour régler sa valeur.';
+      return;
+    }
+    var cat = CATALOG_BY_KEY[selectedInst.key];
+    nameEl.textContent = cat.label;
+    if (!cat.hasValue){
+      inp.value = ''; inp.disabled = true; unitEl.textContent = '';
+      hintEl.textContent = 'Ce composant n\'a pas de valeur réglable.';
+      return;
+    }
+    inp.disabled = isValidated;
+    inp.value = selectedInst.value;
+    unitEl.textContent = cat.unit;
+    hintEl.textContent = isValidated ? 'Circuit validé : réglage verrouillé.' : 'Valeur strictement positive.';
+  }
+  function selectInstance(inst){ selectedInst = inst; refreshSelection(); }
+
+  function refreshAnchor(a){ if (a === pending) a.pt.setAttribute({strokeColor:'#f59e0b', strokeWidth:3.5}); else if (a._connected) a.pt.setAttribute({strokeColor:'#16a34a', strokeWidth:3.5}); else a.pt.setAttribute({strokeColor:'#1f2937', strokeWidth:1.4}); }
+  function rotatedOffset(dx, dy, rot){ switch (((rot % 4) + 4) % 4){ case 0: return [dx, dy]; case 1: return [dy, -dx]; case 2: return [-dx, -dy]; default: return [-dy, dx]; } }
+
+  function updateImage(inst, cat){ var innerBody; if (cat.svgOn) innerBody = inst.lit ? cat.svgOn : cat.svgOff; else if (cat.states) innerBody = cat.states[inst.state].svg; else innerBody = cat.svg; var svgFull = wrapSvg(innerBody, cat.innerH, inst.rot * 90); var bs = cat.boxSize; var newImg = board.create('image', [dataUri(svgFull), [function(){ return inst.H.X() - bs/2; }, function(){ return inst.H.Y() - bs/2; }], [bs, bs]], {fixed:true, highlight:false, layer:1}); newImg.on('down', function(){ if (isValidated) return; if (scissorsMode) return; if (cat.states) { if (selectedInst === inst) { toggleState(inst, cat); return; } } selectInstance(inst); }); if (inst.img) board.removeObject(inst.img); inst.img = newImg; board.update(); }
+
+  function createInstance(cat, x, y){
+      if (isValidated) return null;
+      instCounter++; var inst = {id:'c'+instCounter, key:cat.key, rot:0, state:0, lit:false, value:cat.defaultValue, anchors:[], img:null}; inst.H = board.create('point', [x, y], {size:8, face:'square', fillColor:'#cbd5e1', strokeColor:'#64748b', strokeWidth:1.5, withLabel:false, showInfobox:false, name:'', layer:10, visible:false}); inst.H.on('drag', function(){ if(!isValidated) recompute(); }); updateImage(inst, cat); cat.terminals.forEach(function(t){ var a = { inst: inst, role: t.role, cableCount:0, _connected:false, pt: board.create('point', [function(){ var o = rotatedOffset(t.dx, t.dy, inst.rot); return inst.H.X()+o[0]; }, function(){ var o = rotatedOffset(t.dx, t.dy, inst.rot); return inst.H.Y()+o[1]; }], {size:7, strokeColor:'#1f2937', strokeWidth:1.4, fillColor:t.color, fixed:true, withLabel:false, showInfobox:false, name:'', layer:12}) }; inst.anchors.push(a); a.pt.on('down', function(){ onAnchorDown(a); }); }); inst.rotateBtn = board.create('text', [function(){ var o = rotatedOffset(-cat.w/2-0.05, cat.h/2+0.05, inst.rot); return inst.H.X()+o[0]; }, function(){ var o = rotatedOffset(-cat.w/2-0.05, cat.h/2+0.05, inst.rot); return inst.H.Y()+o[1]; }, '⟳'], {fontSize:16, color:'#1e40af', fixed:true, anchorX:'left', layer:15}); inst.rotateBtn.on('down', function(){ if (isValidated || scissorsMode) return; inst.rot = (inst.rot + 1) % 4; updateImage(inst, cat); recompute(); }); inst.labelTxt = board.create('text', [function(){ var o = rotatedOffset(0, -cat.h/2-0.22, inst.rot); return inst.H.X()+o[0]; }, function(){ var o = rotatedOffset(0, -cat.h/2-0.22, inst.rot); return inst.H.Y()+o[1]; }, function(){ return cat.hasValue ? (cat.label + ' (' + inst.value + ' ' + cat.unit + ') ✎') : cat.label; }], {fontSize:11, color:'#64748b', fixed:true, anchorX:'middle', layer:15}); inst.labelTxt.on('down', function(){ if (isValidated) return; if (scissorsMode) return; selectInstance(inst); }); instances.push(inst); selectInstance(inst); recompute(); return inst;
+  }
+
+  function toggleState(inst, cat){ if (isValidated || scissorsMode) return; inst.state = (inst.state + 1) % cat.states.length; updateImage(inst, cat); recompute(); }
+  function deleteInstance(inst){ if (isValidated) return; cables.slice().forEach(function(c){ if (inst.anchors.indexOf(c.a) !== -1 || inst.anchors.indexOf(c.b) !== -1) removeCable(c); }); if (pending) { if (inst.anchors.indexOf(pending) !== -1) cancelPending(); } (inst.anchors || []).forEach(function(a){ board.removeObject(a.pt); }); if (inst.img) board.removeObject(inst.img); if (inst.rotateBtn) board.removeObject(inst.rotateBtn); if (inst.labelTxt) board.removeObject(inst.labelTxt); if (inst.H) board.removeObject(inst.H); var idx = instances.indexOf(inst); if (idx !== -1) instances.splice(idx, 1); if (selectedInst === inst) selectedInst = null; refreshSelection(); recompute(); }
+  function clearInProgressPath(){ pathSegs.forEach(function(s){ board.removeObject(s); }); pathPoints.forEach(function(p){ board.removeObject(p); }); pathSegs = []; pathPoints = []; }
+  function cancelPending(){ clearInProgressPath(); if (pending){ var p = pending; pending = null; refreshAnchor(p); } board.update(); }
+  function addWaypoint(x, y){ if (isValidated) return; var wp = board.create('point', [x, y], {size:5, fillColor:'#0ea5e9', strokeColor:'#0369a1', strokeWidth:1, withLabel:false, showInfobox:false, name:''}); var prevPt = pathPoints.length ? pathPoints[pathPoints.length-1] : pending.pt; var seg = board.create('segment', [prevPt, wp], {strokeColor:'#0ea5e9', strokeWidth:4, fixed:true, highlight:false, layer:6}); pathPoints.push(wp); pathSegs.push(seg); board.update(); }
+  function finalizeCable(destAnchor){ if (isValidated) return; var prevPt = pathPoints.length ? pathPoints[pathPoints.length-1] : pending.pt; var lastSeg = board.create('segment', [prevPt, destAnchor.pt], {strokeColor:'#0ea5e9', strokeWidth:4, fixed:true, highlight:false, layer:6}); var cableObj = { segs: pathSegs.concat([lastSeg]), waypoints: pathPoints.slice(), a: pending, b: destAnchor }; cables.push(cableObj); pending.cableCount++; destAnchor.cableCount++; pathPoints = []; pathSegs = []; pending = null; recompute(); }
+  function removeCable(cableObj){ var idx = cables.indexOf(cableObj); if (idx === -1) return; cableObj.segs.forEach(function(s){ board.removeObject(s); }); cableObj.waypoints.forEach(function(wp){ board.removeObject(wp); }); cables.splice(idx, 1); cableObj.a.cableCount--; cableObj.b.cableCount--; recompute(); }
+  function onAnchorDown(a){ if (isValidated || scissorsMode) return; if (!pending){ pending = a; refreshAnchor(a); board.update(); return; } if (pending === a){ cancelPending(); return; } finalizeCable(a); }
+  var scissorsMode = false;
+  function cutNearestCable(x, y){ if (isValidated) return false; var best = null, bestDist = 0.3; cables.forEach(function(cab){ var chain = [cab.a.pt].concat(cab.waypoints).concat([cab.b.pt]); for (var i=0; Math.sign(i-(chain.length-1))===-1; i++){ var dx=chain[i+1].X()-chain[i].X(), dy=chain[i+1].Y()-chain[i].Y(), lenSq=dx*dx+dy*dy; var t = lenSq === 0 ? 0 : Math.max(0, Math.min(1, ((x-chain[i].X())*dx + (y-chain[i].Y())*dy) / lenSq)); var d = Math.hypot(x - (chain[i].X()+t*dx), y - (chain[i].Y()+t*dy)); if (Math.sign(d-bestDist)===-1){ bestDist = d; best = cab; } } }); if (best){ removeCable(best); return true; } return false; }
+
+  document.getElementById('btnScissors').addEventListener('click', function(){ if(isValidated) return; scissorsMode = !scissorsMode; document.getElementById('btnScissors').classList.toggle('active', scissorsMode); document.getElementById('board').classList.toggle('cutting', scissorsMode); if (scissorsMode) cancelPending(); });
+  document.getElementById('btnUndo').addEventListener('click', function(){ if(isValidated) return; if (pathPoints.length){ board.removeObject(pathSegs.pop()); board.removeObject(pathPoints.pop()); board.update(); } else if (pending) cancelPending(); });
+  document.getElementById('btnReset').addEventListener('click', function(){ if(isValidated) return; scissorsMode = false; document.getElementById('btnScissors').classList.remove('active'); document.getElementById('board').classList.remove('cutting'); instances.slice().forEach(function(inst){ try { deleteInstance(inst); } catch(e){} }); instances = []; cables = []; clearInProgressPath(); pending = null; selectedInst = null; fb.textContent = 'Choisis un composant à droite pour commencer.'; fb.style.background = "#f1f5f9"; fb.style.color = "#475569"; fb.style.borderColor = "var(--line)"; board.update(); });
+
+  board.on('down', function(evt){
+    var c = board.getUsrCoordsOfMouse(evt);
+    if (scissorsMode){
+      if (!cutNearestCable(c[0], c[1])){
+        for (var i = 0; lt(i, instances.length); i++){
+          var ins = instances[i];
+          var rr = CATALOG_BY_KEY[ins.key].boxSize / 2 * 1.05;
+          if (lt(Math.hypot(c[0] - ins.H.X(), c[1] - ins.H.Y()), rr)){ deleteInstance(ins); break; }
+        }
+      }
+      return;
+    }
+    var nearAnchor = instances.some(function(inst){ return inst.anchors.some(function(a){ return lt(Math.hypot(a.pt.X() - c[0], a.pt.Y() - c[1]), ANCHOR_HIT); }); });
+    var nearBody = instances.some(function(inst){ var r = CATALOG_BY_KEY[inst.key].boxSize / 2 * 1.05; return lt(Math.hypot(c[0] - inst.H.X(), c[1] - inst.H.Y()), r); });
+    if (!pending){
+      /* clic dans le vide : on deselectionne */
+      if (!nearBody) { if (!nearAnchor) { if (selectedInst){ selectedInst = null; refreshSelection(); } } }
+      return;
+    }
+    if (!nearAnchor) { if (!nearBody) { addWaypoint(c[0], c[1]); } }
+  });
+
+  /* ================== MODELE DE NOTATION ==================
+     Noeuds calcules a partir des fils et contacts seulement, puis chaines
+     en serie contractees, puis forme canonique du graphe. Sont sans effet :
+     l'ordre des composants en serie, l'ordre de construction, la position
+     sur la planche, le sens des fils d'un composant non polarise.
+     Restent distingues : serie / parallele, court-circuit, composant en
+     trop ou manquant, cablage d'un interrupteur 3 pts, et le SENS d'une LED
+     (la presence d'une LED active d'office la prise en compte de la
+     polarite de la pile, sans quoi "bon sens" n'aurait pas de sens). */
+
+  function gradingNets(){
+    var list = [], i, j;
+    instances.forEach(function(inst){ inst.anchors.forEach(function(a){ list.push(a); }); });
+    var n = list.length;
+    var parent = []; for (i = 0; lt(i, n); i++) parent.push(i);
+    function find(k){ while (parent[k] !== k) k = parent[k]; return k; }
+    function union(x, y){ var rx = find(x), ry = find(y); if (rx !== ry) parent[rx] = ry; }
+    for (i = 0; lt(i, n); i++){ for (j = i + 1; lt(j, n); j++){ if (list[i].inst === list[j].inst) continue; if (lt(list[i].pt.Dist(list[j].pt), CONTACT_DIST)) union(i, j); } }
+    cables.forEach(function(c){ var ia = list.indexOf(c.a), ib = list.indexOf(c.b); if (ia !== -1) { if (ib !== -1) { union(ia, ib); } } });
+    var netId = {}, count = 0, netOf = [];
+    for (i = 0; lt(i, n); i++){ var r = find(i); if (!(r in netId)) { netId[r] = count; count++; } netOf.push(netId[r]); }
+    return { list: list, netOf: netOf, count: count };
+  }
+
+  function buildGraph(){
+    var g = gradingNets();
+    var comps = instances.map(function(inst){
+      return { key: inst.key, terms: inst.anchors.map(function(a){
+        var ai = g.list.indexOf(a); if (ai === -1) return -1; return g.netOf[ai];
+      }) };
+    });
+    return contractGraph(comps, g.count);
+  }
+
+  var POLARITE = false;
+  function lt(a, b){ return Math.sign(a - b) === -1; }
+  function gt(a, b){ return Math.sign(a - b) === 1; }
+
+  function roleOf(key, idx){
+    if (key === 'gen') return idx === 0 ? 'moins' : 'plus';
+    if (key === 'led') return idx === 0 ? 'anode' : 'cathode';
+    if (key === 'switch3') return idx === 0 ? 'c' : 't';
+    return 'x';
+  }
+
+  /* Composants polarises : leur sens de branchement est significatif. */
+  function isDirected(key){ return key === 'led'; }
+
+  /* Un composant est "chainable" s'il a exactement 2 bornes interchangeables.
+     Avec POLARITE, la pile devient un point de branchement oriente et sort
+     des chaines, sinon son sens serait perdu par la contraction. */
+  /* Une LED impose de tenir compte du sens de la pile : sans reference de
+     polarite, "LED dans le bon sens" n'a aucune signification physique.
+     La polarite s'active donc d'elle-meme des qu'une LED est presente. */
+  function polariteEffective(comps){
+    if (POLARITE) return true;
+    var i;
+    for (i = 0; lt(i, comps.length); i++){ if (isDirected(comps[i].key)) return true; }
+    return false;
+  }
+
+  function chainable(c, polar){
+    if (c.terms.length !== 2) return false;
+    if (c.key === 'gen') { if (polar) return false; }
+    return true;
+  }
+
+  function compress(arr){
+    var uniq = arr.slice().sort().filter(function(v, i, a){ return i === 0 || v !== a[i - 1]; });
+    var map = {};
+    uniq.forEach(function(v, i){ map[v] = 'c' + i; });
+    return arr.map(function(v){ return map[v]; });
+  }
+
+  /* comps : [{key, terms:[netId, ...]}]   netCount : nombre de noeuds
+
+     Une chaine en serie est resumee par : le multi-ensemble trie de ses
+     composants non polarises, plus le nombre de composants polarises orientes
+     dans un sens et dans l'autre. L'ordre le long de la chaine disparait, mais
+     le SENS des LED est conserve. Si les deux lectures (d'un bout a l'autre et
+     inversement) sont identiques la chaine est symetrique et l'arete est non
+     orientee ; sinon on retient la lecture la plus petite, ce qui rend le
+     resultat independant du sens de parcours. */
+  function contractGraph(comps, netCount){
+    var i, j;
+    var polar = polariteEffective(comps);
+    function chn(c){ return chainable(c, polar); }
+
+    var inc = []; for (i = 0; lt(i, netCount); i++) inc.push([]);
+    comps.forEach(function(c, ci){
+      c.terms.forEach(function(nid, ti){ if (nid !== -1) inc[nid].push({ ci: ci, ti: ti }); });
+    });
+
+    function isInternal(nid){
+      var t = inc[nid];
+      if (t.length !== 2) return false;
+      if (t[0].ci === t[1].ci) return false;
+      if (!chn(comps[t[0].ci])) return false;
+      if (!chn(comps[t[1].ci])) return false;
+      return true;
+    }
+
+    var done = [], chains = [], loops = [];
+    for (i = 0; lt(i, comps.length); i++) done.push(false);
+
+    /* remonte depuis (ci,ti) jusqu'au premier noeud non interne */
+    function reachEnd(ci, ti, seed){
+      var guard = 0;
+      while (true){
+        guard++; if (gt(guard, 500)) return null;
+        var nid = comps[ci].terms[ti];
+        if (nid === -1) return { net: -1, ci: ci, ti: ti };
+        if (!isInternal(nid)) return { net: nid, ci: ci, ti: ti };
+        var t = inc[nid];
+        var nxt = (t[0].ci === ci) ? t[1] : t[0];
+        if (nxt.ci === seed) return null;
+        ci = nxt.ci; ti = 1 - nxt.ti;
+      }
+    }
+
+    for (i = 0; lt(i, comps.length); i++){
+      if (done[i]) continue;
+      if (!chn(comps[i])) continue;
+
+      var endA = reachEnd(i, 0, i);
+
+      if (endA === null){
+        /* boucle fermee sans point de branchement */
+        var lp = [], lf = 0, lr = 0, ci = i, ti = 0, guard = 0;
+        while (true){
+          guard++; if (gt(guard, 500)) break;
+          done[ci] = true;
+          if (isDirected(comps[ci].key)) { if (ti === 0) lf++; else lr++; }
+          else lp.push(comps[ci].key);
+          var nid = comps[ci].terms[1 - ti];
+          var t = inc[nid];
+          var nxt = (t[0].ci === ci) ? t[1] : t[0];
+          if (nxt.ci === i) break;
+          ci = nxt.ci; ti = nxt.ti;
+        }
+        /* le sens de parcours d'une boucle est arbitraire : on normalise */
+        var lo = Math.min(lf, lr), hi = Math.max(lf, lr);
+        loops.push(lp.sort().join('+') + '/' + lo + ':' + hi);
+        continue;
+      }
+
+      /* parcours d'un bout a l'autre en notant le sens des composants polarises */
+      var passives = [], fwd = 0, rev = 0;
+      var cc = endA.ci, ct = endA.ti, endB = -1, g2 = 0;
+      while (true){
+        g2++; if (gt(g2, 500)) break;
+        done[cc] = true;
+        if (isDirected(comps[cc].key)) { if (ct === 0) fwd++; else rev++; }
+        else passives.push(comps[cc].key);
+        var nid2 = comps[cc].terms[1 - ct];
+        if (nid2 === -1) { endB = -1; break; }
+        if (!isInternal(nid2)) { endB = nid2; break; }
+        var t2 = inc[nid2];
+        var nx2 = (t2[0].ci === cc) ? t2[1] : t2[0];
+        cc = nx2.ci; ct = nx2.ti;
+      }
+
+      var base = passives.sort().join('+');
+      var Lab = base + '/' + fwd + ':' + rev;
+      var Lba = base + '/' + rev + ':' + fwd;
+      if (fwd === rev) chains.push({ label: 'S{' + Lab + '}', a: endA.net, b: endB, dir: false });
+      else if (Lab.localeCompare(Lba) === -1) chains.push({ label: 'D{' + Lab + '}', a: endA.net, b: endB, dir: true });
+      else chains.push({ label: 'D{' + Lba + '}', a: endB, b: endA.net, dir: true });
+    }
+
+    var keep = {};
+    chains.forEach(function(ch){ if (ch.a !== -1) keep[ch.a] = true; if (ch.b !== -1) keep[ch.b] = true; });
+    comps.forEach(function(c){
+      if (chn(c)) return;
+      c.terms.forEach(function(nid){ if (nid !== -1) keep[nid] = true; });
+    });
+
+    var vlabels = [], netVertex = {};
+    Object.keys(keep).map(Number).sort(function(a, b){ return a - b; }).forEach(function(nid){
+      netVertex[nid] = vlabels.length; vlabels.push('net');
+    });
+
+    var edges = [];
+    chains.forEach(function(ch){
+      if (ch.a === -1) return; if (ch.b === -1) return;
+      edges.push({ role: ch.label, u: netVertex[ch.a], v: netVertex[ch.b], dir: ch.dir });
+    });
+    comps.forEach(function(c){
+      if (chn(c)) return;
+      var cv = vlabels.length; vlabels.push(c.key);
+      c.terms.forEach(function(nid, ti){
+        if (nid === -1) return;
+        edges.push({ role: roleOf(c.key, ti), u: cv, v: netVertex[nid], dir: false });
+      });
+    });
+    loops.forEach(function(l){ vlabels.push('loop{' + l + '}'); });
+
+    return { n: vlabels.length, labels: vlabels, edges: edges };
+  }
+
+  function canonicalFromGraph(G){
+    var n = G.n, i, round;
+    if (n === 0) return '';
+
+    var color = G.labels.slice();
+    for (round = 0; lt(round, 4); round++){
+      var acc = []; for (i = 0; lt(i, n); i++) acc.push([]);
+      G.edges.forEach(function(e){
+        if (e.dir){ acc[e.u].push(e.role + '-out~' + color[e.v]); acc[e.v].push(e.role + '-in~' + color[e.u]); }
+        else { acc[e.u].push(e.role + '~' + color[e.v]); acc[e.v].push(e.role + '~' + color[e.u]); }
+      });
+      var next = [];
+      for (i = 0; lt(i, n); i++) next.push(color[i] + '{' + acc[i].sort().join(',') + '}');
+      color = compress(next);
+    }
+    var key = [];
+    for (i = 0; lt(i, n); i++) key.push(G.labels[i] + '#' + color[i]);
+
+    var order = []; for (i = 0; lt(i, n); i++) order.push(i);
+    order.sort(function(a, b){ var c = key[a].localeCompare(key[b]); if (c !== 0) return c; return a - b; });
+
+    var groups = [], cur = [order[0]];
+    for (i = 1; lt(i, n); i++){
+      if (key[order[i]] === key[cur[0]]) cur.push(order[i]);
+      else { groups.push(cur); cur = [order[i]]; }
+    }
+    groups.push(cur);
+
+    var offsets = [], off = 0;
+    groups.forEach(function(g){ offsets.push(off); off += g.length; });
+
+    function sig(perm){
+      var lab = [];
+      for (var k = 0; lt(k, n); k++) lab[perm[k]] = G.labels[k];
+      var es = G.edges.map(function(e){
+        var a = perm[e.u], b = perm[e.v];
+        if (e.dir) return e.role + ':' + a + '.' + b;
+        return e.role + ':' + Math.min(a, b) + '.' + Math.max(a, b);
+      }).sort().join('|');
+      return lab.join(',') + '|' + es;
+    }
+
+    var total = 1;
+    groups.forEach(function(g){ var f = 1, k; for (k = 2; !gt(k, g.length); k++) f *= k; total *= f; });
+    if (gt(total, 20000)){
+      var perm0 = []; order.forEach(function(v, idx){ perm0[v] = idx; });
+      return 'A' + n + '|' + sig(perm0);
+    }
+
+    function permutations(arr){
+      if (arr.length === 1) return [arr];
+      var out = [];
+      arr.forEach(function(x, idx){
+        var rest = arr.slice(0, idx).concat(arr.slice(idx + 1));
+        permutations(rest).forEach(function(p){ out.push([x].concat(p)); });
+      });
+      return out;
+    }
+    var perGroup = groups.map(function(g){ return permutations(g); });
+    var best = null;
+    function rec(gi, perm){
+      if (gi === groups.length){
+        var s = sig(perm);
+        if (best === null) { best = s; return; }
+        if (s.localeCompare(best) === -1) best = s;
+        return;
+      }
+      perGroup[gi].forEach(function(p){
+        var p2 = perm.slice();
+        p.forEach(function(v, k){ p2[v] = offsets[gi] + k; });
+        rec(gi + 1, p2);
+      });
+    }
+    rec(0, []);
+    return 'C' + n + '|' + best;
+  }
+  function canonicalSignature(){ return canonicalFromGraph(buildGraph()); }
+  function componentsSignature(){ return instances.map(function(inst){ return inst.key; }).sort().join(','); }
+
+  /* Valeurs : multi-ensemble trie "cle=valeur", pour un controle separe
+     dans le PRT (un mauvais reglage ne doit pas ressembler a un mauvais
+     cablage). Les composants sans valeur n'y figurent pas. */
+  function fmtNum(v){
+    var x = Math.round(v * 1000) / 1000;
+    return String(x);
+  }
+  function valuesSignature(){
+    var out = [];
+    instances.forEach(function(inst){
+      var cat = CATALOG_BY_KEY[inst.key];
+      if (!cat.hasValue) return;
+      out.push(inst.key + '=' + fmtNum(inst.value));
+    });
+    return out.sort().join(',');
+  }
+
+  /* ================== SAUVEGARDE / RESTAURATION DU SCHEMA ==================
+     Moodle recharge la page a chaque soumission : sans cela le schema
+     disparait. L'etat complet est ecrit en continu dans ans3 (base64 url-safe,
+     donc sans caractere qui puisse casser une chaine Maxima). */
+  function b64encode(s){ return btoa(s).split('+').join('-').split('/').join('_').split('=').join(''); }
+  function b64decode(s){ var t = s.split('-').join('+').split('_').join('/'); while (t.length % 4) t += '='; return atob(t); }
+  function r2(x){ return Math.round(x * 100) / 100; }
+
+  function serializeState(){
+    var comps = instances.map(function(inst){ return { k: inst.key, x: r2(inst.H.X()), y: r2(inst.H.Y()), r: inst.rot, s: inst.state, v: inst.value }; });
+    var wires = cables.map(function(c){
+      return { a: [instances.indexOf(c.a.inst), c.a.inst.anchors.indexOf(c.a)],
+               b: [instances.indexOf(c.b.inst), c.b.inst.anchors.indexOf(c.b)],
+               p: c.waypoints.map(function(wp){ return [r2(wp.X()), r2(wp.Y())]; }) };
+    });
+    return b64encode(JSON.stringify({ c: comps, w: wires, v: isValidated ? 1 : 0 }));
+  }
+
+  function pushState(){
+    var a = document.getElementById('sigOut'), b = document.getElementById('compOut'), c = document.getElementById('valOut');
+    if (a) a.value = canonicalSignature();
+    if (b) b.value = componentsSignature();
+    if (c) c.value = valuesSignature();
+  }
+
+  function restoreState(str){
+    if (!str) return;
+    var data;
+    try { data = JSON.parse(b64decode(str)); } catch (e) { return; }
+    if (!data) return; if (!data.c) return;
+    var wasValidated = isValidated;
+    isValidated = false;
+    var made = [];
+    data.c.forEach(function(cd){
+      var cat = CATALOG_BY_KEY[cd.k];
+      if (!cat) { made.push(null); return; }
+      var inst = createInstance(cat, cd.x, cd.y);
+      if (inst){
+        inst.rot = cd.r || 0;
+        inst.state = cd.s || 0;
+        if (typeof cd.v !== 'undefined') inst.value = cd.v;
+        updateImage(inst, cat);
+      }
+      made.push(inst);
+    });
+    (data.w || []).forEach(function(wd){
+      var ia = made[wd.a[0]], ib = made[wd.b[0]];
+      if (!ia) return; if (!ib) return;
+      var aA = ia.anchors[wd.a[1]], aB = ib.anchors[wd.b[1]];
+      if (!aA) return; if (!aB) return;
+      pending = aA;
+      (wd.p || []).forEach(function(pt){ addWaypoint(pt[0], pt[1]); });
+      finalizeCable(aB);
+    });
+    isValidated = wasValidated || (data.v === 1);
+    selectedInst = null; refreshSelection();
+    recompute();
+  }
+
+  /* Animation : une lampe s'allume si, en faisant conduire tous les autres
+     composants (mais PAS elle-meme), ses deux bornes rejoignent les deux
+     bornes d'un generateur. Un condensateur ne conduit pas le continu,
+     un interrupteur conduit selon sa position. */
+  function conductionPairs(inst){
+    var cat = CATALOG_BY_KEY[inst.key];
+    if (cat.states) return cat.states[inst.state].connections || [];
+    return cat.conducts || [];
+  }
+
+  function recompute(){
+    var g = gradingNets(), list = g.list, i;
+    var netCount = {};
+    g.netOf.forEach(function(id){ netCount[id] = (netCount[id] || 0) + 1; });
+    list.forEach(function(a, idx){ a._connected = gt(netCount[g.netOf[idx]], 1); refreshAnchor(a); });
+
+    var gens = instances.filter(function(x){ return x.key === 'gen'; });
+    var lamps = instances.filter(function(x){ if (x.key === 'lamp') return true; return x.key === 'led'; });
+    lamps.forEach(function(lampInst){
+      var lit = false;
+      if (gens.length){
+        var parent = []; for (var k = 0; lt(k, g.count); k++) parent.push(k);
+        var find = function(z){ while (parent[z] !== z) z = parent[z]; return z; };
+        var union = function(x, y){ var rx = find(x), ry = find(y); if (rx !== ry) parent[rx] = ry; };
+        instances.forEach(function(inst){
+          if (inst === lampInst) return;
+          if (inst.key === 'gen') return;
+          conductionPairs(inst).forEach(function(pair){
+            var ia = list.indexOf(inst.anchors[pair[0]]), ib = list.indexOf(inst.anchors[pair[1]]);
+            if (ia !== -1) { if (ib !== -1) { union(g.netOf[ia], g.netOf[ib]); } }
+          });
+        });
+        var la = list.indexOf(lampInst.anchors[0]), lb = list.indexOf(lampInst.anchors[1]);
+        if (la !== -1) { if (lb !== -1) {
+          var A = find(g.netOf[la]), B = find(g.netOf[lb]);
+          var polarise = CATALOG_BY_KEY[lampInst.key].polarise;
+          lit = gens.some(function(gn){
+            var m = list.indexOf(gn.anchors[0]), q = list.indexOf(gn.anchors[1]);
+            if (m === -1) return false; if (q === -1) return false;
+            var M = find(g.netOf[m]), P = find(g.netOf[q]);
+            /* A = borne 0 (anode pour une LED), B = borne 1 (cathode) */
+            if (P === A) { if (M === B) return true; }
+            if (polarise) return false;
+            if (P === B) { if (M === A) return true; }
+            return false;
+          });
+        } }
+      }
+      if (lampInst.lit !== lit){ lampInst.lit = lit; updateImage(lampInst, CATALOG_BY_KEY[lampInst.key]); }
+    });
+    board.update();
+    pushState();
+  }
+
+
+
+
+  document.getElementById('valInput').addEventListener('input', function(){
+    if (isValidated) return;
+    if (!selectedInst) return;
+    var cat = CATALOG_BY_KEY[selectedInst.key];
+    if (!cat.hasValue) return;
+    var v = parseFloat(String(this.value).replace(',', '.'));
+    if (isNaN(v)) return;
+    if (!gt(v, 0)) return;
+    selectedInst.value = v;
+    board.update();
+    pushState();
+  });
+
+  var paletteEl = document.getElementById('palette');
+  CATALOG.forEach(function(cat){
+      var card = document.createElement('div');
+      card.className = 'card';
+      var img = document.createElement('img');
+      var previewInner = cat.svg || cat.svgOff; if (!previewInner) { if (cat.states) { previewInner = cat.states[0].svg; } }
+      img.src = dataUri(wrapSvg(previewInner, cat.innerH, 0));
+      var span = document.createElement('span');
+      span.textContent = cat.label;
+      card.appendChild(img);
+      card.appendChild(span);
+      card.addEventListener('click', function(){ var slot = instances.length; createInstance(cat, 6.5 + (slot % 3) * 0.4, 6.0 - (slot % 5) * 0.5); });
+      paletteEl.appendChild(card);
+  });
+}
+
+var jxgReady = false, inputReady = false;
+function tryInit(){ if (jxgReady) { if (inputReady) initApp(); } }
+
+
+var linkCss = document.createElement('link'); linkCss.rel = 'stylesheet'; linkCss.href = 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.11.1/jsxgraph.css'; document.head.appendChild(linkCss);
+var scriptJsx = document.createElement('script'); scriptJsx.src = 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.11.1/jsxgraphcore.js';
+scriptJsx.onload = function(){ jxgReady = true; inputReady = true; tryInit(); };
+document.head.appendChild(scriptJsx);
+
+</script>
+</body>
+</html>

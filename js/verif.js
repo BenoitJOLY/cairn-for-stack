@@ -117,7 +117,6 @@ function getVerifTypeLabel(type) {
     'vf':             'type.vf',
     'ord':            'type.ord',
     'imgclick':       'type.imgclick',
-    'glr':            'type.glr',
     'rvbcmj':         'type.rvbcmj'
   };
   const key = keyMap[t];

@@ -99,7 +99,7 @@
       chemical: "Chemistry — equation", chemical_topo: "Topological chemistry",
       nuclear: "Nuclear reaction", composition: "Composition",
       jxgdrop: "Drag & Drop (JSXGraph)", vf: "True / False", ord: "Ranking",
-      imgclick: "Image selection", glr: "Graph reading", rvbcmj: "RGB / CMYK",
+      imgclick: "Image selection", rvbcmj: "RGB / CMYK",
       optique: "Geometric optics", "acide-base": "Acid-base titration", redox: "Redox titration",
       basen: "Base-N conversion", circuit: "Electrical circuits",
       logique: "Boolean logic", complexe: "Complex numbers",
@@ -108,7 +108,7 @@
       suites: "Number sequences", probabilites: "Probability",
       trigonometrie: "Trigonometry", polynomes: "Quadratic polynomials",
       limites: "Function limits", physique: "Physics — Mechanics",
-      inequation: "Inequalities (solution set)", thermo: "Thermodynamics (ideal gas, heat)"
+      inequation: "Inequalities (solution set)"
     },
 
     /* ── Detailed step-3 guidance, field by field, per type ── */
@@ -415,19 +415,6 @@
           "<strong>Feedback</strong> correct / incorrect."
         ],
         tip: "STACK accepts oo/oc/co/cc for intervals and union() for unions. Use inf and -inf for half-lines."
-      },
-      thermo: {
-        intro: "Thermodynamics: ideal gas law PV=nRT, heat Q=mcΔT, Boyle's and Charles's laws. NumRelative 1%.",
-        fields: [
-          "<strong>Preset</strong> — choose a scenario.",
-          "<strong>Question type</strong> — P, V, T, n (ideal gas) or Q (heat) or Boyle's/Charles's law.",
-          "<strong>Gas parameters</strong> — P (Pa), V (m³), n (mol), T (K).",
-          "<strong>Heat parameters</strong> — m (kg), cp (J/kg/K), ΔT (K).",
-          "<strong>The preview</strong> computes the expected result.",
-          "<strong>Question text</strong> — via ✏️ Editor.",
-          "<strong>Feedback</strong> correct / incorrect."
-        ],
-        tip: "R = 8.314 J/(mol·K). Check units: P in Pa, V in m³, T in Kelvin."
       }
     }
   };
