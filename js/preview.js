@@ -2994,33 +2994,6 @@ function renderPreviewHTML_calcul(state) {
 }
 window.calcRefreshPreview = _hsWireSimplePreview('calcul', 'calc', 'calc-preview-container', 'fp-calcul', renderPreviewHTML_calcul);
 
-function renderPreviewHTML_thermo(state) {
-  var realParts = {};
-  try { realParts = (typeof genThermo === 'function') ? genThermo(1) : {}; } catch (e) { realParts = {}; }
-  var realGeneralFeedback = realParts.generalFeedback || '';
-  var knownVars = _calcExtractKnownVars(realParts.vars || '');
-  Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });
-  var prtBoxes = _hsPrtBoxes(realParts);
-  var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
-  var bodyFrag = (realParts.textFrag || '')
-    .replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
-    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled style="' + fakeInputStyle + '">')
-    .replace(/\[\[validation:[^\]]+\]\]/g, '');
-  var scenarioHTML = bodyFrag ? _calcTokenizeForPreview(bodyFrag, knownVars)
-    : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
-  var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
-  return _hsSimplePreviewHTML({
-    badge: 'Thermodynamique', badgeColor: '#92400e', noteBg: '#fff7ed', noteColor: '#92400e',
-    prefix: 'thy', bareme: state.bareme || 1,
-    text: _hsRenderMath(scenarioHTML),
-    hideExampleBox: true,
-    fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
-    fbGenAuto: _hsRenderMath(_calcTokenizeForPreview(realGeneralFeedback, knownVars) + note),
-    fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen
-  });
-}
-window.thyRefreshPreview = _hsWireSimplePreview('thermo', 'thy', 'thy-preview-container', 'fp-thermo', renderPreviewHTML_thermo);
-
 // Extrait le contenu d'un bloc STACK [[tag ...]]...[[/tag]] et, pour l'iframe,
 // sépare [[style]]/[[script type="module"]] du reste du HTML — sert uniquement à
 // rejouer une version "live" (littéraux JS à la place des {#...#}) dans l'aperçu.
@@ -3100,31 +3073,21 @@ function renderPreviewHTML_acideBase(state) {
 window.abRefreshPreview = _hsWireSimplePreview('acide-base', 'ab', 'ab-preview-container', 'fp-acide-base', renderPreviewHTML_acideBase, true);
 
 function renderPreviewHTML_circuit(state) {
-  var realParts = {};
-  try { realParts = (typeof genCircuit === 'function') ? genCircuit(1) : {}; } catch (e) { realParts = {}; }
-  var realGeneralFeedback = realParts.generalFeedback || '';
-  var knownVars = _calcExtractKnownVars(realParts.vars || '');
-  Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });
-  var prtBoxes = _hsPrtBoxes(realParts);
-  var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
-  var bodyFrag = (realParts.textFrag || '')
-    .replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
-    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled style="' + fakeInputStyle + '">')
-    .replace(/\[\[validation:[^\]]+\]\]/g, '');
-  var scenarioHTML = bodyFrag ? _calcTokenizeForPreview(bodyFrag, knownVars)
-    : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
-  var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
-  return _hsSimplePreviewHTML({
-    badge: 'Circuit \xe9lectrique', badgeColor: '#c2410c', noteBg: '#fff7ed', noteColor: '#9a3412',
-    prefix: 'cir', bareme: state.bareme || 1,
-    text: _hsRenderMath(scenarioHTML),
-    hideExampleBox: true,
-    fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
-    fbGenAuto: _hsRenderMath(_calcTokenizeForPreview(realGeneralFeedback, knownVars) + note),
-    fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen
-  });
+  var model = state.cirModel;
+  if (!model || !model.state) {
+    return _hsSimplePreviewHTML({
+      badge: 'Circuit \xe9lectrique', badgeColor: '#c2410c', noteBg: '#fff7ed', noteColor: '#9a3412',
+      prefix: 'cir', bareme: state.bareme || 1,
+      text: '<p><em style="color:#6b7280;">Construisez un circuit mod\xe8le dans l\'atelier ci-contre pour voir l\'aper\xe7u \xe9l\xe8ve.</em></p>',
+      hideExampleBox: true, hideOkWrongBoxes: true,
+      fbGenAuto: '', fbGen: state.fbGen
+    });
+  }
+  // L'\xe9l\xe8ve part toujours d'un board vierge (le circuit mod\xe8le n'est jamais
+  // transmis c\xf4t\xe9 \xe9l\xe8ve, ni ici en aper\xe7u ni r\xe9ellement dans Moodle).
+  return cirBuildAtelierHTML({ mode: 'student-preview', initialStateB64: '' });
 }
-window.cirRefreshPreview = _hsWireSimplePreview('circuit', 'cir', 'cir-preview-container', 'fp-circuit', renderPreviewHTML_circuit);
+window.cirRefreshPreview = _hsWireSimplePreview('circuit', 'cir', 'cir-preview-container', 'fp-circuit', renderPreviewHTML_circuit, true);
 
 function renderPreviewHTML_basen(state) {
   var realParts = {};
@@ -3482,17 +3445,6 @@ function renderPreviewHTML_imgclick(state) {
   });
 }
 window.icRefreshPreview = _hsWireSimplePreview('imgclick', 'ic', 'ic-preview-container', 'fp-imgclick', renderPreviewHTML_imgclick, true);
-
-function renderPreviewHTML_glr(state) {
-  return _hsSimplePreviewHTML({
-    badge: 'Lecture graphique', badgeColor: '#0369A1', noteBg: '#eff6ff', noteColor: '#1e40af',
-    prefix: 'glr', bareme: state.bareme || 1,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : cliquer sur la courbe au point demandé.</em></p>'),
-    exampleHTML: '<p style="color:#94a3b8;font-style:italic;">Le graphe JSXGraph interactif n\'est visible que dans l\'export Moodle final.</p>',
-    fbOk: state.fbOk, fbWrong: state.fbWrong, fbGen: state.fbGen
-  });
-}
-window.glrRefreshPreview = _hsWireSimplePreview('glr', 'glr', 'glr-preview-container', 'fp-glr', renderPreviewHTML_glr);
 
 // {@expr@} : jetons STACK non calculables côté JS (ex: {@pct_1@} dans le
 // feedback faux) — affichés en <code> plutôt que laissés bruts, même

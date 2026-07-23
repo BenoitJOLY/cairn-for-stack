@@ -1,167 +1,179 @@
-// ── XML GENERATORS: circuit électrique ──
+// ── XML GENERATORS: circuit électrique (atelier de construction) ──
+// L'enseignant construit un circuit modèle dans le canvas de la modale de
+// config (js/circuit-ui.js), l'élève reconstruit le même circuit dans la
+// question Moodle. Correction par comparaison de graphes (isomorphisme),
+// portée depuis js/circuit-atelier.js (cirEngineRun / CIR_ENGINE_JS).
 
 function genCircuit(X) {
     var gv = function(id) { var el=document.getElementById(id); return el?parseFloat(el.value)||0:0; };
     var gs = function(id) { var el=document.getElementById(id); return el?el.value:""; };
+    var gc = function(id) { var el=document.getElementById(id); return !!(el && el.checked); };
+
+    var model = (typeof cirReadModelFromCanvas === 'function') ? cirReadModelFromCanvas() : null;
+    if (!model) {
+        throw new Error(I18N.t('cir.err_no_model'));
+    }
 
     var p = {
-        scenario: gs("cir-scenario") || "loi-ohm",
-        ask:      gs("cir-ask")      || "i",
-        e:        gv("cir-e")  || 9,
-        r1:       gv("cir-r1") || 100,
-        r2:       gv("cir-r2") || 220,
-        r3:       gv("cir-r3") || 0,
-        iKnown:   gv("cir-i-known") / 1000,
-        tol:      gv("cir-tol") || 5,
-        bareme:   parseFloat(gv("cir-bareme")) || 1,
-        fbOk:     gs("cir-fb-ok"),
-        fbWrong:  gs("cir-fb-wrong"),
-        text:     richVal("cir-text"),
-        fbGen:    gs("cir-fbgen")
+        model:       model,
+        checkValues: gc('cir-check-values'),
+        bareme:      parseFloat(gv('cir-bareme')) || 1,
+        text:        richVal('cir-text'),
+        fbGen:       gs('cir-fbgen')
     };
     return genCircuitCore(X, p);
 }
 
 /* genCircuitCore : fonction pure (aucun accès DOM), voir js/gen-redox.js
-   pour le pattern (deps injectables — test/unit/gen-circuit.test.js). */
+   pour le pattern (deps injectables — test/unit/gen-circuit.test.js).
+   p.model = { signature, components, values, state } (retourné par
+   window.__cirGetModelState() côté canvas enseignant). */
 function genCircuitCore(X, p, deps) {
     deps = deps || {};
-    var I18N_D = deps.I18N || I18N;
+    var I18N_D        = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var mkFbGen_D      = deps._mkFbGen || _mkFbGen;
+    var CIR_ENGINE_JS_D  = deps.CIR_ENGINE_JS  || (typeof cirEngineRun !== 'undefined' ? cirEngineRun.toString() : '');
+    var CIR_ATELIER_CSS_D = deps.CIR_ATELIER_CSS || (typeof CIR_ATELIER_CSS !== 'undefined' ? CIR_ATELIER_CSS : '');
 
-    var scenario = p.scenario, ask = p.ask, e = p.e, r1 = p.r1, r2 = p.r2, r3 = p.r3;
-    var iKnown = p.iKnown, tol = p.tol, bareme = p.bareme, fbOk = p.fbOk, fbWrong = p.fbWrong, text = p.text;
+    var model    = p.model || {};
+    var bareme   = p.bareme;
+    var checkValues = !!p.checkValues;
+    var text     = p.text;
 
-    var req = 0, I = 0, I1 = 0, I2 = 0, tansJS = 0;
-    if (scenario === "loi-ohm") {
-        if (ask === "i") tansJS = r1 > 0 ? e / r1 : 0;
-        if (ask === "r") tansJS = iKnown > 0 ? e / iKnown : 0;
-        if (ask === "u") tansJS = r1 * iKnown;
-    } else if (scenario === "serie") {
-        req = r1 + r2 + (r3 > 0 ? r3 : 0);
-        I   = req > 0 ? e / req : 0;
-        if (ask === "r-eq") tansJS = req;
-        if (ask === "i")    tansJS = I;
-        if (ask === "u1")   tansJS = r1 * I;
-        if (ask === "u2")   tansJS = r2 * I;
-        if (ask === "u3")   tansJS = r3 * I;
-    } else {
-        req  = r1 > 0 && r2 > 0 ? 1/(1/r1+1/r2) : 0;
-        I    = req > 0 ? e / req : 0;
-        I1   = r1 > 0 ? e / r1 : 0;
-        I2   = r2 > 0 ? e / r2 : 0;
-        if (ask === "r-eq")    tansJS = req;
-        if (ask === "i-total") tansJS = I;
-        if (ask === "i1")      tansJS = I1;
-        if (ask === "i2")      tansJS = I2;
-    }
-
-    var isI  = (ask === "i" || ask === "i-total" || ask === "i1" || ask === "i2");
-    var isU  = (ask === "u" || ask.charAt(0) === "u");
-    var unit = isI ? "A" : isU ? "V" : "Ohm";
-
-    var fmtSI = function(v, u) {
-        var a = Math.abs(v);
-        if (a === 0) return "0 " + u;
-        if (a < 0.1) return (v*1000).toFixed(2) + " m" + u;
-        if (a >= 1000) return (v/1000).toFixed(3) + " k" + u;
-        return v.toFixed(4).replace(/\.?0+$/, "") + " " + u;
+    var escStr = function(s) {
+        return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     };
-    var tansStr = fmtSI(tansJS, unit);
 
-    var qvars = "", tansMaxima = "";
-    var tolFrac = (tol / 100).toFixed(4);
+    var nameS = 'ans' + X + 's', nameC = 'ans' + X + 'c', nameW = 'ans' + X + 'w', nameV = 'ans' + X + 'v';
+    // Convention de nommage 'ta{X}_xxx' (digit de qid immédiatement après 'ta') : c'est le
+    // seul motif reconnu par la regex étroite ren() de js/editor.js (renumberChips()) pour
+    // renommer les <tans> lors d'un réordonnancement de questions ; 'ta_xxx{X}' ne matcherait
+    // pas et laisserait une référence Maxima périmée dans inputXML après renumérotage.
+    var mTaComponents = 'ta' + X + '_components', mTaSignature = 'ta' + X + '_signature', mTaValues = 'ta' + X + '_values';
+    var mVerifierValeurs = 'verifier_valeurs' + X;
+    var mSchemaEleve = 'schema_eleve' + X, mValEleve = 'val_eleve' + X;
 
-    if (scenario === "loi-ohm") {
-        if (ask === "i") {
-            qvars = "cir_e:" + e + "; cir_r:" + r1 + ";\ncir_i:cir_e/cir_r;\ntans:cir_i;\n";
-            tansMaxima = String(e) + "/" + String(r1);
-        } else if (ask === "r") {
-            var iA = iKnown.toFixed(6);
-            qvars = "cir_e:" + e + "; cir_i:" + iA + ";\ncir_r:cir_e/cir_i;\ntans:cir_r;\n";
-            tansMaxima = e + "/" + iA;
-        } else {
-            var iA2 = iKnown.toFixed(6);
-            qvars = "cir_r:" + r1 + "; cir_i:" + iA2 + ";\ncir_u:cir_r*cir_i;\ntans:cir_u;\n";
-            tansMaxima = r1 + "*" + iA2;
-        }
-    } else if (scenario === "serie") {
-        var hasR3 = (r3 > 0);
-        qvars = "cir_e:" + e + "; cir_r1:" + r1 + "; cir_r2:" + r2 + "; cir_r3:" + (hasR3?r3:0) + ";\n"
-              + "cir_req:cir_r1+cir_r2+cir_r3;\n"
-              + "cir_i:cir_e/cir_req;\n"
-              + "cir_u1:cir_r1*cir_i; cir_u2:cir_r2*cir_i; cir_u3:cir_r3*cir_i;\n";
-        if (ask === "r-eq") { qvars += "tans:cir_req;\n"; tansMaxima = String(r1+r2+(hasR3?r3:0)); }
-        if (ask === "i")    { qvars += "tans:cir_i;\n"; }
-        if (ask === "u1")   { qvars += "tans:cir_u1;\n"; }
-        if (ask === "u2")   { qvars += "tans:cir_u2;\n"; }
-        if (ask === "u3")   { qvars += "tans:cir_u3;\n"; }
-        if (!tansMaxima) tansMaxima = String(tansJS.toFixed(8));
-    } else {
-        qvars = "cir_e:" + e + "; cir_r1:" + r1 + "; cir_r2:" + r2 + ";\n"
-              + "cir_req:1/(1/cir_r1+1/cir_r2);\n"
-              + "cir_i_tot:cir_e/cir_req;\n"
-              + "cir_i1:cir_e/cir_r1; cir_i2:cir_e/cir_r2;\n";
-        if (ask === "r-eq")    { qvars += "tans:cir_req;\n"; }
-        if (ask === "i-total") { qvars += "tans:cir_i_tot;\n"; }
-        if (ask === "i1")      { qvars += "tans:cir_i1;\n"; }
-        if (ask === "i2")      { qvars += "tans:cir_i2;\n"; }
-        tansMaxima = String(tansJS.toFixed(8));
+    var vars = mTaComponents + ': "' + escStr(model.components) + '"$\n'
+        + mTaSignature + ': "' + escStr(model.signature) + '"$\n'
+        + mTaValues + ': "' + escStr(model.values) + '"$\n'
+        + mVerifierValeurs + ': ' + (checkValues ? 'true' : 'false') + '$';
+
+    function _cirInput(name, tans, boxsize) {
+        return '<input><name>' + name + '</name><type>string</type><tans>' + tans + '</tans>'
+            + '<boxsize>' + boxsize + '</boxsize><strictsyntax>0</strictsyntax><insertstars>0</insertstars>'
+            + '<syntaxhint></syntaxhint><syntaxattribute>0</syntaxattribute>'
+            + '<forbidwords></forbidwords><allowwords></allowwords>'
+            + '<forbidfloat>0</forbidfloat><requirelowestterms>0</requirelowestterms>'
+            + '<checkanswertype>0</checkanswertype><mustverify>0</mustverify>'
+            + '<showvalidation>0</showvalidation><options></options></input>';
     }
+    var inputXML = _cirInput(nameS, mTaSignature, 60) + '\n'
+        + _cirInput(nameC, mTaComponents, 30) + '\n'
+        + _cirInput(nameW, '""', 10) + '\n'
+        + _cirInput(nameV, mTaValues, 40);
 
-    var inputXML = "<input><name>ans" + X + "</name>"
-        + "<type>algebraic</type><tans>" + tansMaxima + "</tans>"
-        + "<boxsize>10</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars>"
-        + "<syntaxhint></syntaxhint><syntaxattribute>0</syntaxattribute>"
-        + "<forbidwords></forbidwords><allowwords></allowwords>"
-        + "<forbidfloat>0</forbidfloat><requirelowestterms>0</requirelowestterms>"
-        + "<checkanswertype>0</checkanswertype><mustverify>0</mustverify>"
-        + "<showvalidation>0</showvalidation><options></options></input>";
+    // ── Bloc iframe : moteur JS embarqué à l'identique (CIR_ENGINE_JS), mode 'student' ──
+    var bootCfg = { mode: 'student', inputNames: { s: nameS, c: nameC, w: nameW, v: nameV } };
+    var scriptModule = 'import {stack_js} from \'[[cors src="stackjsiframe.js"/]]\';\n\n'
+        + CIR_ENGINE_JS_D + '\n\n'
+        + 'cirEngineRun(' + JSON.stringify(bootCfg) + ');\n';
 
-    var feedVars = "cir_tol_frac:" + tolFrac + ";\n"
-        + "cir_err:if is(tans = 0) then abs(ans" + X + ") else abs((ans" + X + " - tans)/tans);\n"
-        + "cir_ok:is(cir_err < cir_tol_frac);\n";
+    var atelierBody = '<h1 class="sc">🔌 Atelier circuits électriques</h1>\n'
+        + '<p class="sub">Clique sur un composant à droite pour le placer. Clique sur un composant du schéma pour le <strong>sélectionner</strong> : un repère carré gris apparaît, glisse-le pour déplacer le composant. <strong>⟳</strong> pour tourner, l\'étiquette (✎) pour changer une valeur. Clique sur deux bornes pour tirer un câble. Un interrupteur déjà sélectionné bascule quand on reclique dessus.</p>\n'
+        + '<div class="layout">\n'
+        + '  <div class="left">\n'
+        + '    <div class="toolbar">\n'
+        + '      <button id="btnScissors" type="button">✂️ Ciseau</button>\n'
+        + '      <button id="btnUndo" type="button">← Annuler point</button>\n'
+        + '      <button id="btnReset" type="button">↺ Vider tout</button>\n'
+        + '    </div>\n'
+        + '    <div id="board"></div>\n'
+        + '    <div id="feedback">Choisis un composant à droite pour commencer.</div>\n'
+        + '  </div>\n'
+        + '  <div class="right">\n'
+        + '    <h2 class="sc">Composants</h2>\n'
+        + '    <div class="palette" id="palette"></div>\n'
+        + '    <h2 class="sc">Valeur</h2>\n'
+        + '    <div id="valBox">\n'
+        + '      <div id="valName">Sélectionne un composant</div>\n'
+        + '      <div class="valrow">\n'
+        + '        <input id="valInput" type="number" step="any" min="0" disabled>\n'
+        + '        <span id="valUnit"></span>\n'
+        + '      </div>\n'
+        + '      <div id="valHint">Clique sur un composant du schéma pour régler sa valeur.</div>\n'
+        + '    </div>\n'
+        + '    <h2 class="sc">Validation</h2>\n'
+        + '    <button id="btnExport" type="button">✅ Valider le circuit</button>\n'
+        + '  </div>\n'
+        + '</div>\n';
 
-    var fbOkFinal    = fbOk    || "<p>&#10003; <strong>" + I18N_D.t('cir.fb_ok_default') + "</strong> " + tansStr + "</p>";
-    var fbWrongFinal = fbWrong || ("<p>&#10007; <strong>" + I18N_D.t('cir.fb_wrong_default') + "</strong> " + I18N_D.t('cir.fb_wrong_valeur_attendue') + tansStr + " (+-" + tol + "%).</p>");
+    var iframeBlock = '[[iframe width="100%" height="740px" scrolling="false"]]\n\n'
+        + '[[style]]\n' + CIR_ATELIER_CSS_D + '\n[[/style]]\n\n'
+        + atelierBody + '\n'
+        + '[[script type="module"]]\n' + scriptModule + '[[/script]]\n'
+        + '[[/iframe]]\n';
 
-    var prtMeta = { name: "prt" + X, value: "1", autosimplify: "1", feedbackstyle: "1", feedbackvariables: feedVars };
-    var canonicalNodes = [{
-        name: "0", description: "", answertest: "AlgEquiv", sans: "cir_ok", tans: "true",
-        testoptions: "", quiet: "0",
-        truescoremode: "=", truescore: String(bareme), truepenalty: "0", truenextnode: "-1",
-        trueanswernote: "PRT" + X + "-1-T", truefeedback: fbOkFinal,
-        falsescoremode: "=", falsescore: "0", falsepenalty: "0", falsenextnode: "-1",
-        falseanswernote: "PRT" + X + "-1-F", falsefeedback: fbWrongFinal
-    }];
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
-
-    var scenarioLabel = scenario === "loi-ohm" ? I18N_D.t('cir.scenario_label_ohm') : I18N_D.t('cir.scenario_label_prefix') + scenario;
-    var askLabels = {
-        i: I18N_D.t('cir.ask_lbl_i'), r: I18N_D.t('cir.ask_lbl_r'), u: I18N_D.t('cir.ask_lbl_u'),
-        "r-eq": I18N_D.t('cir.ask_lbl_r_eq'), "i-total": I18N_D.t('cir.ask_lbl_i_total'),
-        u1: I18N_D.t('cir.ask_lbl_u1'), u2: I18N_D.t('cir.ask_lbl_u2'), u3: I18N_D.t('cir.ask_lbl_u3'),
-        i1: I18N_D.t('cir.ask_lbl_i1'), i2: I18N_D.t('cir.ask_lbl_i2')
-    };
-    var askLabel = askLabels[ask] || ask;
-    var instrText = text || ("<p>" + I18N_D.t('cir.instr_line1', {scenario: scenarioLabel, ask: askLabel, unit: unit}) + "</p>"
-        + "<p style=\"font-size:.85em;color:#6b7280;\">" + I18N_D.t('cir.instr_line2', {unit: unit, tol: String(tol)}) + "</p>");
+    var instrText = text || ('<p><strong>Consigne :</strong> Utilisez l\'atelier ci-dessous pour construire un circuit identique à celui attendu. '
+        + 'Une fois terminé, cliquez sur le bouton <strong>✅ Valider le circuit</strong> dans l\'atelier pour verrouiller votre travail, '
+        + 'puis soumettez votre réponse avec le bouton habituel de la page.</p>');
 
     var questionText = instrText
-        + "[[input:ans" + X + "]][[validation:ans" + X + "]]"
-        + "[[feedback:prt" + X + "]]";
+        + '<div style="display: none;" aria-hidden="true" tabindex="-1">\n'
+        + '[[input:' + nameS + ']] [[validation:' + nameS + ']]\n'
+        + '[[input:' + nameC + ']] [[validation:' + nameC + ']]\n'
+        + '[[input:' + nameW + ']] [[validation:' + nameW + ']]\n'
+        + '[[input:' + nameV + ']] [[validation:' + nameV + ']]\n'
+        + '</div>\n'
+        + iframeBlock
+        + '[[feedback:prt' + X + ']]';
+
+    // ── PRT — 3 nœuds (composants / topologie / valeurs), score additif final ──
+    var feedVars = mSchemaEleve + ': ' + nameW + '$\n'
+        + mValEleve + ': if ' + mVerifierValeurs + ' then ' + nameV + ' else ' + mTaValues + '$';
+
+    var prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedVars };
+    var canonicalNodes = [
+        {
+            name: '0', description: 'Bons composants placés (et circuit validé) ?', answertest: 'String',
+            sans: nameC, tans: mTaComponents, testoptions: '', quiet: '0',
+            truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '1',
+            trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
+            falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
+            falseanswernote: 'PRT' + X + '-0-F',
+            falsefeedback: '<p>Les composants placés ne correspondent pas à ceux attendus, ou vous n\'avez pas cliqué sur "✅ Valider le circuit" dans l\'atelier.</p>'
+        },
+        {
+            name: '1', description: 'Les branchements (topologie du circuit) sont-ils corrects ?', answertest: 'String',
+            sans: nameS, tans: mTaSignature, testoptions: '', quiet: '0',
+            truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '2',
+            trueanswernote: 'PRT' + X + '-1-T', truefeedback: '',
+            falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
+            falseanswernote: 'PRT' + X + '-1-F',
+            falsefeedback: '<p>Les composants sont bons mais le câblage (branchements) ne correspond pas au circuit attendu.</p>'
+        },
+        {
+            name: '2', description: 'Les valeurs des composants sont-elles correctes ?', answertest: 'String',
+            sans: mValEleve, tans: mTaValues, testoptions: '', quiet: '0',
+            truescoremode: '+', truescore: String(bareme), truepenalty: '0', truenextnode: '-1',
+            trueanswernote: 'PRT' + X + '-2-T', truefeedback: '<p>Circuit correct et bien réglé, bravo !</p>',
+            falsescoremode: '+', falsescore: String(+(bareme * 0.5).toFixed(4)), falsepenalty: '0', falsenextnode: '-1',
+            falseanswernote: 'PRT' + X + '-2-F',
+            falsefeedback: '<p>Le câblage est correct mais certaines valeurs de composants ne correspondent pas à celles attendues.</p>'
+        }
+    ];
+    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
     return {
-        type:            "circuit",
+        type:            'circuit',
         bareme:          bareme,
-        vars:            qvars,
-        qnote:           "Circuit Q" + X + " " + scenario + " ask=" + ask + " ans=" + tansStr,
+        vars:            vars,
+        qnote:           'Circuit Q' + X + ' composants=' + model.components + ' signature=' + model.signature,
         textFrag:        questionText,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: mkFbGen_D("", p.fbGen),
-        feedbackRef:     "[[feedback:prt" + X + "]]",
+        generalFeedback: mkFbGen_D('', p.fbGen),
+        feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
 }
@@ -169,9 +181,3 @@ function genCircuitCore(X, p, deps) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { genCircuit: genCircuit, genCircuitCore: genCircuitCore };
 }
-
-// ==============================================================
-//  genLogique — Logique booleenne
-//  Scenarios : table | simplif | equivalent
-//  STACK answertests : AlgEquiv (table/equiv), PropLogic (simplif)
-// ==============================================================

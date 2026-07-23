@@ -19,14 +19,13 @@ var PALETTE_TYPES = [
   {type:'composition',   label:'Composition'},
   {type:'jxgdrop',       label:'Glisser-Déposer'},
   {type:'imgclick',      label:'Sélection image'},
-  {type:'glr',           label:'Lecture graphique'},
   {type:'geogebra',      label:'GeoGebra'},
   {type:'rvbcmj',        label:'RVB / CMJN'},
   {type:'optique',       label:'Optique géométrique'},
   {type:'acide-base',   label:'pH-métrie / Titrage'},
   {type:'redox',        label:'Dosage redox (potentiométrie)'},
   {type:'basen',        label:'Conversion de base (Base N)'},
-  {type:'circuit',      label:'Circuits électriques (Ohm, série, parallèle)'},
+  {type:'circuit',      label:'Circuits électriques (atelier de construction)'},
   {type:'logique',      label:'Logique booléenne (tables de vérité, simplification)'},
   {type:'complexe',     label:'Nombres complexes (formes, module, argument)'},
   {type:'calcul',       label:'Calcul différentiel (dérivée, primitive, intégrale)'},
@@ -42,7 +41,6 @@ var PALETTE_TYPES = [
   {type:'oscilloscope',  label:'Oscilloscope (signal sinusoïdal, retard, RC)'},
   {type:'inequation',   label:'Inéquations (ensemble-solution, intervalles, AlgEquiv)'},
   {type:'equivalence',  label:'Raisonnement par équivalence (développement, équation, factorisation, système)'},
-  {type:'thermo',       label:'Thermodynamique (gaz parfaits PV=nRT, chaleur, enthalpie)'},
   {type:'diffraction',  label:'Interférences-Diffraction (fente, Young, λ)'},
   {type:'image-mesure', label:'Mesure sur image (spectre, microscope, règle…)'},
   {type:'apn',          label:"Appareil photo (triangle d'exposition)"},
@@ -52,11 +50,11 @@ var PALETTE_TYPES = [
 var PALETTE_CATEGORIES = [
   {id:'choix',       label:'Choix multiples',       types:['checkbox','radio','dropdown','vf']},
   {id:'numerique',   label:'Mathématiques',   types:['numerical','algebraic','complexe','calcul','statistiques','matrices','geometrie','suites','probabilites','trigonometrie','polynomes','limites','inequation','equivalence','geogebra']},
-  {id:'physchim',    label:'Physique-Chimie',        types:['units','doi','chemical','chemical_topo','nuclear','optique','acide-base','redox','circuit','physique','oscilloscope','thermo','diffraction','rvbcmj','apn']},
+  {id:'physchim',    label:'Physique-Chimie',        types:['units','doi','chemical','chemical_topo','nuclear','optique','acide-base','redox','circuit','physique','oscilloscope','diffraction','rvbcmj','apn']},
   {id:'info',        label:'Informatique',           types:['basen','logique']},
   {id:'textuelle',   label:'Réponse textuelle',      types:['string','composition']},
   {id:'organisation',label:'Organisation',           types:['match','crossword','ord']},
-  {id:'interactif',  label:'Interactif / Visuel',   types:['jxgdrop','imgclick','glr','image-mesure']},
+  {id:'interactif',  label:'Interactif / Visuel',   types:['jxgdrop','imgclick','image-mesure']},
   {id:'expert',      label:'Mode Expert STACK',     types:['expert']}
 ];
 

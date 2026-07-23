@@ -31,6 +31,13 @@ function openConfigPanel(qid, type) {
     resetFormForType(type);
   }
 
+  // Montage du canvas enseignant de l'atelier circuits (iframe scriptée JSXGraph,
+  // hors du flux générique _hsWireSimplePreview — le canvas n'est pas un aperçu
+  // mais l'éditeur lui-même, il ne doit pas être remonté à chaque frappe).
+  if (type === 'circuit' && typeof cirTeacherInit === 'function') {
+    setTimeout(function() { cirTeacherInit(qid); }, 150);
+  }
+
   // Rendu direct apercu crossword (bypass guards _hsWireSimplePreview)
   if (type === 'crossword') {
     setTimeout(function() {
@@ -89,7 +96,7 @@ async function _generateAndStoreQuestion(qid, type) {
     string: W.genString, match: W.genMatch, crossword: W.genCrossword, doi: W.genDOI,
     chemical: W.genChemical, chemical_topo: W.genChemicalTopo, nuclear: W.genNuclear,
     composition: W.genComposition, jxgdrop: W.genJxgDrop, vf: W.genVF, ord: W.genOrd,
-    imgclick: W.genImgClick, glr: W.genGLR, rvbcmj: W.genRvbCmj, optique: W.genOptique, 'acide-base': W.genAcideBase, 'redox': W.genRedox, 'basen': W.genBasen, 'circuit': W.genCircuit, 'logique': W.genLogique, 'complexe': W.genComplexe, 'calcul': W.genCalcul, 'statistiques': W.genStatistiques, 'matrices': W.genMatrices, 'geometrie': W.genGeometrie, 'suites': W.genSuites, 'probabilites': W.genProbabilites, 'trigonometrie': W.genTrigonometrie, 'polynomes': W.genPolynomes, 'equivalence': W.genEquivalence, 'limites': W.genLimites, 'physique': W.genPhysique, 'oscilloscope': W.genOscilloscope, 'inequation': W.genInequation, 'thermo': W.genThermo, 'diffraction': W.genDiffraction, 'image-mesure': W.genImageMesure, 'apn': W.genApn,
+    imgclick: W.genImgClick, rvbcmj: W.genRvbCmj, optique: W.genOptique, 'acide-base': W.genAcideBase, 'redox': W.genRedox, 'basen': W.genBasen, 'circuit': W.genCircuit, 'logique': W.genLogique, 'complexe': W.genComplexe, 'calcul': W.genCalcul, 'statistiques': W.genStatistiques, 'matrices': W.genMatrices, 'geometrie': W.genGeometrie, 'suites': W.genSuites, 'probabilites': W.genProbabilites, 'trigonometrie': W.genTrigonometrie, 'polynomes': W.genPolynomes, 'equivalence': W.genEquivalence, 'limites': W.genLimites, 'physique': W.genPhysique, 'oscilloscope': W.genOscilloscope, 'inequation': W.genInequation, 'diffraction': W.genDiffraction, 'image-mesure': W.genImageMesure, 'apn': W.genApn,
     'stack-raw': W.genStackRaw,
     'expert': W.genExpert,
     'geogebra': W.genGeoGebra
@@ -325,12 +332,6 @@ function captureState() {
       s.seqZones=JSON.parse(JSON.stringify(icst.zones||[]));
       s.seqNextZoneId=icst.nextZoneId||1;
       break;
-    case 'glr':
-      s.bareme=v('glr-bareme');s.fn=v('glr-fn');
-      s.xMin=v('glr-xmin');s.xMax=v('glr-xmax');s.yMin=v('glr-ymin');s.yMax=v('glr-ymax');
-      s.x0=v('glr-x0');s.tol=v('glr-tol');s.w=v('glr-w');s.h=v('glr-h');
-      s.text=richVal('glr-text');s.fbOk=v('glr-fb-ok');s.fbWrong=v('glr-fb-wrong');s.fbGen=v('glr-fbgen');
-      break;
     case 'rvbcmj':
       s.bareme=v('rvb-bareme');s.imgData=v('rvb-imgdata');
       var rvbModeEl=document.querySelector('input[name="rvb-mode"]:checked');
@@ -376,15 +377,9 @@ function captureState() {
       break;
     case 'circuit':
       s.bareme=v('cir-bareme');s.text=richVal('cir-text');
-      s.scenario=v('cir-scenario')||'loi-ohm';
-      s.ask=v('cir-ask')||'i';
-      s.e=v('cir-e')||'9';
-      s.r1=v('cir-r1')||'100';
-      s.r2=v('cir-r2')||'220';
-      s.r3=v('cir-r3')||'0';
-      s.iKnown=v('cir-i-known')||'0';
-      s.tol=v('cir-tol')||'5';
-      s.fbOk=v('cir-fb-ok');s.fbWrong=v('cir-fb-wrong');s.fbGen=v('cir-fbgen');
+      s.checkValues=document.getElementById('cir-check-values')?.checked||false;
+      s.fbGen=v('cir-fbgen');
+      s.cirModel=(typeof cirReadModelFromCanvas==='function')?cirReadModelFromCanvas():null;
       break;
     case 'logique':
       s.bareme=v('lg-bareme');s.text=richVal('lg-text');
@@ -552,14 +547,6 @@ function captureState() {
       s.op=v('ineq-op')||'>';
       s.tans=v('ineq-tans')||'oo(3,inf)';
       s.fbOk=v('ineq-fb-ok');s.fbWrong=v('ineq-fb-wrong');s.fbGen=v('ineq-fbgen');
-      break;
-    case 'thermo':
-      s.bareme=v('thy-bareme');s.text=richVal('thy-text');
-      s.scenario=v('thy-scenario')||'pression';
-      s.P=v('thy-P')||'101325'; s.V=v('thy-V')||'0.0224';
-      s.n=v('thy-n')||'1'; s.T=v('thy-T')||'273.15';
-      s.m=v('thy-m')||'1'; s.cp=v('thy-cp')||'4186'; s.dT=v('thy-dT')||'10';
-      s.fbOk=v('thy-fb-ok');s.fbWrong=v('thy-fb-wrong');s.fbGen=v('thy-fbgen');
       break;
     case 'optique':
       s.scenario=v('opt-scenario')||'lentille-convergente';
@@ -794,16 +781,6 @@ function restoreState(s) {
       });
       if(typeof icToggleMode==='function')icToggleMode();
       break;
-    case 'glr':
-      document.getElementById('glr-bareme').value=s.bareme||1;document.getElementById('glr-fn').value=s.fn||'';
-      document.getElementById('glr-xmin').value=s.xMin||-10;document.getElementById('glr-xmax').value=s.xMax||10;
-      document.getElementById('glr-ymin').value=s.yMin||-10;document.getElementById('glr-ymax').value=s.yMax||10;
-      document.getElementById('glr-x0').value=s.x0||0;document.getElementById('glr-tol').value=s.tol||0.5;
-      document.getElementById('glr-w').value=s.w||500;document.getElementById('glr-h').value=s.h||400;
-      setRichVal('glr-text',s.text||'');
-      document.getElementById('glr-fb-ok').value=s.fbOk||'';document.getElementById('glr-fb-wrong').value=s.fbWrong||'';
-      var _glrFbGen=document.getElementById('glr-fbgen');if(_glrFbGen)_glrFbGen.value=s.fbGen||'';
-      break;
     case 'rvbcmj':
       document.getElementById('rvb-bareme').value=s.bareme||1;document.getElementById('rvb-imgdata').value=s.imgData||'';
       if(s.imgData&&typeof rvbRestoreImage==='function')rvbRestoreImage(s.imgData);
@@ -878,18 +855,8 @@ function restoreState(s) {
     case 'circuit':
       document.getElementById('cir-bareme').value=s.bareme||1;
       setRichVal('cir-text',s.text||'');
-      document.getElementById('cir-scenario').value=s.scenario||'loi-ohm';
-      document.getElementById('cir-ask').value=s.ask||'i';
-      document.getElementById('cir-e').value=s.e||'9';
-      document.getElementById('cir-r1').value=s.r1||'100';
-      document.getElementById('cir-r2').value=s.r2||'220';
-      document.getElementById('cir-r3').value=s.r3||'0';
-      document.getElementById('cir-i-known').value=s.iKnown||'0';
-      document.getElementById('cir-tol').value=s.tol||'5';
-      document.getElementById('cir-fb-ok').value=s.fbOk||'';
-      document.getElementById('cir-fb-wrong').value=s.fbWrong||'';
+      var _cirChk=document.getElementById('cir-check-values');if(_cirChk)_cirChk.checked=!!s.checkValues;
       var _cirFbGen=document.getElementById('cir-fbgen');if(_cirFbGen)_cirFbGen.value=s.fbGen||'';
-      if(typeof cirFormChange==='function')cirFormChange();
       break;
     case 'logique':
       document.getElementById('lg-bareme').value=s.bareme||1;
@@ -1157,22 +1124,6 @@ function restoreState(s) {
       var _ineqFbGen=document.getElementById('ineq-fbgen');if(_ineqFbGen)_ineqFbGen.value=s.fbGen||'';
       if(typeof ineqFormChange==='function')ineqFormChange();
       break;
-    case 'thermo':
-      document.getElementById('thy-bareme').value=s.bareme||1;
-      setRichVal('thy-text',s.text||'');
-      document.getElementById('thy-scenario').value=s.scenario||'pression';
-      document.getElementById('thy-P').value=s.P||'101325';
-      document.getElementById('thy-V').value=s.V||'0.0224';
-      document.getElementById('thy-n').value=s.n||'1';
-      document.getElementById('thy-T').value=s.T||'273.15';
-      document.getElementById('thy-m').value=s.m||'1';
-      document.getElementById('thy-cp').value=s.cp||'4186';
-      document.getElementById('thy-dT').value=s.dT||'10';
-      document.getElementById('thy-fb-ok').value=s.fbOk||'';
-      document.getElementById('thy-fb-wrong').value=s.fbWrong||'';
-      var _thyFbGen=document.getElementById('thy-fbgen');if(_thyFbGen)_thyFbGen.value=s.fbGen||'';
-      if(typeof thyFormChange==='function')thyFormChange();
-      break;
     case 'optique':
       document.getElementById('opt-scenario').value=s.scenario||'lentille-convergente';
       document.getElementById('opt-bareme').value=s.bareme||1;
@@ -1415,16 +1366,6 @@ function resetFormForType(type) {
       if(typeof icReset==='function')icReset();
       if(typeof icToggleMode==='function')icToggleMode();
       break;
-    case 'glr':
-      document.getElementById('glr-fn').value='';
-      document.getElementById('glr-xmin').value=-10;document.getElementById('glr-xmax').value=10;
-      document.getElementById('glr-ymin').value=-10;document.getElementById('glr-ymax').value=10;
-      document.getElementById('glr-x0').value=0;document.getElementById('glr-tol').value=0.5;
-      document.getElementById('glr-w').value=500;document.getElementById('glr-h').value=400;
-      setRichVal('glr-text','');document.getElementById('glr-fb-ok').value='';document.getElementById('glr-fb-wrong').value='';
-      var _glrfbGen=document.getElementById('glr-fbgen');if(_glrfbGen)_glrfbGen.value='';
-      document.getElementById('glr-bareme').value=1;
-      break;
     case 'rvbcmj':
       document.getElementById('rvb-imgdata').value='';
       if(typeof rvbClearImage==='function')rvbClearImage();
@@ -1499,18 +1440,9 @@ function resetFormForType(type) {
     case 'circuit':
       setRichVal('cir-text','');
       document.getElementById('cir-bareme').value=1;
-      document.getElementById('cir-scenario').value='loi-ohm';
-      document.getElementById('cir-ask').value='i';
-      document.getElementById('cir-e').value='9';
-      document.getElementById('cir-r1').value='100';
-      document.getElementById('cir-r2').value='220';
-      document.getElementById('cir-r3').value='0';
-      document.getElementById('cir-i-known').value='0';
-      document.getElementById('cir-tol').value='5';
-      document.getElementById('cir-fb-ok').value='';
-      document.getElementById('cir-fb-wrong').value='';
+      var _circhk=document.getElementById('cir-check-values');if(_circhk)_circhk.checked=false;
       var _cirfbGen=document.getElementById('cir-fbgen');if(_cirfbGen)_cirfbGen.value='';
-      if(typeof cirFormChange==='function')cirFormChange();
+      if(typeof cirClearCanvas==='function')cirClearCanvas();
       break;
     case 'logique':
       setRichVal('lg-text','');
@@ -1752,22 +1684,6 @@ function resetFormForType(type) {
       document.getElementById('ineq-fb-wrong').value='';
       var _ineqfbGen=document.getElementById('ineq-fbgen');if(_ineqfbGen)_ineqfbGen.value='';
       if(typeof ineqFormChange==='function')ineqFormChange();
-      break;
-    case 'thermo':
-      setRichVal('thy-text','');
-      document.getElementById('thy-bareme').value=1;
-      document.getElementById('thy-scenario').value='pression';
-      document.getElementById('thy-P').value='101325';
-      document.getElementById('thy-V').value='0.0224';
-      document.getElementById('thy-n').value='1';
-      document.getElementById('thy-T').value='273.15';
-      document.getElementById('thy-m').value='1';
-      document.getElementById('thy-cp').value='4186';
-      document.getElementById('thy-dT').value='10';
-      document.getElementById('thy-fb-ok').value='';
-      document.getElementById('thy-fb-wrong').value='';
-      var _thyfbGen=document.getElementById('thy-fbgen');if(_thyfbGen)_thyfbGen.value='';
-      if(typeof thyFormChange==='function')thyFormChange();
       break;
     case 'optique':
       setRichVal('opt-text','');

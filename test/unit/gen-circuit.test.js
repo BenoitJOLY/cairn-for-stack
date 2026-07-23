@@ -3,13 +3,15 @@
 // Lancer :  npm test
 //
 // genCircuitCore() ne lit jamais document : tout est passé en p (voir la
-// fonction genCircuit(X), seul point de contact avec le DOM).
+// fonction genCircuit(X), seul point de contact avec le DOM). Le modèle de
+// circuit (p.model) est fabriqué directement — pas besoin de canvas JSXGraph
+// pour tester la génération XML.
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 
-const { genCircuitCore } = require(path.join('..', '..', 'js', 'gen-circuit.js'));
+const { genCircuit, genCircuitCore } = require(path.join('..', '..', 'js', 'gen-circuit.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
 
 const I18N_STUB = {
@@ -17,14 +19,28 @@ const I18N_STUB = {
 };
 const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen };
+const DEPS = {
+    I18N: I18N_STUB, buildPrtXml, _mkFbGen,
+    CIR_ENGINE_JS: 'function cirEngineRun(cfg){ return cfg; }',
+    CIR_ATELIER_CSS: '.foo{color:red}'
+};
+
+function baseModel(overrides) {
+    return Object.assign({
+        signature: 'SIG-ABC123',
+        components: 'R,L',
+        values: 'R1=100;L1=9',
+        state: 'BASE64STATEBLOB=='
+    }, overrides || {});
+}
 
 function baseParams(overrides) {
     return Object.assign({
-        scenario: 'loi-ohm', ask: 'i',
-        e: 9, r1: 100, r2: 220, r3: 0,
-        iKnown: 0, tol: 5, bareme: 1,
-        fbOk: '', fbWrong: '', text: '', fbGen: ''
+        model: baseModel(),
+        checkValues: true,
+        bareme: 2,
+        text: '',
+        fbGen: ''
     }, overrides || {});
 }
 
@@ -46,60 +62,96 @@ function assertBalancedTags(xml, label) {
     assert.equal(stack.length, 0, `${label}: balises non fermées: ${stack.join(', ')}`);
 }
 
-test("loi-ohm : ask='i' calcule tans=e/r1", () => {
-    const q = genCircuitCore(1, baseParams({ scenario: 'loi-ohm', ask: 'i', e: 9, r1: 100 }), DEPS);
-    assert.match(q.vars, /tans:cir_i;/);
-    assert.match(q.inputXML, /<tans>9\/100<\/tans>/);
-});
-
-test("loi-ohm : ask='r' calcule tans=e/iKnown", () => {
-    const q = genCircuitCore(1, baseParams({ scenario: 'loi-ohm', ask: 'r', e: 9, iKnown: 0.05 }), DEPS);
-    assert.match(q.vars, /tans:cir_r;/);
-});
-
-test("serie : ask='r-eq' additionne r1+r2+r3", () => {
-    const q = genCircuitCore(1, baseParams({ scenario: 'serie', ask: 'r-eq', r1: 100, r2: 200, r3: 50 }), DEPS);
-    assert.match(q.inputXML, /<tans>350<\/tans>/);
-});
-
-test("parallele : ask='r-eq' calcule la résistance équivalente", () => {
-    const q = genCircuitCore(1, baseParams({ scenario: 'parallele', ask: 'r-eq', r1: 100, r2: 100 }), DEPS);
-    assert.match(q.vars, /cir_req:1\/\(1\/cir_r1\+1\/cir_r2\);/);
-    assert.match(q.vars, /tans:cir_req;/);
-});
-
-test('un seul nœud PRT AlgEquiv comparant cir_ok à true', () => {
+test('modèle valide : 4 inputs ans1s/ans1c/ans1w/ans1v, PRT à 3 nœuds, XML bien formé', () => {
     const q = genCircuitCore(1, baseParams(), DEPS);
-    assert.equal(q.prt.nodes.length, 1);
-    assert.equal(q.prt.nodes[0].sans, 'cir_ok');
-    assert.equal(q.prt.nodes[0].tans, 'true');
+    assert.match(q.inputXML, /<name>ans1s<\/name>/);
+    assert.match(q.inputXML, /<name>ans1c<\/name>/);
+    assert.match(q.inputXML, /<name>ans1w<\/name>/);
+    assert.match(q.inputXML, /<name>ans1v<\/name>/);
+    assert.equal(q.prt.nodes.length, 3);
+    assertBalancedTags(q.inputXML, 'inputXML');
+    assertBalancedTags(q.prtXML, 'prtXML');
 });
 
-test('fbOk/fbWrong personnalisés remplacent le feedback par défaut', () => {
-    const q = genCircuitCore(1, baseParams({ fbOk: 'Bravo', fbWrong: 'Non' }), DEPS);
-    assert.equal(q.prt.nodes[0].truefeedback, 'Bravo');
-    assert.equal(q.prt.nodes[0].falsefeedback, 'Non');
+test("checkValues=false : verifier_valeurs1 vaut false dans vars", () => {
+    const q = genCircuitCore(1, baseParams({ checkValues: false }), DEPS);
+    assert.match(q.vars, /verifier_valeurs1: false\$/);
 });
 
-test('generalFeedback intègre fbGen via _mkFbGen', () => {
-    const q = genCircuitCore(1, baseParams({ fbGen: 'Remarque' }), DEPS);
-    assert.match(q.generalFeedback, /Remarque/);
+test('checkValues=true : verifier_valeurs1 vaut true dans vars', () => {
+    const q = genCircuitCore(1, baseParams({ checkValues: true }), DEPS);
+    assert.match(q.vars, /verifier_valeurs1: true\$/);
 });
 
-test('feedbackvariables contient la tolérance convertie en fraction', () => {
-    const q = genCircuitCore(1, baseParams({ tol: 10 }), DEPS);
-    assert.match(q.prt.meta.feedbackvariables, /cir_tol_frac:0\.1000;/);
+test('barème : nœud 2 (valeurs) porte le score, nœuds 0/1 (gates) restent à 0', () => {
+    const q = genCircuitCore(1, baseParams({ bareme: 2 }), DEPS);
+    const [n0, n1, n2] = q.prt.nodes;
+    assert.equal(n0.truescore, '0');
+    assert.equal(n0.falsescore, '0');
+    assert.equal(n1.truescore, '0');
+    assert.equal(n1.falsescore, '0');
+    assert.equal(n2.truescore, '2');
+    assert.equal(n2.falsescore, '1');
 });
 
-test('le XML (prtXML, inputXML) est bien formé pour chaque scenario/ask', () => {
-    const cases = [
-        ['loi-ohm', 'i'], ['loi-ohm', 'r'], ['loi-ohm', 'u'],
-        ['serie', 'r-eq'], ['serie', 'i'], ['serie', 'u1'],
-        ['parallele', 'r-eq'], ['parallele', 'i-total'], ['parallele', 'i1']
-    ];
-    cases.forEach(([scenario, ask]) => {
-        const q = genCircuitCore(1, baseParams({ scenario, ask }), DEPS);
-        assertBalancedTags(q.prtXML, `prtXML[${scenario}/${ask}]`);
-        assertBalancedTags(q.inputXML, `inputXML[${scenario}/${ask}]`);
-    });
+test("prtMeta.value vaut toujours '1' (score absolu additif, pas le barème)", () => {
+    const q = genCircuitCore(1, baseParams({ bareme: 5 }), DEPS);
+    assert.equal(q.prt.meta.value, '1');
+});
+
+test('genCircuit(X) lève une erreur si aucun modèle construit (cirReadModelFromCanvas renvoie null)', () => {
+    const prevFn = global.cirReadModelFromCanvas;
+    const prevI18N = global.I18N;
+    global.cirReadModelFromCanvas = () => null;
+    global.I18N = I18N_STUB;
+    try {
+        assert.throws(() => genCircuit(1), /cir\.err_no_model/);
+    } finally {
+        global.cirReadModelFromCanvas = prevFn;
+        global.I18N = prevI18N;
+    }
+});
+
+test('compatibilité renumérotage : ren()/renCode() de js/editor.js renomment correctement ans1*/ta1_* → ans2*/ta2_*', () => {
+    // Regex copiées à l'identique de js/editor.js renumberChips() (lignes ~393-406) —
+    // pas d'accès DOM ici, on teste juste la logique de substitution sur un échantillon
+    // représentatif du inputXML/vars produits par genCircuitCore.
+    const oldQid = 1, newQid = 2;
+    const ren = (s) => {
+        if (!s) return s;
+        return s
+            .replace(new RegExp('\\bans' + oldQid + '(?!\\d)', 'g'), 'ans' + newQid)
+            .replace(new RegExp('\\bprt' + oldQid + '(?!\\d)', 'g'), 'prt' + newQid)
+            .replace(new RegExp('\\bta' + oldQid + '(?!\\d)', 'g'), 'ta' + newQid)
+            .replace(new RegExp('\\bq' + oldQid + '_(\\w+)', 'g'), 'q' + newQid + '_$1');
+    };
+    const renCode = (s) => {
+        if (!s) return s;
+        return s.replace(new RegExp('([a-zA-Z_])' + oldQid + '(?!\\d)', 'g'), '$1' + newQid);
+    };
+
+    const q = genCircuitCore(1, baseParams(), DEPS);
+
+    const renamedInputXML = ren(q.inputXML);
+    assert.match(renamedInputXML, /<name>ans2s<\/name>/);
+    assert.match(renamedInputXML, /<name>ans2c<\/name>/);
+    assert.match(renamedInputXML, /<name>ans2w<\/name>/);
+    assert.match(renamedInputXML, /<name>ans2v<\/name>/);
+    assert.match(renamedInputXML, /<tans>ta2_signature<\/tans>/);
+    assert.match(renamedInputXML, /<tans>ta2_components<\/tans>/);
+    assert.match(renamedInputXML, /<tans>ta2_values<\/tans>/);
+    assert.doesNotMatch(renamedInputXML, /\bans1[a-z]\b/);
+    assert.doesNotMatch(renamedInputXML, /\bta1_/);
+
+    const renamedVars = renCode(q.vars);
+    assert.match(renamedVars, /ta2_components: /);
+    assert.match(renamedVars, /ta2_signature: /);
+    assert.match(renamedVars, /ta2_values: /);
+    assert.match(renamedVars, /verifier_valeurs2: /);
+    assert.doesNotMatch(renamedVars, /ta1_/);
+    assert.doesNotMatch(renamedVars, /verifier_valeurs1/);
+
+    const renamedPrtXML = renCode(q.prtXML);
+    assert.match(renamedPrtXML, /<name>prt2<\/name>/);
+    assert.doesNotMatch(renamedPrtXML, /\bprt1\b/);
 });
