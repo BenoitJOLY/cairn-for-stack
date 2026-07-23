@@ -7,3 +7,7 @@ node_modules/
 # Comptes utilisateurs (hash de mots de passe) — jamais commités, gérés
 # uniquement sur le NAS via server/create-account.js (voir PLAN.md)
 server/data/
+
+# Identifiant/mot de passe du premier compte (création automatique au
+# démarrage du conteneur, voir server/entrypoint.sh) — jamais commité
+.env

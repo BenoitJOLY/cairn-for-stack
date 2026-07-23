@@ -12,7 +12,8 @@ COPY lang ./lang
 COPY lib ./lib
 COPY assets ./assets
 COPY server ./server
+RUN chmod +x server/entrypoint.sh
 
 ENV PORT=3000
 EXPOSE 3000
-CMD ["node", "server/server.js"]
+ENTRYPOINT ["server/entrypoint.sh"]

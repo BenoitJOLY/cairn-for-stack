@@ -8,4 +8,7 @@ services:
       - "3000:3000"
     volumes:
       - ./server/data:/app/server/data
+    environment:
+      - ACCOUNT_USERNAME=${ACCOUNT_USERNAME:-}
+      - ACCOUNT_PASSWORD=${ACCOUNT_PASSWORD:-}
     restart: unless-stopped
