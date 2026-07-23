@@ -1,6 +1,6 @@
 // ── XML GENERATORS: algébrique ──
 
-function genAlgebraic(X){
+async function genAlgebraic(X){
   const formula=sanitizeMaxima(v('alg-formula').trim());
   const mode=v('alg-mode')||'libre';
   const exprDisplay=sanitizeMaxima((document.getElementById('alg-expr-display')?.value||'').trim());
@@ -32,6 +32,20 @@ function genAlgebraic(X){
       expert: { partial: _algFb('expert','partial'), errsigne: _algFb('expert','errsigne') }
     }
   };
+  // Étape 3 (PLAN.md) : tente la génération côté serveur, avec repli
+  // automatique sur le calcul local si le serveur échoue ou est absent —
+  // aucun risque de casser la génération pendant la migration.
+  try{
+    const res=await fetch('/api/generate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'algebraic', X, params:p})
+    });
+    if(res.ok){
+      const data=await res.json();
+      if(data && data.ok) return data.parts;
+    }
+  }catch(e){ /* réseau indisponible : repli local ci-dessous */ }
   return genAlgebraicCore(X, p);
 }
 

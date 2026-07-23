@@ -55,6 +55,24 @@ function requireAuth(req, res, next) {
 
 app.use(requireAuth);
 
+const { generate } = require('./generate');
+
+// Un type de question migré à la fois — voir PLAN.md, chantier
+// "Backend auto-hébergé NAS", étape 3. Chemin local (js/gen-*.js côté
+// client) gardé en parallèle tant qu'un type n'est pas validé ici.
+app.post('/api/generate', (req, res) => {
+  const { type, X, params } = req.body || {};
+  if (typeof type !== 'string' || typeof X === 'undefined') {
+    return res.status(400).json({ error: 'Requête invalide.' });
+  }
+  try {
+    const parts = generate(type, X, params || {});
+    res.json({ ok: true, parts });
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || 'Erreur serveur.' });
+  }
+});
+
 // Le reste (app statique) n'est servi qu'après authentification — voir
 // PLAN.md, chantier "Backend auto-hébergé NAS", décision "toute l'app
 // derrière le login".

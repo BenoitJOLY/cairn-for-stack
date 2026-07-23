@@ -60,3 +60,7 @@ function algPrtNodeCanonical(X,n,test,sans,tans,opts,trueNext,trueScore,falseNex
     falseanswernote: falseNote||('PRT-'+X+'-'+n+'-F'), falsefeedback: falseFb||''
   };
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { wrapFb: wrapFb, sanitizeMaxima: sanitizeMaxima, algPrtNodeCanonical: algPrtNodeCanonical };
+}

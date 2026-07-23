@@ -75,6 +75,10 @@ stack_js.request_access_to_input("${ansRef}", true).then(function(input_id) {
 [[/iframe]]`;
 }
 
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { buildKbdStackHTML: buildKbdStackHTML };
+}
+
 function openKbdModal(type,fieldId){
   kbdCurrentType = type;
   const colors = {alg:'var(--algebraic)',num:'var(--numerical)',un:'var(--units)'};
@@ -302,30 +306,34 @@ function updateKbdPreview(){
 }
 
 // Hook keyboard buttons inside the modal to the test input
-document.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('#kbdModal .btn-kbd').forEach(function(btn){
-    btn.addEventListener('click',function(e){
-      e.preventDefault();
-      const val = this.getAttribute('data-val');
-      const input = document.getElementById('kbd-test-input');
-      const start = input.selectionStart, end = input.selectionEnd;
-      const actuel = input.value;
-      const charPrecedent = start>0 ? actuel.charAt(start-1) : null;
-      const exclusions = [null,'=','+','-','*','/','^','('];
-      const insertionEstOperateur = /^[\+\-\*\/\^\)]/.test(val);
-      let prefixe = '';
-      if(!exclusions.includes(charPrecedent) && !insertionEstOperateur) prefixe='*';
-      const texteAInserer = prefixe + val;
-      input.value = actuel.substring(0,start) + texteAInserer + actuel.substring(end);
-      input.focus();
-      let newPos = start + texteAInserer.length;
-      if(val.includes('()')) newPos = start + prefixe.length + val.indexOf('(') + 1;
-      else if(val==='*10^') newPos = start + prefixe.length + 4;
-      input.setSelectionRange(newPos,newPos);
-      updateKbdPreview();
+// (garde 'typeof document' : ce fichier est aussi require() côté serveur
+// pour buildKbdStackHTML, seule fonction pure exposée — voir server/generate.js)
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded',function(){
+    document.querySelectorAll('#kbdModal .btn-kbd').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.preventDefault();
+        const val = this.getAttribute('data-val');
+        const input = document.getElementById('kbd-test-input');
+        const start = input.selectionStart, end = input.selectionEnd;
+        const actuel = input.value;
+        const charPrecedent = start>0 ? actuel.charAt(start-1) : null;
+        const exclusions = [null,'=','+','-','*','/','^','('];
+        const insertionEstOperateur = /^[\+\-\*\/\^\)]/.test(val);
+        let prefixe = '';
+        if(!exclusions.includes(charPrecedent) && !insertionEstOperateur) prefixe='*';
+        const texteAInserer = prefixe + val;
+        input.value = actuel.substring(0,start) + texteAInserer + actuel.substring(end);
+        input.focus();
+        let newPos = start + texteAInserer.length;
+        if(val.includes('()')) newPos = start + prefixe.length + val.indexOf('(') + 1;
+        else if(val==='*10^') newPos = start + prefixe.length + 4;
+        input.setSelectionRange(newPos,newPos);
+        updateKbdPreview();
+      });
     });
   });
-});
+}
 
 // ══════════════════════════════════════════════════════
 //  HELP
