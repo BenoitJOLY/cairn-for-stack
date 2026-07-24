@@ -15,12 +15,13 @@ function saveAccounts(accounts) {
   fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2));
 }
 
-function createAccount(username, password) {
+function createAccount(username, password, opts) {
+  opts = opts || {};
   const accounts = loadAccounts();
   if (accounts.some((a) => a.username === username)) {
     throw new Error(`Le compte "${username}" existe déjà.`);
   }
-  accounts.push({ username, passwordHash: bcrypt.hashSync(password, 12) });
+  accounts.push({ username, passwordHash: bcrypt.hashSync(password, 12), selfRegistered: !!opts.selfRegistered });
   saveAccounts(accounts);
 }
 
@@ -30,4 +31,13 @@ function verifyPassword(username, password) {
   return bcrypt.compareSync(password, account.passwordHash);
 }
 
-module.exports = { loadAccounts, saveAccounts, createAccount, verifyPassword };
+// Distingue les comptes créés via /api/register (auto-inscription, ouverte
+// à tous) des comptes créés à la main via create-account.js (cercle
+// restreint, confiance déjà établie) — seuls les premiers sont soumis au
+// quota hebdomadaire, voir server/usage.js et PLAN.md.
+function isSelfRegistered(username) {
+  const account = loadAccounts().find((a) => a.username === username);
+  return !!(account && account.selfRegistered);
+}
+
+module.exports = { loadAccounts, saveAccounts, createAccount, verifyPassword, isSelfRegistered };

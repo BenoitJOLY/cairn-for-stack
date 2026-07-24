@@ -37,6 +37,10 @@ async function genCalcul(X) {
             const data = await res.json();
             if (data && data.ok) return data.parts;
         }
+        if (res.status === 429) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Quota hebdomadaire atteint.');
+        }
         console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "calcul", repli sur le calcul local (session expirée ?).');
     } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "calcul", repli sur le calcul local.', e); }
     return genCalculCore(X, p);

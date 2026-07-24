@@ -53,6 +53,10 @@ async function genChemicalTopo(X){
       const data = await res.json();
       if (data && data.ok) return data.parts;
     }
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Quota hebdomadaire atteint.');
+    }
     console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "chemical_topo", repli sur le calcul local (session expirée ?).');
   } catch (e) {
     console.warn('[stackforge] /api/generate injoignable pour "chemical_topo", repli sur le calcul local.', e);
@@ -532,6 +536,10 @@ async function genChemical(X){
     if (res.ok) {
       const data = await res.json();
       if (data && data.ok) return data.parts;
+    }
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Quota hebdomadaire atteint.');
     }
     console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "chemical", repli sur le calcul local (session expirée ?).');
   } catch (e) {

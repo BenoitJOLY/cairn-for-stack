@@ -2,7 +2,8 @@ const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
-const { verifyPassword } = require('./accounts');
+const { verifyPassword, createAccount, isSelfRegistered } = require('./accounts');
+const { isUnderQuota, recordUsage, WEEKLY_LIMIT } = require('./usage');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,7 @@ app.use(
 app.get('/healthz', (req, res) => res.send('ok'));
 
 app.get('/login.html', (req, res) => res.sendFile(path.join(ROOT, 'login.html')));
+app.get('/register.html', (req, res) => res.sendFile(path.join(ROOT, 'register.html')));
 
 // Servi avant le gate d'authentification : login.html en a besoin pour son
 // fond d'écran, et ce dossier ne contient que des images/icônes, pas la
@@ -45,6 +47,30 @@ app.post('/api/login', (req, res) => {
     return res.status(401).json({ error: 'Identifiant ou mot de passe incorrect.' });
   }
   req.session.username = username;
+  res.json({ ok: true });
+});
+
+// Auto-inscription publique — voir PLAN.md, section accès/auto-inscription.
+// Comptes marqués selfRegistered pour être soumis au quota hebdomadaire
+// (server/usage.js), contrairement aux comptes créés via create-account.js.
+app.post('/api/register', (req, res) => {
+  const { username, password } = req.body || {};
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    return res.status(400).json({ error: 'Identifiant et mot de passe requis.' });
+  }
+  const u = username.trim();
+  if (u.length < 3) {
+    return res.status(400).json({ error: 'Identifiant trop court (3 caractères minimum).' });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Mot de passe trop court (8 caractères minimum).' });
+  }
+  try {
+    createAccount(u, password, { selfRegistered: true });
+  } catch (err) {
+    return res.status(409).json({ error: err.message });
+  }
+  req.session.username = u;
   res.json({ ok: true });
 });
 
@@ -70,8 +96,16 @@ app.post('/api/generate', (req, res) => {
   if (typeof type !== 'string' || typeof X === 'undefined') {
     return res.status(400).json({ error: 'Requête invalide.' });
   }
+  const username = req.session.username;
+  const limited = isSelfRegistered(username);
+  if (limited && !isUnderQuota(username)) {
+    return res.status(429).json({
+      error: `Quota hebdomadaire atteint (${WEEKLY_LIMIT} questions/semaine pour un compte auto-inscrit). Réessaie la semaine prochaine.`,
+    });
+  }
   try {
     const parts = generate(type, X, params || {});
+    if (limited) recordUsage(username);
     res.json({ ok: true, parts });
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message || 'Erreur serveur.' });

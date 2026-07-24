@@ -278,6 +278,10 @@ async function genRvbCmj(X) {
             var data = await res.json();
             if (data && data.ok) return data.parts;
         }
+        if (res.status === 429) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Quota hebdomadaire atteint.');
+        }
         console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "rvbcmj", repli sur le calcul local (session expirée ?).');
     } catch (e) {
         console.warn('[stackforge] /api/generate injoignable pour "rvbcmj", repli sur le calcul local.', e);
@@ -598,6 +602,10 @@ async function genOptique(X) {
         if (res.ok) {
             var data = await res.json();
             if (data && data.ok) return data.parts;
+        }
+        if (res.status === 429) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Quota hebdomadaire atteint.');
         }
         console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "optique", repli sur le calcul local (session expirée ?).');
     } catch (e) {
