@@ -24,7 +24,7 @@ function apnUnknownChange() {
     if (typeof apnRefreshPreview === 'function') apnRefreshPreview();
 }
 
-function genApn(X) {
+function genApnParams() {
     var gv = function(id) { var el = document.getElementById(id); return el ? el.value : ''; };
     var gc = function(id) { var el = document.getElementById(id); return !!el && el.checked; };
 
@@ -45,11 +45,27 @@ function genApn(X) {
     var nChanged = (changed.D ? 1 : 0) + (changed.V ? 1 : 0) + (changed.I ? 1 : 0);
     if (nChanged < 1) throw new Error(I18N.t('msg.err_apn_param_modifie'));
 
-    var p = {
+    return {
         bareme: bareme, text: text, fbOk: fbOk, fbWrong: fbWrong,
         unknown: unknown, changed: changed, nChanged: nChanged,
         fbGen: gv('apn-fbgen')
     };
+}
+
+async function genApn(X) {
+    var p = genApnParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'apn', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "apn", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "apn", repli sur le calcul local.', e); }
     return genApnCore(X, p);
 }
 
@@ -338,5 +354,5 @@ function genApnCore(X, p, deps) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genApn: genApn, genApnCore: genApnCore };
+    module.exports = { genApn: genApn, genApnCore: genApnCore, genApnParams: genApnParams };
 }

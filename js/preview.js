@@ -3813,7 +3813,7 @@ window.doiRefreshPreview = _hsWireSimplePreview('doi', 'doi', 'doi-preview-conta
 
 function renderPreviewHTML_apn(state) {
   var realParts = {};
-  try { realParts = (typeof genApn === 'function') ? genApn(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genApnCore === 'function' && typeof genApnParams === 'function') ? genApnCore(1, genApnParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   var prtBoxes = _hsPrtBoxes(realParts);
