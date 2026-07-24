@@ -3391,11 +3391,8 @@ function renderPreviewHTML_imgclick(state) {
   if (mode === 'sequence') {
     var realParts = null;
     try {
-      if (typeof genImgClickSequence === 'function' && icst.bgData && icst.zones && icst.zones.length) {
-        var _icBareme = parseFloat((document.getElementById('ic-bareme') || {}).value) || 1;
-        var _icFbOk = (document.getElementById('ic-fb-ok') || {}).value || '';
-        var _icFbWr = (document.getElementById('ic-fb-wrong') || {}).value || '';
-        realParts = genImgClickSequence(1, _icBareme, richVal('ic-text'), _icFbOk, _icFbWr);
+      if (typeof genImgClickSequenceCore === 'function' && typeof genImgClickParams === 'function' && icst.bgData && icst.zones && icst.zones.length) {
+        realParts = genImgClickSequenceCore(1, genImgClickParams());
       }
     } catch (e) { console.error('[preview] imgclick sequence build error:', e); realParts = null; }
 
@@ -3416,8 +3413,8 @@ function renderPreviewHTML_imgclick(state) {
   } else {
     var realPartsSingle = null;
     try {
-      if (typeof genImgClick === 'function' && icst.bgData && icst.zones && icst.zones.length) {
-        realPartsSingle = genImgClick(1);
+      if (typeof genImgClickCore === 'function' && typeof genImgClickParams === 'function' && icst.bgData && icst.zones && icst.zones.length) {
+        realPartsSingle = genImgClickCore(1, genImgClickParams());
       }
     } catch (e) { console.error('[preview] imgclick single build error:', e); realPartsSingle = null; }
 

@@ -1,25 +1,61 @@
 // ── XML GENERATORS: image cliquable ──
 
-function genImgClick(X) {
+// Construit les paramètres depuis le DOM/l'état pour le mode actuellement sélectionné
+// ('single' ou 'sequence') — seul point de contact avec le DOM, réutilisé par le
+// wrapper réseau genImgClick(X) et par js/preview.js (aperçu réel, en synchrone,
+// voir renderPreviewHTML_imgclick).
+function genImgClickParams() {
     var bareme    = parseFloat(v('ic-bareme')) || 1;
     var text      = richVal('ic-text');
     var fbOkTxt   = v('ic-fb-ok').trim();
     var fbWrTxt   = v('ic-fb-wrong').trim();
+    var fbGen     = v('ic-fbgen');
 
     var modeEl = document.querySelector('input[name="ic-mode"]:checked');
     var mode   = modeEl ? modeEl.value : 'single';
-    if (mode === 'sequence') return genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt);
-
     var st = window._icState || {};
+
+    if (mode === 'sequence') {
+        var seqTime = parseInt(v('ic-seq-time')) || 5;
+        if (!st.bgData)                    throw new Error(I18N.t('ic.err_no_image'));
+        if (!st.zones || !st.zones.length) throw new Error(I18N.t('ic.err_seq_zones'));
+        return {
+            mode: 'sequence',
+            bareme: bareme, text: text, fbOkTxt: fbOkTxt, fbWrTxt: fbWrTxt,
+            seqTime: seqTime, bgData: st.bgData, bgW: st.bgW, bgH: st.bgH, zones: st.zones,
+            fbGen: fbGen
+        };
+    }
+
     if (!st.bgData)                    throw new Error(I18N.t('ic.err_no_image'));
     if (!st.zones || !st.zones.length) throw new Error(I18N.t('ic.err_no_zone'));
-
-    var p = {
+    return {
+        mode: 'single',
         bareme: bareme, text: text, fbOkTxt: fbOkTxt, fbWrTxt: fbWrTxt,
         bgData: st.bgData, bgW: st.bgW, bgH: st.bgH, zone: st.zones[0],
-        fbGen: v('ic-fbgen')
+        fbGen: fbGen
     };
-    return genImgClickCore(X, p);
+}
+
+function genImgClickDispatchLocal(X, p) {
+    return (p.mode === 'sequence') ? genImgClickSequenceCore(X, p) : genImgClickCore(X, p);
+}
+
+async function genImgClick(X) {
+    var p = genImgClickParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'imgclick', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "imgclick", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "imgclick", repli sur le calcul local.', e); }
+    return genImgClickDispatchLocal(X, p);
 }
 
 function genImgClickCore(X, p, deps) {
@@ -168,19 +204,6 @@ function genImgClickCore(X, p, deps) {
 //  (inspiré de test/.../image-clic : zones JS invisibles,
 //   timer JS, ordre imposé, réponse string "reussi"/"echec")
 // ══════════════════════════════════════════════════════
-function genImgClickSequence(X, bareme, text, fbOkTxt, fbWrTxt) {
-    var seqTime = parseInt(v('ic-seq-time')) || 5;
-    var st = window._icState || {};
-    if (!st.bgData)              throw new Error(I18N.t('ic.err_no_image'));
-    if (!st.zones || !st.zones.length) throw new Error(I18N.t('ic.err_seq_zones'));
-    var p = {
-        bareme: bareme, text: text, fbOkTxt: fbOkTxt, fbWrTxt: fbWrTxt,
-        seqTime: seqTime, bgData: st.bgData, bgW: st.bgW, bgH: st.bgH, zones: st.zones,
-        fbGen: v('ic-fbgen')
-    };
-    return genImgClickSequenceCore(X, p);
-}
-
 function genImgClickSequenceCore(X, p, deps) {
     deps = deps || {};
     var I18N_D = deps.I18N || I18N;
@@ -379,5 +402,5 @@ function genImgClickSequenceCore(X, p, deps) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genImgClick: genImgClick, genImgClickCore: genImgClickCore, genImgClickSequence: genImgClickSequence, genImgClickSequenceCore: genImgClickSequenceCore };
+    module.exports = { genImgClick: genImgClick, genImgClickCore: genImgClickCore, genImgClickSequenceCore: genImgClickSequenceCore, genImgClickParams: genImgClickParams, genImgClickDispatchLocal: genImgClickDispatchLocal };
 }
