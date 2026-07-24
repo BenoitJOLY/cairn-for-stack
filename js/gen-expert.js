@@ -26,7 +26,7 @@ function buildInputXml(inp){
 }
 
 /* ── Generator ─────────────────────────────────────────────────── */
-async function genExpert(qid){
+function genExpertParams(qid){
   var q=questions[qid];
   if(!q) throw new Error(I18N.t('msg.err_expert_q_introuvable'));
 
@@ -36,6 +36,23 @@ async function genExpert(qid){
   var s=q._expertState;
   if(!s) throw new Error(I18N.t('msg.err_expert_state'));
 
+  return s;
+}
+
+async function genExpert(qid){
+  var s = genExpertParams(qid);
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'expert', X: qid, params: s})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "expert", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "expert", repli sur le calcul local.', e); }
   return genExpertCore(s);
 }
 
@@ -160,5 +177,5 @@ function genExpertCore(s, deps){
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genExpert: genExpert, genExpertCore: genExpertCore, buildInputXml: buildInputXml };
+    module.exports = { genExpert: genExpert, genExpertCore: genExpertCore, genExpertParams: genExpertParams, buildInputXml: buildInputXml };
 }
