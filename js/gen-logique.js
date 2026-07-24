@@ -86,9 +86,9 @@ function _lgBox(kind, html) {
 }
 
 // Encart "Réponse attendue" du feedback général.
-function _lgGenFbBox(bodyHtml) {
+function _lgGenFbBox(bodyHtml, I18N_arg) {
     return '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-        + '<div style="font-weight:bold;color:#0f766e;margin-bottom:15px;">' + I18N.t('log.reponse_attendue_lbl') + '</div>' + bodyHtml + '</div>';
+        + '<div style="font-weight:bold;color:#0f766e;margin-bottom:15px;">' + (I18N_arg || I18N).t('log.reponse_attendue_lbl') + '</div>' + bodyHtml + '</div>';
 }
 
 // Table de vérité complète (toutes les lignes, même celles non demandées)
@@ -146,17 +146,17 @@ function _lgSeqNode(X, idx, isLast, spec) {
         falseanswernote: 'PRT' + X + '-' + idx + '-F', falsefeedback: ''
     };
 }
-function _lgSeqPrt(X, bareme, specs) {
+function _lgSeqPrt(X, bareme, specs, buildPrtXmlFn) {
     var nodes = specs.map(function (spec, idx) { return _lgSeqNode(X, idx, idx === specs.length - 1, spec); });
     var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: '' };
-    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml(prtMeta, nodes) };
+    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: (buildPrtXmlFn || buildPrtXml)(prtMeta, nodes) };
 }
 
-function genLogique(X) {
+function genLogiqueParams() {
     var gs = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
     var nbVars = parseInt(gs('lg-nb-vars')) || 2;
     var nRows = Math.pow(2, _lgVars(nbVars).length);
-    var p = {
+    return {
         scenario: gs('lg-scenario') || 'table',
         nbVars: nbVars,
         expr: gs('lg-expr') || '(P and Q) or not(P)',
@@ -173,6 +173,22 @@ function genLogique(X) {
         fbGen: gs('lg-fbgen'),
         text: richVal('lg-text')
     };
+}
+
+async function genLogique(X) {
+    var p = genLogiqueParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'logique', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "logique", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "logique", repli sur le calcul local.', e); }
     return genLogiqueCore(X, p);
 }
 
@@ -263,13 +279,13 @@ function genLogiqueCore(X, p, deps) {
             feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.table_fallback_desc'))
         });
 
-        var built = lgSeqPrt_D(X, bareme, specs);
+        var built = lgSeqPrt_D(X, bareme, specs, buildPrtXml_D);
         prtMeta = built.prtMeta; canonicalNodes = built.canonicalNodes; prtXML = built.prtXML;
 
         var instrText = text || '<p>' + I18N_D.t(isCases ? 'log.cases_instr' : 'log.table_instr') + '</p>';
         questionText = HDR + instrText + tbl;
         qnote = 'Logique Q' + X + ' ' + scenario + ' ' + expr.substring(0, 20);
-        generalFeedback = mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes)), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes), I18N_D), fbGen);
 
     } else if (scenario === 'identifier') {
         var choices = [
@@ -320,14 +336,14 @@ function genLogiqueCore(X, p, deps) {
             feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.identifier_fallback_desc'))
         });
 
-        var builtI = lgSeqPrt_D(X, bareme, specsI);
+        var builtI = lgSeqPrt_D(X, bareme, specsI, buildPrtXml_D);
         prtMeta = builtI.prtMeta; canonicalNodes = builtI.canonicalNodes; prtXML = builtI.prtXML;
 
         var instrText2 = text || '<p>' + I18N_D.t('log.identifier_instr') + '</p>';
         questionText = HDR + instrText2 + tbl2
             + '<div style="text-align:center;margin:16px 0;"><p><strong>' + I18N_D.t('log.expr_correspondante_lbl') + '</strong></p>[[input:' + ansName + ']][[validation:' + ansName + ']]</div>';
         qnote = 'Logique Q' + X + ' identifier ' + expr.substring(0, 20);
-        generalFeedback = mkFbGen_D(lgGenFbBox_D(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI)), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI), I18N_D), fbGen);
 
     } else if (scenario === 'equivalence') {
         var items3 = [];
@@ -421,7 +437,7 @@ function genLogiqueCore(X, p, deps) {
                 + '<td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-size:1.2rem;">' + (vA === vB ? '✅' : '❌') + '</td></tr>';
         }
         eqGenBody += '</tbody></table></div>';
-        generalFeedback = mkFbGen_D(lgGenFbBox_D(eqGenBody), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D(eqGenBody, I18N_D), fbGen);
 
     } else if (scenario === 'intermediaire') {
         var se1 = subexpr1 || '(P and Q)';
@@ -479,7 +495,7 @@ function genLogiqueCore(X, p, deps) {
                 feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.inter_fallback_desc'))
             }
         ];
-        var built3 = lgSeqPrt_D(X, bareme, specs4);
+        var built3 = lgSeqPrt_D(X, bareme, specs4, buildPrtXml_D);
         prtMeta = built3.prtMeta; canonicalNodes = built3.canonicalNodes; prtXML = built3.prtXML;
 
         var instrText4 = text || '<p>' + I18N_D.t('log.inter_instr') + '</p>';
@@ -501,7 +517,7 @@ function genLogiqueCore(X, p, deps) {
                 + '<td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">' + allResFin[qk] + '</td></tr>';
         }
         interBody += '</tbody></table></div>';
-        generalFeedback = mkFbGen_D(lgGenFbBox_D(interBody), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D(interBody, I18N_D), fbGen);
 
     } else { // simplif
         var tansMaxima = tansForm || expr;
@@ -533,7 +549,7 @@ function genLogiqueCore(X, p, deps) {
             + '<p>' + I18N_D.t('log.simplif_instr2') + '</p>');
         questionText = HDR + instrText5 + '[[input:' + ansName2 + ']][[validation:' + ansName2 + ']]';
         qnote = 'Logique Q' + X + ' simplif ' + expr.substring(0, 20);
-        generalFeedback = mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.simplif_genfb_line1', {tans: _lgToLatex(tansMaxima)}) + '</p><p>' + I18N_D.t('log.simplif_genfb_line2', {expr: _lgToLatex(expr)}) + '</p>'), fbGen);
+        generalFeedback = mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.simplif_genfb_line1', {tans: _lgToLatex(tansMaxima)}) + '</p><p>' + I18N_D.t('log.simplif_genfb_line2', {expr: _lgToLatex(expr)}) + '</p>', I18N_D), fbGen);
     }
 
     questionText += '[[feedback:prt' + X + ']]';
@@ -548,7 +564,7 @@ function genLogiqueCore(X, p, deps) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genLogique: genLogique, genLogiqueCore: genLogiqueCore };
+    module.exports = { genLogique: genLogique, genLogiqueCore: genLogiqueCore, genLogiqueParams: genLogiqueParams };
 }
 
 // ==============================================================
