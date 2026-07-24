@@ -75,7 +75,7 @@ function genStrPaletteHTML(X){
   return `<div style="background:#f8f4ff;border:1px solid #e9d5ff;border-radius:8px;padding:8px 10px;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;"><span style="font-size:.72rem;font-weight:700;color:#6b21a8;margin-right:4px;">${I18N.t('tpl.str_aide')}</span>${btnHTML}</div><p><scr`+`ipt>${sc}<`+`/scr`+`ipt></p>`;
 }
 
-function genString(X){
+async function genString(X){
   const bareme=parseFloat(v('str-bareme'))||1;
   const text=richVal('str-text');
   const ansRich=richVal('str-ans-rich');
@@ -94,6 +94,18 @@ function genString(X){
   const altsRaw=(document.getElementById('str-alts')||{value:''}).value.trim();
   const altsArr=altsRaw?altsRaw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;}) : [];
   const p={bareme,text,ansPlain,size,test,fbc,fbe,fbGen,solH,paletteHtml,levenOn,altsArr};
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'string', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "string", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "string", repli sur le calcul local.', e); }
   return genStringCore(X,p);
 }
 

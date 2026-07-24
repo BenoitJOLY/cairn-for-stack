@@ -18,6 +18,7 @@ const { genCompositionCore } = require('../js/gen-composition.js');
 const { genNumericalCore } = require('../js/gen-numerical.js');
 const { genCheckboxCore } = require('../js/gen-checkbox.js');
 const { genPoolCore } = require('../js/gen-pool.js');
+const { genStringCore } = require('../js/gen-string.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
@@ -52,6 +53,7 @@ const GENERATORS = {
   checkbox: (X, p) => genCheckboxCore(X, p, DEPS),
   radio: (X, p) => genPoolCore(X, p, DEPS),
   dropdown: (X, p) => genPoolCore(X, p, DEPS),
+  string: (X, p) => genStringCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {
