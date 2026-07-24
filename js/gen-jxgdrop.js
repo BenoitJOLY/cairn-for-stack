@@ -76,7 +76,7 @@ function jxgDropBuildSolutionImage(st) {
     return canvas.toDataURL('image/jpeg', 0.85);
 }
 
-function genJxgDrop(X) {
+function genJxgDropParams() {
     var st = window._jdState;
     if (!st.bgData)           throw new Error(I18N.t('jd.err_no_image'));
     if (!st.proposals.length) throw new Error(I18N.t('jd.err_no_proposals'));
@@ -89,13 +89,29 @@ function genJxgDrop(X) {
 
     var solutionImgData = jxgDropBuildSolutionImage(st);
 
-    var p = {
+    return {
         bareme: bareme, instruction: instruction, zonesVisible: zonesVisible,
         bgW: st.bgW, bgH: st.bgH, bgData: st.bgData,
         zones: st.zones, proposals: st.proposals,
         solutionImgData: solutionImgData,
         fbGen: v('jd-fbgen')
     };
+}
+
+async function genJxgDrop(X) {
+    var p = genJxgDropParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'jxgdrop', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "jxgdrop", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "jxgdrop", repli sur le calcul local.', e); }
     return genJxgDropCore(X, p);
 }
 
@@ -397,7 +413,7 @@ function genJxgDropCore(X, p, deps) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genJxgDrop: genJxgDrop, genJxgDropCore: genJxgDropCore, jxgDropChunkedJsString: jxgDropChunkedJsString, jxgDropChunkedRaw: jxgDropChunkedRaw };
+    module.exports = { genJxgDrop: genJxgDrop, genJxgDropCore: genJxgDropCore, genJxgDropParams: genJxgDropParams, jxgDropChunkedJsString: jxgDropChunkedJsString, jxgDropChunkedRaw: jxgDropChunkedRaw };
 }
 
 // ══════════════════════════════════════════════════════

@@ -3456,8 +3456,8 @@ function renderPreviewHTML_jxgdrop(state) {
   var jd = window._jdState || {};
   var realParts = null;
   try {
-    if (typeof genJxgDrop === 'function' && jd.bgData && jd.proposals && jd.proposals.length && jd.zones && jd.zones.length) {
-      realParts = genJxgDrop(1);
+    if (typeof genJxgDropCore === 'function' && typeof genJxgDropParams === 'function' && jd.bgData && jd.proposals && jd.proposals.length && jd.zones && jd.zones.length) {
+      realParts = genJxgDropCore(1, genJxgDropParams());
     }
   } catch (e) { console.error('[preview] jxgdrop build error:', e); realParts = null; }
 
