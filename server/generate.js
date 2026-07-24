@@ -3,6 +3,7 @@ const { genComplexeCore } = require('../js/gen-math-complexe.js');
 const { genCalculCore } = require('../js/gen-math-calcul.js');
 const { genStatistiquesCore } = require('../js/gen-math-statistiques.js');
 const { genMatricesCore } = require('../js/gen-math-matrices.js');
+const { genGeometrieCore } = require('../js/gen-math-geometrie.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
@@ -20,6 +21,7 @@ const GENERATORS = {
   calcul: (X, p) => genCalculCore(X, p, DEPS),
   statistiques: (X, p) => genStatistiquesCore(X, p, DEPS),
   matrices: (X, p) => genMatricesCore(X, p, DEPS),
+  geometrie: (X, p) => genGeometrieCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {

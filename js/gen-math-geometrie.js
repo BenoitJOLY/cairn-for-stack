@@ -15,9 +15,10 @@ function _geoBox(kind, html) {
     return '<div style="border-left:4px solid ' + s.c + ';padding:10px 14px;background:' + s.bg + ';border-radius:4px;">' + icon + ' ' + html + '</div>';
 }
 
-function _geoGenFbBox(bodyHtml) {
+function _geoGenFbBox(bodyHtml, deps) {
+    var I18N_D = (deps && deps.I18N) || I18N;
     return '<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-        + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N.t('calc.correction_detaillee_lbl') + '</div>'
+        + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('calc.correction_detaillee_lbl') + '</div>'
         + '<div style="font-size:.9rem;">' + bodyHtml + '</div></div>';
 }
 
@@ -46,10 +47,11 @@ function _geoSeqNode(X, idx, isLast, spec) {
         falseanswernote: 'PRT' + X + '-' + idx + '-F', falsefeedback: ''
     };
 }
-function _geoSeqPrt(X, bareme, specs) {
+function _geoSeqPrt(X, bareme, specs, deps) {
+    var buildPrtXml_D = (deps && deps.buildPrtXml) || buildPrtXml;
     var nodes = specs.map(function (spec, idx) { return _geoSeqNode(X, idx, idx === specs.length - 1, spec); });
     var prtMeta = { name: 'prt' + X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml(prtMeta, nodes) };
+    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml_D(prtMeta, nodes) };
 }
 
 // Noeuds de diagnostic intermediaires (entre le noeud "reponse correcte" et le
@@ -60,10 +62,10 @@ function _geoDiagNodes(specs) {
     return specs.slice(1, -1).map(function (s) { return { desc: s.description, fb: s.feedback }; });
 }
 
-function genGeometrie(X) {
+function _geoBuildParams() {
     var gs = function (id) { var e = document.getElementById(id); return e ? e.value : ''; };
     var gnRaw = function (id) { return parseFloat(gs(id)); };
-    var p = {
+    return {
         bareme: parseFloat(gs('geo-bareme')) || 1,
         scenario: gs('geo-scenario') || 'distance',
         mode: gs('geo-mode') || 'aleatoire',
@@ -75,6 +77,21 @@ function genGeometrie(X) {
         p2x: gnRaw('geo-p2x'), p2y: gnRaw('geo-p2y'), p2z: gnRaw('geo-p2z'),
         p3x: gnRaw('geo-p3x'), p3y: gnRaw('geo-p3y'), p3z: gnRaw('geo-p3z')
     };
+}
+
+async function genGeometrie(X) {
+    var p = _geoBuildParams();
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'geometrie', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genGeometrieCore(X, p);
 }
 
@@ -136,13 +153,13 @@ q${X}_err_origine:abs(sqrt(q${X}_xb^2+q${X}_yb^2+q${X}_zb^2)-sqrt(q${X}_xa^2+q${
                     feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.dist_fallback_desc', {zterm: d3dm ? '+(z_B-z_A)^2' : ''})}`) }
             ];
             diagNodes = _geoDiagNodes(specsDist);
-            var builtDist = geoSeqPrt_D(X, bareme, specsDist);
+            var builtDist = geoSeqPrt_D(X, bareme, specsDist, deps);
             prtMeta = builtDist.prtMeta; canonicalNodes = builtDist.canonicalNodes; prtXML = builtDist.prtXML;
             generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.dist_correction_desc', {
                 repere: repere, zterm: d3dm ? '+(z_B-z_A)^2' : '',
                 dx: `{@q${X}_dx@}`, dy: `{@q${X}_dy@}`, dzterm: d3dm ? `+{@q${X}_dz@}^2` : '',
                 somme: `{@q${X}_somme@}`, ta: `{@q${X}_ta@}`
-            })), p.fbGenRaw);
+            }), deps), p.fbGenRaw);
 
         } else { // milieu
             var mat2or3 = function (x, y, z) { return d3dm ? `matrix([${x}],[${y}],[${z}])` : `matrix([${x}],[${y}])`; };
@@ -178,7 +195,7 @@ q${X}_err_nodiv:${errNodiv};`;
                     feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.milieu_fallback_desc', {zterm: d3dm ? '\\;;\\;\\frac{z_A+z_B}{2}' : ''})}`) }
             ];
             diagNodes = _geoDiagNodes(specsMid);
-            var builtMid = geoSeqPrt_D(X, bareme, specsMid);
+            var builtMid = geoSeqPrt_D(X, bareme, specsMid, deps);
             prtMeta = builtMid.prtMeta; canonicalNodes = builtMid.canonicalNodes; prtXML = builtMid.prtXML;
             generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.milieu_correction_desc', {
                 zterm1: d3dm ? '\\;;\\;\\frac{z_A+z_B}{2}' : '',
@@ -186,7 +203,7 @@ q${X}_err_nodiv:${errNodiv};`;
                 ya: `{@q${X}_ya@}`, yb: `{@q${X}_yb@}`, ym: `{@q${X}_ym@}`,
                 zterm2: d3dm ? `<br>\\[z_I=\\frac{{@q${X}_za@}+({@q${X}_zb@})}{2}={@q${X}_zm@}\\]` : '',
                 I: _geoPointTex(X, 'xm', 'ym', 'zm', d3dm)
-            })), p.fbGenRaw);
+            }), deps), p.fbGenRaw);
         }
 
     } else if (scenario === 'norme') {
@@ -226,14 +243,14 @@ q${X}_err_sub:${d3n ? `sqrt(abs(q${X}_ux^2+q${X}_uy^2-q${X}_uz^2))` : `sqrt(abs(
                 feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.norme_fallback_desc', {zterm: d3n ? '+z^2' : ''})}`) }
         ];
         diagNodes = _geoDiagNodes(specsNorm);
-        var builtNorm = geoSeqPrt_D(X, bareme, specsNorm);
+        var builtNorm = geoSeqPrt_D(X, bareme, specsNorm, deps);
         prtMeta = builtNorm.prtMeta; canonicalNodes = builtNorm.canonicalNodes; prtXML = builtNorm.prtXML;
         generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.norme_correction_desc', {
             zterm1: d3n ? '+z^2' : '',
             ux: `{@q${X}_ux@}`, uy: `{@q${X}_uy@}`,
             zterm2: d3n ? `+{@q${X}_uz@}^2` : '',
             somme: `{@q${X}_somme@}`, ta: `{@q${X}_ta@}`
-        })), p.fbGenRaw);
+        }), deps), p.fbGenRaw);
 
     } else if (scenario === 'pente') {
         var declPente;
@@ -272,12 +289,12 @@ q${X}_err_moins:-q${X}_b/q${X}_a;`;
                 feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.pente_fallback_desc')}`) }
         ];
         diagNodes = _geoDiagNodes(specsPente);
-        var builtPente = geoSeqPrt_D(X, bareme, specsPente);
+        var builtPente = geoSeqPrt_D(X, bareme, specsPente, deps);
         prtMeta = builtPente.prtMeta; canonicalNodes = builtPente.canonicalNodes; prtXML = builtPente.prtXML;
         generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.pente_correction_desc', {
             xa: `{@q${X}_xa@}`, ya: `{@q${X}_ya@}`, za: `{@q${X}_za@}`,
             a: `{@q${X}_a@}`, b: `{@q${X}_b@}`, c: `{@q${X}_c@}`, ta: `{@q${X}_ta@}`
-        })), p.fbGenRaw);
+        }), deps), p.fbGenRaw);
 
     } else if (scenario === 'ordonnee') {
         var declOao;
@@ -317,12 +334,12 @@ q${X}_err_absc:-q${X}_c/q${X}_a;`;
                 feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.ordonnee_fallback_desc')}`) }
         ];
         diagNodes = _geoDiagNodes(specsOao);
-        var builtOao = geoSeqPrt_D(X, bareme, specsOao);
+        var builtOao = geoSeqPrt_D(X, bareme, specsOao, deps);
         prtMeta = builtOao.prtMeta; canonicalNodes = builtOao.canonicalNodes; prtXML = builtOao.prtXML;
         generalFeedback = mkFbGen_D(geoGenFbBox_D(I18N_D.t('geo.ordonnee_correction_desc', {
             eq: `{@q${X}_a*x+q${X}_b*y+q${X}_c@}`,
             a: `{@q${X}_a@}`, b: `{@q${X}_b@}`, c: `{@q${X}_c@}`, ta: `{@q${X}_ta@}`
-        })), p.fbGenRaw);
+        }), deps), p.fbGenRaw);
 
     } else { /* aire */
         var d3a = dimSel === '3d';
@@ -379,7 +396,7 @@ q${X}_err_2d:round(float(q${X}_aire2d)*100)/100;`;
         specsAire.push({ description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
             feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${d3a ? I18N_D.t('geo.aire_fallback_3d_desc') : I18N_D.t('geo.aire_fallback_2d_desc')}`) });
         diagNodes = _geoDiagNodes(specsAire);
-        var builtAire = geoSeqPrt_D(X, bareme, specsAire);
+        var builtAire = geoSeqPrt_D(X, bareme, specsAire, deps);
         prtMeta = builtAire.prtMeta; canonicalNodes = builtAire.canonicalNodes; prtXML = builtAire.prtXML;
         generalFeedback = mkFbGen_D(geoGenFbBox_D(d3a
             ? I18N_D.t('geo.aire_correction_3d', {
@@ -391,7 +408,7 @@ q${X}_err_2d:round(float(q${X}_aire2d)*100)/100;`;
             : I18N_D.t('geo.aire_correction_2d', {
                 ux: `{@q${X}_ux@}`, uy: `{@q${X}_uy@}`,
                 vx: `{@q${X}_vx@}`, vy: `{@q${X}_vy@}`, ta: `{@q${X}_ta@}`
-              })), p.fbGenRaw);
+              }), deps), p.fbGenRaw);
     }
 
     return {
