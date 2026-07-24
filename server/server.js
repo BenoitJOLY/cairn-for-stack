@@ -34,6 +34,11 @@ app.get('/healthz', (req, res) => res.send('ok'));
 
 app.get('/login.html', (req, res) => res.sendFile(path.join(ROOT, 'login.html')));
 
+// Servi avant le gate d'authentification : login.html en a besoin pour son
+// fond d'écran, et ce dossier ne contient que des images/icônes, pas la
+// logique métier protégée (contrairement à js/, gardé derrière requireAuth).
+app.use('/assets', express.static(path.join(ROOT, 'assets')));
+
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body || {};
   if (typeof username !== 'string' || typeof password !== 'string' || !verifyPassword(username, password)) {
@@ -76,7 +81,7 @@ app.post('/api/generate', (req, res) => {
 // Le reste (app statique) n'est servi qu'après authentification — voir
 // PLAN.md, chantier "Backend auto-hébergé NAS", décision "toute l'app
 // derrière le login".
-const PUBLIC_DIRS = ['js', 'css', 'lang', 'lib', 'assets'];
+const PUBLIC_DIRS = ['js', 'css', 'lang', 'lib'];
 for (const dir of PUBLIC_DIRS) {
   app.use('/' + dir, express.static(path.join(ROOT, dir)));
 }
