@@ -1,10 +1,15 @@
-function genStatistiques(X) {
+// Lecture pure du formulaire (aucun effet de bord réseau) — factorisée pour
+// être appelée à la fois par genStatistiques() (export réel) et par l'aperçu
+// local synchrone (js/preview.js:renderPreviewHTML_statistiques), qui ne doit
+// pas dépendre du réseau ni devenir async (voir PLAN.md, étape 3 du chantier
+// Backend NAS, même piège que gen-math-calcul.js/_calcBuildParams).
+function _statBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var dataDecimals = parseInt(gs('stat-data-decimals'));
     if (isNaN(dataDecimals) || dataDecimals < 0) dataDecimals = 1;
     if (dataDecimals > 3) dataDecimals = 3;
     var randFormatEl = document.querySelector('input[name="stat-rand-format-radio"]:checked');
-    var p = {
+    return {
         bareme: parseFloat(gs('stat-bareme')) || 1,
         scenario: gs('stat-scenario') || 'moyenne',
         display: gs('stat-display') || 'liste',
@@ -16,6 +21,24 @@ function genStatistiques(X) {
         randFormat: randFormatEl ? randFormatEl.value : 'decimal',
         fbGen: gs('stat-fbgen')
     };
+}
+
+async function genStatistiques(X) {
+    var p = _statBuildParams();
+    // Étape 3 (PLAN.md) : tente la génération côté serveur, avec repli
+    // automatique sur le calcul local si le serveur échoue ou est absent —
+    // aucun risque de casser la génération pendant la migration.
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'statistiques', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genStatistiquesCore(X, p);
 }
 

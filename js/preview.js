@@ -2800,7 +2800,7 @@ window.trigRefreshPreview = _hsWireSimplePreview('trigonometrie', 'trig', 'trig-
 
 function renderPreviewHTML_statistiques(state) {
   var realParts = {};
-  try { realParts = (typeof genStatistiques === 'function') ? genStatistiques(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genStatistiquesCore === 'function') ? genStatistiquesCore(1, _statBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   // ri(a,b) est un alias local de rand() défini dans gen-math-statistiques.js : toute
