@@ -183,14 +183,14 @@ function genApnCore(X, p, deps) {
     // pour 2 erreurs classiques (sens de compensation inversé, paramètre changé
     // ignoré), afin de donner un feedback ciblé plutôt qu'un simple "faux". ──
     var snapList = function(listVar, exprStr, outName) {
-        return P + 'diffs_' + outName + ': map(lambda([x], abs(float(x)-float(' + exprStr + '))), ' + listVar + '),\n'
-            + P + 'md_' + outName + ': lmin(' + P + 'diffs_' + outName + '),\n'
+        return P + 'diffs_' + outName + ': map(lambda([x], abs(float(x)-float(' + exprStr + '))), ' + listVar + ');\n'
+            + P + 'md_' + outName + ': lmin(' + P + 'diffs_' + outName + ');\n'
             + P + outName + ': first(sublist(' + listVar + ', lambda([x], abs(float(x)-float(' + exprStr + '))=' + P + 'md_' + outName + ')));\n';
     };
     var snapAperture = function(exprStr, outName) {
-        return P + 'diffs_' + outName + ': map(lambda([x], abs(float(x)-float(' + exprStr + '))), ' + P + 'ldr),\n'
-            + P + 'md_' + outName + ': lmin(' + P + 'diffs_' + outName + '),\n'
-            + P + 'idx_' + outName + ': first(sublist(makelist(i,i,1,length(' + P + 'ldr)), lambda([i], abs(float(' + P + 'ldr[i])-float(' + exprStr + '))=' + P + 'md_' + outName + '))),\n'
+        return P + 'diffs_' + outName + ': map(lambda([x], abs(float(x)-float(' + exprStr + '))), ' + P + 'ldr);\n'
+            + P + 'md_' + outName + ': lmin(' + P + 'diffs_' + outName + ');\n'
+            + P + 'idx_' + outName + ': first(sublist(makelist(i,i,1,length(' + P + 'ldr)), lambda([i], abs(float(' + P + 'ldr[i])-float(' + exprStr + '))=' + P + 'md_' + outName + ')));\n'
             + P + outName + ': ' + P + 'lda[' + P + 'idx_' + outName + '];\n';
     };
 
