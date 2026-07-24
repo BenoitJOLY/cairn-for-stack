@@ -3649,7 +3649,7 @@ window.topoRefreshPreview = _hsWireSimplePreview('chemical_topo', 'topo', 'topo-
 
 function renderPreviewHTML_nuclear(state) {
   var realParts = {};
-  try { realParts = (typeof genNuclear === 'function') ? genNuclear(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genNuclearCore === 'function') ? genNuclearCore(1, _nucBuildParams()) : {}; } catch (e) { realParts = {}; }
   var prtBoxes = _hsPrtBoxes(realParts);
   var diagNodes = (realParts.diagNodes || []).map(function(n) { return { desc: n.desc, fb: n.fb }; });
   // genNuclear() embarque désormais lui-même l'encart "réponse attendue" dans

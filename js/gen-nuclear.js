@@ -387,12 +387,28 @@ if(savedVal && savedVal.value && savedVal.value.trim()!==''){
 // ══════════════════════════════════════════════════════
 //  GÉNÉRATEUR PRINCIPAL
 // ══════════════════════════════════════════════════════
-function genNuclear(X) {
+function _nucBuildParams() {
   const bareme = parseFloat(v('nuc-bareme')) || 1;
   const text   = richVal('nuc-text');
   const editor = document.getElementById('nuc-editor');
   const rawEq  = editor ? editor.innerText.trim() : '';
-  const p = { bareme, text, rawEq, fbGenRaw: v('nuc-fbgen') };
+  return { bareme, text, rawEq, fbGenRaw: v('nuc-fbgen') };
+}
+
+async function genNuclear(X) {
+  const p = _nucBuildParams();
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'nuclear', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "nuclear", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "nuclear", repli sur le calcul local.', e); }
   return genNuclearCore(X, p);
 }
 
