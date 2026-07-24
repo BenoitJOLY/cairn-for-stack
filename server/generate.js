@@ -22,6 +22,11 @@ const { genStringCore } = require('../js/gen-string.js');
 const { genMatchCore } = require('../js/gen-match.js');
 const { genCrosswordCore } = require('../js/gen-crossword.js');
 const { generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty } = require('../js/crossword-ui.js');
+const { genVFCore } = require('../js/gen-vf.js');
+const { genOrdCore } = require('../js/gen-ord.js');
+const { genRedoxCore } = require('../js/gen-redox.js');
+const { genBasenCore } = require('../js/gen-basen.js');
+const { bnStrictParse, bnSyntaxHint } = require('../js/basen-ui.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
@@ -30,7 +35,7 @@ const { _cpxGenFbgen } = require('../js/complexe-ui.js');
 const { htmlEsc, escapeMaximaString, rawEsc } = require('../js/data.js');
 const I18N = require('./i18n-node.js');
 
-const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty };
+const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty, bnStrictParse, bnSyntaxHint };
 
 // Un type migré à la fois — voir PLAN.md, chantier "Backend auto-hébergé NAS",
 // étape 3. Ajouter une entrée ici seulement après audit + test réel Moodle.
@@ -59,6 +64,10 @@ const GENERATORS = {
   string: (X, p) => genStringCore(X, p, DEPS),
   match: (X, p) => genMatchCore(X, p, DEPS),
   crossword: (X, p) => genCrosswordCore(X, p, DEPS),
+  vf: (X, p) => genVFCore(X, p, DEPS),
+  ord: (X, p) => genOrdCore(X, p, DEPS),
+  redox: (X, p) => genRedoxCore(X, p, DEPS),
+  basen: (X, p) => genBasenCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {
