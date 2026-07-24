@@ -622,7 +622,7 @@ function copyMatchPrompt() {
   const textarea = document.getElementById('match-pb-result');
   if(!textarea) return;
   textarea.select();
-  textarea.setSelectionRange(0, 99999); 
+  textarea.setSelectionRange(0, 99999);
   navigator.clipboard.writeText(textarea.value).then(() => {
     const btn = document.getElementById('match-pb-copy-btn');
     if(btn) {
@@ -632,4 +632,8 @@ function copyMatchPrompt() {
       setTimeout(() => { btn.innerHTML = orig; btn.style.background = ""; }, 2000);
     }
   }).catch(e => { alert("Erreur copie"); });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { generateCWMaximaString: generateCWMaximaString, renderCWGridHTML: renderCWGridHTML, renderCWGridHTMLEmpty: renderCWGridHTMLEmpty };
 }

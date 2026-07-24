@@ -1,6 +1,6 @@
 // ── XML GENERATORS: mots croisés ──
 
-function genCrossword(X){
+async function genCrossword(X){
     if(!Array.isArray(currentPlacedWords)) currentPlacedWords = [...currentPlacedWords];
     if(!currentGridData || currentPlacedWords.length === 0) throw new Error(I18N.t('msg.err_cw_grille'));
     const p = {
@@ -9,6 +9,18 @@ function genCrossword(X){
         gridData: currentGridData,
         fbGen: v('cw-fbgen')
     };
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'crossword', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "crossword", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "crossword", repli sur le calcul local.', e); }
     return genCrosswordCore(X, p);
 }
 
