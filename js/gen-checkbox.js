@@ -1,6 +1,6 @@
 // ── XML GENERATORS: checkbox ──
 
-function genCheckbox(X){
+async function genCheckbox(X){
  if(!validateCBDraw()){throw new Error(I18N.t('msg.err_tirage_cb'));}
   const rows=document.querySelectorAll('#cb-props .prop-row');
   if(!rows.length)throw new Error(I18N.t('msg.err_props_vide'));
@@ -23,6 +23,18 @@ function genCheckbox(X){
     cbFbGen: resolveFb('cb-fbgen', ''),
     cbFbGenShowFb: document.getElementById('cb-fbgen-showfb')?.checked || false
   };
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'checkbox', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "checkbox", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "checkbox", repli sur le calcul local.', e); }
   return genCheckboxCore(X, p);
 }
 

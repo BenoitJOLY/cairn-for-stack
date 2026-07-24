@@ -16,15 +16,16 @@ const { genUnitsCore } = require('../js/gen-units.js');
 const { genNuclearCore } = require('../js/gen-nuclear.js');
 const { genCompositionCore } = require('../js/gen-composition.js');
 const { genNumericalCore } = require('../js/gen-numerical.js');
+const { genCheckboxCore } = require('../js/gen-checkbox.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
 const { _mkInput, _mkFbGen } = require('../js/gen-math-shared.js');
 const { _cpxGenFbgen } = require('../js/complexe-ui.js');
-const { htmlEsc } = require('../js/data.js');
+const { htmlEsc, escapeMaximaString } = require('../js/data.js');
 const I18N = require('./i18n-node.js');
 
-const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc };
+const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString };
 
 // Un type migré à la fois — voir PLAN.md, chantier "Backend auto-hébergé NAS",
 // étape 3. Ajouter une entrée ici seulement après audit + test réel Moodle.
@@ -47,6 +48,7 @@ const GENERATORS = {
   nuclear: (X, p) => genNuclearCore(X, p, DEPS),
   composition: (X, p) => genCompositionCore(X, p, DEPS),
   numerical: (X, p) => genNumericalCore(X, p, DEPS),
+  checkbox: (X, p) => genCheckboxCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {

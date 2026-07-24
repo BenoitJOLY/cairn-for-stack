@@ -104,5 +104,5 @@ const LABELS_PLAIN={
 function applyFormula(){document.getElementById('num-val').value=document.getElementById('modal-formula').value;document.getElementById('calcModal').style.display='none';}
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { htmlEsc: htmlEsc, rawEsc: rawEsc, attrEsc: attrEsc };
+    module.exports = { htmlEsc: htmlEsc, rawEsc: rawEsc, attrEsc: attrEsc, escapeMaximaString: escapeMaximaString };
 }
