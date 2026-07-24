@@ -1020,7 +1020,7 @@ var _diffKO = '<div style="border-left:4px solid #dc2626;padding:8px 12px;backgr
 var _diffEnd = "</div>";
 
 /* ── Generateur ── */
-function genDiffraction(X) {
+function genDiffractionParams() {
   var type = v("diff-type") || "fente_simple";
   var mode = v("diff-mode") || "ecran";
   var bareme = parseFloat(v("diff-bareme")) || 1;
@@ -1032,10 +1032,28 @@ function genDiffraction(X) {
   var bFix = parseFloat(v("diff-b")) || 200;
   var lambdaFix = parseFloat(v("diff-lambda")) || 532;
   var fbGenRaw = v("diff-fbgen");
-  return genDiffractionCore(X, {
+  return {
     type: type, mode: mode, bareme: bareme, text: text, isRnd: isRnd,
     aFix: aFix, DFix: DFix, bFix: bFix, lambdaFix: lambdaFix, fbGenRaw: fbGenRaw
-  });
+  };
+}
+
+async function genDiffraction(X) {
+  var p = genDiffractionParams();
+  try {
+    var res = await fetch('/api/generate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'diffraction', X: X, params: p })
+    });
+    if (res.ok) {
+      var data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "diffraction", repli sur le calcul local (session expirée ?).');
+  } catch (e) {
+    console.warn('[stackforge] /api/generate injoignable pour "diffraction", repli sur le calcul local.', e);
+  }
+  return genDiffractionCore(X, p);
 }
 
 function genDiffractionCore(X, p, deps) {
@@ -1640,6 +1658,7 @@ function genDiffractionCore(X, p, deps) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     genDiffraction: genDiffraction,
-    genDiffractionCore: genDiffractionCore
+    genDiffractionCore: genDiffractionCore,
+    genDiffractionParams: genDiffractionParams
   };
 }
