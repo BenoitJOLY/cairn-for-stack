@@ -37,6 +37,7 @@ const { genOscilloscopeCore } = require('../js/gen-oscilloscope.js');
 const { genDiffractionCore } = require('../js/gen-diffraction.js');
 const { genImageMesureCore } = require('../js/gen-image-mesure.js');
 const { genChemicalCore, genChemicalTopoCore } = require('../js/gen-topo.js');
+const { genRvbCmjCore, genOptiqueCore } = require('../js/gen-optique.js');
 const { CIR_ENGINE_JS } = require('../js/circuit-atelier.js');
 const { CIR_ATELIER_CSS } = require('../js/circuit-ui.js');
 const { bnStrictParse, bnSyntaxHint } = require('../js/basen-ui.js');
@@ -95,6 +96,8 @@ const GENERATORS = {
   'image-mesure': (X, p) => genImageMesureCore(X, p, DEPS),
   chemical: (X, p) => genChemicalCore(X, p, DEPS),
   chemical_topo: (X, p) => genChemicalTopoCore(X, p, DEPS),
+  rvbcmj: (X, p) => genRvbCmjCore(X, p, DEPS),
+  optique: (X, p) => genOptiqueCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {
