@@ -375,7 +375,7 @@ if (savedVal && savedVal.value && savedVal.value.trim()!=='') {
 //  GÉNÉRATEUR XML
 // ════════════════════════════════════════════════════════
 
-function genComposition(X) {
+function _compBuildParams(X) {
   var bareme = parseFloat(document.getElementById('comp-bareme').value) || 4;
   var text   = richVal('comp-text');
   var height = document.getElementById('comp-height').value || '600px';
@@ -386,7 +386,23 @@ function genComposition(X) {
     throw new Error(I18N.t('msg.err_comp_enonce', {n: X}));
   }
 
-  var p = { bareme: bareme, text: text, height: height, msg: msg, fbGenRaw: v('comp-fbgen') };
+  return { bareme: bareme, text: text, height: height, msg: msg, fbGenRaw: v('comp-fbgen') };
+}
+
+async function genComposition(X) {
+  var p = _compBuildParams(X);
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'composition', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "composition", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "composition", repli sur le calcul local.', e); }
   return genCompositionCore(X, p);
 }
 
