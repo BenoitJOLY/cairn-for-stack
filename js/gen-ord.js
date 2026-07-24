@@ -1,6 +1,6 @@
 // ── XML GENERATORS: ordonnancement ──
 
-function genOrd(X) {
+async function genOrd(X) {
     var rows = document.querySelectorAll('#ord-items .ord-row');
     if (rows.length < 2) throw new Error(I18N.t('ord.err_min'));
     var p = {
@@ -12,6 +12,18 @@ function genOrd(X) {
             return r.querySelector('.ord-item-text').value.trim();
         })
     };
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'ord', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "ord", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "ord", repli sur le calcul local.', e); }
     return genOrdCore(X, p);
 }
 
@@ -21,7 +33,7 @@ function genOrdCore(X, p, deps) {
     deps = deps || {};
     var I18N_D        = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-    var mkFbGen_D      = deps.mkFbGen || _mkFbGen;
+    var mkFbGen_D      = deps._mkFbGen || _mkFbGen;
     var rawEsc_D       = deps.rawEsc || rawEsc;
     var wrapFb_D       = deps.wrapFb || wrapFb;
 

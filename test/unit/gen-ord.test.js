@@ -19,7 +19,7 @@ const mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fb
 const rawEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const wrapFb = (html, ok) => `<div class="${ok ? 'ok' : 'ko'}">${html || '&nbsp;'}</div>`;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, mkFbGen, rawEsc, wrapFb };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen: mkFbGen, rawEsc, wrapFb };
 
 function baseParams(overrides) {
     return Object.assign({
