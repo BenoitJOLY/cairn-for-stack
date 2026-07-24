@@ -1226,7 +1226,7 @@ I18N.add("en", {
   "ineq.fbgen_auto_desc":  "The grading (solving the inequality) is generated automatically based on the type chosen in Config.",
   "ineq.fbgen_extra_note": "(optional, added after the auto grading)",
   "ineq.banniere":         "Inequalities",
-  "ineq.note_notation":    "Solution set: ]a;b[ (open), [a;b] (closed), [a;b[ or ]a;b] (half-open), inf for infinity (e.g. ]3;inf[). Multiple intervals: ]a;b[ U ]c;d[.",
+  "ineq.note_notation":    "Solution set: ]a;b[ (open), [a;b] (closed), [a;b[ or ]a;b] (half-open), inf for infinity (e.g. ]3;inf[). Fractions accepted (e.g. 5/3). Multiple intervals: ]a;b[ U ]c;d[.",
   "ineq.resoudre_reel":    "Solve in \\(\\mathbb{R}\\):",
   "ineq.ensemble_solution_lbl": "Solution set: ",
   "ineq.fb_wrong_reponse": "Answer: {@{tavar}@}.",

@@ -1228,7 +1228,7 @@ I18N.add("fr", {
   "ineq.fbgen_auto_desc":  "La correction (résolution de l'inéquation) est générée automatiquement selon le type choisi dans Config.",
   "ineq.fbgen_extra_note": "(optionnel, ajouté à la suite de la correction auto)",
   "ineq.banniere":         "Inéquations",
-  "ineq.note_notation":    "Ensemble solution : ]a;b[ (ouvert), [a;b] (fermé), [a;b[ ou ]a;b] (semi-ouvert), inf pour l'infini (ex. ]3;inf[). Plusieurs intervalles : ]a;b[ U ]c;d[.",
+  "ineq.note_notation":    "Ensemble solution : ]a;b[ (ouvert), [a;b] (fermé), [a;b[ ou ]a;b] (semi-ouvert), inf pour l'infini (ex. ]3;inf[). Fractions acceptées (ex. 5/3). Plusieurs intervalles : ]a;b[ U ]c;d[.",
   "ineq.resoudre_reel":    "Résoudre dans \\(\\mathbb{R}\\) :",
   "ineq.ensemble_solution_lbl": "Ensemble solution : ",
   "ineq.fb_wrong_reponse": "Réponse : {@{tavar}@}.",

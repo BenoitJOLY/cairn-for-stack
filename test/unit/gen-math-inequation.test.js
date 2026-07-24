@@ -107,6 +107,12 @@ test('feedbackvariables contient le parseur d\'intervalle _ic_X', () => {
     assert.match(q.prt.meta.feedbackvariables, /_ic1:block\(/);
 });
 
+test('le parseur de bornes _inum_X gère les fractions p/q (solutions non entières en mode aléatoire)', () => {
+    const q = genInequationCore(1, baseParams(), DEPS);
+    assert.match(q.prt.meta.feedbackvariables, /_sp:sposition\("\/",_ns\)/);
+    assert.match(q.prt.meta.feedbackvariables, /_a\/_b/);
+});
+
 test('le XML (prtXML, inputXML) est bien formé pour chaque combinaison mode/scenario', () => {
     ['aleatoire', 'fixe'].forEach(mode => {
         ['lineaire', 'trinome', 'valeur-abs'].forEach(scenario => {

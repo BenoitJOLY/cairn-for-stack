@@ -2,21 +2,19 @@
 // avec ∞/∪/U pour les unions) en expression Maxima comparable à q${X}_ta via AlgEquiv.
 // N'utilise volontairement PAS parse_string (fonction interdite par le bac à sable
 // de sécurité STACK, "globalyforbiddenfunction" dans security-map.json) : les bornes
-// numériques sont converties chiffre par chiffre, et les intervalles construits par
-// appel direct aux fonctions cc/co/oc/oo/union déjà chargées par STACK. Renvoie false
-// si rien d'interprétable n'a été saisi — le noeud PRT traite alors la réponse comme fausse.
+// numériques sont converties chiffre par chiffre (entiers, ou fractions p/q — les
+// scénarios "linéaire"/"valeur absolue" en mode aléatoire calculent des solutions par
+// division qui ne tombent pas toujours sur un entier), et les intervalles construits
+// par appel direct aux fonctions cc/co/oc/oo/union déjà chargées par STACK. Renvoie
+// false si rien d'interprétable n'a été saisi — le noeud PRT traite alors la réponse
+// comme fausse.
 function ineqIntervalFeedbackVars(X) {
     return `_ir${X}:ans_ineq${X};
 _ir${X}:ssubst("inf","∞",_ir${X});
 _ir${X}:ssubst(" union ","∪",_ir${X});
 _ir${X}:ssubst(" union ","U",_ir${X});
 _ir${X}:strim(" ",_ir${X});
-_inum${X}(_ns):=block([_neg:false,_i,_n,_v:0,_ch,_dp],
- _ns:strim(" ",_ns),
- if slength(_ns)=0 then return(false),
- if is(charat(_ns,1)="-") then (_neg:true,_ns:substring(_ns,2,slength(_ns)+1))
-  elseif is(charat(_ns,1)="+") then _ns:substring(_ns,2,slength(_ns)+1),
- if is(_ns="inf") then return(if _neg then -inf else inf),
+_idig${X}(_ns):=block([_i,_n,_v:0,_ch,_dp],
  _n:slength(_ns),
  if is(_n=0) then return(false),
  for _i:1 thru _n do (
@@ -25,7 +23,25 @@ _inum${X}(_ns):=block([_neg:false,_i,_n,_v:0,_ch,_dp],
   if is(_dp=false) then return(false),
   _v:_v*10+ev(_dp-1,simp)
  ),
- if _neg then -_v else _v
+ _v
+)$
+_inum${X}(_ns):=block([_neg:false,_sp,_a,_b],
+ _ns:strim(" ",_ns),
+ if slength(_ns)=0 then return(false),
+ if is(charat(_ns,1)="-") then (_neg:true,_ns:substring(_ns,2,slength(_ns)+1))
+  elseif is(charat(_ns,1)="+") then _ns:substring(_ns,2,slength(_ns)+1),
+ if is(_ns="inf") then return(if _neg then -inf else inf),
+ _sp:sposition("/",_ns),
+ if is(_sp=false) then (
+  _a:_idig${X}(_ns),
+  if is(_a=false) then return(false),
+  if _neg then -_a else _a
+ ) else (
+  _a:_idig${X}(substring(_ns,1,_sp)),
+  _b:_idig${X}(substring(_ns,_sp+1,slength(_ns)+1)),
+  if is(_a=false) or is(_b=false) or is(_b=0) then return(false),
+  if _neg then -_a/_b else _a/_b
+ )
 )$
 _iseg${X}(_seg):=block([_lob,_hib,_mid,_isp,_lo,_hi,_fn,_nlo,_nhi],
  _seg:strim(" ",_seg),
