@@ -14,6 +14,8 @@ _ir${X}:ssubst("inf","∞",_ir${X});
 _ir${X}:ssubst(" union ","∪",_ir${X});
 _ir${X}:ssubst(" union ","U",_ir${X});
 _ir${X}:strim(" ",_ir${X});
+_ir${X}:ssubst("","(",_ir${X});
+_ir${X}:ssubst("",")",_ir${X});
 _idig${X}(_ns):=block([_i,_n,_v:0,_ch,_dp],
  _n:slength(_ns),
  if is(_n=0) then return(false),
@@ -97,6 +99,8 @@ q${X}_tastr:block([_parts,_i,_n,_s,_op,_lo,_hi,_lb,_rb],
   if _i>1 then _s:sconcat(_s," U "),
   _s:sconcat(_s,_lb,if is(_lo=-inf) then "-inf" else _lo,";",if is(_hi=inf) then "+inf" else _hi,_rb)
  ),
+ _s:ssubst("","(",_s),
+ _s:ssubst("",")",_s),
  _s
 );`;
 }
@@ -131,7 +135,8 @@ async function genInequation(X) {
             const data = await res.json();
             if (data && data.ok) return data.parts;
         }
-    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "inequation", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "inequation", repli sur le calcul local.', e); }
     return genInequationCore(X, p);
 }
 
