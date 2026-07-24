@@ -26,6 +26,10 @@ const { genVFCore } = require('../js/gen-vf.js');
 const { genOrdCore } = require('../js/gen-ord.js');
 const { genRedoxCore } = require('../js/gen-redox.js');
 const { genBasenCore } = require('../js/gen-basen.js');
+const { genApnCore } = require('../js/gen-apn.js');
+const { genImgClickCore, genImgClickSequenceCore } = require('../js/gen-imgclick.js');
+const { genJxgDropCore, jxgDropChunkedJsString, jxgDropChunkedRaw } = require('../js/gen-jxgdrop.js');
+const { genExpertCore } = require('../js/gen-expert.js');
 const { bnStrictParse, bnSyntaxHint } = require('../js/basen-ui.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
@@ -35,7 +39,7 @@ const { _cpxGenFbgen } = require('../js/complexe-ui.js');
 const { htmlEsc, escapeMaximaString, rawEsc } = require('../js/data.js');
 const I18N = require('./i18n-node.js');
 
-const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty, bnStrictParse, bnSyntaxHint };
+const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty, bnStrictParse, bnSyntaxHint, jxgDropChunkedJsString, jxgDropChunkedRaw };
 
 // Un type migré à la fois — voir PLAN.md, chantier "Backend auto-hébergé NAS",
 // étape 3. Ajouter une entrée ici seulement après audit + test réel Moodle.
@@ -68,6 +72,12 @@ const GENERATORS = {
   ord: (X, p) => genOrdCore(X, p, DEPS),
   redox: (X, p) => genRedoxCore(X, p, DEPS),
   basen: (X, p) => genBasenCore(X, p, DEPS),
+  apn: (X, p) => genApnCore(X, p, DEPS),
+  // imgclick regroupe deux modes internes ('single'/'sequence', voir p.mode)
+  // sous un seul type app-level — cf. PLAN.md, chantier NAS, lot 5.
+  imgclick: (X, p) => (p.mode === 'sequence' ? genImgClickSequenceCore : genImgClickCore)(X, p, DEPS),
+  jxgdrop: (X, p) => genJxgDropCore(X, p, DEPS),
+  expert: (X, p) => genExpertCore(p, DEPS),
 };
 
 function generate(type, X, params) {
