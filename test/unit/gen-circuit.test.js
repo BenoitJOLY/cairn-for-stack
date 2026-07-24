@@ -99,13 +99,13 @@ test("prtMeta.value vaut toujours '1' (score absolu additif, pas le barème)", (
     assert.equal(q.prt.meta.value, '1');
 });
 
-test('genCircuit(X) lève une erreur si aucun modèle construit (cirReadModelFromCanvas renvoie null)', () => {
+test('genCircuit(X) lève une erreur si aucun modèle construit (cirReadModelFromCanvas renvoie null)', async () => {
     const prevFn = global.cirReadModelFromCanvas;
     const prevI18N = global.I18N;
     global.cirReadModelFromCanvas = () => null;
     global.I18N = I18N_STUB;
     try {
-        assert.throws(() => genCircuit(1), /cir\.err_no_model/);
+        await assert.rejects(() => genCircuit(1), /cir\.err_no_model/);
     } finally {
         global.cirReadModelFromCanvas = prevFn;
         global.I18N = prevI18N;

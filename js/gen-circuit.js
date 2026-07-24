@@ -4,7 +4,7 @@
 // question Moodle. Correction par comparaison de graphes (isomorphisme),
 // portée depuis js/circuit-atelier.js (cirEngineRun / CIR_ENGINE_JS).
 
-function genCircuit(X) {
+function genCircuitParams() {
     var gv = function(id) { var el=document.getElementById(id); return el?parseFloat(el.value)||0:0; };
     var gs = function(id) { var el=document.getElementById(id); return el?el.value:""; };
     var gc = function(id) { var el=document.getElementById(id); return !!(el && el.checked); };
@@ -14,13 +14,29 @@ function genCircuit(X) {
         throw new Error(I18N.t('cir.err_no_model'));
     }
 
-    var p = {
+    return {
         model:       model,
         checkValues: gc('cir-check-values'),
         bareme:      parseFloat(gv('cir-bareme')) || 1,
         text:        richVal('cir-text'),
         fbGen:       gs('cir-fbgen')
     };
+}
+
+async function genCircuit(X) {
+    var p = genCircuitParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'circuit', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "circuit", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "circuit", repli sur le calcul local.', e); }
     return genCircuitCore(X, p);
 }
 
@@ -179,5 +195,5 @@ function genCircuitCore(X, p, deps) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genCircuit: genCircuit, genCircuitCore: genCircuitCore };
+    module.exports = { genCircuit: genCircuit, genCircuitCore: genCircuitCore, genCircuitParams: genCircuitParams };
 }
