@@ -69,6 +69,16 @@ function genRedoxCore(X, p, deps) {
     var W = p.W, H = p.H, bareme = p.bareme;
     var fbOk = p.fbOk, fbWrong = p.fbWrong, textFrag = p.textFrag;
 
+    // ── Bandeau coloré d'en-tête (Q{X} — titre / barème) ───────────────────
+    // Bug trouvé lors de la validation Moodle réelle du 2026-07-24 : genRedoxCore
+    // ne posait jamais de bandeau, contrairement à tous les autres types migrés
+    // (voir le motif équivalent dans gen-acidebase.js:banner(), gen-basen.js:HDR, etc.).
+    var RX_BG = '#1e40af', RX_BORDER = '#172554';
+    var banner = '<div style="background:' + RX_BG + ';border-left:5px solid ' + RX_BORDER + ';border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+        + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18Nd.t('rx.title') + '</strong>'
+        + '<span style="background:' + RX_BORDER + ';color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
+        + '</div>\n';
+
     // ── Grandeurs physiques ──────────────────────────────────────────────
     var Veq  = n2 * c2 * v2 / (n1 * c1);          // mL
     var Eeq  = (n1 * e1 + n2 * e2) / (n1 + n2);   // V
@@ -235,7 +245,7 @@ cursorCode,
             + 'À l\'équivalence : n₁·C₁·Veq = n₂·C₂·V₂, soit C₂ = (' + n1 + '×' + c1 + '×' + Veq.toFixed(2) + ')/(' + n2 + '×' + v2 + ') = ' + c2Target.toFixed(4) + ' mol/L.');
 
         var questionLabel = I18Nd.t('rx.qnote_calc_fallback', {n: String(X)});
-        var questionText  = '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML
+        var questionText  = banner + '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML
             + '<p>[[input:ans' + X + ']][[validation:ans' + X + ']]</p>';
 
         return {
@@ -365,7 +375,7 @@ cursorCode,
     var genFb = meth.genLabel ? fbBox(GREEN, GREENBG, '<strong>🔑 Méthode et résultat :</strong> ' + meth.genLabel + '.') : '';
 
     var questionLabel = I18Nd.t('rx.qnote_fallback', {n: String(X)});
-    var questionText  = '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML
+    var questionText  = banner + '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML
         + '[[input:ans' + X + ']][[validation:ans' + X + ']]';
 
     return {
