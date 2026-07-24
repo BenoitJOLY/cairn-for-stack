@@ -1,6 +1,6 @@
 // ── XML GENERATORS: pool (radio, dropdown) ──
 
-function genPool(X,type,textId,Xe,vcid,fcid,bareme,fbGenId,fbGenShowFbId){
+async function genPool(X,type,textId,Xe,vcid,fcid,bareme,fbGenId,fbGenShowFbId){
   const _pfx=vcid.split('-')[0];
   if(!validateRADraw(_pfx)){throw new Error(I18N.t('msg.err_tirage_pool', {type: type}));}
 
@@ -15,6 +15,18 @@ function genPool(X,type,textId,Xe,vcid,fcid,bareme,fbGenId,fbGenShowFbId){
   document.querySelectorAll(`#${fcid} .prop-row`).forEach(r=>{propsFaux.push({text:r.querySelector('.p-text').value,fb:r.querySelector('.p-fb').value});});
 
   const p={type,label,text,Xe,bareme,poolFbGen,poolShowFb,propsVrais,propsFaux};
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type, X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "' + type + '", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "' + type + '", repli sur le calcul local.', e); }
   return genPoolCore(X, p);
 }
 
