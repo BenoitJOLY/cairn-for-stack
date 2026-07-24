@@ -102,3 +102,7 @@ const LABELS_PLAIN={
     'geogebra':'📐 GeoGebra'
 };
 function applyFormula(){document.getElementById('num-val').value=document.getElementById('modal-formula').value;document.getElementById('calcModal').style.display='none';}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { htmlEsc: htmlEsc, rawEsc: rawEsc, attrEsc: attrEsc };
+}

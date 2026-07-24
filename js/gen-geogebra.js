@@ -170,12 +170,13 @@ function _ggbKo(txt) { return '<div style="border-left:4px solid #dc2626;padding
    disponible. Factorisé pour être réutilisé à la fois par la génération XML
    réelle (genGeoGebra) et par l'aperçu du panneau de configuration
    (ggbRefreshPreview dans geogebra-ui.js). */
-function ggbBuildOutputFeedback(o) {
-  var label = htmlEsc(o.desc || o.ggbName);
+function ggbBuildOutputFeedback(o, deps) {
+  var htmlEsc_D = (deps && deps.htmlEsc) || htmlEsc;
+  var label = htmlEsc_D(o.desc || o.ggbName);
   var trueFb = _ggbOk('<strong>' + label + '</strong> ' + I18N.t('ggb.fb_crit_ok'));
   var remedy = o.hint
-    ? htmlEsc(o.hint)
-    : I18N.t('ggb.fb_expected_value') + ' <code>' + htmlEsc(String(o.tans || '')) + '</code>';
+    ? htmlEsc_D(o.hint)
+    : I18N.t('ggb.fb_expected_value') + ' <code>' + htmlEsc_D(String(o.tans || '')) + '</code>';
   var falseFb = _ggbKo('<strong>' + label + '</strong> ' + I18N.t('ggb.fb_crit_ko') + '<br>' + remedy);
   return {trueFb: trueFb, falseFb: falseFb};
 }
@@ -220,6 +221,18 @@ async function genGeoGebra(qid) {
     modelPreset: modelPreset,
     fbGen: v('ggb-fbgen')
   };
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'geogebra', X: qid, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "geogebra", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "geogebra", repli sur le calcul local.', e); }
   return genGeoGebraCore(qid, p);
 }
 
@@ -338,7 +351,7 @@ function genGeoGebraCore(X, p, deps) {
   var N = outputs.length;
   var scorePerNode = String(Math.round((1 / N) * 1e10) / 1e10);
   var canonicalNodes = outputs.map(function (o, i) {
-    var fb = ggbBuildOutputFeedback_D(o);
+    var fb = ggbBuildOutputFeedback_D(o, deps);
     var isLast = i === N - 1;
     var nextNode = isLast ? '-1' : String(i + 1);
     var desc = o.desc || I18N_D.t('ggb.prt_node0_desc') + ' (' + o.ggbName + ')';
