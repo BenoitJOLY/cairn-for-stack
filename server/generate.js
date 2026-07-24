@@ -34,6 +34,9 @@ const { genCircuitCore } = require('../js/gen-circuit.js');
 const { genLogiqueCore } = require('../js/gen-logique.js');
 const { genAcideBaseCore } = require('../js/gen-acidebase.js');
 const { genOscilloscopeCore } = require('../js/gen-oscilloscope.js');
+const { genDiffractionCore } = require('../js/gen-diffraction.js');
+const { genImageMesureCore } = require('../js/gen-image-mesure.js');
+const { genChemicalCore, genChemicalTopoCore } = require('../js/gen-topo.js');
 const { CIR_ENGINE_JS } = require('../js/circuit-atelier.js');
 const { CIR_ATELIER_CSS } = require('../js/circuit-ui.js');
 const { bnStrictParse, bnSyntaxHint } = require('../js/basen-ui.js');
@@ -88,6 +91,10 @@ const GENERATORS = {
   logique: (X, p) => genLogiqueCore(X, p, DEPS),
   'acide-base': (X, p) => genAcideBaseCore(X, p, DEPS),
   oscilloscope: (X, p) => genOscilloscopeCore(X, p, DEPS),
+  diffraction: (X, p) => genDiffractionCore(X, p, DEPS),
+  'image-mesure': (X, p) => genImageMesureCore(X, p, DEPS),
+  chemical: (X, p) => genChemicalCore(X, p, DEPS),
+  chemical_topo: (X, p) => genChemicalTopoCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {
