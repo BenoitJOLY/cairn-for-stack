@@ -1,4 +1,8 @@
-function genCalcul(X) {
+// Lecture pure du formulaire (aucun effet de bord réseau) — factorisée pour
+// être appelée à la fois par genCalcul() (export réel) et par l'aperçu local
+// synchrone (js/preview.js:renderPreviewHTML_calcul), qui ne doit pas dépendre
+// du réseau ni devenir async (voir PLAN.md, étape 3 du chantier Backend NAS).
+function _calcBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var bareme = parseFloat(gs('calc-bareme')) || 1;
     var scenario = gs('calc-scenario') || 'derivee-produit';
@@ -12,10 +16,28 @@ function genCalcul(X) {
     var varValues = {};
     ['a','b','c','d','f','k','m','offset'].forEach(function(key){ varValues[key] = _calcVarValue(key); });
 
-    var p = {
+    return {
         bareme: bareme, scenario: scenario, exprF: exprF, boundA: boundA, boundB: boundB,
         fbOk: fbOk, fbWrong: fbWrong, custText: custText, fbGen: fbGen, varValues: varValues
     };
+}
+
+async function genCalcul(X) {
+    var p = _calcBuildParams();
+    // Étape 3 (PLAN.md) : tente la génération côté serveur, avec repli
+    // automatique sur le calcul local si le serveur échoue ou est absent —
+    // aucun risque de casser la génération pendant la migration.
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'calcul', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genCalculCore(X, p);
 }
 

@@ -2966,7 +2966,7 @@ function renderPreviewHTML_calcul(state) {
   var fbGenTab = document.getElementById('calc-fb-gen');
   var fbGenActive = !!(fbGenTab && fbGenTab.classList.contains('on'));
   var realParts = {};
-  try { realParts = (typeof genCalcul === 'function') ? genCalcul(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genCalculCore === 'function') ? genCalculCore(1, _calcBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
