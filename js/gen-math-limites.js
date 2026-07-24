@@ -1,6 +1,6 @@
-function genLimites(X) {
+function _limBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
-    var p = {
+    return {
         bareme: parseFloat(gs('lim-bareme')) || 1,
         scenario: gs('lim-scenario') || 'plus-inf',
         mode: (document.querySelector('input[name="lim-mode-r"]:checked')||{}).value || gs('lim-mode') || 'aleatoire',
@@ -11,6 +11,21 @@ function genLimites(X) {
         point: gs('lim-point').trim() || '1',
         fbGen: gs('lim-fbgen')
     };
+}
+
+async function genLimites(X) {
+    var p = _limBuildParams();
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'limites', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genLimitesCore(X, p);
 }
 

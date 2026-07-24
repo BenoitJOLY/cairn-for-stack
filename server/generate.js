@@ -8,6 +8,7 @@ const { genSuitesCore } = require('../js/gen-math-suites.js');
 const { genProbabilitesCore } = require('../js/gen-math-probabilites.js');
 const { genTrigonometrieCore } = require('../js/gen-math-trigonometrie.js');
 const { genPolynomesCore } = require('../js/gen-math-polynomes.js');
+const { genLimitesCore } = require('../js/gen-math-limites.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
@@ -30,6 +31,7 @@ const GENERATORS = {
   probabilites: (X, p) => genProbabilitesCore(X, p, DEPS),
   trigonometrie: (X, p) => genTrigonometrieCore(X, p, DEPS),
   polynomes: (X, p) => genPolynomesCore(X, p, DEPS),
+  limites: (X, p) => genLimitesCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {

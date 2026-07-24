@@ -2626,7 +2626,7 @@ window.eqRefreshPreview = _hsWireSimplePreview('equivalence', 'eq', 'eq-preview-
 
 function renderPreviewHTML_limites(state) {
   var realParts = {};
-  try { realParts = (typeof genLimites === 'function') ? genLimites(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genLimitesCore === 'function') ? genLimitesCore(1, _limBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });
