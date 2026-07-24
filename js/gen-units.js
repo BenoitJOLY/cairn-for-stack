@@ -1,6 +1,6 @@
 // ── XML GENERATORS: unités ──
 
-function genUnits(X){
+async function genUnits(X){
   // un-tol/un-fbc/un-fbe ne sont pas utilisés par le calcul, mais resolveFb() a l'effet de
   // bord de pré-remplir les textarea un-fbc/un-fbe si vides — comportement du code d'origine
   // à préserver même si ces valeurs ne servent pas au cœur pur.
@@ -16,6 +16,18 @@ function genUnits(X){
     aide: buildUnHelp(),
     useKbd: document.getElementById('un-h-kbd').checked
   };
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'units', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "units", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "units", repli sur le calcul local.', e); }
   return genUnitsCore(X, p);
 }
 
@@ -25,7 +37,7 @@ function genUnitsCore(X, p, deps){
   deps = deps || {};
   var I18N_D = deps.I18N || I18N;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-  var mkFbGen_D = deps.mkFbGen || _mkFbGen;
+  var mkFbGen_D = deps._mkFbGen || _mkFbGen;
   const bareme=p.bareme;
   const text=p.text;
   const val=p.val;

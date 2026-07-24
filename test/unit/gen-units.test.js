@@ -17,7 +17,7 @@ const I18N_STUB = {
 const mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 const buildKbdStackHTML = (X) => `<!--KBD-STUB-${X}-->`;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, mkFbGen, buildKbdStackHTML };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen: mkFbGen, buildKbdStackHTML };
 
 function baseParams(overrides) {
     return Object.assign({
