@@ -85,9 +85,9 @@ q${X}_tastr:block([_parts,_i,_n,_s,_op,_lo,_hi,_lb,_rb],
 );`;
 }
 
-function genInequation(X) {
+function _ineqBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
-    var p = {
+    return {
         bareme: parseFloat(gs('ineq-bareme')) || 1,
         scenario: gs('ineq-scenario') || 'lineaire',
         mode: (document.querySelector('input[name="ineq-mode-r"]:checked')||{}).value || gs('ineq-mode') || 'aleatoire',
@@ -101,6 +101,21 @@ function genInequation(X) {
         ftans: gs('ineq-tans').trim() || 'oo(3,inf)',
         fbGen: gs('ineq-fbgen')
     };
+}
+
+async function genInequation(X) {
+    var p = _ineqBuildParams();
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'inequation', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genInequationCore(X, p);
 }
 

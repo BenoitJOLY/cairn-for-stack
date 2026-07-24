@@ -2538,7 +2538,7 @@ function _hsWireSimplePreview(typeName, prefix, containerId, panelId, renderFn, 
 
 function renderPreviewHTML_inequation(state) {
   var realParts = {};
-  try { realParts = (typeof genInequation === 'function') ? genInequation(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genInequationCore === 'function') ? genInequationCore(1, _ineqBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });
