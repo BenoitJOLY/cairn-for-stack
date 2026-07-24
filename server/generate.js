@@ -11,14 +11,19 @@ const { genPolynomesCore } = require('../js/gen-math-polynomes.js');
 const { genLimitesCore } = require('../js/gen-math-limites.js');
 const { genInequationCore } = require('../js/gen-math-inequation.js');
 const { genEquivalenceCore } = require('../js/gen-math-equivalence.js');
+const { genGeoGebraCore } = require('../js/gen-geogebra.js');
+const { genUnitsCore } = require('../js/gen-units.js');
+const { genNuclearCore } = require('../js/gen-nuclear.js');
+const { genCompositionCore } = require('../js/gen-composition.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
 const { _mkInput, _mkFbGen } = require('../js/gen-math-shared.js');
 const { _cpxGenFbgen } = require('../js/complexe-ui.js');
+const { htmlEsc } = require('../js/data.js');
 const I18N = require('./i18n-node.js');
 
-const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen };
+const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc };
 
 // Un type migré à la fois — voir PLAN.md, chantier "Backend auto-hébergé NAS",
 // étape 3. Ajouter une entrée ici seulement après audit + test réel Moodle.
@@ -36,6 +41,10 @@ const GENERATORS = {
   limites: (X, p) => genLimitesCore(X, p, DEPS),
   inequation: (X, p) => genInequationCore(X, p, DEPS),
   equivalence: (X, p) => genEquivalenceCore(X, p, DEPS),
+  geogebra: (X, p) => genGeoGebraCore(X, p, DEPS),
+  units: (X, p) => genUnitsCore(X, p, DEPS),
+  nuclear: (X, p) => genNuclearCore(X, p, DEPS),
+  composition: (X, p) => genCompositionCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {
