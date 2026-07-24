@@ -1,6 +1,6 @@
 // ── XML GENERATORS: numérique ──
 
-function genNumerical(X){
+async function genNumerical(X){
   const val=sanitizeMaxima(v('num-val').trim());
   if(!val)throw new Error(I18N.t('msg.err_valeur_vide', {n: X}));
   const aideOn=document.getElementById('num-aide-on')?.checked||false;
@@ -20,6 +20,18 @@ function genNumerical(X){
     aide: aideOn?buildNumHelp():'',
     useKbd: useKbd
   };
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'numerical', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "numerical", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "numerical", repli sur le calcul local.', e); }
   return genNumericalCore(X, p);
 }
 

@@ -15,6 +15,7 @@ const { genGeoGebraCore } = require('../js/gen-geogebra.js');
 const { genUnitsCore } = require('../js/gen-units.js');
 const { genNuclearCore } = require('../js/gen-nuclear.js');
 const { genCompositionCore } = require('../js/gen-composition.js');
+const { genNumericalCore } = require('../js/gen-numerical.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
@@ -45,6 +46,7 @@ const GENERATORS = {
   units: (X, p) => genUnitsCore(X, p, DEPS),
   nuclear: (X, p) => genNuclearCore(X, p, DEPS),
   composition: (X, p) => genCompositionCore(X, p, DEPS),
+  numerical: (X, p) => genNumericalCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {
