@@ -144,7 +144,7 @@ function genImgClickCore(X, p, deps) {
         + 'board.suspendUpdate();\n'
         + "board.create('image',[" + jxgDropChunkedJsString_D(p.bgData, 2000) + ",[0,0],[" + BGW + ',' + BGH + "]],{fixed:true,highlight:false});\n"
         + "var tracker=board.create('point',[-1," + (BGH / 2) + "],{visible:false});\n"
-        + 'stack_jxg.bind_point(board,ans' + X + ',tracker);\n'
+        + 'stack_jxg.bind_point(refAns' + X + ',tracker);\n'
         + "var marker=board.create('point',[-1," + (BGH / 2) + "],{\n"
         + "  size:8,fillColor:'#ef4444',strokeColor:'#fff',strokeWidth:2,\n"
         + "  visible:false,fixed:true,name:'',label:{visible:false}\n"
@@ -180,7 +180,7 @@ function genImgClickCore(X, p, deps) {
         + '<span style="background:#0f766e;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
         + '</div>\n'
         + '<!-- ENONCE-START -->' + (text || '') + '<!-- ENONCE-END -->\n'
-        + '[[jsxgraph width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
+        + '[[jsxgraph input-ref-ans' + X + '="refAns' + X + '" width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
         + '<!--HS-KBD:' + X + '-->\n'
         + '[[/jsxgraph]]\n'
         + '<div style="display:none">[[input:ans' + X + ']][[validation:ans' + X + ']]</div>';
