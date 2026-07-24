@@ -3091,7 +3091,7 @@ window.cirRefreshPreview = _hsWireSimplePreview('circuit', 'cir', 'cir-preview-c
 
 function renderPreviewHTML_basen(state) {
   var realParts = {};
-  try { realParts = (typeof genBasen === 'function') ? genBasen(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genBasenCore === 'function' && typeof genBasenParams === 'function') ? genBasenCore(1, genBasenParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) {

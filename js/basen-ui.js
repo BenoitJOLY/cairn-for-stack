@@ -172,3 +172,7 @@ function bnUpdatePreview() {
 
     el.innerHTML = html;
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { bnStrictParse: bnStrictParse, bnSyntaxHint: bnSyntaxHint };
+}

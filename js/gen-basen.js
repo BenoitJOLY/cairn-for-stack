@@ -5,7 +5,11 @@
 // successives (decimal -> base), generalisees a une base source et une
 // base cible quelconques (2 a 36), avec diagnostics d'erreurs frequentes.
 
-function genBasen(X) {
+// Extrait dans sa propre fonction (aucun accès DOM au-delà de la lecture) pour que
+// js/preview.js puisse reconstruire p et appeler genBasenCore() directement en
+// synchrone (l'aperçu élève a besoin du vrai résultat du générateur immédiatement,
+// il ne peut pas attendre un aller-retour /api/generate) — voir renderPreviewHTML_basen.
+function genBasenParams() {
     var gv = function(id) { var el = document.getElementById(id); return el ? el.value : ''; };
 
     var format     = gv('bn-format')   || 'S';
@@ -23,7 +27,7 @@ function genBasen(X) {
     var fixedWidthRaw = parseInt(gv('bn-fixed-width'));
     var fixedWidth = (toBase !== 10 && fixedWidthRaw > 0) ? fixedWidthRaw : 0;
 
-    var p = {
+    return {
         format: format, fromBase: fromBase, toBase: toBase,
         valueMode: valueMode, valueBase: valueBase, bareme: bareme,
         fbOk: fbOk, fbWrong: fbWrong, text: text, fixedWidth: fixedWidth,
@@ -31,6 +35,22 @@ function genBasen(X) {
         valueRaw: gv('bn-value'),
         fbGen: gv('bn-fbgen')
     };
+}
+
+async function genBasen(X) {
+    var p = genBasenParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'basen', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "basen", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "basen", repli sur le calcul local.', e); }
     return genBasenCore(X, p);
 }
 
@@ -354,7 +374,7 @@ function genBasenCore(X, p, deps) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genBasen: genBasen, genBasenCore: genBasenCore };
+    module.exports = { genBasen: genBasen, genBasenCore: genBasenCore, genBasenParams: genBasenParams };
 }
 // ==============================================================
 //  genCircuit -- Circuits electriques (loi d Ohm, serie, parallele)
