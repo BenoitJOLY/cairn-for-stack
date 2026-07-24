@@ -2830,7 +2830,7 @@ window.statRefreshPreview = _hsWireSimplePreview('statistiques', 'stat', 'stat-p
 
 function renderPreviewHTML_matrices(state) {
   var realParts = {};
-  try { realParts = (typeof genMatrices === 'function') ? genMatrices(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genMatricesCore === 'function') ? genMatricesCore(1, _matBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });

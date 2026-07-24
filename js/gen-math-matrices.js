@@ -1,9 +1,9 @@
-function genMatrices(X) {
+function _matBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var gi = function(id, def){ var v = parseInt(gs(id)); return isNaN(v) ? def : v; };
     var mn = gi('mat-rand-min', -3), mx = gi('mat-rand-max', 3);
     if (mx < mn) { var t = mn; mn = mx; mx = t; }
-    var p = {
+    return {
         bareme: parseFloat(gs('mat-bareme')) || 1,
         scenario: gs('mat-scenario') || 'det-2x2',
         fbOk: gs('mat-fb-ok').trim(), fbWrong: gs('mat-fb-wrong').trim(),
@@ -11,6 +11,21 @@ function genMatrices(X) {
         mn: mn, mx: mx,
         fbGen: gs('mat-fbgen')
     };
+}
+
+async function genMatrices(X) {
+    var p = _matBuildParams();
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'matrices', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genMatricesCore(X, p);
 }
 
