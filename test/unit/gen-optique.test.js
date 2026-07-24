@@ -7,11 +7,10 @@
 // seuls points de contact avec le DOM).
 //
 // Cas particulier : genOptiqueCore(X, p, deps) est un simple routeur qui
-// délègue à _genOptiqueXxx(X) (wrappers DOM, pas les *Core) selon
-// p.scenario — voir la note dans js/gen-optique.js. Il n'est donc testable
-// unitairement (sans DOM réel) que sur sa branche d'erreur (scenario
-// inconnu) ; les branches de dispatch valides appelleraient de vraies
-// fonctions DOM et sortent du périmètre d'un test pur.
+// délègue directement aux *Core purs (pas de wrapper DOM) selon p.scenario
+// — voir la note dans js/gen-optique.js. Chaque branche de dispatch est
+// donc testable unitairement, en plus de la branche d'erreur (scenario
+// inconnu).
 //
 // Cas particulier bis : _genOptiqueMiroirCore(X, convexe) est le nom
 // HISTORIQUE de la fonction partagée concave/convexe (sans rapport avec la
@@ -124,6 +123,46 @@ test('genOptiqueCore : scenario inconnu lève une erreur via I18N injecté', () 
     } catch (e) {
         assert.match(e.message, /scenario-inexistant$/);
     }
+});
+
+test('genOptiqueCore : dispatch lentille-convergente vers _genOptiqueLentilleRayonsCore', () => {
+    const q = genOptiqueCore(1, Object.assign({ scenario: 'lentille-convergente' }, lentilleRayonsParams()), DEPS);
+    assert.match(q.qnote, /Optique-/);
+});
+
+test('genOptiqueCore : dispatch lentille-divergente vers _genOptiqueLentilleDivergenteCore', () => {
+    const q = genOptiqueCore(1, Object.assign({ scenario: 'lentille-divergente' }, lentilleDivergenteParams()), DEPS);
+    assert.match(q.qnote, /Optique-Divergente/);
+});
+
+test('genOptiqueCore : dispatch miroir-concave vers _genOptiqueMiroirCoreImpl (convexe=false)', () => {
+    const q = genOptiqueCore(1, Object.assign({ scenario: 'miroir-concave' }, miroirParams({ convexe: false })), DEPS);
+    assert.match(q.qnote, /Optique-MiroirConcave/);
+});
+
+test('genOptiqueCore : dispatch miroir-convexe vers _genOptiqueMiroirCoreImpl (convexe=true)', () => {
+    const q = genOptiqueCore(1, Object.assign({ scenario: 'miroir-convexe' }, miroirParams({ convexe: true, SA: 3 })), DEPS);
+    assert.match(q.qnote, /Optique-MiroirConvexe/);
+});
+
+test('genOptiqueCore : dispatch miroir-plan vers _genOptiqueMiroirPlanCore', () => {
+    const q = genOptiqueCore(1, Object.assign({ scenario: 'miroir-plan' }, miroirPlanParams()), DEPS);
+    assert.match(q.qnote, /Optique-MiroirPlan/);
+});
+
+test('genOptiqueCore : dispatch lunette-galilee vers _genOptiqueLunetteConstructionCore', () => {
+    const q = genOptiqueCore(1, Object.assign({ scenario: 'lunette-galilee' }, lunetteParams()), DEPS);
+    assertBalancedTags(q.prtXML, 'prtXML (dispatch lunette)');
+});
+
+test('genOptiqueCore : dispatch telescope-newton vers _genOptiqueTelescopeConstructionCore', () => {
+    const q = genOptiqueCore(1, Object.assign({ scenario: 'telescope-newton' }, telescopeParams()), DEPS);
+    assert.match(q.qnote, /Optique-Telescope/);
+});
+
+test('genOptiqueCore : dispatch microscope vers _genOptiqueMicroscopeConstructionCore', () => {
+    const q = genOptiqueCore(1, Object.assign({ scenario: 'microscope' }, microscopeParams()), DEPS);
+    assert.match(q.qnote, /Optique-Microscope/);
 });
 
 // ── _genOptiqueLentilleImageCore ─────────────────────────────────────────

@@ -250,7 +250,7 @@ function _rvbMx(s) {
     return String(s || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, ' ');
 }
 
-function genRvbCmj(X) {
+function genRvbCmjParams() {
     var bareme  = parseFloat(v('rvb-bareme')) || 1;
     var text    = richVal('rvb-text');
     var imgData = v('rvb-imgdata');
@@ -261,10 +261,28 @@ function genRvbCmj(X) {
     var fbOkTxt = v('rvb-fb-ok').trim();
     var fbWrTxt = v('rvb-fb-wrong').trim();
     var fbGenRaw = v('rvb-fbgen');
-    return genRvbCmjCore(X, {
+    return {
         bareme: bareme, text: text, imgData: imgData, mode: mode, nb: nb, answer: answer,
         fbOkTxt: fbOkTxt, fbWrTxt: fbWrTxt, fbGenRaw: fbGenRaw
-    });
+    };
+}
+
+async function genRvbCmj(X) {
+    var p = genRvbCmjParams();
+    try {
+        var res = await fetch('/api/generate', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'rvbcmj', X: X, params: p })
+        });
+        if (res.ok) {
+            var data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "rvbcmj", repli sur le calcul local (session expirée ?).');
+    } catch (e) {
+        console.warn('[stackforge] /api/generate injoignable pour "rvbcmj", repli sur le calcul local.', e);
+    }
+    return genRvbCmjCore(X, p);
 }
 
 function genRvbCmjCore(X, p, deps) {
@@ -554,26 +572,55 @@ function genRvbCmjCore(X, p, deps) {
 /* ══════════════════════════════════════════════════════
    OPTIQUE — 3 scénarios JSXGraph interactifs
    ══════════════════════════════════════════════════════ */
-function genOptique(X) {
+function genOptiqueParams() {
     var scenario = v('opt-scenario') || 'lentille-convergente';
-    return genOptiqueCore(X, { scenario: scenario });
+    var p;
+    if (scenario === 'lentille-convergente') p = _genOptiqueLentilleRayonsParams();
+    else if (scenario === 'lentille-divergente') p = _genOptiqueLentilleDivergenteParams();
+    else if (scenario === 'miroir-concave') { p = _genOptiqueMiroirParams(); p.convexe = false; }
+    else if (scenario === 'miroir-convexe') { p = _genOptiqueMiroirParams(); p.convexe = true; }
+    else if (scenario === 'miroir-plan') p = _genOptiqueMiroirPlanParams();
+    else if (scenario === 'lunette-galilee') p = _genOptiqueLunetteConstructionParams();
+    else if (scenario === 'telescope-newton') p = _genOptiqueTelescopeConstructionParams();
+    else if (scenario === 'microscope') p = _genOptiqueMicroscopeConstructionParams();
+    else throw new Error(I18N.t('msg.optique_err_scenario') + scenario);
+    p.scenario = scenario;
+    return p;
 }
 
-/* Routeur pur : ne lit jamais le DOM lui-même — délègue à _genOptiqueXxx(X),
-   qui restent chacune responsables de leur propre lecture DOM (voir leur
-   propre wrapper/*Core plus bas dans ce fichier). */
+async function genOptique(X) {
+    var p = genOptiqueParams();
+    try {
+        var res = await fetch('/api/generate', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'optique', X: X, params: p })
+        });
+        if (res.ok) {
+            var data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "optique", repli sur le calcul local (session expirée ?).');
+    } catch (e) {
+        console.warn('[stackforge] /api/generate injoignable pour "optique", repli sur le calcul local.', e);
+    }
+    return genOptiqueCore(X, p);
+}
+
+/* Routeur pur : ne lit jamais le DOM — délègue directement aux *Core purs
+   selon p.scenario (p.convexe distingue miroir-concave/miroir-convexe, qui
+   partagent le même _genOptiqueMiroirCoreImpl). */
 function genOptiqueCore(X, p, deps) {
     deps = deps || {};
     var I18N_D = deps.I18N || I18N;
     var scenario = p.scenario;
-    if (scenario === 'lentille-convergente') return _genOptiqueLentilleRayons(X);
-    if (scenario === 'lentille-divergente')  return _genOptiqueLentilleDivergente(X);
-    if (scenario === 'miroir-concave') return _genOptiqueMiroirConcave(X);
-    if (scenario === 'miroir-convexe') return _genOptiqueMiroirConvexe(X);
-    if (scenario === 'miroir-plan') return _genOptiqueMiroirPlan(X);
-    if (scenario === 'lunette-galilee') return _genOptiqueLunetteConstruction(X);
-    if (scenario === 'telescope-newton') return _genOptiqueTelescopeConstruction(X);
-    if (scenario === 'microscope') return _genOptiqueMicroscopeConstruction(X);
+    if (scenario === 'lentille-convergente') return _genOptiqueLentilleRayonsCore(X, p, deps);
+    if (scenario === 'lentille-divergente')  return _genOptiqueLentilleDivergenteCore(X, p, deps);
+    if (scenario === 'miroir-concave') return _genOptiqueMiroirCoreImpl(X, p, deps);
+    if (scenario === 'miroir-convexe') return _genOptiqueMiroirCoreImpl(X, p, deps);
+    if (scenario === 'miroir-plan') return _genOptiqueMiroirPlanCore(X, p, deps);
+    if (scenario === 'lunette-galilee') return _genOptiqueLunetteConstructionCore(X, p, deps);
+    if (scenario === 'telescope-newton') return _genOptiqueTelescopeConstructionCore(X, p, deps);
+    if (scenario === 'microscope') return _genOptiqueMicroscopeConstructionCore(X, p, deps);
     throw new Error(I18N_D.t('msg.optique_err_scenario') + scenario);
 }
 
@@ -849,7 +896,7 @@ function _genOptiqueLentilleImageCore(X, p, deps) {
    nécessite en plus le suivi des prolongements virtuels (arrière-plan
    pointillé) des rayons émergents, qui sera porté séparément une fois ce
    premier cas validé en Moodle réel ("un type à la fois"). */
-function _genOptiqueLentilleRayons(X) {
+function _genOptiqueLentilleRayonsParams() {
     var bareme = parseFloat(v('opt-bareme')) || 1;
     var text   = richVal('opt-text');
     var f      = parseFloat(v('opt-f'))  || 3;
@@ -858,9 +905,11 @@ function _genOptiqueLentilleRayons(X) {
     var dispW  = parseInt(v('opt-w'))  || 700;
     var dispH  = parseInt(v('opt-h'))  || 380;
     var fbGenRaw = v('opt-fbgen');
-    return _genOptiqueLentilleRayonsCore(X, {
-        bareme: bareme, text: text, f: f, xAin: xAin, AB: AB, dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw
-    });
+    return { bareme: bareme, text: text, f: f, xAin: xAin, AB: AB, dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw };
+}
+
+function _genOptiqueLentilleRayons(X) {
+    return _genOptiqueLentilleRayonsCore(X, _genOptiqueLentilleRayonsParams());
 }
 
 function _genOptiqueLentilleRayonsCore(X, p, deps) {
@@ -1163,7 +1212,7 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
    image virtuelle »). Réutilise le même moteur de construction/scoring que
    la lentille convergente en cas virtuel, avec xF/xFp inversés (xF=f,
    xFp=-f) et un glyphe de lentille échancré (concave). ── */
-function _genOptiqueLentilleDivergente(X) {
+function _genOptiqueLentilleDivergenteParams() {
     var bareme = parseFloat(v('opt-bareme')) || 1;
     var text   = richVal('opt-text');
     var f      = parseFloat(v('opt-f'))  || 3;
@@ -1172,9 +1221,11 @@ function _genOptiqueLentilleDivergente(X) {
     var dispW  = parseInt(v('opt-w'))  || 700;
     var dispH  = parseInt(v('opt-h'))  || 380;
     var fbGenRaw = v('opt-fbgen');
-    return _genOptiqueLentilleDivergenteCore(X, {
-        bareme: bareme, text: text, f: f, xAin: xAin, AB: AB, dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw
-    });
+    return { bareme: bareme, text: text, f: f, xAin: xAin, AB: AB, dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw };
+}
+
+function _genOptiqueLentilleDivergente(X) {
+    return _genOptiqueLentilleDivergenteCore(X, _genOptiqueLentilleDivergenteParams());
 }
 
 function _genOptiqueLentilleDivergenteCore(X, p, deps) {
@@ -2170,7 +2221,7 @@ function _miroirConstructionJXG(X, p) {
    PLAN.md / rapport de conversion. Le nom et la signature de
    _genOptiqueMiroirCore(X, convexe) sont conservés à l'identique : c'est le
    point d'entrée utilisé par _genOptiqueMiroirConcave/_genOptiqueMiroirConvexe. */
-function _genOptiqueMiroirCore(X, convexe) {
+function _genOptiqueMiroirParams() {
     var bareme = parseFloat(v('opt-bareme'))   || 1;
     var text   = richVal('opt-text');
     var f      = parseFloat(v('opt-mir-f'))    || 3;
@@ -2179,10 +2230,13 @@ function _genOptiqueMiroirCore(X, convexe) {
     var dispW  = parseInt(v('opt-w'))  || 700;
     var dispH  = parseInt(v('opt-h'))  || 380;
     var fbGenRaw = v('opt-fbgen');
-    return _genOptiqueMiroirCoreImpl(X, {
-        convexe: convexe, bareme: bareme, text: text, f: f, SA: SA, AB: AB,
-        dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw
-    });
+    return { bareme: bareme, text: text, f: f, SA: SA, AB: AB, dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw };
+}
+
+function _genOptiqueMiroirCore(X, convexe) {
+    var p = _genOptiqueMiroirParams();
+    p.convexe = convexe;
+    return _genOptiqueMiroirCoreImpl(X, p);
 }
 
 function _genOptiqueMiroirCoreImpl(X, p, deps) {
@@ -2928,7 +2982,7 @@ function _lunetteConstructionJXG(X, p) {
    parallèle (système afocal, image finale à l'infini — pas de second
    point à construire). Voir le fichier de référence « Lunette
    astronomique » pour les formules physiques (reprises à l'identique). */
-function _genOptiqueLunetteConstruction(X) {
+function _genOptiqueLunetteConstructionParams() {
     var bareme = parseFloat(v('opt-bareme')) || 1;
     var text   = richVal('opt-text');
     var f1     = parseFloat(v('opt-f1'))     || 40;
@@ -2938,10 +2992,14 @@ function _genOptiqueLunetteConstruction(X) {
     var dispW  = parseInt(v('opt-w')) || 700;
     var dispH  = parseInt(v('opt-h')) || 380;
     var fbGenRaw = v('opt-fbgen');
-    return _genOptiqueLunetteConstructionCore(X, {
+    return {
         bareme: bareme, text: text, f1: f1, f2: f2, theta: theta, beamH: beamH,
         dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw
-    });
+    };
+}
+
+function _genOptiqueLunetteConstruction(X) {
+    return _genOptiqueLunetteConstructionCore(X, _genOptiqueLunetteConstructionParams());
 }
 
 function _genOptiqueLunetteConstructionCore(X, p, deps) {
@@ -3489,7 +3547,7 @@ function _miroirPlanConstructionJXG(X, p) {
    Rayon "vers S" : issu de B en direction du sommet S, repart symétriquement
    par rapport à l'axe optique (pente opposée), comme pour les miroirs
    sphériques. L'image A'B' est toujours virtuelle et de même taille (gam=1). */
-function _genOptiqueMiroirPlan(X) {
+function _genOptiqueMiroirPlanParams() {
     var bareme = parseFloat(v('opt-bareme')) || 1;
     var text   = richVal('opt-text');
     var SA     = parseFloat(v('opt-mp-sa')) || 7;
@@ -3497,9 +3555,11 @@ function _genOptiqueMiroirPlan(X) {
     var dispW  = parseInt(v('opt-w')) || 700;
     var dispH  = parseInt(v('opt-h')) || 380;
     var fbGenRaw = v('opt-fbgen');
-    return _genOptiqueMiroirPlanCore(X, {
-        bareme: bareme, text: text, SA: SA, AB: AB, dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw
-    });
+    return { bareme: bareme, text: text, SA: SA, AB: AB, dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw };
+}
+
+function _genOptiqueMiroirPlan(X) {
+    return _genOptiqueMiroirPlanCore(X, _genOptiqueMiroirPlanParams());
 }
 
 function _genOptiqueMiroirPlanCore(X, p, deps) {
@@ -4243,7 +4303,7 @@ function _telescopeConstructionJXG(X, p) {
    intersection. (Le télescope de Newton complet ajoute un miroir secondaire
    plan à 45° et un oculaire ; cette version couvre la formation de l'image
    par le miroir primaire seul, cohérente avec le scénario proposé.) */
-function _genOptiqueTelescopeConstruction(X) {
+function _genOptiqueTelescopeConstructionParams() {
     var bareme = parseFloat(v('opt-bareme'))     || 1;
     var text   = richVal('opt-text');
     var f1     = parseFloat(v('opt-tel-f1'))     || 40;
@@ -4252,10 +4312,14 @@ function _genOptiqueTelescopeConstruction(X) {
     var dispW  = parseInt(v('opt-w')) || 700;
     var dispH  = parseInt(v('opt-h')) || 380;
     var fbGenRaw = v('opt-fbgen');
-    return _genOptiqueTelescopeConstructionCore(X, {
+    return {
         bareme: bareme, text: text, f1: f1, theta: theta, beamH: beamH,
         dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw
-    });
+    };
+}
+
+function _genOptiqueTelescopeConstruction(X) {
+    return _genOptiqueTelescopeConstructionCore(X, _genOptiqueTelescopeConstructionParams());
 }
 
 function _genOptiqueTelescopeConstructionCore(X, p, deps) {
@@ -4779,7 +4843,7 @@ function _microscopeConstructionJXG(X, p) {
    Un seul point à construire (B1, intersection de deux des trois rayons
    de l'objectif) ; comme pour la lunette, le faisceau émergent de
    l'oculaire ne requiert aucun second point. */
-function _genOptiqueMicroscopeConstruction(X) {
+function _genOptiqueMicroscopeConstructionParams() {
     var bareme = parseFloat(v('opt-bareme'))     || 1;
     var text   = richVal('opt-text');
     var f1     = parseFloat(v('opt-mic-f1'))     || 1;
@@ -4789,10 +4853,14 @@ function _genOptiqueMicroscopeConstruction(X) {
     var dispW  = parseInt(v('opt-w')) || 700;
     var dispH  = parseInt(v('opt-h')) || 380;
     var fbGenRaw = v('opt-fbgen');
-    return _genOptiqueMicroscopeConstructionCore(X, {
+    return {
         bareme: bareme, text: text, f1: f1, f2: f2, oaIn: oaIn, AB: AB,
         dispW: dispW, dispH: dispH, fbGenRaw: fbGenRaw
-    });
+    };
+}
+
+function _genOptiqueMicroscopeConstruction(X) {
+    return _genOptiqueMicroscopeConstructionCore(X, _genOptiqueMicroscopeConstructionParams());
 }
 
 function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
@@ -5030,17 +5098,17 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    genRvbCmj: genRvbCmj, genRvbCmjCore: genRvbCmjCore,
-    genOptique: genOptique, genOptiqueCore: genOptiqueCore,
+    genRvbCmj: genRvbCmj, genRvbCmjCore: genRvbCmjCore, genRvbCmjParams: genRvbCmjParams,
+    genOptique: genOptique, genOptiqueCore: genOptiqueCore, genOptiqueParams: genOptiqueParams,
     _genOptiqueLentilleImage: _genOptiqueLentilleImage, _genOptiqueLentilleImageCore: _genOptiqueLentilleImageCore,
-    _genOptiqueLentilleRayons: _genOptiqueLentilleRayons, _genOptiqueLentilleRayonsCore: _genOptiqueLentilleRayonsCore,
-    _genOptiqueLentilleDivergente: _genOptiqueLentilleDivergente, _genOptiqueLentilleDivergenteCore: _genOptiqueLentilleDivergenteCore,
-    _genOptiqueMiroirCore: _genOptiqueMiroirCore, _genOptiqueMiroirCoreImpl: _genOptiqueMiroirCoreImpl,
+    _genOptiqueLentilleRayons: _genOptiqueLentilleRayons, _genOptiqueLentilleRayonsCore: _genOptiqueLentilleRayonsCore, _genOptiqueLentilleRayonsParams: _genOptiqueLentilleRayonsParams,
+    _genOptiqueLentilleDivergente: _genOptiqueLentilleDivergente, _genOptiqueLentilleDivergenteCore: _genOptiqueLentilleDivergenteCore, _genOptiqueLentilleDivergenteParams: _genOptiqueLentilleDivergenteParams,
+    _genOptiqueMiroirCore: _genOptiqueMiroirCore, _genOptiqueMiroirCoreImpl: _genOptiqueMiroirCoreImpl, _genOptiqueMiroirParams: _genOptiqueMiroirParams,
     _genOptiqueMiroirConcave: _genOptiqueMiroirConcave, _genOptiqueMiroirConvexe: _genOptiqueMiroirConvexe,
-    _genOptiqueLunetteConstruction: _genOptiqueLunetteConstruction, _genOptiqueLunetteConstructionCore: _genOptiqueLunetteConstructionCore,
-    _genOptiqueMiroirPlan: _genOptiqueMiroirPlan, _genOptiqueMiroirPlanCore: _genOptiqueMiroirPlanCore,
+    _genOptiqueLunetteConstruction: _genOptiqueLunetteConstruction, _genOptiqueLunetteConstructionCore: _genOptiqueLunetteConstructionCore, _genOptiqueLunetteConstructionParams: _genOptiqueLunetteConstructionParams,
+    _genOptiqueMiroirPlan: _genOptiqueMiroirPlan, _genOptiqueMiroirPlanCore: _genOptiqueMiroirPlanCore, _genOptiqueMiroirPlanParams: _genOptiqueMiroirPlanParams,
     _genOptiqueMiroirSpherique: _genOptiqueMiroirSpherique, _genOptiqueMiroirSpheriqueCore: _genOptiqueMiroirSpheriqueCore,
-    _genOptiqueTelescopeConstruction: _genOptiqueTelescopeConstruction, _genOptiqueTelescopeConstructionCore: _genOptiqueTelescopeConstructionCore,
-    _genOptiqueMicroscopeConstruction: _genOptiqueMicroscopeConstruction, _genOptiqueMicroscopeConstructionCore: _genOptiqueMicroscopeConstructionCore
+    _genOptiqueTelescopeConstruction: _genOptiqueTelescopeConstruction, _genOptiqueTelescopeConstructionCore: _genOptiqueTelescopeConstructionCore, _genOptiqueTelescopeConstructionParams: _genOptiqueTelescopeConstructionParams,
+    _genOptiqueMicroscopeConstruction: _genOptiqueMicroscopeConstruction, _genOptiqueMicroscopeConstructionCore: _genOptiqueMicroscopeConstructionCore, _genOptiqueMicroscopeConstructionParams: _genOptiqueMicroscopeConstructionParams
   };
 }
