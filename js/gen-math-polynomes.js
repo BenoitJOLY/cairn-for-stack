@@ -1,8 +1,8 @@
-function genPolynomes(X) {
+function _polBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var dMin = parseInt(gs('pol-delta-min'), 10); if (isNaN(dMin)) dMin = 1;
     var dMax = parseInt(gs('pol-delta-max'), 10); if (isNaN(dMax)) dMax = 50;
-    var p = {
+    return {
         bareme: parseFloat(gs('pol-bareme')) || 1,
         scenario: gs('pol-scenario') || 'discriminant',
         mode: (document.querySelector('input[name="pol-mode-r"]:checked')||{}).value || gs('pol-mode') || 'aleatoire',
@@ -16,6 +16,21 @@ function genPolynomes(X) {
         dMax: dMax,
         fbGen: gs('pol-fbgen')
     };
+}
+
+async function genPolynomes(X) {
+    var p = _polBuildParams();
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'polynomes', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genPolynomesCore(X, p);
 }
 

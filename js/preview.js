@@ -2568,7 +2568,7 @@ window.ineqRefreshPreview = _hsWireSimplePreview('inequation', 'ineq', 'ineq-pre
 
 function renderPreviewHTML_polynomes(state) {
   var realParts = {};
-  try { realParts = (typeof genPolynomes === 'function') ? genPolynomes(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genPolynomesCore === 'function') ? genPolynomesCore(1, _polBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });
