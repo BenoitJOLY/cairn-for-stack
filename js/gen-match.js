@@ -1,5 +1,5 @@
 // ── GENERATOR MATCH + MATCH PROMPT ─────────────────────────────────────
-function genMatch(X){
+async function genMatch(X){
   const bareme=parseFloat(v('match-bareme'))||2;
   const text=richVal('match-text');
 
@@ -11,6 +11,18 @@ function genMatch(X){
     left: matchState.left, right: matchState.right, connections: matchState.connections,
     fbGen: v('match-fbgen')
   };
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'match', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "match", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "match", repli sur le calcul local.', e); }
   return genMatchCore(X, p);
 }
 
