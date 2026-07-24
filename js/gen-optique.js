@@ -963,8 +963,11 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
     /* ── Construction correcte de référence (pour <tans>) ──
        Cas réel : chaque rayon émergent n'est réel qu'après la lentille (x>0).
        Cas virtuel : en plus du tronçon réel après la lentille, le prolongement
-       virtuel du rayon émergent avant la lentille (x<0) est requis, ainsi
-       qu'un tronçon explicite ["vert", xAp, [[0,ABp,2]]] pour A'B' (virtuel). */
+       virtuel du rayon émergent avant la lentille (x<0) est requis.
+       Dans les deux cas, un tronçon explicite ["vert", xAp, [[0,ABp,want]]] pour
+       A'B' est requis (want=1 réel / want=2 virtuel) : c'est ce que vérifie le
+       nœud PRT 2 (found_AB_status). L'omettre pour le cas réel rendait ce nœud
+       structurellement infaisable (bug corrigé le 2026-07-24, cf. PLAN.md). */
     var emergentPieces1 = virtuelle ? '[[' + xminG + ',0,2],[0,' + xmaxG + ',1]]' : '[[0,' + xmaxG + ',1]]';
     var emergentPieces2 = virtuelle ? '[[' + xminG + ',0,2],[0,' + xmaxG + ',1]]' : '[[0,' + xmaxG + ',1]]';
     var tansRayList = '[[0,' + _n(AB) + ',[[' + _n(xA) + ',0,1]]],'
@@ -972,7 +975,7 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
         + '[' + _n(m2) + ',' + _n(p2) + ',[[' + xminG + ',' + xmaxG + ',1]]],'
         + '[' + _n(m3i) + ',' + _n(p3i) + ',[[' + _n(xA) + ',0,1]]],'
         + '[' + _n(m3e) + ',' + _n(p3e) + ',' + emergentPieces2 + ']'
-        + (virtuelle ? ',["vert",' + _n(xAp) + ',[[0,' + _n(ABp) + ',2]]]' : '')
+        + ',["vert",' + _n(xAp) + ',[[0,' + _n(ABp) + ',' + (virtuelle ? 2 : 1) + ']]]'
         + ']';
     var tansPtList = '[["B\'",' + _n(xAp) + ',' + _n(ABp) + '],["A\'",' + _n(xAp) + ',0]]';
     var tans = 'lentille_construction(' + tansRayList + ',' + tansPtList + ')';

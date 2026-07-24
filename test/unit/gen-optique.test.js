@@ -226,14 +226,17 @@ test('_genOptiqueLentilleRayonsCore : xAin = -f lève opt.err_oa_eq_f_s2', () =>
     assert.throws(() => _genOptiqueLentilleRayonsCore(1, lentilleRayonsParams({ f: 3, xAin: -3 }), DEPS), /opt\.err_oa_eq_f_s2/);
 });
 
-test('_genOptiqueLentilleRayonsCore : objet au-delà de F (OA>f) donne une image réelle (pas de tronçon "vert")', () => {
+test('_genOptiqueLentilleRayonsCore : objet au-delà de F (OA>f) donne une image réelle (tronçon "vert" statut réel=1)', () => {
+    // Régression : le tans omettait ce tronçon dans le cas réel, rendant le nœud
+    // PRT "abp_status" (found_AB_status) structurellement infaisable même pour
+    // la réponse correcte (bug signalé sur Moodle, corrigé le 2026-07-24).
     const q = _genOptiqueLentilleRayonsCore(1, lentilleRayonsParams({ f: 3, xAin: -6 }), DEPS);
-    assert.doesNotMatch(q.inputXML, /"vert"/);
+    assert.match(q.inputXML, /"vert",6,\[\[0,-1\.5,1\]\]/);
 });
 
-test('_genOptiqueLentilleRayonsCore : objet entre F et O (OA<f) donne une image virtuelle (tronçon "vert" présent)', () => {
+test('_genOptiqueLentilleRayonsCore : objet entre F et O (OA<f) donne une image virtuelle (tronçon "vert" statut virtuel=2)', () => {
     const q = _genOptiqueLentilleRayonsCore(1, lentilleRayonsParams({ f: 3, xAin: -2 }), DEPS);
-    assert.match(q.inputXML, /"vert"/);
+    assert.match(q.inputXML, /"vert".*,2\]\]/);
 });
 
 test('_genOptiqueLentilleRayonsCore : le XML (prtXML, inputXML) est bien formé', () => {
