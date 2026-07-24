@@ -55,9 +55,9 @@ test('genCompositionCore : textFrag contient le marqueur JSX et l\'input notes',
     assert.match(q.textFrag, /<p>Rédigez\.<\/p>/);
 });
 
-test('genCompositionCore : msg vide ne produit pas de bandeau', () => {
+test('genCompositionCore : msg vide ne produit pas d\'encart message enseignant', () => {
     const q = genCompositionCore(1, baseParams({ msg: '' }), DEPS);
-    assert.doesNotMatch(q.textFrag, /👨/);
+    assert.doesNotMatch(q.textFrag, /border-left:4px solid #f59e0b/);
 });
 
 test('genCompositionCore : msg présent produit un bandeau avec le texte du message', () => {

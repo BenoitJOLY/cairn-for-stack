@@ -430,7 +430,14 @@ function genCompositionCore(X, p, deps) {
   // On insère un marqueur texte (voir genAlgebraic/kbdRaw) et le vrai code est
   // réinjecté tel quel par app.js, après tous ces allers-retours.
   var jsxMarker = '<!--HS-KBD:' + X + '-->';
+  var HDR =
+    '<div style="background:#ede9fe;border-left:5px solid #6d28d9;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+      '<strong style="font-weight:800;color:#4c1d95;font-size:.95rem;">Q' + X + ' — Rédaction</strong>' +
+      '<span style="background:#6d28d9;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>' +
+      '<span style="background:#fef3c7;color:#92400e;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">👨‍🏫 Correction manuelle</span>' +
+    '</div>';
   var textFrag =
+    HDR +
     '<!-- ENONCE-START --><div style="margin-bottom:14px;">' + text + '</div><!-- ENONCE-END -->\n' +
     jsxMarker + '\n' +
     msgHtml + '\n' +
@@ -440,11 +447,7 @@ function genCompositionCore(X, p, deps) {
 
   // ── previewFrag : prévisualisation StackForge — Q{X} Rédaction + énoncé seul, sans JSXGraph ──
   var previewFrag =
-    '<div style="background:#ede9fe;border-left:5px solid #6d28d9;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
-      '<strong style="font-weight:800;color:#4c1d95;font-size:.95rem;">Q' + X + ' — Rédaction</strong>' +
-      '<span style="background:#6d28d9;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>' +
-      '<span style="background:#fef3c7;color:#92400e;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">👨‍🏫 Correction manuelle</span>' +
-    '</div>' +
+    HDR +
     '<div style="margin-bottom:10px;">' + text + '</div>' +
     '<div style="padding:10px 14px;background:#f5f3ff;border:1.5px dashed #a78bfa;border-radius:8px;font-size:.82rem;color:#5b21b6;text-align:center;">' +
       '📝 Éditeur de réponse élève (visible dans Moodle uniquement)' +
