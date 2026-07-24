@@ -2,7 +2,7 @@
 
 // Wrapper DOM-couplé : lit les champs du panneau et délègue à genRedoxCore()
 // (fonction pure, testable hors navigateur — voir test/unit/gen-redox.test.js).
-function genRedox(X) {
+async function genRedox(X) {
     var v = function(id){ var el=document.getElementById(id); return el?el.value:''; };
 
     var p = {
@@ -28,6 +28,18 @@ function genRedox(X) {
         textFrag:    richVal('rx-text')
     };
 
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'redox', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "redox", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "redox", repli sur le calcul local.', e); }
     return genRedoxCore(X, p);
 }
 
@@ -38,7 +50,7 @@ function genRedoxCore(X, p, deps) {
     deps = deps || {};
     var I18Nd       = deps.I18N       || I18N;
     var buildPrtXml_= deps.buildPrtXml|| buildPrtXml;
-    var mkFbGen     = deps.mkFbGen    || _mkFbGen;
+    var mkFbGen     = deps._mkFbGen   || _mkFbGen;
 
     var rxFind      = p.rxFind;
     var e1 = p.e1, n1 = p.n1, e2 = p.e2, n2 = p.n2;

@@ -19,7 +19,7 @@ const I18N_STUB = {
 };
 const mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, mkFbGen };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen: mkFbGen };
 
 // Jeu de paramètres de référence : MnO4-/Mn2+ (n1=5) titrant Fe2+/Fe3+ (n2=1).
 function baseParams(overrides) {
