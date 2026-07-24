@@ -19,6 +19,9 @@ const { genNumericalCore } = require('../js/gen-numerical.js');
 const { genCheckboxCore } = require('../js/gen-checkbox.js');
 const { genPoolCore } = require('../js/gen-pool.js');
 const { genStringCore } = require('../js/gen-string.js');
+const { genMatchCore } = require('../js/gen-match.js');
+const { genCrosswordCore } = require('../js/gen-crossword.js');
+const { generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty } = require('../js/crossword-ui.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
@@ -27,7 +30,7 @@ const { _cpxGenFbgen } = require('../js/complexe-ui.js');
 const { htmlEsc, escapeMaximaString, rawEsc } = require('../js/data.js');
 const I18N = require('./i18n-node.js');
 
-const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc };
+const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty };
 
 // Un type migré à la fois — voir PLAN.md, chantier "Backend auto-hébergé NAS",
 // étape 3. Ajouter une entrée ici seulement après audit + test réel Moodle.
@@ -54,6 +57,8 @@ const GENERATORS = {
   radio: (X, p) => genPoolCore(X, p, DEPS),
   dropdown: (X, p) => genPoolCore(X, p, DEPS),
   string: (X, p) => genStringCore(X, p, DEPS),
+  match: (X, p) => genMatchCore(X, p, DEPS),
+  crossword: (X, p) => genCrosswordCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {
