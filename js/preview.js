@@ -2740,7 +2740,7 @@ window.suiRefreshPreview = _hsWireSimplePreview('suites', 'sui', 'sui-preview-co
 
 function renderPreviewHTML_probabilites(state) {
   var realParts = {};
-  try { realParts = (typeof genProbabilites === 'function') ? genProbabilites(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genProbabilitesCore === 'function') ? genProbabilitesCore(1, _probBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });

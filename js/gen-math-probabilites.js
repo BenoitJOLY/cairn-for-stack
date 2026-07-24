@@ -45,7 +45,7 @@ function _probDiagNodes(specs) {
     return specs.slice(1, -1).map(function (s) { return { desc: s.description, fb: s.feedback }; });
 }
 
-function genProbabilites(X) {
+function _probBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var raw = {};
     ['prob-n', 'prob-n-min', 'prob-n-max', 'prob-k', 'prob-k-min', 'prob-k-max',
@@ -53,7 +53,7 @@ function genProbabilites(X) {
      'prob-pa', 'prob-pa-min', 'prob-pa-max',
      'prob-pb', 'prob-pb-min', 'prob-pb-max',
      'prob-pab', 'prob-pab-min', 'prob-pab-max'].forEach(function(id){ raw[id] = gs(id); });
-    var p = {
+    return {
         bareme: parseFloat(gs('prob-bareme')) || 1,
         scenario: gs('prob-scenario') || 'combinaison',
         mode: gs('prob-mode') || 'aleatoire',
@@ -62,6 +62,21 @@ function genProbabilites(X) {
         fbGen: gs('prob-fbgen'),
         raw: raw
     };
+}
+
+async function genProbabilites(X) {
+    var p = _probBuildParams();
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'probabilites', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genProbabilitesCore(X, p);
 }
 
