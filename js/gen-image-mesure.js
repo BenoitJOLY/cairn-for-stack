@@ -253,11 +253,12 @@ function immAddTarget(desc, val) {
 // textuelle de l'énoncé) où se trouvent les repères d'étalonnage sur le
 // document, d'y positionner l'outil de mesure, d'en déduire l'échelle, puis
 // de mesurer la grandeur demandée — rien n'est pré-placé ni pré-calculé.
-function immBuildBoardJS(divIdExpr, imgData, imgW, imgH) {
+function immBuildBoardJS(divIdExpr, imgData, imgW, imgH, jxgChunkFn) {
+  var chunkFn = jxgChunkFn || jxgDropChunkedJsString;
   var jxg = '(function(){\n';
   jxg += 'var W=' + imgW + ',H=' + imgH + ';\n';
   jxg += 'var board=JXG.JSXGraph.initBoard(' + divIdExpr + ',{boundingbox:[0,H,W,0],axis:false,showNavigation:false,showCopyright:false,keepaspectratio:false,pan:{enabled:false},zoom:{enabled:false}});\n';
-  jxg += 'board.create("image",[' + jxgDropChunkedJsString(imgData, 2000) + ',[0,0],[W,H]],{fixed:true,highlight:false});\n';
+  jxg += 'board.create("image",[' + chunkFn(imgData, 2000) + ',[0,0],[W,H]],{fixed:true,highlight:false});\n';
 
   var lw = Math.max(1, Math.round(imgW / 400));
 
@@ -271,7 +272,7 @@ function immBuildBoardJS(divIdExpr, imgData, imgW, imgH) {
 }
 
 // ── GENERATOR ────────────────────────────────────────────────────────
-function genImageMesure(X) {
+function genImageMesureParams() {
   var bareme  = parseFloat(document.getElementById('imm-bareme').value) || 2;
   var text    = document.getElementById('imm-text').value || '';
   var imgData = document.getElementById('imm-image-data').value;
@@ -320,20 +321,38 @@ function genImageMesure(X) {
   });
 
   // Validations
-  if (!imgData) { alert(I18N.t('imm.alert_charger_image')); return ''; }
+  if (!imgData) { alert(I18N.t('imm.alert_charger_image')); return null; }
   if (isNaN(r1x) || isNaN(r1y) || isNaN(r2x) || isNaN(r2y) || isNaN(r1v) || isNaN(r2v) || (r1x === r2x && r1y === r2y)) {
-    alert(I18N.t('imm.alert_etalonnage_distinct')); return '';
+    alert(I18N.t('imm.alert_etalonnage_distinct')); return null;
   }
-  if (targets.length === 0) { alert(I18N.t('imm.alert_ajouter_mesure')); return ''; }
-  if (isNaN(imgW) || isNaN(imgH)) { alert(I18N.t('imm.alert_erreur_dimensions')); return ''; }
+  if (targets.length === 0) { alert(I18N.t('imm.alert_ajouter_mesure')); return null; }
+  if (isNaN(imgW) || isNaN(imgH)) { alert(I18N.t('imm.alert_erreur_dimensions')); return null; }
 
-  var p = {
+  return {
     bareme: bareme, text: text, imgData: imgData, imgW: imgW, imgH: imgH,
     r1x: r1x, r1y: r1y, r1v: r1v, r2x: r2x, r2y: r2y, r2v: r2v,
     unit: unit, tol: tol, mode: mode, fbOk: fbOk, fbWrong: fbWrong,
     fbGenRaw: fbGenEl ? fbGenEl.value : '',
     targets: targets
   };
+}
+
+async function genImageMesure(X) {
+  var p = genImageMesureParams();
+  if (!p) return '';
+  try {
+    var res = await fetch('/api/generate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'image-mesure', X: X, params: p })
+    });
+    if (res.ok) {
+      var data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "image-mesure", repli sur le calcul local (session expirée ?).');
+  } catch (e) {
+    console.warn('[stackforge] /api/generate injoignable pour "image-mesure", repli sur le calcul local.', e);
+  }
   return genImageMesureCore(X, p);
 }
 
@@ -343,6 +362,7 @@ function genImageMesureCore(X, p, deps) {
   var mkFbGen_D = deps._mkFbGen || _mkFbGen;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var htmlEsc_D = deps.htmlEsc || htmlEsc;
+  var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
 
   var bareme = p.bareme, text = p.text, imgData = p.imgData, imgW = p.imgW, imgH = p.imgH;
   var r1x = p.r1x, r1y = p.r1y, r1v = p.r1v, r2x = p.r2x, r2y = p.r2y, r2v = p.r2v;
@@ -425,7 +445,7 @@ function genImageMesureCore(X, p, deps) {
   var dispW = Math.min(700, imgW);
   var dispH = Math.round(imgH * dispW / imgW);
 
-  var jxg = immBuildBoardJS('divid', imgData, imgW, imgH);
+  var jxg = immBuildBoardJS('divid', imgData, imgW, imgH, jxgDropChunkedJsString_D);
 
   // ── textFrag (contenu visible, inséré dans le corps composite du Parcours) ──
   // Le code JS brut ne survit pas au traitement DOM (clone/innerHTML) du
@@ -668,5 +688,5 @@ function genImageMesureCore(X, p, deps) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { genImageMesure: genImageMesure, genImageMesureCore: genImageMesureCore };
+  module.exports = { genImageMesure: genImageMesure, genImageMesureCore: genImageMesureCore, genImageMesureParams: genImageMesureParams };
 }

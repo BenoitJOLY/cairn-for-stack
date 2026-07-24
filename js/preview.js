@@ -3355,11 +3355,12 @@ function renderPreviewHTML_imageMesure(state) {
   // aperçu live où l'on rappelle la fonction à chaque frappe : on neutralise alert()
   // pendant l'appel et on se rabat sur un message neutre si la génération échoue.
   var realGeneralFeedback = '';
-  if (hasCalib && typeof genImageMesure === 'function') {
+  if (hasCalib && typeof genImageMesureCore === 'function') {
     var _immOrigAlert = window.alert;
     window.alert = function () {};
     try {
-      var realParts = genImageMesure(1);
+      var _immP = genImageMesureParams();
+      var realParts = _immP ? genImageMesureCore(1, _immP) : null;
       realGeneralFeedback = (realParts && realParts.generalFeedback) || '';
     } catch (e) {
       realGeneralFeedback = '';

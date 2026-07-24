@@ -15,11 +15,6 @@ const { genImageMesureCore } = require(path.join('..', '..', 'js', 'gen-image-me
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
 const { jxgDropChunkedJsString } = require(path.join('..', '..', 'js', 'gen-jxgdrop.js'));
 
-// immBuildBoardJS() (interne, non-exportée) appelle jxgDropChunkedJsString en
-// tant que globale bare (comme dans le navigateur, où tous les fichiers js/*.js
-// partagent le même scope global).
-global.jxgDropChunkedJsString = jxgDropChunkedJsString;
-
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
 };
@@ -28,7 +23,7 @@ function _mkFbGen(generalFeedback, fbGen) {
 }
 function htmlEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
-const DEPS = { I18N: I18N_STUB, _mkFbGen, buildPrtXml, htmlEsc };
+const DEPS = { I18N: I18N_STUB, _mkFbGen, buildPrtXml, htmlEsc, jxgDropChunkedJsString };
 
 function baseParams(overrides) {
     return Object.assign({
