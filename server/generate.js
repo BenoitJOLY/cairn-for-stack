@@ -30,6 +30,12 @@ const { genApnCore } = require('../js/gen-apn.js');
 const { genImgClickCore, genImgClickSequenceCore } = require('../js/gen-imgclick.js');
 const { genJxgDropCore, jxgDropChunkedJsString, jxgDropChunkedRaw } = require('../js/gen-jxgdrop.js');
 const { genExpertCore } = require('../js/gen-expert.js');
+const { genCircuitCore } = require('../js/gen-circuit.js');
+const { genLogiqueCore } = require('../js/gen-logique.js');
+const { genAcideBaseCore } = require('../js/gen-acidebase.js');
+const { genOscilloscopeCore } = require('../js/gen-oscilloscope.js');
+const { CIR_ENGINE_JS } = require('../js/circuit-atelier.js');
+const { CIR_ATELIER_CSS } = require('../js/circuit-ui.js');
 const { bnStrictParse, bnSyntaxHint } = require('../js/basen-ui.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
@@ -39,7 +45,7 @@ const { _cpxGenFbgen } = require('../js/complexe-ui.js');
 const { htmlEsc, escapeMaximaString, rawEsc } = require('../js/data.js');
 const I18N = require('./i18n-node.js');
 
-const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty, bnStrictParse, bnSyntaxHint, jxgDropChunkedJsString, jxgDropChunkedRaw };
+const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty, bnStrictParse, bnSyntaxHint, jxgDropChunkedJsString, jxgDropChunkedRaw, CIR_ENGINE_JS, CIR_ATELIER_CSS };
 
 // Un type migré à la fois — voir PLAN.md, chantier "Backend auto-hébergé NAS",
 // étape 3. Ajouter une entrée ici seulement après audit + test réel Moodle.
@@ -78,6 +84,10 @@ const GENERATORS = {
   imgclick: (X, p) => (p.mode === 'sequence' ? genImgClickSequenceCore : genImgClickCore)(X, p, DEPS),
   jxgdrop: (X, p) => genJxgDropCore(X, p, DEPS),
   expert: (X, p) => genExpertCore(p, DEPS),
+  circuit: (X, p) => genCircuitCore(X, p, DEPS),
+  logique: (X, p) => genLogiqueCore(X, p, DEPS),
+  'acide-base': (X, p) => genAcideBaseCore(X, p, DEPS),
+  oscilloscope: (X, p) => genOscilloscopeCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {
