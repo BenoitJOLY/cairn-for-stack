@@ -1,6 +1,6 @@
 // ── XML GENERATORS: vrai/faux ──
 
-function genVF(X) {
+async function genVF(X) {
     var rows = document.querySelectorAll('#vf-props .vf-row');
     if (!rows.length) throw new Error(I18N.t('msg.err_props_vide'));
     if (!validateVFDraw()) throw new Error(I18N.t('msg.err_tirage_pool', {type: I18N.t('tpl.vf_banniere')}));
@@ -21,6 +21,18 @@ function genVF(X) {
             };
         })
     };
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'vf', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "vf", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "vf", repli sur le calcul local.', e); }
     return genVFCore(X, p);
 }
 
