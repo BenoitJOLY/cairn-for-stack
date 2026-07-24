@@ -2710,7 +2710,7 @@ window.lgRefreshPreview = _hsWireSimplePreview('logique', 'lg', 'lg-preview-cont
 
 function renderPreviewHTML_suites(state) {
   var realParts = {};
-  try { realParts = (typeof genSuites === 'function') ? genSuites(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genSuitesCore === 'function') ? genSuitesCore(1, _suiBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });

@@ -35,11 +35,11 @@ function _suiDiagNodes(specs) {
     return specs.slice(1, -1).map(function (s) { return { desc: s.description, fb: s.feedback }; });
 }
 
-function genSuites(X) {
+function _suiBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var gn = function(id, def){ var v = parseFloat(gs(id)); return isNaN(v) ? def : v; };
     var gi = function(id, def){ var v = parseInt(gs(id)); return isNaN(v) ? def : v; };
-    var p = {
+    return {
         bareme: parseFloat(gs('sui-bareme')) || 1,
         scenario: gs('sui-scenario') || 'terme-arith',
         mode: gs('sui-mode') || 'aleatoire',
@@ -51,6 +51,21 @@ function genSuites(X) {
         q: gn('sui-q', null), qMin: gn('sui-q-min', -3), qMax: gn('sui-q-max', 3),
         k: gi('sui-k', null), kMin: gi('sui-k-min', 3), kMax: gi('sui-k-max', 6)
     };
+}
+
+async function genSuites(X) {
+    var p = _suiBuildParams();
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'suites', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genSuitesCore(X, p);
 }
 
