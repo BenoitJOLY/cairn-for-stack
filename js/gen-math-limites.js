@@ -25,7 +25,8 @@ async function genLimites(X) {
             const data = await res.json();
             if (data && data.ok) return data.parts;
         }
-    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "limites", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "limites", repli sur le calcul local.', e); }
     return genLimitesCore(X, p);
 }
 
