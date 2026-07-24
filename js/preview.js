@@ -2598,7 +2598,7 @@ window.polRefreshPreview = _hsWireSimplePreview('polynomes', 'pol', 'pol-preview
 
 function renderPreviewHTML_equivalence(state) {
   var realParts = {};
-  try { realParts = (typeof genEquivalence === 'function') ? genEquivalence(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genEquivalenceCore === 'function') ? genEquivalenceCore(1, _eqBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   var prtBoxes = _hsPrtBoxes(realParts);

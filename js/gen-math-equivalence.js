@@ -1,10 +1,10 @@
 // gen-math-equivalence.js — Raisonnement par équivalence (STACK input type "equiv")
 // Développement, résolution d'équation, factorisation, système d'équations.
 
-function genEquivalence(X) {
+function _eqBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var etapeChecked = !!(document.getElementById('eq-etape-check') || {}).checked;
-    var p = {
+    return {
         bareme: parseFloat(gs('eq-bareme')) || 1,
         scenario: gs('eq-scenario') || 'developpement',
         custText: gs('eq-text').trim(),
@@ -17,6 +17,22 @@ function genEquivalence(X) {
         fbOk: gs('eq-fb-ok').trim(), fbWrong: gs('eq-fb-wrong').trim(),
         fbGenExtra: gs('eq-fbgen')
     };
+}
+
+async function genEquivalence(X) {
+    var p = _eqBuildParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'equivalence', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "equivalence", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "equivalence", repli sur le calcul local.', e); }
     return genEquivalenceCore(X, p);
 }
 
@@ -25,7 +41,7 @@ function genEquivalence(X) {
 function genEquivalenceCore(X, p, deps) {
     deps = deps || {};
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-    var mkFbGen_D      = deps.mkFbGen || _mkFbGen;
+    var mkFbGen_D      = deps._mkFbGen || _mkFbGen;
 
     var bareme = p.bareme;
     var scenario = p.scenario;

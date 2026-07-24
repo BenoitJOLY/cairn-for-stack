@@ -10,6 +10,7 @@ const { genTrigonometrieCore } = require('../js/gen-math-trigonometrie.js');
 const { genPolynomesCore } = require('../js/gen-math-polynomes.js');
 const { genLimitesCore } = require('../js/gen-math-limites.js');
 const { genInequationCore } = require('../js/gen-math-inequation.js');
+const { genEquivalenceCore } = require('../js/gen-math-equivalence.js');
 const { buildPrtXml } = require('../js/prt-manager.js');
 const { wrapFb, algPrtNodeCanonical } = require('../js/generators.js');
 const { buildKbdStackHTML } = require('../js/keyboard.js');
@@ -34,6 +35,7 @@ const GENERATORS = {
   polynomes: (X, p) => genPolynomesCore(X, p, DEPS),
   limites: (X, p) => genLimitesCore(X, p, DEPS),
   inequation: (X, p) => genInequationCore(X, p, DEPS),
+  equivalence: (X, p) => genEquivalenceCore(X, p, DEPS),
 };
 
 function generate(type, X, params) {

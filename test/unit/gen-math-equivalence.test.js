@@ -13,7 +13,7 @@ const { genEquivalenceCore } = require(path.join('..', '..', 'js', 'gen-math-equ
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
 
 const mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
-const DEPS = { buildPrtXml, mkFbGen };
+const DEPS = { buildPrtXml, _mkFbGen: mkFbGen };
 
 function baseParams(overrides) {
     return Object.assign({
