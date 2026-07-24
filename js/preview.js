@@ -2770,7 +2770,7 @@ window.probRefreshPreview = _hsWireSimplePreview('probabilites', 'prob', 'prob-p
 
 function renderPreviewHTML_trigonometrie(state) {
   var realParts = {};
-  try { realParts = (typeof genTrigonometrie === 'function') ? genTrigonometrie(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genTrigonometrieCore === 'function') ? genTrigonometrieCore(1, _trigBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });

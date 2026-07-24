@@ -1,6 +1,6 @@
-function genTrigonometrie(X) {
+function _trigBuildParams() {
     var gs = function(id){ var e=document.getElementById(id); return e?e.value:''; };
-    var p = {
+    return {
         bareme: parseFloat(gs('trig-bareme')) || 1,
         scenario: gs('trig-scenario') || 'valeur-exacte',
         mode: (document.querySelector('input[name="trig-mode-r"]:checked')||{}).value || gs('trig-mode') || 'aleatoire',
@@ -11,6 +11,21 @@ function genTrigonometrie(X) {
         expr: gs('trig-expr').trim() || 'sin(x)^2 + cos(x)^2',
         fbGenExtra: gs('trig-fbgen')
     };
+}
+
+async function genTrigonometrie(X) {
+    var p = _trigBuildParams();
+    try{
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'trigonometrie', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch(e) { /* réseau indisponible : repli local ci-dessous */ }
     return genTrigonometrieCore(X, p);
 }
 
@@ -20,8 +35,8 @@ function genTrigonometrieCore(X, p, deps) {
     deps = deps || {};
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-    var mkFbGen_D = deps.mkFbGen || _mkFbGen;
-    var mkInput_D = deps.mkInput || _mkInput;
+    var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var mkInput_D = deps._mkInput || _mkInput;
 
     var bareme = p.bareme, scenario = p.scenario, mode = p.mode;
     var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
