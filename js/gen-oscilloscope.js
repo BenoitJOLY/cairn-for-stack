@@ -452,8 +452,8 @@ function _oscSimplePair(idPrefix, q1, q2, neutral){
 /* ══════════════════════════════════════════════════════════════
    GÉNÉRATEUR PRINCIPAL — genOscilloscope(X)
    ══════════════════════════════════════════════════════════════ */
-function genOscilloscope(X){
-  var p = {
+function genOscilloscopeParams(){
+  return {
     mode:    v('osc-mode') || 'periode_frequence',
     pedMode: v('osc-ped-mode') || 'guide',
     bareme:  parseFloat(v('osc-bareme')) || 1,
@@ -474,6 +474,22 @@ function genOscilloscope(X){
     dtMin:     parseFloat(v('osc-dt-min'))   || 4,
     dtMax:     parseFloat(v('osc-dt-max'))   || 8
   };
+}
+
+async function genOscilloscope(X){
+  var p = genOscilloscopeParams();
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'oscilloscope', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "oscilloscope", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "oscilloscope", repli sur le calcul local.', e); }
   return genOscilloscopeCore(X, p);
 }
 
@@ -795,6 +811,7 @@ function _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, p
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     genOscilloscope: genOscilloscope,
-    genOscilloscopeCore: genOscilloscopeCore
+    genOscilloscopeCore: genOscilloscopeCore,
+    genOscilloscopeParams: genOscilloscopeParams
   };
 }

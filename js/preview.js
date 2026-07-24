@@ -3274,7 +3274,7 @@ function renderPreviewHTML_oscilloscope(state) {
   }
 
   var realParts = {};
-  try { realParts = (typeof genOscilloscope === 'function') ? genOscilloscope(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genOscilloscopeCore === 'function') ? genOscilloscopeCore(1, genOscilloscopeParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
 
   // Consigne fixe + questions numérotées (1. Période, 2. Fréquence…) : sans elles,
