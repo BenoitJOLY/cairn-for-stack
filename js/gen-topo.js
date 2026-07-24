@@ -1,4 +1,4 @@
-async function genChemicalTopo(X){
+async function genChemicalTopoParams(X){
   const bareme=parseFloat(v('topo-bareme'))||2;
   const text=richVal('topo-text');
   const equation=document.getElementById('topo-editor').innerText.trim();
@@ -36,10 +36,28 @@ async function genChemicalTopo(X){
     }, 350);
   });
 
-  return genChemicalTopoCore(X, {
+  return {
     bareme, text, equation, w_prt1, w_n0, w_n1, w_n2, w_n3, w_n4, w_n5,
     fctDefault, typeReac, fbGenRaw, capturedHtml
-  });
+  };
+}
+
+async function genChemicalTopo(X){
+  const p = await genChemicalTopoParams(X);
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'chemical_topo', X: X, params: p })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "chemical_topo", repli sur le calcul local (session expirée ?).');
+  } catch (e) {
+    console.warn('[stackforge] /api/generate injoignable pour "chemical_topo", repli sur le calcul local.', e);
+  }
+  return genChemicalTopoCore(X, p);
 }
 
 function genChemicalTopoCore(X, p, deps){
@@ -478,7 +496,7 @@ is_proportional${X}: if length(full_ans_map${X})=0 then false else is(length(sub
     feedbackRef:`[[feedback:prt${X}]]`
   };
 }
-function genChemical(X){
+function genChemicalParams(X){
   const bareme = parseFloat(v('chem-bareme')) || 2;
   const text   = richVal('chem-text');
   if(!text || !text.trim()) throw new Error(I18N.t('msg.err_chem_enonce_vide', {n: X}));
@@ -501,7 +519,25 @@ function genChemical(X){
   }
   const latex = htmlToLatex(editorHTML);
 
-  return genChemicalCore(X, { bareme, text, editorHTML, editorPlain, latex, fbGenRaw });
+  return { bareme, text, editorHTML, editorPlain, latex, fbGenRaw };
+}
+
+async function genChemical(X){
+  const p = genChemicalParams(X);
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'chemical', X: X, params: p })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "chemical", repli sur le calcul local (session expirée ?).');
+  } catch (e) {
+    console.warn('[stackforge] /api/generate injoignable pour "chemical", repli sur le calcul local.', e);
+  }
+  return genChemicalCore(X, p);
 }
 
 function genChemicalCore(X, p, deps){
@@ -1379,7 +1415,9 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     genChemicalTopo: genChemicalTopo,
     genChemicalTopoCore: genChemicalTopoCore,
+    genChemicalTopoParams: genChemicalTopoParams,
     genChemical: genChemical,
-    genChemicalCore: genChemicalCore
+    genChemicalCore: genChemicalCore,
+    genChemicalParams: genChemicalParams
   };
 }

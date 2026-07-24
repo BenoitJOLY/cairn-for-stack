@@ -3531,7 +3531,7 @@ window.ordRefreshPreview = _hsWireSimplePreview('ord', 'ord', 'ord-preview-conta
 
 function renderPreviewHTML_chemical(state) {
   var realParts = {};
-  try { realParts = (typeof genChemical === 'function') ? genChemical(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genChemicalCore === 'function') ? genChemicalCore(1, genChemicalParams(1)) : {}; } catch (e) { realParts = {}; }
   var prtBoxes = _hsPrtBoxes(realParts);
   var diagNodes = (realParts.diagNodes || []).map(function(n) { return { desc: n.desc, fb: n.fb }; });
   // genChemical() embarque désormais lui-même l'encart "réponse attendue" dans
