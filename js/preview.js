@@ -3010,7 +3010,7 @@ function _abSubstitutePlaceholders(js, previewVars) {
 
 function renderPreviewHTML_acideBase(state) {
   var realParts = {};
-  try { realParts = (typeof genAcideBase === 'function') ? genAcideBase(1) : {}; } catch (e) { realParts = {}; console.error('[preview] acide-base build error:', e); }
+  try { realParts = (typeof genAcideBaseCore === 'function') ? genAcideBaseCore(1, genAcideBaseParams()) : {}; } catch (e) { realParts = {}; console.error('[preview] acide-base build error:', e); }
   var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
   var bodyFrag = (realParts.textFrag || '')
     .replace(/\[\[iframe[\s\S]*?\[\[\/iframe\]\]/, '<!--HS-AB-GRAPHIC-->')

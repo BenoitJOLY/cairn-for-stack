@@ -5,8 +5,8 @@
    Mono / Di / Triprotique (n=1,2,3)
    ══════════════════════════════════════════════════════ */
 
-function genAcideBase(X) {
-    var p = {
+function genAcideBaseParams() {
+    return {
         abMethod: v('ab-method') || 'colorimetrie',
         abType:   v('ab-type')  || 'af-bf',
         abFind:   v('ab-find')  || 'equivalence',
@@ -26,6 +26,22 @@ function genAcideBase(X) {
         indKeys:  Array.prototype.slice.call(document.querySelectorAll('.ab-ind-chk:checked'))
             .map(function(el) { return el.dataset.ind; })
     };
+}
+
+async function genAcideBase(X) {
+    var p = genAcideBaseParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'acide-base', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "acide-base", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "acide-base", repli sur le calcul local.', e); }
     return genAcideBaseCore(X, p);
 }
 
@@ -35,7 +51,7 @@ function genAcideBaseCore(X, p, deps) {
     deps = deps || {};
     var I18N_D        = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-    var mkFbGen_D     = deps.mkFbGen || _mkFbGen;
+    var mkFbGen_D     = deps._mkFbGen || _mkFbGen;
 
     var S = '_' + X;  // suffixe Maxima/inputs pour éviter les collisions entre sous-questions
     var abMethod = p.abMethod;
@@ -731,5 +747,5 @@ function genAcideBaseCore(X, p, deps) {
 // Export CommonJS pour les tests Node (test/unit/*.test.js) : seule la fonction
 // pure (aucune dépendance au DOM) est exposée. Sans effet dans le navigateur.
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genAcideBase: genAcideBase, genAcideBaseCore: genAcideBaseCore };
+    module.exports = { genAcideBase: genAcideBase, genAcideBaseCore: genAcideBaseCore, genAcideBaseParams: genAcideBaseParams };
 }

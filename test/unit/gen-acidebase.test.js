@@ -18,9 +18,9 @@ const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
 };
-const mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
+const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, mkFbGen };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen };
 
 // Jeu de paramètres de référence : acide faible / base forte, monoacide, pKa=4.8.
 function baseParams(overrides) {
