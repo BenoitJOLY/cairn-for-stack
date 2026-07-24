@@ -23,5 +23,9 @@ function _mkInput(o) {
     </input>`;
 }
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { _mkFbGen: _mkFbGen, _mkInput: _mkInput };
+}
+
 // ─── COMPLEXES ───────────────────────────────────────────────
 

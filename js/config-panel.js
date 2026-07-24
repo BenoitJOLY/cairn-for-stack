@@ -1482,7 +1482,7 @@ function resetFormForType(type) {
       if (typeof CPX_FB_DEFS !== 'undefined') {
         Object.keys(CPX_FB_DEFS).forEach(function(scn){
           CPX_FB_DEFS[scn].forEach(function(item){
-            setRichVal(_cpxFbId(scn,item.key), item.def);
+            setRichVal(_cpxFbId(scn,item.key), I18N.t(item.defKey));
           });
         });
       }

@@ -67,7 +67,7 @@ function _cpxFb(scenario, key, X, pmap) {
     return _cpxReplace(raw, X, pmap);
 }
 
-function genComplexe(X) {
+async function genComplexe(X) {
     var gs  = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var gn  = function(id){ return parseFloat(gs(id)) || 0; };
     var bareme    = parseFloat(gs('cpx-bareme')) || 1;
@@ -98,6 +98,19 @@ function genComplexe(X) {
         fa: fa, fb: fb, fc: fc, fd: fd, feqb: feqb, feqc: feqc,
         fbOverrides: fbOverrides
     };
+    // Étape 3 (PLAN.md) : tente la génération côté serveur, avec repli
+    // automatique sur le calcul local si le serveur échoue ou est absent.
+    try {
+        var res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'complexe', X: X, params: p})
+        });
+        if (res.ok) {
+            var data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+    } catch (e) { /* réseau indisponible : repli local ci-dessous */ }
     return genComplexeCore(X, p);
 }
 

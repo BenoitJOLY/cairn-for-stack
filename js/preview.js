@@ -2067,7 +2067,7 @@ function renderPreviewHTML_complexe(state) {
   if (typeof CPX_FB_DEFS !== 'undefined' && CPX_FB_DEFS[scenario]) {
     fbGlobalHTML = CPX_FB_DEFS[scenario].map(function (item) {
       const id = _cpxFbId(scenario, item.key);
-      const raw = (state.fbDetail && state.fbDetail[id]) ? state.fbDetail[id] : item.def;
+      const raw = (state.fbDetail && state.fbDetail[id]) ? state.fbDetail[id] : I18N.t(item.defKey);
       return `<div class="hs-clickable" data-cpx-field="detail:${id}" style="margin-bottom:8px;">${_hsRenderMath(_cpxSubst(raw, pmap))}</div>`;
     }).join('');
   }

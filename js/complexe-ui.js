@@ -137,6 +137,10 @@ function _cpxGenFbgen(scenario, op, letter) {
     return s;
 }
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { _cpxGenFbgen: _cpxGenFbgen };
+}
+
 // ── Régénération du canevas ───────────────────────────────────────────────────
 
 function cpxSetCanvas() {

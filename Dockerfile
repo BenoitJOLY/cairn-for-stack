@@ -12,8 +12,11 @@ COPY lang ./lang
 COPY lib ./lib
 COPY assets ./assets
 COPY server ./server
-RUN chmod +x server/entrypoint.sh
 
+# Lancé via "sh" (pas en exécutable direct) : server/ est monté en volume
+# depuis l'hôte (docker-compose.yml) pour permettre les mises à jour de code
+# sans reconstruction d'image — le bit +x du fichier hôte n'est pas fiable
+# après un upload File Station, "sh" n'en a pas besoin.
 ENV PORT=3000
 EXPOSE 3000
-ENTRYPOINT ["server/entrypoint.sh"]
+ENTRYPOINT ["sh", "server/entrypoint.sh"]

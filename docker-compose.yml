@@ -7,7 +7,16 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./server/data:/app/server/data
+      - ./index.html:/app/index.html
+      - ./depot.html:/app/depot.html
+      - ./login.html:/app/login.html
+      - ./js:/app/js
+      - ./css:/app/css
+      - ./lang:/app/lang
+      - ./lib:/app/lib
+      - ./assets:/app/assets
+      - ./server:/app/server
+      - /app/server/node_modules
     environment:
       - ACCOUNT_USERNAME=${ACCOUNT_USERNAME:-}
       - ACCOUNT_PASSWORD=${ACCOUNT_PASSWORD:-}
