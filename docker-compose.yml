@@ -10,6 +10,7 @@ services:
       - ./index.html:/app/index.html
       - ./depot.html:/app/depot.html
       - ./login.html:/app/login.html
+      - ./register.html:/app/register.html
       - ./js:/app/js
       - ./css:/app/css
       - ./lang:/app/lang

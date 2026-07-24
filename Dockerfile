@@ -5,7 +5,7 @@ WORKDIR /app
 COPY server/package.json server/package-lock.json* ./server/
 RUN cd server && npm install --omit=dev
 
-COPY index.html depot.html login.html ./
+COPY index.html depot.html login.html register.html ./
 COPY js ./js
 COPY css ./css
 COPY lang ./lang
