@@ -49,7 +49,11 @@ function genUnitsCore(X, p, deps){
   const vars=`/* Q${X} : Unité (${bareme}pt) */\nta${X}:${val}*${unit};`;
   const qnote=`{@ta${X}@}`;
   const inputLine=useKbd?`${aide}<!--HS-KBD:${X}-->`:`${aide}<p>[[input:ans${X}]] [[validation:ans${X}]]</p>`;
-  const generalFeedback=mkFbGen_D(`<p><strong>${I18N_D.t('un.fb_valeur_attendue')}</strong> {@ta${X}@}</p>`, fbGen);
+  const fbBox = `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
+    <span style="font-weight:bold;color:#1e293b;">Q${X} — ${I18N_D.t('un.unit_lbl')}</span>
+  </div>
+  <p><strong>${I18N_D.t('un.fb_valeur_attendue')}</strong> {@ta${X}@}</p>`;
+  const generalFeedback=mkFbGen_D(fbBox, fbGen);
   var fbVars=`\n           /* Normalisation SI */\n           stud_si${X} : stack_unit_si_to_si_base(ans${X});\n           teach_si${X} : stack_unit_si_to_si_base(ta${X});\n\n           /* Extraction du nombre pur pour isoler l'unité */\n           v_pure_e${X} : subst(map(lambda([u], u=1), listofvars(stud_si${X})), stud_si${X});\n           v_pure_t${X} : subst(map(lambda([u], u=1), listofvars(teach_si${X})), teach_si${X});\n\n           /* Création de l'unité pure (le coefficient 2 évite les simplifications par défaut) */\n           eleve_unit${X} : 2 * stud_si${X} / v_pure_e${X};\n           teacher_unit${X} : 2 * teach_si${X} / v_pure_t${X};\n        `;
   var prtMeta={name:'prt'+X,value:String(bareme),autosimplify:'1',feedbackstyle:'2',feedbackvariables:fbVars};
   var canonicalNodes=[

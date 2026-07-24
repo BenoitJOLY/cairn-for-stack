@@ -386,10 +386,19 @@ function genGeoGebraCore(X, p, deps) {
       materialId: materialId, width: width, height: height, showToolbar: false,
       inputs: fbInputs, outputs: [], remember: ''
     });
-    correctionHtml = '<p>' + I18N_D.t('ggb.correction_lbl') + '</p>\n' + fbBuilt.block;
+    correctionHtml = '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">'
+      + '<span style="font-weight:bold;color:#1e293b;">Q' + X + ' — ' + I18N_D.t('ggb.banniere') + '</span>'
+      + '<span style="color:#64748b;font-size:.85rem;margin-left:6px;">' + I18N_D.t('ggb.correction_lbl') + '</span>'
+      + '</div>\n' + fbBuilt.block;
   }
 
-  var textFrag = '<!-- ENONCE-START -->' + (instruction || '') + formulaHtml + '<!-- ENONCE-END -->\n'
+  var HDR = '<div style="background:#38761d;border-left:5px solid #2a5c15;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+    + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N_D.t('ggb.banniere') + '</strong>'
+    + '<span style="background:#2a5c15;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ' + bareme + ' pt</span>'
+    + '</div>';
+
+  var textFrag = HDR
+    + '<!-- ENONCE-START -->' + (instruction || '') + formulaHtml + '<!-- ENONCE-END -->\n'
     + built.block + '\n'
     + built.hiddenInputsHtml;
 

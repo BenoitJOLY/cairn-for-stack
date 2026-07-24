@@ -966,6 +966,7 @@ I18N.add("fr", {
   "ggb.model_hint_preset":  "Votre activité GeoGebra doit pousser les coefficients (entrées) dans des objets de même nom, puis calculer des diagnostics (racines, extremum, sens de variation) sur g, la courbe tracée par l'élève, via un bouton \"Valider mon tracé\". Utilisez le fichier .ggb fourni pour ce modèle : tous les objets de coefficients et de diagnostic y sont masqués pour ne pas révéler la réponse ; la correction se fait uniquement via le bouton \"Vérifier\" de STACK.",
   "ggb.tracez_courbe_lbl":  "Tracez à main levée la courbe d'équation",
   "ggb.correction_lbl":     "🔑 Correction",
+  "ggb.banniere":           "GeoGebra",
   "ggb.coeffs_lbl":         "Coefficients :",
   "ggb.coeff_mode_random":  "Aléatoire (min/max/pas)",
   "ggb.coeff_mode_fixed":   "Valeur fixe",

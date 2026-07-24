@@ -964,6 +964,7 @@ I18N.add("en", {
   "ggb.model_hint_preset":  "Your GeoGebra activity must push the coefficients (inputs) into same-named objects, then compute diagnostics (roots, extremum, slope direction) on g, the curve traced by the student, via a \"Valider mon tracé\" button. Use the provided .ggb file for this model: all coefficient and diagnostic objects are hidden there so the answer is never revealed; grading happens only through STACK's \"Vérifier\" button.",
   "ggb.tracez_courbe_lbl":  "Freehand-trace the curve with equation",
   "ggb.correction_lbl":     "🔑 Correction",
+  "ggb.banniere":           "GeoGebra",
   "ggb.coeffs_lbl":         "Coefficients:",
   "ggb.coeff_mode_random":  "Random (min/max/step)",
   "ggb.coeff_mode_fixed":   "Fixed value",
