@@ -1,10 +1,6 @@
 // ── DOI UI + genDOI + VERIF TAG HELPERS ────────────────────────
 // ════════════════════════════════════════════════════
 
-// Initialisation de la couleur pour DOI (ajout à l'objet global COLORS si besoin)
-COLORS.doi = '#ADA762'; 
-LABELS.doi = '<img src="assets/DOI.png" style="height:20px; vertical-align:middle;"> DOI';
-
 // Gestion de l'interface DOI
 function doiInitUI(){
     const list = document.getElementById('doi-objects-list');
@@ -385,7 +381,11 @@ function genDOIFullPreviewImage(config = null) {
 //  GÉNÉRATION XML DOI (VERSION CANVAS - STRUCTURE RIGIDE)
 //  Basé sur l'exemple XML fourni
 // ══════════════════════════════════════════════════════════════════════════════════════════
-function genDOI(X){
+// Lecture DOM pure : construit les paramètres consommés par genDOICore. L'image de
+// correction (canvas) doit être rendue ici, côté navigateur — un cœur serveur ne
+// peut pas dessiner sur un canvas — donc elle est transmise déjà finalisée, même
+// technique que genChemicalTopoParams() (js/gen-topo.js) pour SmilesDrawer.
+function _doiBuildParams(){
     const bareme = parseFloat(document.getElementById('doi-bareme').value) || 2;
     const text = richVal('doi-text');
     const mainObj = document.getElementById('doi-main-obj').value || "Système";
@@ -404,6 +404,39 @@ function genDOI(X){
     });
     // Config sauvegardée pour la prévisualisation (verif.js)
     const rawConfig = { mainObj, extraZones, objects: rawObjects };
+
+    const correctionImg = `<div style="text-align:center; margin:15px 0; padding:10px; background:#fff; border:1px solid #e2e8f0; border-radius:8px;"><h4 style="margin:0 0 10px 0; color:#334155;">${I18N.t('tpl.doi_correction_titre')}</h4>${genDOIFullPreviewImage(rawConfig)}</div>`;
+
+    return { bareme, text, mainObj, extraZones, objects, rawConfig, correctionImg, fbGen: v('doi-fbgen') };
+}
+
+async function genDOI(X){
+    const p = _doiBuildParams();
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: 'doi', X, params: p})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) return data.parts;
+        }
+        if (res.status === 429) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Quota hebdomadaire atteint.');
+        }
+        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "doi", repli sur le calcul local (session expirée ?).');
+    } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "doi", repli sur le calcul local.', e); }
+    return genDOICore(X, p);
+}
+
+function genDOICore(X, p, deps){
+    deps = deps || {};
+    const mkFbGen_D = deps._mkFbGen || _mkFbGen;
+
+    const bareme = p.bareme, text = p.text, mainObj = p.mainObj, extraZones = p.extraZones;
+    const objects = p.objects, rawConfig = p.rawConfig, correctionImg = p.correctionImg, fbGen = p.fbGen;
 
     const interacting = objects.filter(o => o.type !== 'intrus');
     const intrus = objects.filter(o => o.type === 'intrus');
@@ -434,10 +467,9 @@ function genDOI(X){
         const bx = Math.round(centerX + orbitRx * Math.cos(angle));
         const by = Math.round(centerY + orbitRy * Math.sin(angle));
         const key = "blue" + i;
-        positions.push({ key, x: bx, y: by, angle });
-        
         const pX = Math.round(bx - bRx * Math.cos(angle));
         const pY = Math.round(by - bRy * Math.sin(angle));
+        positions.push({ key, x: bx, y: by, angle, pX, pY });
 
         jsObjectsStr += `, ${key}: { x: ${bx}, y: ${by}, rx: ${bRx}, ry: ${bRy}, color: '#3B82F6', pX: ${pX}, pY: ${pY} }`;
     }
@@ -819,9 +851,6 @@ test_distance: is(ssearch("dashed", ans${X}) # false);]]></text>
       </node>
     </prt>`;
 
-    // Génération de l'image de correction (Pour General Feedback)
-    const correctionImg = `<div style="text-align:center; margin:15px 0; padding:10px; background:#fff; border:1px solid #e2e8f0; border-radius:8px;"><h4 style="margin:0 0 10px 0; color:#334155;">${I18N.t('tpl.doi_correction_titre')}</h4>${genDOIFullPreviewImage(rawConfig)}</div>`;
-
     // Feedbacks par nœud (description + feedback vrai/faux), pour l'aperçu enseignant
     const diagNodes = [
         { desc: 'Système', fb: `<p>L'objet d'étude est bien placé.</p>`, falseFb: `<p>L'objet d'étude est incorrect.</p>` },
@@ -837,7 +866,7 @@ test_distance: is(ssearch("dashed", ans${X}) # false);]]></text>
         textFrag: textFrag,
         inputXML: `    <input>\n      <name>ans${X}</name>\n      <type>string</type>\n      <tans><![CDATA["${reponseModele}"]]></tans>\n      <boxsize>80</boxsize>\n      <strictsyntax>1</strictsyntax>\n      <insertstars>0</insertstars>\n      <syntaxhint></syntaxhint>\n      <syntaxattribute>0</syntaxattribute>\n      <forbidwords></forbidwords>\n      <allowwords></allowwords>\n      <forbidfloat>1</forbidfloat>\n      <requirelowestterms>0</requirelowestterms>\n      <checkanswertype>0</checkanswertype>\n      <mustverify>0</mustverify>\n      <showvalidation>0</showvalidation>\n      <options></options>\n    </input>`,
         prtXML: prt1XML + "\n\n" + prt2XML,
-        generalFeedback: _mkFbGen(correctionImg, v('doi-fbgen')),
+        generalFeedback: mkFbGen_D(correctionImg, fbGen),
         feedbackRef: `[[feedback:prt${X}_1]]<br/>[[feedback:prt${X}_2]]`,
         correctionImg: correctionImg,
         rawConfig: rawConfig,
@@ -875,4 +904,8 @@ function verifAddTag(){
 function verifRemoveTag(i){
   _verifTags.splice(i, 1);
   verifRenderTags();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { genDOI: genDOI, genDOICore: genDOICore, _doiBuildParams: _doiBuildParams };
 }

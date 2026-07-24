@@ -3792,7 +3792,7 @@ function renderPreviewHTML_doi(state) {
     ? genDOIStudentPreviewHTML()
     : '<p style="color:#94a3b8;font-style:italic;">Ajoutez des objets dans l\'onglet Config pour afficher l\'aperçu.</p>';
   var realParts = {};
-  try { realParts = (typeof genDOI === 'function') ? genDOI(1) : {}; } catch (e) { realParts = {}; }
+  try { realParts = (typeof genDOICore === 'function' && typeof _doiBuildParams === 'function') ? genDOICore(1, _doiBuildParams()) : {}; } catch (e) { realParts = {}; }
   return _hsSimplePreviewHTML({
     badge: 'Diagramme Objet-Interaction', badgeColor: '#78716c', noteBg: '#fafaf9', noteColor: '#57534e',
     prefix: 'doi', bareme: state.bareme || 2,
