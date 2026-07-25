@@ -19,7 +19,7 @@ function renderPreviewHTML_ord(state) {
     listHTML = '<p style="color:#94a3b8;font-style:italic;">Ajoutez des éléments dans l\'onglet Config pour afficher l\'aperçu.</p>';
   }
   return _hsSimplePreviewHTML({
-    badge: 'Classement', badgeColor: '#be185d', noteBg: '#fdf2f8', noteColor: '#9d174d',
+    badge: I18N.t('type.ord'), badgeColor: '#be185d', noteBg: '#fdf2f8', noteColor: '#9d174d',
     prefix: 'ord', bareme: state.bareme || 1,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : remettre les éléments dans le bon ordre.</em></p>'),
     exampleHTML: listHTML,

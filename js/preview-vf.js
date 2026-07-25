@@ -94,19 +94,19 @@ function renderPreviewHTML_vf(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Vrai / Faux</span>
+    <span class="hs-preview-badge">${I18N.t('type.vf')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-vf-field="text">${text}</div>
     <table class="hs-vf-table"><tbody>${rowsHTML}</tbody></table>
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
     ${fbItemsHTML}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (toujours affiché)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_always_title')}</div>
     ${fbGenHTML}
   </div>
 </body>

@@ -15,32 +15,33 @@ var PRT_ROW  = 130;
 var PRT_PAD  = 52;
 
 // ── DESCRIPTIONS DES TESTS ──────────────────────────────────────────
-var PRT_AT_HELP = {
-  'AlgEquiv':    '<b>AlgEquiv</b> — Équivalence algébrique avec simplification. <em>Test par défaut recommandé.</em>',
-  'EqualComAss': '<b>EqualComAss</b> — Égalité commutative+associative (a+b = b+a). Sans simplification.',
-  'CasEquiv':    '<b>CasEquiv</b> — Équivalence CAS (Maxima brut). Moins tolérant qu\'AlgEquiv.',
-  'SubstEquiv':  '<b>SubstEquiv</b> — Substitution numérique aléatoire. Rapide mais moins rigoureux.',
-  'ExpandEquiv': '<b>ExpandEquiv</b> — Formes développées égales.',
-  'FacForm':     '<b>FacForm</b> — Vérifie que la réponse est bien factorisée.',
-  'SameType':    '<b>SameType</b> — Même type Maxima (entier, fraction, liste…).',
-  'Equiv':       '<b>Equiv</b> — Équivalences logiques de systèmes d\'équations.',
-  'LowestTerms': '<b>LowestTerms</b> — La fraction est-elle irréductible ?',
-  'Diff':        '<b>Diff</b> — Vérifie si la réponse est la dérivée de tans.',
-  'Int':         '<b>Int</b> — Vérifie si la réponse est une primitive de tans.',
-  'String':      '<b>String</b> — Comparaison de chaîne exacte (insensible à la casse).',
-  'StringSloppy':'<b>StringSloppy</b> — Chaîne tolérante : espaces et casse ignorés.',
-  'RegExp':      '<b>RegExp</b> — Expression régulière. Mettre le motif dans <em>Options</em>.',
-  'NumAbsolute': '<b>NumAbsolute</b> — Erreur absolue ≤ options. <em>Ex: options=0.05</em>',
-  'NumRelative': '<b>NumRelative</b> — Erreur relative ≤ options. <em>Ex: options=0.05 (5%)</em>',
-  'NumSigFigs':  '<b>NumSigFigs</b> — Chiffres significatifs. <em>Options: min,max (ex: 2,4)</em>',
-  'UnitsAbsolute':'<b>UnitsAbsolute</b> — Grandeur avec unités, erreur absolue.',
-  'UnitsRelative':'<b>UnitsRelative</b> — Grandeur avec unités, erreur relative.',
-  'UnitsSigFigs': '<b>UnitsSigFigs</b> — Unités + chiffres significatifs.',
-  'GT':          '<b>GT</b> — Teste si réponse élève > tans.',
-  'GTE':         '<b>GTE</b> — Teste si réponse élève ≥ tans.',
-  'Sets':        '<b>Sets</b> — Égalité d\'ensembles {a,b,c}.',
+// Valeurs = clés i18n (résolues à l'affichage via I18N.t pour suivre la langue active).
+var PRT_AT_HELP_KEYS = {
+  'AlgEquiv':    'prt.help_algequiv',
+  'EqualComAss': 'prt.help_equalcomass',
+  'CasEquiv':    'prt.help_casequiv',
+  'SubstEquiv':  'prt.help_substequiv',
+  'ExpandEquiv': 'prt.help_expandequiv',
+  'FacForm':     'prt.help_facform',
+  'SameType':    'prt.help_sametype',
+  'Equiv':       'prt.help_equiv',
+  'LowestTerms': 'prt.help_lowestterms',
+  'Diff':        'prt.help_diff',
+  'Int':         'prt.help_int',
+  'String':      'prt.help_string',
+  'StringSloppy':'prt.help_stringsloppy',
+  'RegExp':      'prt.help_regexp',
+  'NumAbsolute': 'prt.help_numabsolute',
+  'NumRelative': 'prt.help_numrelative',
+  'NumSigFigs':  'prt.help_numsigfigs',
+  'UnitsAbsolute':'prt.help_unitsabsolute',
+  'UnitsRelative':'prt.help_unitsrelative',
+  'UnitsSigFigs': 'prt.help_unitssigfigs',
+  'GT':          'prt.help_gt',
+  'GTE':         'prt.help_gte',
+  'Sets':        'prt.help_sets',
 };
-var PRT_ANSWER_TESTS = Object.keys(PRT_AT_HELP);
+var PRT_ANSWER_TESTS = Object.keys(PRT_AT_HELP_KEYS);
 
 // ── PARSE XML ────────────────────────────────────────────────────────
 function parsePrtXml(xmlStr) {
@@ -102,16 +103,16 @@ function buildPrtXml(meta, nodes) {
 // ── OPEN / CLOSE ─────────────────────────────────────────────────────
 function openPrtManager(qid) {
   var q = questions[qid];
-  if (!q || (!q.prtXML && !q.prt)) { if(typeof toast==='function') toast('Enregistrez d\'abord la question.'); return; }
+  if (!q || (!q.prtXML && !q.prt)) { if(typeof toast==='function') toast(I18N.t('prt.toast_save_first')); return; }
   // Types migrés (ex: Base N) exposent déjà q.prt en JSON (meta+nodes) : on l'utilise
   // directement, sans repasser par un parsing XML fragile. Fallback XML pour les
   // types pas encore migrés.
   var parsed = q.prt ? { meta: q.prt.meta, nodes: q.prt.nodes } : parsePrtXml(q.prtXML);
-  if (!parsed) { if(typeof toast==='function') toast('PRT XML illisible.'); return; }
+  if (!parsed) { if(typeof toast==='function') toast(I18N.t('prt.toast_xml_unreadable')); return; }
   _prtQid = qid; _prtMeta = Object.assign({}, parsed.meta);
   _prtNodes = parsed.nodes.map(function(n){ return Object.assign({},n); });
   _prtSelectedNode = -1; _prtPos = []; _prtDrag = null; _prtZoom = 1.0;
-  document.getElementById('prt-mngr-title').textContent = 'Arbre PRT — Q'+qid+' ('+((q.type)||'')+')';
+  document.getElementById('prt-mngr-title').textContent = I18N.t('prt.mngr_title', {qid: qid, type: (q.type)||''});
   document.getElementById('prt-manager-modal').style.display = 'flex';
   if (typeof FocusTrap !== 'undefined') FocusTrap.trap(document.getElementById('prt-manager-modal'), closePrtManager);
   _prtInitLayout();
@@ -136,10 +137,8 @@ function closePrtManager(_skipValidation) {
   if (!_skipValidation && _prtNodes.length) {
     var g = _prtValidateGraph();
     if (!g.ok) {
-      var gmsg = g.cycle
-        ? 'Boucle infinie détectée : le nœud N'+g.cycle+' se rappelle lui-même via une chaîne de branches.'
-        : 'Nœud(s) non connecté(s) au reste de l\'arbre : N'+g.orphans.join(', N')+'.';
-      if (!confirm('⚠️ '+gmsg+'\n\nFermer quand même sans corriger ?')) return;
+      var gmsg = _prtGraphErrorMsg(g);
+      if (!confirm('⚠️ '+gmsg+'\n\n'+I18N.t('prt.confirm_close_anyway'))) return;
     }
   }
   document.removeEventListener('mousemove', _prtOnDragMove);
@@ -241,7 +240,7 @@ function _ni(name) {
 function renderPrtSvg() {
   var wrap = document.getElementById('prt-tree-svg-wrap');
   if (!wrap) return;
-  if (!_prtNodes.length) { wrap.innerHTML='<p class="prt-tree-empty">Aucun nœud dans ce PRT.</p>'; return; }
+  if (!_prtNodes.length) { wrap.innerHTML='<p class="prt-tree-empty">'+I18N.t('prt.tree_empty')+'</p>'; return; }
 
   var bounds = _prtBounds();
   var svgW = bounds.maxX + PRT_PAD + 60;
@@ -355,7 +354,7 @@ function _renderArrowHtml(n, i, br) {
       '<rect id="prt-endc-'+i+'-'+br+'" x="'+(ep.x-18)+'" y="'+(ep.y-12)+'" width="36" height="22" rx="6"'
       +' fill="'+color+'" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>'
       +'<text id="prt-endt-'+i+'-'+br+'" x="'+ep.x+'" y="'+(ep.y+1)+'" text-anchor="middle" dominant-baseline="middle"'
-      +' font-size="9.5" fill="white" font-weight="800" pointer-events="none">FIN</text>';
+      +' font-size="9.5" fill="white" font-weight="800" pointer-events="none">'+I18N.t('prt.end_label')+'</text>';
   }
 
   /* Fond sombre derrière le label pour lisibilité */
@@ -635,11 +634,11 @@ function _prtShowTooltip(e, idx) {
   if (_prtDrag || _prtRubber) return;
   var n=_prtNodes[idx];
   var tip=document.getElementById('prt-tooltip'); if(!tip) return;
-  var trueNext=n.truenextnode==='-1'?'FIN':'N'+n.truenextnode;
-  var falseNext=n.falsenextnode==='-1'?'FIN':'N'+n.falsenextnode;
+  var trueNext=n.truenextnode==='-1'?I18N.t('prt.end_label'):'N'+n.truenextnode;
+  var falseNext=n.falsenextnode==='-1'?I18N.t('prt.end_label'):'N'+n.falsenextnode;
   var desc=n.description?('<div class="prt-tip-desc">'+_hesc(n.description)+'</div>'):'';
   tip.innerHTML=
-    '<div class="prt-tip-name">Nœud N'+_hesc(n.name)+'</div>'+desc+
+    '<div class="prt-tip-name">'+I18N.t('prt.node_label', {name: _hesc(n.name)})+'</div>'+desc+
     '<div class="prt-tip-test">'+_hesc(n.answertest)+'</div>'+
     '<div class="prt-tip-io"><code>'+_hesc(n.sans)+'</code><span> ↔ </span><code>'+_hesc(n.tans)+'</code></div>'+
     '<div class="prt-tip-br prt-tip-t">✓ '+_hesc(n.truescoremode+n.truescore)+' → '+trueNext+'</div>'+
@@ -680,7 +679,7 @@ function prtSelectNode(idx) {
 
 function renderNodeEditorPlaceholder() {
   document.getElementById('prt-node-details').innerHTML=
-    '<div class="prt-ne-placeholder">Cliquez sur un nœud pour l\'éditer.</div>';
+    '<div class="prt-ne-placeholder">'+I18N.t('prt.ne_placeholder')+'</div>';
 }
 
 // ── NODE EDITOR ──────────────────────────────────────────────────────
@@ -688,7 +687,7 @@ function renderNodeEditor(idx) {
   var n=_prtNodes[idx]; if(!n) return;
   var panel=document.getElementById('prt-node-details');
   function nextOpts(cur){
-    var o='<option value="-1"'+(cur==='-1'||cur===-1?' selected':'')+'>— FIN —</option>';
+    var o='<option value="-1"'+(cur==='-1'||cur===-1?' selected':'')+'>'+I18N.t('prt.opt_end')+'</option>';
     _prtNodes.forEach(function(nn,i){ if(i!==idx){var s=(String(cur)===String(nn.name))?' selected':'';o+='<option value="'+nn.name+'"'+s+'>N'+nn.name+'</option>';} });
     return o;
   }
@@ -696,55 +695,55 @@ function renderNodeEditor(idx) {
   var atOpts=PRT_ANSWER_TESTS.map(function(t){ return '<option value="'+t+'"'+(n.answertest===t?' selected':'')+'>'+t+'</option>'; }).join('');
 
   panel.innerHTML=
-    '<div class="prt-ne-head">Nœud N'+_hesc(n.name)+
-      '<button class="prt-ne-del-btn" onclick="prtDeleteNode('+idx+')" title="Supprimer">🗑</button>'+
+    '<div class="prt-ne-head">'+I18N.t('prt.node_label', {name: _hesc(n.name)})+
+      '<button class="prt-ne-del-btn" onclick="prtDeleteNode('+idx+')" title="'+I18N.t('common.supprimer')+'">🗑</button>'+
     '</div>'+
 
-    '<div class="prt-ne-section">Identification</div>'+
-    '<label class="prt-ne-lbl" for="pne-desc">Description</label>'+
+    '<div class="prt-ne-section">'+I18N.t('prt.section_identification')+'</div>'+
+    '<label class="prt-ne-lbl" for="pne-desc">'+I18N.t('prt.lbl_description')+'</label>'+
     '<input class="prt-ne-inp" id="pne-desc" value="'+_hesc(n.description)+'">'+
 
-    '<div class="prt-ne-section">Test de réponse</div>'+
+    '<div class="prt-ne-section">'+I18N.t('prt.section_test')+'</div>'+
     '<div style="display:flex;gap:6px;align-items:center;">'+
-      '<select class="prt-ne-sel" id="pne-at" aria-label="Test de réponse" onchange="prtUpdateAtHelp()" style="flex:1">'+atOpts+'</select>'+
+      '<select class="prt-ne-sel" id="pne-at" aria-label="'+I18N.t('prt.section_test')+'" onchange="prtUpdateAtHelp()" style="flex:1">'+atOpts+'</select>'+
       '<button class="prt-help-btn" onclick="prtToggleAtHelp()">?</button>'+
     '</div>'+
     '<div id="pne-at-help" class="prt-at-help" style="display:none"></div>'+
     '<div class="prt-ne-row2" style="margin-top:5px">'+
-      '<div><label class="prt-ne-lbl" for="pne-sans">Sans (élève)</label><input class="prt-ne-inp mono" id="pne-sans" value="'+_hesc(n.sans)+'"></div>'+
-      '<div><label class="prt-ne-lbl" for="pne-tans">Tans (prof)</label><input class="prt-ne-inp mono" id="pne-tans" value="'+_hesc(n.tans)+'"></div>'+
+      '<div><label class="prt-ne-lbl" for="pne-sans">'+I18N.t('prt.lbl_sans')+'</label><input class="prt-ne-inp mono" id="pne-sans" value="'+_hesc(n.sans)+'"></div>'+
+      '<div><label class="prt-ne-lbl" for="pne-tans">'+I18N.t('prt.lbl_tans')+'</label><input class="prt-ne-inp mono" id="pne-tans" value="'+_hesc(n.tans)+'"></div>'+
     '</div>'+
-    '<label class="prt-ne-lbl">Options du test <small>(ex: 0.05)</small></label>'+
-    '<input class="prt-ne-inp mono" id="pne-opts" value="'+_hesc(n.testoptions)+'" placeholder="laisser vide si inutile">'+
+    '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_options')+'</label>'+
+    '<input class="prt-ne-inp mono" id="pne-opts" value="'+_hesc(n.testoptions)+'" placeholder="'+I18N.t('prt.ph_leave_empty')+'">'+
 
-    '<div class="prt-ne-section prt-ne-true-section">Branche Vraie ✓</div>'+
+    '<div class="prt-ne-section prt-ne-true-section">'+I18N.t('prt.section_true')+'</div>'+
     '<div class="prt-ne-row3">'+
-      '<div><label class="prt-ne-lbl" for="pne-tsm">Mode</label><select class="prt-ne-sel" id="pne-tsm">'+smOpts(n.truescoremode)+'</select></div>'+
-      '<div><label class="prt-ne-lbl" for="pne-ts">Score</label><input class="prt-ne-inp" id="pne-ts" type="text" placeholder="0…1 ou variable" value="'+n.truescore+'"></div>'+
-      '<div><label class="prt-ne-lbl" for="pne-tnn">Suivant</label><select class="prt-ne-sel" id="pne-tnn">'+nextOpts(n.truenextnode)+'</select></div>'+
+      '<div><label class="prt-ne-lbl" for="pne-tsm">'+I18N.t('prt.lbl_mode')+'</label><select class="prt-ne-sel" id="pne-tsm">'+smOpts(n.truescoremode)+'</select></div>'+
+      '<div><label class="prt-ne-lbl" for="pne-ts">'+I18N.t('prt.lbl_score')+'</label><input class="prt-ne-inp" id="pne-ts" type="text" placeholder="'+I18N.t('prt.ph_score')+'" value="'+n.truescore+'"></div>'+
+      '<div><label class="prt-ne-lbl" for="pne-tnn">'+I18N.t('prt.lbl_suivant')+'</label><select class="prt-ne-sel" id="pne-tnn">'+nextOpts(n.truenextnode)+'</select></div>'+
     '</div>'+
-    '<label class="prt-ne-lbl" for="pne-tan">Note réponse (vraie)</label>'+
+    '<label class="prt-ne-lbl" for="pne-tan">'+I18N.t('prt.lbl_note_true')+'</label>'+
     '<input class="prt-ne-inp mono" id="pne-tan" value="'+_hesc(n.trueanswernote)+'">'+
-    '<label class="prt-ne-lbl">Feedback (vraie) <button class="btn-rich-sm" onclick="prtOpenRich(\'pne-tfb\')">✏️</button></label>'+
+    '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_feedback_true')+' <button class="btn-rich-sm" onclick="prtOpenRich(\'pne-tfb\')">✏️</button></label>'+
     _fbTplRow('pne-tfb')+
-    '<div class="rich-preview prt-rich-prev" id="prev-pne-tfb" tabindex="0" onclick="prtOpenRich(\'pne-tfb\')" data-ph="Cliquer pour rédiger…"></div>'+
+    '<div class="rich-preview prt-rich-prev" id="prev-pne-tfb" tabindex="0" onclick="prtOpenRich(\'pne-tfb\')" data-ph="'+I18N.t('prt.ph_write_click')+'"></div>'+
     '<textarea id="pne-tfb" style="display:none"></textarea>'+
 
-    '<div class="prt-ne-section prt-ne-false-section">Branche Fausse ✗</div>'+
+    '<div class="prt-ne-section prt-ne-false-section">'+I18N.t('prt.section_false')+'</div>'+
     '<div class="prt-ne-row3">'+
-      '<div><label class="prt-ne-lbl" for="pne-fsm">Mode</label><select class="prt-ne-sel" id="pne-fsm">'+smOpts(n.falsescoremode)+'</select></div>'+
-      '<div><label class="prt-ne-lbl" for="pne-fs">Score</label><input class="prt-ne-inp" id="pne-fs" type="text" placeholder="0…1 ou variable" value="'+n.falsescore+'"></div>'+
-      '<div><label class="prt-ne-lbl" for="pne-fnn">Suivant</label><select class="prt-ne-sel" id="pne-fnn">'+nextOpts(n.falsenextnode)+'</select></div>'+
+      '<div><label class="prt-ne-lbl" for="pne-fsm">'+I18N.t('prt.lbl_mode')+'</label><select class="prt-ne-sel" id="pne-fsm">'+smOpts(n.falsescoremode)+'</select></div>'+
+      '<div><label class="prt-ne-lbl" for="pne-fs">'+I18N.t('prt.lbl_score')+'</label><input class="prt-ne-inp" id="pne-fs" type="text" placeholder="'+I18N.t('prt.ph_score')+'" value="'+n.falsescore+'"></div>'+
+      '<div><label class="prt-ne-lbl" for="pne-fnn">'+I18N.t('prt.lbl_suivant')+'</label><select class="prt-ne-sel" id="pne-fnn">'+nextOpts(n.falsenextnode)+'</select></div>'+
     '</div>'+
-    '<label class="prt-ne-lbl" for="pne-fan">Note réponse (fausse)</label>'+
+    '<label class="prt-ne-lbl" for="pne-fan">'+I18N.t('prt.lbl_note_false')+'</label>'+
     '<input class="prt-ne-inp mono" id="pne-fan" value="'+_hesc(n.falseanswernote)+'">'+
-    '<label class="prt-ne-lbl">Feedback (fausse) <button class="btn-rich-sm" onclick="prtOpenRich(\'pne-ffb\')">✏️</button></label>'+
+    '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_feedback_false')+' <button class="btn-rich-sm" onclick="prtOpenRich(\'pne-ffb\')">✏️</button></label>'+
     _fbTplRow('pne-ffb')+
-    '<div class="rich-preview prt-rich-prev" id="prev-pne-ffb" tabindex="0" onclick="prtOpenRich(\'pne-ffb\')" data-ph="Cliquer pour rédiger…"></div>'+
+    '<div class="rich-preview prt-rich-prev" id="prev-pne-ffb" tabindex="0" onclick="prtOpenRich(\'pne-ffb\')" data-ph="'+I18N.t('prt.ph_write_click')+'"></div>'+
     '<textarea id="pne-ffb" style="display:none"></textarea>'+
 
     _buildVarsHtml()+
-    '<button class="prt-ne-apply-btn" onclick="prtApplyNodeEdit('+idx+')">✓ Appliquer</button>';
+    '<button class="prt-ne-apply-btn" onclick="prtApplyNodeEdit('+idx+')">'+I18N.t('prt.btn_apply')+'</button>';
 
   if(typeof setRichVal==='function'){
     setRichVal('pne-tfb', n.truefeedback);
@@ -763,7 +762,7 @@ function prtToggleAtHelp(){
 function prtUpdateAtHelp(){
   var s=document.getElementById('pne-at'), e=document.getElementById('pne-at-help');
   if(!s||!e||e.style.display==='none') return;
-  e.innerHTML=PRT_AT_HELP[s.value]||'<em>Pas de description disponible.</em>';
+  e.innerHTML=(PRT_AT_HELP_KEYS[s.value]?I18N.t(PRT_AT_HELP_KEYS[s.value]):null)||I18N.t('prt.help_none');
 }
 function prtOpenRich(fieldId){ if(typeof openRich==='function') openRich(fieldId); }
 
@@ -777,7 +776,7 @@ var _PRT_FB_TPLS = {
 function _fbTplRow(fid) {
   function btn(t,lbl){ return '<button class="prt-fb-tpl-btn" id="tpl-'+fid+'-'+t+'" onclick="prtApplyFbTpl(\''+fid+'\',\''+t+'\')">'+lbl+'</button>'; }
   return '<div class="prt-fb-tpl-row">'+
-    btn('sans','Sans')+btn('vrai','✅ Vrai')+btn('faux','❌ Faux')+btn('partiel','🔶 Partiel')+
+    btn('sans',I18N.t('prt.tpl_sans'))+btn('vrai',I18N.t('prt.tpl_vrai'))+btn('faux',I18N.t('prt.tpl_faux'))+btn('partiel',I18N.t('prt.tpl_partiel'))+
   '</div>';
 }
 
@@ -830,27 +829,27 @@ function _buildVarsHtml(){
     if(seen[nm]) return; seen[nm]=true;
     chips+='<span class="prt-var-chip '+cls+'" title="'+title+'" onclick="prtInsertVar(this)">'+_hesc(nm)+'</span>';
   }
-  chip('ans'+X,'prt-var-std','Réponse élève');
-  chip('ta'+X, 'prt-var-std','Réponse attendue');
+  chip('ans'+X,'prt-var-std',I18N.t('prt.var_title_student'));
+  chip('ta'+X, 'prt-var-std',I18N.t('prt.var_title_expected'));
   if(q&&q.vars){
     (q.vars.match(/\b([a-zA-Z_]\w*)\s*:/g)||[]).forEach(function(m){
       var nm=m.replace(/\s*:$/,'').trim();
-      if(nm&&!/^(if|then|else|true|false|block|for|do|while)$/.test(nm)) chip(nm,'prt-var-q','Variable question');
+      if(nm&&!/^(if|then|else|true|false|block|for|do|while)$/.test(nm)) chip(nm,'prt-var-q',I18N.t('prt.var_title_question'));
     });
   }
   if(_prtMeta.feedbackvariables){
     (_prtMeta.feedbackvariables.match(/\b([a-zA-Z_]\w*)\s*:/g)||[]).forEach(function(m){
-      var nm=m.replace(/\s*:$/,'').trim(); if(nm) chip(nm,'prt-var-fb','Variable rétroaction');
+      var nm=m.replace(/\s*:$/,'').trim(); if(nm) chip(nm,'prt-var-fb',I18N.t('prt.var_title_feedback'));
     });
   }
-  if(!chips) chips='<span style="color:#94a3b8;font-size:.75rem;font-style:italic">Aucune variable trouvée.</span>';
-  return '<div class="prt-ne-section">Variables disponibles <small style="font-weight:400;font-size:.67rem">(clic→copier)</small></div>'+
+  if(!chips) chips='<span style="color:#94a3b8;font-size:.75rem;font-style:italic">'+I18N.t('prt.vars_none')+'</span>';
+  return '<div class="prt-ne-section">'+I18N.t('prt.section_vars_title')+' <small style="font-weight:400;font-size:.67rem">'+I18N.t('prt.vars_copy_hint')+'</small></div>'+
          '<div class="prt-vars-panel">'+chips+'</div>';
 }
 function prtInsertVar(el){
   var nm=el.textContent;
   if(navigator.clipboard) navigator.clipboard.writeText(nm);
-  if(typeof toast==='function') toast('"'+nm+'" copié');
+  if(typeof toast==='function') toast(I18N.t('prt.toast_copied', {name: nm}));
 }
 
 // ── APPLY EDITS ──────────────────────────────────────────────────────
@@ -871,7 +870,7 @@ function prtApplyNodeEdit(idx){
   var nc = document.querySelector('#prt-node-'+idx+' circle');
   if(nc){ nc.setAttribute('fill','#1e3a8a'); nc.setAttribute('stroke','#93c5fd'); nc.setAttribute('stroke-width','4'); nc.setAttribute('filter','url(#prt-sel-glow)'); }
   renderNodeEditor(idx);
-  if(typeof toast==='function') toast('Nœud N'+n.name+' mis à jour.');
+  if(typeof toast==='function') toast(I18N.t('prt.toast_node_updated', {name: n.name}));
 }
 
 // ── ADD NODE ─────────────────────────────────────────────────────────
@@ -895,7 +894,7 @@ function prtAddNode(){
 
 // ── DELETE NODE ──────────────────────────────────────────────────────
 function prtDeleteNode(idx){
-  if(_prtNodes.length<=1){if(typeof toast==='function') toast('Au moins un nœud requis.'); return;}
+  if(_prtNodes.length<=1){if(typeof toast==='function') toast(I18N.t('prt.toast_min_node')); return;}
   var name=_prtNodes[idx].name;
   if(!confirm(I18N.t('msg.confirm_del_node') + name + ' ?')) return;
   _prtNodes.splice(idx,1); _prtPos.splice(idx,1);
@@ -914,7 +913,7 @@ function prtDeleteNode(idx){
 // nœud n'était pas assez visible, on ajoute un point d'entrée évident qui agit
 // sur le nœud actuellement sélectionné.
 function prtDeleteSelectedNode(){
-  if(_prtSelectedNode<0){ if(typeof toast==='function') toast('Sélectionnez d\'abord un nœud à supprimer.'); return; }
+  if(_prtSelectedNode<0){ if(typeof toast==='function') toast(I18N.t('prt.toast_select_first')); return; }
   prtDeleteNode(_prtSelectedNode);
 }
 
@@ -947,7 +946,7 @@ function prtTidy(){
   _prtNameToIdx={}; _prtNodes.forEach(function(n,i){_prtNameToIdx[n.name]=i;});
   _prtSelectedNode=-1;
   renderPrtSvg(); renderNodeEditorPlaceholder();
-  if(typeof toast==='function') toast('Nœuds renumérotés : N0, N1…');
+  if(typeof toast==='function') toast(I18N.t('prt.toast_renumbered'));
 }
 
 // ── RESET LAYOUT ─────────────────────────────────────────────────────
@@ -956,7 +955,7 @@ function prtResetLayout(){
   _prtInitLayout();
   renderPrtSvg();
   renderNodeEditorPlaceholder();
-  if(typeof toast==='function') toast('Disposition réinitialisée.');
+  if(typeof toast==='function') toast(I18N.t('prt.toast_layout_reset'));
 }
 
 // ── SAVE ─────────────────────────────────────────────────────────────
@@ -967,16 +966,14 @@ function savePrtManager(){
   if(_fbvIn) _prtMeta.feedbackvariables=_fbvIn.value;
   var g = _prtValidateGraph();
   if(!g.ok){
-    var gmsg = g.cycle
-      ? 'Boucle infinie détectée : le nœud N'+g.cycle+' se rappelle lui-même via une chaîne de branches.'
-      : 'Nœud(s) non connecté(s) au reste de l\'arbre : N'+g.orphans.join(', N')+'.';
+    var gmsg = _prtGraphErrorMsg(g);
     if(!confirm('⚠️ '+gmsg+'\n\n'+I18N.t('msg.confirm_apply_anyway'))) return;
   }
   var v = _prtValidateTruePath();
   if(!v.ok){
     var msg = v.reason
-      ? 'Erreur : '+v.reason
-      : 'Le chemin des branches vraies aboutit à un score de '+v.score+' au lieu de 1.';
+      ? I18N.t('prt.err_prefix', {reason: v.reason})
+      : I18N.t('prt.err_truepath_score', {score: v.score});
     if(!confirm('⚠️ '+msg+'\n\n'+I18N.t('msg.confirm_apply_anyway'))) return;
   }
   var xml=buildPrtXml(_prtMeta,_prtNodes);
@@ -999,7 +996,7 @@ function savePrtManager(){
       if(typeof _expertSyncPrt==='function') _expertSyncPrt(_prtQid, xml);
     }
     if(typeof saveEditorState==='function') saveEditorState();
-    if(typeof toast==='function') toast('PRT de Q'+_prtQid+' mis à jour.');
+    if(typeof toast==='function') toast(I18N.t('prt.toast_prt_updated', {qid: _prtQid}));
   }
   if(!_prtInlineMode) closePrtManager(true);
 }
@@ -1019,7 +1016,7 @@ function _prtValidateTruePath(){
   }
   var score=0, visited={}, idx=rootIdx, path=[], MAX=100;
   while(idx>=0 && path.length<MAX){
-    if(visited[idx]) return {ok:false, reason:'Cycle détecté sur N'+_prtNodes[idx].name};
+    if(visited[idx]) return {ok:false, reason:I18N.t('prt.err_cycle_at', {name: _prtNodes[idx].name})};
     visited[idx]=true;
     var n=_prtNodes[idx];
     path.push('N'+n.name);
@@ -1087,18 +1084,26 @@ function _prtValidateGraph(){
   return { ok: orphans.length===0 && !hasCycle, orphans:orphans, cycle:hasCycle?cycleNode:null };
 }
 
+// Construit le message d'erreur (boucle ou nœuds orphelins) à partir du résultat
+// de _prtValidateGraph(), utilisé à la fois par closePrtManager() et savePrtManager().
+function _prtGraphErrorMsg(g) {
+  return g.cycle
+    ? I18N.t('prt.err_cycle', {node: g.cycle})
+    : I18N.t('prt.err_orphans', {names: g.orphans.join(', N')});
+}
+
 function _prtUpdateScoreBanner(){
   var el=document.getElementById('prt-score-banner'); if(!el) return;
   var v=_prtValidateTruePath();
   if(v.ok){
     el.className='prt-score-banner prt-score-ok';
-    el.textContent='✓ Chemin vrai = 1';
+    el.textContent=I18N.t('prt.banner_ok');
   } else if(v.reason){
     el.className='prt-score-banner prt-score-err';
     el.textContent='⚠ '+v.reason;
   } else {
     el.className='prt-score-banner prt-score-err';
-    el.textContent='⚠ Chemin vrai = '+v.score+' ≠ 1';
+    el.textContent=I18N.t('prt.banner_warn_score', {score: v.score});
   }
 }
 

@@ -12,7 +12,7 @@ function renderPreviewHTML_equivalence(state) {
   var scenarioHTML = bodyFrag ? _calcTokenizeForPreview(bodyFrag, knownVars)
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
   return _hsSimplePreviewHTML({
-    badge: '\xc9quivalence', badgeColor: '#5b21b6', noteBg: '#f5f3ff', noteColor: '#5b21b6',
+    badge: I18N.t('badge.equivalence'), badgeColor: '#5b21b6', noteBg: '#f5f3ff', noteColor: '#5b21b6',
     prefix: 'eq', bareme: state.bareme || 1,
     text: _hsRenderMath(scenarioHTML),
     hideExampleBox: true,

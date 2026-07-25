@@ -185,7 +185,7 @@ function createChipEl(qid, type) {
   chip.dataset.type = type;
   chip.setAttribute('role', 'button');
   chip.setAttribute('tabindex', '0');
-  chip.setAttribute('aria-label', 'Question ' + qid + ' · ' + (LABELS_PLAIN[type] || type) + '. Cliquer pour configurer.');
+  chip.setAttribute('aria-label', 'Question ' + qid + ' · ' + dataLabel(type) + '. Cliquer pour configurer.');
   chip.style.background = (COLORS[type] || '#64748b') + '22';
   chip.style.borderColor = COLORS[type] || '#64748b';
 
@@ -198,7 +198,7 @@ function createChipEl(qid, type) {
 
   var lbl = document.createElement('span');
   lbl.className = 'chip-label';
-  lbl.textContent = 'Q' + qid + ' · ' + (LABELS_PLAIN[type] || type).replace(/^[^\s]+\s/, '');
+  lbl.textContent = 'Q' + qid + ' · ' + dataLabel(type).replace(/^[^\s]+\s/, '');
 
   var sta = document.createElement('span');
   sta.className = 'chip-status';
@@ -483,7 +483,10 @@ function buildQuestionText() {
       chip.replaceWith(document.createTextNode('[[input:ans' + qid + ']] [[validation:ans' + qid + ']]'));
     }
   });
-  return clone.innerHTML;
+  // Le contenu libre de #v4-editor (hors chips) peut contenir un bloc JSXGraph
+  // inséré tel quel (wrapper <div class="jxg-inserted-wrap">...<script type="text/plain">),
+  // le même traitement que spansToLatex() (rich.js) doit donc s'appliquer ici.
+  return _jxgUnwrapBlocks(clone.innerHTML);
 }
 
 // Returns chips in visual (DOM) order

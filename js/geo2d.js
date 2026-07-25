@@ -406,16 +406,15 @@ function _g2Triangle() {
   content += angTag(C,A,B,'g2tri-lbl-gamma','g2tri-show-gamma','g2tri-val-gamma',aCd);
 
   // ── Sommets A, B, C ──
-  // show=true → affiche le nom ; val=true → ajoute " = 45°" (angle au sommet)
-  function vtxTag(V,idL,idSh,idV,angleDeg) {
+  // show=true → affiche le nom
+  function vtxTag(V,idL,idSh) {
     if (!_geo2dB(idSh)) return '';
     var lo=loff(V), lbl=_geo2dS(idL,'?');
-    if (_geo2dB(idV)) lbl += ' = '+angleDeg.toFixed(1)+'°';
     return _g2Lbl(lo[0],lo[1],lbl,true);
   }
-  content += vtxTag(A,'g2tri-lbl-A','g2tri-show-A','g2tri-val-A',aAd);
-  content += vtxTag(B,'g2tri-lbl-B','g2tri-show-B','g2tri-val-B',aBd);
-  content += vtxTag(C,'g2tri-lbl-C','g2tri-show-C','g2tri-val-C',aCd);
+  content += vtxTag(A,'g2tri-lbl-A','g2tri-show-A');
+  content += vtxTag(B,'g2tri-lbl-B','g2tri-show-B');
+  content += vtxTag(C,'g2tri-lbl-C','g2tri-show-C');
 
   return '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+
          '" viewBox="0 0 '+W+' '+H+'" overflow="hidden" font-family="serif" font-size="14">'+
@@ -1489,6 +1488,16 @@ function _g2segRotate(delta) {
   if (!el) return;
   var v = (parseFloat(el.value) || 0) + delta;
   // Normalise dans [-180, 180]
+  while (v > 180)  v -= 360;
+  while (v < -180) v += 360;
+  el.value = Math.round(v);
+  _geo2dPreview();
+}
+
+function _g2thaRotate(delta) {
+  var el = document.getElementById('g2tha-incl');
+  if (!el) return;
+  var v = (parseFloat(el.value) || 0) + delta;
   while (v > 180)  v -= 360;
   while (v < -180) v += 360;
   el.value = Math.round(v);

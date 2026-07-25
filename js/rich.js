@@ -102,7 +102,7 @@ function spansToLatex(el){
   c.querySelectorAll('.lx-span').forEach(s=>{const f=s.dataset.f,m=s.dataset.m;s.replaceWith(document.createTextNode(m==='block'?`\\[${f}\\]`:`\\(${f}\\)`));});
   c.querySelectorAll('.math-inline').forEach(s=>{const f=s.getAttribute('data-math');if(f)s.replaceWith(document.createTextNode(`\\(${f}\\)`));});
   c.querySelectorAll('.math-block').forEach(s=>{const f=s.getAttribute('data-math');if(f)s.replaceWith(document.createTextNode(`\\[${f}\\]`));});
-  return c.innerHTML;
+  return _jxgUnwrapBlocks(c.innerHTML);
 }
 
 // Table
@@ -166,7 +166,7 @@ function verifHandleAudio(input,id){
   verifSetActive(id);
   handleRichAudio(input);
 }
-function insertRichVideo(){const url=prompt('URL de la vidéo (Portail tube, YouTube, Vimeo ou .mp4) :');if(!url)return;let h='';const yt=url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&?]+)/);const vm=url.match(/vimeo\.com\/(\d+)/);if(yt)h=`<br><iframe width="560" height="315" src="https://www.youtube.com/embed/${yt[1]}" frameborder="0" allowfullscreen style="max-width:100%;border-radius:6px;"></iframe><br>`;else if(vm)h=`<br><iframe src="https://player.vimeo.com/video/${vm[1]}" width="560" height="315" frameborder="0" allowfullscreen style="max-width:100%;border-radius:6px;"></iframe><br>`;else h=`<br><video src="${url}" controls style="max-width:100%;border-radius:6px;"></video><br>`;const _tv=(_verifZoneActive)||richEditor();_richInsertHtml(h,_tv);_verifZoneActive=null;}
+function insertRichVideo(){const url=prompt(I18N.t('rtb.video_prompt'));if(!url)return;let h='';const yt=url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&?]+)/);const vm=url.match(/vimeo\.com\/(\d+)/);if(yt)h=`<br><iframe width="560" height="315" src="https://www.youtube.com/embed/${yt[1]}" frameborder="0" allowfullscreen style="max-width:100%;border-radius:6px;"></iframe><br>`;else if(vm)h=`<br><iframe src="https://player.vimeo.com/video/${vm[1]}" width="560" height="315" frameborder="0" allowfullscreen style="max-width:100%;border-radius:6px;"></iframe><br>`;else h=`<br><video src="${url}" controls style="max-width:100%;border-radius:6px;"></video><br>`;const _tv=(_verifZoneActive)||richEditor();_richInsertHtml(h,_tv);_verifZoneActive=null;}
 
 // ══════════════════════════════════════════════════════
 //  LINK MODAL (with Base64 file embedding)

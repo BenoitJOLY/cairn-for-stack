@@ -101,6 +101,12 @@ const LABELS_PLAIN={
     'expert':'🛠 Expert STACK',
     'geogebra':'📐 GeoGebra'
 };
+/* Résolu à l'appel (pas à l'import) pour rester correct après un changement de langue à chaud. */
+function dataLabel(type){
+  var key='data.label.'+type;
+  var v=(typeof window!=='undefined'&&window.I18N)?window.I18N.t(key):null;
+  return (v&&v!==key) ? v : (LABELS_PLAIN[type]||type);
+}
 function applyFormula(){document.getElementById('num-val').value=document.getElementById('modal-formula').value;document.getElementById('calcModal').style.display='none';}
 
 if (typeof module !== 'undefined' && module.exports) {

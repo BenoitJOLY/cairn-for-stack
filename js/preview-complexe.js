@@ -134,21 +134,21 @@ function renderPreviewHTML_complexe(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Nombres complexes</span>
+    <span class="hs-preview-badge">${I18N.t('type.complexe')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
     <span class="hs-preview-note">${scenarioLabels[scenario] || scenario}</span>
-    ${mode === 'aleatoire' ? '<span class="hs-preview-note">🎲 Valeurs générées par STACK</span>' : ''}
+    ${mode === 'aleatoire' ? `<span class="hs-preview-note">${I18N.t('common.preview_stack_generated_values')}</span>` : ''}
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-cpx-field="text">${text}</div>
     ${inputRow}
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (correction)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_correction_title')}</div>
     ${fbGlobalHTML}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (toujours affiché)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_always_title')}</div>
     ${fbGenHTML}
   </div>
 </body>

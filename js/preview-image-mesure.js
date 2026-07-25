@@ -59,7 +59,7 @@ function renderPreviewHTML_imageMesure(state) {
     : '<p style="color:#94a3b8;font-style:italic;">Complétez l\'étalonnage et ajoutez au moins une cible mesurée pour afficher le feedback général réel.</p>';
 
   return _hsSimplePreviewHTML({
-    badge: 'Mesure sur image', badgeColor: '#0891b2', noteBg: '#ecfeff', noteColor: '#0e7490',
+    badge: I18N.t('badge.image_mesure'), badgeColor: '#0891b2', noteBg: '#ecfeff', noteColor: '#0e7490',
     prefix: 'imm', bareme: state.bareme || 2,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : mesure par proportionnalité sur une image (spectre, microscope, règle…).</em></p>'),
     exampleHTML: exampleHTML,

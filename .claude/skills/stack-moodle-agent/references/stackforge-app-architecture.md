@@ -146,7 +146,11 @@ export function generateStackXML(data) {
         });
     }
 
-    xml += `    <deployedseeds></deployedseeds>\n`;
+    // ATTENTION : forme fausse — STACK n'a pas de wrapper <deployedseeds>. Vérifié
+    // contre un export réel le 2026-07-25 : ce sont des <deployedseed>N</deployedseed>
+    // répétés (un par variante), placés juste avant <tags>. Voir insertDeployedSeeds()
+    // dans js/maxima-client.js pour l'implémentation réelle.
+    seeds.forEach(seed => { xml += `    <deployedseed>${seed}</deployedseed>\n`; });
     xml += `    <qtype_options></qtype_options>\n`;
     xml += `  </question>\n</quiz>`;
 

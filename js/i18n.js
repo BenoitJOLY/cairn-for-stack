@@ -77,6 +77,9 @@ window.I18N = (function () {
     root.querySelectorAll("[data-i18n-val]").forEach(function (el) {
       el.value = t(el.getAttribute("data-i18n-val"));
     });
+    root.querySelectorAll("[data-i18n-dataph]").forEach(function (el) {
+      el.setAttribute("data-ph", t(el.getAttribute("data-i18n-dataph")));
+    });
   }
 
   /* ── Changement de langue ── */

@@ -61,21 +61,21 @@ function renderPreviewHTML_numerical(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Numérique</span>
+    <span class="hs-preview-badge">${I18N.t('type.numerical')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
-    <span class="hs-preview-note">Tolérance ${tolLabel} ± ${_hsNumToleranceValue(state.val, state.tolType, tolVal)}</span>
+    <span class="hs-preview-note">${I18N.t('common.preview_tolerance')} ${tolLabel} ± ${_hsNumToleranceValue(state.val, state.tolType, tolVal)}</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-num-field="text">${text}</div>
     <div data-num-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? '<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ Clavier virtuel Maxima inclus dans la question.</div>' : ''}</div>
     <input class="hs-num-input" type="text" disabled placeholder="Réponse de l'élève…">
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
     ${fbGlobalHTML}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (toujours affiché)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_always_title')}</div>
     ${fbGenHTML}
   </div>
 </body>
@@ -100,7 +100,7 @@ function renderPreviewHTML_numerical(state) {
       var tolLabel = state.tolType === 'absolute' ? 'Absolue (NumAbsolute)' : 'Relative (NumRelative)';
       var tolVal = state.tolVal || '0.05';
       var tolNumeric = _hsNumToleranceValue(state.val, state.tolType, tolVal);
-      autoPreview.innerHTML = '<p style="margin:0;"><strong>Valeur acceptée :</strong> <code>' + (state.val || '—') + ' ± ' + tolNumeric + '</code> <span style="color:#64748b;">(tolérance ' + tolLabel + ')</span></p>';
+      autoPreview.innerHTML = '<p style="margin:0;"><strong>Valeur acceptée :</strong> <code>' + (state.val || '—') + ' ± ' + tolNumeric + '</code> <span style="color:#64748b;">(' + I18N.t('common.preview_tolerance').toLowerCase() + ' ' + tolLabel + ')</span></p>';
     }
   }
   window.numRefreshPreview = updateNumFullPreview;

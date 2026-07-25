@@ -112,6 +112,31 @@ app.post('/api/generate', (req, res) => {
   }
 });
 
+// Relais interne vers stack-api (conteneur "maxima-stack-api-1", réseau Docker
+// partagé "maxima_default", port interne 80 — voir docker-compose.yml). Le
+// navigateur n'appelle jamais bjoly.synology.me:8443 directement : ça évite le
+// blocage CORS (origine différente à cause du port) puisque tout transite par
+// la même origine que le reste de l'appli. Liste blanche de routes pour ne pas
+// exposer stack-api comme proxy ouvert vers le réseau interne.
+const STACK_API_ROUTES = new Set(['render', 'grade', 'validate', 'diff']);
+
+app.post('/stack-api/:route', async (req, res) => {
+  if (!STACK_API_ROUTES.has(req.params.route)) {
+    return res.status(404).json({ error: 'Route stack-api inconnue.' });
+  }
+  try {
+    const upstream = await fetch(`http://maxima-stack-api-1/${req.params.route}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body || {}),
+    });
+    const text = await upstream.text();
+    res.status(upstream.status).type(upstream.headers.get('content-type') || 'application/json').send(text);
+  } catch (err) {
+    res.status(502).json({ error: 'stack-api injoignable : ' + err.message });
+  }
+});
+
 // Le reste (app statique) n'est servi qu'après authentification — voir
 // PLAN.md, chantier "Backend auto-hébergé NAS", décision "toute l'app
 // derrière le login".

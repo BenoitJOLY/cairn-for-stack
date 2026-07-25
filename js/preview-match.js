@@ -33,16 +33,16 @@ function renderPreviewHTML_match(state) {
   ${state.fbGen ? '<p>' + _hsRenderMath(state.fbGen) + '</p>' : ''}`;
 
   const bodyHTML = onlyFbGen ? `
-  <div class="hs-fb-section-title">Feedback général (solution + commentaire complémentaire)</div>
+  <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_solution_title')}</div>
   <div class="hs-clickable" data-match-field="fbgen" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin:4px 0;">${fbGenBody}</div>` : `
   <div class="hs-preview-text" data-match-field="text">${text}</div>
   <div class="hs-match-cols">
     <div class="hs-match-col">${colHTML(left, 'left')}</div>
     <div class="hs-match-col">${colHTML(right, 'right')}</div>
   </div>
-  <button class="hs-validate-btn" disabled>Répondre…</button>
+  <button class="hs-validate-btn" disabled>${I18N.t('common.preview_answer_btn')}</button>
 
-  <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+  <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
   <div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${nodeDesc}</div>
   <div style="border-left:4px solid #16a34a;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:8px;color:#166534;"><strong>Excellent !</strong> Vous avez trouvé les <em>{@nb_bons@}</em> liaisons correctes.</div>
   <div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${nodeDesc}</div>
@@ -74,9 +74,9 @@ function renderPreviewHTML_match(state) {
 </head>
 <body>
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Relier</span>
+    <span class="hs-preview-badge">${I18N.t('type.match')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
-    ${onlyFbGen ? '' : '<span class="hs-preview-note">⚠️ Widget interactif JSXGraph non rejouable ici</span>'}
+    ${onlyFbGen ? '' : `<span class="hs-preview-note">${I18N.t('common.preview_jsx_not_replayable')}</span>`}
   </div>
   ${bodyHTML}
 </body>

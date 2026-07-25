@@ -124,5 +124,28 @@ function lintExportedXML(xml) {
   var scriptRe = /<script[^>]*>([\s\S]*?)<\/script>/g, sm, sidx = 0;
   while ((sm = scriptRe.exec(xml))) { sidx++; scanForEscapedComparison(sm[1], 'un bloc <script>', sidx); }
 
+  // 8) rand() utilisé dans <questionvariables> mais <questionnote> ne référence aucune
+  //    variable via {@...@} — le tirage aléatoire de cette question reste alors
+  //    invisible dans les rapports/exports Moodle (impossible de savoir, après coup,
+  //    quelle variante un élève a eue). Heuristique volontairement globale (pas de
+  //    correspondance variable-par-variable) : dans ce codebase, rand() est très
+  //    souvent isolé dans un helper Maxima (ex: ri(a,b):=a+rand(b-a+1)) et n'apparaît
+  //    donc pas littéralement sur la ligne d'affectation de la variable qui en dépend —
+  //    tracer précisément "quelle variable vient de rand()" serait peu fiable. On
+  //    vérifie donc seulement qu'au moins un {@...@} existe dès que rand( apparaît
+  //    quelque part dans questionvariables. Cas d'usage principal : le mode Expert, où
+  //    questionvariables ET questionnote sont saisis à la main par l'auteur.
+  var qvMatch = xml.match(/<questionvariables>\s*<text>(?:<!\[CDATA\[([\s\S]*?)\]\]>|([\s\S]*?))<\/text>\s*<\/questionvariables>/);
+  var qvText = qvMatch ? (qvMatch[1] !== undefined ? qvMatch[1] : qvMatch[2]) || '' : '';
+  if (/\brand\s*\(/.test(qvText)) {
+    var qnMatch = xml.match(/<questionnote[^>]*>\s*<text>([\s\S]*?)<\/text>\s*<\/questionnote>/);
+    var qnText = qnMatch ? qnMatch[1] : '';
+    if (!/\{@[^@]+@\}/.test(qnText)) {
+      warnings.push('rand() utilisé dans <questionvariables> mais <questionnote> ne référence aucune variable '
+        + 'via {@...@} — la valeur randomisée tirée pour cette question restera invisible dans les rapports/exports '
+        + 'Moodle. Ajouter au moins un {@nom_variable@} dans le champ "Note de la question".');
+    }
+  }
+
   return warnings;
 }

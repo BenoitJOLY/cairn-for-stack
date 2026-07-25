@@ -49,7 +49,7 @@ function renderPreviewHTML_imgclick(state) {
     }
   }
   return _hsSimplePreviewHTML({
-    badge: 'Sélection sur image', badgeColor: '#047C6A', noteBg: '#f0fdfa', noteColor: '#0f766e',
+    badge: I18N.t('type.imgclick'), badgeColor: '#047C6A', noteBg: '#f0fdfa', noteColor: '#0f766e',
     prefix: 'ic', bareme: state.bareme || 1,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : cliquer sur la bonne zone de l\'image.</em></p>'),
     exampleHTML: exampleHTML,

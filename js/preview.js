@@ -148,8 +148,8 @@ function _raSimulateDraw(vrais, faux, xe) {
 // la bonne réponse + son feedback sont TOUJOURS affichés automatiquement,
 // le champ "Feedback général" du formulaire ne fait que s'y ajouter.
 function _raAutoFbGenHTML(drawnVrai, showFb) {
-  if (!drawnVrai) return '<p style="margin:0;color:#94a3b8;">(aucune bonne réponse définie)</p>';
-  return `<p style="margin:0 0 4px 0;"><strong>La bonne réponse était :</strong> ${_hsRenderMath(drawnVrai.text || '')}</p>
+  if (!drawnVrai) return '<p style="margin:0;color:#94a3b8;">' + I18N.t('common.preview_no_correct_answer') + '</p>';
+  return `<p style="margin:0 0 4px 0;"><strong>${I18N.t('common.preview_correct_answer_was')}</strong> ${_hsRenderMath(drawnVrai.text || '')}</p>
     ${showFb && drawnVrai.fb ? `<p style="margin:0;">${_hsRenderMath(drawnVrai.fb)}</p>` : ''}`;
 }
 
@@ -191,7 +191,7 @@ function renderPreviewHTML_units(state) {
   try { focusFbGen = document.querySelector('#fp-units .mpane.on') && document.querySelector('#fp-units .mpane.on').id === 'un-fb-gen'; } catch (e) {}
 
   const fbGenHTML = `<div class="hs-clickable" data-un-field="fbgen" style="border-left:4px solid #b45309;padding:10px 14px;background:#fffbeb;border-radius:4px;margin:4px 0;">
-    <p style="margin:0 0 4px 0;"><strong>Valeur attendue :</strong> <code>${state.val || '—'} ${state.unit || ''}</code></p>
+    <p style="margin:0 0 4px 0;"><strong>${I18N.t('common.preview_expected_value')}</strong> <code>${state.val || '—'} ${state.unit || ''}</code></p>
     ${state.fbGen ? `<div style="margin-top:8px;">${_hsRenderMath(state.fbGen)}</div>` : ''}
   </div>`;
 
@@ -224,7 +224,7 @@ function renderPreviewHTML_units(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Unité</span>
+    <span class="hs-preview-badge">${I18N.t('type.units')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
   </div>
   <div class="hs-main-block">
@@ -232,13 +232,13 @@ function renderPreviewHTML_units(state) {
     ${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}
     ${kbdOn ? '<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ Clavier virtuel Maxima inclus dans la question.</div>' : ''}
     <input class="hs-un-input" type="text" disabled placeholder="ex : 9.81*m/s^2">
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
     ${fbGlobalHTML}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (toujours affiché)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_always_title')}</div>
     ${fbGenHTML}
   </div>
 </body>
@@ -419,7 +419,7 @@ function renderPreviewHTML_redox(state) {
     <div data-rx-field="fbc">${wrapFb(_hsRenderMath(state.fbOk || '✅ <strong>Bonne réponse !</strong>'), true)}</div>
     <div data-rx-field="fbe">${wrapFb(_hsRenderMath(state.fbWrong || '❌ <strong>Réponse incorrecte.</strong>'), false)}</div>`;
 
-  const fbGenHTML = `<div class="hs-clickable" data-rx-field="fbgen" style="border-left:4px solid #b91c1c;padding:10px 14px;background:#fee2e2;border-radius:4px;margin:4px 0;">${state.fbGen ? _hsRenderMath(state.fbGen) : '<span style="color:#94a3b8;">(vide — la correction auto reste affichée à l\'élève)</span>'}</div>`;
+  const fbGenHTML = `<div class="hs-clickable" data-rx-field="fbgen" style="border-left:4px solid #b91c1c;padding:10px 14px;background:#fee2e2;border-radius:4px;margin:4px 0;">${state.fbGen ? _hsRenderMath(state.fbGen) : '<span style="color:#94a3b8;">' + I18N.t('common.preview_no_general_fb') + '</span>'}</div>`;
 
   let focusFbGen = false;
   try { focusFbGen = document.querySelector('#fp-redox .mpane.on') && document.querySelector('#fp-redox .mpane.on').id === 'rx-fb-gen'; } catch (e) {}
@@ -448,21 +448,21 @@ function renderPreviewHTML_redox(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Dosage Redox</span>
+    <span class="hs-preview-badge">${I18N.t('type.redox')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
-    <span class="hs-preview-note">⚠️ Widget interactif JSXGraph non rejouable ici (curseur figé au départ)</span>
+    <span class="hs-preview-note">${I18N.t('common.preview_jsx_not_replayable_cursor')}</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-rx-field="text">${text}</div>
     ${svg}
-    <div class="hs-rx-target"><strong>Réponse attendue :</strong> ${targetLabel}</div>
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <div class="hs-rx-target"><strong>${I18N.t('common.preview_expected_answer')}</strong> ${targetLabel}</div>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
     ${fbHTML}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (solution + commentaire complémentaire)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_solution_title')}</div>
     ${fbGenHTML}
   </div>
 </body>
@@ -539,7 +539,7 @@ function _hsSimplePreviewHTML(cfg) {
   }
   const fbGenBody = cfg.fbGenAuto
     ? cfg.fbGenAuto + (cfg.fbGen ? `<p>${_hsRenderMath(cfg.fbGen)}</p>` : '')
-    : (cfg.fbGen ? _hsRenderMath(cfg.fbGen) : '<span style="color:#94a3b8;">(vide — la correction auto reste affichée à l\'élève)</span>');
+    : (cfg.fbGen ? _hsRenderMath(cfg.fbGen) : '<span style="color:#94a3b8;">' + I18N.t('common.preview_no_general_fb') + '</span>');
   const fbGenHTML = `<div class="hs-clickable" data-${cfg.prefix}-field="fbgen" style="border-left:4px solid ${cfg.badgeColor};padding:10px 14px;background:${cfg.noteBg};border-radius:4px;margin:4px 0;">${fbGenBody}</div>`;
   const fbOkDescHTML = cfg.fbOkDesc ? `<div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${_hsRenderMath(cfg.fbOkDesc)}</div>` : '';
   const fbWrongDescHTML = cfg.fbWrongDesc ? `<div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${_hsRenderMath(cfg.fbWrongDesc)}</div>` : '';
@@ -548,7 +548,7 @@ function _hsSimplePreviewHTML(cfg) {
   // gabarit standard à 2 boîtes (Ok/Faux). On les liste ici pour que rien ne reste
   // caché à l'enseignant dans l'aperçu.
   const extraNodesHTML = (cfg.extraFeedbackNodes && cfg.extraFeedbackNodes.length) ? `
-    <div style="font-size:.75rem;color:#64748b;margin:10px 0 4px;font-weight:600;">${cfg.extraFeedbackNodesTitle || "Autres diagnostics possibles selon l'erreur détectée :"}</div>
+    <div style="font-size:.75rem;color:#64748b;margin:10px 0 4px;font-weight:600;">${cfg.extraFeedbackNodesTitle || I18N.t('common.preview_other_diagnostics_title')}</div>
     ${cfg.extraFeedbackNodes.map(n => `<div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${_hsRenderMath(n.desc || '')}</div>${_hsRenderMath(n.fb || '')}`).join('')}` : '';
   const okWrongHTML = cfg.hideOkWrongBoxes ? '' : `
     <div data-${cfg.prefix}-field="fbc">${fbOkDescHTML}${wrapFb(_hsRenderMath(cfg.fbOk || '✅ <strong>Bonne réponse !</strong>'), true)}</div>
@@ -558,13 +558,13 @@ function _hsSimplePreviewHTML(cfg) {
     ${extraNodesHTML}
     ${cfg.hideFbGen ? '' : fbGenHTML}`;
   const bodyHTML = cfg.onlyFbGen ? `
-  <div class="hs-fb-section-title">Feedback général (solution + commentaire complémentaire)</div>
+  <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_solution_title')}</div>
   ${fbGenHTML}` : `
   <div class="hs-preview-text" data-${cfg.prefix}-field="text">${cfg.text}</div>
-  ${cfg.hideExampleBox ? '' : `<div class="hs-example-box">${cfg.exampleLabel === '' ? '' : `<strong>${cfg.exampleLabel || 'Exemple (génération aléatoire Maxima — change à chaque affichage) :'}</strong><br>`}${cfg.exampleHTML || '<em>(aperçu indisponible)</em>'}</div>`}
-  <button class="hs-validate-btn" disabled>Répondre…</button>
+  ${cfg.hideExampleBox ? '' : `<div class="hs-example-box">${cfg.exampleLabel === '' ? '' : `<strong>${cfg.exampleLabel || I18N.t('common.preview_example_label_default')}</strong><br>`}${cfg.exampleHTML || '<em>' + I18N.t('common.preview_unavailable') + '</em>'}</div>`}
+  <button class="hs-validate-btn" disabled>${I18N.t('common.preview_answer_btn')}</button>
 
-  <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+  <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
   ${fbHTML}`;
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -678,7 +678,7 @@ function renderPreviewHTML_physique(state) {
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
   var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
   return _hsSimplePreviewHTML({
-    badge: 'Physique', badgeColor: '#7f1d1d', noteBg: '#fff1f2', noteColor: '#7f1d1d',
+    badge: I18N.t('type.physique'), badgeColor: '#7f1d1d', noteBg: '#fff1f2', noteColor: '#7f1d1d',
     prefix: 'phy', bareme: state.bareme || 1,
     text: _hsRenderMath(scenarioHTML),
     hideExampleBox: true,
@@ -835,7 +835,7 @@ function renderPreviewHTML_acideBase(state) {
   exampleHTML = '<div style="background:#fef9c3;border:1px solid #eab308;color:#713f12;font-size:.78rem;padding:6px 10px;border-radius:6px;margin-bottom:10px;">⚠️ Aperçu — la simulation ci-dessous est visuelle uniquement : les interactions (clics, glisser, saisie) ne sont pas prises en compte dans le calcul du score ici. La correction réelle se fait dans Moodle.</div>' + exampleHTML;
 
   return _hsSimplePreviewHTML({
-    badge: 'Acide-base', badgeColor: '#16a34a', noteBg: '#d1fae5', noteColor: '#065f46',
+    badge: I18N.t('type.acide-base'), badgeColor: '#16a34a', noteBg: '#d1fae5', noteColor: '#065f46',
     prefix: 'ab', bareme: state.bareme || 1,
     text: textBefore,
     exampleLabel: '',
@@ -853,7 +853,7 @@ function renderPreviewHTML_circuit(state) {
   var model = state.cirModel;
   if (!model || !model.state) {
     return _hsSimplePreviewHTML({
-      badge: 'Circuit \xe9lectrique', badgeColor: '#c2410c', noteBg: '#fff7ed', noteColor: '#9a3412',
+      badge: I18N.t('type.circuit'), badgeColor: '#c2410c', noteBg: '#fff7ed', noteColor: '#9a3412',
       prefix: 'cir', bareme: state.bareme || 1,
       text: '<p><em style="color:#6b7280;">Construisez un circuit mod\xe8le dans l\'atelier ci-contre pour voir l\'aper\xe7u \xe9l\xe8ve.</em></p>',
       hideExampleBox: true, hideOkWrongBoxes: true,
@@ -878,7 +878,7 @@ function renderPreviewHTML_rvbcmj(state) {
     ? '<p>Voici l\'image originale sans filtre pour vérifier&nbsp;:</p><p><img src="' + rawDataEl.value + '" alt="scène originale" style="max-width:600px;border-radius:6px;"></p>'
     : '';
   return _hsSimplePreviewHTML({
-    badge: 'RVB / CMJN', badgeColor: '#7E22CE', noteBg: '#faf5ff', noteColor: '#581c87',
+    badge: I18N.t('type.rvbcmj'), badgeColor: '#7E22CE', noteBg: '#faf5ff', noteColor: '#581c87',
     prefix: 'rvb', bareme: state.bareme || 1,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : identifier la couleur d\'un objet à travers des filtres.</em></p>'),
     exampleHTML: _hsRenderMath(exampleHTML),
@@ -890,7 +890,7 @@ window.rvbRefreshPreview = _hsWireSimplePreview('rvbcmj', 'rvb', 'rvb-preview-co
 
 function renderPreviewHTML_optique(state) {
   return _hsSimplePreviewHTML({
-    badge: 'Optique géométrique', badgeColor: '#0284c7', noteBg: '#f0f9ff', noteColor: '#0c4a6e',
+    badge: I18N.t('type.optique'), badgeColor: '#0284c7', noteBg: '#f0f9ff', noteColor: '#0c4a6e',
     prefix: 'opt', bareme: state.bareme || 1,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : construction géométrique (lentille, miroir ou instrument optique).</em></p>'),
     exampleHTML: '<p style="color:#94a3b8;font-style:italic;">Le schéma interactif JSXGraph n\'est visible que dans l\'export Moodle final.</p>',
@@ -902,7 +902,7 @@ window.optRefreshPreview = _hsWireSimplePreview('optique', 'opt', 'opt-preview-c
 function renderPreviewHTML_diffraction(state) {
   var liveEl = document.getElementById('diff-preview');
   return _hsSimplePreviewHTML({
-    badge: 'Interférences-Diffraction', badgeColor: '#4338ca', noteBg: '#f5f3ff', noteColor: '#4c1d95',
+    badge: I18N.t('type.diffraction'), badgeColor: '#4338ca', noteBg: '#f5f3ff', noteColor: '#4c1d95',
     prefix: 'diff', bareme: state.bareme || 1,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : diffraction ou interférences lumineuses.</em></p>'),
     exampleHTML: _hsRenderMath(liveEl ? liveEl.innerHTML : ''),
@@ -1016,7 +1016,7 @@ function renderPreviewHTML_oscilloscope(state) {
   }).filter(function(n) { return n.fb; });
 
   return _hsSimplePreviewHTML({
-    badge: 'Oscilloscope — ' + live.modeLabel, badgeColor: '#0c4a6e', noteBg: '#eff6ff', noteColor: '#1e3a5f',
+    badge: I18N.t('type.oscilloscope') + ' — ' + live.modeLabel, badgeColor: '#0c4a6e', noteBg: '#eff6ff', noteColor: '#1e3a5f',
     prefix: 'osc', bareme: state.bareme || 1,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : mesure sur oscilloscope interactif (curseurs ▪X/▪Y).</em></p>'),
     exampleLabel: '',
@@ -1044,7 +1044,7 @@ function renderPreviewHTML_chemical(state) {
   // reconstruire séparément, pour ne jamais diverger de l'export réel.
   var fbGenAutoHTML = realParts.generalFeedback ? _hsRenderMath(realParts.generalFeedback) : '';
   return _hsSimplePreviewHTML({
-    badge: 'Équation Chimique', badgeColor: '#2F855E', noteBg: '#f0fdf4', noteColor: '#166534',
+    badge: I18N.t('type.chemical'), badgeColor: '#2F855E', noteBg: '#f0fdf4', noteColor: '#166534',
     prefix: 'chem', bareme: state.bareme || 2,
     text: _hsRenderMath(state.text || '<p style="color:#b91c1c;"><em>⚠️ Aucun énoncé saisi — l\'élève ne verra aucune consigne au-dessus de l\'éditeur d\'équation. Rédigez l\'énoncé (ex. "Écrire l\'équation de combustion du méthane").</em></p>'),
     exampleLabel: 'Ce que voit l\'élève (zone de saisie vide, il compose sa propre équation) :',
@@ -1136,7 +1136,7 @@ function renderPreviewHTML_topo(state) {
     + '<div style="background:#fcfcfc;border:1px solid #eee;border-radius:5px;padding:12px;min-height:80px;"></div>'
     + '</div>';
   return _hsSimplePreviewHTML({
-    badge: 'Chimie Topologique', badgeColor: '#8f2b33', noteBg: '#fef2f2', noteColor: '#8f2b33',
+    badge: I18N.t('type.chemical_topo'), badgeColor: '#8f2b33', noteBg: '#fef2f2', noteColor: '#8f2b33',
     prefix: 'topo', bareme: state.bareme || 2,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : compléter la réaction (structures moléculaires).</em></p>') + widgetHTML,
     hideExampleBox: true,
@@ -1172,7 +1172,7 @@ function renderPreviewHTML_nuclear(state) {
     ['e⁺', '#d35400'], ['e⁻', '#8e44ad'], ['n', '#f39c12'], ['p', '#e74c3c'], ['ν', '#7f8c8d']
   ].map(function(c) { return '<span style="background:' + c[1] + ';color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">' + c[0] + '</span>'; }).join('');
   return _hsSimplePreviewHTML({
-    badge: 'Réaction Nucléaire', badgeColor: '#5b21b6', noteBg: '#f5f3ff', noteColor: '#5b21b6',
+    badge: I18N.t('type.nuclear'), badgeColor: '#5b21b6', noteBg: '#f5f3ff', noteColor: '#5b21b6',
     prefix: 'nuc', bareme: state.bareme || 2,
     text: _hsRenderMath(state.text || '<p style="color:#b91c1c;"><em>⚠️ Aucun énoncé saisi — l\'élève ne verra aucune consigne au-dessus de l\'éditeur de réaction. Rédigez l\'énoncé (ex. "Compléter la réaction de fission de l\'uranium 235").</em></p>'),
     exampleLabel: 'Ce que voit l\'élève (zone de saisie vide, il compose sa propre réaction) :',
@@ -1197,7 +1197,7 @@ function renderPreviewHTML_doi(state) {
   var realParts = {};
   try { realParts = (typeof genDOICore === 'function' && typeof _doiBuildParams === 'function') ? genDOICore(1, _doiBuildParams()) : {}; } catch (e) { realParts = {}; }
   return _hsSimplePreviewHTML({
-    badge: 'Diagramme Objet-Interaction', badgeColor: '#78716c', noteBg: '#fafaf9', noteColor: '#57534e',
+    badge: I18N.t('badge.doi'), badgeColor: '#78716c', noteBg: '#fafaf9', noteColor: '#57534e',
     prefix: 'doi', bareme: state.bareme || 2,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : placer les objets et interactions dans les zones bleues.</em></p>'),
     exampleHTML: imgHTML,
@@ -1227,7 +1227,7 @@ function renderPreviewHTML_apn(state) {
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
   var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
   return _hsSimplePreviewHTML({
-    badge: 'Appareil photo', badgeColor: '#1e3a8a', noteBg: '#eff6ff', noteColor: '#1e3a8a',
+    badge: I18N.t('type.apn'), badgeColor: '#1e3a8a', noteBg: '#eff6ff', noteColor: '#1e3a8a',
     prefix: 'apn', bareme: state.bareme || 1,
     text: _hsRenderMath(scenarioHTML),
     hideExampleBox: true,

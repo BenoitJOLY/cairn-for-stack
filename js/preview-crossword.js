@@ -77,7 +77,7 @@ function renderPreviewHTML_cw(state) {
   }
 
   return _hsSimplePreviewHTML({
-    badge: 'Mots Crois\xe9s', badgeColor: '#c2410c', noteBg: '#fff7ed', noteColor: '#9a3412',
+    badge: I18N.t('type.crossword'), badgeColor: '#c2410c', noteBg: '#fff7ed', noteColor: '#9a3412',
     prefix: 'cw', bareme: state.bareme || 10,
     text: gridHTML + defsHTML,
     hideExampleBox: true,

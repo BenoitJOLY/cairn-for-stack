@@ -410,7 +410,7 @@ function buildXML() {
 
 var _lastXML = null, _lastQName = null;
 
-function confirmAndPreview() {
+async function confirmAndPreview() {
   var orderedQ = getQuestionsInDOMOrder();
   if (!orderedQ.length) { toast(I18N.t('msg.aucune_question_a_previsualiser') || 'Aucune question à prévisualiser.'); return; }
 
@@ -436,6 +436,40 @@ function confirmAndPreview() {
         + '\n\nExporter quand même ?'
       );
       if (!proceed) return;
+    }
+  }
+
+  if (typeof maximaConfigured === 'function' && maximaConfigured() && typeof generateDeployedSeeds === 'function') {
+    var seedCountInput = document.getElementById('tm-seedcount-input');
+    var seedCount = seedCountInput ? (parseInt(seedCountInput.value, 10) || 0) : 0;
+    if (seedCount > 0) {
+      var progWrap = document.getElementById('tm-seed-progress-wrap');
+      var progBar = document.getElementById('tm-seed-progress-bar');
+      var progText = document.getElementById('tm-seed-progress-text');
+      if (progWrap) progWrap.style.display = '';
+      if (progBar) progBar.style.width = '0%';
+      if (progText) progText.textContent = 'Génération des variantes STACK…';
+      try {
+        var seedRes = await generateDeployedSeeds(built.xml, seedCount, {
+          maxConsecutiveFailures: 10,
+          onProgress: function(info) {
+            var pct = Math.round(info.found / info.target * 100);
+            if (progBar) progBar.style.width = pct + '%';
+            if (progText) progText.textContent = info.found + '/' + info.target + ' variante(s) validée(s) (essai ' + info.tried + ')';
+          }
+        });
+        built.xml = insertDeployedSeeds(built.xml, seedRes.seeds);
+        _lastXML = built.xml;
+        if (seedRes.seeds.length < seedCount) {
+          toast('⚠️ ' + seedRes.seeds.length + '/' + seedCount + ' variante(s) STACK valide(s) trouvée(s)'
+            + (seedRes.aborted ? ' (arrêt après 10 échecs consécutifs).' : '.'));
+        }
+      } catch(e) {
+        console.error('[deployedseed] génération échouée', e);
+        toast('⚠️ Génération des variantes STACK impossible (' + e.message + ') — export sans deployedseed.');
+      } finally {
+        if (progWrap) progWrap.style.display = 'none';
+      }
     }
   }
 
@@ -623,6 +657,16 @@ function getTagList() {
   });
 }
 
+var TM_SEEDCOUNT_MIN = 5;
+
+function tmSeedCountInvalid() {
+  if (!(typeof maximaConfigured === 'function' && maximaConfigured())) return false;
+  var input = document.getElementById('tm-seedcount-input');
+  if (!input) return false;
+  var v = parseInt(input.value, 10);
+  return isNaN(v) || v < TM_SEEDCOUNT_MIN;
+}
+
 function updateTagRecap() {
   var tags = getTagList();
   var recap = document.getElementById('tm-recap');
@@ -631,13 +675,16 @@ function updateTagRecap() {
       ? '<em style="color:#92400e;font-size:.82rem;">Aucun tag — question non mutualisable</em>'
       : tags.map(function(t){ return '<span class="tm-tag">' + t.clean + '</span>'; }).join('');
   }
-  var disabled = !_tmNoTag && tags.length === 0;
+  var seedInvalid = tmSeedCountInvalid();
+  var seedErr = document.getElementById('tm-seedcount-error');
+  if (seedErr) seedErr.style.display = seedInvalid ? '' : 'none';
+  var disabled = (!_tmNoTag && tags.length === 0) || seedInvalid;
   var btn = document.getElementById('tm-confirm-btn');
   if (btn) btn.disabled = disabled;
   var depositBtn = document.getElementById('tm-deposit-btn');
   if (depositBtn) depositBtn.disabled = disabled;
   var maximaBtn = document.getElementById('tm-maxima-btn');
-  if (maximaBtn) maximaBtn.disabled = disabled;
+  if (maximaBtn) maximaBtn.disabled = !_tmNoTag && tags.length === 0;
 }
 
 // ── DÉPÔT POUR VALIDATION (GitHub Contents API, sans backend) ────

@@ -149,23 +149,23 @@ function renderPreviewHTML_dropdown(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Menu déroulant</span>
+    <span class="hs-preview-badge">${I18N.t('type.dropdown')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
-    <span class="hs-preview-note">📋 Choix dans une liste</span>
+    <span class="hs-preview-note">${I18N.t('common.preview_choice_list')}</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-dd-field="text">${text}</div>
     <details class="hs-dd-select">
-      <summary>-- Choisir --</summary>
+      <summary>${I18N.t('common.preview_choose_placeholder')}</summary>
       <div class="hs-dd-options">${selectOptionsHTML}</div>
     </details>
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
     ${fbItemsHTML}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (toujours affiché)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_always_title')}</div>
     ${fbGenHTML}
   </div>
 </body>

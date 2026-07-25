@@ -1308,15 +1308,18 @@ html[data-theme="dark"] .jxg-modal-box{background:#1e293b;}
 .btn-jxg-gen:hover{filter:brightness(1.12);}
 .btn-jxg-copy{padding:6px 14px;background:#f1f5f9;border:1.5px solid var(--border);border-radius:7px;font-size:.8rem;font-weight:600;color:var(--navy);cursor:pointer;align-self:flex-start;margin-top:4px;}
 .btn-jxg-copy:hover{background:#e2e8f0;}
+.btn-jxg-preview{padding:6px 14px;background:#f1f5f9;border:1.5px solid var(--border);border-radius:7px;font-size:.8rem;font-weight:600;color:var(--navy);cursor:pointer;align-self:flex-start;margin-top:4px;}
+.btn-jxg-preview:hover{background:#e2e8f0;}
+.jxg-live-preview{border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:#fff;min-height:60px;}
 .jxg-hr{border:none;border-top:1px solid var(--border);margin:4px 0;}
 .jxg-footer{display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding-top:6px;}
 .btn-jxg-insert{padding:10px 22px;background:#15803d;color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;}
 .btn-jxg-insert:hover{background:#166534;}
 .jxg-btn-close{padding:10px 18px;background:#f1f5f9;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;cursor:pointer;color:var(--navy);}
-/* Bloc JSXGraph inséré dans l'éditeur riche */
-.jxg-inserted-block{border:2px solid #6366f1;border-radius:8px;background:#eef2ff;margin:8px 0;padding:6px 10px;position:relative;}
-.jxg-block-label{display:block;font-size:.7rem;font-weight:700;color:#4338ca;margin-bottom:4px;letter-spacing:.04em;}
-.jxg-block-pre{margin:0;font-size:.72rem;white-space:pre-wrap;word-break:break-all;color:#1e293b;background:none;font-family:'Courier New',monospace;max-height:220px;overflow-y:auto;}
+/* Bloc JSXGraph inséré dans l'éditeur riche (le code lui-même vit dans un
+   <script type="text/plain"> invisible, cf. js/jsxgraph-assist.js) */
+.jxg-inserted-wrap{border:2px solid #6366f1;border-radius:8px;background:#eef2ff;margin:8px 0;padding:6px 10px;position:relative;}
+.jxg-block-badge{display:block;font-size:.7rem;font-weight:700;color:#4338ca;letter-spacing:.04em;}
 /* Bouton JSXGraph dans la toolbar */
 .rtb-jxg{background:#0369a1;color:#fff !important;border-color:#0369a1 !important;}
 .rtb-jxg:hover{background:#075985 !important;border-color:#075985 !important;}
@@ -1449,10 +1452,11 @@ html[data-theme="dark"] .jd-assign-cb{color:#94a3b8;}
 html[data-theme="dark"] .jd-assign-cb:hover{background:#2d1a0e;}
 html[data-theme="dark"] .jxg-pool-chip{background:#312e81;border-color:#6366f1;color:#a5b4fc;}
 html[data-theme="dark"] .jxg-pool-chip:hover{background:#6366f1;color:#fff;}
-html[data-theme="dark"] .jxg-inserted-block{background:#1e1b4b;border-color:#6366f1;}
-html[data-theme="dark"] .jxg-block-pre{color:#e2e8f0;}
+html[data-theme="dark"] .jxg-inserted-wrap{background:#1e1b4b;border-color:#6366f1;}
 html[data-theme="dark"] .jxg-dim-input{background:#0f172a;border-color:#334155;color:#e2e8f0;}
 html[data-theme="dark"] .btn-jxg-copy{background:#1e293b;border-color:#334155;color:#e2e8f0;}
+html[data-theme="dark"] .btn-jxg-preview{background:#1e293b;border-color:#334155;color:#e2e8f0;}
+html[data-theme="dark"] .jxg-live-preview{background:#0f172a;border-color:#334155;}
 html[data-theme="dark"] .jxg-btn-close{background:#1e293b;border-color:#334155;color:#e2e8f0;}
 
 /* Config repère JSXGraph */

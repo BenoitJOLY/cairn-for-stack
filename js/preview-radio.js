@@ -110,20 +110,20 @@ function renderPreviewHTML_radio(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Bouton radio</span>
+    <span class="hs-preview-badge">${I18N.t('type.radio')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
-    <span class="hs-preview-note">🔘 Choix unique</span>
+    <span class="hs-preview-note">${I18N.t('common.preview_choice_unique')}</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-ra-field="text">${text}</div>
     <div class="hs-cb-list">${propsHTML}</div>
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
     ${fbItemsHTML}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (toujours affiché)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_always_title')}</div>
     ${fbGenHTML}
   </div>
 </body>

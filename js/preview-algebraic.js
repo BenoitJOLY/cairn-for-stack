@@ -96,7 +96,7 @@ function renderPreviewHTML_algebraic(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Algébrique</span>
+    <span class="hs-preview-badge">${I18N.t('type.algebraic')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
     <span class="hs-preview-note">${modeLabel}</span>
   </div>
@@ -105,14 +105,14 @@ function renderPreviewHTML_algebraic(state) {
     ${exprDisplay ? `<div class="hs-preview-text" data-alg-field="expr-display" style="font-weight:600;">${exprDisplayHTML}</div>` : ''}
     <div data-alg-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? '<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ Clavier virtuel Maxima inclus dans la question.</div>' : ''}</div>
     <input class="hs-alg-input" type="text" disabled placeholder="Réponse de l'élève…">
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
     ${fbGlobalHTML}
-    ${fbDetailHTML ? `<div class="hs-fb-section-title">Feedbacks détaillés (cas partiels)</div>${fbDetailHTML}` : ''}
+    ${fbDetailHTML ? `<div class="hs-fb-section-title">${I18N.t('common.preview_fb_detailed_title')}</div>${fbDetailHTML}` : ''}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (toujours affiché)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_always_title')}</div>
     ${fbGenHTML}
   </div>
 </body>

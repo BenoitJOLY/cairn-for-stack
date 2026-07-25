@@ -17,7 +17,7 @@ function renderPreviewHTML_statistiques(state) {
   var prtBoxes = _hsPrtBoxes(realParts);
   var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement ci-dessus.</em></p>';
   return _hsSimplePreviewHTML({
-    badge: 'Statistiques', badgeColor: '#0f766e', noteBg: '#f0fdfa', noteColor: '#0f766e',
+    badge: I18N.t('type.statistiques'), badgeColor: '#0f766e', noteBg: '#f0fdfa', noteColor: '#0f766e',
     prefix: 'stat', bareme: state.bareme || 1,
     text: _hsRenderMath(scenarioHTML),
     hideExampleBox: true,

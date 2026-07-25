@@ -40,7 +40,7 @@ function renderPreviewHTML_jxgdrop(state) {
   var node0 = realParts && realParts.prt && realParts.prt.nodes && realParts.prt.nodes[0];
 
   return _hsSimplePreviewHTML({
-    badge: 'Glisser-Déposer JSXGraph', badgeColor: '#d97706', noteBg: '#fffbeb', noteColor: '#92400e',
+    badge: I18N.t('type.jxgdrop') + ' JSXGraph', badgeColor: '#d97706', noteBg: '#fffbeb', noteColor: '#92400e',
     prefix: 'jd', bareme: state.bareme || 1,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : glisser les propositions vers les bonnes zones.</em></p>'),
     exampleLabel: '',

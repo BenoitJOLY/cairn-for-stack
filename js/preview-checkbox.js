@@ -62,7 +62,7 @@ function renderPreviewHTML_checkbox(state) {
 
   const autoFbGenList = _cbAutoFbGenListHTML(drawnProps, !!state.fbGenShowFb);
   const fbGenHTML = `<div class="hs-clickable" data-cb-field="fbgen" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin:4px 0;">
-    <p style="margin:0 0 4px 0;"><strong>Les bonnes réponses étaient :</strong></p>
+    <p style="margin:0 0 4px 0;"><strong>${I18N.t('tpl.checkbox_bonnes_reponses')}</strong></p>
     <ul style="margin:4px 0 0 0;padding-left:1.4em;">${autoFbGenList}</ul>
     ${state.fbGen ? `<div style="margin-top:8px;">${_hsRenderMath(state.fbGen)}</div>` : ''}
   </div>`;
@@ -163,22 +163,22 @@ function renderPreviewHTML_checkbox(state) {
 </head>
 <body class="${focusFbGen ? 'hs-focus-fbgen' : ''}">
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Cases à cocher</span>
+    <span class="hs-preview-badge">${I18N.t('type.checkbox')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
-    <span class="hs-preview-note">☑️ Plusieurs choix possibles</span>
+    <span class="hs-preview-note">${I18N.t('tpl.checkbox_plusieurs_choix')}</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-cb-field="text">${text}</div>
     <div class="hs-cb-list">${propsHTML}</div>
-    <button class="hs-validate-btn" disabled>Valider</button>
+    <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-    <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
     ${fbItemsHTML}
     ${fbOubliHTML}
     ${fbGlobalHTML}
   </div>
   <div class="hs-fbgen-block">
-    <div class="hs-fb-section-title">Feedback général (toujours affiché)</div>
+    <div class="hs-fb-section-title">${I18N.t('common.preview_fbgen_always_title')}</div>
     ${fbGenHTML}
   </div>
 </body>
@@ -213,7 +213,7 @@ function renderPreviewHTML_checkbox(state) {
       var allProps = state.props || [];
       var drawnProps = _cbSimulateDraw(allProps, state.xe, state.xb, state.mXb);
       var autoList = _cbAutoFbGenListHTML(drawnProps, !!state.fbGenShowFb);
-      autoPreview.innerHTML = '<p style="margin:0 0 4px 0;"><strong>Les bonnes réponses étaient :</strong></p><ul style="margin:4px 0 0 0;padding-left:1.4em;">' + autoList + '</ul>';
+      autoPreview.innerHTML = '<p style="margin:0 0 4px 0;"><strong>' + I18N.t('tpl.checkbox_bonnes_reponses') + '</strong></p><ul style="margin:4px 0 0 0;padding-left:1.4em;">' + autoList + '</ul>';
     }
   }
   window.cbRefreshPreview = updateCheckboxPreview;

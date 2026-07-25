@@ -13,7 +13,7 @@ function openConfigPanel(qid, type) {
     var color = COLORS[type] || '#64748b';
     var ico = TYPE_ICON_MAP ? (TYPE_ICON_MAP[type] || type) : type;
     titleEl.innerHTML = '<svg class="hs-ico" style="color:' + color + '" aria-hidden="true"><use href="#ico-type-' + ico + '"></use></svg> '
-      + 'Q' + qid + ' &middot; ' + (LABELS_PLAIN[type] || type).replace(/^[^\s]+\s/, '');
+      + 'Q' + qid + ' &middot; ' + dataLabel(type).replace(/^[^\s]+\s/, '');
   }
 
   // Hide all form panels, show the correct one

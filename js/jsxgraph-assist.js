@@ -7,6 +7,8 @@ function openJsxGraphModal() {
   document.getElementById('jxg-desc').value = '';
   document.getElementById('jxg-prompt-out').value = '';
   document.getElementById('jxg-code-in').value = '';
+  var prev = document.getElementById('jxg-live-preview');
+  if (prev) { prev.style.display = 'none'; prev.innerHTML = ''; }
   document.getElementById('jxg-mode-display').checked = true;
   document.getElementById('jxg-w').value = '600';
   document.getElementById('jxg-h').value = '400';
@@ -115,20 +117,24 @@ function jxgGeneratePrompt() {
 
   var varBlock = names.length
     ? names.map(function(n) {
-        return '  ' + n + '  →  injecter avec {#' + n + '#} (valeur brute)';
+        return '  ' + n + '  →  var ' + n + ' = <valeur d\'exemple>; // POOLVAR: ' + n;
       }).join('\n')
     : '  (aucune variable définie dans le pool pour ce questionnaire)';
 
   var varInit = names.slice(0, 6).map(function(n) {
-    return 'var ' + n + ' = {#' + n + '#};';
+    return 'var ' + n + ' = 1; // POOLVAR: ' + n;
   }).join('\n');
 
   var modeRule = isInteractive
-    ? '5. Ce graphique est INTERACTIF : utiliser l\'API stack_jxg.bind_point pour lier\n'
-    + '   les déplacements de points à des variables de réponse. Exemple :\n'
-    + '   stack_jxg.bind_point(board, ans1, point);'
-    : '5. Ce graphique est en AFFICHAGE SEUL (non interactif) :\n'
-    + '   tous les objets JSXGraph DOIVENT avoir {fixed:true, highlight:false}.';
+    ? '5. Ce graphique est INTERACTIF : les points que l\'élève doit pouvoir déplacer\n'
+    + '   sont des points JSXGraph normaux, déplaçables (PAS fixed:true). Juste après\n'
+    + '   la ligne board.create(\'point\', …) de CHAQUE point interactif, ajoute un\n'
+    + '   commentaire // BIND: nomVariable (ex: // BIND: ans1) indiquant à quelle\n'
+    + '   variable de réponse STACK il correspond — je ferai le branchement\n'
+    + '   stack_jxg.bind_point moi-même après conversion.'
+    : '5. Ce graphique est en AFFICHAGE SEUL (non interactif) : tous les objets\n'
+    + '   JSXGraph DOIVENT avoir {fixed:true, highlight:false, visible:true}\n'
+    + '   (les trois — STACK a besoin de visible:true en plus de fixed:true).';
 
   var optSummary = [
     optAxis  ? 'axes visibles' : 'pas d\'axes',
@@ -170,34 +176,39 @@ function jxgGeneratePrompt() {
     : '';
 
   var prompt =
-'Tu génères un bloc JSXGraph pour une question STACK/Moodle.\n'
+'Tu génères un graphique JSXGraph CLASSIQUE et AUTONOME (testable seul dans un\n'
++ 'navigateur). Ne te préoccupe PAS de STACK/Moodle : je convertis moi-même ton\n'
++ 'code ensuite (syntaxe [[jsxgraph]], divid, {#…#}) — inutile de la connaître.\n'
 + '\n'
-+ '━━ RÈGLES STRICTES (structure STACK — PAS du JSXGraph classique) ━━\n'
-+ '1. Délimiteurs STACK uniquement — à l\'intérieur de <questiontext> :\n'
-+ '   [[jsxgraph width="' + w + '" height="' + h + '"]] ... [[/jsxgraph]]\n'
-+ '   → INTERDITS : <div id="box">, <script src="jsxgraphcore.js">.\n'
-+ '     STACK charge lui-même la bibliothèque et fournit le conteneur.\n'
-+ '2. Premier argument de initBoard = la VARIABLE divid (fournie par STACK) :\n'
-+ '   ✓ JXG.JSXGraph.initBoard(divid, {…})    ← CORRECT\n'
-+ '   ✗ JXG.JSXGraph.initBoard(\'box\', {…})   ← INTERDIT (id en dur)\n'
-+ '3. Injection des variables Maxima dans le JS avec {# #} (DIÈSE), jamais {@ @} :\n'
-+ '   - Nombre ou liste Maxima  →  var a = {#a#};\n'
-+ '     (une liste Maxima [x,y,z] devient un tableau JS [x,y,z])\n'
-+ '   - Chaîne de caractères    →  var c = \'{#couleur#}\';\n'
-+ '   {@ @} sert à afficher du LaTeX dans le texte — ne l\'utilise PAS en JS.\n'
-+ '4. Encadre le dessin de board.suspendUpdate() / board.unsuspendUpdate().\n'
++ '━━ RÈGLES ━━\n'
++ '1. Structure complète et autonome :\n'
++ '   <div id="box" style="width:' + w + ';height:' + h + ';"></div>\n'
++ '   <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>\n'
++ '   <script>\n'
++ '   var board = JXG.JSXGraph.initBoard(\'box\', {…});\n'
++ '   … ton code …\n'
++ '   </script>\n'
++ '2. Nomme la variable du board EXACTEMENT "board" et le conteneur EXACTEMENT\n'
++ '   "box" (comme dans le squelette ci-dessous).\n'
++ '3. Si tu utilises une des variables listées plus bas, déclare-la avec une\n'
++ '   valeur d\'exemple ET le commentaire // POOLVAR: nom sur la MÊME ligne\n'
++ '   (ex: var a = 3; // POOLVAR: a) — c\'est ce qui me permet de la relier\n'
++ '   automatiquement après conversion.\n'
++ '4. Encadre le tracé de board.suspendUpdate() / board.unsuspendUpdate().\n'
 + modeRule + '\n'
 + '\n'
 + '━━ CONFIGURATION DU REPÈRE (à respecter exactement) ━━\n'
 + 'Fenêtre : x de ' + xmin + ' à ' + xmax + ', y de ' + ymin + ' à ' + ymax + '\n'
 + 'Options : ' + optSummary + '\n'
 + '\n'
-+ '━━ VARIABLES MAXIMA DISPONIBLES ━━\n'
++ '━━ VARIABLES DISPONIBLES ━━\n'
 + varBlock + '\n'
 + '\n'
 + '━━ SQUELETTE DE RÉFÉRENCE (utiliser cette config exacte pour initBoard) ━━\n'
-+ '[[jsxgraph width="' + w + '" height="' + h + '"]]\n'
-+ 'var board = JXG.JSXGraph.initBoard(divid, {\n'
++ '<div id="box" style="width:' + w + ';height:' + h + ';"></div>\n'
++ '<script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>\n'
++ '<script>\n'
++ 'var board = JXG.JSXGraph.initBoard(\'box\', {\n'
 + boardConfig + '\n'
 + '});\n'
 + 'board.suspendUpdate();\n'
@@ -205,13 +216,15 @@ function jxgGeneratePrompt() {
 + '/* --- tracé ici --- */\n'
 + (reticuleSnippet ? reticuleSnippet : '')
 + 'board.unsuspendUpdate();\n'
-+ '[[/jsxgraph]]\n'
++ '</script>\n'
 + '\n'
 + '━━ DEMANDE ━━\n'
 + (desc || '(aucune description fournie)') + '\n'
 + '\n'
-+ 'Génère UNIQUEMENT le bloc [[jsxgraph]]…[[/jsxgraph]] complet, prêt à coller dans STACK.\n'
-+ 'Pas de markdown, pas d\'explication, pas de balise ```.';
++ 'Réponds UNIQUEMENT avec le code (div + script), prêt à coller et tester dans\n'
++ 'un navigateur, entouré d\'un bloc de code markdown (```html au début, ```\n'
++ 'à la fin) — sans quoi certaines interfaces de chat exécutent le HTML/JS\n'
++ 'au lieu de l\'afficher comme du texte. Pas d\'explication avant ou après.';
 
   var out = document.getElementById('jxg-prompt-out');
   out.value = prompt;
@@ -226,12 +239,126 @@ function jxgCopyPrompt() {
   });
 }
 
+// ── Conversion JSXGraph classique → STACK ────────────────────
+// Le code collé par l'utilisateur est du JSXGraph "classique" (généré par une
+// IA généraliste qui ne connaît pas la syntaxe STACK). Ces helpers l'analysent
+// mécaniquement (regex) pour produire un bloc [[jsxgraph]] valide : ils ne
+// comprennent pas le dessin, ils ne font que renommer/encadrer.
+
+function _jxgExtractBoardId(code) {
+  var m = /JXG\.JSXGraph\.initBoard\(\s*['"]([^'"]+)['"]/.exec(code);
+  return m ? m[1] : null;
+}
+
+function _jxgFindBoardVarName(js) {
+  var m = /(?:var|let|const)\s+(\w+)\s*=\s*JXG\.JSXGraph\.initBoard/.exec(js);
+  return m ? m[1] : null;
+}
+
+// Le prompt demande à l'IA d'entourer sa réponse d'un bloc markdown ```
+// (pour que les interfaces de chat l'affichent en texte au lieu de l'exécuter) —
+// on retire ce fencing avant analyse s'il a été collé tel quel.
+function _jxgStripMdFences(code) {
+  var s = String(code || '').trim();
+  s = s.replace(/^```[^\n]*\n?/, '');
+  s = s.replace(/\n?```\s*$/, '');
+  return s.trim();
+}
+
+// Si l'utilisateur colle une page complète (div + <script src=jsxgraphcore.js>
+// + <script>…</script>), n'en garde que le JS des <script> SANS attribut src
+// (le loader de la bibliothèque est ignoré). S'il n'y a aucune balise <script>,
+// on suppose que le champ ne contient déjà que du JS brut.
+function _jxgExtractJs(code) {
+  code = _jxgStripMdFences(code);
+  var re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
+  var m, found = false, parts = [];
+  while ((m = re.exec(code))) {
+    found = true;
+    if (/\bsrc\s*=/i.test(m[1] || '')) continue;
+    parts.push(m[2]);
+  }
+  return (found ? parts.join('\n') : code).trim();
+}
+
+// Construit un document HTML autonome pour l'aperçu live (iframe sandboxée).
+// Les jetons {#nom#} (injection Maxima, invalides en JS brut) sont neutralisés
+// par une valeur factice — uniquement pour l'aperçu, jamais pour la conversion.
+function _jxgBuildPreviewHTML(code, w, h) {
+  var js = _jxgExtractJs(code).replace(/\{#\s*([A-Za-z_]\w*)\s*#\}/g, '1');
+  var boardId = _jxgExtractBoardId(js) || 'box';
+  var wPx = parseInt(w, 10) || 600;
+  var hPx = parseInt(h, 10) || 400;
+  var idJson = JSON.stringify(boardId);
+  return '<!doctype html><html><head><meta charset="utf-8">'
+    + '<link rel="stylesheet" href="lib/jsxgraph/jsxgraph.css">'
+    + '<style>html,body{margin:0;padding:0;}#' + boardId + '{width:' + wPx + 'px;height:' + hPx + 'px;}</style>'
+    + '</head><body>'
+    + '<div id="' + boardId + '"></div>'
+    + '<script src="lib/jsxgraph/jsxgraphcore.js"><\/script>'
+    + '<script>(function(){ try { ' + js + ' } catch(e) { '
+    + 'var el = document.getElementById(' + idJson + '); '
+    + 'if (el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">Erreur JSXGraph : " + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; '
+    + 'console.error(e); } })();<\/script>'
+    + '</body></html>';
+}
+
+function jxgPreviewCode() {
+  var code = document.getElementById('jxg-code-in').value.trim();
+  if (!code) { toast(I18N.t('jxg.preview_first')); return; }
+  var html = _jxgBuildPreviewHTML(code, _jxgVal('jxg-w', '600'), _jxgVal('jxg-h', '400'));
+  var wrap = document.getElementById('jxg-live-preview');
+  if (wrap) wrap.style.display = 'block';
+  mountPreviewIframeScripted('jxg-live-preview', html);
+}
+
+// Filtre mécanique : JSXGraph classique → bloc [[jsxgraph]] STACK.
+// - id littéral de initBoard (et ses autres occurrences) → variable divid
+// - "var x = val; // POOLVAR: x" → "var x = {#x#};"
+// - encadrement suspendUpdate/unsuspendUpdate si absent
+function jxgConvertClassicToStack(code) {
+  var w = _jxgVal('jxg-w', '600');
+  var h = _jxgVal('jxg-h', '400');
+  var js = _jxgExtractJs(code);
+
+  var boardId = _jxgExtractBoardId(js);
+  if (boardId) {
+    var escId = boardId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    js = js.replace(new RegExp("(JXG\\.JSXGraph\\.initBoard\\(\\s*)['\"]" + escId + "['\"]"), '$1divid');
+    js = js.replace(new RegExp("(['\"])" + escId + "\\1", 'g'), 'divid');
+  }
+
+  js = js.replace(/var\s+(\w+)\s*=\s*[^;]+;(\s*\/\/\s*POOLVAR:\s*\1\b[^\n]*)/g, 'var $1 = {#$1#};');
+
+  if (js.indexOf('suspendUpdate') === -1) {
+    var boardVar = _jxgFindBoardVarName(js);
+    if (boardVar) {
+      js = js.replace(/(JXG\.JSXGraph\.initBoard\([\s\S]*?\)\s*;)/, '$1\n' + boardVar + '.suspendUpdate();');
+      js = js.replace(/\s*$/, '') + '\n' + boardVar + '.unsuspendUpdate();';
+    }
+  }
+
+  return '[[jsxgraph width="' + w + 'px" height="' + h + 'px"]]\n' + js.trim() + '\n[[/jsxgraph]]';
+}
+
+// Un <script> n'est jamais entity-échappé par le sérialiseur HTML (contrairement
+// à du texte dans un <div>/<pre>) : c'est ce qui permet au code (avec ses < > &)
+// de survivre intact à l'aller-retour .innerHTML fait par confirmRich(). Le
+// wrapper visuel (badge) est jeté ici ; le code brut est réinjecté tel quel.
+function _jxgUnwrapBlocks(html) {
+  if (!html || html.indexOf('jxg-inserted-block') === -1) return html;
+  return html.replace(/<div class="jxg-inserted-wrap"[^>]*>[\s\S]*?<script[^>]*class="jxg-inserted-block"[^>]*>([\s\S]*?)<\/script>[\s\S]*?<\/div>/gi, function(m, code) {
+    return code.replace(/<\\\/script/gi, '</script');
+  });
+}
+
 function jxgInsertCode() {
   const code = document.getElementById('jxg-code-in').value.trim();
   if (!code) { toast(I18N.t('jxg.paste_first')); return; }
-  const html = '<div class="jxg-inserted-block" contenteditable="false">'
-    + '<span class="jxg-block-label">📊 JSXGraph</span>'
-    + '<pre class="jxg-block-pre">' + htmlEsc(code) + '</pre>'
+  const stackCode = jxgConvertClassicToStack(code).replace(/<\/script/gi, '<\\/script');
+  const html = '<div class="jxg-inserted-wrap" contenteditable="false">'
+    + '<span class="jxg-block-badge">📊 JSXGraph (converti STACK)</span>'
+    + '<script type="text/plain" class="jxg-inserted-block">' + stackCode + '</script>'
     + '</div><p><br></p>';
   closeJsxGraphModal();
   const tgt = (typeof _verifZoneActive !== 'undefined' && _verifZoneActive) || richEditor();

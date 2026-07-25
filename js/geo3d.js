@@ -70,7 +70,6 @@ function _geo3dGenerate() {
     case 'sphere':      return _g3Sphere();
     case 'coin_rect':   return _g3CoinRect();
     case 'coin_tri':    return _g3CoinTri();
-    case 'polyedre':    return _g3Polyedre();
     default: return '';
   }
 }
@@ -122,7 +121,10 @@ function _svgWrap(W, H, inner) {
 
 // Render a solid from vertex list + edge sets + optional labels
 // labels: array of [vertexIdx, offsetX, offsetY, text]
-function _render(verts3d, solidE, dashE, labels) {
+// opts.lengths: { on:bool, unit:'cm'|'', edges:[[i,j],...] }  (defaults to solidE+dashE)
+// opts.points: array of { xyz:[x,y,z], label:string, dx, dy }
+function _render(verts3d, solidE, dashE, labels, opts) {
+  opts = opts || {};
   var alpha = _3N('g3-angle', 45) * Math.PI / 180;
   var k     = _3N('g3-k', 50) / 100;
   var pts2d = _cav(verts3d, alpha, k);
@@ -132,7 +134,66 @@ function _render(verts3d, solidE, dashE, labels) {
   dashE.forEach(function(e){ c += _svgLine(sc[e[0]], sc[e[1]], true); });
   solidE.forEach(function(e){ c += _svgLine(sc[e[0]], sc[e[1]], false); });
   if (labels) labels.forEach(function(l){ c += _svgLbl(sc[l[0]][0], sc[l[0]][1], l[1], l[2], l[3]); });
+  if (opts.lengths && opts.lengths.on) {
+    var edges = opts.lengths.edges || solidE.concat(dashE);
+    edges.forEach(function(e) {
+      var d  = _dist3(verts3d[e[0]], verts3d[e[1]]);
+      var mx = (sc[e[0]][0] + sc[e[1]][0]) / 2, my = (sc[e[0]][1] + sc[e[1]][1]) / 2;
+      c += '<text x="'+mx.toFixed(1)+'" y="'+my.toFixed(1)+'" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#7c3aed">'+_fmtLen3(d, opts.lengths.unit)+'</text>';
+    });
+  }
+  if (opts.points) {
+    var pf = f;
+    opts.points.forEach(function(p) {
+      var s2d = _cav([p.xyz], alpha, k);
+      var s   = _scr(s2d, pf)[0];
+      c += '<circle cx="'+s[0].toFixed(1)+'" cy="'+s[1].toFixed(1)+'" r="2.2" fill="#dc2626"/>';
+      if (p.label) c += '<text x="'+(s[0]+(p.dx||4)).toFixed(1)+'" y="'+(s[1]+(p.dy||-4)).toFixed(1)+'" font-family="serif" font-size="12" font-style="italic" fill="#dc2626">'+p.label+'</text>';
+    });
+  }
   return _svgWrap(_W3, _H3, c);
+}
+
+// ─── Helpers: longueurs réelles + points remarquables ────────────────────
+function _dist3(a, b) {
+  var dx=a[0]-b[0], dy=a[1]-b[1], dz=a[2]-b[2];
+  return Math.sqrt(dx*dx+dy*dy+dz*dz);
+}
+function _fmtLen3(d, unit) {
+  var r = Math.round(d*100)/100;
+  return (r % 1 === 0 ? r.toFixed(0) : String(r)) + (unit ? ' '+unit : '');
+}
+function _mid3(a, b) { return [(a[0]+b[0])/2, (a[1]+b[1])/2, (a[2]+b[2])/2]; }
+function _centroid3(pts) {
+  var n = pts.length, x=0,y=0,z=0;
+  pts.forEach(function(p){ x+=p[0]; y+=p[1]; z+=p[2]; });
+  return [x/n, y/n, z/n];
+}
+function _3B(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+
+// Points remarquables génériques : milieux des arêtes, centres des faces, centre/pied de hauteur
+// idPrefix ex: 'g3pave' → cherche g3pave-rem-mid / g3pave-rem-face / g3pave-rem-center
+function _g3Remarkable(v, edges, faces, centerPts, idPrefix) {
+  var pts = [];
+  if (_3B(idPrefix+'-rem-mid')) {
+    edges.forEach(function(e, idx) {
+      pts.push({ xyz: _mid3(v[e[0]], v[e[1]]), label: 'I'+(idx+1), dx:4, dy:-4 });
+    });
+  }
+  if (faces && faces.length && _3B(idPrefix+'-rem-face')) {
+    faces.forEach(function(fc, idx) {
+      pts.push({ xyz: _centroid3(fc.map(function(i){ return v[i]; })), label: 'G'+(idx+1), dx:4, dy:-4 });
+    });
+  }
+  if (centerPts && centerPts.length && _3B(idPrefix+'-rem-center')) {
+    centerPts.forEach(function(cp) {
+      pts.push({ xyz: cp.xyz, label: cp.label, dx:4, dy:-4 });
+    });
+  }
+  return pts;
+}
+function _g3Lengths(idPrefix, edges) {
+  return { on: _3B(idPrefix+'-len'), unit: _3B(idPrefix+'-len-cm') ? 'cm' : '', edges: edges };
 }
 
 // Render curves (cone/cylinder/sphere): same pipeline but returns screen + fit for manual drawing
@@ -157,15 +218,16 @@ function _g3Pave() {
   var P = Math.max(0.1, _3N('g3pave-p', 3));
   var v = [[0,0,0],[L,0,0],[L,H,0],[0,H,0],[0,0,P],[L,0,P],[L,H,P],[0,H,P]];
   //         0       1       2       3       4       5       6       7
-  var sol = [[0,1],[1,2],[2,3],[3,0], [1,5],[2,6],[3,7], [5,6],[6,7],[4,5]];
-  var dsh = [[0,4],[4,7],[4,5]];
-  // For angle in [0,π/2]: hidden = AE(0-4), EH(4-7), EF(4-5)?
-  // Actually [4,5]=EF is hidden; [5,4] already in sol above — fix:
-  sol = [[0,1],[1,2],[2,3],[3,0],[1,5],[2,6],[3,7],[5,6],[6,7]];
-  dsh = [[0,4],[4,5],[4,7]]; // AE, EF, EH hidden
-  var lbl = [[0,-14,5,'A'],[1,5,5,'B'],[2,5,-11,'C'],[3,-14,-11,'D'],
-             [4,-14,5,'E'],[5,5,5,'F'],[6,5,-11,'G'],[7,-14,-11,'H']];
-  return _render(v, sol, dsh, lbl);
+  var sol = [[0,1],[1,2],[2,3],[3,0],[1,5],[2,6],[3,7],[5,6],[6,7]];
+  var dsh = [[0,4],[4,5],[4,7]]; // AE, EF, EH hidden
+  var def = ['A','B','C','D','E','F','G','H'];
+  var nm  = def.map(function(l){ return _3S('g3pave-lbl-'+l, l); });
+  var off = [[-14,5],[5,5],[5,-11],[-14,-11],[-14,5],[5,5],[5,-11],[-14,-11]];
+  var lbl = nm.map(function(t,i){ return [i, off[i][0], off[i][1], t]; });
+  var faces = [[0,1,2,3],[4,5,6,7],[0,1,5,4],[3,2,6,7],[0,3,7,4],[1,2,6,5]];
+  var center = [{ xyz:[L/2,H/2,P/2], label:'O' }];
+  var pts = _g3Remarkable(v, sol.concat(dsh), faces, center, 'g3pave');
+  return _render(v, sol, dsh, lbl, { lengths: _g3Lengths('g3pave', sol.concat(dsh)), points: pts });
 }
 
 // ─── PRISME DROIT À BASE RÉGULIÈRE ───────────────────────────────────────
@@ -181,17 +243,22 @@ function _g3Prisme() {
     v.push([R*Math.cos(a), H, R*Math.sin(a)]);  // top    2*i+1
   }
   var sol = [], dsh = [];
-  var letters = 'ABCDEFGH', lbl = [];
+  var letters = 'ABCDEFGH', lbl = [], names = [], bottomIdx = [], topIdx = [], faces = [];
+  for (var ii = 0; ii < n; ii++) names.push(_3S('g3pri-lbl-'+letters[ii], letters[ii]));
   for (var j = 0; j < n; j++) {
     var jb = 2*j, jt = 2*j+1, nb = 2*((j+1)%n), nt = 2*((j+1)%n)+1;
     sol.push([jt, nt]);
-    sol.push([jb, jt]);
-    if (v[jb][2] < 0) sol.push([jb, nb]);
-    else               dsh.push([jb, nb]);
-    lbl.push([jb, 4, 6, letters[j]]);
-    lbl.push([jt, 4,-10, letters[j]+"'"]);
+    if (v[jb][2] < 0) { sol.push([jb, jt]); sol.push([jb, nb]); }
+    else               { dsh.push([jb, jt]); dsh.push([jb, nb]); }
+    lbl.push([jb, 4, 6, names[j]]);
+    lbl.push([jt, 4,-10, names[j]+"'"]);
+    bottomIdx.push(jb); topIdx.push(jt);
+    faces.push([jb, nb, nt, jt]);
   }
-  return _render(v, sol, dsh, lbl);
+  faces.push(bottomIdx, topIdx);
+  var center = [{ xyz:[0,0,0], label:'O' }, { xyz:[0,H,0], label:"O'" }];
+  var pts = _g3Remarkable(v, sol.concat(dsh), faces, center, 'g3pri');
+  return _render(v, sol, dsh, lbl, { lengths: _g3Lengths('g3pri', sol.concat(dsh)), points: pts });
 }
 
 // ─── PRISME DROIT À BASE TRIANGULAIRE (triangle équilatéral) ─────────────
@@ -204,11 +271,16 @@ function _g3PrismeTri() {
     [0, 0, 0], [a, 0, 0], [a/2, 0, h3],
     [0, H, 0], [a, H, 0], [a/2, H, h3]
   ];
-  var sol = [[0,1],[0,3],[1,4],[2,5],[3,4],[4,5],[3,5]];
-  var dsh = [[0,2],[1,2]]; // AC, BC hidden bottom back
-  var lbl = [[0,-14,5,'A'],[1,5,5,'B'],[2,4,10,'C'],
-             [3,-14,-11,"A'"],[4,5,-11,"B'"],[5,4,-11,"C'"]];
-  return _render(v, sol, dsh, lbl);
+  var sol = [[0,1],[0,3],[1,4],[3,4],[4,5],[3,5]];
+  var dsh = [[0,2],[1,2],[2,5]]; // AC, BC hidden bottom back ; CC' hidden vertical
+  var def = ['A','B','C'];
+  var nm  = def.map(function(l){ return _3S('g3ptri-lbl-'+l, l); });
+  var lbl = [[0,-14,5,nm[0]],[1,5,5,nm[1]],[2,4,10,nm[2]],
+             [3,-14,-11,nm[0]+"'"],[4,5,-11,nm[1]+"'"],[5,4,-11,nm[2]+"'"]];
+  var faces = [[0,1,2],[3,4,5],[0,1,4,3],[1,2,5,4],[2,0,3,5]];
+  var center = [{ xyz:[a/2,0,h3/3], label:'O' }, { xyz:[a/2,H,h3/3], label:"O'" }];
+  var pts = _g3Remarkable(v, sol.concat(dsh), faces, center, 'g3ptri');
+  return _render(v, sol, dsh, lbl, { lengths: _g3Lengths('g3ptri', sol.concat(dsh)), points: pts });
 }
 
 // ─── PYRAMIDE RÉGULIÈRE À BASE CARRÉE ────────────────────────────────────
@@ -220,10 +292,16 @@ function _g3PyrCarree() {
     [0, 0, 0], [L, 0, 0], [L, 0, L], [0, 0, L], // A B C D (0-3)
     [L/2, H, L/2]                                  // S (4)
   ];
-  var sol = [[0,1],[1,2],[2,4],[1,4],[0,4],[3,4],[2,3]];
-  var dsh = [[0,3]]; // AD hidden
-  var lbl = [[0,-13,5,'A'],[1,5,5,'B'],[2,6,8,'C'],[3,-13,8,'D'],[4,0,-13,'S']];
-  return _render(v, sol, dsh, lbl);
+  var sol = [[0,1],[1,2],[2,4],[1,4],[0,4]];
+  var dsh = [[0,3],[3,4],[2,3]]; // AD, SD, DC hidden (D = sommet caché)
+  var def = ['A','B','C','D','S'];
+  var nm  = def.map(function(l){ return _3S('g3pyrc-lbl-'+l, l); });
+  var off = [[-13,5],[5,5],[6,8],[-13,8],[0,-13]];
+  var lbl = nm.map(function(t,i){ return [i, off[i][0], off[i][1], t]; });
+  var faces = [[0,1,2,3],[0,1,4],[1,2,4],[2,3,4],[3,0,4]];
+  var center = [{ xyz:[L/2,0,L/2], label:'O' }];
+  var pts = _g3Remarkable(v, sol.concat(dsh), faces, center, 'g3pyrc');
+  return _render(v, sol, dsh, lbl, { lengths: _g3Lengths('g3pyrc', sol.concat(dsh)), points: pts });
 }
 
 // ─── PYRAMIDE À BASE TRIANGULAIRE ────────────────────────────────────────
@@ -236,10 +314,16 @@ function _g3PyrTri() {
     [0, 0, 0], [a, 0, 0], [a/2, 0, h3],
     [a/2, H, h3/3]
   ];
-  var sol = [[0,1],[1,2],[0,3],[1,3],[2,3]];
-  var dsh = [[0,2]]; // AC hidden
-  var lbl = [[0,-13,5,'A'],[1,6,5,'B'],[2,4,10,'C'],[3,0,-13,'S']];
-  return _render(v, sol, dsh, lbl);
+  var sol = [[0,1],[0,3],[1,3]];
+  var dsh = [[0,2],[1,2],[2,3]]; // AC, BC, SC hidden (C = sommet caché)
+  var def = ['A','B','C','S'];
+  var nm  = def.map(function(l){ return _3S('g3pyrt-lbl-'+l, l); });
+  var off = [[-13,5],[6,5],[4,10],[0,-13]];
+  var lbl = nm.map(function(t,i){ return [i, off[i][0], off[i][1], t]; });
+  var faces = [[0,1,2],[0,1,3],[1,2,3],[2,0,3]];
+  var center = [{ xyz:[a/2,0,h3/3], label:'O' }];
+  var pts = _g3Remarkable(v, sol.concat(dsh), faces, center, 'g3pyrt');
+  return _render(v, sol, dsh, lbl, { lengths: _g3Lengths('g3pyrt', sol.concat(dsh)), points: pts });
 }
 
 // ─── TRONC DE PYRAMIDE À BASES RECTANGULAIRES ────────────────────────────
@@ -255,11 +339,16 @@ function _g3Tronc() {
     [0,0,0],[L,0,0],[L,0,P],[0,0,P],                         // A B C D (0-3)
     [dx,H,dz],[dx+l,H,dz],[dx+l,H,dz+p],[dx,H,dz+p]         // E F G H (4-7)
   ];
-  var sol = [[0,1],[1,2],[2,3],[4,5],[5,6],[6,7],[4,7],[0,4],[1,5],[2,6],[3,7]];
-  var dsh = [[0,3]]; // AD hidden
-  var lbl = [[0,-13,5,'A'],[1,6,5,'B'],[2,6,8,'C'],[3,-13,8,'D'],
-             [4,-13,-10,'E'],[5,6,-10,'F'],[6,6,-10,'G'],[7,-13,-10,'H']];
-  return _render(v, sol, dsh, lbl);
+  var sol = [[0,1],[1,2],[4,5],[5,6],[6,7],[4,7],[0,4],[1,5],[2,6]];
+  var dsh = [[0,3],[2,3],[3,7]]; // AD, CD, DH hidden (D = sommet caché)
+  var def = ['A','B','C','D','E','F','G','H'];
+  var nm  = def.map(function(l){ return _3S('g3tronc-lbl-'+l, l); });
+  var off = [[-13,5],[6,5],[6,8],[-13,8],[-13,-10],[6,-10],[6,-10],[-13,-10]];
+  var lbl = nm.map(function(t,i){ return [i, off[i][0], off[i][1], t]; });
+  var faces = [[0,1,2,3],[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7]];
+  var center = [{ xyz:[L/2,0,P/2], label:'O' }, { xyz:[L/2,H,P/2], label:"O'" }];
+  var pts = _g3Remarkable(v, sol.concat(dsh), faces, center, 'g3tronc');
+  return _render(v, sol, dsh, lbl, { lengths: _g3Lengths('g3tronc', sol.concat(dsh)), points: pts });
 }
 
 // ─── Helpers pour solides de révolution (ellipse = b=r·sin(angIncl)) ─────
@@ -267,11 +356,11 @@ function _g3Tronc() {
 // Arc SVG d'une demi-ellipse : large-arc=0 → arc mineur (sens horaire = bas de l'ellipse)
 function _ellArcF(cx, cy, rx, ry) { // front (bas) = solid
   return '<path d="M '+(cx-rx).toFixed(1)+','+cy.toFixed(1)+
-         ' A '+rx.toFixed(1)+','+ry.toFixed(1)+' 0 0 1 '+(cx+rx).toFixed(1)+','+cy.toFixed(1)+'" '+_STR+'/>';
+         ' A '+rx.toFixed(1)+','+ry.toFixed(1)+' 0 0 0 '+(cx+rx).toFixed(1)+','+cy.toFixed(1)+'" '+_STR+'/>';
 }
 function _ellArcB(cx, cy, rx, ry) { // back (haut) = dashed
   return '<path d="M '+(cx-rx).toFixed(1)+','+cy.toFixed(1)+
-         ' A '+rx.toFixed(1)+','+ry.toFixed(1)+' 0 0 0 '+(cx+rx).toFixed(1)+','+cy.toFixed(1)+'" '+_DSH+'/>';
+         ' A '+rx.toFixed(1)+','+ry.toFixed(1)+' 0 0 1 '+(cx+rx).toFixed(1)+','+cy.toFixed(1)+'" '+_DSH+'/>';
 }
 
 // ─── CÔNE DE RÉVOLUTION ───────────────────────────────────────────────────
@@ -354,40 +443,6 @@ function _g3Sphere() {
   return _svgWrap(W, Hv, c);
 }
 
-// ─── POLYÈDRE POINT PAR POINT ────────────────────────────────────────────
-// Sommets : une ligne par sommet "A x y z"
-// Arêtes  : une ligne "A B" (plein) ou "A B --" (pointillé)
-function _g3Polyedre() {
-  var vtxText  = _3S('g3poly-verts', '');
-  var edgeText = _3S('g3poly-edges', '');
-
-  // Parse vertices
-  var names = [], coords = [];
-  vtxText.split('\n').forEach(function(ln) {
-    ln = ln.trim(); if (!ln) return;
-    var m = ln.match(/^([A-Za-z][A-Za-z0-9']*)\s+([-\d.]+)[\s,;]+([-\d.]+)[\s,;]+([-\d.]+)/);
-    if (m) { names.push(m[1].toUpperCase()); coords.push([parseFloat(m[2]),parseFloat(m[3]),parseFloat(m[4])]); }
-  });
-
-  if (coords.length < 1) return _svgWrap(_W3, _H3,
-    '<text x="20" y="60" font-family="sans-serif" font-size="12" fill="#94a3b8">Entrez les sommets :\nA x y z (une ligne par sommet)</text>');
-
-  // Parse edges
-  var sol = [], dsh = [];
-  edgeText.split('\n').forEach(function(ln) {
-    ln = ln.trim(); if (!ln) return;
-    var dashed = ln.indexOf('--') >= 0 || ln.indexOf('...') >= 0;
-    var tok = ln.replace(/--|\.\.\.|\*/g,'').trim().split(/[\s,;]+/);
-    if (tok.length >= 2) {
-      var i1 = names.indexOf(tok[0].toUpperCase()), i2 = names.indexOf(tok[1].toUpperCase());
-      if (i1 >= 0 && i2 >= 0) (dashed ? dsh : sol).push([i1, i2]);
-    }
-  });
-
-  var lbls = names.map(function(nm, idx){ return [idx, 5, -5, nm]; });
-  return _render(coords, sol, dsh, lbls);
-}
-
 // ─── COIN DE PAVé DROIT À BASE RECTANGULAIRE ─────────────────────────────
 // Pyramid: base = rectangle ABCD in XZ plane (y=0); apex S = (0,H,0)
 function _g3CoinRect() {
@@ -398,10 +453,15 @@ function _g3CoinRect() {
     [0,0,0],[L,0,0],[L,0,P],[0,0,P], // A B C D (0-3) base
     [0,H,0]                           // S (4) apex
   ];
-  var sol = [[0,1],[1,2],[2,3],[0,4],[1,4],[2,4],[3,4]];
-  var dsh = [[0,3]]; // AD back-left hidden
-  var lbl = [[0,-13,5,'A'],[1,6,5,'B'],[2,6,8,'C'],[3,-13,8,'D'],[4,-14,-10,'S']];
-  return _render(v, sol, dsh, lbl);
+  var sol = [[0,1],[2,3],[0,4],[1,4],[2,4]];
+  var dsh = [[0,3],[1,2],[3,4]]; // AD, BC, SD hidden
+  var def = ['A','B','C','D','S'];
+  var nm  = def.map(function(l){ return _3S('g3cr-lbl-'+l, l); });
+  var off = [[-13,5],[6,5],[6,8],[-13,8],[-14,-10]];
+  var lbl = nm.map(function(t,i){ return [i, off[i][0], off[i][1], t]; });
+  var faces = [[0,1,2,3],[0,1,4],[1,2,4],[2,3,4],[3,0,4]];
+  var pts = _g3Remarkable(v, sol.concat(dsh), faces, null, 'g3cr');
+  return _render(v, sol, dsh, lbl, { lengths: _g3Lengths('g3cr', sol.concat(dsh)), points: pts });
 }
 
 // ─── COIN DE PAVé DROIT À BASE TRIANGULAIRE ──────────────────────────────
@@ -416,6 +476,11 @@ function _g3CoinTri() {
   ];
   var sol = [[0,1],[1,2],[0,3],[1,3],[2,3]];
   var dsh = [[0,2]]; // AC hidden
-  var lbl = [[0,-13,5,'A'],[1,6,5,'B'],[2,6,8,'C'],[3,-14,-10,'S']];
-  return _render(v, sol, dsh, lbl);
+  var def = ['A','B','C','S'];
+  var nm  = def.map(function(l){ return _3S('g3ct-lbl-'+l, l); });
+  var off = [[-13,5],[6,5],[6,8],[-14,-10]];
+  var lbl = nm.map(function(t,i){ return [i, off[i][0], off[i][1], t]; });
+  var faces = [[0,1,2],[0,1,3],[1,2,3],[2,0,3]];
+  var pts = _g3Remarkable(v, sol.concat(dsh), faces, null, 'g3ct');
+  return _render(v, sol, dsh, lbl, { lengths: _g3Lengths('g3ct', sol.concat(dsh)), points: pts });
 }

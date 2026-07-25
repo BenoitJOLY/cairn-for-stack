@@ -14,7 +14,7 @@ function renderPreviewHTML_trigonometrie(state) {
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
   var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
   return _hsSimplePreviewHTML({
-    badge: 'Trigonom\xe9trie', badgeColor: '#b45309', noteBg: '#fffbeb', noteColor: '#b45309',
+    badge: I18N.t('type.trigonometrie'), badgeColor: '#b45309', noteBg: '#fffbeb', noteColor: '#b45309',
     prefix: 'trig', bareme: state.bareme || 1,
     text: _hsRenderMath(scenarioHTML),
     hideExampleBox: true,

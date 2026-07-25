@@ -50,15 +50,15 @@ function renderPreviewHTML_string(state) {
 </head>
 <body>
   <div class="hs-preview-header">
-    <span class="hs-preview-badge">Réponse textuelle</span>
+    <span class="hs-preview-badge">${I18N.t('badge.string_answer')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
   </div>
   <div class="hs-preview-text" data-str-field="text">${text}</div>
   ${paletteHTML}
   <input class="hs-str-input" type="text" disabled size="${size}" placeholder="Réponse de l'élève…">
-  <button class="hs-validate-btn" disabled>Valider</button>
+  <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
-  <div class="hs-fb-section-title">Aperçu du feedback (affiché après validation)</div>
+  <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
   ${fbGlobalHTML}
 </body>
 </html>`;

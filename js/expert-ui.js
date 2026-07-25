@@ -170,11 +170,11 @@ function _expReplaceStackTags(html, env){
   });
   /* [[input:name]] → boîte stylée */
   html=html.replace(/\[\[input:(\w+)\]\]/g,function(_,name){
-    return '<span class="exp-pv-input" title="Champ réponse : '+name+'">▢ <em>'+name+'</em></span>';
+    return '<span class="exp-pv-input" title="'+_ee(I18N.t('exp.pv_input_title',{name:name}))+'">▢ <em>'+name+'</em></span>';
   });
   /* [[validation:name]] */
   html=html.replace(/\[\[validation:(\w+)\]\]/g,function(){
-    return '<span class="exp-pv-valid">✓ validation</span>';
+    return '<span class="exp-pv-valid">'+I18N.t('exp.pv_validation_label')+'</span>';
   });
   /* [[feedback:name]] */
   html=html.replace(/\[\[feedback:(\w+)\]\]/g,function(_,name){
@@ -271,7 +271,7 @@ function expExportJson(){
   a.download=(s.name||'question-expert').replace(/[^a-zA-Z0-9_-]/g,'_')+'.json';
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('💾 JSON exporté : '+a.download);
+  toast(I18N.t('exp.toast_json_exported',{name:a.download}));
 }
 
 function expImportJson(input){
@@ -280,15 +280,15 @@ function expImportJson(input){
   reader.onload=function(e){
     try{
       var state=JSON.parse(e.target.result);
-      if(!state.inputs||!state.prts) throw new Error('Format invalide — champs inputs/prts manquants.');
+      if(!state.inputs||!state.prts) throw new Error(I18N.t('exp.err_import_invalid_format'));
       var q=questions[_activeQid];
       if(!q) questions[_activeQid]=q={id:_activeQid,type:'expert'};
       q._expertState=state;
       expertInit(_activeQid);
       expertInitAttrs(state.attributes||{});
-      toast('✅ Question importée depuis '+file.name);
+      toast(I18N.t('exp.toast_json_imported',{name:file.name}));
     }catch(err){
-      toast('❌ Erreur JSON : '+err.message);
+      toast(I18N.t('exp.toast_json_error',{msg:err.message}));
     }
     input.value='';
   };
@@ -376,10 +376,10 @@ function expertInitQtextRich(html){
     /* Insérer le bouton JSXGraph + Code juste avant le dernier </div> de la toolbar */
     tbHtml = tbHtml.replace(/<\/div>\s*$/, function(m){
       return '<div class="rtb-sep"></div>'
-        + '<button class="rtb rtb-jxg" onclick="expOpenJsx(\'exp-qtext-rich\')" title="Insérer un bloc JSXGraph STACK">📊 JSXGraph</button>'
+        + '<button class="rtb rtb-jxg" onclick="expOpenJsx(\'exp-qtext-rich\')" title="'+_ee(I18N.t('exp.jsx_insert_title'))+'">📊 JSXGraph</button>'
         + '<div class="rtb-sep"></div>'
-        + '<button class="rtb" id="exp-code-btn" onclick="expToggleQtextCode()" title="Basculer vue HTML brut">'
-        + '&#x3C;/&#x3E; Code</button>' + m;
+        + '<button class="rtb" id="exp-code-btn" onclick="expToggleQtextCode()" title="'+_ee(I18N.t('exp.toggle_code_title'))+'">'
+        + '&#x3C;/&#x3E; '+I18N.t('exp.code_btn')+'</button>' + m;
     });
     /* Remplacer le border-radius de la toolbar pour la coller au-dessus de la zone */
     tbHtml = tbHtml.replace('border-radius:6px 6px 0 0','border-radius:0');
@@ -441,10 +441,10 @@ function expertInitGfbRich(html){
       : '<div class="rich-toolbar"></div>';
     tbHtml = tbHtml.replace(/<\/div>\s*$/, function(m){
       return '<div class="rtb-sep"></div>'
-        + '<button class="rtb rtb-jxg" onclick="expOpenJsx(\'exp-gfb-rich\')" title="Insérer un bloc JSXGraph STACK">📊 JSXGraph</button>'
+        + '<button class="rtb rtb-jxg" onclick="expOpenJsx(\'exp-gfb-rich\')" title="'+_ee(I18N.t('exp.jsx_insert_title'))+'">📊 JSXGraph</button>'
         + '<div class="rtb-sep"></div>'
-        + '<button class="rtb" id="exp-gfb-code-btn" onclick="expToggleGfbCode()" title="Basculer vue HTML brut">'
-        + '&#x3C;/&#x3E; Code</button>' + m;
+        + '<button class="rtb" id="exp-gfb-code-btn" onclick="expToggleGfbCode()" title="'+_ee(I18N.t('exp.toggle_code_title'))+'">'
+        + '&#x3C;/&#x3E; '+I18N.t('exp.code_btn')+'</button>' + m;
     });
     tbHtml = tbHtml.replace('border-radius:6px 6px 0 0','border-radius:0');
     tb.innerHTML = tbHtml;
@@ -572,30 +572,30 @@ function expertInputCard(inp,i){
   return '<div class="exp-card" id="exp-inp-'+i+'">'
     +'<div class="exp-card-hd">'
       +'<span class="exp-card-title">Input '+(i+1)+' &mdash; <code>'+_ee(inp.name)+'</code></span>'
-      +'<button type="button" class="exp-card-del" onclick="expertRemoveInput('+i+')" title="Supprimer">✕</button>'
+      +'<button type="button" class="exp-card-del" onclick="expertRemoveInput('+i+')" title="'+_ee(I18N.t('common.supprimer'))+'">✕</button>'
     +'</div>'
     +'<div class="exp-card-body">'
 
       /* ── Ligne 1 : identité */
       +'<div class="exp-row3">'
-        +'<div><label class="cfg-lbl">Nom de la variable</label>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_name_lbl')+'</label>'
           +'<input class="hs-input exp-mono" value="'+_ee(inp.name)+'" '
           +'onchange="expertUpdateInput('+i+',\'name\',this.value);document.querySelector(\'#exp-inp-'+i+' code\').textContent=this.value"></div>'
-        +'<div><label class="cfg-lbl">Type de saisie</label>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_type_lbl')+'</label>'
           +'<select class="hs-input" onchange="expertUpdateInput('+i+',\'type\',this.value)">'+typeOpts+'</select></div>'
-        +'<div><label class="cfg-lbl">Réponse modèle (Maxima)</label>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_tans_lbl')+'</label>'
           +'<input class="hs-input exp-mono" value="'+_ee(inp.tans)+'" onchange="expertUpdateInput('+i+',\'tans\',this.value)"></div>'
       +'</div>'
 
       /* ── Ligne 2 : champ et syntaxe */
       +'<div class="exp-row4">'
-        +'<div><label class="cfg-lbl">Largeur (car.)</label>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_boxsize_lbl')+'</label>'
           +'<input type="number" class="hs-input" min="1" max="80" value="'+(inp.boxsize||15)+'" onchange="expertUpdateInput('+i+',\'boxsize\',+this.value)"></div>'
-        +'<div><label class="cfg-lbl">Exemple de saisie</label>'
-          +'<input class="hs-input exp-mono" value="'+_ee(inp.syntaxhint||'')+'" placeholder="ex: x^2+1" onchange="expertUpdateInput('+i+',\'syntaxhint\',this.value)"></div>'
-        +'<div><label class="cfg-lbl">Mots interdits</label>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_syntaxhint_lbl')+'</label>'
+          +'<input class="hs-input exp-mono" value="'+_ee(inp.syntaxhint||'')+'" placeholder="'+_ee(I18N.t('exp.input_syntaxhint_ph'))+'" onchange="expertUpdateInput('+i+',\'syntaxhint\',this.value)"></div>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_forbidwords_lbl')+'</label>'
           +'<input class="hs-input exp-mono" value="'+_ee(inp.forbidwords||'')+'" placeholder="cos,sin,[[BASIC-TRIG]]" onchange="expertUpdateInput('+i+',\'forbidwords\',this.value)"></div>'
-        +'<div><label class="cfg-lbl">Mots autorisés</label>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_allowwords_lbl')+'</label>'
           +'<input class="hs-input exp-mono" value="'+_ee(inp.allowwords||'')+'" placeholder="Sin,myFunc" onchange="expertUpdateInput('+i+',\'allowwords\',this.value)"></div>'
       +'</div>'
 
@@ -635,72 +635,72 @@ function expertInputOptsHtml(inp, i){
   /* Select Étoiles (insertstars 0-7) */
   var starsVal = inp.insertstars||0;
   var starsOpts = [
-    [0,'2*x obligatoire (pas de raccourci)'],
-    [1,'2(x+1) accepté → 2*(x+1)'],
-    [2,'xy accepté → x*y (variables 1 lettre)'],
-    [3,'f(x) sans * accepté → f*(x)'],
-    [4,'2(x+1) et xy acceptés'],
-    [5,'2(x+1) et f(x) sans * acceptés'],
-    [6,'xy et f(x) sans * acceptés'],
-    [7,'Tout accepté (le plus souple)'],
+    [0,I18N.t('exp.stars_opt0')],
+    [1,I18N.t('exp.stars_opt1')],
+    [2,I18N.t('exp.stars_opt2')],
+    [3,I18N.t('exp.stars_opt3')],
+    [4,I18N.t('exp.stars_opt4')],
+    [5,I18N.t('exp.stars_opt5')],
+    [6,I18N.t('exp.stars_opt6')],
+    [7,I18N.t('exp.stars_opt7')],
   ].map(function(o){ return '<option value="'+o[0]+'"'+(starsVal===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
 
   /* Select Validation (showvalidation 0-3) */
   var showVal = inp.showvalidation!=null ? inp.showvalidation : 1;
   var showOpts = [
-    [0,'Validation: masquée'],
-    [1,'Validation: avec variables (recommandé)'],
-    [2,'Validation: sans variables'],
-    [3,'Validation: compacte'],
+    [0,I18N.t('exp.showval_opt0')],
+    [1,I18N.t('exp.showval_opt1')],
+    [2,I18N.t('exp.showval_opt2')],
+    [3,I18N.t('exp.showval_opt3')],
   ].map(function(o){ return '<option value="'+o[0]+'"'+(showVal==o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
 
   var s = '<div class="exp-toggles">';
 
   /* Communs à tous les types (hors MCQ pur) */
   if(!isMCQ){
-    s += '<select class="hs-input exp-sel-inline" title="Est-ce que l\'élève peut écrire 2x au lieu de 2*x ?" onchange="expertUpdateInput('+i+',\'insertstars\',+this.value)">'+starsOpts+'</select>';
-    s += chk('strictsyntax','Syntaxe stricte','L\'étudiant doit écrire * et les parenthèses explicitement. Rejette 2x si les étoiles ne sont pas insérées.');
-    s += chk('forbidfloat','Interdire décimaux','Rejette 0.333 — l\'étudiant doit écrire 1/3. Recommandé quand la forme exacte est attendue.');
-    s += chk('requirelowestterms','Fraction irréductible','Rejette 2/4, exige 1/2. S\'applique à tous les coefficients rationnels.');
-    s += chk('checkanswertype','Vérifier le type','Si la réponse modèle est une équation, rejette une expression simple. Idem pour liste, matrice, inéquation.');
-    s += chk('allowempty','Vide autorisé','Réponse vide = EMPTYANSWER (valide). Utile pour les questions optionnelles.',true);
+    s += '<select class="hs-input exp-sel-inline" title="'+_ee(I18N.t('exp.stars_select_title'))+'" onchange="expertUpdateInput('+i+',\'insertstars\',+this.value)">'+starsOpts+'</select>';
+    s += chk('strictsyntax',I18N.t('exp.opt_strictsyntax_lbl'),I18N.t('exp.opt_strictsyntax_tip'));
+    s += chk('forbidfloat',I18N.t('exp.opt_forbidfloat_lbl'),I18N.t('exp.opt_forbidfloat_tip'));
+    s += chk('requirelowestterms',I18N.t('exp.opt_requirelowestterms_lbl'),I18N.t('exp.opt_requirelowestterms_tip'));
+    s += chk('checkanswertype',I18N.t('exp.opt_checkanswertype_lbl'),I18N.t('exp.opt_checkanswertype_tip'));
+    s += chk('allowempty',I18N.t('exp.opt_allowempty_lbl'),I18N.t('exp.opt_allowempty_tip'),true);
   }
 
-  s += '<select class="hs-input exp-sel-inline" title="Niveau de retour visuel après saisie" onchange="expertUpdateInput('+i+',\'showvalidation\',+this.value)">'+showOpts+'</select>';
-  s += chk('mustverify','Étudiant confirme','L\'étudiant doit cliquer "Confirmer" après avoir vu sa réponse rendue en 2D avant l\'envoi.');
+  s += '<select class="hs-input exp-sel-inline" title="'+_ee(I18N.t('exp.showval_select_title'))+'" onchange="expertUpdateInput('+i+',\'showvalidation\',+this.value)">'+showOpts+'</select>';
+  s += chk('mustverify',I18N.t('exp.opt_mustverify_lbl'),I18N.t('exp.opt_mustverify_tip'));
 
   /* Numérique */
   if(isNum || isUnits){
-    s += numF('minsf','Sig. min','Minimum de chiffres significatifs');
-    s += numF('maxsf','Sig. max','Maximum de chiffres significatifs');
-    s += numF('mindp','Déc. min','Minimum de décimales');
-    s += numF('maxdp','Déc. max','Maximum de décimales');
+    s += numF('minsf',I18N.t('exp.opt_minsf_lbl'),I18N.t('exp.opt_minsf_tip'));
+    s += numF('maxsf',I18N.t('exp.opt_maxsf_lbl'),I18N.t('exp.opt_maxsf_tip'));
+    s += numF('mindp',I18N.t('exp.opt_mindp_lbl'),I18N.t('exp.opt_mindp_tip'));
+    s += numF('maxdp',I18N.t('exp.opt_maxdp_lbl'),I18N.t('exp.opt_maxdp_tip'));
   }
   if(isNum){
-    s += chk('floatnum','Flottant','Exige un nombre décimal flottant. 3.14 ✓, pi ✗.',true);
-    s += chk('intnum','Entier','Entier seul uniquement. 6 ✓, 2*3 ✗.',true);
-    s += chk('rationalnum','Fraction','Fraction uniquement. 2/3 ✓, 6 ✗.',true);
-    s += chk('rationalized','Rationalisé','Dénominateur sans racines. 1/√2 ✗.',true);
+    s += chk('floatnum',I18N.t('exp.opt_floatnum_lbl'),I18N.t('exp.opt_floatnum_tip'),true);
+    s += chk('intnum',I18N.t('exp.opt_intnum_lbl'),I18N.t('exp.opt_intnum_tip'),true);
+    s += chk('rationalnum',I18N.t('exp.opt_rationalnum_lbl'),I18N.t('exp.opt_rationalnum_tip'),true);
+    s += chk('rationalized',I18N.t('exp.opt_rationalized_lbl'),I18N.t('exp.opt_rationalized_tip'),true);
   }
 
   /* Texte */
   if(t==='string'){
-    s += chk('casesensitive','Casse sensible','A ≠ a pour la comparaison.',true);
-    s += chk('allowempty','Vide autorisé','Réponse vide = EMPTYANSWER.',true);
+    s += chk('casesensitive',I18N.t('exp.opt_casesensitive_lbl'),I18N.t('exp.opt_casesensitive_tip'),true);
+    s += chk('allowempty',I18N.t('exp.opt_allowempty_lbl'),I18N.t('exp.opt_allowempty_tip_str'),true);
   }
   if(t==='notes'){
-    s += chk('manualgraded','Correction manuelle','Question à corriger manuellement par l\'enseignant. Aucune note automatique.',true);
-    s += chk('allowempty','Vide autorisé','Réponse vide = EMPTYANSWER.',true);
+    s += chk('manualgraded',I18N.t('exp.opt_manualgraded_lbl'),I18N.t('exp.opt_manualgraded_tip'),true);
+    s += chk('allowempty',I18N.t('exp.opt_allowempty_lbl'),I18N.t('exp.opt_allowempty_tip_str'),true);
   }
   if(t==='textarea'||t==='equiv'){
-    s += chk('allowempty','Vide autorisé','Réponse vide = EMPTYANSWER.',true);
+    s += chk('allowempty',I18N.t('exp.opt_allowempty_lbl'),I18N.t('exp.opt_allowempty_tip_str'),true);
   }
 
   /* MCQ */
   if(isMCQ){
-    s += chk('shuffle','Mélanger les choix','Ordre des propositions aléatoire à chaque affichage.',true);
-    s += chk('nocheck','Sans bouton vérifier','Retire le bouton de validation individuel.',true);
-    if(t!=='dropdown') s += chk('allowempty','Vide autorisé','Aucune sélection = EMPTYANSWER.',true);
+    s += chk('shuffle',I18N.t('exp.opt_shuffle_lbl'),I18N.t('exp.opt_shuffle_tip'),true);
+    s += chk('nocheck',I18N.t('exp.opt_nocheck_lbl'),I18N.t('exp.opt_nocheck_tip'),true);
+    if(t!=='dropdown') s += chk('allowempty',I18N.t('exp.opt_allowempty_lbl'),I18N.t('exp.opt_allowempty_tip_mcq'),true);
   }
 
   s += '</div>';
@@ -733,7 +733,7 @@ function expertAddInput(){
 
 function expertRemoveInput(i){
   var q=questions[_activeQid]; if(!q||!q._expertState) return;
-  if(q._expertState.inputs.length<=1){ toast('Il faut au moins un input.'); return; }
+  if(q._expertState.inputs.length<=1){ toast(I18N.t('exp.err_min_one_input')); return; }
   q._expertState.inputs.splice(i,1);
   expertRenderInputs(q._expertState.inputs);
 }
@@ -749,7 +749,7 @@ function expertRenderPrts(qid, prts){
 }
 
 function expertPrtCard(qid, prt, i){
-  var fsLabels={'0':'0 — Sans feedback','1':'1 — Fraction seulement','2':'2 — Fraction + icône (défaut)','3':'3 — Fraction + icône + %'};
+  var fsLabels={'0':I18N.t('exp.fs_opt0'),'1':I18N.t('exp.fs_opt1'),'2':I18N.t('exp.fs_opt2'),'3':I18N.t('exp.fs_opt3')};
   var fsOpts=['0','1','2','3'].map(function(v){
     return '<option value="'+v+'"'+(String(prt.feedbackstyle||2)===v?' selected':'')+'>'+fsLabels[v]+'</option>';
   }).join('');
@@ -760,29 +760,29 @@ function expertPrtCard(qid, prt, i){
       +'<span class="exp-card-title">🌳 PRT '+(i+1)+' &mdash; <code>'+_ee(prt.name)+'</code></span>'
       +'<div style="display:flex;gap:6px;align-items:center;">'
         +'<button type="button" id="exp-prt-toggle-'+i+'" class="exp-prt-open"'
-          +' onclick="expertExpandInlinePrt('+qid+','+i+')">▼ Voir l\'arbre</button>'
-        +'<button type="button" class="exp-card-del" onclick="expertRemovePrt('+i+')" title="Supprimer">✕</button>'
+          +' onclick="expertExpandInlinePrt('+qid+','+i+')">'+I18N.t('exp.prt_show_tree_btn')+'</button>'
+        +'<button type="button" class="exp-card-del" onclick="expertRemovePrt('+i+')" title="'+_ee(I18N.t('common.supprimer'))+'">✕</button>'
       +'</div>'
     +'</div>'
     /* ── Paramètres PRT ── */
     +'<div class="exp-card-body">'
       +'<div class="exp-row3">'
-        +'<div><label class="cfg-lbl">Nom PRT</label>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.prt_name_lbl')+'</label>'
           +'<input class="hs-input exp-mono" value="'+_ee(prt.name)+'" '
           +'onchange="expertUpdatePrt('+i+',\'name\',this.value);document.querySelector(\'#exp-prt-'+i+' code\').textContent=this.value"></div>'
-        +'<div><label class="cfg-lbl">Valeur (pts)</label>'
+        +'<div><label class="cfg-lbl">'+I18N.t('exp.prt_value_lbl')+'</label>'
           +'<input type="number" class="hs-input" min="0" step="0.1" value="'+(prt.value||1)+'" onchange="expertUpdatePrt('+i+',\'value\',+this.value)"></div>'
-        +'<div><label class="cfg-lbl" title="Affichage du score dans le feedback Moodle:\n0 = rien\n1 = fraction (ex: 1/2)\n2 = fraction + icône ✓✗ (défaut STACK)\n3 = fraction + icône + pourcentage">Affichage score</label>'
+        +'<div><label class="cfg-lbl" title="'+_ee(I18N.t('exp.prt_feedbackstyle_title'))+'">'+I18N.t('exp.prt_feedbackstyle_lbl')+'</label>'
           +'<select class="hs-input" onchange="expertUpdatePrt('+i+',\'feedbackstyle\',+this.value)">'+fsOpts+'</select></div>'
       +'</div>'
       +'<label class="exp-chk" style="margin-bottom:8px;">'
         +'<input type="checkbox" '+(prt.autosimplify?'checked':'')+' onchange="expertUpdatePrt('+i+',\'autosimplify\',this.checked?1:0)">'
         +'<span>Auto-simplify</span></label>'
-      +'<div style="display:flex;flex-direction:column;gap:4px;"><label class="cfg-lbl">Variables feedback (Maxima)</label>'
+      +'<div style="display:flex;flex-direction:column;gap:4px;"><label class="cfg-lbl">'+I18N.t('exp.prt_feedbackvars_lbl')+'</label>'
         +'<textarea class="hs-input exp-mono exp-autogrow" rows="2" style="resize:none;overflow:hidden;min-height:52px;"'
         +' oninput="expAutoGrow(this);expertUpdatePrt('+i+',\'feedbackvariables\',this.value)"'
         +' onchange="expertUpdatePrt('+i+',\'feedbackvariables\',this.value)">'+_ee(prt.feedbackvariables||'')+'</textarea></div>'
-      +'<div class="exp-prt-info">📍 <span id="exp-prt-nodecount-'+i+'">'+nodeCount+'</span> nœud(s)</div>'
+      +'<div class="exp-prt-info">📍 <span id="exp-prt-nodecount-'+i+'">'+nodeCount+'</span> '+I18N.t('exp.prt_node_count_suffix')+'</div>'
     +'</div>'
     /* ── Zone inline du prt-manager (masquée jusqu'au clic) ── */
     +'<div id="exp-prt-slot-'+i+'" class="exp-prt-slot" style="display:none;"></div>'
@@ -816,7 +816,7 @@ function expertAddPrt(){
 
 function expertRemovePrt(i){
   var q=questions[_activeQid]; if(!q||!q._expertState) return;
-  if(q._expertState.prts.length<=1){ toast('Il faut au moins un PRT.'); return; }
+  if(q._expertState.prts.length<=1){ toast(I18N.t('exp.err_min_one_prt')); return; }
   q._expertState.prts.splice(i,1);
   expertRenderPrts(_activeQid, q._expertState.prts);
 }
@@ -857,11 +857,11 @@ function expertExpandInlinePrt(qid, prtIdx){
   var bar = document.createElement('div');
   bar.className='exp-prt-inline-bar';
   bar.innerHTML=
-    '<span style="font-size:.8rem;font-weight:700;color:#a78bfa;">🌳 Arbre PRT — '+_ee(prt.name)+'</span>'
+    '<span style="font-size:.8rem;font-weight:700;color:#a78bfa;">'+_ee(I18N.t('exp.prt_tree_title',{name:prt.name}))+'</span>'
    +'<button class="prt-hdr-btn prt-hdr-tidy"  onclick="prtTidy()">⟳ Tidy</button>'
    +'<button class="prt-hdr-btn prt-hdr-reset" onclick="prtResetLayout()">⊞ Reset</button>'
-   +'<button class="prt-hdr-btn prt-hdr-add"   onclick="prtAddNode()">＋ Nœud</button>'
-   +'<button class="prt-hdr-btn prt-hdr-save"  onclick="savePrtManager()" style="margin-left:auto;">✓ Appliquer</button>';
+   +'<button class="prt-hdr-btn prt-hdr-add"   onclick="prtAddNode()">'+I18N.t('exp.prt_add_node_btn')+'</button>'
+   +'<button class="prt-hdr-btn prt-hdr-save"  onclick="savePrtManager()" style="margin-left:auto;">'+I18N.t('exp.prt_apply_btn')+'</button>';
   slot.appendChild(bar);
   slot.appendChild(body);
   slot.style.display='block';
@@ -877,7 +877,7 @@ function expertExpandInlinePrt(qid, prtIdx){
 
   /* Mettre à jour le bouton */
   var btn=document.getElementById('exp-prt-toggle-'+prtIdx);
-  if(btn){ btn.textContent='▲ Masquer l\'arbre'; btn.style.background='#f0fdf4'; }
+  if(btn){ btn.textContent=I18N.t('exp.prt_hide_tree_btn'); btn.style.background='#f0fdf4'; }
 }
 
 function expertCollapseInlinePrt(prtIdx){
@@ -898,7 +898,7 @@ function expertCollapseInlinePrt(prtIdx){
 
   /* Bouton */
   var btn=document.getElementById('exp-prt-toggle-'+prtIdx);
-  if(btn){ btn.textContent='▼ Voir l\'arbre'; btn.style.background=''; }
+  if(btn){ btn.textContent=I18N.t('exp.prt_show_tree_btn'); btn.style.background=''; }
 
   _prtInlineMode=false;
   _prtInlineCurrentIdx=null;
@@ -917,7 +917,7 @@ function _expertSyncPrtInline(qid, newPrtXml){
   q._expertState.prts[idx]=Object.assign({},existing,parsed.meta,{nodes:parsed.nodes});
   /* Mettre à jour le compteur de nœuds dans la carte */
   var info=document.querySelector('#exp-prt-'+idx+' .exp-prt-info');
-  if(info) info.textContent='📍 '+parsed.nodes.length+' nœud(s)';
+  if(info) info.textContent='📍 '+parsed.nodes.length+' '+I18N.t('exp.prt_node_count_suffix');
 }
 
 /* ── Sync modal (flow classique stack-raw ou expert en modal) ────── */
@@ -938,7 +938,7 @@ function _expertSyncPrt(qid, newPrtXml){
    ════════════════════════════════════════════════════════════════════ */
 function convertStackRawToExpert(qid){
   var q=questions[qid];
-  if(!q||q.type!=='stack-raw'){ toast('Cette question n\'est pas de type stack-raw.'); return; }
+  if(!q||q.type!=='stack-raw'){ toast(I18N.t('exp.err_not_stackraw')); return; }
 
   var parser=new DOMParser();
   var raw=q.rawXml||'<root/>';
@@ -1004,6 +1004,6 @@ function convertStackRawToExpert(qid){
 
   updateChipStatus(qid,true);
   saveEditorState();
-  toast('✅ Convertie en mode Expert — '+prts.length+' PRT(s), '+inputs.length+' input(s).');
+  toast(I18N.t('exp.toast_converted',{prts:prts.length,inputs:inputs.length}));
   openConfigPanel(qid,'expert');
 }
