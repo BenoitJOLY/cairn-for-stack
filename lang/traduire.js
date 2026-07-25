@@ -1,81 +1,68 @@
 const fs = require('fs');
 const https = require('https');
 
-// MET TA CLE API DEEPL ICI (gratuite sur deepl.com/pro-api)
-const API_KEY = '398b4a26-b800-4028-8210-382f0b94f162:fx'; 
 const INPUT_FILE = 'fr.js';
-const OUTPUT_FILE = 'es.js';
+const OUTPUT_FILE = 'nl.js';
 
-function translateBatch(texts) {
-  return new Promise((resolve, reject) => {
-    const postData = new URLSearchParams({
-      text: texts,
-      target_lang: 'ES',
-      source_lang: 'FR',
-      split_sentences: '0'
-    }).toString();
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    const options = {
-      hostname: 'api-free.deepl.com',
-      path: '/v2/translate',
-      method: 'POST',
-      headers: {
-        'Authorization': `DeepL-Auth-Key ${API_KEY}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    const req = https.request(options, res => {
+function translateText(text) {
+  return new Promise((resolve) => {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=nl&dt=t&q=${encodeURIComponent(text)}`;
+    https.get(url, (res) => {
       let data = '';
-      res.on('data', chunk => data += chunk);
+      res.on('data', (chunk) => data += chunk);
       res.on('end', () => {
-        if (res.statusCode === 200) resolve(JSON.parse(data).translations.map(t => t.text));
-        else reject(new Error(`Erreur API: ${res.statusCode} - ${data}`));
+        try {
+          const parsed = JSON.parse(data);
+          resolve(parsed[0].map(item => item[0]).join(''));
+        } catch (e) {
+          resolve(text); 
+        }
       });
-    });
-    req.on('error', reject);
-    req.write(postData);
-    req.end();
+    }).on('error', () => resolve(text));
   });
 }
 
-async function processFile(fileInfo) {
-  console.log(`\n--- Traitement de ${fileInfo.input} ---`);
-  let content = fs.readFileSync(fileInfo.input, 'utf8');
+async function main() {
+  console.log(`Lecture de ${INPUT_FILE}...`);
+  let content = fs.readFileSync(INPUT_FILE, 'utf8');
   const regex = /"([^"]+)"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
   
-  let match, keys = [], values = [];
+  let match, fullMatches = [], values = [];
   while ((match = regex.exec(content)) !== null) {
-    keys.push(match[1]);
+    fullMatches.push(match[0]);
     values.push(match[2]);
   }
-  console.log(`Trouvé ${values.length} textes. Traduction...`);
+  
+  console.log(`Trouvé ${values.length} textes. Traduction Google en cours...`);
 
-  let translatedValues = [];
-  for (let i = 0; i < values.length; i += 50) {
-    const batch = values.slice(i, i + 50);
-    const translated = await translateBatch(batch);
-    translatedValues.push(...translated);
-    console.log(`${Math.min(i + 50, values.length)} / ${values.length} fait(s)...`);
+  let translatedValues = new Array(values.length).fill("");
+
+  for (let i = 0; i < values.length; i++) {
+    if (values[i].trim() !== "") {
+      const translated = await translateText(values[i]);
+      translatedValues[i] = translated.replace(/'/g, "\\'");
+    }
+    
+    // On affiche l'avancement toutes les 100 lignes
+    if ((i + 1) % 100 === 0) {
+      console.log(`${i + 1} / ${values.length} traduits...`);
+      await sleep(1000); // Pause d'1 seconde pour ne pas se faire bloquer par Google
+    }
   }
 
-  for (let i = keys.length - 1; i >= 0; i--) {
-    const originalStr = `"${keys[i]}": "${values[i]}"`;
-    const translatedStr = `"${keys[i]}": "${translatedValues[i]}"`;
-    content = content.replace(originalStr, translatedStr);
+  console.log("Application de la traduction dans le fichier...");
+  for (let i = fullMatches.length - 1; i >= 0; i--) {
+    const safeTranslation = translatedValues[i] ? translatedValues[i].replace(/\$/g, '$$$$') : "";
+    const newStr = fullMatches[i].replace(values[i], safeTranslation);
+    content = content.replace(fullMatches[i], newStr);
   }
 
-  content = content.replace('I18N.add("fr"', 'I18N.add("de"');
-  fs.writeFileSync(fileInfo.output, content, 'utf8');
-  console.log(`Fichier ${fileInfo.output} créé.`);
-}
+  content = content.replace('I18N.add("fr"', 'I18N.add("nl"');
 
-async function main() {
-  for (const file of FILES) {
-    await processFile(file);
-  }
-  console.log('\nTOUS LES FICHIERS ONT ÉTÉ TRADUITS.');
+  fs.writeFileSync(OUTPUT_FILE, content, 'utf8');
+  console.log(`\nTERMINÉ ! Fichier ${OUTPUT_FILE} créé avec succès.`);
 }
 
 main().catch(err => console.error("ERREUR :", err.message));

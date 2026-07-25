@@ -622,4 +622,3 @@ const HELP_CONTENT = {
   window.HELP_LANG = window.HELP_LANG || {};
   window.HELP_LANG.nl = HELP_CONTENT;
 })();
-}
