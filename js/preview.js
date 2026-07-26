@@ -1218,6 +1218,10 @@ function renderPreviewHTML_apn(state) {
   var realGeneralFeedback = realParts.generalFeedback || '';
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   var prtBoxes = _hsPrtBoxes(realParts);
+  // _hsPrtBoxes lit prt.nodes, désormais bruts (sans encadré, cf. js/fb-box.js) :
+  // on applique l'encadré uniquement ici, au point d'affichage de l'aperçu.
+  prtBoxes.okFb = applyFbBox('true', prtBoxes.okFb);
+  prtBoxes.wrongFb = applyFbBox('false', prtBoxes.wrongFb);
   var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:170px;';
   var bodyFrag = (realParts.textFrag || '')
     .replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
@@ -1235,7 +1239,7 @@ function renderPreviewHTML_apn(state) {
     fbGenAuto: _hsRenderMath(_calcTokenizeForPreview(realGeneralFeedback, knownVars) + note),
     fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen,
     extraFeedbackNodes: (realParts.diagNodes || []).map(function(n) {
-      return { desc: n.desc, fb: _calcTokenizeForPreview(n.fb, knownVars) };
+      return { desc: n.desc, fb: applyFbBox(n.kind, _calcTokenizeForPreview(n.fb, knownVars)) };
     })
   });
 }

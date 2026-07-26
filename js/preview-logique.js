@@ -5,6 +5,10 @@ function renderPreviewHTML_logique(state) {
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });
   var prtBoxes = _hsPrtBoxes(realParts);
+  // _hsPrtBoxes lit prt.nodes, désormais bruts (sans encadré, cf. js/fb-box.js) :
+  // on applique l'encadré uniquement ici, au point d'affichage de l'aperçu.
+  prtBoxes.okFb = applyFbBox('true', prtBoxes.okFb);
+  prtBoxes.wrongFb = applyFbBox('false', prtBoxes.wrongFb);
   var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
   var bodyFrag = (realParts.textFrag || '')
     .replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')

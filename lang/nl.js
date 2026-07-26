@@ -721,7 +721,8 @@ I18N.add("nl", {
   "maxima.err_connexion":       "Kan geen contact maken met de Maxima-server ({msg}).",
 
   /* ── Instelbare feedbackkaders (Opties) ── */
-  "footer.fbbox_options":       "Feedbackopties",
+  "opt.fbbox_lbl":              "Feedback",
+  "opt.fbbox_btn":              "🎨 Kaders aanpassen",
   "fbbox.titre":                "Weergaveopties voor feedback",
   "fbbox.explication":          "Pas de randkleur, achtergrond en het icoon aan van de feedbackkaders die worden gebruikt in de voorvertoning en bij de XML-export (Juist, Gedeeltelijk, Fout, Algemeen). Deze instellingen worden alleen in uw browser opgeslagen.",
   "fbbox.type_true":            "Feedback juist (100%)",

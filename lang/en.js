@@ -719,7 +719,8 @@ I18N.add("en", {
   "maxima.err_connexion":       "Could not reach the Maxima server ({msg}).",
 
   /* ── Configurable feedback boxes (Options) ── */
-  "footer.fbbox_options":       "Feedback box options",
+  "opt.fbbox_lbl":              "Feedback",
+  "opt.fbbox_btn":              "🎨 Customize the boxes",
   "fbbox.titre":                "Feedback display options",
   "fbbox.explication":          "Customize the border color, background and icon of the feedback boxes used in the preview and the XML export (True, Partial, False, General). These settings are stored in your browser only.",
   "fbbox.type_true":            "True feedback (100%)",

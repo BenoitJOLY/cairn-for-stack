@@ -721,7 +721,8 @@ I18N.add("fr", {
   "maxima.err_connexion":       "Impossible de contacter le serveur Maxima ({msg}).",
 
   /* ── Encadrés de feedback configurables (Options) ── */
-  "footer.fbbox_options":       "Options des feedbacks",
+  "opt.fbbox_lbl":              "Feedbacks",
+  "opt.fbbox_btn":              "🎨 Personnaliser les encadrés",
   "fbbox.titre":                "Options d'affichage des feedbacks",
   "fbbox.explication":          "Personnalisez la couleur, le fond et l'icône des encadrés de feedback utilisés dans l'aperçu et l'export XML (Vrai, Partiel, Faux, Général). Ces réglages sont propres à votre navigateur.",
   "fbbox.type_true":            "Feedback vrai (100%)",

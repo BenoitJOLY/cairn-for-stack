@@ -75,7 +75,9 @@
       '<section class="hs-opt-sec"><label id="hs-opt-mode-lbl"></label>' +
       '<div id="hs-opt-modes" class="hs-opt-row">' +
       '<button data-mode="normal"></button><button data-mode="expert"></button></div>' +
-      '<p class="hs-opt-hint" id="hs-opt-mode-hint"></p></section>';
+      '<p class="hs-opt-hint" id="hs-opt-mode-hint"></p></section>' +
+      '<section class="hs-opt-sec"><label id="hs-opt-fbbox-lbl"></label>' +
+      '<div class="hs-opt-row"><button id="hs-opt-fbbox-btn" type="button"></button></div></section>';
     back.appendChild(box);
     document.body.appendChild(back);
 
@@ -108,6 +110,11 @@
     // mode
     box.querySelectorAll("#hs-opt-modes button").forEach(function (b) {
       b.addEventListener("click", function () { applyMode(b.getAttribute("data-mode")); });
+    });
+    // encadrés de feedback (ouvre la modale dédiée js/fb-box-options.js)
+    box.querySelector("#hs-opt-fbbox-btn").addEventListener("click", function () {
+      closeModal();
+      if (typeof openFbBoxOptionsModal === "function") openFbBoxOptionsModal();
     });
 
     relabel();
@@ -142,6 +149,8 @@
     set("hs-opt-theme-lbl", t("opt.theme", "Thème"));
     set("hs-opt-mode-lbl", t("opt.mode", "Mode"));
     set("hs-opt-mode-hint", t("opt.mode_hint", "Mode Expert : accès aux variables partagées et à l'importation XML."));
+    set("hs-opt-fbbox-lbl", t("opt.fbbox_lbl", "Feedbacks"));
+    set("hs-opt-fbbox-btn", t("opt.fbbox_btn", "🎨 Personnaliser les encadrés"));
     var box = document.getElementById("hs-opt-themes");
     if (box) {
       box.querySelector('[data-theme="light"]').textContent = t("opt.light", "☀ Clair");

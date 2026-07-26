@@ -721,7 +721,8 @@ I18N.add("de", {
   "maxima.err_connexion":       "Der Maxima-Server ({msg}) konnte nicht kontaktiert werden.",
 
   /* ── Konfigurierbare Feedback-Kästen (Optionen) ── */
-  "footer.fbbox_options":       "Feedback-Optionen",
+  "opt.fbbox_lbl":              "Feedback",
+  "opt.fbbox_btn":              "🎨 Kästen anpassen",
   "fbbox.titre":                "Anzeigeoptionen für Feedback",
   "fbbox.explication":          "Passen Sie Rahmenfarbe, Hintergrund und Symbol der Feedback-Kästen an, die in der Vorschau und beim XML-Export verwendet werden (Richtig, Teilweise, Falsch, Allgemein). Diese Einstellungen werden nur in Ihrem Browser gespeichert.",
   "fbbox.type_true":            "Feedback richtig (100%)",
