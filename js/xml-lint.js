@@ -147,5 +147,50 @@ function lintExportedXML(xml) {
     }
   }
 
+  // 9) Branches terminales de PRT sans feedback : un nœud dont truenextnode/falsenextnode
+  //    vaut -1 marque la fin du parcours de notation pour cette branche — le score de
+  //    l'élève y est figé. Si le truefeedback/falsefeedback correspondant est vide,
+  //    l'élève reçoit cette note finale sans aucune explication. Règle volontairement
+  //    stricte : un generalfeedback renseigné sur la question ne compense PAS l'absence
+  //    de feedback sur cette branche précise (décision utilisateur du 2026-07-26) — chaque
+  //    branche terminale doit porter son propre message.
+  function extractTagText(block, tag) {
+    var re = new RegExp('<' + tag + '(?:\\s+[^>]*)?>\\s*<text>(?:<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>|([\\s\\S]*?))<\\/text>\\s*<\\/' + tag + '>', 'i');
+    var m = block.match(re);
+    if (!m) return null;
+    return (m[1] !== undefined ? m[1] : m[2]) || '';
+  }
+  function isFeedbackEmpty(text) {
+    if (text === null) return true;
+    var stripped = text.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+    return stripped.length === 0;
+  }
+  var prtRe = /<prt>([\s\S]*?)<\/prt>/g, prtM;
+  while ((prtM = prtRe.exec(xml))) {
+    var prtBlock = prtM[1];
+    var prtNameM = prtBlock.match(/^\s*<name>([^<]*)<\/name>/);
+    var prtName = prtNameM ? prtNameM[1] : '(sans nom)';
+    var nodeRe = /<node>([\s\S]*?)<\/node>/g, nodeM;
+    while ((nodeM = nodeRe.exec(prtBlock))) {
+      var nodeBlock = nodeM[1];
+      var nodeNameM = nodeBlock.match(/^\s*<name>([^<]*)<\/name>/);
+      var nodeName = nodeNameM ? nodeNameM[1] : '?';
+      var trueNext = (nodeBlock.match(/<truenextnode>([^<]*)<\/truenextnode>/) || [])[1];
+      var falseNext = (nodeBlock.match(/<falsenextnode>([^<]*)<\/falsenextnode>/) || [])[1];
+      var trueNote = (nodeBlock.match(/<trueanswernote>([^<]*)<\/trueanswernote>/) || [])[1] || '';
+      var falseNote = (nodeBlock.match(/<falseanswernote>([^<]*)<\/falseanswernote>/) || [])[1] || '';
+      if (trueNext === '-1' && isFeedbackEmpty(extractTagText(nodeBlock, 'truefeedback'))) {
+        warnings.push('PRT "' + prtName + '", nœud ' + nodeName + ' : branche VRAIE terminale (truenextnode=-1'
+          + (trueNote ? ', trueanswernote=' + trueNote : '') + ') sans truefeedback — '
+          + 'l\'élève recevra ce score final sans aucune explication.');
+      }
+      if (falseNext === '-1' && isFeedbackEmpty(extractTagText(nodeBlock, 'falsefeedback'))) {
+        warnings.push('PRT "' + prtName + '", nœud ' + nodeName + ' : branche FAUSSE terminale (falsenextnode=-1'
+          + (falseNote ? ', falseanswernote=' + falseNote : '') + ') sans falsefeedback — '
+          + 'l\'élève recevra ce score final sans aucune explication.');
+      }
+    }
+  }
+
   return warnings;
 }
