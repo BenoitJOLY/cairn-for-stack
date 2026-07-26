@@ -14,11 +14,8 @@ function addCWRow(word, def) {
     row.innerHTML =
         '<input type="text" class="cw-input cw-word" placeholder="' + I18N.t('tpl.cw_mot') + '">' +
         '<div class="cw-def-wrap">' +
-          '<div class="rich-preview rich-preview-sm cw-def-preview" id="prev-' + defId + '" data-ph="' + attrEsc(I18N.t('tpl.cw_definition') + '…') + '" onclick="openRich(\'' + defId + '\')"></div>' +
+          '<div class="rich-preview rich-preview-sm cw-def-preview" id="prev-' + defId + '" tabindex="0" role="button" data-ph="' + attrEsc(I18N.t('tpl.cw_definition') + '…') + '" onclick="openRich(\'' + defId + '\')"></div>' +
           '<textarea id="' + defId + '" class="cw-def" style="display:none"></textarea>' +
-          '<button class="btn-rich" type="button" onclick="openRich(\'' + defId + '\')">' +
-            '<svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> \xc9diteur' +
-          '</button>' +
         '</div>' +
         '<button class="cw-btn-del" type="button" onclick="this.parentElement.remove()" aria-label="' + I18N.t('btn.supprimer') + '">✕</button>';
     tbody.appendChild(row);

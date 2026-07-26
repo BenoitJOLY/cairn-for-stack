@@ -21,6 +21,14 @@ function openRich(fieldId){
   FocusTrap.trap(modal, closeRich);
 }
 function closeRich(){document.getElementById('richModal').style.display='none';FocusTrap.release();}
+// Zones .rich-preview cliquables : les rendre activables au clavier (Entrée/Espace) via délégation,
+// pour remplacer les boutons "Éditeur" redondants supprimés du HTML.
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('rich-preview')){
+    e.preventDefault();
+    e.target.click();
+  }
+});
 function confirmRich(){setRichVal(currentRichField,spansToLatex(richEditor()));
   if(currentRichField==='chem-text' && typeof chemUpdateLock==='function') chemUpdateLock();
   if(currentRichField==='nuc-text' && typeof nucUpdateLock==='function') nucUpdateLock();

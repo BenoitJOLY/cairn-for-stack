@@ -9,10 +9,9 @@ function addCBRow(isV,text='',fb='',fb2=''){
   div.id='r'+id;
   div.className='prop-row';
   const showOubli=document.getElementById('cb-show-oubli')?.checked;
-  const editBtn=(fid,lbl)=>`<button class="btn-rich" onclick="openRich('${fid}')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> ${lbl}</button>`;
-  const textField=`<div>${editBtn(`p-text-${id}`,'Texte')}<div id="prev-p-text-${id}" class="rich-preview rich-preview-sm" data-ph="${I18N.t('tpl.prop_intitule')}" onclick="openRich('p-text-${id}')"></div><textarea id="p-text-${id}" class="p-text" style="display:none"></textarea></div>`;
-  const fbField=`<div class="p-fb-col">${editBtn(`p-fb-${id}`,'Feedback')}<div id="prev-p-fb-${id}" class="rich-preview rich-preview-sm" data-ph="Feedback" onclick="openRich('p-fb-${id}')"></div><textarea id="p-fb-${id}" class="p-fb" style="display:none"></textarea></div>`;
-  const fb2inner=isV?`${editBtn(`p-fb2-${id}`,'Feedback si oubliée')}<div id="prev-p-fb2-${id}" class="rich-preview rich-preview-sm" data-ph="Feedback si oubliée" onclick="openRich('p-fb2-${id}')"></div><textarea id="p-fb2-${id}" class="p-fb2" style="display:none"></textarea>`:`<input type="hidden" class="p-fb2" value="">`;
+  const textField=`<div><div id="prev-p-text-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="${I18N.t('tpl.prop_intitule')}" onclick="openRich('p-text-${id}')"></div><textarea id="p-text-${id}" class="p-text" style="display:none"></textarea></div>`;
+  const fbField=`<div class="p-fb-col"><div id="prev-p-fb-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Feedback" onclick="openRich('p-fb-${id}')"></div><textarea id="p-fb-${id}" class="p-fb" style="display:none"></textarea></div>`;
+  const fb2inner=isV?`<div id="prev-p-fb2-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Feedback si oubliée" onclick="openRich('p-fb2-${id}')"></div><textarea id="p-fb2-${id}" class="p-fb2" style="display:none"></textarea>`:`<input type="hidden" class="p-fb2" value="">`;
   const fb2wrap=isV?`<div class="p-fb2-wrap" style="grid-column:1/-1;${showOubli?'':'display:none;'}">${fb2inner}</div>`:`<input type="hidden" class="p-fb2" value="">`;
   div.innerHTML=`<span class="type-badge ${isV?'badge-v':'badge-f'}">${isV?I18N.t('tpl.prop_vrai'):I18N.t('tpl.prop_faux')}</span><input type="hidden" class="p-bool" value="${isV}">${textField}${fbField}<button class="btn-del" onclick="document.getElementById('r${id}').remove();validateCBDraw();" aria-label="${I18N.t('btn.supprimer')}">✕</button>${fb2wrap}`;
   document.getElementById('cb-props').appendChild(div);
@@ -31,9 +30,8 @@ function addPoolRow(cid,isV,text,fb,upd){
   const div=document.createElement('div');
   div.id='r'+id;
   div.className='prop-row two-col';
-  const editBtn=(fid,lbl)=>`<button class="btn-rich" onclick="openRich('${fid}')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> ${lbl}</button>`;
-  const textField=`<div>${editBtn(`p-text-${id}`,'Texte')}<div id="prev-p-text-${id}" class="rich-preview rich-preview-sm" data-ph="${I18N.t('tpl.prop_intitule')}" onclick="openRich('p-text-${id}')"></div><textarea id="p-text-${id}" class="p-text" style="display:none"></textarea></div>`;
-  const fbField=`<div class="p-fb-col">${editBtn(`p-fb-${id}`,'Feedback')}<div id="prev-p-fb-${id}" class="rich-preview rich-preview-sm" data-ph="Feedback" onclick="openRich('p-fb-${id}')"></div><textarea id="p-fb-${id}" class="p-fb" style="display:none"></textarea></div>`;
+  const textField=`<div><div id="prev-p-text-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="${I18N.t('tpl.prop_intitule')}" onclick="openRich('p-text-${id}')"></div><textarea id="p-text-${id}" class="p-text" style="display:none"></textarea></div>`;
+  const fbField=`<div class="p-fb-col"><div id="prev-p-fb-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Feedback" onclick="openRich('p-fb-${id}')"></div><textarea id="p-fb-${id}" class="p-fb" style="display:none"></textarea></div>`;
   div.innerHTML=`<input type="hidden" class="p-bool" value="${isV}">${textField}${fbField}<button class="btn-del" onclick="delPoolRow('r${id}','${cid}')" aria-label="${I18N.t('btn.supprimer')}">✕</button>`;
   document.getElementById(cid).appendChild(div);
   setRichVal(`p-text-${id}`,text);
@@ -167,7 +165,6 @@ function addVFRow(text, exp, fbIfVrai, fbIfFaux) {
   const isFaux = (exp === 2 || exp === 'f');
   const chkV   = !isFaux ? 'checked' : '';
   const chkF   = isFaux  ? 'checked' : '';
-  const editBtn=(fid,lbl)=>`<button class="btn-rich" onclick="openRich('${fid}')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> ${lbl}</button>`;
 
   const div = document.createElement('div');
   div.id = 'vfr' + id;
@@ -175,7 +172,7 @@ function addVFRow(text, exp, fbIfVrai, fbIfFaux) {
   div.innerHTML =
     `<div class="vf-row-num"></div>
     <div class="vf-row-top">
-      <div class="vf-ptext-wrap">${editBtn(`vf-ptext-${id}`,'Texte')}<div id="prev-vf-ptext-${id}" class="rich-preview rich-preview-sm" data-ph="Texte de la proposition" onclick="openRich('vf-ptext-${id}')"></div><textarea id="vf-ptext-${id}" class="vf-ptext" style="display:none"></textarea></div>
+      <div class="vf-ptext-wrap"><div id="prev-vf-ptext-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Texte de la proposition" onclick="openRich('vf-ptext-${id}')"></div><textarea id="vf-ptext-${id}" class="vf-ptext" style="display:none"></textarea></div>
       <div class="vf-exp-group">
         <span class="vf-exp-label">Réponse attendue :</span>
         <label class="vf-radio-lbl"><input type="radio" class="vf-exp" name="vf-exp-${id}" value="v" ${chkV} onchange="validateVFDraw();"> Vrai</label>
@@ -186,14 +183,12 @@ function addVFRow(text, exp, fbIfVrai, fbIfFaux) {
     <div class="vf-row-fbs">
       <div class="vf-fb-block">
         <label class="vf-fb-label">💡 Ce que voit l'élève s'il coche <b>Vrai</b></label>
-        ${editBtn(`vf-fbv-${id}`,'Éditer')}
-        <div id="prev-vf-fbv-${id}" class="rich-preview rich-preview-sm" data-ph="Message affiché si l'élève coche Vrai" onclick="openRich('vf-fbv-${id}')"></div>
+        <div id="prev-vf-fbv-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Message affiché si l'élève coche Vrai" onclick="openRich('vf-fbv-${id}')"></div>
         <textarea id="vf-fbv-${id}" class="vf-fb-ifvrai" style="display:none"></textarea>
       </div>
       <div class="vf-fb-block">
         <label class="vf-fb-label">💡 Ce que voit l'élève s'il coche <b>Faux</b></label>
-        ${editBtn(`vf-fbf-${id}`,'Éditer')}
-        <div id="prev-vf-fbf-${id}" class="rich-preview rich-preview-sm" data-ph="Message affiché si l'élève coche Faux" onclick="openRich('vf-fbf-${id}')"></div>
+        <div id="prev-vf-fbf-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Message affiché si l'élève coche Faux" onclick="openRich('vf-fbf-${id}')"></div>
         <textarea id="vf-fbf-${id}" class="vf-fb-iffaux" style="display:none"></textarea>
       </div>
     </div>`;

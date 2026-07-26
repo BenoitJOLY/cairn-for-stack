@@ -882,8 +882,8 @@ fill="currentColor" stroke="none">
 
       <!-- Énoncé -->
       <div class="field">
-        <label><span data-i18n="jd.instruction_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('jd-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-jd-text" data-ph="Cliquez sur Éditeur…" data-i18n-dataph="common.click_editor_ellipsis" onclick="openRich('jd-text')"></div>
+        <label><span data-i18n="jd.instruction_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-jd-text" data-ph="Cliquez sur Éditeur…" data-i18n-dataph="common.click_editor_ellipsis" onclick="openRich('jd-text')"></div>
         <textarea id="jd-text" style="display:none"></textarea>
       </div>
 
@@ -977,8 +977,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="jd-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="jd.fbgen_auto_note">La correction est automatique : un pourcentage de zones correctement complétées est calculé, avec rappel de la solution attendue en cas d'erreur.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('jd-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-jd-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('jd-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-jd-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('jd-fbgen')"></div>
           <textarea id="jd-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -1024,8 +1024,8 @@ fill="currentColor" stroke="none">
 
       <!-- Énoncé -->
       <div class="field">
-        <label><span data-i18n="ggb.instruction_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('ggb-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-ggb-text" data-ph="Cliquez sur Éditeur…" data-i18n-dataph="common.click_editor_ellipsis" onclick="openRich('ggb-text')"></div>
+        <label><span data-i18n="ggb.instruction_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-ggb-text" data-ph="Cliquez sur Éditeur…" data-i18n-dataph="common.click_editor_ellipsis" onclick="openRich('ggb-text')"></div>
         <textarea id="ggb-text" style="display:none"></textarea>
       </div>
 
@@ -1071,8 +1071,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="ggb-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="ggb.fbgen_auto_note">La correction est automatique : un pourcentage d'objets de sortie corrects est calculé, avec rappel de la solution attendue en cas d'erreur.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('ggb-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-ggb-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ggb-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-ggb-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ggb-fbgen')"></div>
           <textarea id="ggb-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -1095,8 +1095,8 @@ fill="currentColor" stroke="none">
       <span data-i18n="type.vf">Vrai / Faux</span>
       <div class="json-btns">
         <button class="btn-json" onclick="openPromptBuilder('VF')" style="color:#365314;" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button>
-        <button class="btn-json" onclick="openJsonModal('VF')" style="color:#365314;" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">JSON</span></button>
-        <button class="btn-json" onclick="exportVFJSON()" style="color:#365314;" data-i18n-title="btn.export_json_aria" data-i18n-aria="btn.export_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-export"></use></svg> <span data-i18n="common.json_export_btn">JSON</span></button>
+        <button class="btn-json" onclick="openJsonModal('VF')" style="color:#365314;" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">Import réponse IA</span></button>
+        
       </div>
     </div>
     <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="vf-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
@@ -1131,8 +1131,8 @@ fill="currentColor" stroke="none">
       </div>
       <div class="warn-box" id="warn-vf-draw" style="display:none;border-color:#f59e0b;background:#fefce8;color:#92400e;">⚠️ <span id="warn-vf-draw-msg"></span></div>
       <div class="field">
-        <label><span data-i18n="vf.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('vf-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-vf-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('vf-text')"></div>
+        <label><span data-i18n="vf.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-vf-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('vf-text')"></div>
         <textarea id="vf-text" style="display:none"></textarea>
       </div>
       <div id="vf-props"></div>
@@ -1153,8 +1153,8 @@ fill="currentColor" stroke="none">
           <span class="hint" data-i18n="vf.showfb_hint">En plus de la réponse attendue (Vrai/Faux) de chaque proposition, affiche son feedback correspondant (champ « Si coche Vrai/Faux » de chaque proposition).</span>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="vf.fbgen_extra_note">(optionnel, ajouté à la suite de la liste ci-dessus)</span> <button class="btn-rich" onclick="openRich('vf-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-vf-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('vf-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="vf.fbgen_extra_note">(optionnel, ajouté à la suite de la liste ci-dessus)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-vf-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('vf-fbgen')"></div>
           <textarea id="vf-fbgen" style="display:none"></textarea>
         </div>
         <p class="hint" data-i18n="common.fbgen_note_detail">Ce feedback est toujours affiché après validation, en plus du détail par proposition, quel que soit le résultat.</p>
@@ -1187,8 +1187,8 @@ fill="currentColor" stroke="none">
         <span data-i18n="ord.info">L'élève remet des éléments dans le bon ordre par glisser-déposer (exercice de remise en ordre).</span>
       </div>
       <div class="field">
-        <label><span data-i18n="ord.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('ord-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-ord-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('ord-text')"></div>
+        <label><span data-i18n="ord.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-ord-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('ord-text')"></div>
         <textarea id="ord-text" style="display:none"></textarea>
       </div>
       <div id="ord-items"></div>
@@ -1202,8 +1202,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="ord-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="ord.fbgen_auto_note">La correction vérifie automatiquement l'ordre exact des éléments.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('ord-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-ord-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ord-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-ord-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ord-fbgen')"></div>
           <textarea id="ord-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -1236,8 +1236,8 @@ fill="currentColor" stroke="none">
         <span data-i18n="ic.info">L'élève clique sur la bonne zone d'une image (SVT, physique, géographie…). La zone reste invisible.</span>
       </div>
       <div class="field">
-        <label><span data-i18n="ic.text_lbl">Instruction</span> <button class="btn-rich" onclick="openRich('ic-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-ic-text" data-ph="Ex : Cliquez sur le ventricule gauche…" data-i18n-dataph="ic.text_ph" onclick="openRich('ic-text')"></div>
+        <label><span data-i18n="ic.text_lbl">Instruction</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-ic-text" data-ph="Ex : Cliquez sur le ventricule gauche…" data-i18n-dataph="ic.text_ph" onclick="openRich('ic-text')"></div>
         <textarea id="ic-text" style="display:none"></textarea>
       </div>
       <div class="field" style="margin-top:10px;">
@@ -1350,8 +1350,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="ic-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="ic.fbgen_auto_note">La correction de la zone cliquée est automatique. Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('ic-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-ic-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ic-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-ic-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ic-fbgen')"></div>
           <textarea id="ic-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -1385,8 +1385,8 @@ fill="currentColor" stroke="none">
         <span data-i18n="rvb.info">L'élève identifie la couleur d'un objet en observant son image à travers des filtres colorés.</span>
       </div>
       <div class="field">
-        <label><span data-i18n="rvb.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('rvb-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-rvb-text" data-ph="Ex : Voici la même scène photographiée à travers différents filtres…" data-i18n-dataph="rvb.text_ph" onclick="openRich('rvb-text')"></div>
+        <label><span data-i18n="rvb.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-rvb-text" data-ph="Ex : Voici la même scène photographiée à travers différents filtres…" data-i18n-dataph="rvb.text_ph" onclick="openRich('rvb-text')"></div>
         <textarea id="rvb-text" style="display:none"></textarea>
       </div>
       <div class="field">
@@ -1470,8 +1470,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="rvb-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="rvb.fbgen_auto_note">La correction de la couleur est automatique. Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('rvb-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-rvb-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('rvb-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-rvb-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('rvb-fbgen')"></div>
           <textarea id="rvb-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -1704,8 +1704,8 @@ fill="currentColor" stroke="none">
 
       <!-- Consigne -->
       <div class="field">
-        <label><span data-i18n="glr.text_lbl">Consigne</span> <button class="btn-rich" onclick="openRich('opt-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-opt-text" data-ph="Ex : Tracer les rayons remarquables…" data-i18n-dataph="opt.text_ph" onclick="openRich('opt-text')"></div>
+        <label><span data-i18n="glr.text_lbl">Consigne</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-opt-text" data-ph="Ex : Tracer les rayons remarquables…" data-i18n-dataph="opt.text_ph" onclick="openRich('opt-text')"></div>
         <textarea id="opt-text" style="display:none"></textarea>
       </div>
 
@@ -1713,8 +1713,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="opt-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="opt.fbgen_auto_desc">La correction de la construction géométrique est automatique (tolérances ci-dessus). Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('opt-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-opt-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('opt-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-opt-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('opt-fbgen')"></div>
           <textarea id="opt-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -1817,8 +1817,8 @@ fill="currentColor" stroke="none">
 
       <!-- Consigne -->
       <div class="field">
-        <label><span data-i18n="glr.text_lbl">Consigne</span> <button class="btn-rich" onclick="openRich('diff-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-diff-text" data-ph="Ex : Mesurez la distance avec le réticule et déduisez λ…" data-i18n-dataph="diff.text_ph" onclick="openRich('diff-text')"></div>
+        <label><span data-i18n="glr.text_lbl">Consigne</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-diff-text" data-ph="Ex : Mesurez la distance avec le réticule et déduisez λ…" data-i18n-dataph="diff.text_ph" onclick="openRich('diff-text')"></div>
         <textarea id="diff-text" style="display:none"></textarea>
       </div>
 
@@ -1837,8 +1837,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="diff-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="diff.fbgen_auto_desc">La correction est automatique (une PRT par sous-question). Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('diff-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-diff-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('diff-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-diff-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('diff-fbgen')"></div>
           <textarea id="diff-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -1871,8 +1871,8 @@ fill="currentColor" stroke="none">
 
       <!-- Énoncé -->
       <div class="field">
-        <label><span data-i18n="ineq.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('imm-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-imm-text" data-ph="Ex : Déplacez les repères A et B pour mesurer une distance en pixels sur le document, déterminez l'échelle à partir des repères d'étalonnage, puis calculez les valeurs demandées." data-i18n-dataph="imm.text_ph" onclick="openRich('imm-text')"></div>
+        <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-imm-text" data-ph="Ex : Déplacez les repères A et B pour mesurer une distance en pixels sur le document, déterminez l'échelle à partir des repères d'étalonnage, puis calculez les valeurs demandées." data-i18n-dataph="imm.text_ph" onclick="openRich('imm-text')"></div>
         <textarea id="imm-text" style="display:none"></textarea>
       </div>
 
@@ -1980,8 +1980,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="imm-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="imm.fbgen_auto_desc">La correction de chaque mesure est automatique. Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('imm-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-imm-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('imm-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-imm-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('imm-fbgen')"></div>
           <textarea id="imm-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -2014,8 +2014,8 @@ fill="currentColor" stroke="none">
 
       <!-- Énoncé -->
       <div class="field">
-        <label><span data-i18n="ab.enonce_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('ab-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-ab-text" data-ph="Ex : Sur la courbe de titrage ci-dessous, déterminer le volume équivalent." data-i18n-dataph="ab.text_ph" onclick="openRich('ab-text')"></div>
+        <label><span data-i18n="ab.enonce_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-ab-text" data-ph="Ex : Sur la courbe de titrage ci-dessous, déterminer le volume équivalent." data-i18n-dataph="ab.text_ph" onclick="openRich('ab-text')"></div>
         <textarea id="ab-text" style="display:none"></textarea>
       </div>
 
@@ -2272,8 +2272,8 @@ fill="currentColor" stroke="none">
 
       <!-- Consigne -->
       <div class="field">
-        <label><span data-i18n="glr.text_lbl">Consigne</span> <button class="btn-rich" onclick="openRich('rx-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-rx-text" data-ph="Ex : Sur la courbe potentiométrique ci-dessous, déterminer le volume équivalent." data-i18n-dataph="rx.text_ph" onclick="openRich('rx-text')"></div>
+        <label><span data-i18n="glr.text_lbl">Consigne</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-rx-text" data-ph="Ex : Sur la courbe potentiométrique ci-dessous, déterminer le volume équivalent." data-i18n-dataph="rx.text_ph" onclick="openRich('rx-text')"></div>
         <textarea id="rx-text" style="display:none"></textarea>
       </div>
 
@@ -2292,8 +2292,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="rx-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="rx.fbgen_auto_desc">La correction du volume/potentiel est automatique (tolérance ci-dessus). Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('rx-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-rx-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('rx-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-rx-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('rx-fbgen')"></div>
           <textarea id="rx-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -2325,7 +2325,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="ineq-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-ineq-text" onclick="openRich('ineq-text')" style="min-height:60px;border-color:#0e7490;background:#ecfeff;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-ineq-text" onclick="openRich('ineq-text')" style="min-height:60px;border-color:#0e7490;background:#ecfeff;"></div>
         <textarea id="ineq-text" style="display:none"></textarea>
       </div>
 
@@ -2412,7 +2412,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="pol-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-pol-text" onclick="openRich('pol-text')" style="min-height:60px;border-color:#166534;background:#f0fdf4;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-pol-text" onclick="openRich('pol-text')" style="min-height:60px;border-color:#166534;background:#f0fdf4;"></div>
         <textarea id="pol-text" style="display:none"></textarea>
       </div>
 
@@ -2496,7 +2496,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="eq-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-eq-text" onclick="openRich('eq-text')" style="min-height:60px;border-color:#5b21b6;background:#f5f3ff;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-eq-text" onclick="openRich('eq-text')" style="min-height:60px;border-color:#5b21b6;background:#f5f3ff;"></div>
         <textarea id="eq-text" style="display:none"></textarea>
       </div>
 
@@ -2583,7 +2583,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="lim-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-lim-text" onclick="openRich('lim-text')" style="min-height:60px;border-color:#1e3a8a;background:#eff6ff;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-lim-text" onclick="openRich('lim-text')" style="min-height:60px;border-color:#1e3a8a;background:#eff6ff;"></div>
         <textarea id="lim-text" style="display:none"></textarea>
       </div>
 
@@ -2704,7 +2704,7 @@ fill="currentColor" stroke="none">
 
       <div class="field">
         <label data-i18n="thy.consigne_lbl">Consigne (HTML/LaTeX)</label>
-        <div class="rich-preview" id="prev-phy-text" onclick="openRich('phy-text')" style="min-height:60px;border-color:#7f1d1d;background:#fff1f2;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-phy-text" onclick="openRich('phy-text')" style="min-height:60px;border-color:#7f1d1d;background:#fff1f2;"></div>
         <textarea id="phy-text" style="display:none"></textarea>
       </div>
       <div class="g2">
@@ -2748,8 +2748,8 @@ fill="currentColor" stroke="none">
 
       <!-- Énoncé -->
       <div class="field">
-        <label><span data-i18n="ineq.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('osc-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-osc-text" onclick="openRich('osc-text')" style="min-height:60px;border-color:#0c4a6e;background:#eff6ff;"></div>
+        <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-osc-text" onclick="openRich('osc-text')" style="min-height:60px;border-color:#0c4a6e;background:#eff6ff;"></div>
         <textarea id="osc-text" style="display:none"></textarea>
       </div>
 
@@ -2868,8 +2868,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="osc-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="osc.fbgen_auto_desc">La correction de la mesure est automatique. Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('osc-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-osc-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('osc-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-osc-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('osc-fbgen')"></div>
           <textarea id="osc-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -2900,8 +2900,8 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane on" id="sui-cfg">
       <div class="field">
-        <label><span data-i18n="ineq.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('sui-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-sui-text" data-ph="Laissez vide pour l'énoncé automatique..." data-i18n-dataph="common.empty_statement_auto_ph" onclick="openRich('sui-text')" style="min-height:60px;border-color:#7e22ce;background:#f5f3ff;"></div>
+        <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-sui-text" data-ph="Laissez vide pour l'énoncé automatique..." data-i18n-dataph="common.empty_statement_auto_ph" onclick="openRich('sui-text')" style="min-height:60px;border-color:#7e22ce;background:#f5f3ff;"></div>
         <textarea id="sui-text" style="display:none"></textarea>
       </div>
 
@@ -2992,8 +2992,8 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane on" id="prob-cfg">
       <div class="field">
-        <label><span data-i18n="ineq.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('prob-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-prob-text" data-ph="Laissez vide pour l'énoncé automatique..." data-i18n-dataph="common.empty_statement_auto_ph" onclick="openRich('prob-text')" style="min-height:60px;border-color:#0369a1;background:#eff6ff;"></div>
+        <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-prob-text" data-ph="Laissez vide pour l'énoncé automatique..." data-i18n-dataph="common.empty_statement_auto_ph" onclick="openRich('prob-text')" style="min-height:60px;border-color:#0369a1;background:#eff6ff;"></div>
         <textarea id="prob-text" style="display:none"></textarea>
       </div>
 
@@ -3106,7 +3106,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="trig-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-trig-text" onclick="openRich('trig-text')" style="min-height:60px;border-color:#b45309;background:#fffbeb;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-trig-text" onclick="openRich('trig-text')" style="min-height:60px;border-color:#b45309;background:#fffbeb;"></div>
         <textarea id="trig-text" style="display:none"></textarea>
       </div>
 
@@ -3189,7 +3189,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="stat-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-stat-text" onclick="openRich('stat-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-stat-text" onclick="openRich('stat-text')"
              style="min-height:60px;border-color:#0f766e;background:#f0fdfa;"></div>
         <textarea id="stat-text" style="display:none"></textarea>
       </div>
@@ -3279,13 +3279,13 @@ fill="currentColor" stroke="none">
       <div class="g2">
         <div class="field">
           <label data-i18n="stat.fb_ok_lbl">✅ Message si bonne réponse</label>
-          <div class="rich-preview" id="prev-stat-fb-ok" data-ph="Correct !" data-i18n-dataph="common.correct_ph" onclick="openRich('stat-fb-ok')"
+          <div class="rich-preview" tabindex="0" role="button" id="prev-stat-fb-ok" data-ph="Correct !" data-i18n-dataph="common.correct_ph" onclick="openRich('stat-fb-ok')"
                style="min-height:40px;"></div>
           <textarea id="stat-fb-ok" style="display:none"></textarea>
         </div>
         <div class="field">
           <label data-i18n="stat.fb_wrong_lbl">❌ Message si mauvaise réponse</label>
-          <div class="rich-preview" id="prev-stat-fb-wrong" data-ph="Réponse incorrecte." data-i18n-dataph="common.incorrect_response_ph" onclick="openRich('stat-fb-wrong')"
+          <div class="rich-preview" tabindex="0" role="button" id="prev-stat-fb-wrong" data-ph="Réponse incorrecte." data-i18n-dataph="common.incorrect_response_ph" onclick="openRich('stat-fb-wrong')"
                style="min-height:40px;"></div>
           <textarea id="stat-fb-wrong" style="display:none"></textarea>
         </div>
@@ -3294,7 +3294,7 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="stat-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
         <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
-          <div class="rich-preview" id="prev-stat-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('stat-fbgen')"></div>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-stat-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('stat-fbgen')"></div>
           <textarea id="stat-fbgen" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -3324,7 +3324,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="mat-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-mat-text" onclick="openRich('mat-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-mat-text" onclick="openRich('mat-text')"
              style="min-height:60px;border-color:#7c2d12;background:#fff7ed;"></div>
         <textarea id="mat-text" style="display:none"></textarea>
       </div>
@@ -3393,7 +3393,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="geo-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-geo-text" onclick="openRich('geo-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-geo-text" onclick="openRich('geo-text')"
              style="min-height:60px;border-color:#1e40af;background:#eff6ff;"></div>
         <textarea id="geo-text" style="display:none"></textarea>
       </div>
@@ -3467,12 +3467,12 @@ fill="currentColor" stroke="none">
       <div class="g2">
         <div class="field">
           <label data-i18n="geo.fb_ok_lbl">&#x2705; Feedback correct</label>
-          <div class="rich-preview" id="prev-geo-fb-ok" data-ph="(optionnel)" data-i18n-dataph="common.optional_ph" onclick="openRich('geo-fb-ok')" style="min-height:40px;"></div>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-geo-fb-ok" data-ph="(optionnel)" data-i18n-dataph="common.optional_ph" onclick="openRich('geo-fb-ok')" style="min-height:40px;"></div>
           <textarea id="geo-fb-ok" style="display:none"></textarea>
         </div>
         <div class="field">
           <label data-i18n="geo.fb_wrong_lbl">&#x274c; Feedback incorrect</label>
-          <div class="rich-preview" id="prev-geo-fb-wrong" data-ph="(optionnel)" data-i18n-dataph="common.optional_ph" onclick="openRich('geo-fb-wrong')" style="min-height:40px;"></div>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-geo-fb-wrong" data-ph="(optionnel)" data-i18n-dataph="common.optional_ph" onclick="openRich('geo-fb-wrong')" style="min-height:40px;"></div>
           <textarea id="geo-fb-wrong" style="display:none"></textarea>
         </div>
       </div>
@@ -3480,7 +3480,7 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="geo-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
         <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
-          <div class="rich-preview" id="prev-geo-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('geo-fbgen')"></div>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-geo-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('geo-fbgen')"></div>
           <textarea id="geo-fbgen" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -3579,7 +3579,7 @@ fill="currentColor" stroke="none">
 
       <div class="field">
         <label data-i18n="log.consigne_lbl">Consigne (HTML/LaTeX)</label>
-        <div class="rich-preview" id="prev-lg-text" onclick="openRich('lg-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-lg-text" onclick="openRich('lg-text')"
              style="min-height:60px;border-color:#7c3aed;background:#f5f3ff;"></div>
         <textarea id="lg-text" style="display:none"></textarea>
       </div>
@@ -3620,8 +3620,8 @@ fill="currentColor" stroke="none">
 
       <!-- ── ONGLET CONFIG ── -->
       <div class="mpane on" id="cpx-cfg">
-        <div class="field"><label><span data-i18n="ineq.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('cpx-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-cpx-text" data-ph="Laissez vide pour l'énoncé automatique..." data-i18n-dataph="common.empty_statement_auto_ph" onclick="openRich('cpx-text')"></div>
+        <div class="field"><label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-cpx-text" data-ph="Laissez vide pour l'énoncé automatique..." data-i18n-dataph="common.empty_statement_auto_ph" onclick="openRich('cpx-text')"></div>
           <textarea id="cpx-text" style="display:none"></textarea></div>
 
         <div class="g2">
@@ -3734,7 +3734,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="calc-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-calc-text" onclick="openRich('calc-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-calc-text" onclick="openRich('calc-text')"
              style="min-height:60px;border-color:#4338ca;background:#eef2ff;"></div>
         <textarea id="calc-text" style="display:none"></textarea>
       </div>
@@ -3779,13 +3779,13 @@ fill="currentColor" stroke="none">
       <div class="g2">
         <div class="field">
           <label data-i18n="calc.fb_ok_lbl">✅ Message si bonne réponse</label>
-          <div class="rich-preview" id="prev-calc-fb-ok" data-ph="Correct !" data-i18n-dataph="common.correct_ph" onclick="openRich('calc-fb-ok')"
+          <div class="rich-preview" tabindex="0" role="button" id="prev-calc-fb-ok" data-ph="Correct !" data-i18n-dataph="common.correct_ph" onclick="openRich('calc-fb-ok')"
                style="min-height:40px;"></div>
           <textarea id="calc-fb-ok" style="display:none"></textarea>
         </div>
         <div class="field">
           <label data-i18n="calc.fb_wrong_lbl">❌ Message si mauvaise réponse</label>
-          <div class="rich-preview" id="prev-calc-fb-wrong" data-ph="Réponse incorrecte." data-i18n-dataph="common.incorrect_response_ph" onclick="openRich('calc-fb-wrong')"
+          <div class="rich-preview" tabindex="0" role="button" id="prev-calc-fb-wrong" data-ph="Réponse incorrecte." data-i18n-dataph="common.incorrect_response_ph" onclick="openRich('calc-fb-wrong')"
                style="min-height:40px;"></div>
           <textarea id="calc-fb-wrong" style="display:none"></textarea>
         </div>
@@ -3794,7 +3794,7 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="calc-fb-gen">
         <p class="hint" data-i18n="calc.fbgen_auto_desc">La correction (dérivée, primitive ou intégrale) est générée automatiquement selon le type de question choisi dans Config.</p>
         <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
-          <div class="rich-preview" id="prev-calc-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('calc-fbgen')"></div>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-calc-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('calc-fbgen')"></div>
           <textarea id="calc-fbgen" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -3840,7 +3840,7 @@ fill="currentColor" stroke="none">
       <!-- Consigne riche -->
       <div class="field">
         <label data-i18n="log.consigne_lbl">Consigne (HTML/LaTeX)</label>
-        <div class="rich-preview" id="prev-cir-text"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-cir-text"
              onclick="openRich('cir-text')"
              style="min-height:70px;border-color:#c2410c;background:#fff7ed;"></div>
         <textarea id="cir-text" style="display:none"></textarea>
@@ -3850,8 +3850,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="cir-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="cir.fbgen_auto_desc">La correction est automatique et porte sur trois critères successifs : les composants placés, le câblage (topologie), puis — si activé — les valeurs des composants. Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la correction.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('cir-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-cir-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cir-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-cir-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cir-fbgen')"></div>
           <textarea id="cir-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -3885,7 +3885,7 @@ fill="currentColor" stroke="none">
       <!-- Consigne riche -->
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" id="prev-bn-text"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-bn-text"
              onclick="openRich('bn-text')"
              style="min-height:80px;border-color:#1d4ed8;background:#eff6ff;"></div>
         <textarea id="bn-text" style="display:none"></textarea>
@@ -3991,8 +3991,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="bn-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="bn.fbgen_auto_desc">La correction de la conversion est automatique. Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('bn-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-bn-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('bn-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-bn-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('bn-fbgen')"></div>
           <textarea id="bn-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -4028,8 +4028,8 @@ fill="currentColor" stroke="none">
 
       <!-- Consigne riche (l'enseignant y insère les photos/tableaux d'ouvertures via l'éditeur riche) -->
       <div class="field">
-        <label><span data-i18n="ineq.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('apn-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-apn-text" onclick="openRich('apn-text')" style="min-height:60px;border-color:#1e3a8a;background:#eff6ff;"></div>
+        <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-apn-text" onclick="openRich('apn-text')" style="min-height:60px;border-color:#1e3a8a;background:#eff6ff;"></div>
         <textarea id="apn-text" style="display:none"></textarea>
       </div>
 
@@ -4068,8 +4068,8 @@ fill="currentColor" stroke="none">
       <div class="mpane" id="apn-fb-gen">
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="apn.fbgen_auto_desc">La correction (analyse des changements, valeur correcte) est générée automatiquement. Ce champ permet d'ajouter un commentaire pédagogique complémentaire.</p>
         <div class="field">
-          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('apn-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-apn-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('apn-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-apn-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('apn-fbgen')"></div>
           <textarea id="apn-fbgen" style="display:none"></textarea>
         </div>
         <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -4087,7 +4087,7 @@ fill="currentColor" stroke="none">
   <!-- CHECKBOX -->
   <div class="form-panel" id="fp-checkbox">
     <div class="form-panel-head" style="background:var(--checkbox);"><svg class="hs-ico"><use href="#ico-type-checkbox"></use></svg> <span data-i18n="type.checkbox">Cases à cocher</span>
-      <div class="json-btns"><button class="btn-json" onclick="openPromptBuilder('CB')" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button><button class="btn-json" onclick="openJsonModal('CB')" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">JSON</span></button><button class="btn-json" onclick="exportCBJSON()" data-i18n-title="btn.export_json_aria" data-i18n-aria="btn.export_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-export"></use></svg> <span data-i18n="common.json_export_btn">JSON</span></button></div>
+      <div class="json-btns"><button class="btn-json" onclick="openPromptBuilder('CB')" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button><button class="btn-json" onclick="openJsonModal('CB')" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">Import réponse IA</span></button></div>
     </div>
     <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <label for="cb-bareme"><span data-i18n="common.bareme_label">Barème</span> :</label> <input type="number" id="cb-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
     <div class="hs-split-row" id="cb-split-row">
@@ -4101,8 +4101,8 @@ fill="currentColor" stroke="none">
       <!-- ONGLET CONFIG -->
       <div class="mpane on" id="cb-cfg">
         <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-random"></use></svg> <span data-i18n-html="cb.info_html"><strong>Nb bonnes réponses</strong> tirées du pool VRAI + complétion tirée du pool FAUX. Note partielle automatique.</span></div>
-        <div class="field"><label><span data-i18n="cb.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('cb-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-cb-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-text')"></div>
+        <div class="field"><label><span data-i18n="cb.text_lbl">Énoncé</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-cb-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-text')"></div>
           <textarea id="cb-text" style="display:none"></textarea></div>
         <div class="g2">
           <div class="field">
@@ -4134,13 +4134,13 @@ fill="currentColor" stroke="none">
           <label data-i18n="field.feedback_par_defaut_correct">Feedback par défaut (Correct / Incorrect)</label>
           <div class="g2">
             <div>
-              <label class="hint"><span data-i18n="cb.fbc_lbl">Si tout est coché correctement :</span> <button class="btn-rich" onclick="openRich('cb-fbc')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-              <div class="rich-preview" id="prev-cb-fbc" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbc')"></div>
+              <label class="hint"><span data-i18n="cb.fbc_lbl">Si tout est coché correctement :</span></label>
+              <div class="rich-preview" tabindex="0" role="button" id="prev-cb-fbc" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbc')"></div>
               <textarea id="cb-fbc" style="display:none"></textarea>
             </div>
             <div>
-              <label class="hint"><span data-i18n="cb.fbe_lbl">Si erreur détectée :</span> <button class="btn-rich" onclick="openRich('cb-fbe')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-              <div class="rich-preview" id="prev-cb-fbe" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbe')"></div>
+              <label class="hint"><span data-i18n="cb.fbe_lbl">Si erreur détectée :</span></label>
+              <div class="rich-preview" tabindex="0" role="button" id="prev-cb-fbe" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbe')"></div>
               <textarea id="cb-fbe" style="display:none"></textarea>
             </div>
           </div>
@@ -4161,8 +4161,8 @@ fill="currentColor" stroke="none">
           <span class="hint" data-i18n="cb.showfb_hint">En plus du texte des propositions vraies, affiche leur feedback (champ « Feedback si correct » de chaque proposition).</span>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite de la liste ci-dessus)</span> <button class="btn-rich" onclick="openRich('cb-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-cb-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite de la liste ci-dessus)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-cb-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbgen')"></div>
           <textarea id="cb-fbgen" style="display:none"></textarea>
         </div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -4179,7 +4179,7 @@ fill="currentColor" stroke="none">
   <!-- RADIO -->
   <div class="form-panel" id="fp-radio">
     <div class="form-panel-head" style="background:var(--radio);"><svg class="hs-ico"><use href="#ico-type-radio"></use></svg> <span data-i18n="type.radio">Bouton Radio</span>
-     <div class="json-btns"><button class="btn-json" onclick="openPromptBuilder('RA')" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button><button class="btn-json" onclick="openJsonModal('RA')" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">JSON</span></button><button class="btn-json" onclick="exportRAJSON()" data-i18n-title="btn.export_json_aria" data-i18n-aria="btn.export_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-export"></use></svg> <span data-i18n="common.json_export_btn">JSON</span></button></div>
+     <div class="json-btns"><button class="btn-json" onclick="openPromptBuilder('RA')" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button><button class="btn-json" onclick="openJsonModal('RA')" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">Import réponse IA</span></button></div>
  </div>
     <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="ra-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
     <div class="hs-split-row" id="ra-split-row">
@@ -4193,8 +4193,8 @@ fill="currentColor" stroke="none">
       <!-- ONGLET CONFIG -->
       <div class="mpane on" id="ra-cfg">
       <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-random"></use></svg> <span data-i18n-html="ra.info_html"><strong>1 bonne réponse aléatoire</strong> du pool VRAI + <strong>reste en distracteurs</strong>. Une seule réponse correcte.</span></div>
-      <div class="field"><label><span data-i18n="ra.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('ra-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-ra-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ra-text')"></div>
+      <div class="field"><label><span data-i18n="ra.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-ra-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ra-text')"></div>
         <textarea id="ra-text" style="display:none"></textarea></div>
       <div class="field" style="max-width:240px;">
           <label data-i18n="field.nb_total_de_boutons">Nb total de boutons affichés </label>
@@ -4227,8 +4227,8 @@ fill="currentColor" stroke="none">
           <span class="hint" data-i18n="ra.showfb_hint">En plus du texte de la bonne réponse, affiche son feedback (champ « Feedback » de la proposition).</span>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span> <button class="btn-rich" onclick="openRich('ra-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-ra-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ra-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-ra-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ra-fbgen')"></div>
           <textarea id="ra-fbgen" style="display:none"></textarea>
         </div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -4245,7 +4245,7 @@ fill="currentColor" stroke="none">
   <!-- DROPDOWN -->
   <div class="form-panel" id="fp-dropdown">
     <div class="form-panel-head" style="background:var(--dropdown);"><svg class="hs-ico"><use href="#ico-type-dropdown"></use></svg> <span data-i18n="type.dropdown">Menu Déroulant</span>
-      <div class="json-btns"><button class="btn-json" onclick="openPromptBuilder('DD')" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button><button class="btn-json" onclick="openJsonModal('DD')" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">JSON</span></button><button class="btn-json" onclick="exportDDJSON()" data-i18n-title="btn.export_json_aria" data-i18n-aria="btn.export_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-export"></use></svg> <span data-i18n="common.json_export_btn">JSON</span></button></div>
+      <div class="json-btns"><button class="btn-json" onclick="openPromptBuilder('DD')" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button><button class="btn-json" onclick="openJsonModal('DD')" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">Import réponse IA</span></button></div>
      </div>
     <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="dd-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
     <div class="hs-split-row" id="dd-split-row">
@@ -4259,8 +4259,8 @@ fill="currentColor" stroke="none">
       <!-- ONGLET CONFIG -->
       <div class="mpane on" id="dd-cfg">
       <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-random"></use></svg> <span data-i18n-html="ddm.info_html"><strong>1 bonne réponse aléatoire</strong> du pool VRAI + <strong>distracteurs</strong> du pool FAUX. Une seule réponse correcte.</span></div>
-      <div class="field"><label><span data-i18n="ddm.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('dd-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-dd-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('dd-text')"></div>
+      <div class="field"><label><span data-i18n="ddm.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-dd-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('dd-text')"></div>
         <textarea id="dd-text" style="display:none"></textarea></div>
       <div class="field" style="max-width:240px;">
         <label data-i18n="field.nb_de_propositions_affichees">Nb de propositions affichées </label>
@@ -4293,8 +4293,8 @@ fill="currentColor" stroke="none">
           <span class="hint" data-i18n="ddm.showfb_hint">En plus du texte de la bonne réponse, affiche son feedback (champ « Feedback » de la proposition).</span>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span> <button class="btn-rich" onclick="openRich('dd-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-dd-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('dd-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-dd-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('dd-fbgen')"></div>
           <textarea id="dd-fbgen" style="display:none"></textarea>
         </div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -4320,8 +4320,8 @@ fill="currentColor" stroke="none">
         <div class="mtab" onclick="tab('alg','fb-gen',this);if(typeof algRefreshPreview==='function')algRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
       </div>
       <div class="mpane on" id="alg-cfg">
-        <div class="field"><label><span data-i18n="alg.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('alg-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-alg-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('alg-text')"></div>
+        <div class="field"><label><span data-i18n="alg.text_lbl">Énoncé</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-alg-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('alg-text')"></div>
           <textarea id="alg-text" style="display:none"></textarea></div>
         <div class="field">
           <label data-i18n="alg.mode_lbl">Type d'exercice</label>
@@ -4371,11 +4371,11 @@ fill="currentColor" stroke="none">
             </div>
           </div>
         </div>
-        <div class="field"><label><span data-i18n="alg.fbc_lbl">Feedback si JUSTE</span> <button class="btn-rich" onclick="openRich('alg-fbc')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview hs-minh42" id="prev-alg-fbc" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('alg-fbc')"></div>
+        <div class="field"><label><span data-i18n="alg.fbc_lbl">Feedback si JUSTE</span></label>
+          <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-alg-fbc" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('alg-fbc')"></div>
           <textarea id="alg-fbc" style="display:none"></textarea></div>
-        <div class="field"><label><span data-i18n="alg.fbe_lbl">Feedback si FAUX</span> <button class="btn-rich" onclick="openRich('alg-fbe')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview hs-minh42" id="prev-alg-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('alg-fbe')"></div>
+        <div class="field"><label><span data-i18n="alg.fbe_lbl">Feedback si FAUX</span></label>
+          <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-alg-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('alg-fbe')"></div>
           <textarea id="alg-fbe" style="display:none"></textarea></div>
 
         <!-- ── FEEDBACKS DÉTAILLÉS PAR CAS (selon le type d'exercice) ──
@@ -4390,8 +4390,8 @@ fill="currentColor" stroke="none">
           <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="alg.fbgen_auto_note">(réponse attendue — non modifiable ici)</span></label>
           <div class="rich-preview" id="alg-fbgen-auto-preview" data-ph="—" style="background:#ecfeff;"></div>
         </div>
-        <div class="field"><label><span data-i18n="alg.solution_prefix">Solution détaillée /</span> <span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="common.fbgen_extra_paren">(optionnel, ajouté à la suite)</span> <button class="btn-rich" onclick="openRich('alg-sol')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-alg-sol" data-ph="Rédigez la solution complète..." data-i18n-dataph="alg.sol_ph" onclick="openRich('alg-sol')"></div>
+        <div class="field"><label><span data-i18n="alg.solution_prefix">Solution détaillée /</span> <span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="common.fbgen_extra_paren">(optionnel, ajouté à la suite)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-alg-sol" data-ph="Rédigez la solution complète..." data-i18n-dataph="alg.sol_ph" onclick="openRich('alg-sol')"></div>
           <textarea id="alg-sol" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -4416,8 +4416,8 @@ fill="currentColor" stroke="none">
         <div class="mtab" onclick="tab('num','fb-gen',this);if(typeof numRefreshPreview==='function')numRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
       </div>
       <div class="mpane on" id="num-cfg">
-      <div class="field"><label><span data-i18n="num.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('num-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-num-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('num-text')"></div>
+      <div class="field"><label><span data-i18n="num.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-num-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('num-text')"></div>
         <textarea id="num-text" style="display:none"></textarea></div>
       <div class="g2">
         <div class="field">
@@ -4453,11 +4453,11 @@ fill="currentColor" stroke="none">
           </div>
         </div>
       </div>
-      <div class="field"><label><span data-i18n="num.fbc_lbl">Feedback si correct</span> <button class="btn-rich" onclick="openRich('num-fbc')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview hs-minh42" id="prev-num-fbc" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('num-fbc')"></div>
+      <div class="field"><label><span data-i18n="num.fbc_lbl">Feedback si correct</span></label>
+        <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-num-fbc" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('num-fbc')"></div>
         <textarea id="num-fbc" style="display:none"></textarea></div>
-      <div class="field"><label><span data-i18n="num.fbe_lbl">Feedback si erreur</span> <button class="btn-rich" onclick="openRich('num-fbe')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview hs-minh42" id="prev-num-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('num-fbe')"></div>
+      <div class="field"><label><span data-i18n="num.fbe_lbl">Feedback si erreur</span></label>
+        <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-num-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('num-fbe')"></div>
         <textarea id="num-fbe" style="display:none"></textarea></div>
       </div>
       <div class="mpane" id="num-fb-gen">
@@ -4466,8 +4466,8 @@ fill="currentColor" stroke="none">
           <div class="rich-preview" id="num-fbgen-auto-preview" data-ph="—" style="background:#ecfdf5;"></div>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span> <button class="btn-rich" onclick="openRich('num-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-num-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('num-fbgen')"></div>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-num-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('num-fbgen')"></div>
           <textarea id="num-fbgen" style="display:none"></textarea>
         </div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -4494,8 +4494,8 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane on" id="un-cfg">
         <div class="info-box" data-i18n-html="info.units_relative">Test : <strong>UnitsRelative</strong> — vérifie valeur numérique (tolérance relative) + unité physique.</div>
-        <div class="field"><label><span data-i18n="un.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('un-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-un-text" data-ph="Exemple : Quelle est la valeur de g sur Terre ?" data-i18n-dataph="un.text_ph" onclick="openRich('un-text')"></div>
+        <div class="field"><label><span data-i18n="un.text_lbl">Énoncé</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-un-text" data-ph="Exemple : Quelle est la valeur de g sur Terre ?" data-i18n-dataph="un.text_ph" onclick="openRich('un-text')"></div>
           <textarea id="un-text" style="display:none"></textarea></div>
         <div class="g2">
           <div class="field">
@@ -4522,11 +4522,11 @@ fill="currentColor" stroke="none">
           <div class="help-preview-label"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-preview"></use></svg> <span data-i18n="un.apercu_lbl">Aperçu :</span></div>
           <div class="help-preview" id="un-help-preview"><em class="hs-c-muted" data-i18n="un.cochez_options">Cochez des options...</em></div>
         </div>
-        <div class="field"><label><span data-i18n="num.fbc_lbl">Feedback si correct</span> <button class="btn-rich" onclick="openRich('un-fbc')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview hs-minh42" id="prev-un-fbc" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('un-fbc')"></div>
+        <div class="field"><label><span data-i18n="num.fbc_lbl">Feedback si correct</span></label>
+          <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-un-fbc" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('un-fbc')"></div>
           <textarea id="un-fbc" style="display:none"></textarea></div>
-        <div class="field"><label><span data-i18n="num.fbe_lbl">Feedback si erreur</span> <button class="btn-rich" onclick="openRich('un-fbe')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview hs-minh42" id="prev-un-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('un-fbe')"></div>
+        <div class="field"><label><span data-i18n="num.fbe_lbl">Feedback si erreur</span></label>
+          <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-un-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('un-fbe')"></div>
           <textarea id="un-fbe" style="display:none"></textarea></div>
       </div>
       <div class="mpane" id="un-fb-gen">
@@ -4534,8 +4534,8 @@ fill="currentColor" stroke="none">
           <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="un.fbgen_auto_note">(valeur + unité attendues — non modifiable ici)</span></label>
           <div class="rich-preview" id="un-fbgen-auto-preview" data-ph="—" style="background:#fffbeb;"></div>
         </div>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="common.fbgen_extra_paren">(optionnel, ajouté à la suite)</span> <button class="btn-rich" onclick="openRich('un-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-un-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('un-fbgen')"></div>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="common.fbgen_extra_paren">(optionnel, ajouté à la suite)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-un-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('un-fbgen')"></div>
           <textarea id="un-fbgen" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -4560,13 +4560,13 @@ fill="currentColor" stroke="none">
         <div class="mtab" onclick="tab('str','fb',this);if(typeof strRefreshPreview==='function')strRefreshPreview()">💬 <span data-i18n="str.tab_fb">Feedbacks &amp; Solution</span></div>
       </div>
       <div class="mpane on" id="str-cfg">
-        <div class="field"><label><span data-i18n="str.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('str-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-str-text" data-ph="Exemple : Quelle est l'unité de Force ?" data-i18n-dataph="str.text_ph" onclick="openRich('str-text')"></div>
+        <div class="field"><label><span data-i18n="str.text_lbl">Énoncé</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-str-text" data-ph="Exemple : Quelle est l'unité de Force ?" data-i18n-dataph="str.text_ph" onclick="openRich('str-text')"></div>
           <textarea id="str-text" style="display:none"></textarea></div>
         <div class="g2">
           <div class="field">
-            <label><span data-i18n="str.answer_lbl">Réponse attendue</span> <span class="hs-c-danger">*</span> <button class="btn-rich" onclick="openRich('str-ans-rich')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-            <div class="rich-preview hs-minh42" id="prev-str-ans-rich" data-ph="ex: Newton, H₂O, …" data-i18n-dataph="str.answer_ph" onclick="openRich('str-ans-rich')"></div>
+            <label><span data-i18n="str.answer_lbl">Réponse attendue</span> <span class="hs-c-danger">*</span></label>
+            <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-str-ans-rich" data-ph="ex: Newton, H₂O, …" data-i18n-dataph="str.answer_ph" onclick="openRich('str-ans-rich')"></div>
             <textarea id="str-ans-rich" style="display:none"></textarea>
             <input type="hidden" id="str-ans" value="">
             <span class="field-err" id="err-str-ans" style="display:none" data-i18n="common.champ_obligatoire">⚠️ Champ obligatoire</span></div>
@@ -4611,14 +4611,14 @@ fill="currentColor" stroke="none">
         </div>
       </div>
       <div class="mpane" id="str-fb">
-        <div class="field"><label><span data-i18n="alg.fbc_lbl">Feedback si JUSTE</span> <button class="btn-rich" onclick="openRich('str-fbc')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview hs-minh42" id="prev-str-fbc" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('str-fbc')"></div>
+        <div class="field"><label><span data-i18n="alg.fbc_lbl">Feedback si JUSTE</span></label>
+          <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-str-fbc" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('str-fbc')"></div>
           <textarea id="str-fbc" style="display:none"></textarea></div>
-        <div class="field"><label><span data-i18n="alg.fbe_lbl">Feedback si FAUX</span> <button class="btn-rich" onclick="openRich('str-fbe')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview hs-minh42" id="prev-str-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('str-fbe')"></div>
+        <div class="field"><label><span data-i18n="alg.fbe_lbl">Feedback si FAUX</span></label>
+          <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-str-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('str-fbe')"></div>
           <textarea id="str-fbe" style="display:none"></textarea></div>
-        <div class="field"><label><span data-i18n="str.sol_lbl">Solution / Explication</span> <button class="btn-rich" onclick="openRich('str-sol')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-          <div class="rich-preview" id="prev-str-sol" data-ph="Ex: L'unité SI de la force est le Newton (N)." data-i18n-dataph="str.sol_ph" onclick="openRich('str-sol')"></div>
+        <div class="field"><label><span data-i18n="str.sol_lbl">Solution / Explication</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-str-sol" data-ph="Ex: L'unité SI de la force est le Newton (N)." data-i18n-dataph="str.sol_ph" onclick="openRich('str-sol')"></div>
           <textarea id="str-sol" style="display:none"></textarea></div>
       </div>
     </div>
@@ -4637,8 +4637,8 @@ fill="currentColor" stroke="none">
   <svg class="hs-ico"><use href="#ico-type-match"></use></svg> <span data-i18n="match.title">Question type "Relier"</span>
   <div class="json-btns">
     <button class="btn-json" onclick="openMatchPrompt()" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button>
-    <button class="btn-json" onclick="openJsonModal('MATCH')" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">JSON</span></button>
-    <button class="btn-json" onclick="exportMatchJSON()" data-i18n-title="btn.export_json_aria" data-i18n-aria="btn.export_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-export"></use></svg> <span data-i18n="common.json_export_btn">JSON</span></button>
+    <button class="btn-json" onclick="openJsonModal('MATCH')" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">Import réponse IA</span></button>
+    
   </div>
 </div>
   <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="match-bareme" value="2" min="0.5" step="0.5"> <span data-i18n="common.bareme_pt">pt</span></div>
@@ -4653,8 +4653,8 @@ fill="currentColor" stroke="none">
 
     <!-- Énoncé principal -->
     <div class="field">
-      <label><span data-i18n="match.text_lbl">Énoncé de la question</span> <button class="btn-rich" onclick="openRich('match-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-      <div class="rich-preview" id="prev-match-text" data-ph="Consigne pour l'élève..." data-i18n-dataph="match.text_ph" onclick="openRich('match-text')"></div>
+      <label><span data-i18n="match.text_lbl">Énoncé de la question</span></label>
+      <div class="rich-preview" tabindex="0" role="button" id="prev-match-text" data-ph="Consigne pour l'élève..." data-i18n-dataph="match.text_ph" onclick="openRich('match-text')"></div>
       <textarea id="match-text" style="display:none"></textarea>
     </div>
 
@@ -4698,8 +4698,8 @@ fill="currentColor" stroke="none">
   <div class="mpane" id="match-fb-gen">
     <p style="font-size:.85rem;color:#6b7280;" data-i18n="match.fbgen_auto_desc">La correction est automatique : un pourcentage de liaisons correctement établies est calculé, avec rappel des erreurs de liaison.</p>
     <div class="field">
-      <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('match-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-      <div class="rich-preview" id="prev-match-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('match-fbgen')"></div>
+      <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+      <div class="rich-preview" tabindex="0" role="button" id="prev-match-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('match-fbgen')"></div>
       <textarea id="match-fbgen" style="display:none"></textarea>
     </div>
     <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -4727,8 +4727,8 @@ fill="currentColor" stroke="none">
       <!-- Partie DROITE (Boutons) -->
       <div class="json-btns">
           <button class="btn-json" onclick="openCWPromptModal()" data-i18n-title="btn.prompt_ia_aria" data-i18n-aria="btn.prompt_ia_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-ai"></use></svg> <span data-i18n="common.prompt_ia_btn">Prompt IA</span></button>
-          <button class="btn-json" onclick="importCWJSON()" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">JSON</span></button>
-          <button class="btn-json" onclick="exportCWJSON()" data-i18n-title="btn.export_json_aria" data-i18n-aria="btn.export_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-export"></use></svg> <span data-i18n="common.json_export_btn">JSON</span></button>
+          <button class="btn-json" onclick="importCWJSON()" data-i18n-title="btn.import_json_aria" data-i18n-aria="btn.import_json_aria"><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-import"></use></svg> <span data-i18n="common.json_import_btn">Import réponse IA</span></button>
+          
       </div>
   </div>
     <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="cw-bareme" value="10" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
@@ -4765,8 +4765,8 @@ fill="currentColor" stroke="none">
     <div class="mpane" id="cw-fb-gen">
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="cw.fbgen_auto_desc">La correction est automatique : chaque mot est comparé à la solution, avec un score proportionnel au nombre de mots corrects.</p>
       <div class="field">
-        <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('cw-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-cw-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cw-fbgen')"></div>
+        <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-cw-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cw-fbgen')"></div>
         <textarea id="cw-fbgen" style="display:none"></textarea>
       </div>
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -4794,8 +4794,8 @@ fill="currentColor" stroke="none">
       <div class="mtab" onclick="tab('doi','fb-gen',this);if(typeof doiRefreshPreview==='function')doiRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
     </div>
     <div class="mpane on" id="doi-cfg">
-    <div class="field"><label><span data-i18n="doi.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('doi-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-      <div class="rich-preview" id="prev-doi-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('doi-text')"></div>
+    <div class="field"><label><span data-i18n="doi.text_lbl">Énoncé</span></label>
+      <div class="rich-preview" tabindex="0" role="button" id="prev-doi-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('doi-text')"></div>
       <textarea id="doi-text" style="display:none"></textarea>
     </div>
 
@@ -4826,8 +4826,8 @@ fill="currentColor" stroke="none">
     <div class="mpane" id="doi-fb-gen">
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="doi.fbgen_auto_desc">La correction se base sur le placement correct des objets (interaction de contact ou à distance) et l'exclusion des zones bleues en trop.</p>
       <div class="field">
-        <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('doi-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-doi-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('doi-fbgen')"></div>
+        <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-doi-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('doi-fbgen')"></div>
         <textarea id="doi-fbgen" style="display:none"></textarea>
       </div>
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="doi.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement (schéma de correction) dans le feedback général Moodle.</p>
@@ -4856,7 +4856,7 @@ fill="currentColor" stroke="none">
     <div class="mpane on" id="chem-cfg">
     <div class="field">
       <label><span data-i18n="chem.text_lbl">Énoncé</span> <span style="color:#b91c1c;" data-i18n="chem.text_required_note">(obligatoire — l'élève ne voit aucune autre consigne)</span></label>
-      <div class="rich-preview" id="prev-chem-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('chem-text')"></div>
+      <div class="rich-preview" tabindex="0" role="button" id="prev-chem-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('chem-text')"></div>
       <textarea id="chem-text" style="display:none"></textarea>
     </div>
 
@@ -4900,8 +4900,8 @@ fill="currentColor" stroke="none">
     <div class="mpane" id="chem-fb-gen">
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="chem.fbgen_auto_desc">La correction se base sur plusieurs critères (flèche, réactifs, produits, charges, coefficients, groupes fonctionnels) évalués automatiquement.</p>
       <div class="field">
-        <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('chem-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-chem-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('chem-fbgen')"></div>
+        <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-chem-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('chem-fbgen')"></div>
         <textarea id="chem-fbgen" style="display:none"></textarea>
       </div>
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -4935,8 +4935,8 @@ fill="currentColor" stroke="none">
     <div class="mpane on" id="topo-cfg">
     <!-- Énoncé -->
     <div class="field">
-      <label><span data-i18n="topo.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('topo-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-      <div class="rich-preview" id="prev-topo-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('topo-text')"></div>
+      <label><span data-i18n="topo.text_lbl">Énoncé</span></label>
+      <div class="rich-preview" tabindex="0" role="button" id="prev-topo-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('topo-text')"></div>
       <textarea id="topo-text" style="display:none"></textarea>
     </div>
 
@@ -4979,8 +4979,8 @@ fill="currentColor" stroke="none">
     <div class="mpane" id="topo-fb-gen">
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="topo.fbgen_auto_desc">La correction se base sur les pondérations PRT définies ci-dessus (flèche, bilan d'atomes, charges, formules, coefficients, groupes fonctionnels).</p>
       <div class="field">
-        <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('topo-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-        <div class="rich-preview" id="prev-topo-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('topo-fbgen')"></div>
+        <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-topo-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('topo-fbgen')"></div>
         <textarea id="topo-fbgen" style="display:none"></textarea>
       </div>
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -5011,8 +5011,8 @@ fill="currentColor" stroke="none">
   <div class="mpane on" id="nuc-cfg">
     <!-- Énoncé (Rich Text) -->
     <div class="field">
-      <label><span data-i18n="ineq.text_lbl">Énoncé</span> <button class="btn-rich" onclick="openRich('nuc-text')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-      <div class="rich-preview" id="prev-nuc-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('nuc-text')"></div>
+      <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
+      <div class="rich-preview" tabindex="0" role="button" id="prev-nuc-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('nuc-text')"></div>
       <textarea id="nuc-text" style="display:none"></textarea>
     </div>
 
@@ -5075,8 +5075,8 @@ fill="currentColor" stroke="none">
   <div class="mpane" id="nuc-fb-gen">
     <p style="font-size:.85rem;color:#6b7280;" data-i18n="nuc.fbgen_auto_desc">La correction est automatique : chaque particule des réactifs et des produits est vérifiée (nature, nombre de masse, numéro atomique), avec conservation des lois de Soddy.</p>
     <div class="field">
-      <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('nuc-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-      <div class="rich-preview" id="prev-nuc-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('nuc-fbgen')"></div>
+      <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+      <div class="rich-preview" tabindex="0" role="button" id="prev-nuc-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('nuc-fbgen')"></div>
       <textarea id="nuc-fbgen" style="display:none"></textarea>
     </div>
     <p style="font-size:.85rem;color:#6b7280;" data-i18n="nuc.fbgen_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
@@ -5126,9 +5126,8 @@ fill="currentColor" stroke="none">
     <div class="field">
       <label style="color:#4c1d95;">
         <span data-i18n="comp.enonce_label">📋 Énoncé de la question</span> <span class="hs-c-danger">*</span>
-        <button class="btn-rich" onclick="openRich('comp-text')" style="margin-left:8px;"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="comp.btn_editeur_riche">Éditeur riche</span></button>
       </label>
-      <div class="rich-preview" id="prev-comp-text"
+      <div class="rich-preview" tabindex="0" role="button" id="prev-comp-text"
            data-ph="Rédigez ici la question posée à l'élève... (images, formules LaTeX, tableaux possibles)"
            data-i18n-dataph="comp.text_ph"
            onclick="openRich('comp-text')"
@@ -5161,8 +5160,8 @@ fill="currentColor" stroke="none">
   <div class="mpane" id="comp-fb-gen">
     <p style="font-size:.85rem;color:#6b7280;" data-i18n="comp.fbgen_auto_desc">Cette question n'est pas corrigée automatiquement : c'est le professeur qui attribue la note dans Moodle après lecture de la copie.</p>
     <div class="field">
-      <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span> <button class="btn-rich" onclick="openRich('comp-fbgen')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> <span data-i18n="common.editor_btn">Éditeur</span></button></label>
-      <div class="rich-preview" id="prev-comp-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('comp-fbgen')"></div>
+      <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+      <div class="rich-preview" tabindex="0" role="button" id="prev-comp-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('comp-fbgen')"></div>
       <textarea id="comp-fbgen" style="display:none"></textarea>
     </div>
     <p style="font-size:.85rem;color:#6b7280;" data-i18n="comp.fbgen_note">Ce texte s'affichera dans le feedback général Moodle une fois la question corrigée.</p>

@@ -74,9 +74,8 @@ function renderComposition() {
       <div class="field">
         <label style="font-size:.8rem;font-weight:700;color:#4c1d95;text-transform:uppercase;letter-spacing:.05em;">
           📋 Énoncé de la question <span style="color:#dc2626;">*</span>
-          <button class="btn-rich" onclick="openRich('comp-text')" style="margin-left:8px;">✏️ Éditeur riche</button>
         </label>
-        <div class="rich-preview" id="prev-comp-text"
+        <div class="rich-preview" id="prev-comp-text" tabindex="0" role="button"
              data-ph="Rédigez ici la question posée à l'élève... (images, formules LaTeX, tableaux possibles)"
              onclick="openRich('comp-text')"
              style="min-height:90px;border-color:#7c3aed;background:#faf5ff;"></div>

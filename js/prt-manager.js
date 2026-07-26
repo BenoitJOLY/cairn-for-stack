@@ -724,9 +724,9 @@ function renderNodeEditor(idx) {
     '</div>'+
     '<label class="prt-ne-lbl" for="pne-tan">'+I18N.t('prt.lbl_note_true')+'</label>'+
     '<input class="prt-ne-inp mono" id="pne-tan" value="'+_hesc(n.trueanswernote)+'">'+
-    '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_feedback_true')+' <button class="btn-rich-sm" onclick="prtOpenRich(\'pne-tfb\')">✏️</button></label>'+
+    '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_feedback_true')+'</label>'+
     _fbTplRow('pne-tfb')+
-    '<div class="rich-preview prt-rich-prev" id="prev-pne-tfb" tabindex="0" onclick="prtOpenRich(\'pne-tfb\')" data-ph="'+I18N.t('prt.ph_write_click')+'"></div>'+
+    '<div class="rich-preview prt-rich-prev" id="prev-pne-tfb" tabindex="0" role="button" onclick="prtOpenRich(\'pne-tfb\')" data-ph="'+I18N.t('prt.ph_write_click')+'"></div>'+
     '<textarea id="pne-tfb" style="display:none"></textarea>'+
 
     '<div class="prt-ne-section prt-ne-false-section">'+I18N.t('prt.section_false')+'</div>'+
@@ -737,9 +737,9 @@ function renderNodeEditor(idx) {
     '</div>'+
     '<label class="prt-ne-lbl" for="pne-fan">'+I18N.t('prt.lbl_note_false')+'</label>'+
     '<input class="prt-ne-inp mono" id="pne-fan" value="'+_hesc(n.falseanswernote)+'">'+
-    '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_feedback_false')+' <button class="btn-rich-sm" onclick="prtOpenRich(\'pne-ffb\')">✏️</button></label>'+
+    '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_feedback_false')+'</label>'+
     _fbTplRow('pne-ffb')+
-    '<div class="rich-preview prt-rich-prev" id="prev-pne-ffb" tabindex="0" onclick="prtOpenRich(\'pne-ffb\')" data-ph="'+I18N.t('prt.ph_write_click')+'"></div>'+
+    '<div class="rich-preview prt-rich-prev" id="prev-pne-ffb" tabindex="0" role="button" onclick="prtOpenRich(\'pne-ffb\')" data-ph="'+I18N.t('prt.ph_write_click')+'"></div>'+
     '<textarea id="pne-ffb" style="display:none"></textarea>'+
 
     _buildVarsHtml()+

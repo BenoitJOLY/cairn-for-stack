@@ -188,9 +188,8 @@ function cpxRenderFbDetail() {
         CPX_FB_DEFS[scn].forEach(function(item) {
             var id = _cpxFbId(scn, item.key);
             html += '<div class="field"><label>' + I18N.t(item.labelKey)
-                 + ' <button type="button" class="btn-rich" onclick="openRich(\'' + id + '\')">'
-                 + '<svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> Éditeur</button></label>'
-                 + '<div class="rich-preview hs-minh42" id="prev-' + id + '" onclick="openRich(\'' + id + '\')"></div>'
+                 + '</label>'
+                 + '<div class="rich-preview hs-minh42" id="prev-' + id + '" tabindex="0" role="button" onclick="openRich(\'' + id + '\')"></div>'
                  + '<textarea id="' + id + '" style="display:none"></textarea></div>';
         });
         html += '</div>';
