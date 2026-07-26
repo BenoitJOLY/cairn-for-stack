@@ -76,19 +76,11 @@ function _lgMathBox(exprStr) {
         + '\\( ' + _lgToLatex(exprStr) + ' \\)</div>';
 }
 
-// Encart de feedback coloré (vert = correct, orange = partiel, rouge = faux),
-// même palette que les exemples XML de référence.
-function _lgBox(kind, html) {
-    var s = kind === 'ok' ? { c: '#15803d', bg: '#f0fdf4' }
-        : kind === 'warn' ? { c: '#ca8a04', bg: '#fefce8' }
-        : { c: '#dc2626', bg: '#fef2f2' };
-    return '<div style="border-left:4px solid ' + s.c + ';padding:10px 14px;background:' + s.bg + ';border-radius:4px;margin:4px 0;"><p>' + html + '</p></div>';
-}
-
-// Encart "Réponse attendue" du feedback général.
+// Encart "Réponse attendue" du feedback général : le contenu brut ne porte
+// plus l'encadré (voir js/fb-box.js applyFbBox('general', ...), appliqué au
+// point d'export/aperçu uniquement), seulement le libellé + le corps.
 function _lgGenFbBox(bodyHtml, I18N_arg) {
-    return '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-        + '<div style="font-weight:bold;color:#0f766e;margin-bottom:15px;">' + (I18N_arg || I18N).t('log.reponse_attendue_lbl') + '</div>' + bodyHtml + '</div>';
+    return '<div style="font-weight:bold;color:#0f766e;margin-bottom:15px;">' + (I18N_arg || I18N).t('log.reponse_attendue_lbl') + '</div>' + bodyHtml;
 }
 
 // Table de vérité complète (toutes les lignes, même celles non demandées)
@@ -146,10 +138,28 @@ function _lgSeqNode(X, idx, isLast, spec) {
         falseanswernote: 'PRT' + X + '-' + idx + '-F', falsefeedback: ''
     };
 }
-function _lgSeqPrt(X, bareme, specs, buildPrtXmlFn) {
-    var nodes = specs.map(function (spec, idx) { return _lgSeqNode(X, idx, idx === specs.length - 1, spec); });
+function _lgSeqPrt(X, bareme, specs, buildPrtXmlFn, applyFbBoxFn) {
+    // Le dernier spec sert de filet générique (sans:'true', tans:'true') :
+    // sa branche fausse est de toute façon inatteignable (le test est
+    // toujours vrai), donc on ne le garde pas comme nœud à part — son
+    // message passe en falsefeedback du dernier nœud réel, qui devient
+    // le nœud terminal.
+    var realSpecs = specs.slice(0, -1);
+    var fallbackSpec = specs[specs.length - 1];
+    var nodes = realSpecs.map(function (spec, idx) { return _lgSeqNode(X, idx, idx === realSpecs.length - 1, spec); });
+    if (fallbackSpec && nodes.length) nodes[nodes.length - 1].falsefeedback = fallbackSpec.feedback || '';
     var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: '' };
-    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: (buildPrtXmlFn || buildPrtXml)(prtMeta, nodes) };
+    // ── Encadrés colorés : appliqués uniquement sur la copie servant à l'export XML ──
+    // canonicalNodes (exposé via prt.nodes pour prt-manager.js) reste brut, sans
+    // encadré. Voir js/fb-box.js (applyFbBox).
+    var applyFbBox_D = applyFbBoxFn || applyFbBox;
+    var xmlNodes = nodes.map(function (n, idx) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(realSpecs[idx].kind, n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: (buildPrtXmlFn || buildPrtXml)(prtMeta, xmlNodes) };
 }
 
 function genLogiqueParams() {
@@ -204,6 +214,7 @@ function genLogiqueCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var lgSeqPrt_D = deps._lgSeqPrt || _lgSeqPrt;
     var lgGenFbBox_D = deps._lgGenFbBox || _lgGenFbBox;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var scenario = p.scenario, nbVars = p.nbVars;
     var vars = _lgVars(nbVars);
@@ -217,7 +228,7 @@ function genLogiqueCore(X, p, deps) {
         + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">' + I18N_D.t('log.title') + '</strong>'
         + '<span style="background:#5b21b6;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span></div>';
 
-    var inputXML = '', prtXML = '', prtMeta, canonicalNodes, questionText, qnote, generalFeedback;
+    var inputXML = '', prtXML = '', prtMeta, canonicalNodes, questionText, generalFeedback;
     var fbOkFinal, fbWrongFinal;
 
     if (scenario === 'table' || scenario === 'cases') {
@@ -261,35 +272,34 @@ function genLogiqueCore(X, p, deps) {
         var specs = [
             {
                 description: isCases ? 'Cases correctes' : 'Tableau correct',
-                sans: sansList, tans: tansMain, score: 1,
-                feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N_D.t(isCases ? 'log.cases_ok_title' : 'log.table_ok_title') + '</strong> ' + I18N_D.t(isCases ? 'log.cases_ok_desc' : 'log.table_ok_desc'))
+                sans: sansList, tans: tansMain, score: 1, kind: 'true',
+                feedback: fbOk || ('<strong>' + I18N_D.t(isCases ? 'log.cases_ok_title' : 'log.table_ok_title') + '</strong> ' + I18N_D.t(isCases ? 'log.cases_ok_desc' : 'log.table_ok_desc'))
             },
             {
                 description: 'Négation calculée',
-                sans: sansList, tans: tansNeg, score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.presque_ca_title') + '</strong> ' + I18N_D.t('log.neg_desc', {expr: _lgToLatex(expr)}))
+                sans: sansList, tans: tansNeg, score: 0.5, kind: 'partial',
+                feedback: '<strong>' + I18N_D.t('log.presque_ca_title') + '</strong> ' + I18N_D.t('log.neg_desc', {expr: _lgToLatex(expr)})
             }
         ];
         if (items.length >= 2) {
             specs.push({
                 description: 'Ordre inversé',
-                sans: sansList, tans: tansRev, score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.ordre_title') + '</strong> ' + I18N_D.t(nbVars === 3 ? 'log.ordre_3vars_desc' : 'log.ordre_2vars_desc'))
+                sans: sansList, tans: tansRev, score: 0.5, kind: 'partial',
+                feedback: '<strong>' + I18N_D.t('log.ordre_title') + '</strong> ' + I18N_D.t(nbVars === 3 ? 'log.ordre_3vars_desc' : 'log.ordre_2vars_desc')
             });
         }
         specs.push({
             description: isCases ? 'Cases incorrectes' : 'Tableau incorrect',
-            sans: 'true', tans: 'true', score: 0, quiet: true,
-            feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.table_fallback_desc'))
+            sans: 'true', tans: 'true', score: 0, quiet: true, kind: 'false',
+            feedback: fbWrong || ('<strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.table_fallback_desc'))
         });
 
-        var built = lgSeqPrt_D(X, bareme, specs, buildPrtXml_D);
+        var built = lgSeqPrt_D(X, bareme, specs, buildPrtXml_D, applyFbBox_D);
         prtMeta = built.prtMeta; canonicalNodes = built.canonicalNodes; prtXML = built.prtXML;
 
         var instrText = text || '<p>' + I18N_D.t(isCases ? 'log.cases_instr' : 'log.table_instr') + '</p>';
         questionText = HDR + instrText + tbl;
-        qnote = 'Logique Q' + X + ' ' + scenario + ' ' + expr.substring(0, 20);
-        generalFeedback = mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes), I18N_D), fbGen);
+        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes), I18N_D), fbGen));
 
     } else if (scenario === 'identifier') {
         var choices = [
@@ -324,30 +334,29 @@ function genLogiqueCore(X, p, deps) {
 
         var specsI = [{
             description: 'Bonne expression',
-            answertest: 'String', sans: ansName, tans: '"A"', score: 1,
-            feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N_D.t('log.cases_ok_title') + '</strong> ' + I18N_D.t('log.identifier_ok_desc'))
+            answertest: 'String', sans: ansName, tans: '"A"', score: 1, kind: 'true',
+            feedback: fbOk || ('<strong>' + I18N_D.t('log.cases_ok_title') + '</strong> ' + I18N_D.t('log.identifier_ok_desc'))
         }];
         if (negChoice) {
             specsI.push({
                 description: 'A choisi la négation de l\'expression',
-                answertest: 'String', sans: ansName, tans: '"' + negChoice.key + '"', score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.presque_ca_title') + '</strong> ' + I18N_D.t('log.identifier_neg_desc'))
+                answertest: 'String', sans: ansName, tans: '"' + negChoice.key + '"', score: 0.5, kind: 'partial',
+                feedback: '<strong>' + I18N_D.t('log.presque_ca_title') + '</strong> ' + I18N_D.t('log.identifier_neg_desc')
             });
         }
         specsI.push({
             description: 'Expression incorrecte',
-            sans: 'true', tans: 'true', score: 0, quiet: true,
-            feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.identifier_fallback_desc'))
+            sans: 'true', tans: 'true', score: 0, quiet: true, kind: 'false',
+            feedback: fbWrong || ('<strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.identifier_fallback_desc'))
         });
 
-        var builtI = lgSeqPrt_D(X, bareme, specsI, buildPrtXml_D);
+        var builtI = lgSeqPrt_D(X, bareme, specsI, buildPrtXml_D, applyFbBox_D);
         prtMeta = builtI.prtMeta; canonicalNodes = builtI.canonicalNodes; prtXML = builtI.prtXML;
 
         var instrText2 = text || '<p>' + I18N_D.t('log.identifier_instr') + '</p>';
         questionText = HDR + instrText2 + tbl2
             + '<div style="text-align:center;margin:16px 0;"><p><strong>' + I18N_D.t('log.expr_correspondante_lbl') + '</strong></p>[[input:' + ansName + ']][[validation:' + ansName + ']]</div>';
-        qnote = 'Logique Q' + X + ' identifier ' + expr.substring(0, 20);
-        generalFeedback = mkFbGen_D(lgGenFbBox_D(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI), I18N_D), fbGen);
+        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI), I18N_D), fbGen));
 
     } else if (scenario === 'equivalence') {
         var items3 = [];
@@ -397,23 +406,33 @@ function genLogiqueCore(X, p, deps) {
                 sans: eqName, tans: equiv ? 'true' : 'false', testoptions: '', quiet: '0',
                 truescoremode: '+', truescore: '0.5', truepenalty: '0', truenextnode: '-1',
                 trueanswernote: 'PRT' + X + '-1-T',
-                truefeedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N_D.t('mat.fb_ok_parfait') + '</strong> ' + I18N_D.t('log.equiv_ok_desc')),
+                truefeedback: fbOk || ('<strong>' + I18N_D.t('mat.fb_ok_parfait') + '</strong> ' + I18N_D.t('log.equiv_ok_desc')),
                 falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
                 falseanswernote: 'PRT' + X + '-1-F',
-                falsefeedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.equiv_partial_title') + '</strong> ' + I18N_D.t('log.equiv_partial_desc'))
+                falsefeedback: '<strong>' + I18N_D.t('log.equiv_partial_title') + '</strong> ' + I18N_D.t('log.equiv_partial_desc')
             },
             {
                 name: '2', description: 'Tables incorrectes', answertest: 'AlgEquiv',
                 sans: 'true', tans: 'true', testoptions: '', quiet: '1',
                 truescoremode: '=', truescore: '0', truepenalty: '0', truenextnode: '-1',
                 trueanswernote: 'PRT' + X + '-2-T',
-                truefeedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('log.equiv_wrong_title') + '</strong> ' + I18N_D.t('log.equiv_wrong_desc')),
+                truefeedback: fbWrong || ('<strong>' + I18N_D.t('log.equiv_wrong_title') + '</strong> ' + I18N_D.t('log.equiv_wrong_desc')),
                 falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
                 falseanswernote: 'PRT' + X + '-2-F', falsefeedback: ''
             }
         ];
         prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVarsEq };
-        prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+        // ── Encadrés colorés : appliqués uniquement sur la copie servant à l'export XML ──
+        // canonicalNodes (exposé via prt.nodes) reste brut. Voir js/fb-box.js.
+        var xmlNodesEq = [
+            canonicalNodes[0],
+            Object.assign({}, canonicalNodes[1], {
+                truefeedback: applyFbBox_D('true', canonicalNodes[1].truefeedback),
+                falsefeedback: applyFbBox_D('partial', canonicalNodes[1].falsefeedback)
+            }),
+            Object.assign({}, canonicalNodes[2], { truefeedback: applyFbBox_D('false', canonicalNodes[2].truefeedback) })
+        ];
+        prtXML = buildPrtXml_D(prtMeta, xmlNodesEq);
 
         var instrText3 = text || '<p>' + I18N_D.t('log.equiv_instr') + '</p>';
         questionText = HDR + instrText3
@@ -422,7 +441,6 @@ function genLogiqueCore(X, p, deps) {
             + '<div><p><strong>' + I18N_D.t('log.e2_lbl') + '</strong> ' + (expr2 ? '\\(' + _lgToLatex(expr2) + '\\)' : '—') + '</p>' + tblE2 + '</div>'
             + '</div>'
             + '<div style="margin-top:12px;"><p><strong>' + I18N_D.t('log.equivalentes_lbl') + '</strong> [[input:' + eqName + ']][[validation:' + eqName + ']]</p></div>';
-        qnote = 'Logique Q' + X + ' equivalence ' + expr.substring(0, 15) + ' vs ' + (expr2 || '').substring(0, 15);
 
         var eqGenBody = '<p style="text-align:center;margin-bottom:15px;font-size:1.05rem;"><strong>' + I18N_D.t('log.equiv_result_prefix') + ' ' + I18N_D.t(equiv ? 'log.equiv_yes' : 'log.equiv_no') + '</strong></p>'
             + '<div style="overflow-x:auto;width:fit-content;margin:0 auto;"><table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">'
@@ -441,7 +459,7 @@ function genLogiqueCore(X, p, deps) {
                 + '<td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-size:1.2rem;">' + (vA === vB ? '✅' : '❌') + '</td></tr>';
         }
         eqGenBody += '</tbody></table></div>';
-        generalFeedback = mkFbGen_D(lgGenFbBox_D(eqGenBody, I18N_D), fbGen);
+        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D(eqGenBody, I18N_D), fbGen));
 
     } else if (scenario === 'intermediaire') {
         var se1 = subexpr1 || '(P and Q)';
@@ -480,31 +498,30 @@ function genLogiqueCore(X, p, deps) {
         var specs4 = [
             {
                 description: 'Tout correct',
-                sans: '[' + allNames.join(',') + ']', tans: '[' + allTargets.join(',') + ']', score: 1,
-                feedback: fbOk || _lgBox('ok', '✅ <strong>' + I18N_D.t('mat.fb_ok_parfait') + '</strong> ' + I18N_D.t('log.inter_ok_desc'))
+                sans: '[' + allNames.join(',') + ']', tans: '[' + allTargets.join(',') + ']', score: 1, kind: 'true',
+                feedback: fbOk || ('<strong>' + I18N_D.t('mat.fb_ok_parfait') + '</strong> ' + I18N_D.t('log.inter_ok_desc'))
             },
             {
                 description: 'Sous-expressions correctes, finale fausse',
-                sans: '[' + interNames.join(',') + ']', tans: '[' + interTargets.join(',') + ']', score: 0.5,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.inter_partial1_title') + '</strong> ' + I18N_D.t('log.inter_partial1_desc'))
+                sans: '[' + interNames.join(',') + ']', tans: '[' + interTargets.join(',') + ']', score: 0.5, kind: 'partial',
+                feedback: '<strong>' + I18N_D.t('log.inter_partial1_title') + '</strong> ' + I18N_D.t('log.inter_partial1_desc')
             },
             {
                 description: 'Seule la finale est correcte',
-                sans: '[' + nfNames.join(',') + ']', tans: '[' + allResFin.join(',') + ']', score: 0.3,
-                feedback: _lgBox('warn', '🔶 <strong>' + I18N_D.t('log.inter_partial2_title') + '</strong> ' + I18N_D.t('log.inter_partial2_desc'))
+                sans: '[' + nfNames.join(',') + ']', tans: '[' + allResFin.join(',') + ']', score: 0.3, kind: 'partial',
+                feedback: '<strong>' + I18N_D.t('log.inter_partial2_title') + '</strong> ' + I18N_D.t('log.inter_partial2_desc')
             },
             {
                 description: 'Tout incorrect',
-                sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _lgBox('bad', '❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.inter_fallback_desc'))
+                sans: 'true', tans: 'true', score: 0, quiet: true, kind: 'false',
+                feedback: fbWrong || ('<strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('log.inter_fallback_desc'))
             }
         ];
-        var built3 = lgSeqPrt_D(X, bareme, specs4, buildPrtXml_D);
+        var built3 = lgSeqPrt_D(X, bareme, specs4, buildPrtXml_D, applyFbBox_D);
         prtMeta = built3.prtMeta; canonicalNodes = built3.canonicalNodes; prtXML = built3.prtXML;
 
         var instrText4 = text || '<p>' + I18N_D.t('log.inter_instr') + '</p>';
         questionText = HDR + instrText4 + _lgMathBox(expr) + tbl4;
-        qnote = 'Logique Q' + X + ' intermediaire ' + expr.substring(0, 15);
 
         var interBody = '<div style="overflow-x:auto;width:fit-content;margin:0 auto;"><table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">'
             + '<thead><tr style="background:#f1f5f9;">'
@@ -521,7 +538,7 @@ function genLogiqueCore(X, p, deps) {
                 + '<td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">' + allResFin[qk] + '</td></tr>';
         }
         interBody += '</tbody></table></div>';
-        generalFeedback = mkFbGen_D(lgGenFbBox_D(interBody, I18N_D), fbGen);
+        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D(interBody, I18N_D), fbGen));
 
     } else { // simplif
         var tansMaxima = tansForm || expr;
@@ -535,8 +552,8 @@ function genLogiqueCore(X, p, deps) {
             + '<checkanswertype>0</checkanswertype><mustverify>0</mustverify>'
             + '<showvalidation>0</showvalidation><options></options></input>';
 
-        fbOkFinal = fbOk || '<p>✅ ' + I18N_D.t('log.simplif_ok_desc', {tans: tansMaxima}) + '</p>';
-        fbWrongFinal = fbWrong || '<p>❌ ' + I18N_D.t('log.simplif_wrong_desc', {tans: tansMaxima}) + '</p>';
+        fbOkFinal = fbOk || ('<p>' + I18N_D.t('log.simplif_ok_desc', {tans: tansMaxima}) + '</p>');
+        fbWrongFinal = fbWrong || ('<p>' + I18N_D.t('log.simplif_wrong_desc', {tans: tansMaxima}) + '</p>');
         canonicalNodes = [{
             name: '0', description: '', answertest: 'PropLogic', sans: ansName2, tans: tansMaxima,
             testoptions: '', quiet: '0',
@@ -546,21 +563,25 @@ function genLogiqueCore(X, p, deps) {
             falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrongFinal
         }];
         prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-        prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+        // ── Encadrés colorés : appliqués uniquement sur la copie servant à l'export XML ──
+        var xmlNodesS = [Object.assign({}, canonicalNodes[0], {
+            truefeedback: applyFbBox_D('true', canonicalNodes[0].truefeedback),
+            falsefeedback: applyFbBox_D('false', canonicalNodes[0].falsefeedback)
+        })];
+        prtXML = buildPrtXml_D(prtMeta, xmlNodesS);
 
         var instrText5 = text || ('<p>' + I18N_D.t('log.simplif_instr1') + '</p>'
             + _lgMathBox(expr)
             + '<p>' + I18N_D.t('log.simplif_instr2') + '</p>');
         questionText = HDR + instrText5 + '[[input:' + ansName2 + ']][[validation:' + ansName2 + ']]';
-        qnote = 'Logique Q' + X + ' simplif ' + expr.substring(0, 20);
-        generalFeedback = mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.simplif_genfb_line1', {tans: _lgToLatex(tansMaxima)}) + '</p><p>' + I18N_D.t('log.simplif_genfb_line2', {expr: _lgToLatex(expr)}) + '</p>', I18N_D), fbGen);
+        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.simplif_genfb_line1', {tans: _lgToLatex(tansMaxima)}) + '</p><p>' + I18N_D.t('log.simplif_genfb_line2', {expr: _lgToLatex(expr)}) + '</p>', I18N_D), fbGen));
     }
 
     questionText += '[[feedback:prt' + X + ']]';
 
     return {
         type: 'logique', bareme: bareme, vars: '',
-        qnote: qnote,
+        qnote: '',
         textFrag: questionText, inputXML: inputXML, prtXML: prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },
         generalFeedback: generalFeedback, feedbackRef: '[[feedback:prt' + X + ']]'

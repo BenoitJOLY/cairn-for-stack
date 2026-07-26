@@ -14,6 +14,7 @@ const path = require('node:path');
 
 const { genLogiqueCore } = require(path.join('..', '..', 'js', 'gen-logique.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -38,16 +39,26 @@ function _lgSeqNode(X, idx, isLast, spec) {
         falseanswernote: 'PRT' + X + '-' + idx + '-F', falsefeedback: ''
     };
 }
-function _lgSeqPrt(X, bareme, specs) {
-    var nodes = specs.map(function (spec, idx) { return _lgSeqNode(X, idx, idx === specs.length - 1, spec); });
+function _lgSeqPrt(X, bareme, specs, buildPrtXmlFn, applyFbBoxFn) {
+    var realSpecs = specs.slice(0, -1);
+    var fallbackSpec = specs[specs.length - 1];
+    var nodes = realSpecs.map(function (spec, idx) { return _lgSeqNode(X, idx, idx === realSpecs.length - 1, spec); });
+    if (fallbackSpec && nodes.length) nodes[nodes.length - 1].falsefeedback = fallbackSpec.feedback || '';
     var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: '' };
-    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml(prtMeta, nodes) };
+    var applyFbBox_D = applyFbBoxFn || applyFbBox;
+    var xmlNodes = nodes.map(function (n, idx) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(realSpecs[idx].kind, n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: (buildPrtXmlFn || buildPrtXml)(prtMeta, xmlNodes) };
 }
 function _lgGenFbBox(bodyHtml) {
     return '<div>' + I18N_STUB.t('log.reponse_attendue_lbl') + bodyHtml + '</div>';
 }
 
-const DEPS = { I18N: I18N_STUB, _mkInput, _mkFbGen, buildPrtXml, _lgSeqPrt, _lgGenFbBox };
+const DEPS = { I18N: I18N_STUB, _mkInput, _mkFbGen, buildPrtXml, _lgSeqPrt, _lgGenFbBox, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -77,11 +88,14 @@ function assertBalancedTags(xml, label) {
     assert.equal(stack.length, 0, `${label}: balises non fermées: ${stack.join(', ')}`);
 }
 
-test('genLogiqueCore : table — toutes les lignes en input, 4 nœuds PRT (ok/négation/ordre inversé/fallback)', () => {
+test('genLogiqueCore : table — toutes les lignes en input, 3 nœuds PRT (ok/négation/ordre inversé = terminal)', () => {
     const q = genLogiqueCore(1, baseParams({ scenario: 'table', nbBlanks: 4 }), DEPS);
     assert.match(q.inputXML, /<name>ans1r0<\/name>/);
     assert.match(q.inputXML, /<name>ans1r3<\/name>/);
-    assert.equal(q.prt.nodes.length, 4);
+    assert.equal(q.prt.nodes.length, 3);
+    const last = q.prt.nodes[q.prt.nodes.length - 1];
+    assert.equal(last.falsenextnode, '-1');
+    assert.notEqual(last.falsefeedback, '');
 });
 
 test('genLogiqueCore : cases — seules les dernières nbBlanks lignes sont des inputs', () => {
@@ -94,14 +108,14 @@ test('genLogiqueCore : identifier — dropdown avec choix A par défaut correct'
     const q = genLogiqueCore(1, baseParams({ scenario: 'identifier' }), DEPS);
     assert.match(q.inputXML, /<type>dropdown<\/type>/);
     assert.match(q.inputXML, /<name>ans1<\/name>/);
-    assert.ok(q.prt.nodes.length >= 2);
+    assert.ok(q.prt.nodes.length >= 1);
 });
 
 test('genLogiqueCore : identifier — détecte une négation parmi les choix et ajoute un nœud intermédiaire', () => {
     const q = genLogiqueCore(1, baseParams({
         scenario: 'identifier', expr: 'P and Q', expr2: 'not(P and Q)'
     }), DEPS);
-    assert.equal(q.prt.nodes.length, 3);
+    assert.equal(q.prt.nodes.length, 2);
 });
 
 test('genLogiqueCore : equivalence — 3 nœuds PRT, tables équivalentes détectées', () => {
@@ -115,12 +129,12 @@ test('genLogiqueCore : equivalence — tables différentes détectées comme non
     assert.equal(q.prt.nodes[1].tans, 'false');
 });
 
-test('genLogiqueCore : intermediaire — inputs pour les 2 sous-expressions + finale, 4 nœuds PRT', () => {
+test('genLogiqueCore : intermediaire — inputs pour les 2 sous-expressions + finale, 3 nœuds PRT (dernier = terminal)', () => {
     const q = genLogiqueCore(1, baseParams({ scenario: 'intermediaire', subexpr1: '(P and Q)', subexpr2: 'not(P)' }), DEPS);
     assert.match(q.inputXML, /<name>ans1s1r0<\/name>/);
     assert.match(q.inputXML, /<name>ans1s2r0<\/name>/);
     assert.match(q.inputXML, /<name>ans1fr0<\/name>/);
-    assert.equal(q.prt.nodes.length, 4);
+    assert.equal(q.prt.nodes.length, 3);
 });
 
 test('genLogiqueCore : simplif (scénario par défaut) — input algébrique unique, 1 nœud PRT', () => {
@@ -139,12 +153,24 @@ test('genLogiqueCore : simplif — tansForm personnalisé remplace expr comme r�
 test('genLogiqueCore : fbOk/fbWrong personnalisés remplacent le feedback par défaut (table)', () => {
     const q = genLogiqueCore(1, baseParams({ scenario: 'table', fbOk: 'Bravo perso', fbWrong: 'Raté perso' }), DEPS);
     assert.equal(q.prt.nodes[0].truefeedback, 'Bravo perso');
-    assert.equal(q.prt.nodes[q.prt.nodes.length - 1].truefeedback, 'Raté perso');
+    assert.equal(q.prt.nodes[q.prt.nodes.length - 1].falsefeedback, 'Raté perso');
 });
 
 test('genLogiqueCore : generalFeedback intègre fbGen via _mkFbGen', () => {
     const q = genLogiqueCore(1, baseParams({ scenario: 'table', fbGen: 'Remarque' }), DEPS);
     assert.match(q.generalFeedback, /Remarque/);
+});
+
+test('genLogiqueCore : les encadrés colorés ne sont jamais dans le contenu brut édité (prt.nodes), seulement dans prtXML/generalFeedback', () => {
+    ['table', 'cases', 'identifier', 'equivalence', 'intermediaire', 'simplif'].forEach(scenario => {
+        const q = genLogiqueCore(1, baseParams({ scenario, expr: 'P and Q', expr2: 'not(P and Q)', subexpr1: '(P and Q)', subexpr2: 'not(P)' }), DEPS);
+        q.prt.nodes.forEach(n => {
+            assert.doesNotMatch(n.truefeedback, /border-left/, `${scenario}: truefeedback`);
+            assert.doesNotMatch(n.falsefeedback, /border-left/, `${scenario}: falsefeedback`);
+        });
+        assert.match(q.prtXML, /border-left|border:1px solid/, `${scenario}: prtXML devrait contenir un encadré`);
+        assert.match(q.generalFeedback, /border:1px solid/, `${scenario}: generalFeedback devrait porter l'encadré general`);
+    });
 });
 
 test('genLogiqueCore : le XML (prtXML, inputXML) est bien formé pour chaque scénario', () => {
