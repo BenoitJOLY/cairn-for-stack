@@ -51,11 +51,11 @@ function polCheckDeltaBounds() {
     var max = polStrictInt(gs('pol-delta-max'));
     if (min === null || max === null) {
         polLastInvalid = true;
-        return { error: 'Les bornes du discriminant (Δ min / Δ max) doivent être des nombres entiers.' };
+        return { error: I18N.t('pol.err_bornes_entiers') };
     }
     if (min > max) {
         polLastInvalid = true;
-        return { error: 'Δ min doit être inférieur ou égal à Δ max.' };
+        return { error: I18N.t('pol.err_min_sup_max') };
     }
     polLastInvalid = false;
     return { min: min, max: max };
@@ -90,19 +90,19 @@ function polUpdatePreview() {
         }
         if (needsRealRoots0 && bounds.min < 1) {
             polLastInvalid = true;
-            el.innerHTML = '<em style="color:#dc2626;">⚠ Δ min = ' + bounds.min + ' : ce sc\xe9nario exige deux racines r\xe9elles distinctes (Δ &gt; 0, pas Δ=0). R\xe9glez Δ min \xe0 1 ou plus.</em>';
+            el.innerHTML = '<em style="color:#dc2626;">⚠ ' + I18N.t('pol.err_delta_min_scenario', {min: bounds.min}) + '</em>';
             return;
         }
         polLastInvalid = false;
-        el.innerHTML = 'Trin\xf4me ax\xb2+bx+c — <em style="color:#6b7280;">g\xe9n\xe9r\xe9 al\xe9atoirement par Maxima \xe0 chaque tirage, avec Δ ∈ [' + bounds.min + ', ' + bounds.max + '].</em>';
+        el.innerHTML = I18N.t('pol.preview_trinome_auto', {min: bounds.min, max: bounds.max});
         return;
     }
     var r = polCompute();
     var needsRealRoots = needsRealRoots0;
     if (needsRealRoots && r.delta <= 0) {
         polLastInvalid = true;
-        var deltaReason = r.delta < 0 ? 'le polyn\xf4me n\'a pas de racine r\xe9elle' : 'la racine est double (x1=x2), pas deux racines distinctes';
-        el.innerHTML = '<em style="color:#dc2626;">⚠ Avec a=' + polFmt(r.a) + ', b=' + polFmt(r.b) + ', c=' + polFmt(r.c) + ', Δ = ' + polFmt(r.delta) + ' : ' + deltaReason + '. Ce sc\xe9nario exige Δ &gt; 0 : choisissez d\'autres coefficients.</em>';
+        var deltaReason = r.delta < 0 ? I18N.t('pol.reason_pas_racine_reelle') : I18N.t('pol.reason_racine_double');
+        el.innerHTML = '<em style="color:#dc2626;">⚠ ' + I18N.t('pol.err_delta_scenario', {a: polFmt(r.a), b: polFmt(r.b), c: polFmt(r.c), delta: polFmt(r.delta), reason: deltaReason}) + '</em>';
         return;
     }
     polLastInvalid = false;
@@ -111,11 +111,11 @@ function polUpdatePreview() {
     html += 'Δ = b²−4ac = ' + polFmt(r.b) + '² − 4×' + polFmt(r.a) + '×' + polFmt(r.c) + ' = <strong>' + polFmt(r.delta) + '</strong><br>';
 
     if (r.delta > 0 && r.x1 !== null) {
-        html += '2 racines réelles : x₁ = <strong>' + polFmt(r.x1) + '</strong>, x₂ = <strong>' + polFmt(r.x2) + '</strong>';
+        html += I18N.t('pol.preview_2racines', {x1: polFmt(r.x1), x2: polFmt(r.x2)});
     } else if (r.delta === 0 && r.x1 !== null) {
-        html += 'Racine double : x₀ = <strong>' + polFmt(r.x1) + '</strong>';
+        html += I18N.t('pol.preview_racine_double', {x0: polFmt(r.x1)});
     } else {
-        html += '<em style="color:#dc2626;">Pas de racine réelle (Δ < 0)</em>';
+        html += '<em style="color:#dc2626;">' + I18N.t('pol.preview_pas_racine') + '</em>';
     }
 
     var scenario = r.scenario;

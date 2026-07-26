@@ -33,9 +33,9 @@ function limUpdatePreview() {
         var expr = gs('lim-expr') || '';
         var tans = gs('lim-tans') || '';
         var html = limLabel + ' <code>' + expr + '</code>';
-        html += tans ? ' = <strong>' + tans + '</strong>' : ' = <em style="color:#6b7280;">(saisir la réponse ci-dessus)</em>';
+        html += tans ? ' = <strong>' + tans + '</strong>' : ' = <em style="color:#6b7280;">' + I18N.t('lim.preview_saisir_hint') + '</em>';
         el.innerHTML = html;
     } else {
-        el.innerHTML = limLabel + ' <em style="color:#6b7280;">— généré aléatoirement par Maxima à chaque tirage.</em>';
+        el.innerHTML = limLabel + ' <em style="color:#6b7280;">' + I18N.t('lim.preview_random_note') + '</em>';
     }
 }

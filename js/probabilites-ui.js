@@ -104,7 +104,7 @@ function probUpdatePreview() {
     if (!el) return;
     var mode = (document.getElementById('prob-mode') || {}).value || 'aleatoire';
     if (mode !== 'fixe') {
-        el.innerHTML = '<small style="color:#6b7280;">Valeurs générées aléatoirement par Maxima dans les bornes indiquées — différentes à chaque étudiant.</small>';
+        el.innerHTML = '<small style="color:#6b7280;">' + I18N.t('sui.preview_random_note') + '</small>';
         return;
     }
     var r = probCompute();

@@ -2,41 +2,15 @@
 // Scénarios cibles : lentille-convergente, lentille-divergente, miroir-concave,
 // miroir-convexe, miroir-plan, lunette-galilee, telescope-newton, microscope (tous implémentés).
 
-var OPT_SCENARIO_INFO = {
-    "lentille-convergente":
-        "✏️ L'élève trace au moins deux des trois rayons particuliers issus de B à l'aide de la barre d'outils"
-        + " (rayon 2 clics, rayon // axe, rayon parallèle 3 clics), puis construit le point B' par intersection"
-        + " des rayons émergents. Le statut réel/virtuel de chaque tronçon est corrigé automatiquement.",
-    "lentille-divergente":
-        "✏️ Comme pour la lentille convergente, mais l'image est <strong>toujours virtuelle</strong> : les rayons"
-        + " émergents divergent après la lentille et doivent être prolongés en arrière (pointillés) pour construire B'.",
-    "miroir-plan":
-        "✏️ L'élève trace les deux rayons remarquables issus de B (incidence normale, et rayon arrivant en S), les fait se"
-        + " réfléchir sur le miroir plan, puis construit B' par intersection des rayons réfléchis prolongés. L'image est"
-        + " <strong>toujours virtuelle et de même taille</strong> que l'objet.",
-    "miroir-concave":
-        "✏️ L'élève trace au moins deux des quatre rayons remarquables issus de B (// axe, par C, par F, vers S), les"
-        + " fait se réfléchir sur le miroir, puis construit B' par intersection des rayons réfléchis. Selon la position"
-        + " de l'objet (SA &lt; f ou SA &gt; f), l'image est virtuelle ou réelle — le statut réel/virtuel attendu de"
-        + " chaque tronçon est corrigé automatiquement.",
-    "miroir-convexe":
-        "✏️ Comme pour le miroir concave, mais le foyer F et le centre C sont <strong>virtuels</strong> (derrière le"
-        + " miroir) : l'image obtenue est toujours virtuelle, quelle que soit la position de l'objet.",
-    "lunette-galilee":
-        "✏️ L'élève construit quatre rayons remarquables : deux rayons incidents parallèles (l'un par le centre de"
-        + " l'objectif) qui convergent en B&#8321; dans le plan focal commun, puis deux rayons issus de B&#8321; vers"
-        + " l'oculaire, qui ressortent parallèles (système afocal, image à l'infini). Le point B&#8321; est construit"
-        + " par l'outil « Intersection ».",
-    "telescope-newton":
-        "✏️ L'élève construit deux rayons incidents parallèles inclinés de θ (l'un touchant le sommet S du miroir"
-        + " primaire, l'autre décalé de h) et leurs rayons réfléchis correspondants (utiliser « Symétrique / axe »"
-        + " pour le rayon réfléchi au sommet), qui convergent au point image B&#8321; dans le plan focal du miroir."
-        + " Le point B&#8321; est construit par l'outil « Intersection ».",
-    "microscope":
-        "✏️ L'élève trace au moins deux des trois rayons remarquables issus de B à travers l'objectif L&#8321;, qui"
-        + " convergent en B&#8321; (image réelle intermédiaire, construite par « Intersection »), puis les deux rayons"
-        + " issus de B&#8321; à travers l'oculaire L&#8322;, placé de sorte que B&#8321; soit exactement dans son plan"
-        + " focal objet (réglage pour un œil normal) : le faisceau émergent ressort parallèle (image finale à l'infini)."
+var OPT_SCENARIO_INFO_KEY = {
+    "lentille-convergente": "opt.info_lentille_convergente",
+    "lentille-divergente":  "opt.info_lentille_divergente",
+    "miroir-plan":          "opt.info_miroir_plan",
+    "miroir-concave":       "opt.info_miroir_concave",
+    "miroir-convexe":       "opt.info_miroir_convexe",
+    "lunette-galilee":      "opt.info_lunette_galilee",
+    "telescope-newton":     "opt.info_telescope_newton",
+    "microscope":           "opt.info_microscope"
 };
 
 var OPT_SCENARIOS_LENTILLE = ["lentille-convergente", "lentille-divergente"];
@@ -51,7 +25,7 @@ function optScenarioChange() {
     var sc = (document.getElementById("opt-scenario") || {}).value || "lentille-convergente";
 
     var infoEl = document.getElementById("opt-info-box");
-    if (infoEl) infoEl.innerHTML = OPT_SCENARIO_INFO[sc] || "";
+    if (infoEl) infoEl.innerHTML = OPT_SCENARIO_INFO_KEY[sc] ? I18N.t(OPT_SCENARIO_INFO_KEY[sc]) : "";
 
     var isLentille   = OPT_SCENARIOS_LENTILLE.indexOf(sc) > -1;
     var isMiroir     = OPT_SCENARIOS_MIROIR.indexOf(sc) > -1;
@@ -85,16 +59,16 @@ function optScenarioChange() {
     var headEl = document.getElementById("opt-head-label");
     if (headEl) {
         var labels = {
-            "lentille-convergente": "Optique — Lentille convergente",
-            "lentille-divergente":  "Optique — Lentille divergente",
-            "miroir-plan":          "Optique — Miroir plan",
-            "miroir-concave":       "Optique — Miroir concave",
-            "miroir-convexe":       "Optique — Miroir convexe",
-            "lunette-galilee":      "Optique — Lunette astronomique",
-            "telescope-newton":     "Optique — Télescope, miroir primaire",
-            "microscope":           "Optique — Microscope, objectif + oculaire"
+            "lentille-convergente": I18N.t('opt.head_lentille_convergente'),
+            "lentille-divergente":  I18N.t('opt.head_lentille_divergente'),
+            "miroir-plan":          I18N.t('opt.head_miroir_plan'),
+            "miroir-concave":       I18N.t('opt.head_miroir_concave'),
+            "miroir-convexe":       I18N.t('opt.head_miroir_convexe'),
+            "lunette-galilee":      I18N.t('opt.head_lunette_galilee'),
+            "telescope-newton":     I18N.t('opt.head_telescope_newton'),
+            "microscope":           I18N.t('opt.head_microscope')
         };
-        headEl.textContent = labels[sc] || "Optique géométrique";
+        headEl.textContent = labels[sc] || I18N.t('opt.head_default');
     }
 
     optUpdatePreview();
@@ -124,12 +98,12 @@ function _optPreviewMiroirPlan(sc) {
     var AB = parseFloat((document.getElementById("opt-mp-ab") || {}).value);
 
     if (isNaN(SA) || isNaN(AB)) {
-        el.innerHTML = "<em>Saisir les paramètres…</em>"; el.style.color = "#6b7280"; return;
+        el.innerHTML = "<em>" + I18N.t('opt.saisir_parametres') + "</em>"; el.style.color = "#6b7280"; return;
     }
-    if (SA <= 0) { el.innerHTML = "⚠️ SA doit être &gt; 0"; el.style.color = "#dc2626"; return; }
+    if (SA <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_sa_positive'); el.style.color = "#dc2626"; return; }
 
     el.style.color = "#7c3aed";
-    el.innerHTML = "<strong>👻 Virtuelle, droite, même taille</strong><br>"
+    el.innerHTML = "<strong>👻 " + I18N.t('opt.mp_type') + "</strong><br>"
         + "<span style=\"font-size:.75rem;\">"
         + "SA'&nbsp;=&nbsp;" + SA.toFixed(2) + "&nbsp;cm,&nbsp;"
         + "A'B'&nbsp;=&nbsp;" + AB.toFixed(2) + "&nbsp;cm,&nbsp;"
@@ -146,18 +120,18 @@ function _optPreviewLunette(sc) {
     var beamH = parseFloat((document.getElementById("opt-beam-h")  || {}).value);
 
     if (isNaN(f1) || isNaN(f2) || isNaN(theta) || isNaN(beamH)) {
-        el.innerHTML = "<em>Saisir les paramètres…</em>"; el.style.color = "#6b7280"; return;
+        el.innerHTML = "<em>" + I18N.t('opt.saisir_parametres') + "</em>"; el.style.color = "#6b7280"; return;
     }
-    if (f1 <= 0) { el.innerHTML = "⚠️ f'&#8321; doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (f2 <= 0) { el.innerHTML = "⚠️ f'&#8322; doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (theta <= 0) { el.innerHTML = "⚠️ θ doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (beamH <= 0) { el.innerHTML = "⚠️ h doit être &gt; 0"; el.style.color = "#dc2626"; return; }
+    if (f1 <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_f1_positive'); el.style.color = "#dc2626"; return; }
+    if (f2 <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_f2_positive'); el.style.color = "#dc2626"; return; }
+    if (theta <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_theta_positive'); el.style.color = "#dc2626"; return; }
+    if (beamH <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_h_positive'); el.style.color = "#dc2626"; return; }
 
     var d = f1 + f2;
     var grossissement = f1 / f2;
 
     el.style.color = "#0369a1";
-    el.innerHTML = "<strong>🔭 Système afocal (image à l'infini)</strong><br>"
+    el.innerHTML = "<strong>🔭 " + I18N.t('opt.lu_type') + "</strong><br>"
         + "<span style=\"font-size:.75rem;\">"
         + "d&nbsp;=&nbsp;" + d.toFixed(1) + "&nbsp;cm,&nbsp;"
         + "G&nbsp;=&nbsp;" + grossissement.toFixed(2)
@@ -172,17 +146,17 @@ function _optPreviewTelescope(sc) {
     var beamH = parseFloat((document.getElementById("opt-tel-beam-h") || {}).value);
 
     if (isNaN(f1) || isNaN(theta) || isNaN(beamH)) {
-        el.innerHTML = "<em>Saisir les paramètres…</em>"; el.style.color = "#6b7280"; return;
+        el.innerHTML = "<em>" + I18N.t('opt.saisir_parametres') + "</em>"; el.style.color = "#6b7280"; return;
     }
-    if (f1 <= 0) { el.innerHTML = "⚠️ f'&#8321; doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (theta <= 0) { el.innerHTML = "⚠️ θ doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (beamH <= 0) { el.innerHTML = "⚠️ h doit être &gt; 0"; el.style.color = "#dc2626"; return; }
+    if (f1 <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_f1_positive'); el.style.color = "#dc2626"; return; }
+    if (theta <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_theta_positive'); el.style.color = "#dc2626"; return; }
+    if (beamH <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_h_positive'); el.style.color = "#dc2626"; return; }
 
     var tanT = Math.tan(theta * Math.PI / 180);
     var yB1  = -f1 * tanT;
 
     el.style.color = "#0369a1";
-    el.innerHTML = "<strong>🔭 Image dans le plan focal</strong><br>"
+    el.innerHTML = "<strong>🔭 " + I18N.t('opt.tel_type') + "</strong><br>"
         + "<span style=\"font-size:.75rem;\">"
         + "B&#8321;&nbsp;=&nbsp;(&minus;" + f1.toFixed(1) + "&nbsp;;&nbsp;" + yB1.toFixed(2) + ")&nbsp;cm"
         + "</span>";
@@ -197,12 +171,12 @@ function _optPreviewMicroscope(sc) {
     var AB = parseFloat((document.getElementById("opt-mic-ab") || {}).value);
 
     if (isNaN(f1) || isNaN(f2) || isNaN(xA) || isNaN(AB)) {
-        el.innerHTML = "<em>Saisir les paramètres…</em>"; el.style.color = "#6b7280"; return;
+        el.innerHTML = "<em>" + I18N.t('opt.saisir_parametres') + "</em>"; el.style.color = "#6b7280"; return;
     }
-    if (f1 <= 0) { el.innerHTML = "⚠️ f'&#8321; doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (f2 <= 0) { el.innerHTML = "⚠️ f'&#8322; doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (xA >= 0) { el.innerHTML = "⚠️ OA doit être &lt; 0"; el.style.color = "#dc2626"; return; }
-    if (Math.abs(xA) <= f1) { el.innerHTML = "⚠️ |OA| doit être &gt; f'&#8321;"; el.style.color = "#dc2626"; return; }
+    if (f1 <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_f1_positive'); el.style.color = "#dc2626"; return; }
+    if (f2 <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_f2_positive'); el.style.color = "#dc2626"; return; }
+    if (xA >= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_oa_negative'); el.style.color = "#dc2626"; return; }
+    if (Math.abs(xA) <= f1) { el.innerHTML = "⚠️ " + I18N.t('opt.err_oa_lt_f1_microscope'); el.style.color = "#dc2626"; return; }
 
     var xA1 = f1 * xA / (xA + f1);
     var gam = xA1 / xA;
@@ -210,7 +184,7 @@ function _optPreviewMicroscope(sc) {
     var d   = xA1 + f2;
 
     el.style.color = "#0369a1";
-    el.innerHTML = "<strong>🔬 Image intermédiaire réelle, puis système afocal</strong><br>"
+    el.innerHTML = "<strong>🔬 " + I18N.t('opt.mic_type') + "</strong><br>"
         + "<span style=\"font-size:.75rem;\">"
         + "B&#8321;&nbsp;=&nbsp;(" + xA1.toFixed(2) + "&nbsp;;&nbsp;" + ABp.toFixed(3) + ")&nbsp;cm,&nbsp;"
         + "γ&nbsp;=&nbsp;" + gam.toFixed(2) + ",&nbsp;"
@@ -226,27 +200,27 @@ function _optPreviewLentille(sc) {
     var AB = parseFloat((document.getElementById("opt-ab") || {}).value);
 
     if (isNaN(f) || isNaN(OA) || isNaN(AB)) {
-        el.innerHTML = "<em>Saisir les paramètres…</em>"; el.style.color = "#6b7280"; return;
+        el.innerHTML = "<em>" + I18N.t('opt.saisir_parametres') + "</em>"; el.style.color = "#6b7280"; return;
     }
-    if (f <= 0) { el.innerHTML = "⚠️ f' doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (OA >= 0) { el.innerHTML = "⚠️ OA doit être &lt; 0"; el.style.color = "#dc2626"; return; }
+    if (f <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_f_positive'); el.style.color = "#dc2626"; return; }
+    if (OA >= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_oa_negative'); el.style.color = "#dc2626"; return; }
 
     var xA = OA;
     var xAp, gamma;
     if (sc === "lentille-divergente") {
         var xFp = -f;
-        if (Math.abs(xA) < 0.01) { el.innerHTML = "⚠️ OA ne peut pas être nul"; el.style.color = "#dc2626"; return; }
+        if (Math.abs(xA) < 0.01) { el.innerHTML = "⚠️ " + I18N.t('opt.err_oa_nul'); el.style.color = "#dc2626"; return; }
         xAp = 1 / ((1 / xFp) + (1 / xA));
     } else {
         if (Math.abs(xA + f) < 0.01) {
-            el.innerHTML = "⚠️ OA = −f' → image à l'infini"; el.style.color = "#dc2626"; return;
+            el.innerHTML = "⚠️ " + I18N.t('opt.err_oa_eq_f_s1'); el.style.color = "#dc2626"; return;
         }
         xAp = f * xA / (xA + f);
     }
     gamma = xAp / xA;
     var ABp = gamma * AB;
 
-    var typeImg  = xAp >= 0 ? "📍 Réelle, renversée" : "👻 Virtuelle, droite";
+    var typeImg  = xAp >= 0 ? I18N.t('opt.type_reelle_renversee') : I18N.t('opt.type_virtuelle_droite');
     var colorImg = xAp >= 0 ? "#0369a1" : "#7c3aed";
     el.style.color = colorImg;
     el.innerHTML = "<strong>" + typeImg + "</strong><br>"
@@ -266,15 +240,15 @@ function _optPreviewMiroir(sc) {
     var convexe = (sc === "miroir-convexe");
 
     if (isNaN(f) || isNaN(SA) || isNaN(AB)) {
-        el.innerHTML = "<em>Saisir les paramètres…</em>"; el.style.color = "#6b7280"; return;
+        el.innerHTML = "<em>" + I18N.t('opt.saisir_parametres') + "</em>"; el.style.color = "#6b7280"; return;
     }
-    if (f <= 0) { el.innerHTML = "⚠️ f doit être &gt; 0"; el.style.color = "#dc2626"; return; }
-    if (SA <= 0) { el.innerHTML = "⚠️ SA doit être &gt; 0"; el.style.color = "#dc2626"; return; }
+    if (f <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_f_positive'); el.style.color = "#dc2626"; return; }
+    if (SA <= 0) { el.innerHTML = "⚠️ " + I18N.t('opt.err_sa_positive'); el.style.color = "#dc2626"; return; }
     if (!convexe && Math.abs(SA - f) < 0.01) {
-        el.innerHTML = "⚠️ SA = f → image à l'infini"; el.style.color = "#dc2626"; return;
+        el.innerHTML = "⚠️ " + I18N.t('opt.err_sa_eq_f'); el.style.color = "#dc2626"; return;
     }
     if (!convexe && Math.abs(SA - 2 * f) < 0.01) {
-        el.innerHTML = "⚠️ SA = 2f → objet au centre C (rayon par C indéfini)"; el.style.color = "#dc2626"; return;
+        el.innerHTML = "⚠️ " + I18N.t('opt.err_sa_eq_2f'); el.style.color = "#dc2626"; return;
     }
 
     var xF  = convexe ? f : -f;
@@ -283,7 +257,7 @@ function _optPreviewMiroir(sc) {
     var gamma = -(xAp / xA);
     var ABp = gamma * AB;
 
-    var typeImg  = xAp > 0 ? "👻 Virtuelle, droite" : "📍 Réelle, renversée";
+    var typeImg  = xAp > 0 ? I18N.t('opt.type_virtuelle_droite') : I18N.t('opt.type_reelle_renversee');
     var colorImg = xAp > 0 ? "#7c3aed" : "#0369a1";
     el.style.color = colorImg;
     el.innerHTML = "<strong>" + typeImg + "</strong><br>"

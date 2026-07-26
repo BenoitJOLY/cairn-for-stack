@@ -79,12 +79,9 @@ function trigUpdatePreview() {
 
     if (mode !== 'fixe') {
         if (scenario === 'valeur-exacte') {
-            html = 'Valeur exacte <em style="color:#6b7280;">— tirée aléatoirement à chaque essai : une fonction parmi ' +
-                '<code>sin, cos, tan</code> appliquée à un angle parmi ' +
-                '<code>π/6, 5π/6, 7π/6, 11π/6, π/4, 3π/4, 5π/4, 7π/4, π/3, 2π/3</code>.</em>';
+            html = I18N.t('trig.preview_valeur_exacte_lbl') + ' <em style="color:#6b7280;">' + I18N.t('trig.preview_valeur_exacte_random') + '</em>';
         } else {
-            html = 'Identité trigonométrique <em style="color:#6b7280;">— tirée aléatoirement à chaque essai parmi les 4 formules de linéarisation (dites de Simpson), ' +
-                'avec deux angles distincts p, q tirés parmi <code>π/6, π/4, π/3</code> :</em>' +
+            html = I18N.t('trig.preview_identite_lbl') + ' <em style="color:#6b7280;">' + I18N.t('trig.preview_identite_random') + '</em>' +
                 '<ul style="margin:6px 0 0 18px;padding:0;color:#374151;">' +
                 '<li><code>cos(p+q) + cos(p-q) = 2cos(p)cos(q)</code></li>' +
                 '<li><code>cos(p+q) - cos(p-q) = -2sin(p)sin(q)</code></li>' +
@@ -108,10 +105,10 @@ function trigUpdatePreview() {
         var tans2 = TRIG_IDENTITIES[expr.trim()];
         if (tans2) {
             html = '<code>' + expr + '</code> = <strong>' + tans2 + '</strong>';
-            html += ' <small style="color:#15803d;">✅ identité connue</small>';
+            html += ' <small style="color:#15803d;">✅ ' + I18N.t('trig.preview_identite_connue') + '</small>';
         } else {
             html = '<code>' + expr + '</code><br>';
-            html += '<em style="color:#b45309;">⚠️ Formule hors des 10 identités connues (ou variable différente de x) : Maxima calculera la forme simplifiée (une seule fonction de x) au moment de l\'export vers Moodle — le résultat exact n\'est pas prévisualisable ici, à vérifier après import.</em>';
+            html += '<em style="color:#b45309;">⚠️ ' + I18N.t('trig.preview_formule_hors') + '</em>';
         }
     }
     el.innerHTML = html;

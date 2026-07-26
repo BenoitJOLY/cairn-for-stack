@@ -18,11 +18,11 @@ function eqToggleEtapeBlock() {
     if (block) block.style.display = checked ? '' : 'none';
 }
 
-var EQ_SCENARIO_LABELS = {
-    developpement: 'Développement et simplification',
-    equation: 'Résolution d’équation',
-    factorisation: 'Factorisation',
-    systeme: 'Résolution de système d’équations'
+var EQ_SCENARIO_KEYS = {
+    developpement: 'equiv.scenario_developpement',
+    equation: 'equiv.scenario_equation',
+    factorisation: 'equiv.scenario_factorisation',
+    systeme: 'equiv.scenario_systeme'
 };
 
 function eqUpdatePreview() {
@@ -36,23 +36,23 @@ function eqUpdatePreview() {
     var resultat = gs('eq-resultat').trim();
 
     if (!formule) {
-        el.innerHTML = '<em style="color:#dc2626;">⚠ Saisissez une formule de départ (expression Maxima).</em>';
+        el.innerHTML = '<em style="color:#dc2626;">' + I18N.t('equiv.preview_err') + '</em>';
         return;
     }
-    var html = '<strong>' + (EQ_SCENARIO_LABELS[scenario] || scenario) + '</strong><br>';
-    html += 'Donnée de départ : <code>' + formule + '</code><br>';
+    var html = '<strong>' + I18N.t(EQ_SCENARIO_KEYS[scenario] || scenario) + '</strong><br>';
+    html += I18N.t('equiv.preview_depart') + '<code>' + formule + '</code><br>';
     if (scenario === 'equation') {
-        html += 'Inconnue : <code>' + (gs('eq-variable').trim() || 'x') + '</code><br>';
+        html += I18N.t('equiv.preview_inconnue') + '<code>' + (gs('eq-variable').trim() || 'x') + '</code><br>';
     } else if (scenario === 'systeme') {
-        html += 'Inconnues : <code>' + (gs('eq-variables').trim() || 'x,y') + '</code><br>';
+        html += I18N.t('equiv.preview_inconnues') + '<code>' + (gs('eq-variables').trim() || 'x,y') + '</code><br>';
     }
     html += resultat
-        ? 'Résultat final (imposé) : <code>' + resultat + '</code><br>'
-        : '<em style="color:#6b7280;">Résultat final calculé automatiquement par Maxima (expand/factor/solve selon le type).</em><br>';
+        ? I18N.t('equiv.preview_resultat_impose') + '<code>' + resultat + '</code><br>'
+        : '<em style="color:#6b7280;">' + I18N.t('equiv.preview_resultat_auto') + '</em><br>';
     if (etapeChecked && etapeVal) {
-        html += 'Étape intermédiaire imposée : <code>' + etapeVal + '</code>';
+        html += I18N.t('equiv.preview_etape_impose') + '<code>' + etapeVal + '</code>';
     } else if (etapeChecked) {
-        html += '<em style="color:#dc2626;">⚠ Cochez et renseignez l’étape intermédiaire attendue.</em>';
+        html += '<em style="color:#dc2626;">' + I18N.t('equiv.preview_etape_manque') + '</em>';
     }
     el.innerHTML = html;
 }

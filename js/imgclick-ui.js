@@ -283,10 +283,10 @@ function _icRenderOrderList() {
         return;
     }
     list.innerHTML = _ic.zones.map(function (z, i) {
-        var label = z.label && z.label.trim() ? z.label.trim() : ('Zone ' + (i + 1));
+        var label = z.label && z.label.trim() ? z.label.trim() : I18N.t('jd.zone_label', {n: i + 1});
         var isSel = z.id === _ic.selZoneId;
         return '<div class="ic-seq-order-row' + (isSel ? ' ic-seq-order-row-sel' : '') + '" draggable="true" data-zid="' + z.id + '" onclick="icSelectZone(' + z.id + ')">'
-            + '<span class="ord-handle" title="Glisser pour réordonner">⠿</span>'
+            + '<span class="ord-handle" title="' + I18N.t('ord.drag_hint') + '">⠿</span>'
             + '<span class="ord-num">' + (i + 1) + '.</span>'
             + '<span class="ic-seq-order-label">' + htmlEsc(label) + '</span>'
             + '<span class="ic-seq-order-shape">' + (z.shape === 'circle' ? '○' : '□') + '</span>'

@@ -35,7 +35,7 @@ function ineqCompute() {
 
     var mode = (document.querySelector('input[name="ineq-mode-r"]:checked')||{}).value || 'aleatoire';
     if (mode !== 'fixe') {
-        el.innerHTML = '<em style="color:#6b7280;">G\xe9n\xe9r\xe9 al\xe9atoirement par Maxima \xe0 chaque tirage.</em>';
+        el.innerHTML = '<em style="color:#6b7280;">' + I18N.t('ineq.preview_auto') + '</em>';
         return;
     }
 
@@ -76,7 +76,7 @@ function ineqCompute() {
     } else if (scenario === 'trinome') {
         // ax² + bx + c ▷ 0
         if (a === 0) {
-            preview = '<em>a = 0 : réduire en inéquation linéaire</em>';
+            preview = '<em>' + I18N.t('ineq.preview_a_zero') + '</em>';
             autoComputed = false;
         } else {
             var delta = b*b - 4*a*c;
@@ -135,7 +135,7 @@ function ineqCompute() {
         tanEl.value = tans;
     }
 
-    el.innerHTML = preview || '<em style="color:#6b7280;">Aperçu indisponible</em>';
+    el.innerHTML = preview || '<em style="color:#6b7280;">' + I18N.t('ineq.preview_indisponible') + '</em>';
 }
 
 (function(){

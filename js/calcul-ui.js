@@ -5,23 +5,23 @@ var CALC_AUTO = ['derivee-produit','primitive-exp','integrale-def','convexite-ta
 // Variables "racines" (tirées directement par rand([...]) dans les XML de référence) par scénario auto.
 // Chaque variable peut être configurée par l'enseignant comme aléatoire (liste de valeurs pour rand()) ou fixe (valeur unique).
 var CALC_VAR_SPECS = {
-    'derivee-produit':    [{key:'a', label:'Coefficient a (dans u(x)=ax+b)', domain:[1,2,3]},
-                           {key:'b', label:'Constante b (dans u(x)=ax+b)', domain:[-3,-2,-1,1,2]}],
-    'primitive-exp':      [{key:'a', label:"Coefficient a (dans e^(ax))", domain:[-2,-1,1,2]},
-                           {key:'b', label:"Coefficient b (devant e^(ax))", domain:[2,3,4,5]},
-                           {key:'c', label:'Constante c', domain:[1,2,3]}],
-    'integrale-def':      [{key:'d', label:"Coefficient d (dans e^(dx))", domain:[-1,-2]},
-                           {key:'c', label:"Coefficient c (devant e^(dx))", domain:[2,3]},
-                           {key:'f', label:'Constante f', domain:[1,2]}],
-    'convexite-tangente': [{key:'k', label:"Coefficient k (devant e^x)", domain:[1,2,3]},
-                           {key:'m', label:'Coefficient m (devant x)', domain:[-2,-1,1,2]}],
-    'encadrement-tvi':    [{key:'b', label:'Chiffre décimal de α (α = 1 + b/10)', domain:[2,3,4,5,6,7,8,9]}],
-    'aire-courbes':       [{key:'a', label:'Première abscisse a', domain:[-3,-2,-1,1,2]},
-                           {key:'offset', label:'Écart entre les abscisses (b − a)', domain:[2,3,4]},
-                           {key:'k', label:'Coefficient k', domain:[1,2,3]}],
-    'tangente-ext':       [{key:'a', label:'Abscisse a (1ère tangente)', domain:[-3,-2,-1,1,2,3]},
-                           {key:'b', label:'Abscisse b (2e tangente, ≠ a)', domain:[-3,-2,-1,1,2,3]},
-                           {key:'k', label:'Constante k (dans f(x)=x²+k)', domain:[-2,-1,0,1,2]}]
+    'derivee-produit':    [{key:'a', labelKey:'calc.var_a_ux_ax_b', domain:[1,2,3]},
+                           {key:'b', labelKey:'calc.var_b_ux_ax_b', domain:[-3,-2,-1,1,2]}],
+    'primitive-exp':      [{key:'a', labelKey:'calc.var_a_eax', domain:[-2,-1,1,2]},
+                           {key:'b', labelKey:'calc.var_b_eax', domain:[2,3,4,5]},
+                           {key:'c', labelKey:'calc.var_c_const', domain:[1,2,3]}],
+    'integrale-def':      [{key:'d', labelKey:'calc.var_d_edx', domain:[-1,-2]},
+                           {key:'c', labelKey:'calc.var_c_edx', domain:[2,3]},
+                           {key:'f', labelKey:'calc.var_f_const', domain:[1,2]}],
+    'convexite-tangente': [{key:'k', labelKey:'calc.var_k_ex', domain:[1,2,3]},
+                           {key:'m', labelKey:'calc.var_m_x', domain:[-2,-1,1,2]}],
+    'encadrement-tvi':    [{key:'b', labelKey:'calc.var_b_alpha', domain:[2,3,4,5,6,7,8,9]}],
+    'aire-courbes':       [{key:'a', labelKey:'calc.var_a_abscisse', domain:[-3,-2,-1,1,2]},
+                           {key:'offset', labelKey:'calc.var_offset', domain:[2,3,4]},
+                           {key:'k', labelKey:'calc.var_k_coeff', domain:[1,2,3]}],
+    'tangente-ext':       [{key:'a', labelKey:'calc.var_a_tangente1', domain:[-3,-2,-1,1,2,3]},
+                           {key:'b', labelKey:'calc.var_b_tangente2', domain:[-3,-2,-1,1,2,3]},
+                           {key:'k', labelKey:'calc.var_k_fx2', domain:[-2,-1,0,1,2]}]
 };
 
 function _calcRenderVarConfig() {
@@ -33,15 +33,15 @@ function _calcRenderVarConfig() {
     host.style.display = '';
     var rows = specs.map(function(v) {
         return '<div style="margin-bottom:8px;">'
-            + '<label style="font-size:.82rem;font-weight:500;">' + v.label + '</label>'
-            + '<input type="text" class="calc-var-alea-input" id="calc-var-' + v.key + '-alea" value="' + v.domain.join(',') + '" placeholder="valeurs possibles, ex: 1,2,3" oninput="calcUpdatePreview()" style="font-family:monospace;">'
+            + '<label style="font-size:.82rem;font-weight:500;">' + I18N.t(v.labelKey) + '</label>'
+            + '<input type="text" class="calc-var-alea-input" id="calc-var-' + v.key + '-alea" value="' + v.domain.join(',') + '" placeholder="' + I18N.t('calc.var_placeholder_valeurs') + '" oninput="calcUpdatePreview()" style="font-family:monospace;">'
             + '<input type="number" class="calc-var-fixe-input" id="calc-var-' + v.key + '-fixe" value="' + v.domain[0] + '" oninput="calcUpdatePreview()" style="display:none;">'
             + '</div>';
     }).join('');
-    host.innerHTML = '<label style="font-size:.85rem;color:#3730a3;font-weight:600;">Variables de l\'exercice</label>'
+    host.innerHTML = '<label style="font-size:.85rem;color:#3730a3;font-weight:600;">' + I18N.t('calc.var_exercice_lbl') + '</label>'
         + '<div style="display:flex;gap:16px;align-items:center;margin:6px 0 10px;font-size:.85rem;">'
-        + '<label style="cursor:pointer;"><input type="radio" name="calc-var-mode-r" value="aleatoire" checked onchange="calcVarModeChange(this.value)"> Aléatoire (Maxima)</label>'
-        + '<label style="cursor:pointer;"><input type="radio" name="calc-var-mode-r" value="fixe" onchange="calcVarModeChange(this.value)"> Valeurs fixes</label>'
+        + '<label style="cursor:pointer;"><input type="radio" name="calc-var-mode-r" value="aleatoire" checked onchange="calcVarModeChange(this.value)"> ' + I18N.t('calc.var_mode_aleatoire') + '</label>'
+        + '<label style="cursor:pointer;"><input type="radio" name="calc-var-mode-r" value="fixe" onchange="calcVarModeChange(this.value)"> ' + I18N.t('calc.var_mode_fixe') + '</label>'
         + '<input type="hidden" id="calc-var-mode-hidden" value="aleatoire"></div>'
         + rows;
 }
@@ -94,13 +94,13 @@ function calcUpdatePreview() {
     var html = '';
 
     if (scenario === 'derivee') {
-        html = '<p>Soit \\(f\\) d\xe9finie par \\(f(x)=' + tex + '\\). Calculer \\(f\'(x)\\).</p>';
+        html = '<p>' + I18N.t('calc.preview_derivee', {expr: tex}) + '</p>';
     } else if (scenario === 'primitive') {
-        html = '<p>D\xe9terminer une primitive \\(F\\) de \\(f(x)=' + tex + '\\).</p>';
+        html = '<p>' + I18N.t('calc.preview_primitive', {expr: tex}) + '</p>';
     } else if (scenario === 'integrale') {
-        html = '<p>Calculer : \\( \\displaystyle\\int_{' + texA + '}^{' + texB + '} ' + tex + '\\,dx \\)</p>';
+        html = '<p>' + I18N.t('calc.preview_integrale', {a: texA, b: texB, expr: tex}) + '</p>';
     } else {
-        html = '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement par Maxima (valeurs al\xe9atoires internes \xe0 chaque affichage) — voir l\'aper\xe7u \xe9l\xe8ve ci-dessous pour un exemple concret.</em>';
+        html = '<em style="color:#6b7280;">' + I18N.t('calc.preview_auto_maxima') + '</em>';
     }
     el.innerHTML = (typeof _hsRenderMath === 'function') ? _hsRenderMath(custText + html) : (custText + html);
 }

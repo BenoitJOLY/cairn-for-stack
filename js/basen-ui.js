@@ -36,10 +36,10 @@ function bnFormChange() {
     var lblVal  = document.getElementById('bn-lbl-value');
     if (lblVal) {
         if (valueMode === 'aleatoire') {
-            lblVal.textContent = 'Valeur à convertir (bornes en décimal)';
+            lblVal.textContent = I18N.t('bn.lbl_valeur_bornes_decimal');
         } else {
             var chosenBase = (valueBase === 'arrivee') ? toBase : fromBase;
-            lblVal.textContent = 'Valeur à convertir (chiffres en base ' + chosenBase + ')';
+            lblVal.textContent = I18N.t('bn.lbl_valeur_chiffres_base', {base: chosenBase});
         }
     }
 
@@ -48,7 +48,7 @@ function bnFormChange() {
     var formatSel = document.getElementById('bn-format');
     if (formatSel) {
         formatSel.style.borderColor = warnC ? '#dc2626' : '';
-        formatSel.title = warnC ? 'La notation C (0b/0o/0x) n\'est disponible que pour les bases 2, 8 et 16. Passez en notation suffixe.' : '';
+        formatSel.title = warnC ? I18N.t('bn.warn_notation_c_title') : '';
     }
 
     bnUpdatePreview();
@@ -61,23 +61,23 @@ function bnToBase(decVal, base) {
 
 function bnSyntaxHint(format, toBase, fixedWidth) {
     if (toBase === 10) {
-        return 'Notation attendue : uniquement le nombre entier résultat (sans espace).';
+        return I18N.t('bn.syntax_only_integer');
     }
     var widthNote = (fixedWidth > 0)
-        ? (' Réponse attendue sur exactement <strong>' + fixedWidth + '</strong> chiffres : complétez avec des zéros devant si besoin.')
+        ? I18N.t('bn.syntax_width_note', {width: fixedWidth})
         : '';
     if (format === 'C') {
-        if (toBase === 2)  return 'Notation attendue : préfixe 0b suivi des chiffres binaires en MAJUSCULES, sans espace (ex : 0b101010).' + widthNote;
-        if (toBase === 8)  return 'Notation attendue : préfixe 0o suivi des chiffres octaux, sans espace (ex : 0o17).' + widthNote;
-        if (toBase === 16) return 'Notation attendue : préfixe 0x suivi des chiffres hexadécimaux en MAJUSCULES, sans espace (ex : 0x1A).' + widthNote;
+        if (toBase === 2)  return I18N.t('bn.syntax_c_bin') + widthNote;
+        if (toBase === 8)  return I18N.t('bn.syntax_c_oct') + widthNote;
+        if (toBase === 16) return I18N.t('bn.syntax_c_hex') + widthNote;
     }
     if (fixedWidth > 0) {
-        return 'Notation attendue : chiffres ' + (toBase > 10 ? 'en MAJUSCULES, ' : '') + 'sans espace, sans préfixe.' + widthNote;
+        return (toBase > 10 ? I18N.t('bn.syntax_std_width_upper') : I18N.t('bn.syntax_std_width')) + widthNote;
     }
     if (toBase > 10) {
-        return 'Notation attendue : chiffres en MAJUSCULES, sans espace, sans préfixe, sans zéro inutile au début.';
+        return I18N.t('bn.syntax_upper_nowidth');
     }
-    return 'Notation attendue : chiffres uniquement, sans espace, sans préfixe, sans zéro inutile au début.';
+    return I18N.t('bn.syntax_nowidth');
 }
 
 function bnUpdatePreview() {
@@ -92,7 +92,7 @@ function bnUpdatePreview() {
     var fixedWidth = parseInt((document.getElementById('bn-fixed-width') || {}).value || '');
 
     var baseName = function(b) {
-        return b === 2 ? 'binaire' : b === 8 ? 'octal' : b === 10 ? 'décimal' : b === 16 ? 'hexadécimal' : 'base ' + b;
+        return b === 2 ? I18N.t('bn.basename_binaire') : b === 8 ? I18N.t('bn.basename_octal') : b === 10 ? I18N.t('bn.basename_decimal') : b === 16 ? I18N.t('bn.basename_hexadecimal') : I18N.t('bn.basename_generic', {b: b});
     };
 
     // La notation choisie ne s'applique qu'à la représentation en base d'arrivée
@@ -121,51 +121,49 @@ function bnUpdatePreview() {
         var max = parseInt((document.getElementById('bn-value-max') || {}).value || '99');
         if (isNaN(min) || isNaN(max) || min > max) {
             bnLastInvalid = true;
-            el.innerHTML = '<em style="color:#dc2626;">Bornes invalides (min doit être ≤ max).</em>';
+            el.innerHTML = '<em style="color:#dc2626;">' + I18N.t('bn.err_bornes_invalides') + '</em>';
             return;
         }
         if (fixedWidth > 0 && toBase !== 10) {
             var neededMax = bnToBase(max, toBase).length;
             if (neededMax > fixedWidth) {
                 bnLastInvalid = true;
-                el.innerHTML = '<em style="color:#dc2626;">⚠ Largeur fixe impossible : la borne max (' + max + ') nécessite au moins ' + neededMax + ' chiffres en ' + baseName(toBase) + ', mais la largeur imposée n\'est que de ' + fixedWidth + '.</em>';
+                el.innerHTML = '<em style="color:#dc2626;">⚠ ' + I18N.t('bn.err_largeur_fixe_max', {max: max, needed: neededMax, base: baseName(toBase), width: fixedWidth}) + '</em>';
                 return;
             }
         }
         var sample = min + Math.floor(Math.random() * (max - min + 1));
-        html = 'Valeur tirée aléatoirement par Moodle entre <strong>' + min + '</strong> et <strong>' + max + '</strong> (décimal).'
-             + ' Exemple : ' + formatSrc(sample) + ' (' + baseName(fromBase) + ') → ' + formatDst(sample) + ' (' + baseName(toBase) + ')';
+        html = I18N.t('bn.preview_valeur_aleatoire', {min: min, max: max, src: formatSrc(sample), baseFrom: baseName(fromBase), dst: formatDst(sample), baseTo: baseName(toBase)});
     } else {
         var valRaw = (document.getElementById('bn-value') || {}).value || '42';
         var chosenBase = (valueBase === 'arrivee') ? toBase : fromBase;
         var parsed = bnStrictParse(valRaw, chosenBase);
         if (parsed === null) {
             bnLastInvalid = true;
-            el.innerHTML = '<em style="color:#dc2626;">⚠ Valeur impossible : « ' + valRaw + ' » n\'est pas un nombre valide en base ' + chosenBase + '.</em>';
+            el.innerHTML = '<em style="color:#dc2626;">⚠ ' + I18N.t('bn.err_valeur_impossible', {val: valRaw, base: chosenBase}) + '</em>';
             return;
         }
         if (fixedWidth > 0 && toBase !== 10) {
             var neededFixe = bnToBase(parsed, toBase).length;
             if (neededFixe > fixedWidth) {
                 bnLastInvalid = true;
-                el.innerHTML = '<em style="color:#dc2626;">⚠ Largeur fixe impossible : ' + parsed + ' (décimal) nécessite au moins ' + neededFixe + ' chiffres en ' + baseName(toBase) + ', mais la largeur imposée n\'est que de ' + fixedWidth + '.</em>';
+                el.innerHTML = '<em style="color:#dc2626;">⚠ ' + I18N.t('bn.err_largeur_fixe_valeur', {val: parsed, needed: neededFixe, base: baseName(toBase), width: fixedWidth}) + '</em>';
                 return;
             }
         }
-        html = 'Donnée : ' + formatSrc(parsed) + ' (' + baseName(fromBase) + ')'
-             + ' &nbsp;→&nbsp; Réponse attendue : ' + formatDst(parsed) + ' (' + baseName(toBase) + ')';
+        html = I18N.t('bn.preview_donnee', {src: formatSrc(parsed), baseFrom: baseName(fromBase), dst: formatDst(parsed), baseTo: baseName(toBase)});
     }
 
     bnLastInvalid = false;
 
     if (fromBase === toBase) {
-        html += ' <span style="color:#dc2626">⚠ Base source = base cible</span>';
+        html += ' <span style="color:#dc2626">⚠ ' + I18N.t('bn.warn_base_egale') + '</span>';
     }
     if (format === 'C' && toBase !== 2 && toBase !== 8 && toBase !== 16) {
-        html += ' <span style="color:#dc2626">⚠ Notation C incompatible avec la base ' + toBase + '</span>';
+        html += ' <span style="color:#dc2626">⚠ ' + I18N.t('bn.warn_notation_c_incompatible', {base: toBase}) + '</span>';
     }
     if (fixedWidth > 0 && toBase === 10) {
-        html += ' <span style="color:#dc2626">⚠ Largeur fixe ignorée (base d\'arrivée = décimal)</span>';
+        html += ' <span style="color:#dc2626">⚠ ' + I18N.t('bn.warn_largeur_ignoree') + '</span>';
     }
 
     html += '<div style="margin-top:6px;font-style:italic;color:#1e3a8a;">' + bnSyntaxHint(format, toBase, fixedWidth) + '</div>';

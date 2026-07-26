@@ -114,7 +114,7 @@ function statUpdateRandSummary() {
     var nv  = n  ? n.value  : '6';
     var mnv = mn ? mn.value : '1';
     var mxv = mx ? mx.value : '20';
-    el.textContent = 'n = ' + nv + ', plage [' + mnv + ' ; ' + mxv + ']';
+    el.textContent = I18N.t('stat.rand_summary', {n: nv, min: mnv, max: mxv});
 }
 
 function statFormChange() {
@@ -144,16 +144,14 @@ function statUpdatePreview() {
         var n   = gs('stat-rand-n')   || '6';
         var mn  = gs('stat-rand-min') || '1';
         var mx  = gs('stat-rand-max') || '20';
-        el.innerHTML = '<em style="color:#0f766e;">Mode aléatoire — Maxima génère '
-            + n + ' valeurs dans [' + mn + ' ; ' + mx + '] à chaque affichage. '
-            + 'Chaque élève reçoit une série différente.</em>';
+        el.innerHTML = '<em style="color:#0f766e;">' + I18N.t('stat.preview_mode_aleatoire', {n: n, min: mn, max: mx}) + '</em>';
         return;
     }
     var r = statCompute();
     var labels = {
-        'moyenne':'Moyenne x̄', 'mediane':'Médiane Me', 'variance':'Variance V',
-        'ecart-type':'Écart-type σ', 'etendue':'Étendue', 'q1':'Quartile Q₁',
-        'q3':'Quartile Q₃', 'moy-pond':'Moyenne pondérée x̄'
+        'moyenne': I18N.t('stat.preview_lbl_moyenne'), 'mediane': I18N.t('stat.preview_lbl_mediane'), 'variance': I18N.t('stat.preview_lbl_variance'),
+        'ecart-type': I18N.t('stat.preview_lbl_ecart_type'), 'etendue': I18N.t('stat.preview_lbl_etendue'), 'q1': I18N.t('stat.preview_lbl_q1'),
+        'q3': I18N.t('stat.preview_lbl_q3'), 'moy-pond': I18N.t('stat.preview_lbl_moy_pond')
     };
     var label = labels[r.scenario] || r.scenario;
     var val   = statFmtN(r.result, r.round);
@@ -164,14 +162,14 @@ function statUpdatePreview() {
         var display = gs('stat-display') || 'liste';
         if (display === 'tableau') {
             var cells = sorted.map(function(v){ return '<td style="padding:4px 10px;border:1px solid #99f6e4;">' + v + '</td>'; }).join('');
-            html += '<br><small style="color:#6b7280;">n = ' + r.n + ' valeurs — série triée :</small>'
+            html += '<br><small style="color:#6b7280;">' + I18N.t('stat.preview_n_valeurs_triee', {n: r.n}) + '</small>'
                   + '<table style="border-collapse:collapse;margin-top:4px;"><tr>' + cells + '</tr></table>';
         } else {
-            html += '<br><small style="color:#6b7280;">n = ' + r.n + ' valeurs — série triée : ' + sorted.join(', ') + '</small>';
+            html += '<br><small style="color:#6b7280;">' + I18N.t('stat.preview_n_valeurs_triee_liste', {n: r.n, list: sorted.join(', ')}) + '</small>';
         }
     }
     if (r.vals) {
-        html += '<br><small style="color:#6b7280;">Σnᵢxᵢ / Σnᵢ — effectif total : ' + r.effs.reduce(function(s,v){return s+v;},0) + '</small>';
+        html += '<br><small style="color:#6b7280;">' + I18N.t('stat.preview_effectif_total', {total: r.effs.reduce(function(s,v){return s+v;},0)}) + '</small>';
     }
     el.innerHTML = html;
 }

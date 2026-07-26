@@ -169,10 +169,10 @@ function cpxCopyExpression() {
         var btn = document.querySelector('[onclick="cpxCopyExpression()"]');
         if (btn) {
             var orig = btn.textContent;
-            btn.textContent = '✅ Copié !';
+            btn.textContent = '✅ ' + I18N.t('cpx.copie_reussie');
             setTimeout(function() { btn.textContent = orig; }, 1800);
         }
-    }).catch(function() { prompt('Copier cette expression :', expr); });
+    }).catch(function() { prompt(I18N.t('cpx.copier_prompt'), expr); });
 }
 
 // ── Feedbacks détaillés (par nœud PRT) : rendu dynamique ─────────────────────
@@ -230,15 +230,15 @@ function cpxFormChange() {
     }
 
     if (scenario === 'affixes') {
-        setText('cpx-lbl-a', 'Partie réelle de z_A');
-        setText('cpx-lbl-b', 'Partie imaginaire de z_A');
-        setText('cpx-lbl-c', 'Partie réelle de z_B');
-        setText('cpx-lbl-d', 'Partie imaginaire de z_B');
+        setText('cpx-lbl-a', I18N.t('cpx.lbl_partie_reelle_za'));
+        setText('cpx-lbl-b', I18N.t('cpx.lbl_partie_imag_za'));
+        setText('cpx-lbl-c', I18N.t('cpx.lbl_partie_reelle_zb'));
+        setText('cpx-lbl-d', I18N.t('cpx.lbl_partie_imag_zb'));
     } else {
-        setText('cpx-lbl-a', 'Partie réelle a');
-        setText('cpx-lbl-b', 'Partie imaginaire b');
-        setText('cpx-lbl-c', 'Partie réelle c (z₂)');
-        setText('cpx-lbl-d', 'Partie imaginaire d (z₂)');
+        setText('cpx-lbl-a', I18N.t('cpx.lbl_partie_reelle_a'));
+        setText('cpx-lbl-b', I18N.t('cpx.lbl_partie_imag_b'));
+        setText('cpx-lbl-c', I18N.t('cpx.lbl_partie_reelle_c_z2'));
+        setText('cpx-lbl-d', I18N.t('cpx.lbl_partie_imag_d_z2'));
     }
 
     cpxSetCanvas();
@@ -262,12 +262,12 @@ function cpxUpdatePreview() {
 
     if (mode === 'aleatoire') {
         var labels = {
-            'forme-alg':     'z₁ et z₂ aléatoires — valeurs via {@...@}',
-            'module-arg':    'z = a+b' + letter + ' aléatoire — module et arg via {@...@}',
-            'equation-2deg': 'racines entières p±q' + letter + ' — coefficients via {@...@}'
+            'forme-alg':     I18N.t('cpx.preview_forme_alg_alea'),
+            'module-arg':    I18N.t('cpx.preview_module_arg_alea', {letter: letter}),
+            'equation-2deg': I18N.t('cpx.preview_equation_alea', {letter: letter})
         };
-        el.innerHTML = '<em>' + (labels[scenario] || 'Mode aléatoire') + '</em>'
-                     + '<br><small style="color:#6b7280">Bornes [' + min + ', ' + max + '] — unité : ' + letter + '</small>';
+        el.innerHTML = '<em>' + (labels[scenario] || I18N.t('cpx.preview_mode_aleatoire_default')) + '</em>'
+                     + '<br><small style="color:#6b7280">' + I18N.t('cpx.preview_bornes', {min: min, max: max, letter: letter}) + '</small>';
         return;
     }
 
@@ -300,7 +300,7 @@ function cpxUpdatePreview() {
                  + '<br>z₁ = <strong>' + _cpxFmt(zRe, zIm) + '</strong>'
                  + '  z₂ = <strong>' + _cpxFmt(zRe, -zIm) + '</strong>';
         } else {
-            html = '<span style="color:#dc2626;">Δ = ' + _cpxFmtN(disc) + ' ≥ 0 → racines réelles</span>';
+            html = '<span style="color:#dc2626;">' + I18N.t('cpx.preview_racines_reelles', {disc: _cpxFmtN(disc)}) + '</span>';
         }
     } else if (scenario === 'affixes') {
         var midRe = (a+c)/2, midIm = (b+d)/2;

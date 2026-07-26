@@ -14,7 +14,7 @@ function addCWRow(word, def) {
     row.innerHTML =
         '<input type="text" class="cw-input cw-word" placeholder="' + I18N.t('tpl.cw_mot') + '">' +
         '<div class="cw-def-wrap">' +
-          '<div class="rich-preview rich-preview-sm cw-def-preview" id="prev-' + defId + '" data-ph="D\xe9finition…" onclick="openRich(\'' + defId + '\')"></div>' +
+          '<div class="rich-preview rich-preview-sm cw-def-preview" id="prev-' + defId + '" data-ph="' + attrEsc(I18N.t('tpl.cw_definition') + '…') + '" onclick="openRich(\'' + defId + '\')"></div>' +
           '<textarea id="' + defId + '" class="cw-def" style="display:none"></textarea>' +
           '<button class="btn-rich" type="button" onclick="openRich(\'' + defId + '\')">' +
             '<svg class="hs-ico" aria-hidden="true"><use href="#ico-action-edit"></use></svg> \xc9diteur' +
@@ -203,7 +203,7 @@ function cwCanPlace(grid, word, x, y, direction) {
 function cwPlaceWord(grid, word, x, y, direction) { for (let i = 0; i < word.length; i++) { const cx = direction === 'H' ? x + i : x; const cy = direction === 'H' ? y : y + i; const key = `${cx},${cy}`; if (!grid[key]) grid[key] = { letter: word[i], number: null }; } }
 
 function renderCWGridHTML(grid, maxX, maxY) {
-    if (!grid) return "<p>Erreur</p>";
+    if (!grid) return "<p>" + I18N.t('cw.preview_error') + "</p>";
     let html = `<div class="crossword-grid" style="grid-template-columns: repeat(${maxX + 1}, 30px); grid-template-rows: repeat(${maxY + 1}, 30px);">`;
     for (let y = 0; y <= maxY; y++) { 
         for (let x = 0; x <= maxX; x++) { 
@@ -496,7 +496,7 @@ function copyCWPrompt() {
       btn.style.background = "#059669";
       setTimeout(() => { btn.innerHTML = orig; btn.style.background = "#ea580c"; }, 2000);
     }
-  }).catch(e => { alert("Erreur copie"); });
+  }).catch(e => { alert(I18N.t('tpl.copie_erreur')); });
 }
 // ═══════════════════════════════════════════════════════════════════
 // LOGIQUE PROMPT IA POUR "RELIER" (MATCH)
@@ -631,7 +631,7 @@ function copyMatchPrompt() {
       btn.style.background = "#059669";
       setTimeout(() => { btn.innerHTML = orig; btn.style.background = ""; }, 2000);
     }
-  }).catch(e => { alert("Erreur copie"); });
+  }).catch(e => { alert(I18N.t('tpl.copie_erreur')); });
 }
 
 if (typeof module !== 'undefined' && module.exports) {

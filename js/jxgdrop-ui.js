@@ -274,7 +274,7 @@ function _jdRenderProposals() {
             + '<input class="dd-prop-input" type="text" value="' + htmlEsc(p.text) + '" '
             +   'placeholder="' + I18N.t('jd.proposal_ph') + '" '
             +   'oninput="jdPropTextChange(' + p.id + ', this.value)">'
-            + '<button class="dd-prop-del" onclick="jdDeleteProposal(' + p.id + ')" title="Supprimer">✕</button>'
+            + '<button class="dd-prop-del" onclick="jdDeleteProposal(' + p.id + ')" title="' + I18N.t('btn.supprimer') + '">✕</button>'
             + '</div>';
     }).join('');
 }

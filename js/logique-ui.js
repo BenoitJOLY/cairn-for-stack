@@ -122,7 +122,7 @@ function lgUpdateCanvas() {
         html += '<div style="margin-top:8px;font-size:.85rem;">';
         choices.forEach(function (c, i) {
             var letter = String.fromCharCode(65 + i);
-            html += '<div>' + letter + '. <code>' + lgHumanize(c) + '</code>' + (i === 0 ? ' <strong style="color:#15803d;">(bonne réponse)</strong>' : '') + '</div>';
+            html += '<div>' + letter + '. <code>' + lgHumanize(c) + '</code>' + (i === 0 ? ' <strong style="color:#15803d;">' + I18N.t('log.bonne_reponse') + '</strong>' : '') + '</div>';
         });
         html += '</div>';
         el.innerHTML = html;
@@ -134,7 +134,7 @@ function lgUpdateCanvas() {
         html2 += '</div>';
         if (expr && expr2) {
             html2 += '<div style="font-weight:bold;color:' + (equiv ? '#15803d' : '#dc2626') + ';margin-top:8px;">'
-                + (equiv ? '✅ Équivalentes (réponse = true)' : '❌ Non équivalentes (réponse = false)') + '</div>';
+                + (equiv ? I18N.t('log.preview_equivalentes') : I18N.t('log.preview_non_equivalentes')) + '</div>';
         }
         el.innerHTML = html2;
     } else if (scenario === 'intermediaire') {
@@ -159,16 +159,16 @@ function lgUpdateCanvas() {
         el.innerHTML = h3;
     } else if (scenario === 'simplif') {
         var html4 = '<div style="margin:6px 0;">';
-        html4 += '<strong>Expression à simplifier :</strong> <code style="background:#ede9fe;padding:2px 6px;border-radius:4px;">' + expr + '</code>';
-        if (tans) html4 += '<br><strong>Réponse attendue :</strong> <code style="background:#d1fae5;padding:2px 6px;border-radius:4px;">' + tans + '</code>';
+        html4 += '<strong>' + I18N.t('log.preview_expr_a_simplifier') + '</strong> <code style="background:#ede9fe;padding:2px 6px;border-radius:4px;">' + expr + '</code>';
+        if (tans) html4 += '<br><strong>' + I18N.t('log.preview_reponse_attendue') + '</strong> <code style="background:#d1fae5;padding:2px 6px;border-radius:4px;">' + tans + '</code>';
         html4 += '</div>';
         if (tans) {
             var ok = lgAreEquiv(expr, tans, nbVars);
             html4 += ok
-                ? '<div style="color:#15803d;font-size:.82rem;">✅ L\'expression et la forme simplifiée sont bien équivalentes.</div>'
-                : '<div style="color:#dc2626;font-size:.82rem;">⚠️ Attention : les expressions ne semblent pas équivalentes — vérifiez la réponse modèle.</div>';
+                ? '<div style="color:#15803d;font-size:.82rem;">' + I18N.t('log.preview_simplif_ok') + '</div>'
+                : '<div style="color:#dc2626;font-size:.82rem;">' + I18N.t('log.preview_simplif_warn') + '</div>';
         }
-        html4 += '<br><strong>Table de vérité complète :</strong><br>' + lgRenderTable(expr, nbVars, {});
+        html4 += '<br><strong>' + I18N.t('log.preview_table_complete') + '</strong><br>' + lgRenderTable(expr, nbVars, {});
         el.innerHTML = html4;
     }
 }
@@ -188,14 +188,14 @@ function lgFormChange() {
 
     var lblExpr = document.getElementById('lg-lbl-expr');
     if (lblExpr) {
-        lblExpr.textContent = scenario === 'equivalence' ? 'Première expression (E₁)'
-            : scenario === 'identifier' ? 'Expression correcte (option A)'
-            : scenario === 'simplif' ? 'Expression à simplifier'
-            : scenario === 'intermediaire' ? 'Expression finale'
-            : 'Expression logique';
+        lblExpr.textContent = scenario === 'equivalence' ? I18N.t('log.lbl_premiere_expr')
+            : scenario === 'identifier' ? I18N.t('log.lbl_expr_correcte')
+            : scenario === 'simplif' ? I18N.t('log.lbl_expr_a_simplifier')
+            : scenario === 'intermediaire' ? I18N.t('log.lbl_expr_finale')
+            : I18N.t('log.expr_lbl');
     }
     var lblExpr2 = document.getElementById('lg-lbl-expr2');
-    if (lblExpr2) lblExpr2.textContent = scenario === 'identifier' ? 'Distracteur (option B)' : 'Deuxième expression (E₂)';
+    if (lblExpr2) lblExpr2.textContent = scenario === 'identifier' ? I18N.t('log.lbl_distracteur_b') : I18N.t('log.expr2_lbl');
 
     lgUpdateCanvas();
 
@@ -204,23 +204,23 @@ function lgFormChange() {
     var expr = (document.getElementById('lg-expr') || {}).value || '';
     var nbVars = (document.getElementById('lg-nb-vars') || {}).value || '2';
     if (scenario === 'table') {
-        prev.innerHTML = expr ? 'Toutes les cases de la colonne résultat sont à compléter (0 ou 1), une case = 1 point.' : '';
+        prev.innerHTML = expr ? I18N.t('log.preview_table_desc') : '';
     } else if (scenario === 'cases') {
         var nbBlanks = parseInt((document.getElementById('lg-nb-blanks') || {}).value || '2');
-        prev.innerHTML = expr ? nbBlanks + ' case(s) à déduire, les autres sont déjà données.' : '';
+        prev.innerHTML = expr ? I18N.t('log.preview_cases_desc', {n: nbBlanks}) : '';
     } else if (scenario === 'identifier') {
-        prev.innerHTML = expr ? 'L\'élève choisit parmi les options affichées celle qui correspond à la table.' : '';
+        prev.innerHTML = expr ? I18N.t('log.preview_identifier_desc') : '';
     } else if (scenario === 'equivalence') {
         var expr2 = (document.getElementById('lg-expr2') || {}).value || '';
         if (expr && expr2) {
             var equiv = lgAreEquiv(expr, expr2, nbVars);
-            prev.innerHTML = 'Réponse attendue pour l\'équivalence : <strong>' + (equiv ? 'true' : 'false') + '</strong>';
-        } else prev.innerHTML = 'Entrer les deux expressions pour voir la réponse.';
+            prev.innerHTML = I18N.t('log.preview_equiv_reponse', {val: equiv ? 'true' : 'false'});
+        } else prev.innerHTML = I18N.t('log.preview_equiv_entrer');
     } else if (scenario === 'intermediaire') {
-        prev.innerHTML = expr ? 'Colonnes intermédiaires + colonne finale à compléter entièrement.' : '';
+        prev.innerHTML = expr ? I18N.t('log.preview_intermediaire_desc') : '';
     } else if (scenario === 'simplif') {
         var tans = (document.getElementById('lg-tans') || {}).value || '';
-        prev.innerHTML = 'L\'élève saisit la forme simplifiée. STACK vérifie l\'équivalence logique (PropLogic).'
-            + (tans ? ' Réponse modèle : <code>' + tans + '</code>' : '');
+        prev.innerHTML = I18N.t('log.preview_simplif_desc')
+            + (tans ? I18N.t('log.preview_reponse_modele', {tans: tans}) : '');
     }
 }

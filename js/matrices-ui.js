@@ -10,7 +10,7 @@ function matFormChange() {
     if (rr) rr.style.display = isSys ? 'none' : '';
     if (ri) {
         if (isSys) {
-            ri.textContent = 'Coefficients non nuls tirés dans [−4 ; 4], solution entière dans [−4 ; 4].';
+            ri.textContent = I18N.t('mat.info_systeme_range');
             ri.style.display = '';
         } else {
             ri.style.display = 'none';
@@ -28,21 +28,20 @@ function matUpdatePreview() {
     var rmax = gs('mat-rand-max') || '3';
 
     var labels = {
-        'produit-2x2':     'Produit A×B (2×2)',
-        'det-2x2':         'Déterminant 2×2',
-        'det-3x3':         'Déterminant 3×3 (Sarrus)',
-        'trace-3x3':       'Trace 3×3',
-        'transpose-3x3':   'Transposée 3×3',
-        'systeme-2x2':     'Système linéaire 2×2 → (x, y)'
+        'produit-2x2':     I18N.t('mat.preview_produit'),
+        'det-2x2':         I18N.t('mat.preview_det2'),
+        'det-3x3':         I18N.t('mat.preview_det3'),
+        'trace-3x3':       I18N.t('mat.preview_trace'),
+        'transpose-3x3':   I18N.t('mat.preview_transpose'),
+        'systeme-2x2':     I18N.t('mat.preview_systeme')
     };
     var label = labels[scenario] || scenario;
 
     var html = '<strong>' + label + '</strong>';
     if (scenario === 'systeme-2x2') {
-        html += '<br><small style="color:#6b7280;">Coefficients non nuls dans [−4 ; 4] — solution entière aléatoire.</small>';
+        html += '<br><small style="color:#6b7280;">' + I18N.t('mat.preview_systeme_hint') + '</small>';
     } else {
-        html += '<br><small style="color:#6b7280;">Coefficients générés par Maxima dans ['
-            + rmin + ' ; ' + rmax + '] — différents à chaque étudiant.</small>';
+        html += '<br><small style="color:#6b7280;">' + I18N.t('mat.preview_random_hint', {min: rmin, max: rmax}) + '</small>';
     }
     el.innerHTML = html;
 }

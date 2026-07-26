@@ -42,7 +42,7 @@ function suiCompute() {
         return {label:'u_n', expr: u0+'×'+q+'^n', val:null};
     }
     if (scenario === 'somme-arith' || scenario === 'somme-geo') {
-        return {label:'S_n', expr: 'formule en fonction de n', val:null};
+        return {label:'S_n', expr: I18N.t('sui.preview_formule_fn'), val:null};
     }
     if (scenario === 'limite-geo') {
         if (Math.abs(q) < 1) return {val: 0, label:'lim u_n', expr:'→0 (|q|<1)'};
@@ -63,7 +63,7 @@ function suiUpdatePreview() {
     if (!el) return;
     var mode = (document.getElementById('sui-mode') || {}).value || 'aleatoire';
     if (mode !== 'fixe') {
-        el.innerHTML = '<small style="color:#6b7280;">Valeurs générées aléatoirement par Maxima dans les bornes indiquées — différentes à chaque étudiant.</small>';
+        el.innerHTML = '<small style="color:#6b7280;">' + I18N.t('sui.preview_random_note') + '</small>';
         return;
     }
     var r = suiCompute();

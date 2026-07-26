@@ -14,24 +14,24 @@ function abFormChange() {
     var nPRow  = document.getElementById('ab-n-protons-row');
 
     if (abType === 'bf-af') {
-        if (lbl1)   lbl1.textContent   = 'Conc. base faible Cb (mol/L)';
-        if (lbl2)   lbl2.textContent   = 'Conc. acide fort Ca (mol/L)';
-        if (lblPka) lblPka.textContent = 'pKb de la base';
+        if (lbl1)   lbl1.textContent   = I18N.t('ab.conc_base_faible_cb');
+        if (lbl2)   lbl2.textContent   = I18N.t('ab.conc_acide_fort_ca');
+        if (lblPka) lblPka.textContent = I18N.t('ab.pkb_base');
         if (pkaRow) pkaRow.style.display = '';
         // bf-af est toujours monoprote → cacher le sélecteur n-protons
         if (nPRow)      nPRow.style.display  = 'none';
         if (nProtonsEl) nProtonsEl.value     = '1';
         nProtons = 1;
     } else if (abType === 'af-fort-bf') {
-        if (lbl1)   lbl1.textContent   = 'Conc. acide fort Ca (mol/L)';
-        if (lbl2)   lbl2.textContent   = 'Conc. base forte Cb (mol/L)';
+        if (lbl1)   lbl1.textContent   = I18N.t('ab.conc_acide_fort_ca');
+        if (lbl2)   lbl2.textContent   = I18N.t('ab.conc_base_forte_cb');
         if (pkaRow) pkaRow.style.display = 'none';
         if (nPRow)  nPRow.style.display  = 'none';
         if (nProtonsEl) nProtonsEl.value = '1';
         nProtons = 1;
     } else {  // af-bf
-        if (lbl1)   lbl1.textContent   = 'Conc. acide faible Ca (mol/L)';
-        if (lbl2)   lbl2.textContent   = 'Conc. base forte Cb (mol/L)';
+        if (lbl1)   lbl1.textContent   = I18N.t('ab.conc_acide_faible_ca');
+        if (lbl2)   lbl2.textContent   = I18N.t('ab.conc_base_forte_cb');
         if (lblPka) lblPka.textContent = 'pKa1';
         if (pkaRow) pkaRow.style.display = '';
         if (nPRow)  nPRow.style.display  = '';
@@ -83,7 +83,7 @@ function abUpdatePreview() {
     var pka3= parseFloat((document.getElementById('ab-pka3')|| {}).value);
 
     if (isNaN(c1)||isNaN(v1)||isNaN(c2)||c1<=0||v1<=0||c2<=0) {
-        el.innerHTML = '<em>Saisir les param\xe8tres…</em>'; return;
+        el.innerHTML = '<em>' + I18N.t('ab.preview_saisir_params') + '</em>'; return;
     }
 
     var Veq1 = c1 * v1 / c2;

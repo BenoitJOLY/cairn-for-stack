@@ -54,12 +54,12 @@ function rxUpdatePreview() {
 
     if (isNaN(e1)||isNaN(n1)||isNaN(e2)||isNaN(n2)||isNaN(c1)||isNaN(c2)||isNaN(v2)
         ||n1<=0||n2<=0||c1<=0||c2<=0||v2<=0) {
-        el.innerHTML = '<em>Saisir les paramètres…</em>'; return;
+        el.innerHTML = '<em>' + I18N.t('rx.preview_saisir_params') + '</em>'; return;
     }
 
     var Veq = n2 * c2 * v2 / (n1 * c1);
     var Eeq = (n1 * e1 + n2 * e2) / (n1 + n2);
-    var warn = (e1 <= e2) ? ' <span style="color:#dc2626">⚠ E°₁ doit être &gt; E°₂ pour une réaction spontanée</span>' : '';
+    var warn = (e1 <= e2) ? ' <span style="color:#dc2626">' + I18N.t('rx.preview_warn_spontane') + '</span>' : '';
     el.innerHTML = 'Veq = <strong>' + Veq.toFixed(2) + ' mL</strong>'
         + ' &nbsp;|&nbsp; E_éq = <strong>' + Eeq.toFixed(3) + ' V</strong>'
         + ' &nbsp;|&nbsp; E°₁ = <strong>' + e1.toFixed(3) + ' V</strong>'

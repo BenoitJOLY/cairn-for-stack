@@ -72,28 +72,28 @@ function phyCompute() {
     } else if (scenario === 'chute-h') {
         result = 0.5*G*t*t; unit = 'm';
         formula = 'h = ½gt² = ½×9.81×'+phyFmt(t)+'²';
-        label = 'Hauteur de chute';
+        label = I18N.t('phy.label_hauteur_chute');
     } else if (scenario === 'chute-t') {
         result = Math.sqrt(2*d/G); unit = 's';
         formula = 't = √(2h/g) = √(2×'+phyFmt(d)+'/9.81)';
-        label = 'Temps de chute';
+        label = I18N.t('phy.label_temps_chute');
     } else if (scenario === 'ec') {
         var v = d; // d réutilisé comme vitesse v
         result = 0.5*m*v*v; unit = 'J';
         formula = 'Ec = ½mv² = ½×'+phyFmt(m)+'×'+phyFmt(v)+'²';
-        label = 'Énergie cinétique';
+        label = I18N.t('phy.label_energie_cinetique');
     } else if (scenario === 'ep') {
         result = m*G*d; unit = 'J';
         formula = 'Ep = mgh = '+phyFmt(m)+'×9.81×'+phyFmt(d);
-        label = 'Énergie potentielle';
+        label = I18N.t('phy.label_energie_potentielle');
     } else if (scenario === 'em-conserv') {
         result = Math.sqrt(2*G*d); unit = 'm/s';
         formula = 'v = √(2gh) = √(2×9.81×'+phyFmt(d)+')';
-        label = 'Vitesse finale (Em conservée)';
+        label = I18N.t('phy.label_vitesse_finale');
     } else { // newton-f
         result = m*a; unit = 'N';
         formula = 'F = ma = '+phyFmt(m)+'×'+phyFmt(a);
-        label = 'Force résultante';
+        label = I18N.t('phy.label_force_resultante');
     }
 
     return {result:result, unit:unit, formula:formula, label:label};
