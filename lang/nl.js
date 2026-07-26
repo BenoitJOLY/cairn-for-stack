@@ -720,6 +720,22 @@ I18N.add("nl", {
   "maxima.err_non_configure":   "Geen Maxima-servers geconfigureerd. Open de instellingen (⚙️ Maxima Server) om het adres in te voeren.",
   "maxima.err_connexion":       "Kan geen contact maken met de Maxima-server ({msg}).",
 
+  /* ── Instelbare feedbackkaders (Opties) ── */
+  "footer.fbbox_options":       "Feedbackopties",
+  "fbbox.titre":                "Weergaveopties voor feedback",
+  "fbbox.explication":          "Pas de randkleur, achtergrond en het icoon aan van de feedbackkaders die worden gebruikt in de voorvertoning en bij de XML-export (Juist, Gedeeltelijk, Fout, Algemeen). Deze instellingen worden alleen in uw browser opgeslagen.",
+  "fbbox.type_true":            "Feedback juist (100%)",
+  "fbbox.type_partial":         "Feedback gedeeltelijk juist",
+  "fbbox.type_false":           "Feedback fout (0%)",
+  "fbbox.type_general":         "Algemene feedback",
+  "fbbox.label_border":         "Rand",
+  "fbbox.label_bg":             "Achtergrond",
+  "fbbox.label_icon":           "Icoon",
+  "fbbox.preview_sample":       "Voorbeeldbericht dat aan de leerling wordt getoond.",
+  "fbbox.btn_reset":            "Herstellen",
+  "fbbox.msg_enregistre":       "Stijlen van de feedbackkaders opgeslagen.",
+  "fbbox.msg_reinitialise":     "Stijlen van de feedbackkaders hersteld.",
+
   /* ── Boutons communs ── */
   "common.supprimer":           "VERWIJDEREN",
   "btn.save":                   "Redden",

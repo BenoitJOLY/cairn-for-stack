@@ -720,6 +720,22 @@ I18N.add("fr", {
   "maxima.err_non_configure":   "Aucun serveur Maxima configuré. Ouvrez les réglages (⚙️ Serveur Maxima) pour renseigner son adresse.",
   "maxima.err_connexion":       "Impossible de contacter le serveur Maxima ({msg}).",
 
+  /* ── Encadrés de feedback configurables (Options) ── */
+  "footer.fbbox_options":       "Options des feedbacks",
+  "fbbox.titre":                "Options d'affichage des feedbacks",
+  "fbbox.explication":          "Personnalisez la couleur, le fond et l'icône des encadrés de feedback utilisés dans l'aperçu et l'export XML (Vrai, Partiel, Faux, Général). Ces réglages sont propres à votre navigateur.",
+  "fbbox.type_true":            "Feedback vrai (100%)",
+  "fbbox.type_partial":         "Feedback partiel",
+  "fbbox.type_false":           "Feedback faux (0%)",
+  "fbbox.type_general":         "Feedback général",
+  "fbbox.label_border":         "Bordure",
+  "fbbox.label_bg":             "Fond",
+  "fbbox.label_icon":           "Icône",
+  "fbbox.preview_sample":       "Exemple de message affiché à l'élève.",
+  "fbbox.btn_reset":            "Réinitialiser",
+  "fbbox.msg_enregistre":       "Styles des encadrés enregistrés.",
+  "fbbox.msg_reinitialise":     "Styles des encadrés réinitialisés.",
+
   /* ── Boutons communs ── */
   "common.supprimer":           "Supprimer",
   "btn.save":                   "Enregistrer",

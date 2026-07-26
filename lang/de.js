@@ -720,6 +720,22 @@ I18N.add("de", {
   "maxima.err_non_configure":   "Es ist kein Maxima-Server konfiguriert. Öffnen Sie die Einstellungen (⚙️ Maxima-Server), um die Adresse einzugeben.",
   "maxima.err_connexion":       "Der Maxima-Server ({msg}) konnte nicht kontaktiert werden.",
 
+  /* ── Konfigurierbare Feedback-Kästen (Optionen) ── */
+  "footer.fbbox_options":       "Feedback-Optionen",
+  "fbbox.titre":                "Anzeigeoptionen für Feedback",
+  "fbbox.explication":          "Passen Sie Rahmenfarbe, Hintergrund und Symbol der Feedback-Kästen an, die in der Vorschau und beim XML-Export verwendet werden (Richtig, Teilweise, Falsch, Allgemein). Diese Einstellungen werden nur in Ihrem Browser gespeichert.",
+  "fbbox.type_true":            "Feedback richtig (100%)",
+  "fbbox.type_partial":         "Feedback teilweise richtig",
+  "fbbox.type_false":           "Feedback falsch (0%)",
+  "fbbox.type_general":         "Allgemeines Feedback",
+  "fbbox.label_border":         "Rahmen",
+  "fbbox.label_bg":             "Hintergrund",
+  "fbbox.label_icon":           "Symbol",
+  "fbbox.preview_sample":       "Beispielnachricht, die dem Lernenden angezeigt wird.",
+  "fbbox.btn_reset":            "Zurücksetzen",
+  "fbbox.msg_enregistre":       "Stile der Feedback-Kästen gespeichert.",
+  "fbbox.msg_reinitialise":     "Stile der Feedback-Kästen zurückgesetzt.",
+
   /* ── Boutons communs ── */
   "common.supprimer":           "Löschen",
   "btn.save":                   "Speichern",

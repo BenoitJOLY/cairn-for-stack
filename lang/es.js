@@ -720,6 +720,22 @@ I18N.add("es", {
   "maxima.err_non_configure":   "No hay ningún servidor Maxima configurado. Abre la configuración (⚙️ Servidor Maxima) para introducir su dirección.",
   "maxima.err_connexion":       "No se ha podido establecer contacto con el servidor Maxima ({msg}).",
 
+  /* ── Recuadros de feedback configurables (Opciones) ── */
+  "footer.fbbox_options":       "Opciones de los feedbacks",
+  "fbbox.titre":                "Opciones de visualización de los feedbacks",
+  "fbbox.explication":          "Personaliza el color del borde, el fondo y el icono de los recuadros de feedback utilizados en la vista previa y en la exportación XML (Verdadero, Parcial, Falso, General). Estos ajustes se guardan solo en tu navegador.",
+  "fbbox.type_true":            "Feedback verdadero (100%)",
+  "fbbox.type_partial":         "Feedback parcial",
+  "fbbox.type_false":           "Feedback falso (0%)",
+  "fbbox.type_general":         "Feedback general",
+  "fbbox.label_border":         "Borde",
+  "fbbox.label_bg":             "Fondo",
+  "fbbox.label_icon":           "Icono",
+  "fbbox.preview_sample":       "Mensaje de ejemplo mostrado al alumno.",
+  "fbbox.btn_reset":            "Restablecer",
+  "fbbox.msg_enregistre":       "Estilos de los recuadros de feedback guardados.",
+  "fbbox.msg_reinitialise":     "Estilos de los recuadros de feedback restablecidos.",
+
   /* ── Boutons communs ── */
   "common.supprimer":           "Eliminar",
   "btn.save":                   "Guardar",

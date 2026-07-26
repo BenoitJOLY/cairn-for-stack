@@ -11,6 +11,7 @@ const path = require('node:path');
 
 const { genBasenCore } = require(path.join('..', '..', 'js', 'gen-basen.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -31,7 +32,7 @@ function bnSyntaxHint(format, toBase, fixedWidth) {
     return 'hint:' + format + ':' + toBase + ':' + fixedWidth;
 }
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, bnStrictParse, bnSyntaxHint };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, bnStrictParse, bnSyntaxHint, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -139,6 +140,17 @@ test('diagNodes expose les nœuds de diagnostic intermédiaires (hors "réponse 
 test('generalFeedback intègre fbGen via _mkFbGen', () => {
     const q = genBasenCore(1, baseParams({ fbGen: 'Remarque' }), DEPS);
     assert.match(q.generalFeedback, /Remarque/);
+});
+
+test('les encadrés colorés ne sont jamais dans le contenu brut édité (prt.nodes/diagNodes), seulement dans prtXML/generalFeedback', () => {
+    const q = genBasenCore(1, baseParams({ toBase: 2, fromBase: 10 }), DEPS);
+    q.prt.nodes.forEach(n => {
+        assert.doesNotMatch(n.truefeedback, /border-left/);
+        assert.doesNotMatch(n.falsefeedback, /border-left/);
+    });
+    q.diagNodes.forEach(d => assert.doesNotMatch(d.fb, /border-left/));
+    assert.match(q.prtXML, /border-left/);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('le XML (prtXML, inputXML) est bien formé pour plusieurs combinaisons format/base/largeur', () => {

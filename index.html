@@ -7416,6 +7416,26 @@ fill="currentColor" stroke="none">
 </div>
 
 <!-- ══════════════════════════════════════════════════ -->
+<!-- MODALE — OPTIONS DES ENCADRÉS DE FEEDBACK          -->
+<!-- ══════════════════════════════════════════════════ -->
+<div id="fbBoxOptionsModal" class="modal-backdrop" onclick="closeFbBoxOptionsModal(event)" style="z-index:2000;display:none;">
+  <div class="calc-box" style="width:560px;max-width:95vw;" onclick="event.stopPropagation()">
+    <h2 style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);font-size:1rem;">🎨 <span data-i18n="fbbox.titre">Options d'affichage des feedbacks</span></h2>
+    <div style="font-size:.85rem;color:var(--navy2);line-height:1.6;margin-bottom:14px;" data-i18n="fbbox.explication">
+      Personnalisez la couleur, le fond et l'icône des encadrés de feedback utilisés dans l'aperçu et l'export XML (Vrai, Partiel, Faux, Général). Ces réglages sont propres à votre navigateur.
+    </div>
+    <div id="fbbox-rows" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button style="flex:1;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:10px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.85rem;" onclick="resetFbBoxOptionsFromUI()" data-i18n="fbbox.btn_reset">Réinitialiser</button>
+      <button style="flex:1;background:var(--navy);color:white;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.85rem;" onclick="saveFbBoxOptionsFromUI()" data-i18n="btn.save">Enregistrer</button>
+    </div>
+    <div style="margin-top:10px;">
+      <button style="background:none;color:var(--slate);width:100%;padding:8px;border:none;cursor:pointer;font-size:.8rem;" onclick="closeFbBoxOptionsModal()" data-i18n="btn.fermer">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
 <!-- MODALE — CONTACT & SUPPORT                        -->
 <!-- ══════════════════════════════════════════════════ -->
 <div id="contactModal" class="modal-backdrop" onclick="closeContactModal(event)" style="z-index:2000;">
@@ -7635,6 +7655,8 @@ fill="currentColor" stroke="none">
       <a href="javascript:void(0)" onclick="openContactModal()"><svg class="hs-ico"><use href="#ico-footer-contact"></use></svg> <span data-i18n="footer.contact">Contact &amp; Support</span></a>
       <span class="sep">|</span>
       <a href="javascript:void(0)" onclick="openMaximaConfigModal()">⚙️ <span data-i18n="footer.maxima">Serveur Maxima</span></a>
+      <span class="sep">|</span>
+      <a href="javascript:void(0)" onclick="openFbBoxOptionsModal()">🎨 <span data-i18n="footer.fbbox_options">Options des feedbacks</span></a>
       <span class="sep">|</span>
       <a href="https://github.com/BJ44-phy/H-stack.git" target="_blank" rel="noopener noreferrer"><svg class="hs-ico"><use href="#ico-footer-docs"></use></svg> <span data-i18n="footer.docs">Documentation</span></a>
     </nav>
@@ -7883,6 +7905,8 @@ fill="currentColor" stroke="none">
 <script src="js/gen-optique.js"></script>
 <script src="js/gen-acidebase.js"></script>
 <script src="js/gen-redox.js"></script>
+<script src="js/fb-box.js"></script>
+<script src="js/fb-box-options.js"></script>
 <script src="js/gen-basen.js"></script>
 <script src="js/gen-apn.js"></script>
 <script src="js/circuit-atelier.js"></script>

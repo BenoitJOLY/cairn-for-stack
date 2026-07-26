@@ -65,6 +65,7 @@ function genBasenCore(X, p, deps) {
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
     var bnStrictParse_D = deps.bnStrictParse || bnStrictParse;
     var bnSyntaxHint_D = deps.bnSyntaxHint || (typeof bnSyntaxHint === 'function' ? bnSyntaxHint : null);
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var format = p.format, fromBase = p.fromBase, toBase = p.toBase;
     var valueMode = p.valueMode, valueBase = p.valueBase, bareme = p.bareme;
@@ -223,26 +224,26 @@ function genBasenCore(X, p, deps) {
     // ── Construction des noeuds du PRT ──
     var nodes = [];
     var fbVars = '';
-    var fbOkFinal = fbOk || ('<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>' + I18N_D.t('mat.fb_ok_correct') + '</strong> ' + I18N_D.t('bn.fb_ok_desc') + '</div>');
-    var fbWrongFinal = fbWrong || ('<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> '
-        + I18N_D.t('bn.fb_wrong_resultat', {val: '{@' + (toBase === 10 ? vVal : vDstStr) + '@}'}) + '</div>');
+    var fbOkFinal = fbOk || ('<strong>' + I18N_D.t('mat.fb_ok_correct') + '</strong> ' + I18N_D.t('bn.fb_ok_desc'));
+    var fbWrongFinal = fbWrong || ('<strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> '
+        + I18N_D.t('bn.fb_wrong_resultat', {val: '{@' + (toBase === 10 ? vVal : vDstStr) + '@}'}));
 
     if (toBase === 10) {
-        nodes.push({ desc: 'Reponse exacte', test: 'EqualComAss', tans: vVal, fb: fbOkFinal, isCorrect: true });
+        nodes.push({ desc: 'Reponse exacte', test: 'EqualComAss', tans: vVal, fb: fbOkFinal, fbKind: 'true', isCorrect: true });
         if (fromBase !== 10) {
             nodes.push({
                 desc: 'Lecture comme un nombre decimal', test: 'EqualComAss', tans: vMisread10,
-                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('bn.fb_err_base_title') + '</strong> ' + I18N_D.t('bn.fb_err_base_desc', {fromBase: String(fromBase)}) + '</div>'
+                fb: '<strong>' + I18N_D.t('bn.fb_err_base_title') + '</strong> ' + I18N_D.t('bn.fb_err_base_desc', {fromBase: String(fromBase)}), fbKind: 'false'
             });
             nodes.push({
                 desc: 'Poids des chiffres inverses', test: 'EqualComAss', tans: vSrcRevVal,
-                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('bn.fb_err_sens_title') + '</strong> ' + I18N_D.t('bn.fb_err_sens_desc', {fromBase: String(fromBase)}) + '</div>'
+                fb: '<strong>' + I18N_D.t('bn.fb_err_sens_title') + '</strong> ' + I18N_D.t('bn.fb_err_sens_desc', {fromBase: String(fromBase)}), fbKind: 'false'
             });
         }
         // Noeud "attrape-tout" toujours vrai (EqualComAss 1=1) : pas besoin de regex ici,
         // ce noeud ne sert qu'a afficher le feedback generique quand aucun autre noeud
         // au-dessus n'a matche.
-        nodes.push({ desc: 'Erreur de calcul generique', test: 'EqualComAss', sans: '1', tans: '1', fb: fbWrongFinal, isFinal: true });
+        nodes.push({ desc: 'Erreur de calcul generique', test: 'EqualComAss', sans: '1', tans: '1', fb: fbWrongFinal, fbKind: 'false', isFinal: true });
     } else {
         // ── Diagnostics de format calcules en Maxima (feedbackvariables), pas en RegExp ──
         // Chaque diagnostic est un booleen precalcule via des fonctions de chaine simples
@@ -264,47 +265,47 @@ function genBasenCore(X, p, deps) {
         }
         fbVars += vValidChars + ': is(sublist(charlist(' + ansVar + '), lambda([c], not member(c, ' + charsetListLiteral + '))) = []);\n';
 
-        nodes.push({ desc: 'Reponse exacte', test: 'String', tans: vDstStr, fb: fbOkFinal, isCorrect: true });
+        nodes.push({ desc: 'Reponse exacte', test: 'String', tans: vDstStr, fb: fbOkFinal, fbKind: 'true', isCorrect: true });
         nodes.push({
             desc: 'Espaces detectes', test: 'EqualComAss', sans: vHasSpace, tans: 'true',
-            fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_espaces_desc') + '</div>'
+            fb: '<strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_espaces_desc'), fbKind: 'partial'
         });
         if (toBaseFormat === 'S') {
             nodes.push({
                 desc: 'Prefixe interdit detecte', test: 'EqualComAss', sans: vHasPrefix, tans: 'true',
-                fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_prefixe_desc') + '</div>'
+                fb: '<strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_prefixe_desc'), fbKind: 'false'
             });
             if (toBase <= 10) {
                 nodes.push({
                     desc: 'Lettres interdites detectees', test: 'EqualComAss', sans: vHasLetters, tans: 'true',
-                    fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_lettres_desc', {toBase: String(toBase)}) + '</div>'
+                    fb: '<strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_lettres_desc', {toBase: String(toBase)}), fbKind: 'false'
                 });
             } else {
                 nodes.push({
                     desc: 'Minuscules utilisees', test: 'String', tans: vLower,
-                    fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>' + I18N_D.t('bn.fb_presque_correct') + '</strong> ' + I18N_D.t('bn.fb_err_minuscules_desc') + '</div>'
+                    fb: '<strong>' + I18N_D.t('bn.fb_presque_correct') + '</strong> ' + I18N_D.t('bn.fb_err_minuscules_desc'), fbKind: 'partial'
                 });
             }
             if (!fixedWidth) {
                 nodes.push({
                     desc: 'Zeros inutiles au debut', test: 'EqualComAss', sans: vLeadZero, tans: 'true',
-                    fb: '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>' + I18N_D.t('bn.fb_presque_correct') + '</strong> ' + I18N_D.t('bn.fb_err_zeros_desc') + '</div>'
+                    fb: '<strong>' + I18N_D.t('bn.fb_presque_correct') + '</strong> ' + I18N_D.t('bn.fb_err_zeros_desc'), fbKind: 'partial'
                 });
             }
         }
         nodes.push({
             desc: 'Recopie de la valeur de depart', test: 'String', tans: vSrcStr,
-            fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_recopie_desc', {toBase: String(toBase)}) + '</div>'
+            fb: '<strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_recopie_desc', {toBase: String(toBase)}), fbKind: 'false'
         });
         nodes.push({
             desc: 'Restes lus a l\'envers', test: 'String', tans: vDstStrRev,
-            fb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('bn.fb_err_lecture_title') + '</strong> ' + I18N_D.t('bn.fb_err_lecture_desc') + '</div>'
+            fb: '<strong>' + I18N_D.t('bn.fb_err_lecture_title') + '</strong> ' + I18N_D.t('bn.fb_err_lecture_desc'), fbKind: 'false'
         });
         nodes.push({
             desc: 'Caracteres valides pour la base ' + toBase, test: 'EqualComAss', sans: vValidChars, tans: 'true',
-            fb: fbWrongFinal,
+            fb: fbWrongFinal, fbKind: 'false',
             isFinal: true,
-            falseFb: '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('bn.fb_err_carac_title') + '</strong> ' + I18N_D.t('bn.fb_err_carac_desc', {toBase: String(toBase)}) + '</div>'
+            falseFb: '<strong>' + I18N_D.t('bn.fb_err_carac_title') + '</strong> ' + I18N_D.t('bn.fb_err_carac_desc', {toBase: String(toBase)}), falseFbKind: 'false'
         });
     }
 
@@ -340,7 +341,18 @@ function genBasenCore(X, p, deps) {
         };
     });
     var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+    // canonicalNodes (ci-dessus, expose via prt.nodes pour prt-manager.js) reste brut,
+    // sans encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
+    // presentation. Voir js/fb-box.js (applyFbBox).
+    var xmlNodes = canonicalNodes.map(function(n, i) {
+        var nd = nodes[i];
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(nd.fbKind, n.truefeedback),
+            falsefeedback: applyFbBox_D(nd.falseFbKind || 'false', n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     var questionText = instrText
         + conseilsHTML
@@ -358,8 +370,8 @@ function genBasenCore(X, p, deps) {
         var isLastDiag = (di === nodes.length - 1);
         // Le dernier noeud avant fin reutilise fbWrongFinal (= la boite "Feedback si FAUX"
         // standard) : on ne le reaffiche pas ici pour eviter un doublon dans l'apercu.
-        if (dn.fb && !(isLastDiag && dn.fb === fbWrongFinal)) diagNodes.push({ desc: dn.desc, fb: dn.fb });
-        if (dn.falseFb) diagNodes.push({ desc: dn.desc + ' (caracteres invalides)', fb: dn.falseFb });
+        if (dn.fb && !(isLastDiag && dn.fb === fbWrongFinal)) diagNodes.push({ desc: dn.desc, fb: dn.fb, kind: dn.fbKind });
+        if (dn.falseFb) diagNodes.push({ desc: dn.desc + ' (caracteres invalides)', fb: dn.falseFb, kind: dn.falseFbKind });
     }
 
     return {
@@ -371,7 +383,11 @@ function genBasenCore(X, p, deps) {
         inputXML:        inputXML,
         prtXML:          prtXML,
         prt:             { meta: prtMeta, nodes: canonicalNodes },
-        generalFeedback: mkFbGen_D(autoFb, p.fbGen),
+        // Encadre "general" applique ici (export final ET apercu partagent ce meme champ) :
+        // pas de risque de round-trip brut, le texte reellement edite par l'enseignant
+        // (p.fbGen / bn-fbgen) est stocke a part (state.fbGen, config-panel-basen.js),
+        // jamais reparse depuis generalFeedback.
+        generalFeedback: applyFbBox_D('general', mkFbGen_D(autoFb, p.fbGen)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         diagNodes:       diagNodes
     };
