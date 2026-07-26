@@ -78,6 +78,7 @@ function genApnCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme, text = p.text, fbOk = p.fbOk, fbWrong = p.fbWrong;
     var unknown = p.unknown, changed = p.changed, nChanged = p.nChanged;
@@ -93,14 +94,19 @@ function genApnCore(X, p, deps) {
         + P + 'ldr: [1,sqrt(2),2,2*sqrt(2),4,4*sqrt(2),8,8*sqrt(2),16,16*sqrt(2)];\n'
         + P + 'li: [100,200,400,800,1600,3200,6400,12800];\n\n';
 
+    // D1/V1/I1 tirés une seule fois (vraies variables de question) : seule la
+    // recherche de la cible (ci-dessous) est répétée en cas d'échec de tolérance.
+    qvars += P + 'idxD1: rand(length(' + P + 'lda))+1;\n'
+        + P + 'D1a: ' + P + 'lda[' + P + 'idxD1];\n'
+        + P + 'D1r: ' + P + 'ldr[' + P + 'idxD1];\n'
+        + P + 'V1: rand(' + P + 'lv);\n'
+        + P + 'I1: rand(' + P + 'li);\n'
+        + P + 'K: float(' + P + 'V1*' + P + 'I1/' + P + 'D1r^2);\n\n';
+
     qvars += P + 'valid: false;\n'
-        + 'while not ' + P + 'valid do (\n'
-        + '  ' + P + 'idxD1: rand(length(' + P + 'lda))+1,\n'
-        + '  ' + P + 'D1a: ' + P + 'lda[' + P + 'idxD1],\n'
-        + '  ' + P + 'D1r: ' + P + 'ldr[' + P + 'idxD1],\n'
-        + '  ' + P + 'V1: rand(' + P + 'lv),\n'
-        + '  ' + P + 'I1: rand(' + P + 'li),\n'
-        + '  ' + P + 'K: float(' + P + 'V1*' + P + 'I1/' + P + 'D1r^2),\n';
+        + P + 'attempt: 0;\n'
+        + 'while not ' + P + 'valid and ' + P + 'attempt<200 do (\n'
+        + '  ' + P + 'attempt: ' + P + 'attempt+1,\n';
 
     // ── Diaphragme : tiré (si modifié) ou reconduit (si ni modifié ni inconnu) ──
     if (unknown !== 'D') {
@@ -175,8 +181,8 @@ function genApnCore(X, p, deps) {
         + P + 'iaug: if ' + P + 'I2 > ' + P + 'I1 then true else false;\n'
         + P + 'vchange: if ' + P + 'V2 # ' + P + 'V1 then true else false;\n'
         + P + 'vlent: if ' + P + 'V2 > ' + P + 'V1 then true else false;\n'
-        + P + 'napf: (' + P + 'D1r/' + P + 'D2r)^2;\n'
-        + P + 'napo: (' + P + 'D2r/' + P + 'D1r)^2;\n'
+        + P + 'napf: (' + P + 'D2r/' + P + 'D1r)^2;\n'
+        + P + 'napo: (' + P + 'D1r/' + P + 'D2r)^2;\n'
         + P + 'nisou: ' + P + 'I2/' + P + 'I1;\n'
         + P + 'nisod: ' + P + 'I1/' + P + 'I2;\n'
         + P + 'nvR_exact: if ' + P + 'V2>' + P + 'V1 then ' + P + 'V2/' + P + 'V1 else ' + P + 'V1/' + P + 'V2;\n'
@@ -261,8 +267,8 @@ function genApnCore(X, p, deps) {
 
     // ── PRT : plusieurs nœuds de diagnostic (valeur non recalculée, sens de
     // compensation inversé, paramètre changé ignoré), puis nœud générique final ──
-    var fbOkFinal = fbOk || ('<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>' + I18N_D.t('apn.fb_ok_title') + '</strong> ' + I18N_D.t('apn.fb_ok_desc') + '</div>');
-    var fbWrongFinal = fbWrong || ('<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('apn.fb_wrong_correction', {cible: cibleDisplay}) + '</div>');
+    var fbOkFinal = fbOk || ('<strong>' + I18N_D.t('apn.fb_ok_title') + '</strong> ' + I18N_D.t('apn.fb_ok_desc'));
+    var fbWrongFinal = fbWrong || ('<strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('apn.fb_wrong_correction', {cible: cibleDisplay}));
 
     // Comparaison sur chaîne de caractères pour l'inconnue "diaphragme" (les valeurs
     // d'affichage comme 1.4/2.8 doivent matcher exactement la chaîne soumise par le
@@ -277,36 +283,37 @@ function genApnCore(X, p, deps) {
         : { wig1: I18N_D.t('apn.lbl_diaphragme_art'), wig2: I18N_D.t('apn.lbl_vitesse_art') };
 
     var fbBox = function(msg) {
-        return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + msg + ' ' + I18N_D.t('apn.fb_wrong_correction', {cible: cibleDisplay}) + '</div>';
+        return '<strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + msg + ' ' + I18N_D.t('apn.fb_wrong_correction', {cible: cibleDisplay});
     };
 
     var nodes = [];
     nodes.push({
         desc: 'Réponse correcte', test: 'AlgEquiv', tans: tansOf(P + 'cible'),
-        fb: fbOkFinal, isCorrect: true
+        fb: fbOkFinal, fbKind: 'true', isCorrect: true
     });
     nodes.push({
         desc: 'Valeur non recalculée', test: 'AlgEquiv', tans: tansOf(oldValueVar),
-        fb: fbBox(I18N_D.t('apn.msg_valeur_non_recalculee', {label: unknownLabel}))
+        fb: fbBox(I18N_D.t('apn.msg_valeur_non_recalculee', {label: unknownLabel})), fbKind: 'false'
     });
     nodes.push({
         desc: 'Sens de compensation inversé', test: 'AlgEquiv', tans: tansOf(P + 'winv'),
-        fb: fbBox(I18N_D.t('apn.msg_sens_inverse', {label: unknownLabel}))
+        fb: fbBox(I18N_D.t('apn.msg_sens_inverse', {label: unknownLabel})), fbKind: 'false'
     });
     if (nChanged === 2) {
         nodes.push({
             desc: 'Paramètre 1 ignoré', test: 'AlgEquiv', tans: tansOf(P + 'wig1'),
-            fb: fbBox(I18N_D.t('apn.msg_parametre_ignore', {label: ignoredLabels.wig1}))
+            fb: fbBox(I18N_D.t('apn.msg_parametre_ignore', {label: ignoredLabels.wig1})), fbKind: 'false'
         });
         nodes.push({
             desc: 'Paramètre 2 ignoré', test: 'AlgEquiv', tans: tansOf(P + 'wig2'),
-            fb: fbBox(I18N_D.t('apn.msg_parametre_ignore', {label: ignoredLabels.wig2}))
+            fb: fbBox(I18N_D.t('apn.msg_parametre_ignore', {label: ignoredLabels.wig2})), fbKind: 'false'
         });
     }
-    nodes.push({
-        desc: 'Erreur générique', test: 'EqualComAss', sans: '1', tans: '1',
-        fb: fbWrongFinal, isFinal: true
-    });
+    // Pas de nœud générique séparé (test toujours vrai EqualComAss(1,1)) : le
+    // dernier nœud de diagnostic devient le nœud terminal, son message par
+    // défaut (fbWrongFinal) passant en falsefeedback plutôt que d'être un nœud
+    // à part dont la branche fausse est de toute façon inatteignable.
+    nodes[nodes.length - 1].falseFb = fbWrongFinal;
 
     var canonicalNodes = nodes.map(function(nd, i) {
         var isLast = (i === nodes.length - 1);
@@ -329,29 +336,38 @@ function genApnCore(X, p, deps) {
             falsepenalty: '',
             falsenextnode: isLast ? '-1' : String(i + 1),
             falseanswernote: 'prt' + X + '-' + i + '-F',
-            falsefeedback: ''
+            falsefeedback: isLast ? (nd.falseFb || '') : ''
         };
     });
     var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: '' };
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadrés colorés : appliqués uniquement sur la copie servant à l'export XML ──
+    // canonicalNodes (exposé via prt.nodes pour prt-manager.js) reste brut, sans
+    // encadré, pour que l'édition manuelle du PRT n'affiche jamais de HTML de
+    // présentation. Voir js/fb-box.js (applyFbBox).
+    var xmlNodes = canonicalNodes.map(function(n, i) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(nodes[i].fbKind, n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     var diagNodes = [];
     for (var di = 1; di < nodes.length; di++) {
-        var dn = nodes[di];
-        var isLastDiag = (di === nodes.length - 1);
-        if (dn.fb && !(isLastDiag && dn.fb === fbWrongFinal)) diagNodes.push({ desc: dn.desc, fb: dn.fb });
+        diagNodes.push({ desc: nodes[di].desc, fb: nodes[di].fb, kind: nodes[di].fbKind });
     }
 
     return {
         type:            'apn',
         bareme:          bareme,
         vars:            qvars,
-        qnote:           'APN Q' + X + ' inconnue=' + unknown + ' modifie(s)=' + Object.keys(changed).filter(function(k){return changed[k];}).join('+'),
+        qnote:           'APN Q' + X + ' inconnue=' + unknown + ' modifie(s)=' + Object.keys(changed).filter(function(k){return changed[k];}).join('+')
+            + ' D={@' + P + 'D1a@}->{@' + P + 'D2a@} V={@' + P + 'V1@}->{@' + P + 'V2@} I={@' + P + 'I1@}->{@' + P + 'I2@}',
         textFrag:        questionText,
         inputXML:        inputXML,
         prtXML:          prtXML,
         prt:             { meta: prtMeta, nodes: canonicalNodes },
-        generalFeedback: mkFbGen_D(autoFb, p.fbGen),
+        generalFeedback: applyFbBox_D('general', mkFbGen_D(autoFb, p.fbGen)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         diagNodes:       diagNodes
     };

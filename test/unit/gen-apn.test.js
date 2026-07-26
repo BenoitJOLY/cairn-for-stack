@@ -11,13 +11,14 @@ const path = require('node:path');
 
 const { genApnCore } = require(path.join('..', '..', 'js', 'gen-apn.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
 };
 const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -66,23 +67,30 @@ test("unknown='I' cible q1_I2", () => {
     assert.match(q.vars, /q1_cible: q1_I2;/);
 });
 
-test('nChanged=1 : 4 nœuds (correct, valeur non recalculée, sens inversé, fallback), pas de wig1/wig2', () => {
+test('nChanged=1 : 3 nœuds (correct, valeur non recalculée, sens inversé = terminal), pas de wig1/wig2', () => {
     const q = genApnCore(1, baseParams({ nChanged: 1 }), DEPS);
-    assert.equal(q.prt.nodes.length, 4);
+    assert.equal(q.prt.nodes.length, 3);
     assert.doesNotMatch(q.vars, /q1_wig1/);
 });
 
-test('nChanged=2 : 6 nœuds (2 nœuds "paramètre ignoré" supplémentaires)', () => {
+test('nChanged=2 : 5 nœuds (2 nœuds "paramètre ignoré" supplémentaires, le dernier terminal)', () => {
     const q = genApnCore(1, baseParams({ unknown: 'V', changed: { D: true, V: false, I: true }, nChanged: 2 }), DEPS);
-    assert.equal(q.prt.nodes.length, 6);
+    assert.equal(q.prt.nodes.length, 5);
     assert.match(q.vars, /q1_wig1:/);
     assert.match(q.vars, /q1_wig2:/);
 });
 
-test('fbOk/fbWrong personnalisés remplacent le feedback par défaut du nœud correct/final', () => {
+test('fbOk/fbWrong personnalisés remplacent le feedback par défaut du nœud correct / le falsefeedback terminal', () => {
     const q = genApnCore(1, baseParams({ fbOk: 'Bravo', fbWrong: 'Non' }), DEPS);
     assert.equal(q.prt.nodes[0].truefeedback, 'Bravo');
-    assert.equal(q.prt.nodes[q.prt.nodes.length - 1].truefeedback, 'Non');
+    assert.equal(q.prt.nodes[q.prt.nodes.length - 1].falsefeedback, 'Non');
+});
+
+test('le dernier nœud est bien le nœud terminal (falsenextnode=-1) avec falsefeedback non vide', () => {
+    const q = genApnCore(1, baseParams({ nChanged: 1 }), DEPS);
+    const last = q.prt.nodes[q.prt.nodes.length - 1];
+    assert.equal(last.falsenextnode, '-1');
+    assert.notEqual(last.falsefeedback, '');
 });
 
 test('le nœud correct porte le barème complet, les autres 0', () => {
@@ -99,6 +107,17 @@ test('diagNodes expose les nœuds de diagnostic intermédiaires (hors correct et
 test('generalFeedback intègre fbGen via _mkFbGen', () => {
     const q = genApnCore(1, baseParams({ fbGen: 'Remarque' }), DEPS);
     assert.match(q.generalFeedback, /Remarque/);
+});
+
+test('les encadrés colorés ne sont jamais dans le contenu brut édité (prt.nodes/diagNodes), seulement dans prtXML/generalFeedback', () => {
+    const q = genApnCore(1, baseParams({ nChanged: 2 }), DEPS);
+    q.prt.nodes.forEach(n => {
+        assert.doesNotMatch(n.truefeedback, /border-left/);
+        assert.doesNotMatch(n.falsefeedback, /border-left/);
+    });
+    q.diagNodes.forEach(d => assert.doesNotMatch(d.fb, /border-left/));
+    assert.match(q.prtXML, /border-left/);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('qnote résume inconnue et paramètres modifiés', () => {
