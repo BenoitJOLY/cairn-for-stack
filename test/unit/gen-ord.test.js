@@ -11,6 +11,7 @@ const path = require('node:path');
 
 const { genOrdCore } = require(path.join('..', '..', 'js', 'gen-ord.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -19,7 +20,7 @@ const mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fb
 const rawEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const wrapFb = (html, ok) => `<div class="${ok ? 'ok' : 'ko'}">${html || '&nbsp;'}</div>`;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen: mkFbGen, rawEsc, wrapFb };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen: mkFbGen, rawEsc, wrapFb, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -76,6 +77,11 @@ test('un seul nœud PRT, tans="true" sur ord_check', () => {
 test('generalFeedback intègre fbGenExtra via mkFbGen', () => {
     const q = genOrdCore(1, baseParams({ fbGenExtra: 'Info complémentaire' }), DEPS);
     assert.match(q.generalFeedback, /Info complémentaire/);
+});
+
+test('generalFeedback est encadré (applyFbBox "general") quand il y a du contenu', () => {
+    const q = genOrdCore(1, baseParams({ fbGenExtra: 'Info complémentaire' }), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('le XML (prtXML, inputXML) est bien formé', () => {

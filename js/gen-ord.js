@@ -40,6 +40,7 @@ function genOrdCore(X, p, deps) {
     var mkFbGen_D      = deps._mkFbGen || _mkFbGen;
     var rawEsc_D       = deps.rawEsc || rawEsc;
     var wrapFb_D       = deps.wrapFb || wrapFb;
+    var applyFbBox_D   = deps.applyFbBox || applyFbBox;
 
     var bareme  = p.bareme;
     var text    = p.text;
@@ -129,7 +130,7 @@ function genOrdCore(X, p, deps) {
         inputXML:        inputXML,
         prtXML:          prtXML,
         prt:             { meta: prtMeta, nodes: canonicalNodes },
-        generalFeedback: mkFbGen_D("", p.fbGenExtra),
+        generalFeedback: applyFbBox_D('general', mkFbGen_D("", p.fbGenExtra)),
         feedbackRef:     '[[feedback:prt' + X + ']]'
     };
 }
