@@ -11,6 +11,7 @@ const path = require('node:path');
 
 const { genAlgebraicCore } = require(path.join('..', '..', 'js', 'gen-algebraic.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -28,7 +29,7 @@ function algPrtNodeCanonical(X,n,test,sans,tans,opts,trueNext,trueScore,falseNex
     };
 }
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -99,6 +100,16 @@ test('allowwords combine formVars et poolVars sans doublons', () => {
 test('generalFeedback inclut la solution si fournie', () => {
     const q = genAlgebraicCore(1, baseParams({ sol: '<p>Étape par étape...</p>' }), DEPS);
     assert.match(q.generalFeedback, /Étape par étape/);
+});
+
+test('generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = genAlgebraicCore(1, baseParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+});
+
+test('qnote est vide : pas de rand(), pas de variante à documenter (et {@ta@} révélerait la réponse)', () => {
+    const q = genAlgebraicCore(1, baseParams(), DEPS);
+    assert.equal(q.qnote, '');
 });
 
 test('le XML (prtXML, inputXML) est bien formé pour chaque mode', () => {

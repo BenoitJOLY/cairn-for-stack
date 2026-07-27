@@ -62,6 +62,7 @@ function genAlgebraicCore(X, p, deps){
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var wrapFb_D = deps.wrapFb || wrapFb;
   var algPrtNodeCanonical_D = deps.algPrtNodeCanonical || algPrtNodeCanonical;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
   const bareme=p.bareme, text=p.text, formula=p.formula, mode=p.mode;
   const exprDisplay=p.exprDisplay, errorExpr=p.errorExpr;
@@ -77,7 +78,10 @@ function genAlgebraicCore(X, p, deps){
   varsLines.push(`ta${X}:${formula};`);
   if(hasError)varsLines.push(`erreur${X}:${errorExpr};`);
   const vars=varsLines.join('\n');
-  const qnote=hasDisplay?`{@exp${X}@}`:`{@ta${X}@}`;
+  // Pas de rand() : formula/exprDisplay sont saisis par l'enseignant, pas de
+  // variante aléatoire à documenter — et {@ta${X}@} est la réponse attendue,
+  // l'exposer en questionnote la révélerait à l'élève (cf. Numérique/Logique).
+  const qnote='';
   const tansEquiv=hasDisplay?`exp${X}`:`ta${X}`;
   // Feedback
   const fbOK=wrapFb_D(fbc,true);
@@ -162,7 +166,7 @@ function genAlgebraicCore(X, p, deps){
     prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
     feedbackRef:`[[feedback:prt${X}]]`,
-    generalFeedback: `<p><strong>${I18N_D.t('tpl.alg_fb_reponse_attendue')}</strong> \\({@ta${X}@}\\)</p>`+(sol?`<div style="margin-top:8px;">${sol}</div>`:''),
+    generalFeedback: applyFbBox_D('general', `<p><strong>${I18N_D.t('tpl.alg_fb_reponse_attendue')}</strong> \\({@ta${X}@}\\)</p>`+(sol?`<div style="margin-top:8px;">${sol}</div>`:'')),
     solution:sol};
 }
 
