@@ -56,7 +56,10 @@ function genCheckboxCore(X, p, deps){
   const cbFbGen = p.cbFbGen, cbFbGenShowFb = p.cbFbGenShowFb;
   let taAll=[],fbAll=[],fbOubliAll=[];
   p.props.forEach((r,i)=>{const id=String(i+1),b=r.bool;taAll.push(`["${id}",${b},"${escapeMaximaString_D(r.text)}"]`);fbAll.push(`["${id}","${escapeMaximaString_D(r.fb)}"]`);fbOubliAll.push(`["${id}","${escapeMaximaString_D(r.fb2)}"]`);});
-  const tgt=mXb==='alea'?`rand(${Xe}-1)+1`:Xb;
+  // mXb==='fixe' : le nombre de bonnes réponses cochées est figé à Xb (borné à ce qui
+  // est réellement disponible) — avant ce correctif, `nbV` ignorait totalement Xb/mXb
+  // et restait toujours aléatoire, rendant le mode "fixe" sans aucun effet.
+  const nbVExpr=mXb==='alea'?`rand(min(length(listV${X}), ${Xe}-1)) + 1`:`max(1,min(${Xb},min(length(listV${X}),${Xe}-1)))`;
 
   const oubliVar=showOubli?`\nfb_oubli${X}:[${fbOubliAll.join(',')}];`:'';
 
@@ -65,7 +68,7 @@ function genCheckboxCore(X, p, deps){
 ta${X}_all:[${taAll.join(',')}];
 listV${X}:sublist(ta${X}_all,lambda([ex],second(ex)=true));
 listF${X}:sublist(ta${X}_all,lambda([ex],second(ex)=false));
-nbV${X}:rand(min(length(listV${X}), ${Xe}-1)) + 1;
+nbV${X}:${nbVExpr};
 nbF${X}:min(length(listF${X}),${Xe} - nbV${X});
 ta${X}:random_permutation(append(rand_selection(listV${X},nbV${X}),rand_selection(listF${X},nbF${X})));
 fb${X}:[${fbAll.join(',')}];${oubliVar}

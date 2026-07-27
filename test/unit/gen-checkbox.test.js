@@ -88,3 +88,21 @@ test('le XML (prtXML, inputXML) est bien formé', () => {
     assertBalancedTags(q.prtXML, 'prtXML');
     assertBalancedTags(q.inputXML, 'inputXML');
 });
+
+test('mode "fixe" : nbV est figé à Xb (borné), aucun rand() dans les vars', () => {
+    const q = genCheckboxCore(1, baseParams({ mXb: 'fixe', Xb: '2' }), DEPS);
+    assert.match(q.vars, /nbV1:max\(1,min\(2,min\(length\(listV1\),3-1\)\)\);/);
+    assert.ok(!/\brand\(/.test(q.vars), 'le mode fixe ne doit plus contenir rand()');
+});
+
+test('mode "alea" : nbV reste tiré au sort avec rand()', () => {
+    const q = genCheckboxCore(1, baseParams({ mXb: 'alea', Xb: '2' }), DEPS);
+    assert.match(q.vars, /nbV1:rand\(min\(length\(listV1\), 3-1\)\) \+ 1;/);
+    assert.match(q.vars, /\brand\(/);
+});
+
+test('les modes "fixe" et "alea" produisent des vars différentes (Xb pris en compte)', () => {
+    const qFixe = genCheckboxCore(1, baseParams({ mXb: 'fixe', Xb: '2' }), DEPS);
+    const qAlea = genCheckboxCore(1, baseParams({ mXb: 'alea', Xb: '2' }), DEPS);
+    assert.notEqual(qFixe.vars, qAlea.vars);
+});

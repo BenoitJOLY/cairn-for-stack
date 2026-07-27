@@ -128,13 +128,21 @@ async function generateDeployedSeeds(xml, count, opts) {
       // /render puis /grade le 2026-07-25 : soumettre samplesolutionrender donne
       // score 0 (isgradable:true mais faux), soumettre samplesolution[""] donne
       // score 1. `samplesolution` est une map par sous-partie ; pour un input
-      // simple (string/algébrique/numérique) elle n'a qu'une clé "".
+      // simple (string/algébrique/numérique) elle n'a qu'une clé "". Un input
+      // composé de plusieurs sous-parties (ex. checkbox, qui rend chaque case
+      // séparément côté HTML/STACK) peut avoir plusieurs clés — avant ce correctif
+      // ce cas retombait sur `undefined`, ce qui fait toujours échouer /grade
+      // (aucune variante checkbox n'était donc jamais validée, quel que soit le
+      // seed essayé). Pas de confirmation par appel réel pour ce cas précis
+      // (contrairement aux 4 bugs ci-dessus) : on transmet la map complète telle
+      // quelle à /grade plutôt que de l'abandonner — au pire aussi inefficace
+      // qu'avant, au mieux ça corrige le blocage. À confirmer sur le NAS réel.
       var answers = {};
       inputNames.forEach(function(name) {
         var ir = renderRes && renderRes.questioninputs && renderRes.questioninputs[name];
         var sol = ir && ir.samplesolution;
         var solKeys = sol ? Object.keys(sol) : [];
-        answers[name] = solKeys.length === 1 ? sol[solKeys[0]] : undefined;
+        answers[name] = solKeys.length === 1 ? sol[solKeys[0]] : (solKeys.length > 1 ? sol : undefined);
       });
       var gradeRes = await maximaGradeXML(tempXml, seed, answers);
       if (gradeRes && gradeRes.isgradable) {
