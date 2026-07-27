@@ -684,6 +684,23 @@ Retour utilisateur après test réel sur le type Numérique (`js/gen-numerical.j
 
 **Repéré au passage, non corrigé** : `js/gen-algebraic.js` a la même structure (`qnote={@ta${X}@}` sans `rand()` dans le cas courant, `generalFeedback` non encadré) — probable même bug, à confirmer/traiter dans un lot séparé si l'utilisateur le souhaite (pas traité ici pour respecter la règle "un type à la fois").
 
+### Extension du correctif Numérique aux autres types `wrapFb` (2026-07-27)
+
+Retour utilisateur : "je n'ai pas testé les autres pour le moment mais si tu penses qu'il faut le faire fait le" — autorisation explicite à étendre le correctif qnote/generalFeedback ci-dessus (Numérique) aux ~15 autres fichiers consommateurs de `wrapFb` repérés à l'étape A, un fichier/commit à la fois (règle #4). Chaque fichier a été audité individuellement pour distinguer les deux cas :
+- **qnote fuite la réponse** (pas de `rand()`, `qnote` référence directement la variable réponse) → vidé (`qnote: ''`), même raisonnement que Logique/Numérique.
+- **qnote documente une randomisation légitime** (`rand()`/`rand_selection()`/`random_permutation()` réel, ou simple libellé descriptif ne révélant pas la bonne réponse) → laissé inchangé.
+
+Dans tous les cas, `generalFeedback` a été enveloppé avec `applyFbBox_D('general', ...)` (pattern `deps.applyFbBox || applyFbBox` identique aux autres deps injectables) là où ce n'était pas déjà fait.
+
+- **Algébrique** (`js/gen-algebraic.js`, commit `f3c8c5b`) : qnote fuyait (`{@exp${X}@}`/`{@ta${X}@}`, pas de `rand()`) → vidé. generalFeedback encadré.
+- **Pool/Radio/Dropdown** (`js/gen-pool.js`, commit `83e133f`) : qnote (`{@map(first,ta${X})@}`) documente légitimement quelles propositions numérotées ont été tirées via `rand_selection`/`random_permutation`, sans révéler laquelle est vraie → **inchangé**. generalFeedback encadré.
+- **String** (`js/gen-string.js`, commit `7ee53a3`) : les deux cœurs (`genStringCore`, `genStringLevenshteinCore`) avaient `qnote={@ta${X}@}` sans `rand()` → vidé dans les deux. generalFeedback encadré dans les deux (attention : la branche non-Levenshtein de `genStringCore` a `generalFeedback=mkFbGen_D('', fbGen)`, vide par défaut sans `fbGen` enseignant — `applyFbBox` ne fait alors rien, `if(!html) return html`, comportement correct).
+- **Ordonnancement** (`js/gen-ord.js`, commit `2a15ac1`) : qnote (`{@map(first, ord_steps_X)@}`) documente l'ordre de mélange via `random_permutation` → **inchangé**. generalFeedback encadré.
+- **ImgClick** (zone cliquable / séquence, `js/gen-imgclick.js`, commit `502ce24`) : qnote (`'Zone cliquable Q'+X`, `'Séquence Q'+X`) est un simple libellé descriptif → **inchangé**. generalFeedback encadré dans les deux cœurs (`genImgClickCore`, `genImgClickSequenceCore`).
+- **Optique/RVB-CMJ** (`js/gen-optique.js`, commit `1ff0dc4`) : 10 qnote (un par scénario : lentille-image, lentille-rayons, lentille-divergente, miroir concave/convexe, miroir plan, miroir sphérique, lunette, télescope, microscope, RVB-CMJ) sont tous des libellés + paramètres géométriques (f/OA/SA/theta...) → **inchangés**. generalFeedback encadré sur les 10 cœurs.
+
+`npm test` 476/476 au vert après le dernier commit du lot (progression 458→460→461→463→464→466→476 au fil des commits, tests ajoutés à chaque fichier). **Non testé en navigateur/Moodle réel** (aucun outil de rendu disponible dans cette session) — reste à confirmer par l'utilisateur type par type avant tout `✅ validé`.
+
 ## État par type de question
 
 Ordre des lignes aligné sur l'ordre d'affichage des chips de la palette (`js/palette.js`, `PALETTE_CATEGORIES`: Choix multiples → Mathématiques → Physique-Chimie → Informatique → Réponse textuelle → Organisation → Interactif/Visuel → Expert). Les lignes groupant plusieurs types (ex. "Radio / Dropdown", "Physique, Thermo") sont placées à la position du premier type du groupe.
