@@ -11,6 +11,7 @@ const path = require('node:path');
 
 const { genPoolCore } = require(path.join('..', '..', 'js', 'gen-pool.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -18,7 +19,7 @@ const I18N_STUB = {
 const wrapFb = (html, ok) => `<div class="${ok ? 'ok' : 'ko'}">${html || '&nbsp;'}</div>`;
 const rawEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, rawEsc };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, rawEsc, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -81,6 +82,11 @@ test('generalFeedback masque le détail fb_vrai si poolShowFb=false', () => {
 test('generalFeedback intègre poolFbGen', () => {
     const q = genPoolCore(1, baseParams({ poolFbGen: 'Remarque générale' }), DEPS);
     assert.match(q.generalFeedback, /Remarque générale/);
+});
+
+test('generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = genPoolCore(1, baseParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('le XML (prtXML, inputXML) est bien formé', () => {

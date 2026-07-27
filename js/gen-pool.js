@@ -42,6 +42,7 @@ function genPoolCore(X, p, deps){
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var wrapFb_D = deps.wrapFb || wrapFb;
   var rawEsc_D = deps.rawEsc || rawEsc;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
   const type=p.type, label=p.label, text=p.text, Xe=p.Xe, bareme=p.bareme;
   const poolFbGen=p.poolFbGen, poolShowFb=p.poolShowFb;
@@ -102,7 +103,7 @@ function genPoolCore(X, p, deps){
     </input>`,
     prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
-  generalFeedback: `<p><strong>${I18N_D.t('tpl.pool_bonne_reponse')}</strong> {@texte_vrai${X}@}</p>${poolShowFb ? `<p>{@fb_vrai${X}@}</p>` : ''}${poolFbGen ? `<p>${poolFbGen}</p>` : ''}`,
+  generalFeedback: applyFbBox_D('general', `<p><strong>${I18N_D.t('tpl.pool_bonne_reponse')}</strong> {@texte_vrai${X}@}</p>${poolShowFb ? `<p>{@fb_vrai${X}@}</p>` : ''}${poolFbGen ? `<p>${poolFbGen}</p>` : ''}`),
   feedbackRef:`[[feedback:prt${X}]]`};
 }
 function genRadio(X){const b=parseFloat(v('ra-bareme'))||1;return genPool(X,'radio','ra-text',v('ra-xe'),'ra-vrais','ra-faux',b,'ra-fbgen','ra-fbgen-showfb');}
