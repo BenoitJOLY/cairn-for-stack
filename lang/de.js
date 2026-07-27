@@ -2821,7 +2821,7 @@ I18N.add("de", {
   "opt.err_foyer":      "OA = −f': Das Objekt befindet sich im Brennpunkt, das Bild liegt im Unendlichen.",
   "type.oscilloscope":       "Oszilloskop",
   "msg.confirm_effacer":    "Den gesamten Inhalt löschen?",
-  "msg.confirm_del_q":      "Q löschen",
+  "msg.confirm_del_q":      "Frage {n} löschen?",
   "msg.confirm_del_node":   "N löschen",
   "msg.confirm_apply_anyway": "Trotzdem anwenden?",
 

@@ -167,7 +167,7 @@ async function openPrtManagerFromConfig() {
 function deleteConfig() {
   var qid = _activeQid;
   if (!qid) return;
-  if (!confirm(I18N.t('msg.confirm_del_q') + qid + ' ?')) return;
+  if (!confirm(I18N.t('msg.confirm_del_q', {n: qid}))) return;
   removeChip(qid);
   saveEditorState();
   closeConfigPanel();

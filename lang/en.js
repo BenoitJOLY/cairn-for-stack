@@ -2818,7 +2818,7 @@ I18N.add("en", {
   "opt.err_foyer":      "OA = −f': object is at the focal point, image at infinity.",
   "type.oscilloscope":       "Oscilloscope",
   "msg.confirm_effacer":    "Clear all content?",
-  "msg.confirm_del_q":      "Delete Q",
+  "msg.confirm_del_q":      "Delete question {n}?",
   "msg.confirm_del_node":   "Delete N",
   "msg.confirm_apply_anyway": "Apply anyway?",
 

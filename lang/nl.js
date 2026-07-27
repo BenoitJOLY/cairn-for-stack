@@ -2821,7 +2821,7 @@ I18N.add("nl", {
   "opt.err_foyer":      "OA = −f\': het object is scherp, beeld op oneindig.",
   "type.oscilloscope":       "Oscilloscoop",
   "msg.confirm_effacer":    "Alle inhoud wissen?",
-  "msg.confirm_del_q":      "Verwijder Q",
+  "msg.confirm_del_q":      "Vraag {n} verwijderen?",
   "msg.confirm_del_node":   "Verwijder N",
   "msg.confirm_apply_anyway": "Toch solliciteren?",
 

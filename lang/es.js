@@ -2821,7 +2821,7 @@ I18N.add("es", {
   "opt.err_foyer":      "OA = −f': el objeto está en el foco, la imagen está en el infinito.",
   "type.oscilloscope":       "Osciloscopio",
   "msg.confirm_effacer":    "¿Borrar todo el contenido?",
-  "msg.confirm_del_q":      "Eliminar Q",
+  "msg.confirm_del_q":      "¿Eliminar la pregunta {n}?",
   "msg.confirm_del_node":   "Eliminar N",
   "msg.confirm_apply_anyway": "¿Lo aplico de todos modos?",
 

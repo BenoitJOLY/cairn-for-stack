@@ -2821,7 +2821,7 @@ I18N.add("fr", {
   "opt.err_foyer":      "OA = −f' : l'objet est au foyer, image à l'infini.",
   "type.oscilloscope":       "Oscilloscope",
   "msg.confirm_effacer":    "Effacer tout le contenu ?",
-  "msg.confirm_del_q":      "Supprimer Q",
+  "msg.confirm_del_q":      "Supprimer la question {n} ?",
   "msg.confirm_del_node":   "Supprimer N",
   "msg.confirm_apply_anyway": "Appliquer quand même ?",
 

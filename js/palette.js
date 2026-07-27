@@ -147,10 +147,10 @@ function renderPalette() {
     var body = document.createElement('div');
     body.className = 'palette-cat-body';
     body.id = 'pcat-body-' + cat.id;
-    /* ouvert par défaut */
-    btn.setAttribute('aria-expanded', 'true');
-    btn.querySelector('.pcat-arrow').textContent = '▾';
-    body.style.maxHeight = 'none';
+    /* replié par défaut */
+    body.style.maxHeight = '0';
+    body.style.paddingTop = '0';
+    body.style.paddingBottom = '0';
 
     cat.types.forEach(function(type) {
       var t = typeMap[type];
