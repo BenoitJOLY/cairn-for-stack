@@ -442,6 +442,15 @@ async function confirmAndPreview() {
   if (typeof maximaConfigured === 'function' && maximaConfigured() && typeof generateDeployedSeeds === 'function') {
     var seedCountInput = document.getElementById('tm-seedcount-input');
     var seedCount = seedCountInput ? (parseInt(seedCountInput.value, 10) || 0) : 0;
+    /* Chercher des deployedseed n'a de sens que si au moins une question a une
+       vraie source d'aléatoire Maxima (rand(, rand_selection(, rand_with_step(,
+       random(, random_permutation() — toutes préfixées "rand"/"random", voir
+       js/gen-*.js). Sans ça, tous les seeds sont strictement équivalents : on
+       ferait N aller-retours /render+/grade au serveur Maxima pour rien. */
+    if (seedCount > 0 && !/\b(rand|random)[a-z_]*\(/i.test(built.allVars)) {
+      console.info('[deployedseed] Aucun rand()/random() détecté dans les variables Maxima — génération de variantes ignorée.');
+      seedCount = 0;
+    }
     if (seedCount > 0) {
       var progWrap = document.getElementById('tm-seed-progress-wrap');
       var progBar = document.getElementById('tm-seed-progress-bar');
