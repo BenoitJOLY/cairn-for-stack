@@ -293,6 +293,7 @@ function genRvbCmjCore(X, p, deps) {
     deps = deps || {};
     var I18N_D = deps.I18N || I18N;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var bareme = p.bareme, text = p.text, imgData = p.imgData, mode = p.mode, nb = p.nb,
         answer = p.answer, fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
@@ -567,7 +568,7 @@ function genRvbCmjCore(X, p, deps) {
         kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D(genFbDefault, p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFbDefault, p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -657,6 +658,7 @@ function _genOptiqueLentilleImageCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var wrapFb_D = deps.wrapFb || wrapFb;
     var bareme = p.bareme, text = p.text, f = p.f, OA = p.OA, AB = p.AB, tolPos = p.tolPos, tolH = p.tolH,
         dispW = p.dispW, dispH = p.dispH, fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
@@ -884,7 +886,7 @@ function _genOptiqueLentilleImageCore(X, p, deps) {
         textFrag:        textFrag,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D("", p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D("", p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -925,6 +927,7 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var bareme = p.bareme, text = p.text, f = p.f, xAin = p.xAin, AB = p.AB, dispW = p.dispW, dispH = p.dispH;
 
     if (f <= 0)
@@ -1212,7 +1215,7 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
         kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D(genFbDefault, p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFbDefault, p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -1244,6 +1247,7 @@ function _genOptiqueLentilleDivergenteCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var bareme = p.bareme, text = p.text, f = p.f, xAin = p.xAin, AB = p.AB, dispW = p.dispW, dispH = p.dispH;
 
     if (f <= 0)
@@ -1484,7 +1488,7 @@ function _genOptiqueLentilleDivergenteCore(X, p, deps) {
         kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D(genFbDefault, p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFbDefault, p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -2255,6 +2259,7 @@ function _genOptiqueMiroirCoreImpl(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var convexe = p.convexe, bareme = p.bareme, text = p.text, f = p.f, SA = p.SA, AB = p.AB,
         dispW = p.dispW, dispH = p.dispH;
 
@@ -2643,7 +2648,7 @@ function _genOptiqueMiroirCoreImpl(X, p, deps) {
         kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D(genFbDefault, p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFbDefault, p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -3018,6 +3023,7 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var bareme = p.bareme, text = p.text, f1 = p.f1, f2 = p.f2, theta = p.theta, beamH = p.beamH,
         dispW = p.dispW, dispH = p.dispH;
 
@@ -3235,7 +3241,7 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
         kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D(genFbDefault, p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFbDefault, p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -3578,6 +3584,7 @@ function _genOptiqueMiroirPlanCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var bareme = p.bareme, text = p.text, SA = p.SA, AB = p.AB, dispW = p.dispW, dispH = p.dispH;
 
     if (SA <= 0)
@@ -3775,7 +3782,7 @@ function _genOptiqueMiroirPlanCore(X, p, deps) {
         kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D(genFbDefault, p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFbDefault, p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -3808,6 +3815,7 @@ function _genOptiqueMiroirSpheriqueCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var bareme = p.bareme, text = p.text, f = p.f, SA = p.SA, AB = p.AB, msType = p.msType,
         tolPos = p.tolPos, tolH = p.tolH, fbOk = p.fbOk, fbWrong = p.fbWrong,
         dispW = p.dispW, dispH = p.dispH;
@@ -3983,7 +3991,7 @@ function _genOptiqueMiroirSpheriqueCore(X, p, deps) {
         textFrag:        textFrag,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D("", p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D("", p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -4338,6 +4346,7 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var bareme = p.bareme, text = p.text, f1 = p.f1, theta = p.theta, beamH = p.beamH,
         dispW = p.dispW, dispH = p.dispH;
 
@@ -4520,7 +4529,7 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
         kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D(genFbDefault, p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFbDefault, p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -4879,6 +4888,7 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var bareme = p.bareme, text = p.text, f1 = p.f1, f2 = p.f2, oaIn = p.oaIn, AB = p.AB,
         dispW = p.dispW, dispH = p.dispH;
 
@@ -5101,7 +5111,7 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
         kbdRaw:          kbdBlock,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: _mkFbGen_D(genFbDefault, p.fbGenRaw),
+        generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFbDefault, p.fbGenRaw)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };

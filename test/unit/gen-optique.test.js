@@ -35,6 +35,7 @@ const {
     _genOptiqueMicroscopeConstructionCore
 } = require(path.join('..', '..', 'js', 'gen-optique.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -44,7 +45,7 @@ function _mkFbGen(generalFeedback, fbGen) {
 }
 const wrapFb = (html, ok) => `<div class="${ok ? 'ok' : 'ko'}">${html || '&nbsp;'}</div>`;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, wrapFb };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, wrapFb, applyFbBox };
 
 function assertBalancedTags(xml, label) {
     const stripped = xml.replace(/<!\[CDATA\[[\s\S]*?\]\]>/g, '');
@@ -102,6 +103,11 @@ test('genRvbCmjCore : bareme personnalisé propagé à la sortie', () => {
 test('genRvbCmjCore : generalFeedback intègre fbGenRaw via _mkFbGen', () => {
     const q = genRvbCmjCore(1, rvbParams({ fbGenRaw: 'Remarque RVB' }), DEPS);
     assert.match(q.generalFeedback, /Remarque RVB/);
+});
+
+test('genRvbCmjCore : generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = genRvbCmjCore(1, rvbParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('genRvbCmjCore : le XML (prtXML, inputXML) est bien formé', () => {
@@ -199,6 +205,12 @@ test('_genOptiqueLentilleImageCore : bareme personnalisé propagé et generalFee
     assert.match(q.generalFeedback, /Note/);
 });
 
+test('_genOptiqueLentilleImageCore : generalFeedback est encadré (applyFbBox "general") quand il y a du contenu', () => {
+    // Pas de genFbDefault ici (generalFeedback = _mkFbGen_D("", fbGenRaw)) : reste vide sans fbGenRaw.
+    const q = _genOptiqueLentilleImageCore(1, lentilleImageParams({ fbGenRaw: 'Note' }), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+});
+
 test('_genOptiqueLentilleImageCore : le XML (prtXML, inputXML) est bien formé', () => {
     const q = _genOptiqueLentilleImageCore(1, lentilleImageParams(), DEPS);
     assertBalancedTags(q.prtXML, 'prtXML (lentille-image)');
@@ -239,6 +251,11 @@ test('_genOptiqueLentilleRayonsCore : objet entre F et O (OA<f) donne une image 
     assert.match(q.inputXML, /"vert".*,2\]\]/);
 });
 
+test('_genOptiqueLentilleRayonsCore : generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = _genOptiqueLentilleRayonsCore(1, lentilleRayonsParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+});
+
 test('_genOptiqueLentilleRayonsCore : le XML (prtXML, inputXML) est bien formé', () => {
     const q = _genOptiqueLentilleRayonsCore(1, lentilleRayonsParams(), DEPS);
     assertBalancedTags(q.prtXML, 'prtXML (lentille-rayons)');
@@ -271,6 +288,11 @@ test('_genOptiqueLentilleDivergenteCore : bareme personnalisé propagé et gener
     const q = _genOptiqueLentilleDivergenteCore(1, lentilleDivergenteParams({ bareme: 2, fbGenRaw: 'Note div' }), DEPS);
     assert.equal(q.bareme, 2);
     assert.match(q.generalFeedback, /Note div/);
+});
+
+test('_genOptiqueLentilleDivergenteCore : generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = _genOptiqueLentilleDivergenteCore(1, lentilleDivergenteParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('_genOptiqueLentilleDivergenteCore : le XML (prtXML, inputXML) est bien formé', () => {
@@ -316,6 +338,11 @@ test('_genOptiqueMiroirCoreImpl : qnote distingue concave/convexe', () => {
     assert.match(qConvexe.qnote, /Optique-MiroirConvexe/);
 });
 
+test('_genOptiqueMiroirCoreImpl : generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = _genOptiqueMiroirCoreImpl(1, miroirParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+});
+
 test('_genOptiqueMiroirCoreImpl : le XML (prtXML, inputXML) est bien formé', () => {
     const q = _genOptiqueMiroirCoreImpl(1, miroirParams(), DEPS);
     assertBalancedTags(q.prtXML, 'prtXML (miroir)');
@@ -353,6 +380,11 @@ test('_genOptiqueLunetteConstructionCore : bareme personnalisé propagé et gene
     assert.match(q.generalFeedback, /Note lunette/);
 });
 
+test('_genOptiqueLunetteConstructionCore : generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = _genOptiqueLunetteConstructionCore(1, lunetteParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+});
+
 test('_genOptiqueLunetteConstructionCore : le XML (prtXML, inputXML) est bien formé', () => {
     const q = _genOptiqueLunetteConstructionCore(1, lunetteParams(), DEPS);
     assertBalancedTags(q.prtXML, 'prtXML (lunette)');
@@ -381,6 +413,11 @@ test('_genOptiqueMiroirPlanCore : bareme personnalisé propagé et generalFeedba
     const q = _genOptiqueMiroirPlanCore(1, miroirPlanParams({ bareme: 5, fbGenRaw: 'Note plan' }), DEPS);
     assert.equal(q.bareme, 5);
     assert.match(q.generalFeedback, /Note plan/);
+});
+
+test('_genOptiqueMiroirPlanCore : generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = _genOptiqueMiroirPlanCore(1, miroirPlanParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('_genOptiqueMiroirPlanCore : le XML (prtXML, inputXML) est bien formé', () => {
@@ -416,6 +453,12 @@ test('_genOptiqueMiroirSpheriqueCore : bareme personnalisé propagé et generalF
     assert.match(q.generalFeedback, /Note sph/);
 });
 
+test('_genOptiqueMiroirSpheriqueCore : generalFeedback est encadré (applyFbBox "general") quand il y a du contenu', () => {
+    // Pas de genFbDefault ici (generalFeedback = _mkFbGen_D("", fbGenRaw)) : reste vide sans fbGenRaw.
+    const q = _genOptiqueMiroirSpheriqueCore(1, miroirSpheriqueParams({ fbGenRaw: 'Note sph' }), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+});
+
 test('_genOptiqueMiroirSpheriqueCore : le XML (prtXML, inputXML) est bien formé', () => {
     const q = _genOptiqueMiroirSpheriqueCore(1, miroirSpheriqueParams(), DEPS);
     assertBalancedTags(q.prtXML, 'prtXML (miroir-spherique)');
@@ -446,6 +489,11 @@ test('_genOptiqueTelescopeConstructionCore : beamH <= 0 lève opt.err_theta_posi
 test('_genOptiqueTelescopeConstructionCore : qnote reprend f1/theta', () => {
     const q = _genOptiqueTelescopeConstructionCore(1, telescopeParams({ f1: 50, theta: 4 }), DEPS);
     assert.match(q.qnote, /Optique-Telescope Q1 f1=50 th=4/);
+});
+
+test('_genOptiqueTelescopeConstructionCore : generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = _genOptiqueTelescopeConstructionCore(1, telescopeParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('_genOptiqueTelescopeConstructionCore : le XML (prtXML, inputXML) est bien formé', () => {
@@ -488,6 +536,11 @@ test('_genOptiqueMicroscopeConstructionCore : bareme personnalisé propagé et g
     const q = _genOptiqueMicroscopeConstructionCore(1, microscopeParams({ bareme: 6, fbGenRaw: 'Note micro' }), DEPS);
     assert.equal(q.bareme, 6);
     assert.match(q.generalFeedback, /Note micro/);
+});
+
+test('_genOptiqueMicroscopeConstructionCore : generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = _genOptiqueMicroscopeConstructionCore(1, microscopeParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('_genOptiqueMicroscopeConstructionCore : le XML (prtXML, inputXML) est bien formé', () => {
