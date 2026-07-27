@@ -518,8 +518,12 @@ function genChemicalParams(X){
   // que dans le cœur pur : seul le résultat (latex, une chaîne) est transmis.
   function htmlToLatex(html){
     const d=document.createElement('div'); d.innerHTML=html;
-    function cv(n){ let r=''; for(let c of n.childNodes){ if(c.nodeType===3)r+=c.textContent; else if(c.nodeName==='SUB')r+=cv(c); else if(c.nodeName==='SUP')r+=`^{${cv(c)}}`; else r+=cv(c); } return r; }
-    return normSub(cv(d).replace(/ /g,' ').replace(/→/g,'->').replace(/⇌/g,'<=>').trim());
+    const walk=(node)=>Array.prototype.map.call(node.childNodes,(child)=>{
+      if(child.nodeType===3) return child.textContent;
+      if(child.nodeName==='SUP') return `^${walk(child)}`;
+      return walk(child);
+    }).join('');
+    return normSub(walk(d).replace(/ /g,' ').replace(/→/g,'->').replace(/⇌/g,'<=>').trim());
   }
   const latex = htmlToLatex(editorHTML);
 
@@ -559,25 +563,36 @@ function genChemicalCore(X, p, deps){
   // Normaliser subscripts Unicode → chiffres ASCII
   function normSub(s){ return s.replace(/[₀₁₂₃₄₅₆₇₈₉]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x2080+48)); }
 
-  // Parser une formule brute en composants [[n,"X"],...]
-  // CO2 est EXCLU de FG ici — il doit être parsé comme C + 2O (atomes), pas comme groupe fonctionnel
+  // Parser une formule brute en composants [[n,"X"],...] : à chaque position,
+  // on cherche le groupe fonctionnel le plus long qui démarre là, sinon on replie
+  // sur un atome. CO2 est EXCLU de FG ici — il doit être parsé comme C + 2O.
   const FG=["CONH2","COOR","COOH","COO","CHO","CH3","C2H5","OH","NH2","NO2"];
+  const FG_BY_LEN=[...FG].sort((a,b)=>b.length-a.length);
   function parseStruct(mol){
-    let comps=[], det=[];
-    let c=normSub(mol).replace(/\^?\{([^}]+)\}/g,'$1').replace(/-/g,'');
-    let hasC=/(^|[^a-z])C([^a-z]|$)/.test(c);
-    for(let g of FG){
-      let re=new RegExp(g+'(\d*)','g'),m;
-      while((m=re.exec(c))!==null){
-        if(g==='OH'&&!hasC)break;
-        let gn=(g==='CO2')?'COO':g; det.push(gn);
-        comps.push([Number(m[1])||1,gn]);
-        c=c.substring(0,m.index)+' '.repeat(m[0].length)+c.substring(m.index+m[0].length);
+    const comps=[], detected=new Set();
+    const c=normSub(mol).replace(/\^?\{([^}]+)\}/g,'$1').replace(/-/g,'');
+    const hasC=/(^|[^a-z])C([^a-z]|$)/.test(c);
+    let i=0;
+    while(i<c.length){
+      let g=FG_BY_LEN.find(f=>c.startsWith(f,i));
+      if(g==='OH'&&!hasC) g=null;
+      if(g){
+        detected.add(g);
+        comps.push([1,g]);
+        i+=g.length;
+        continue;
       }
+      const am=/^[A-Z][a-z]?/.exec(c.slice(i));
+      if(am){
+        let j=i+am[0].length, digits='';
+        while(j<c.length && c[j]>='0' && c[j]<='9'){ digits+=c[j]; j++; }
+        comps.push([digits?Number(digits):1, am[0]]);
+        i=j;
+        continue;
+      }
+      i++;
     }
-    let ar=/([A-Z][a-z]?)(\d*)/g,am;
-    while((am=ar.exec(c))!==null){ if(am[1].trim()) comps.push([Number(am[2])||1,am[1]]); }
-    return {comps, det:[...new Set(det)]};
+    return {comps, det:[...detected]};
   }
   function parseSide(s){
     let mols=[],ch=[],fcts=[],co=[];
@@ -659,31 +674,45 @@ has_pg${X}:is(length(tpg${X})>0);`;
   const jsxOpen=`[[jsxgraph width="600px" height="300px" input-ref-${iRf}="${rRf}" input-ref-${iRc}="${rRc}" input-ref-${iRk}="${rRk}" input-ref-${iRg}="${rRg}" input-ref-${iPf}="${rPf}" input-ref-${iPc}="${rPc}" input-ref-${iPk}="${rPk}" input-ref-${iPg}="${rPg}" input-ref-${iRaw}="${rRaw}" input-ref-${iArr}="${rArr}"]]`;
   const kbdRaw=`
 var FG = ["CONH2","COOR","COOH","COO","CHO","CH3","C2H5","OH","NH2","NO2"];
+var FG_BY_LEN = FG.slice().sort(function(a,b){ return b.length - a.length; });
+function readCount(s, pos) {
+  if (s.charAt(pos) !== '_') { return { count: "1", next: pos }; }
+  if (s.charAt(pos + 1) === '{') {
+    var close = s.indexOf('}', pos + 2);
+    if (close !== -1) { return { count: s.substring(pos + 2, close), next: close + 1 }; }
+    return { count: "1", next: pos };
+  }
+  var wm = /^[a-zA-Z0-9]+/.exec(s.slice(pos + 1));
+  if (wm) { return { count: wm[0], next: pos + 1 + wm[0].length }; }
+  return { count: "1", next: pos };
+}
 function parseStructure(molStr) {
   var components = [], detected = [];
   var clean = molStr.replace(/-/g,'').replace(/\\^\\{([^}]+)\\}/g,'');
   var hasC = /(^|[^a-z])C([^a-z]|$)/.test(clean);
   var i = 0;
-  while (i !== FG.length) {
-    var g = FG[i]; var reg = new RegExp(g + '(?:_\\\\{([^}]+)\\\\}|_([a-zA-Z0-9]+))?','g'); var m;
-    while ((m = reg.exec(clean)) !== null) {
-      if (g === "OH") { if (!hasC) { break; } }
-      var gName = (g === "CO2") ? "COO" : g; detected.push(gName);
-      var count = m[1] ? m[1] : (m[2] ? m[2] : "1");
-      components.push([isNaN(count) ? count : Number(count), gName]);
-      var sp = ''; var si = 0;
-      while (si !== m[0].length) { sp += ' '; si++; }
-      clean = clean.substring(0, m.index) + sp + clean.substring(m.index + m[0].length);
+  while (i < clean.length) {
+    var g = null, k = 0;
+    while (k !== FG_BY_LEN.length) { if (clean.indexOf(FG_BY_LEN[k], i) === i) { g = FG_BY_LEN[k]; break; } k++; }
+    if (g === "OH" && !hasC) { g = null; }
+    if (g) {
+      var suf = readCount(clean, i + g.length);
+      detected.push(g);
+      components.push([isNaN(suf.count) ? suf.count : Number(suf.count), g]);
+      i = suf.next;
+      continue;
+    }
+    var am = /^[A-Z][a-z]?/.exec(clean.slice(i));
+    if (am) {
+      var asuf = readCount(clean, i + am[0].length);
+      components.push([isNaN(asuf.count) ? asuf.count : Number(asuf.count), am[0]]);
+      i = asuf.next;
+      continue;
     }
     i++;
   }
-  var atomReg = /([A-Z][a-z]?)(?:_\\{([^}]+)\\}|_([a-zA-Z0-9]+))?/g; var am;
-  while ((am = atomReg.exec(clean)) !== null) {
-    var cnt = am[2] ? am[2] : (am[3] ? am[3] : "1");
-    components.push([isNaN(cnt) ? cnt : Number(cnt), am[1]]);
-  }
   var uniq = []; var j = 0;
-  while (j !== detected.length) { var found = false; var k = 0; while (k !== uniq.length) { if (uniq[k] === detected[j]) { found = true; } k++; } if (!found) { uniq.push(detected[j]); } j++; }
+  while (j !== detected.length) { var found = false; var kk = 0; while (kk !== uniq.length) { if (uniq[kk] === detected[j]) { found = true; } kk++; } if (!found) { uniq.push(detected[j]); } j++; }
   return { components: components, detected: uniq };
 }
 function processSide(sideStr) {
@@ -707,7 +736,14 @@ function processSide(sideStr) {
 function setRef(ref, value) { var el = document.getElementById(ref); if (el) { el.value = value; el.dispatchEvent(new Event('change')); } }
 function htmlToLatex(html) {
   var div = document.createElement('div'); div.innerHTML = html;
-  function convert(node) { var res = ''; var children = node.childNodes; var i = 0; while (i !== children.length) { var child = children[i]; if (child.nodeType === 3) { res += child.textContent; } else if (child.nodeName === 'SUB') { res += '_{' + convert(child) + '}'; } else if (child.nodeName === 'SUP') { res += '^{' + convert(child) + '}'; } else { res += convert(child); } i++; } return res; }
+  function convert(node) {
+    return Array.prototype.map.call(node.childNodes, function(child) {
+      if (child.nodeType === 3) { return child.textContent; }
+      if (child.nodeName === 'SUB') { return '_{' + convert(child) + '}'; }
+      if (child.nodeName === 'SUP') { return '^{' + convert(child) + '}'; }
+      return convert(child);
+    }).join('');
+  }
   return convert(div).replace(/\\u00a0/g, ' ').trim();
 }
 function htmlToPlain(html) { var div = document.createElement('div'); div.innerHTML = html; return (div.textContent || div.innerText || '').replace(/\\u00a0/g,' ').trim(); }
