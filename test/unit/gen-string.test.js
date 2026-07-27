@@ -11,6 +11,7 @@ const path = require('node:path');
 
 const { genStringCore, genStringLevenshteinCore } = require(path.join('..', '..', 'js', 'gen-string.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -20,7 +21,7 @@ const htmlEsc = (s) => String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').re
 const wrapFb = (html, ok) => `<div class="${ok ? 'ok' : 'ko'}">${html || '&nbsp;'}</div>`;
 const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, rawEsc, htmlEsc, _mkFbGen };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, rawEsc, htmlEsc, _mkFbGen, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -101,6 +102,22 @@ test('genStringLevenshteinCore construit la liste des réponses valides (princip
 test('generalFeedback intègre fbGen via _mkFbGen (sans alternatives)', () => {
     const q = genStringCore(1, baseParams({ fbGen: 'Remarque' }), DEPS);
     assert.match(q.generalFeedback, /Remarque/);
+});
+
+test('generalFeedback est encadré (applyFbBox "general") quand il y a du contenu — genStringCore et genStringLevenshteinCore', () => {
+    // genStringCore (hors levenshtein) : generalFeedback = mkFbGen_D('', fbGen) -- reste vide (donc
+    // sans encadré, applyFbBox laisse '' inchangé) si fbGen est vide, encadré dès qu'il y a du contenu.
+    const q = genStringCore(1, baseParams({ fbGen: 'Remarque' }), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+    const qLev = genStringLevenshteinCore(1, 1, '<p>t</p>', 'chat', '', 25, '', '', [], DEPS);
+    assert.match(qLev.generalFeedback, /border:1px solid/);
+});
+
+test('qnote est vide : pas de rand(), pas de variante à documenter (et {@ta@} révélerait la réponse) — genStringCore et genStringLevenshteinCore', () => {
+    const q = genStringCore(1, baseParams(), DEPS);
+    assert.equal(q.qnote, '');
+    const qLev = genStringLevenshteinCore(1, 1, '<p>t</p>', 'chat', '', 25, '', '', [], DEPS);
+    assert.equal(qLev.qnote, '');
 });
 
 test('le XML (prtXML, inputXML) est bien formé (avec/sans alternatives, avec/sans levenshtein)', () => {

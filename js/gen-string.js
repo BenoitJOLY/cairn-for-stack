@@ -123,6 +123,7 @@ function genStringCore(X,p,deps){
   const wrapFb_D=deps.wrapFb||wrapFb;
   const rawEsc_D=deps.rawEsc||rawEsc;
   const htmlEsc_D=deps.htmlEsc||htmlEsc;
+  const applyFbBox_D=deps.applyFbBox||applyFbBox;
 
   const bareme=p.bareme, text=p.text, ansPlain=p.ansPlain, size=p.size, test=p.test;
   const fbc=p.fbc, fbe=p.fbe, fbGen=p.fbGen, solH=p.solH, paletteHtml=p.paletteHtml, altsArr=p.altsArr;
@@ -130,7 +131,9 @@ function genStringCore(X,p,deps){
   if(p.levenOn)return genStringLevenshteinCore(X,bareme,text,ansPlain,paletteHtml,size,solH,fbGen,altsArr,deps);
 
   const vars=`/* Q${X} : String (${bareme}pt) */\nta${X}:"${rawEsc_D(ansPlain)}";`;
-  const qnote=`{@ta${X}@}`;
+  // Pas de rand() : ansPlain est saisi par l'enseignant, pas de variante à
+  // documenter — et {@ta${X}@} est la réponse attendue elle-même.
+  const qnote='';
   const textFrag=`
       <div style="background:#dc2626;border-left:5px solid #991b1b;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('tpl.str_banniere')}</strong>
@@ -153,7 +156,7 @@ function genStringCore(X,p,deps){
     const canonicalNodes=[mkNode(test,'ans'+X,'ta'+X)];
     const prtMeta={name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:''};
     const prtXML=buildPrtXml_D(prtMeta, canonicalNodes);
-    return{bareme,vars,qnote,generalFeedback:mkFbGen_D('',fbGen),textFrag,inputXML,
+    return{bareme,vars,qnote,generalFeedback:applyFbBox_D('general',mkFbGen_D('',fbGen)),textFrag,inputXML,
       prtXML,feedbackRef,prt:{meta:prtMeta,nodes:canonicalNodes}};
   }
   const sloppy=test!=='String';
@@ -176,6 +179,7 @@ function genStringLevenshteinCore(X,bareme,text,ansPlain,paletteHtml,size,solH,f
   const wrapFb_D=deps.wrapFb||wrapFb;
   const rawEsc_D=deps.rawEsc||rawEsc;
   const htmlEsc_D=deps.htmlEsc||htmlEsc;
+  const applyFbBox_D=deps.applyFbBox||applyFbBox;
 
   const ta=rawEsc_D(ansPlain);
   const repValItems=[ansPlain].concat(altsArr).map(function(a){return 'supprimer_articles(sdowncase("'+rawEsc_D(a)+'"))';}).join(',');
@@ -253,8 +257,10 @@ fb6_${X}:"${wrapFb_D(I18N_D.t('tpl.str_fb6', {rep: htmlEsc_D(ansPlain)})+solH, f
 
   const inputXML=`    <input>\n      <name>ans${X}</name><type>string</type><tans>ta${X}</tans>\n      <boxsize>${size}</boxsize><mustverify>0</mustverify><showvalidation>0</showvalidation>\n    </input>`;
 
-  const qnote=`{@ta${X}@}`;
-  const generalFeedback=mkFbGen_D(I18N_D.t('tpl.str_reponse_attendue', {rep: htmlEsc_D(ansPlain)}), fbGen);
+  // Pas de rand() : ansPlain est saisi par l'enseignant, pas de variante à
+  // documenter — et {@ta${X}@} est la réponse attendue elle-même.
+  const qnote='';
+  const generalFeedback=applyFbBox_D('general', mkFbGen_D(I18N_D.t('tpl.str_reponse_attendue', {rep: htmlEsc_D(ansPlain)}), fbGen));
 
   return{bareme,vars,qnote,generalFeedback,
     textFrag:`
