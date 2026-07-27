@@ -13,6 +13,7 @@ const path = require('node:path');
 
 const { genImgClickCore, genImgClickSequenceCore } = require(path.join('..', '..', 'js', 'gen-imgclick.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -23,7 +24,7 @@ const rawEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').rep
 const htmlEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const jxgDropChunkedJsString = (str, size) => '"' + (str || '') + '"';
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, wrapFb, rawEsc, htmlEsc, jxgDropChunkedJsString };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, wrapFb, rawEsc, htmlEsc, jxgDropChunkedJsString, applyFbBox };
 
 function baseParamsClick(overrides) {
     return Object.assign({
@@ -86,6 +87,11 @@ test('genImgClickCore : generalFeedback intègre fbGen via _mkFbGen', () => {
     assert.match(q.generalFeedback, /Remarque/);
 });
 
+test('genImgClickCore : generalFeedback est encadré (applyFbBox "general") quand il y a du contenu', () => {
+    const q = genImgClickCore(1, baseParamsClick({ fbGen: 'Remarque' }), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+});
+
 test('genImgClickCore : kbdRaw encode bgData via jxgDropChunkedJsString injecté', () => {
     const q = genImgClickCore(1, baseParamsClick({ bgData: 'XYZ' }), DEPS);
     assert.match(q.kbdRaw, /"XYZ"/);
@@ -122,6 +128,11 @@ test('genImgClickSequenceCore : seqTime alimente TEMPS dans le JS embarqué', ()
 test('genImgClickSequenceCore : generalFeedback intègre fbGen via _mkFbGen', () => {
     const q = genImgClickSequenceCore(1, baseParamsSeq({ fbGen: 'Bravo' }), DEPS);
     assert.match(q.generalFeedback, /Bravo/);
+});
+
+test('genImgClickSequenceCore : generalFeedback est encadré (applyFbBox "general") quand il y a du contenu', () => {
+    const q = genImgClickSequenceCore(1, baseParamsSeq({ fbGen: 'Bravo' }), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
 });
 
 test('genImgClickSequenceCore : XML bien formé', () => {

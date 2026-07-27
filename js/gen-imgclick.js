@@ -70,6 +70,7 @@ function genImgClickCore(X, p, deps) {
     var wrapFb_D = deps.wrapFb || wrapFb;
     var htmlEsc_D = deps.htmlEsc || htmlEsc;
     var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme, text = p.text, fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
     var BGW = p.bgW, BGH = p.bgH;
@@ -197,7 +198,7 @@ function genImgClickCore(X, p, deps) {
         textFrag:        textFrag,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: mkFbGen_D('', p.fbGen),
+        generalFeedback: applyFbBox_D('general', mkFbGen_D('', p.fbGen)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
@@ -217,6 +218,7 @@ function genImgClickSequenceCore(X, p, deps) {
     var htmlEsc_D = deps.htmlEsc || htmlEsc;
     var rawEsc_D = deps.rawEsc || rawEsc;
     var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme, text = p.text, fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
     var seqTime = p.seqTime;
@@ -399,7 +401,7 @@ function genImgClickSequenceCore(X, p, deps) {
         kbdRaw:          jxgCode,
         inputXML:        inputXML,
         prtXML:          prtXML,
-        generalFeedback: mkFbGen_D('', p.fbGen),
+        generalFeedback: applyFbBox_D('general', mkFbGen_D('', p.fbGen)),
         feedbackRef:     '[[feedback:prt' + X + ']]',
         prt:             { meta: prtMeta, nodes: canonicalNodes }
     };
