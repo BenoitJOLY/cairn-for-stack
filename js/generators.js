@@ -1,7 +1,19 @@
 ﻿// ── XML GENERATORS (checkbox, pool, alg, num, units, str, cw) ───
 
 // ══════════════════════════════════════════════════════
-function wrapFb(html,ok){const col=ok?'#15803d':'#dc2626';const bg=ok?'#f0fdf4':'#fff0f0';return `<div style="border-left:4px solid ${col};padding:10px 14px;background:${bg};border-radius:4px;margin:4px 0;">${html||'&nbsp;'}</div>`;}
+// Couleurs/fond puisés dans js/fb-box.js (styles configurables via la modale
+// Options, cf. chantier "Encadrés de feedback PRT configurables") quand ce
+// module est chargé (navigateur) ; repli sur les couleurs historiques sinon
+// (tests Node, où fb-box.js n'est pas require()). Volontairement pas d'icône
+// ni de changement de comportement sur html vide : beaucoup d'appelants
+// (FB_JUSTE_DEFAULT/FB_FAUX_DEFAULT) incluent déjà leur propre icône.
+function wrapFb(html,ok){
+  const kind = ok ? 'true' : 'false';
+  const s = (typeof getFbBoxStyles === 'function') ? getFbBoxStyles()[kind] : null;
+  const col = s ? s.color : (ok?'#15803d':'#dc2626');
+  const bg = s ? s.bg : (ok?'#f0fdf4':'#fff0f0');
+  return `<div style="border-left:4px solid ${col};padding:10px 14px;background:${bg};border-radius:4px;margin:4px 0;">${html||'&nbsp;'}</div>`;
+}
 
 // ── Feedbacks détaillés par mode (Algébrique) : textes par défaut, éditables ──
 const ALG_FB_DEFS = {
