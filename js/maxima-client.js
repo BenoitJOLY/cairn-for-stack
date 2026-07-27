@@ -95,30 +95,46 @@ function _extractInputNames(xml) {
 }
 
 // Cherche `count` seeds "pleinement valides" (render OK + réponse de référence notée
-// à 100%) en essayant des entiers séquentiels à partir de `startSeed`. Pour chaque
-// candidat : XML de base + CE seed en <deployedseed> → /render (réponse de référence
-// par input via questioninputs.<input>.samplesolutionrender) → /grade avec cette
-// réponse → accepté seulement si isgradable et note totale == somme des poids des PRT
-// (les deux champs vérifiés par appel réel au serveur du NAS le 2026-07-25 ; le calcul
-// "note totale == somme des poids" est notre propre critère de "réponse de référence
-// parfaitement notée", pas un champ documenté tel quel par stack-api).
-// Sécurité anti-boucle infinie demandée par l'utilisateur : on arrête dès
-// `maxConsecutiveFailures` échecs consécutifs (défaut 10), même si `count` n'est pas
-// atteint — mieux vaut un export avec moins de variantes qu'un export qui ne se termine
-// jamais parce que le serveur Maxima refuse systématiquement (mauvaise config, question
-// mal formée, etc.).
+// à 100%). Pour chaque candidat : XML de base + CE seed en <deployedseed> → /render
+// (réponse de référence par input via questioninputs.<input>.samplesolutionrender) →
+// /grade avec cette réponse → accepté seulement si isgradable et note totale == somme
+// des poids des PRT (les deux champs vérifiés par appel réel au serveur du NAS le
+// 2026-07-25 ; le calcul "note totale == somme des poids" est notre propre critère de
+// "réponse de référence parfaitement notée", pas un champ documenté tel quel par
+// stack-api).
+// Seeds tirés au hasard dans [startSeed, maxSeed], PAS séquentiellement : la validité
+// d'un seed (est-ce que le brassage aléatoire Maxima qu'il produit reste notable à
+// 100%) n'a aucune raison d'être corrélée à sa proximité avec le seed précédent.
+// Corollaire : "s'arrêter après N échecs CONSÉCUTIFS" (ancienne heuristique) est un
+// mauvais critère d'arrêt — une série d'échecs consécutifs ne prouve rien sur le
+// nombre de seeds valides qui existent ailleurs dans l'espace de recherche, elle peut
+// être un pur hasard local. Remplacé par un budget total de tentatives
+// (`maxAttempts`, indépendant de tout enchaînement d'échecs) — signalé par
+// l'utilisateur (2026-07-27) après le correctif Checkbox fixe/alea.
 async function generateDeployedSeeds(xml, count, opts) {
   opts = opts || {};
-  var maxConsecutiveFailures = opts.maxConsecutiveFailures || 10;
-  var startSeed = opts.startSeed || 1;
+  var minSeed = opts.startSeed || 1;
+  var maxSeed = opts.maxSeed || 1000000;
+  var maxAttempts = opts.maxAttempts || Math.max(30, count * 15);
   var onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : function() {};
   var inputNames = _extractInputNames(xml);
-  var validSeeds = [], consecutiveFailures = 0, tried = 0, seed = startSeed;
+  var validSeeds = [], triedSeeds = {}, tried = 0;
 
-  onProgress({ found: 0, target: count, tried: 0, consecutiveFailures: 0 });
+  function pickSeed() {
+    var seed, guard = 0;
+    do {
+      seed = minSeed + Math.floor(Math.random() * (maxSeed - minSeed + 1));
+      guard++;
+    } while (triedSeeds[seed] && guard < 1000);
+    triedSeeds[seed] = true;
+    return seed;
+  }
 
-  while (validSeeds.length < count && consecutiveFailures < maxConsecutiveFailures) {
+  onProgress({ found: 0, target: count, tried: 0 });
+
+  while (validSeeds.length < count && tried < maxAttempts) {
     tried++;
+    var seed = pickSeed();
     var ok = false;
     try {
       var tempXml = insertDeployedSeeds(xml, [seed]);
@@ -158,15 +174,13 @@ async function generateDeployedSeeds(xml, count, opts) {
     } catch (e) {
       ok = false;
     }
-    if (ok) { validSeeds.push(seed); consecutiveFailures = 0; }
-    else { consecutiveFailures++; }
-    onProgress({ found: validSeeds.length, target: count, tried: tried, consecutiveFailures: consecutiveFailures });
-    seed++;
+    if (ok) { validSeeds.push(seed); }
+    onProgress({ found: validSeeds.length, target: count, tried: tried });
   }
 
   return {
     seeds: validSeeds,
-    aborted: consecutiveFailures >= maxConsecutiveFailures,
+    aborted: validSeeds.length < count,
     tried: tried
   };
 }

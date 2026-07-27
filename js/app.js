@@ -460,7 +460,6 @@ async function confirmAndPreview() {
       if (progText) progText.textContent = 'Génération des variantes STACK…';
       try {
         var seedRes = await generateDeployedSeeds(built.xml, seedCount, {
-          maxConsecutiveFailures: 10,
           onProgress: function(info) {
             var pct = Math.round(info.found / info.target * 100);
             if (progBar) progBar.style.width = pct + '%';
@@ -471,7 +470,7 @@ async function confirmAndPreview() {
         _lastXML = built.xml;
         if (seedRes.seeds.length < seedCount) {
           toast('⚠️ ' + seedRes.seeds.length + '/' + seedCount + ' variante(s) STACK valide(s) trouvée(s)'
-            + (seedRes.aborted ? ' (arrêt après 10 échecs consécutifs).' : '.'));
+            + (seedRes.aborted ? ' (arrêt après ' + seedRes.tried + ' tentative(s) sans atteindre le nombre demandé).' : '.'));
         }
       } catch(e) {
         console.error('[deployedseed] génération échouée', e);
