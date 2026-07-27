@@ -673,6 +673,17 @@ Décision utilisateur : traiter ce chantier en 2 étapes de coût très différe
 
 **Effet** : les couleurs bordure/fond des encadrés vrai/faux deviennent configurables via la modale Options des feedbacks pour tous les ~15 types consommateurs de `wrapFb`, sans toucher un seul de ces fichiers (un seul point de modification : `js/generators.js`). **Ne règle pas** le problème "HTML brut visible en édition PRT avancée" pour ces types — ce serait l'étape B (séparation nœuds bruts/nœuds encadrés par type, comme Base N/APN/Logique), volontairement reportée, à traiter plus tard type par type si demandé. Ordre de script ajusté dans `index.html` (`fb-box.js`/`fb-box-options.js` chargés avant `generators.js`, cohérence de dépendance, sans impact fonctionnel — l'appel réel a lieu bien après le chargement complet de la page). `npm test` 456/456 inchangé (les tests unitaires injectent chacun leur propre stub `wrapFb` local, jamais la vraie fonction). **Non testé visuellement en navigateur** (aucun outil de rendu disponible dans cette session) — à vérifier par l'utilisateur : ouvrir un type wrapFb (ex. Numérique), changer une couleur dans Options des feedbacks, confirmer que l'aperçu et l'export XML suivent.
 
+### Numérique : qnote vidé, encadré general feedback ajouté (2026-07-27)
+
+Retour utilisateur après test réel sur le type Numérique (`js/gen-numerical.js`) : "il n'y a pas de variante donc il ne faut pas de questionnote" + "l'encadré de feedback général n'apparaît pas".
+
+- `qnote` valait `{@ta${X}@}` alors que `val` est une valeur fixe saisie par l'enseignant (pas de `rand()`), donc aucune variante à documenter — exactement le même raisonnement que le retrait du `qnote` de Logique ci-dessus. Pire : `{@ta${X}@}` est justement la réponse attendue, donc l'exposer en questionnote la révélait à l'élève. Corrigé en `qnote: ''`.
+- `generalFeedback` n'était jamais passé par `applyFbBox` (contrairement à Base N/APN/Logique) : aucun encadré ne s'affichait dans l'export XML. Corrigé en enveloppant avec `applyFbBox_D('general', ...)` (deps injectable comme les autres, repli sur le global `applyFbBox` de `fb-box.js`).
+- Pas de risque de double encadré côté aperçu config-panel : `js/preview-numerical.js` ne consomme pas `q.generalFeedback` — il construit son propre bloc violet indépendant (`fbGenHTML`) directement depuis `state.fbGen`/`state.val`.
+- `npm test` 458/458 (2 tests ajoutés : `generalFeedback` porte l'encadré, `qnote` est vide).
+
+**Repéré au passage, non corrigé** : `js/gen-algebraic.js` a la même structure (`qnote={@ta${X}@}` sans `rand()` dans le cas courant, `generalFeedback` non encadré) — probable même bug, à confirmer/traiter dans un lot séparé si l'utilisateur le souhaite (pas traité ici pour respecter la règle "un type à la fois").
+
 ## État par type de question
 
 Ordre des lignes aligné sur l'ordre d'affichage des chips de la palette (`js/palette.js`, `PALETTE_CATEGORIES`: Choix multiples → Mathématiques → Physique-Chimie → Informatique → Réponse textuelle → Organisation → Interactif/Visuel → Expert). Les lignes groupant plusieurs types (ex. "Radio / Dropdown", "Physique, Thermo") sont placées à la position du premier type du groupe.
