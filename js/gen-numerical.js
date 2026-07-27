@@ -46,6 +46,7 @@ function genNumericalCore(X, p, deps){
   var I18N_D = deps.I18N || I18N;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var wrapFb_D = deps.wrapFb || wrapFb;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
   const bareme=p.bareme, text=p.text, val=p.val, n=p.n, isR=p.isR;
   const fbc=p.fbc, fbe=p.fbe, tolType=p.tolType, tolVal=p.tolVal, forbid=p.forbid;
@@ -53,7 +54,10 @@ function genNumericalCore(X, p, deps){
   const kbdHtml=useKbd?(deps.buildKbdStackHTML || buildKbdStackHTML)(X):'';
   const qv=isR?`ta${X}:float(round(${val}*10^(${n}-1-floor(log(abs(${val}))/log(10))))/10^(${n}-1-floor(log(abs(${val}))/log(10))));`:`ta${X}:${val};`;
   const vars=`/* Q${X} : Arithmétique (${bareme}pt) */\n${qv}`;
-  const qnote=`{@ta${X}@}`;
+  // Pas de rand() : val est une valeur fixe saisie par l'enseignant, pas une
+  // variante aléatoire à documenter — et {@ta${X}@} est justement la réponse
+  // attendue (l'exposer en questionnote la révélerait à l'élève).
+  const qnote='';
   const inputLine=useKbd?`${aide}<!--HS-KBD:${X}-->`:`${aide}<p>[[input:ans${X}]] [[validation:ans${X}]]</p>`;
   var prtMeta={name:'prt'+X,value:String(bareme),autosimplify:'1',feedbackstyle:'1',feedbackvariables:''};
   var canonicalNodes=[{
@@ -96,7 +100,7 @@ function genNumericalCore(X, p, deps){
     </input>`,
     prtXML: prtXML,
     prt: { meta: prtMeta, nodes: canonicalNodes },
-  generalFeedback: `<p><strong>${I18N_D.t('tpl.num_fb_valeur_attendue')}</strong> {@ta${X}@}</p>`+(numFbGen?`<p>${numFbGen}</p>`:''),
+  generalFeedback: applyFbBox_D('general', `<p><strong>${I18N_D.t('tpl.num_fb_valeur_attendue')}</strong> {@ta${X}@}</p>`+(numFbGen?`<p>${numFbGen}</p>`:'')),
   feedbackRef:`[[feedback:prt${X}]]`};
 }
 

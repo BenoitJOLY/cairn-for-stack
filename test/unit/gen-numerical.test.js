@@ -11,6 +11,7 @@ const path = require('node:path');
 
 const { genNumericalCore } = require(path.join('..', '..', 'js', 'gen-numerical.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -18,7 +19,7 @@ const I18N_STUB = {
 const wrapFb = (html, ok) => `<div class="${ok ? 'ok' : 'ko'}">${html || '&nbsp;'}</div>`;
 const buildKbdStackHTML = (X) => `<!--KBD-STUB-${X}-->`;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, buildKbdStackHTML };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, buildKbdStackHTML, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -86,6 +87,16 @@ test('sans clavier : input visible en ligne, avec clavier : bloc iframe injecté
 test('generalFeedback intègre numFbGen', () => {
     const q = genNumericalCore(1, baseParams({ numFbGen: 'Astuce' }), DEPS);
     assert.match(q.generalFeedback, /Astuce/);
+});
+
+test('generalFeedback est encadré (applyFbBox "general")', () => {
+    const q = genNumericalCore(1, baseParams(), DEPS);
+    assert.match(q.generalFeedback, /border:1px solid/);
+});
+
+test('qnote est vide : pas de rand(), pas de variante à documenter (et {@ta@} révélerait la réponse)', () => {
+    const q = genNumericalCore(1, baseParams(), DEPS);
+    assert.equal(q.qnote, '');
 });
 
 test('le XML (prtXML, inputXML) est bien formé', () => {
