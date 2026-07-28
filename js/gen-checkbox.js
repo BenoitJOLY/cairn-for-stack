@@ -1,15 +1,12 @@
 // ── XML GENERATORS: checkbox ──
 
-async function genCheckbox(X){
- if(!validateCBDraw()){throw new Error(I18N.t('msg.err_tirage_cb'));}
+// Lecture DOM → shape attendue par genCheckboxCore(). Extraite de genCheckbox()
+// pour être réutilisée par l'aperçu réel (preview-checkbox.js), qui a besoin des
+// mêmes paramètres pour construire un XML autonome sans dupliquer cette lecture.
+function _cbReadFormParams(){
   const rows=document.querySelectorAll('#cb-props .prop-row');
   if(!rows.length)throw new Error(I18N.t('msg.err_props_vide'));
-  // resolveFb() a un effet de bord DOM (remplit le champ avec la valeur par défaut
-  // s'il est vide) — on le laisse dans le wrapper ; cbFbc/cbFbe ne sont pas utilisés
-  // par le cœur pur (comportement préexistant, non modifié ici).
-  resolveFb('cb-fbc', FB_JUSTE_DEFAULT);
-  resolveFb('cb-fbe', FB_FAUX_DEFAULT);
-  const p={
+  return {
     bareme: parseFloat(v('cb-bareme'))||1,
     text: richVal('cb-text'),
     Xe: v('cb-xe'), mXb: v('cb-mode-xb'), Xb: v('cb-xb'),
@@ -23,6 +20,11 @@ async function genCheckbox(X){
     cbFbGen: resolveFb('cb-fbgen', ''),
     cbFbGenShowFb: document.getElementById('cb-fbgen-showfb')?.checked || false
   };
+}
+
+async function genCheckbox(X){
+ if(!validateCBDraw()){throw new Error(I18N.t('msg.err_tirage_cb'));}
+  const p=_cbReadFormParams();
   try {
     const res = await fetch('/api/generate', {
       method: 'POST',

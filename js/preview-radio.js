@@ -3,13 +3,20 @@ function renderPreviewHTML_radio(state) {
   const text = _hsRenderMath(state.text || '');
   const allVrais = state.vrais || [];
   const allFaux = state.faux || [];
-  const { drawnVrai, drawnFaux } = _raSimulateDraw(allVrais, allFaux, state.xe);
+  // state.realDrawn (tirage réellement effectué par Maxima pour un seed donné,
+  // voir _raRefreshRealPreview plus bas) prime sur la simulation locale dès
+  // qu'il est disponible — même gabarit HTML dans les deux cas.
+  const { drawnVrai, drawnFaux } = state.realDrawn || _raSimulateDraw(allVrais, allFaux, state.xe);
   let focusFbGen = false;
   try { focusFbGen = document.querySelector('#fp-radio .mpane.on') && document.querySelector('#fp-radio .mpane.on').id === 'ra-fb-gen'; } catch (e) {}
 
+  // idx = position réelle dans allVrais/allFaux (pas la position dans le
+  // sous-ensemble tiré) : nécessaire pour que le clic-pour-atteindre-le-champ
+  // retrouve la bonne ligne même quand le tirage réel n'est pas contigu à
+  // partir de l'index 0 (contrairement à la simulation).
   const options = [];
-  if (drawnVrai) options.push({ p: drawnVrai, arr: 'vrais', idx: 0, isV: true });
-  drawnFaux.forEach(function (p, i) { options.push({ p: p, arr: 'faux', idx: i, isV: false }); });
+  if (drawnVrai) options.push({ p: drawnVrai, arr: 'vrais', idx: allVrais.indexOf(drawnVrai), isV: true });
+  drawnFaux.forEach(function (p) { options.push({ p: p, arr: 'faux', idx: allFaux.indexOf(p), isV: false }); });
 
   const propsHTML = options.map(function (o) {
     return `
@@ -113,6 +120,7 @@ function renderPreviewHTML_radio(state) {
     <span class="hs-preview-badge">${I18N.t('type.radio')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
     <span class="hs-preview-note">${I18N.t('common.preview_choice_unique')}</span>
+    <span class="hs-preview-note">${state.realDrawn ? ('🟢 ' + I18N.t('common.preview_real_badge')) : ('🎲 ' + I18N.t('common.preview_sim_badge'))}</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-ra-field="text">${text}</div>
@@ -141,6 +149,13 @@ function renderPreviewHTML_radio(state) {
     var container = document.getElementById('ra-preview-container');
     if (!container) return;
     var state = captureState();
+    // Même logique que Checkbox (js/preview-checkbox.js) : épingler le dernier
+    // tirage réel réussi pour qu'un événement sans rapport (barème, xe, autre
+    // champ riche...) ne fasse pas disparaître l'aperçu réel affiché.
+    if (_raLastRealDrawnIds) {
+      var pinnedDrawn = _raResolveDrawnFromIds(_raLastRealDrawnIds, state.vrais || [], state.faux || []);
+      if (pinnedDrawn) state.realDrawn = pinnedDrawn;
+    }
     var iframe = mountPreviewIframe('ra-preview-container', renderPreviewHTML_radio(state));
     if (iframe && !iframe.__hsClickWired) {
       iframe.__hsClickWired = true;
@@ -156,6 +171,117 @@ function renderPreviewHTML_radio(state) {
     }
   }
   window.raRefreshPreview = updateRadioPreview;
+
+  // ── APERÇU RÉEL (via Maxima) ──────────────────────────────────────
+  // Même patron que Checkbox (js/preview-checkbox.js) : déclenché UNIQUEMENT
+  // par un clic explicite sur "Nouveau tirage" (interroger Maxima à chaque
+  // frappe fait scintiller l'aperçu) ; genPoolCore/genRadio partagent le même
+  // format de tirage (ta<X>_all construit vrais puis faux, id 1-indexé) donc
+  // le tirage réel se lit de la même façon dans
+  // questioninputs.ans<X>.configuration.options.
+  var _raPreviewSeed = null;
+  var _raRealPreviewGen = 0;
+  // Épinglé au dernier tirage réel réussi (ids 1-indexés, pas les objets props
+  // eux-mêmes) — voir la même logique dans preview-checkbox.js.
+  var _raLastRealDrawnIds = null;
+
+  function _raEnsurePreviewSeed() {
+    if (!_raPreviewSeed) _raPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    return _raPreviewSeed;
+  }
+
+  function _raSetRealPreviewStatus(msg, isError) {
+    var el = document.getElementById('ra-real-preview-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = isError ? '#b91c1c' : '#64748b';
+  }
+
+  function _raRealDrawnIds(renderRes, qid) {
+    var ir = renderRes && renderRes.questioninputs && renderRes.questioninputs['ans' + qid];
+    var options = ir && ir.configuration && ir.configuration.options;
+    console.log('[stackforge][debug radio real-preview] ir.configuration =', ir && ir.configuration, '| options =', options);
+    if (!options) return null;
+    var ids = Object.keys(options).map(function (id) { return parseInt(id, 10); });
+    return ids.length ? ids : null;
+  }
+
+  function _raResolveDrawnFromIds(ids, allVrais, allFaux) {
+    if (!ids) return null;
+    var combined = allVrais.concat(allFaux);
+    var drawn = ids.map(function (id) { return combined[id - 1]; }).filter(Boolean);
+    if (!drawn.length) return null;
+    var drawnVrai = drawn.filter(function (p) { return allVrais.indexOf(p) !== -1; })[0] || null;
+    var drawnFaux = drawn.filter(function (p) { return allFaux.indexOf(p) !== -1; });
+    return { drawnVrai: drawnVrai, drawnFaux: drawnFaux };
+  }
+
+  async function _raRefreshRealPreview() {
+    var qid = _activeQid;
+    if (!qid || typeof currentType === 'undefined' || currentType !== 'radio') return;
+    var gen = ++_raRealPreviewGen;
+
+    var state;
+    try { state = captureState(); } catch (e) { return; }
+
+    _raSetRealPreviewStatus(I18N.t('common.preview_real_loading'), false);
+
+    var xml;
+    try {
+      var p = {
+        type: 'radio', label: I18N.t('tpl.pool_label_radio'), text: state.text,
+        Xe: state.xe, bareme: state.bareme,
+        poolFbGen: state.fbGen, poolShowFb: state.fbGenShowFb,
+        propsVrais: state.vrais || [], propsFaux: state.faux || []
+      };
+      var q = genPoolCore(qid, p);
+      xml = insertDeployedSeeds(buildStandaloneQuestionXML(q), [_raEnsurePreviewSeed()]);
+    } catch (e) {
+      if (gen === _raRealPreviewGen) _raSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+      return;
+    }
+
+    try {
+      var renderRes = await maximaRenderXML(xml, _raPreviewSeed);
+      if (gen !== _raRealPreviewGen) return;
+
+      var ids = _raRealDrawnIds(renderRes, qid);
+      var realDrawn = _raResolveDrawnFromIds(ids, state.vrais || [], state.faux || []);
+      if (!realDrawn) throw new Error('shape inattendue');
+
+      _raLastRealDrawnIds = ids;
+      state.realDrawn = realDrawn;
+      var iframe = mountPreviewIframe('ra-preview-container', renderPreviewHTML_radio(state));
+      if (iframe && !iframe.__hsClickWired) {
+        iframe.__hsClickWired = true;
+        iframe.addEventListener('load', function () { wireRadioPreviewClicks(iframe); });
+      }
+      _raSetRealPreviewStatus('', false);
+    } catch (e) {
+      if (gen !== _raRealPreviewGen) return;
+      _raSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+    }
+  }
+
+  // Bouton "🎲 Nouveau tirage" : change le seed puis interroge Maxima. Bouton
+  // "👁️ Aperçu réel" : garde le seed courant (ou en crée un si aucun n'existe
+  // encore) et ne fait que rafraîchir le rendu affiché (même patron que
+  // Checkbox, retour utilisateur du 2026-07-27).
+  function raRerollPreviewSeed() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'radio') return;
+    _raPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    _raRefreshRealPreview();
+  }
+  window.raRerollPreviewSeed = raRerollPreviewSeed;
+
+  function raShowRealPreview() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'radio') return;
+    _raEnsurePreviewSeed();
+    _raRefreshRealPreview();
+  }
+  window.raShowRealPreview = raShowRealPreview;
 
   function wireRadioPreviewClicks(iframe) {
     try {
@@ -211,6 +337,14 @@ function renderPreviewHTML_radio(state) {
     new MutationObserver(function (mutations) {
       mutations.forEach(function (m) {
         if (m.attributeName === 'style' && panel.style.display !== 'none') {
+          _raPreviewSeed = null;
+          _raLastRealDrawnIds = null;
+          var rerollBtn = document.getElementById('ra-reroll-preview-btn');
+          var showRealBtn = document.getElementById('ra-show-real-preview-btn');
+          var configured = typeof maximaConfigured === 'function' && maximaConfigured();
+          if (rerollBtn) rerollBtn.style.display = configured ? '' : 'none';
+          if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
+          _raSetRealPreviewStatus('', false);
           setTimeout(updateRadioPreview, 0);
         }
       });

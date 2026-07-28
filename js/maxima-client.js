@@ -88,6 +88,55 @@ function insertDeployedSeeds(xml, seeds) {
   return xml.replace('</question>', block + '  </question>');
 }
 
+// Assemble une SEULE question STACK autonome (mêmes champs par défaut que
+// buildXML() dans js/app.js, réduits à une question, sans tags ni signature
+// stackforge) — utilisée pour l'aperçu réel isolé d'un chip (voir
+// preview-checkbox.js), jamais pour l'export final (buildXML() reste le seul
+// chemin d'export, inchangé). Gabarit vérifié par appel réel à /render le
+// 2026-07-27 (HTTP 200, forme confirmée par test-render-shape.js).
+function buildStandaloneQuestionXML(parts) {
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<quiz>\n'
+    + '  <question type="stack">\n'
+    + '    <name><text>apercu_reel</text></name>\n'
+    + '    <questiontext format="html">\n'
+    + '      <text><![CDATA[' + parts.textFrag + ']]></text>\n'
+    + '    </questiontext>\n'
+    + '    <generalfeedback format="html">\n'
+    + '      <text><![CDATA[' + parts.generalFeedback + ']]></text>\n'
+    + '    </generalfeedback>\n'
+    + '    <defaultgrade>' + parts.bareme + '</defaultgrade>\n'
+    + '    <penalty>0.1</penalty>\n'
+    + '    <hidden>0</hidden>\n'
+    + '    <idnumber></idnumber>\n'
+    + '    <stackversion><text></text></stackversion>\n'
+    + '    <questionvariables>\n'
+    + '      <text><![CDATA[' + parts.vars + ']]></text>\n'
+    + '    </questionvariables>\n'
+    + '    <specificfeedback format="html"><text><![CDATA[]]></text></specificfeedback>\n'
+    + '    <questionnote format="html"><text></text></questionnote>\n'
+    + '    <questionsimplify>1</questionsimplify>\n'
+    + '    <assumepositive>0</assumepositive>\n'
+    + '    <assumereal>0</assumereal>\n'
+    + '    <prtcorrect format="html"><text></text></prtcorrect>\n'
+    + '    <prtpartiallycorrect format="html"><text></text></prtpartiallycorrect>\n'
+    + '    <prtincorrect format="html"><text></text></prtincorrect>\n'
+    + '    <decimals>.</decimals>\n'
+    + '    <scientificnotation>*10</scientificnotation>\n'
+    + '    <multiplicationsign>dot</multiplicationsign>\n'
+    + '    <sqrtsign>1</sqrtsign>\n'
+    + '    <complexno>i</complexno>\n'
+    + '    <inversetrig>cos-1</inversetrig>\n'
+    + '    <logicsymbol>lang</logicsymbol>\n'
+    + '    <matrixparens>[</matrixparens>\n'
+    + '    <isbroken>0</isbroken>\n'
+    + '    <variantsselectionseed></variantsselectionseed>\n'
+    + parts.inputXML + '\n\n'
+    + parts.prtXML + '\n'
+    + '  </question>\n'
+    + '</quiz>';
+}
+
 function _extractInputNames(xml) {
   var names = [], re = /<input>\s*<name>([^<]+)<\/name>/g, m;
   while ((m = re.exec(xml))) names.push(m[1]);
@@ -105,20 +154,24 @@ function _extractInputNames(xml) {
 // Seeds tirés au hasard dans [startSeed, maxSeed], PAS séquentiellement : la validité
 // d'un seed (est-ce que le brassage aléatoire Maxima qu'il produit reste notable à
 // 100%) n'a aucune raison d'être corrélée à sa proximité avec le seed précédent.
-// Corollaire : "s'arrêter après N échecs CONSÉCUTIFS" (ancienne heuristique) est un
-// mauvais critère d'arrêt — une série d'échecs consécutifs ne prouve rien sur le
-// nombre de seeds valides qui existent ailleurs dans l'espace de recherche, elle peut
-// être un pur hasard local. Remplacé par un budget total de tentatives
-// (`maxAttempts`, indépendant de tout enchaînement d'échecs) — signalé par
-// l'utilisateur (2026-07-27) après le correctif Checkbox fixe/alea.
+// Arrêt sur un compteur d'échecs CONSÉCUTIFS (`maxConsecutiveFails`, remis à zéro à
+// chaque succès) : un seed valide peut arriver après une série d'échecs sans rapport,
+// mais si on en enchaîne N sans le moindre succès entre-temps, il est peu probable
+// d'en trouver un juste après. Un budget total (`maxAttempts`) reste en garde-fou pour
+// éviter une boucle très longue si des succès arrivent occasionnellement (chaque
+// succès remet le compteur consécutif à zéro sans jamais faire progresser `tried`).
+// Révisé le 2026-07-28 (retour utilisateur) : la version précédente (budget total sans
+// remise à zéro, b8c1273) tournait 60 essais sans jamais s'arrêter plus tôt même à 0
+// succès — l'utilisateur attendait un arrêt rapide après quelques échecs d'affilée.
 async function generateDeployedSeeds(xml, count, opts) {
   opts = opts || {};
   var minSeed = opts.startSeed || 1;
   var maxSeed = opts.maxSeed || 1000000;
-  var maxAttempts = opts.maxAttempts || Math.max(30, count * 15);
+  var maxConsecutiveFails = opts.maxConsecutiveFails || 10;
+  var maxAttempts = opts.maxAttempts || Math.max(200, count * 50);
   var onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : function() {};
   var inputNames = _extractInputNames(xml);
-  var validSeeds = [], triedSeeds = {}, tried = 0;
+  var validSeeds = [], triedSeeds = {}, tried = 0, consecutiveFails = 0;
 
   function pickSeed() {
     var seed, guard = 0;
@@ -132,7 +185,7 @@ async function generateDeployedSeeds(xml, count, opts) {
 
   onProgress({ found: 0, target: count, tried: 0 });
 
-  while (validSeeds.length < count && tried < maxAttempts) {
+  while (validSeeds.length < count && tried < maxAttempts && consecutiveFails < maxConsecutiveFails) {
     tried++;
     var seed = pickSeed();
     var ok = false;
@@ -144,21 +197,28 @@ async function generateDeployedSeeds(xml, count, opts) {
       // /render puis /grade le 2026-07-25 : soumettre samplesolutionrender donne
       // score 0 (isgradable:true mais faux), soumettre samplesolution[""] donne
       // score 1. `samplesolution` est une map par sous-partie ; pour un input
-      // simple (string/algébrique/numérique) elle n'a qu'une clé "". Un input
-      // composé de plusieurs sous-parties (ex. checkbox, qui rend chaque case
-      // séparément côté HTML/STACK) peut avoir plusieurs clés — avant ce correctif
-      // ce cas retombait sur `undefined`, ce qui fait toujours échouer /grade
-      // (aucune variante checkbox n'était donc jamais validée, quel que soit le
-      // seed essayé). Pas de confirmation par appel réel pour ce cas précis
-      // (contrairement aux 4 bugs ci-dessus) : on transmet la map complète telle
-      // quelle à /grade plutôt que de l'abandonner — au pire aussi inefficace
-      // qu'avant, au mieux ça corrige le blocage. À confirmer sur le NAS réel.
+      // simple (string/algébrique/numérique) elle n'a qu'une clé "". Pour un input
+      // à plusieurs sous-parties (ex. checkbox, une clé "_<position>" par case
+      // COCHÉE), /grade n'accepte PAS un objet imbriqué sous answers[name] : il
+      // faut aplatir, une clé par POSITION AFFICHÉE (cochée ou non) directement à
+      // la racine de `answers`, nommée "<name>_<position>" avec "1"/"0" — comme le
+      // ferait un formulaire HTML natif. Confirmé par appel réel à /grade le
+      // 2026-07-28 (isgradable:true, score:1 uniquement avec cette forme aplatie ;
+      // toutes les formes imbriquées/tableau/bitstring testées échouaient).
       var answers = {};
       inputNames.forEach(function(name) {
         var ir = renderRes && renderRes.questioninputs && renderRes.questioninputs[name];
         var sol = ir && ir.samplesolution;
         var solKeys = sol ? Object.keys(sol) : [];
-        answers[name] = solKeys.length === 1 ? sol[solKeys[0]] : (solKeys.length > 1 ? sol : undefined);
+        if (solKeys.length && solKeys[0].charAt(0) === '_') {
+          var allKeys = Object.keys((ir.configuration && ir.configuration.options) || {});
+          var trueKeys = solKeys.map(function(k) { return k.replace(/^_/, ''); });
+          allKeys.forEach(function(k) {
+            answers[name + '_' + k] = trueKeys.indexOf(k) >= 0 ? '1' : '0';
+          });
+        } else {
+          answers[name] = solKeys.length === 1 ? sol[solKeys[0]] : undefined;
+        }
       });
       var gradeRes = await maximaGradeXML(tempXml, seed, answers);
       if (gradeRes && gradeRes.isgradable) {
@@ -174,8 +234,8 @@ async function generateDeployedSeeds(xml, count, opts) {
     } catch (e) {
       ok = false;
     }
-    if (ok) { validSeeds.push(seed); }
-    onProgress({ found: validSeeds.length, target: count, tried: tried });
+    if (ok) { validSeeds.push(seed); consecutiveFails = 0; } else { consecutiveFails++; }
+    onProgress({ found: validSeeds.length, target: count, tried: tried, consecutiveFails: consecutiveFails });
   }
 
   return {
@@ -280,6 +340,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     getMaximaConfig: getMaximaConfig, setMaximaConfig: setMaximaConfig, maximaConfigured: maximaConfigured,
     maximaTestConnection: maximaTestConnection, maximaRenderXML: maximaRenderXML, maximaValidateInput: maximaValidateInput,
-    maximaGradeXML: maximaGradeXML, insertDeployedSeeds: insertDeployedSeeds, generateDeployedSeeds: generateDeployedSeeds
+    maximaGradeXML: maximaGradeXML, insertDeployedSeeds: insertDeployedSeeds, generateDeployedSeeds: generateDeployedSeeds,
+    buildStandaloneQuestionXML: buildStandaloneQuestionXML
   };
 }

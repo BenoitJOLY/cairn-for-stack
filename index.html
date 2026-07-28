@@ -4130,21 +4130,6 @@ fill="currentColor" stroke="none">
           <button class="btn-prop-add v" onclick="addCBRow(true)"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-success"></use></svg> <span data-i18n="cb.add_true">+ VRAI</span></button>
           <button class="btn-prop-add f" onclick="addCBRow(false)"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-error"></use></svg> <span data-i18n="cb.add_false">+ FAUX</span></button>
         </div>
-        <div class="field" style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
-          <label data-i18n="field.feedback_par_defaut_correct">Feedback par défaut (Correct / Incorrect)</label>
-          <div class="g2">
-            <div>
-              <label class="hint"><span data-i18n="cb.fbc_lbl">Si tout est coché correctement :</span></label>
-              <div class="rich-preview" tabindex="0" role="button" id="prev-cb-fbc" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbc')"></div>
-              <textarea id="cb-fbc" style="display:none"></textarea>
-            </div>
-            <div>
-              <label class="hint"><span data-i18n="cb.fbe_lbl">Si erreur détectée :</span></label>
-              <div class="rich-preview" tabindex="0" role="button" id="prev-cb-fbe" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbe')"></div>
-              <textarea id="cb-fbe" style="display:none"></textarea>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- ONGLET FEEDBACK GENERAL -->
@@ -4171,6 +4156,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="cb-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="cb-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="cbRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="cb-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="cbShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="cb-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="cb-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -4237,6 +4227,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="ra-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="ra-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="raRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="ra-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="raShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="ra-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="ra-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -4303,6 +4298,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="dd-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="dd-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="ddRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="dd-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="ddShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="dd-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="dd-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>

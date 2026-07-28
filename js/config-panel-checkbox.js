@@ -4,7 +4,7 @@
 function captureState_checkbox() {
   var s = { type: 'checkbox' };
       s.bareme=v('cb-bareme');s.text=richVal('cb-text');s.xe=v('cb-xe');s.mXb=v('cb-mode-xb');s.xb=v('cb-xb');
-      s.fbc=richVal('cb-fbc');s.fbe=richVal('cb-fbe');s.fbGen=richVal('cb-fbgen');
+      s.fbGen=richVal('cb-fbgen');
       s.showOubli=document.getElementById('cb-show-oubli')?.checked||false;
       s.fbGenShowFb=document.getElementById('cb-fbgen-showfb')?.checked||false;
       s.props=[];
@@ -18,7 +18,7 @@ function restoreState_checkbox(s) {
       document.getElementById('cb-bareme').value=s.bareme;setRichVal('cb-text',s.text);
       document.getElementById('cb-xe').value=s.xe;document.getElementById('cb-mode-xb').value=s.mXb;
       document.getElementById('cb-xb').value=s.xb;document.getElementById('cb-xb').disabled=s.mXb==='alea';
-      setRichVal('cb-fbc',s.fbc||'');setRichVal('cb-fbe',s.fbe||'');setRichVal('cb-fbgen',s.fbGen||'');
+      setRichVal('cb-fbgen',s.fbGen||'');
       var cbOubliEl=document.getElementById('cb-show-oubli');if(cbOubliEl)cbOubliEl.checked=s.showOubli||false;
       var cbFbGenShowFbEl=document.getElementById('cb-fbgen-showfb');if(cbFbGenShowFbEl)cbFbGenShowFbEl.checked=s.fbGenShowFb||false;
       document.getElementById('cb-props').innerHTML='';
@@ -34,6 +34,6 @@ function resetForm_checkbox() {
       setRichVal('cb-text','');document.getElementById('cb-bareme').value=1;
       document.getElementById('cb-xe').value=2;document.getElementById('cb-mode-xb').value='fixe';
       document.getElementById('cb-xb').value=1;document.getElementById('cb-xb').disabled=false;
-      setRichVal('cb-fbc',I18N.t('msg.cb_fbc_default'));setRichVal('cb-fbe',I18N.t('msg.cb_fbe_default'));setRichVal('cb-fbgen','');
+      setRichVal('cb-fbgen','');
       var warnCb=document.getElementById('warn-cb-draw');if(warnCb)warnCb.style.display='none';
 }
