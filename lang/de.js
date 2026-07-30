@@ -1937,6 +1937,7 @@ I18N.add("de", {
   "log.fbgen_auto_desc":     "Die Auswertung (Wahrheitstabelle, vereinfachte Form oder Äquivalenz) wird automatisch entsprechend dem in „Config“ ausgewählten Fragetyp generiert.",
 
   "log.reponse_attendue_lbl": "🔑 Erwartete Antwort",
+  "log.result_col_lbl":       "Ergebnis",
   "log.cases_instr":          "In der Wahrheitstabelle fehlen einige Zellen. Leiten Sie deren Wert (0 oder 1) ab:",
   "log.table_instr":          "Füllen Sie die Ergebnisspalte der Wahrheitstabelle vollständig aus (0 oder 1):",
   "log.cases_ok_title":       "Genau!",

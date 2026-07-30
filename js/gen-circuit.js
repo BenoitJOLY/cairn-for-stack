@@ -108,7 +108,7 @@ function genCircuitCore(X, p, deps) {
         + '      <button id="btnUndo" type="button">← Annuler point</button>\n'
         + '      <button id="btnReset" type="button">↺ Vider tout</button>\n'
         + '    </div>\n'
-        + '    <div id="board"></div>\n'
+        + '    <div id="board" role="img"></div>\n'
         + '    <div id="feedback">Choisis un composant à droite pour commencer.</div>\n'
         + '  </div>\n'
         + '  <div class="right">\n'

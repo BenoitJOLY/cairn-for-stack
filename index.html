@@ -1142,8 +1142,8 @@ fill="currentColor" stroke="none">
       <!-- ONGLET FEEDBACK GENERAL -->
       <div class="mpane" id="vf-fb-gen">
         <div class="field">
-          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="vf.fbgen_auto_note">(réponses attendues — non modifiable ici)</span></label>
-          <div class="rich-preview" id="vf-fbgen-auto-preview" data-ph="—" style="background:#eef2ff;"></div>
+          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span class="fb-note-hint" data-i18n="vf.fbgen_auto_note">(réponses attendues — non modifiable ici)</span></label>
+          <div class="rich-preview" id="vf-fbgen-auto-preview" data-ph="—"></div>
         </div>
         <div class="field" style="margin-top:-4px;">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.88rem;">
@@ -1153,7 +1153,7 @@ fill="currentColor" stroke="none">
           <span class="hint" data-i18n="vf.showfb_hint">En plus de la réponse attendue (Vrai/Faux) de chaque proposition, affiche son feedback correspondant (champ « Si coche Vrai/Faux » de chaque proposition).</span>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="vf.fbgen_extra_note">(optionnel, ajouté à la suite de la liste ci-dessus)</span></label>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="vf.fbgen_extra_note">(optionnel, ajouté à la suite de la liste ci-dessus)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-vf-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('vf-fbgen')"></div>
           <textarea id="vf-fbgen" style="display:none"></textarea>
         </div>
@@ -1488,7 +1488,7 @@ fill="currentColor" stroke="none">
 
   <!-- OPTIQUE — Optique géométrique (JSXGraph) — 3 scénarios -->
   <div class="form-panel" id="fp-optique">
-    <div class="form-panel-head" style="background:#0284c7;">
+    <div class="form-panel-head" style="background:#0369a1;">
       <svg class="hs-ico"><use href="#ico-type-optique"></use></svg>
       <span id="opt-head-label">Optique géométrique</span>
     </div>
@@ -1855,7 +1855,7 @@ fill="currentColor" stroke="none">
 
   <!-- IMAGE MESURE -->
   <div class="form-panel" id="fp-image-mesure">
-    <div class="form-panel-head" style="background:#0891b2;">
+    <div class="form-panel-head" style="background:#0e7490;">
       <svg class="hs-ico"><use href="#ico-type-image-mesure"></use></svg>
       <span data-i18n="type.image-mesure">Mesure sur image</span>
     </div>
@@ -1998,7 +1998,7 @@ fill="currentColor" stroke="none">
 
   <!-- ACIDE-BASE -->
   <div class="form-panel" id="fp-acide-base">
-    <div class="form-panel-head" style="background:#16a34a;">
+    <div class="form-panel-head" style="background:#15803d;">
       <svg class="hs-ico"><use href="#ico-type-acide-base"></use></svg>
       <span data-i18n="ab.title">pH-métrie — Titrage</span>
     </div>
@@ -2131,7 +2131,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="ab-fb-gen">
         <p class="hint" data-i18n="ab.fbgen_auto_desc">La correction (indicateur, volume équivalent) est générée automatiquement selon le type de titrage et la méthode choisis dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ab.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ab.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="ab-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -2382,7 +2382,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="ineq-fb-gen">
         <p class="hint" data-i18n="ineq.fbgen_auto_desc">La correction (résolution de l'inéquation) est générée automatiquement selon le type choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="ineq-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -2471,7 +2471,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="pol-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="pol-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -2535,7 +2535,7 @@ fill="currentColor" stroke="none">
       </div>
 
       <div class="field">
-        <label><span data-i18n="equiv.resultat_lbl">Résultat final</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="equiv.resultat_hint">(optionnel — sinon calculé automatiquement par Maxima)</span></label>
+        <label><span data-i18n="equiv.resultat_lbl">Résultat final</span> <span class="fb-note-hint" data-i18n="equiv.resultat_hint">(optionnel — sinon calculé automatiquement par Maxima)</span></label>
         <input type="text" id="eq-resultat" placeholder="laisser vide pour un calcul automatique" data-i18n-ph="equiv.resultat_ph" oninput="eqFormChange()">
       </div>
 
@@ -2558,7 +2558,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="eq-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="eq-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -2638,7 +2638,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="lim-fb-gen">
         <p class="hint" data-i18n="lim.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon les réglages choisis dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="lim-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -2724,7 +2724,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="phy-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="phy-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -2759,7 +2759,7 @@ fill="currentColor" stroke="none">
       <!-- Énoncé -->
       <div class="field">
         <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-osc-text" onclick="openRich('osc-text')" style="min-height:60px;border-color:#0c4a6e;background:#eff6ff;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-osc-text" aria-label="Énoncé" onclick="openRich('osc-text')" style="min-height:60px;border-color:#0c4a6e;background:#eff6ff;"></div>
         <textarea id="osc-text" style="display:none"></textarea>
       </div>
 
@@ -2845,7 +2845,7 @@ fill="currentColor" stroke="none">
             <label><span data-i18n="osc.sh_lbl">Base de temps (SH)</span>
               <label style="font-weight:normal;font-size:.82rem;margin-left:6px;"><input type="checkbox" id="osc-sh-auto" checked onchange="oscAutoToggle('sh')"> <span data-i18n="osc.auto_lbl">Auto</span></label>
             </label>
-            <select id="osc-sh-idx" disabled>
+            <select id="osc-sh-idx" disabled aria-label="Base de temps (SH)">
               <option value="0">500 ns/div</option><option value="1">1 µs/div</option>
               <option value="2">2 µs/div</option><option value="3">5 µs/div</option>
               <option value="4">10 µs/div</option><option value="5">20 µs/div</option>
@@ -2862,7 +2862,7 @@ fill="currentColor" stroke="none">
             <label><span data-i18n="osc.sv_lbl">Sensibilité (SV)</span>
               <label style="font-weight:normal;font-size:.82rem;margin-left:6px;"><input type="checkbox" id="osc-sv-auto" checked onchange="oscAutoToggle('sv')"> <span data-i18n="osc.auto_lbl">Auto</span></label>
             </label>
-            <select id="osc-sv-idx" disabled>
+            <select id="osc-sv-idx" disabled aria-label="Sensibilité (SV)">
               <option value="0">5 mV/div</option><option value="1">10 mV/div</option>
               <option value="2">20 mV/div</option><option value="3">50 mV/div</option>
               <option value="4">100 mV/div</option><option value="5">200 mV/div</option>
@@ -2973,7 +2973,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="sui-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="sui-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -3086,7 +3086,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="prob-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="prob-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -3169,7 +3169,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="trig-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="trig-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -3308,7 +3308,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="stat-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-stat-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('stat-fbgen')"></div>
           <textarea id="stat-fbgen" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -3378,7 +3378,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="mat-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="mat-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -3494,7 +3494,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="geo-fb-gen">
         <p class="hint" data-i18n="thy.fbgen_auto_desc">La correction (formule, valeur) est générée automatiquement selon le type d'exercice choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-geo-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('geo-fbgen')"></div>
           <textarea id="geo-fbgen" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -3594,7 +3594,7 @@ fill="currentColor" stroke="none">
 
       <div class="field">
         <label data-i18n="log.consigne_lbl">Consigne (HTML/LaTeX)</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-lg-text" onclick="openRich('lg-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-lg-text" aria-label="Consigne" onclick="openRich('lg-text')"
              style="min-height:60px;border-color:#7c3aed;background:#f5f3ff;"></div>
         <textarea id="lg-text" style="display:none"></textarea>
       </div>
@@ -3605,7 +3605,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="lg-fb-gen">
         <p class="hint" data-i18n="log.fbgen_auto_desc">La correction (table de vérité, forme simplifiée ou équivalence) est générée automatiquement selon le type de question choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <textarea id="lg-fbgen" rows="3" placeholder="Texte additionnel affiché après validation, quel que soit le résultat..." data-i18n-ph="ab.fbgen_placeholder"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
       </div>
@@ -3717,7 +3717,7 @@ fill="currentColor" stroke="none">
       <!-- ── ONGLET FEEDBACK GÉNÉRAL ── -->
       <div class="mpane" id="cpx-fb-gen">
         <div class="field">
-          <label><span data-i18n="cpx.correction_generale_lbl">Correction générale</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="cpx.correction_generale_note">(aperçu — auto-générée)</span></label>
+          <label><span data-i18n="cpx.correction_generale_lbl">Correction générale</span> <span class="fb-note-hint" data-i18n="cpx.correction_generale_note">(aperçu — auto-générée)</span></label>
           <div class="rich-preview hs-minh42" id="prev-cpx-fbgen" data-ph="Cliquez sur un scénario pour prévisualiser la correction..." data-i18n-dataph="cpx.fbgen_preview_ph"></div>
           <textarea id="cpx-fbgen" style="display:none"></textarea>
         </div>
@@ -3808,7 +3808,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="calc-fb-gen">
         <p class="hint" data-i18n="calc.fbgen_auto_desc">La correction (dérivée, primitive ou intégrale) est générée automatiquement selon le type de question choisi dans Config.</p>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-calc-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('calc-fbgen')"></div>
           <textarea id="calc-fbgen" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -3855,7 +3855,7 @@ fill="currentColor" stroke="none">
       <!-- Consigne riche -->
       <div class="field">
         <label data-i18n="log.consigne_lbl">Consigne (HTML/LaTeX)</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-cir-text"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-cir-text" aria-label="Énoncé"
              onclick="openRich('cir-text')"
              style="min-height:70px;border-color:#c2410c;background:#fff7ed;"></div>
         <textarea id="cir-text" style="display:none"></textarea>
@@ -3900,7 +3900,7 @@ fill="currentColor" stroke="none">
       <!-- Consigne riche -->
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-bn-text"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-bn-text" aria-label="Énoncé"
              onclick="openRich('bn-text')"
              style="min-height:80px;border-color:#1d4ed8;background:#eff6ff;"></div>
         <textarea id="bn-text" style="display:none"></textarea>
@@ -3968,7 +3968,7 @@ fill="currentColor" stroke="none">
           <option value="aleatoire" data-i18n="bn.value_mode_aleatoire">Aléatoire (Moodle)</option>
         </select>
         <div id="bn-value-fixe-wrap" style="margin-top:6px;">
-          <select id="bn-value-base" onchange="bnFormChange()" style="margin-bottom:6px;">
+          <select id="bn-value-base" onchange="bnFormChange()" style="margin-bottom:6px;" aria-label="Base d'expression de la valeur">
             <option value="depart" data-i18n="bn.value_base_depart">Valeur exprimée en base de départ</option>
             <option value="arrivee" data-i18n="bn.value_base_arrivee">Valeur exprimée en base d'arrivée</option>
           </select>
@@ -4049,7 +4049,7 @@ fill="currentColor" stroke="none">
       <!-- Consigne riche (l'enseignant y insère les photos/tableaux d'ouvertures via l'éditeur riche) -->
       <div class="field">
         <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-apn-text" onclick="openRich('apn-text')" style="min-height:60px;border-color:#1e3a8a;background:#eff6ff;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-apn-text" aria-label="Énoncé" onclick="openRich('apn-text')" style="min-height:60px;border-color:#1e3a8a;background:#eff6ff;"></div>
         <textarea id="apn-text" style="display:none"></textarea>
       </div>
 
@@ -4065,7 +4065,7 @@ fill="currentColor" stroke="none">
 
       <!-- Paramètre(s) modifié(s) : les 2 autres, au moins 1 coché -->
       <div class="field">
-        <label><span data-i18n="apn.param_modifie_lbl">Paramètre(s) modifié(s)</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="apn.param_modifie_note">(au moins 1, parmi les 2 restants)</span></label>
+        <label><span data-i18n="apn.param_modifie_lbl">Paramètre(s) modifié(s)</span> <span class="fb-note-hint" data-i18n="apn.param_modifie_note">(au moins 1, parmi les 2 restants)</span></label>
         <div id="apn-changed-wrap" style="display:flex;gap:16px;flex-wrap:wrap;">
           <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="apn-changed-D"> <span data-i18n="apn.chk_diaphragme">Diaphragme</span></label>
           <label style="font-weight:normal;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="apn-changed-V"> <span data-i18n="apn.chk_vitesse">Vitesse</span></label>
@@ -4155,8 +4155,8 @@ fill="currentColor" stroke="none">
       <!-- ONGLET FEEDBACK GENERAL -->
       <div class="mpane" id="cb-fb-gen">
         <div class="field">
-          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="cb.fbgen_auto_note">(liste des bonnes réponses — non modifiable ici)</span></label>
-          <div class="rich-preview" id="cb-fbgen-auto-preview" data-ph="—" style="background:#f5f3ff;"></div>
+          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span class="fb-note-hint" data-i18n="cb.fbgen_auto_note">(liste des bonnes réponses — non modifiable ici)</span></label>
+          <div class="rich-preview" id="cb-fbgen-auto-preview" data-ph="—"></div>
         </div>
         <div class="field" style="margin-top:-4px;">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.88rem;">
@@ -4166,7 +4166,7 @@ fill="currentColor" stroke="none">
           <span class="hint" data-i18n="cb.showfb_hint">En plus du texte des propositions vraies, affiche leur feedback (champ « Feedback si correct » de chaque proposition).</span>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite de la liste ci-dessus)</span></label>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint">(optionnel, ajouté à la suite de la liste ci-dessus)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-cb-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-fbgen')"></div>
           <textarea id="cb-fbgen" style="display:none"></textarea>
         </div>
@@ -4226,8 +4226,8 @@ fill="currentColor" stroke="none">
       <!-- ONGLET FEEDBACK GENERAL -->
       <div class="mpane" id="ra-fb-gen">
         <div class="field">
-          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ra.fbgen_auto_note">(bonne réponse — non modifiable ici)</span></label>
-          <div class="rich-preview" id="ra-fbgen-auto-preview" data-ph="—" style="background:#eff6ff;"></div>
+          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span class="fb-note-hint" data-i18n="ra.fbgen_auto_note">(bonne réponse — non modifiable ici)</span></label>
+          <div class="rich-preview" id="ra-fbgen-auto-preview" data-ph="—"></div>
         </div>
         <div class="field" style="margin-top:-4px;">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.88rem;">
@@ -4237,7 +4237,7 @@ fill="currentColor" stroke="none">
           <span class="hint" data-i18n="ra.showfb_hint">En plus du texte de la bonne réponse, affiche son feedback (champ « Feedback » de la proposition).</span>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span></label>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint">(optionnel, ajouté à la suite)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-ra-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ra-fbgen')"></div>
           <textarea id="ra-fbgen" style="display:none"></textarea>
         </div>
@@ -4297,8 +4297,8 @@ fill="currentColor" stroke="none">
       <!-- ONGLET FEEDBACK GENERAL -->
       <div class="mpane" id="dd-fb-gen">
         <div class="field">
-          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="ddm.fbgen_auto_note">(bonne réponse — non modifiable ici)</span></label>
-          <div class="rich-preview" id="dd-fbgen-auto-preview" data-ph="—" style="background:#fdf2f8;"></div>
+          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span class="fb-note-hint" data-i18n="ddm.fbgen_auto_note">(bonne réponse — non modifiable ici)</span></label>
+          <div class="rich-preview" id="dd-fbgen-auto-preview" data-ph="—"></div>
         </div>
         <div class="field" style="margin-top:-4px;">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.88rem;">
@@ -4308,7 +4308,7 @@ fill="currentColor" stroke="none">
           <span class="hint" data-i18n="ddm.showfb_hint">En plus du texte de la bonne réponse, affiche son feedback (champ « Feedback » de la proposition).</span>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span></label>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint">(optionnel, ajouté à la suite)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-dd-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('dd-fbgen')"></div>
           <textarea id="dd-fbgen" style="display:none"></textarea>
         </div>
@@ -4407,10 +4407,10 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="alg-fb-gen">
         <div class="field">
-          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="alg.fbgen_auto_note">(réponse attendue — non modifiable ici)</span></label>
-          <div class="rich-preview" id="alg-fbgen-auto-preview" data-ph="—" style="background:#ecfeff;"></div>
+          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span class="fb-note-hint" data-i18n="alg.fbgen_auto_note">(réponse attendue — non modifiable ici)</span></label>
+          <div class="rich-preview" id="alg-fbgen-auto-preview" data-ph="—"></div>
         </div>
-        <div class="field"><label><span data-i18n="alg.solution_prefix">Solution détaillée /</span> <span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="common.fbgen_extra_paren">(optionnel, ajouté à la suite)</span></label>
+        <div class="field"><label><span data-i18n="alg.solution_prefix">Solution détaillée /</span> <span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="common.fbgen_extra_paren">(optionnel, ajouté à la suite)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-alg-sol" data-ph="Rédigez la solution complète..." data-i18n-dataph="alg.sol_ph" onclick="openRich('alg-sol')"></div>
           <textarea id="alg-sol" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -4482,11 +4482,11 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="num-fb-gen">
         <div class="field">
-          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="num.fbgen_auto_note">(réponse acceptée — non modifiable ici)</span></label>
-          <div class="rich-preview" id="num-fbgen-auto-preview" data-ph="—" style="background:#ecfdf5;"></div>
+          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span class="fb-note-hint" data-i18n="num.fbgen_auto_note">(réponse acceptée — non modifiable ici)</span></label>
+          <div class="rich-preview" id="num-fbgen-auto-preview" data-ph="—"></div>
         </div>
         <div class="field">
-          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;">(optionnel, ajouté à la suite)</span></label>
+          <label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint">(optionnel, ajouté à la suite)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-num-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('num-fbgen')"></div>
           <textarea id="num-fbgen" style="display:none"></textarea>
         </div>
@@ -4551,10 +4551,10 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane" id="un-fb-gen">
         <div class="field">
-          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="un.fbgen_auto_note">(valeur + unité attendues — non modifiable ici)</span></label>
-          <div class="rich-preview" id="un-fbgen-auto-preview" data-ph="—" style="background:#fffbeb;"></div>
+          <label><span data-i18n="common.partie_auto_label">Partie générée automatiquement</span> <span class="fb-note-hint" data-i18n="un.fbgen_auto_note">(valeur + unité attendues — non modifiable ici)</span></label>
+          <div class="rich-preview" id="un-fbgen-auto-preview" data-ph="—"></div>
         </div>
-        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span style="font-size:.78rem;color:#64748b;font-weight:400;" data-i18n="common.fbgen_extra_paren">(optionnel, ajouté à la suite)</span></label>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="common.fbgen_extra_paren">(optionnel, ajouté à la suite)</span></label>
           <div class="rich-preview" tabindex="0" role="button" id="prev-un-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('un-fbgen')"></div>
           <textarea id="un-fbgen" style="display:none"></textarea></div>
         <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
@@ -4765,7 +4765,7 @@ fill="currentColor" stroke="none">
         <input type="number" id="cw-count" placeholder="Tous" data-i18n-ph="cw.count_ph" min="1">
       </div>
 
-      <h4 style="margin:10px 0;font-size:.9rem;color:var(--slate);" data-i18n="cw.list_title">Liste des mots et définitions</h4>
+      <h2 style="margin:10px 0;font-size:.9rem;color:var(--slate);" data-i18n="cw.list_title">Liste des mots et définitions</h2>
       <div class="cw-table-container">
         <div class="cw-table-head"><div data-i18n="cw.col_word">Mot</div><div data-i18n="cw.col_def">Définition</div><div></div></div>
         <div id="cw-body"></div>
@@ -4875,7 +4875,7 @@ fill="currentColor" stroke="none">
     </div>
     <div class="mpane on" id="chem-cfg">
     <div class="field">
-      <label><span data-i18n="chem.text_lbl">Énoncé</span> <span style="color:#b91c1c;" data-i18n="chem.text_required_note">(obligatoire — l'élève ne voit aucune autre consigne)</span></label>
+      <label><span data-i18n="chem.text_lbl">Énoncé</span> <span class="fb-required-note" data-i18n="chem.text_required_note">(obligatoire — l'élève ne voit aucune autre consigne)</span></label>
       <div class="rich-preview" tabindex="0" role="button" id="prev-chem-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('chem-text')"></div>
       <textarea id="chem-text" style="display:none"></textarea>
     </div>
@@ -5041,7 +5041,7 @@ fill="currentColor" stroke="none">
       <div class="field">
       <label><span data-i18n="nuc.modele_lbl">Réaction nucléaire modèle</span> <span class="hs-c-danger">*</span>
         <button class="btn-rich" style="margin-left:auto;" onclick="nucRenderPreview()"><svg class="hs-ico"><use href="#ico-action-refresh"></use></svg> <span data-i18n="nuc.apercu_btn">Aperçu</span></button>
-        <button class="btn-rich" style="background:#fee2e2;color:#dc2626;border-color:#fecaca;" onclick="nucClear()"><svg class="hs-ico"><use href="#ico-action-delete"></use></svg> <span data-i18n="nuc.vider_btn">Vider</span></button>
+        <button class="btn-rich" style="background:#fee2e2;color:#b91c1c;border-color:#fecaca;" onclick="nucClear()"><svg class="hs-ico"><use href="#ico-action-delete"></use></svg> <span data-i18n="nuc.vider_btn">Vider</span></button>
       </label>
       <div id="nuc-lock-hint" style="display:none;font-size:.85rem;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;margin-bottom:6px;">
         🔒 <span data-i18n="nuc.lock_hint">Rédigez d'abord l'Énoncé ci-dessus pour activer l'éditeur de réaction.</span>
@@ -7784,7 +7784,7 @@ fill="currentColor" stroke="none">
 <div id="cwPromptModal" class="modal-backdrop" onclick="if(event.target===this)closeCWPromptModal()" style="z-index:9200;">
   <div class="pb-box" onclick="event.stopPropagation()">
     <div class="pb-head" id="cw-pb-head" style="background:#ea580c;">
-      <h2 style="color:#1e293b;"><svg class="hs-ico"><use href="#ico-tool-ai"></use></svg> <span data-i18n="modal.generateur_de_prompt_ia_3">Générateur de Prompt IA — Mots Croisés</span></h2>
+      <h2 style="color:#111827;"><svg class="hs-ico"><use href="#ico-tool-ai"></use></svg> <span data-i18n="modal.generateur_de_prompt_ia_3">Générateur de Prompt IA — Mots Croisés</span></h2>
       <button onclick="closeCWPromptModal()" data-i18n-aria="btn.fermer" style="background:rgba(0,0,0,.15);border:none;color:#0f172a;border-radius:50%;width:27px;height:27px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">×</button>
     </div>
     

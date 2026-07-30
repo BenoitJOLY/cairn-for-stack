@@ -23,7 +23,7 @@ function renderPreviewHTML_imgclick(state) {
         + realParts.kbdRaw
         + ' } catch(e){ var el=document.getElementById(' + JSON.stringify(boardId) + '); if(el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">Erreur JSXGraph : " + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; console.error(e); } })();<\/script>';
     } else {
-      exampleHTML = '<p style="color:#94a3b8;font-style:italic;">Chargez une image et ajoutez au moins une zone (onglet Config) pour voir l\'aperçu interactif.</p>';
+      exampleHTML = '<p style="color:#475569;font-style:italic;">Chargez une image et ajoutez au moins une zone (onglet Config) pour voir l\'aperçu interactif.</p>';
     }
   } else {
     var realPartsSingle = null;
@@ -45,7 +45,7 @@ function renderPreviewHTML_imgclick(state) {
         + realPartsSingle.kbdRaw
         + ' } catch(e){ var el=document.getElementById(' + JSON.stringify(boardIdS) + '); if(el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">Erreur JSXGraph : " + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; console.error(e); } })();<\/script>';
     } else {
-      exampleHTML = '<p style="color:#94a3b8;font-style:italic;">Chargez une image et posez la zone (onglet Config) pour voir l\'aperçu interactif.</p>';
+      exampleHTML = '<p style="color:#475569;font-style:italic;">Chargez une image et posez la zone (onglet Config) pour voir l\'aperçu interactif.</p>';
     }
   }
   return _hsSimplePreviewHTML({

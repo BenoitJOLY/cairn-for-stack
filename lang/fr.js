@@ -1937,6 +1937,7 @@ I18N.add("fr", {
   "log.fbgen_auto_desc":     "La correction (table de vérité, forme simplifiée ou équivalence) est générée automatiquement selon le type de question choisi dans Config.",
 
   "log.reponse_attendue_lbl": "🔑 Réponse attendue",
+  "log.result_col_lbl":       "Résultat",
   "log.cases_instr":          "Certaines cases de la table de vérité manquent. Déduisez leur valeur (0 ou 1) :",
   "log.table_instr":          "Complétez entièrement la colonne de résultat de la table de vérité (0 ou 1) :",
   "log.cases_ok_title":       "Exact !",

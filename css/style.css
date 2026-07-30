@@ -120,6 +120,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .rich-preview-sm{min-height:34px;padding:5px 8px;font-size:.82rem;line-height:1.5;resize:none;}
 .rich-preview:hover{border-color:#93c5fd;background:#eff6ff;}
 .rich-preview:empty::before{content:attr(data-ph);color:#94a3b8;font-style:italic;}
+.fb-note-hint{font-size:.78rem;color:#64748b;font-weight:400;}
+.fb-required-note{color:#b91c1c;}
+.cpx-fbgen-box{padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;}
+#vf-fbgen-auto-preview{background:#eef2ff;}
+#cb-fbgen-auto-preview{background:#f5f3ff;}
+#ra-fbgen-auto-preview{background:#eff6ff;}
+#dd-fbgen-auto-preview{background:#fdf2f8;}
+#alg-fbgen-auto-preview{background:#ecfeff;}
+#num-fbgen-auto-preview{background:#ecfdf5;}
+#un-fbgen-auto-preview{background:#fffbeb;}
 .rich-preview img{max-width:800px;height:auto;display:block;margin:6px 0;border-radius:4px;}
 .rich-preview iframe,.rich-preview video{max-width:100%;display:block;margin:6px 0;border-radius:4px;}
 /* tabs */
@@ -894,6 +904,17 @@ html[data-theme="dark"] .warn-box{ background:#1a1200; border-color:#78350f; col
 /* ── Prévisualisation riche (champs énoncé / feedback) ── */
 html[data-theme="dark"] .rich-preview{ background:#172033; color:#e2e8f0; }
 html[data-theme="dark"] .rich-preview:hover{ background:#1e293b; border-color:#4f6890; }
+html[data-theme="dark"] .fb-note-hint{ color:#94a3b8; }
+html[data-theme="dark"] .fb-required-note{ color:#f87171; }
+html[data-theme="dark"] .cpx-fbgen-box{ background:#172033; border-color:#334155; }
+html[data-theme="dark"] [style*="color:#6b7280"]{ color:#94a3b8 !important; }
+html[data-theme="dark"] #vf-fbgen-auto-preview,
+html[data-theme="dark"] #cb-fbgen-auto-preview,
+html[data-theme="dark"] #ra-fbgen-auto-preview,
+html[data-theme="dark"] #dd-fbgen-auto-preview,
+html[data-theme="dark"] #alg-fbgen-auto-preview,
+html[data-theme="dark"] #num-fbgen-auto-preview,
+html[data-theme="dark"] #un-fbgen-auto-preview{ background:#172033; }
 
 /* ── Onglets (multi-réponses, etc.) ── */
 html[data-theme="dark"] .mtab{ color:#94a3b8; }
@@ -1007,7 +1028,7 @@ html[data-theme="dark"] .q-chip.chip-ok .chip-label{ color:#bbf7d0; }  /* 9:1 �
 /* inline style="background:#6366f1" → L=0.23 → #e2e8f0 donne 2.99:1 (fail)
    On assombrit via !important et on restaure #fff (6.8:1 ✓)               */
 html[data-theme="dark"] .pb-head{ background:#3730a3 !important; }
-html[data-theme="dark"] .pb-head h2{ color:#fff; }         /* 7.4:1 sur #3730a3 ✓ */
+html[data-theme="dark"] .pb-head h2{ color:#fff !important; }  /* 7.4:1 sur #3730a3 ✓ — !important nécessaire pour vaincre le style inline (h2 match/crossword) */
 
 /* ════ Modale Tags ════ */
 html[data-theme="dark"] .tag-modal-box{ background:#1e293b; }
@@ -1155,7 +1176,7 @@ html[data-theme="dark"] { --slate:#94a3b8; }
 #fp-crossword .btn-json {
   color:#0f172a;
   border-color:rgba(0,0,0,.22);
-  background:rgba(0,0,0,.1);
+  background:rgba(255,255,255,.25);
 }
 #fp-match .btn-json:hover,
 #fp-crossword .btn-json:hover { background:rgba(0,0,0,.2); }

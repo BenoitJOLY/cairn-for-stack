@@ -29,7 +29,7 @@ function renderPreviewHTML_match(state) {
   const onlyFbGen = !!(fbGenTab && fbGenTab.classList.contains('on'));
 
   const fbGenBody = `<p style="color:#166534;font-weight:bold;margin-top:0;">📋 Correction :</p>
-  <ul class="hs-match-conn-list">${connHTML || '<li style="color:#94a3b8;">(aucune liaison définie)</li>'}</ul>
+  <ul class="hs-match-conn-list">${connHTML || '<li style="color:#475569;">(aucune liaison définie)</li>'}</ul>
   ${state.fbGen ? '<p>' + _hsRenderMath(state.fbGen) + '</p>' : ''}`;
 
   const bodyHTML = onlyFbGen ? `

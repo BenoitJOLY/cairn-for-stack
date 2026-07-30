@@ -1937,6 +1937,7 @@ I18N.add("nl", {
   "log.fbgen_auto_desc":     "De correctie (waarheidstabel, vereenvoudigde vorm of gelijkwaardigheid) wordt automatisch gegenereerd op basis van het type vraag gekozen in Config.",
 
   "log.reponse_attendue_lbl": "🔑 Verwachte reactie",
+  "log.result_col_lbl":       "Resultaat",
   "log.cases_instr":          "Sommige vakjes van de waarheidstafel ontbreken. Leid hun waarde af (0 of 1):",
   "log.table_instr":          "Vul de resultatenkolom van de waarheidstabel volledig in (0 of 1):",
   "log.cases_ok_title":       "Exact!",

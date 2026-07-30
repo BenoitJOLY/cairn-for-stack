@@ -71,7 +71,7 @@ function _cpxGenEnonce(scenario, op, letter) {
 }
 
 function _cpxGenFbgen(scenario, op, letter) {
-    var s = '<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">';
+    var s = '<div class="cpx-fbgen-box">';
     s += '<strong>' + I18N.t('tpl.cpx_correction_titre') + '</strong><br><br>';
 
     if (scenario === 'forme-alg') {

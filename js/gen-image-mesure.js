@@ -238,7 +238,7 @@ function immAddTarget(desc, val) {
     '</div></div>' +
     '</div>' +
     '<div class="field" style="margin-top:4px;"><label style="font-size:.8rem;">' + I18N.t('imm.type_mesure_lbl') + '</label>' +
-    '<select class="imm-t-type" onchange="var r=this.closest(\'.imm-target-row\');r.dataset.px=\'\';r.dataset.py=\'\';r.dataset.px2=\'\';r.dataset.py2=\'\';immUpdateOverlay();">' +
+    '<select class="imm-t-type" aria-label="' + I18N.t('imm.type_mesure_lbl') + '" onchange="var r=this.closest(\'.imm-target-row\');r.dataset.px=\'\';r.dataset.py=\'\';r.dataset.px2=\'\';r.dataset.py2=\'\';immUpdateOverlay();">' +
     '<option value="position">' + I18N.t('imm.type_position_opt') + '</option>' +
     '<option value="ecart">' + I18N.t('imm.type_ecart_opt') + '</option>' +
     '</select></div>';

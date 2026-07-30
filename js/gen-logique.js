@@ -85,10 +85,11 @@ function _lgGenFbBox(bodyHtml, I18N_arg) {
 
 // Table de vérité complète (toutes les lignes, même celles non demandées)
 // utilisée dans le feedback général pour montrer la solution intégrale.
-function _lgFullAnswerTable(vars, exprLatex, allRes) {
+function _lgFullAnswerTable(vars, exprLatex, allRes, I18N_arg) {
+    var resultLbl = (I18N_arg || I18N).t('log.result_col_lbl');
     var head = '<tr style="background:#f1f5f9;">';
     vars.forEach(function (v) { head += '<th style="border:1px solid #94a3b8;padding:8px 22px;">' + v + '</th>'; });
-    head += '<th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;">\\(' + exprLatex + '\\)</th></tr>';
+    head += '<th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;" aria-label="' + resultLbl + '"><span class="sr-only">' + resultLbl + '</span>\\(' + exprLatex + '\\)</th></tr>';
     var body = '';
     for (var i = 0; i < allRes.length; i++) {
         var vals = _lgBuildRow(i, vars);
@@ -112,10 +113,11 @@ function _lgCellInput(name, target) {
         + '<showvalidation>0</showvalidation><options></options></input>';
 }
 
-function _lgTableHeadRow(vars, colLabels) {
+function _lgTableHeadRow(vars, colLabels, I18N_arg) {
+    var resultLbl = (I18N_arg || I18N).t('log.result_col_lbl');
     var h = '<tr style="background:#ede9fe;">';
     vars.forEach(function (v) { h += '<th style="padding:4px 10px;border:1px solid #c4b5fd;">' + v + '</th>'; });
-    colLabels.forEach(function (c) { h += '<th style="padding:4px 10px;border:1px solid #c4b5fd;color:#7c3aed;">' + c + '</th>'; });
+    colLabels.forEach(function (c) { h += '<th style="padding:4px 10px;border:1px solid #c4b5fd;color:#7c3aed;" aria-label="' + resultLbl + '"><span class="sr-only">' + resultLbl + '</span>' + c + '</th>'; });
     return h + '</tr>';
 }
 
@@ -245,7 +247,7 @@ function genLogiqueCore(X, p, deps) {
         var items = [];
         var tbl = _lgMathBox(expr)
             + '<table style="border-collapse:collapse;font-family:monospace;">'
-            + '<thead>' + _lgTableHeadRow(vars, ['\\(' + _lgToLatex(expr) + '\\)']) + '</thead><tbody>';
+            + '<thead>' + _lgTableHeadRow(vars, ['\\(' + _lgToLatex(expr) + '\\)'], I18N_D) + '</thead><tbody>';
         for (var i = 0; i < nRows; i++) {
             var vals = _lgBuildRow(i, vars);
             var res = allRes[i];
@@ -299,7 +301,7 @@ function genLogiqueCore(X, p, deps) {
 
         var instrText = text || '<p>' + I18N_D.t(isCases ? 'log.cases_instr' : 'log.table_instr') + '</p>';
         questionText = HDR + instrText + tbl;
-        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes), I18N_D), fbGen));
+        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D('<p>' + I18N_D.t('log.table_genfb_expr', {expr: _lgToLatex(expr)}) + '</p>' + _lgFullAnswerTable(vars, _lgToLatex(expr), allRes, I18N_D), I18N_D), fbGen));
 
     } else if (scenario === 'identifier') {
         var choices = [
@@ -312,7 +314,7 @@ function genLogiqueCore(X, p, deps) {
         for (var ri2 = 0; ri2 < nRows; ri2++) allResI[ri2] = _lgEval(expr, _lgBuildRow(ri2, vars), vars);
 
         var tbl2 = '<table style="border-collapse:collapse;font-family:monospace;">'
-            + '<thead>' + _lgTableHeadRow(vars, ['?']) + '</thead><tbody>';
+            + '<thead>' + _lgTableHeadRow(vars, ['?'], I18N_D) + '</thead><tbody>';
         for (var i2 = 0; i2 < nRows; i2++) {
             var vals2 = _lgBuildRow(i2, vars);
             var res2 = allResI[i2];
@@ -356,7 +358,7 @@ function genLogiqueCore(X, p, deps) {
         var instrText2 = text || '<p>' + I18N_D.t('log.identifier_instr') + '</p>';
         questionText = HDR + instrText2 + tbl2
             + '<div style="text-align:center;margin:16px 0;"><p><strong>' + I18N_D.t('log.expr_correspondante_lbl') + '</strong></p>[[input:' + ansName + ']][[validation:' + ansName + ']]</div>';
-        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI), I18N_D), fbGen));
+        generalFeedback = applyFbBox_D('general', mkFbGen_D(lgGenFbBox_D(_lgFullAnswerTable(vars, _lgToLatex(expr), allResI, I18N_D), I18N_D), fbGen));
 
     } else if (scenario === 'equivalence') {
         var items3 = [];
@@ -364,7 +366,7 @@ function genLogiqueCore(X, p, deps) {
         var buildEqTable = function (exprX, tag) {
             var res = [];
             var t = '<table style="border-collapse:collapse;font-family:monospace;">'
-                + '<thead>' + _lgTableHeadRow(vars, ['\\(' + _lgToLatex(exprX) + '\\)']) + '</thead><tbody>';
+                + '<thead>' + _lgTableHeadRow(vars, ['\\(' + _lgToLatex(exprX) + '\\)'], I18N_D) + '</thead><tbody>';
             for (var i = 0; i < nRows; i++) {
                 var vals = _lgBuildRow(i, vars);
                 var r = _lgEval(exprX, vals, vars);

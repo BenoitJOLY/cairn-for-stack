@@ -11,7 +11,7 @@ function renderPreviewHTML_cw(state) {
         : '') +
       '</div>';
   } else {
-    gridHTML = '<p style="color:#94a3b8;font-style:italic;margin-bottom:12px;">G\xe9n\xe9rez la grille dans l\'onglet Config pour afficher l\'aper\xe7u.</p>';
+    gridHTML = '<p style="color:#475569;font-style:italic;margin-bottom:12px;">G\xe9n\xe9rez la grille dans l\'onglet Config pour afficher l\'aper\xe7u.</p>';
   }
 
   var defsHTML = '';
@@ -33,7 +33,7 @@ function renderPreviewHTML_cw(state) {
       state.rows.map(function(r){ return '<li><strong>' + (r.w||'').replace(/</g,'&lt;') + '</strong> — ' + (r.d||'') + '</li>'; }).join('') +
       '</ul>';
   } else {
-    defsHTML = '<p style="color:#94a3b8;font-style:italic;">Ajoutez des mots pour afficher l\'aper\xe7u.</p>';
+    defsHTML = '<p style="color:#475569;font-style:italic;">Ajoutez des mots pour afficher l\'aper\xe7u.</p>';
   }
 
   // Feedback général : grille complétée (styles inline pour l'iframe) + réponses
@@ -73,7 +73,7 @@ function renderPreviewHTML_cw(state) {
     }
   }
   if (!fbGenContent) {
-    fbGenContent = '<p style="color:#94a3b8;font-style:italic;">G\xe9n\xe9rez la grille pour afficher la solution.</p>';
+    fbGenContent = '<p style="color:#475569;font-style:italic;">G\xe9n\xe9rez la grille pour afficher la solution.</p>';
   }
 
   return _hsSimplePreviewHTML({

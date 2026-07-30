@@ -36,7 +36,7 @@ function cirEngineRun(cfg) {
   }
 
   function initApp() {
-    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-1, 7.5, 14.5, -1.5], axis: false, grid: false, showNavigation: false, showCopyright: false, keepaspectratio: true, pan: { enabled: false }, zoom: { enabled: false } });
+    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-1, 7.5, 14.5, -1.5], axis: false, grid: false, showNavigation: false, showCopyright: false, keepaspectratio: true, pan: { enabled: false }, zoom: { enabled: false }, title: 'Éditeur de circuit électrique', description: 'Grille interactive : cliquez sur un composant de la palette pour l\'ajouter, faites-le glisser pour le positionner, puis connectez ses bornes pour construire le circuit.' });
     function dataUri(svg) { return 'data:image/svg+xml,' + encodeURIComponent(svg); }
     function term(dx, dy, role, color) { return { dx: dx, dy: dy, role: role, color: color || '#6b7280' }; }
     function wrapSvg(innerBody, innerH, deg) { var canvas = Math.max(200, innerH); var dy = (canvas - innerH) / 2; var c = canvas / 2; return detag('#LT#svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + canvas + ' ' + canvas + '"#GT##LT#g transform="rotate(' + deg + ' ' + c + ' ' + c + ') translate(0 ' + dy + ')"#GT#') + innerBody + detag('#LT#/g#GT##LT#/svg#GT#'); }
@@ -635,6 +635,7 @@ function cirEngineRun(cfg) {
       var card = document.createElement('div');
       card.className = 'card';
       var img = document.createElement('img');
+      img.alt = '';
       var previewInner = cat.svg || cat.svgOff; if (!previewInner) { if (cat.states) { previewInner = cat.states[0].svg; } }
       img.src = dataUri(wrapSvg(previewInner, cat.innerH, 0));
       var span = document.createElement('span');

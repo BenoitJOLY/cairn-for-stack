@@ -464,7 +464,7 @@ function genAcideBaseCore(X, p, deps) {
             + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
             + '<span style="font-weight:bold;color:#1e3a5f;">Q' + X + ' Analyse :</span> Le pH à l\'équivalence est d\'environ ' + pHeq.toFixed(2)
             + '. La <strong>' + indLabel + '</strong> est l\'indicateur dont la zone de virage encadre ce pH. Le volume équivalent théorique est '
-            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">V_eq = ' + targetVol.toFixed(1) + ' mL</code>.</div></div>';
+            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code>.</div></div>';
 
     // ═══════════════════════════════════════════════════════════════
     //  MÉTHODE 2 — Méthode des tangentes (JSXGraph)
@@ -709,7 +709,7 @@ function genAcideBaseCore(X, p, deps) {
             + '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div>'
             + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
             + '<span style="font-weight:bold;color:#1e3a5f;">Q' + X + ' Méthode :</span> Tangentes aux points d\'inflexion de la pente et '
-            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">V_eq = ' + targetVol.toFixed(1) + ' mL</code></div></div>';
+            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code></div></div>';
     }
 
     var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);

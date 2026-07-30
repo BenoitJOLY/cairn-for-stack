@@ -29,9 +29,9 @@ function renderPreviewHTML_imageMesure(state) {
       : '<img src="' + imgEl.src + '" style="max-width:100%;border-radius:8px;">';
   } else if (hasImg) {
     exampleHTML = '<img src="' + imgEl.src + '" style="max-width:100%;border-radius:8px;">'
-      + '<p style="color:#94a3b8;font-style:italic;margin-top:6px;">Complétez l\'étalonnage (2 repères + valeurs) pour afficher le curseur JSXGraph interactif.</p>';
+      + '<p style="color:#475569;font-style:italic;margin-top:6px;">Complétez l\'étalonnage (2 repères + valeurs) pour afficher le curseur JSXGraph interactif.</p>';
   } else {
-    exampleHTML = '<p style="color:#94a3b8;font-style:italic;">Chargez une image dans l\'onglet Config pour afficher l\'aperçu.</p>';
+    exampleHTML = '<p style="color:#475569;font-style:italic;">Chargez une image dans l\'onglet Config pour afficher l\'aperçu.</p>';
   }
 
   // Feedback général réel : on appelle le vrai générateur (comme oscilloscope/basen/etc.)
@@ -56,10 +56,10 @@ function renderPreviewHTML_imageMesure(state) {
   }
   var fbGenAuto = realGeneralFeedback
     ? _hsRenderMath(realGeneralFeedback)
-    : '<p style="color:#94a3b8;font-style:italic;">Complétez l\'étalonnage et ajoutez au moins une cible mesurée pour afficher le feedback général réel.</p>';
+    : '<p style="color:#475569;font-style:italic;">Complétez l\'étalonnage et ajoutez au moins une cible mesurée pour afficher le feedback général réel.</p>';
 
   return _hsSimplePreviewHTML({
-    badge: I18N.t('badge.image_mesure'), badgeColor: '#0891b2', noteBg: '#ecfeff', noteColor: '#0e7490',
+    badge: I18N.t('badge.image_mesure'), badgeColor: '#0e7490', noteBg: '#ecfeff', noteColor: '#0e7490',
     prefix: 'imm', bareme: state.bareme || 2,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : mesure par proportionnalité sur une image (spectre, microscope, règle…).</em></p>'),
     exampleHTML: exampleHTML,

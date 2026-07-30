@@ -16,7 +16,7 @@ function renderPreviewHTML_ord(state) {
       + '</div>'
       + '</div>';
   } else {
-    listHTML = '<p style="color:#94a3b8;font-style:italic;">Ajoutez des éléments dans l\'onglet Config pour afficher l\'aperçu.</p>';
+    listHTML = '<p style="color:#475569;font-style:italic;">Ajoutez des éléments dans l\'onglet Config pour afficher l\'aperçu.</p>';
   }
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.ord'), badgeColor: '#be185d', noteBg: '#fdf2f8', noteColor: '#9d174d',

@@ -1937,6 +1937,7 @@ I18N.add("es", {
   "log.fbgen_auto_desc":     "La corrección (tabla de verdad, forma simplificada o equivalencia) se genera automáticamente en función del tipo de pregunta seleccionado en «Config».",
 
   "log.reponse_attendue_lbl": "🔑 Respuesta esperada",
+  "log.result_col_lbl":       "Resultado",
   "log.cases_instr":          "Faltan algunas casillas de la tabla de verdad. Deduzca su valor (0 o 1):",
   "log.table_instr":          "Rellena por completo la columna de resultados de la tabla de verdad (0 o 1):",
   "log.cases_ok_title":       "¡Exacto!",

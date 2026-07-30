@@ -1935,6 +1935,7 @@ I18N.add("en", {
   "log.fbgen_auto_desc":     "The correction (truth table, simplified form, or equivalence) is automatically generated based on the question type chosen in Config.",
 
   "log.reponse_attendue_lbl": "🔑 Expected answer",
+  "log.result_col_lbl":       "Result",
   "log.cases_instr":          "Some cells of the truth table are missing. Deduce their value (0 or 1):",
   "log.table_instr":          "Fully complete the result column of the truth table (0 or 1):",
   "log.cases_ok_title":       "Exact!",

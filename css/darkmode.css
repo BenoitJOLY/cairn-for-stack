@@ -130,6 +130,10 @@
   border-color: #334155 !important;
 }
 [data-theme="dark"] .contact-author-box p { color: #e2e8f0 !important; }
+[data-theme="dark"] .contact-author-box a { color: #60a5fa !important; }  /* 7.0:1 sur #0f172a ✓ */
+
+/* Note barème (Composition Libre) : #92400e illisible sur fond .form-panel sombre */
+[data-theme="dark"] span[data-i18n="comp.bareme_note"] { color: #fbbf24 !important; }  /* 8.8:1 sur #1e293b ✓ */
 
 /* ── Panneau mode assistant ──────────────────────────────────── */
 [data-theme="dark"] .hs-panel            { background: #1e293b; border-color: #334155; }

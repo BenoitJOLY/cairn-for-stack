@@ -421,7 +421,7 @@ function renderPreviewHTML_redox(state) {
     <div data-rx-field="fbc">${wrapFb(_hsRenderMath(state.fbOk || '✅ <strong>Bonne réponse !</strong>'), true)}</div>
     <div data-rx-field="fbe">${wrapFb(_hsRenderMath(state.fbWrong || '❌ <strong>Réponse incorrecte.</strong>'), false)}</div>`;
 
-  const fbGenHTML = `<div class="hs-clickable" data-rx-field="fbgen" style="border-left:4px solid #b91c1c;padding:10px 14px;background:#fee2e2;border-radius:4px;margin:4px 0;">${state.fbGen ? _hsRenderMath(state.fbGen) : '<span style="color:#94a3b8;">' + I18N.t('common.preview_no_general_fb') + '</span>'}</div>`;
+  const fbGenHTML = `<div class="hs-clickable" data-rx-field="fbgen" style="border-left:4px solid #b91c1c;padding:10px 14px;background:#fee2e2;border-radius:4px;margin:4px 0;">${state.fbGen ? _hsRenderMath(state.fbGen) : '<span style="color:#475569;">' + I18N.t('common.preview_no_general_fb') + '</span>'}</div>`;
 
   let focusFbGen = false;
   try { focusFbGen = document.querySelector('#fp-redox .mpane.on') && document.querySelector('#fp-redox .mpane.on').id === 'rx-fb-gen'; } catch (e) {}
@@ -688,7 +688,7 @@ function renderPreviewHTML_physique(state) {
   var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
   var bodyFrag = (realParts.textFrag || '')
     .replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
-    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled style="' + fakeInputStyle + '">')
+    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled aria-hidden="true" style="' + fakeInputStyle + '">')
     .replace(/\[\[validation:[^\]]+\]\]/g, '');
   var scenarioHTML = bodyFrag ? _calcTokenizeForPreview(bodyFrag, knownVars)
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
@@ -808,7 +808,7 @@ function renderPreviewHTML_acideBase(state) {
   var bodyFrag = (realParts.textFrag || '')
     .replace(/\[\[iframe[\s\S]*?\[\[\/iframe\]\]/, '<!--HS-AB-GRAPHIC-->')
     .replace(/\[\[jsxgraph[\s\S]*?\[\[\/jsxgraph\]\]/, '<!--HS-AB-GRAPHIC-->')
-    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled style="' + fakeInputStyle + '">')
+    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled aria-hidden="true" style="' + fakeInputStyle + '">')
     .replace(/\[\[validation:[^\]]+\]\]/g, '');
   var scenarioParts = bodyFrag.split('<!--HS-AB-GRAPHIC-->');
   var textBefore = scenarioParts[0] ? _hsRenderMath(scenarioParts[0]) : '<p><em>Énoncé automatique : titrage pH-métrique.</em></p>';
@@ -851,7 +851,7 @@ function renderPreviewHTML_acideBase(state) {
   exampleHTML = '<div style="background:#fef9c3;border:1px solid #eab308;color:#713f12;font-size:.78rem;padding:6px 10px;border-radius:6px;margin-bottom:10px;">⚠️ Aperçu — la simulation ci-dessous est visuelle uniquement : les interactions (clics, glisser, saisie) ne sont pas prises en compte dans le calcul du score ici. La correction réelle se fait dans Moodle.</div>' + exampleHTML;
 
   return _hsSimplePreviewHTML({
-    badge: I18N.t('type.acide-base'), badgeColor: '#16a34a', noteBg: '#d1fae5', noteColor: '#065f46',
+    badge: I18N.t('type.acide-base'), badgeColor: '#15803d', noteBg: '#d1fae5', noteColor: '#065f46',
     prefix: 'ab', bareme: state.bareme || 1,
     text: textBefore,
     exampleLabel: '',
@@ -906,10 +906,10 @@ window.rvbRefreshPreview = _hsWireSimplePreview('rvbcmj', 'rvb', 'rvb-preview-co
 
 function renderPreviewHTML_optique(state) {
   return _hsSimplePreviewHTML({
-    badge: I18N.t('type.optique'), badgeColor: '#0284c7', noteBg: '#f0f9ff', noteColor: '#0c4a6e',
+    badge: I18N.t('type.optique'), badgeColor: '#0369a1', noteBg: '#f0f9ff', noteColor: '#0c4a6e',
     prefix: 'opt', bareme: state.bareme || 1,
     text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : construction géométrique (lentille, miroir ou instrument optique).</em></p>'),
-    exampleHTML: '<p style="color:#94a3b8;font-style:italic;">Le schéma interactif JSXGraph n\'est visible que dans l\'export Moodle final.</p>',
+    exampleHTML: '<p style="color:#475569;font-style:italic;">Le schéma interactif JSXGraph n\'est visible que dans l\'export Moodle final.</p>',
     fbOk: state.fbOk, fbWrong: state.fbWrong, fbGen: state.fbGen
   });
 }
@@ -1018,7 +1018,7 @@ function renderPreviewHTML_oscilloscope(state) {
   var consigneHTML = consigneMatch ? consigneMatch[1] : '';
   var afterJsx = rawTextFrag.split(/<!--HS-KBD:\d+-->/).slice(1).join('');
   var questionsHTML = afterJsx
-    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled style="' + fakeInputStyle + '">')
+    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled aria-hidden="true" style="' + fakeInputStyle + '">')
     .replace(/\[\[validation:[^\]]+\]\]/g, '')
     .replace(/\[\[feedback:[^\]]+\]\]/g, '');
   var questionsBlockHTML = _hsRenderMath(_oscTokenizeStack(consigneHTML + questionsHTML));
@@ -1181,12 +1181,12 @@ function renderPreviewHTML_nuclear(state) {
   // affiche une zone d'édition VIDE avec la même barre d'outils de particules —
   // donc l'aperçu doit mimer cette interface vide, pas la réponse (même logique que
   // renderPreviewHTML_chemical, cf. exampleHTML).
-  var nucIsotopeChip = '<span style="background:#2980b9;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;display:inline-flex;align-items:center;gap:1px;">'
+  var nucIsotopeChip = '<span style="background:#0369a1;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;display:inline-flex;align-items:center;gap:1px;">'
     + '<span style="display:inline-flex;flex-direction:column;line-height:.75;font-size:.7em;text-align:left;"><span>A</span><span>Z</span></span>X</span>';
   var nucChips = nucIsotopeChip + [
-    ['+', '#7f8c8d'], ['→', '#7f8c8d'], ['*', '#8e44ad'],
-    ['α', '#c0392b'], ['γ', '#27ae60'], ['β⁻', '#e67e22'], ['β⁺', '#e67e22'],
-    ['e⁺', '#d35400'], ['e⁻', '#8e44ad'], ['n', '#f39c12'], ['p', '#e74c3c'], ['ν', '#7f8c8d']
+    ['+', '#475569'], ['→', '#475569'], ['*', '#8e44ad'],
+    ['α', '#c0392b'], ['γ', '#15803d'], ['β⁻', '#b45309'], ['β⁺', '#b45309'],
+    ['e⁺', '#9a3412'], ['e⁻', '#8e44ad'], ['n', '#92400e'], ['p', '#b91c1c'], ['ν', '#475569']
   ].map(function(c) { return '<span style="background:' + c[1] + ';color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">' + c[0] + '</span>'; }).join('');
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.nuclear'), badgeColor: '#5b21b6', noteBg: '#f5f3ff', noteColor: '#5b21b6',
@@ -1195,7 +1195,7 @@ function renderPreviewHTML_nuclear(state) {
     exampleLabel: 'Ce que voit l\'élève (zone de saisie vide, il compose sa propre réaction) :',
     exampleHTML: '<div style="text-align:left;">'
       + '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">' + nucChips + '</div>'
-      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#94a3b8;font-style:italic;">(l\'élève écrit ici sa réaction — aucune réaction n\'est pré-remplie)</div>'
+      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#64748b;font-style:italic;">(l\'élève écrit ici sa réaction — aucune réaction n\'est pré-remplie)</div>'
       + '</div>',
     fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
     fbOk: prtBoxes.okFb, fbWrong: prtBoxes.wrongFb,

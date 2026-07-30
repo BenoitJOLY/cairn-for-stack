@@ -390,8 +390,8 @@ function buildOscJSXCode_Retard(cfg){
   + 'ctrl.appendChild(mkB("\\u25BC","#dc2626",function(){ypB=Math.max(-4,parseFloat((ypB-0.5).toFixed(1)));bd.update();}));\n'
   + 'ctrl.appendChild(mkB("\\u25B2","#dc2626",function(){ypB=Math.min(4,parseFloat((ypB+0.5).toFixed(1)));bd.update();}));\n'
   + 'var spacer=document.createElement("div"); spacer.style.cssText="flex-grow:1;"; ctrl.appendChild(spacer);\n'
-  + 'ctrl.appendChild(mkB("X","#a855f7",function(){ toggleGroup(purpleGroup); }));\n'
-  + 'ctrl.appendChild(mkB("V","#ef4444",function(){ toggleGroup(redGroup); }));\n'
+  + 'ctrl.appendChild(mkB("X","#7c3aed",function(){ toggleGroup(purpleGroup); }));\n'
+  + 'ctrl.appendChild(mkB("V","#b91c1c",function(){ toggleGroup(redGroup); }));\n'
   + _oscMountCtrlJS()
   + 'var _ou=bd.update.bind(bd);\n'
   + 'bd.update=function(){\n  _ou();\n  lblVA.textContent=fV(SV_A());\n  lblVB.textContent=fV(SV_B());\n  lblT.textContent=fT(SH());\n};\n'
