@@ -57,7 +57,7 @@ function renderPreviewHTML_basen(state) {
       .replace(/\[\[feedback:[^\]]+\]\]/g, '');
     scenarioHTML = bodyFrag ? _calcTokenizeForPreview(bodyFrag, knownVars)
       : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
-    var note = '<p><em style="color:#475569;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
+    var note = '<p><em style="color:#475569;font-size:.82rem;">' + I18N.t('common.preview_maxima_vars_note') + '</em></p>';
     fbGenBody = _calcTokenizeForPreview(realGeneralFeedback, knownVars) + note;
   }
   return _hsSimplePreviewHTML({

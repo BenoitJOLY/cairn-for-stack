@@ -146,15 +146,15 @@ q${X}_err_origine:abs(sqrt(q${X}_xb^2+q${X}_yb^2+q${X}_zb^2)-sqrt(q${X}_xa^2+q${
             inputXML = mkInput_D({ name: `ans_dist${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
 
             var specsDist = [
-                { description: 'Réponse correcte (tolérance arrondi)', answertest: 'NumAbsolute', sans: `ans_dist${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
+                { description: I18N_D.t('geo.node_reponse_correcte_tol'), answertest: 'NumAbsolute', sans: `ans_dist${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
                     feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.dist_ok_desc')}`) },
-                { description: "Erreur : a oublié la racine carrée", sans: `ans_dist${X}`, tans: `q${X}_err_nosqrt`, score: 0,
+                { description: I18N_D.t('geo.node_err_racine'), sans: `ans_dist${X}`, tans: `q${X}_err_nosqrt`, score: 0,
                     feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.oubli_racine_title')}</strong> ${I18N_D.t('geo.dist_racine_desc')}`) },
-                { description: 'Erreur : distance de Manhattan (somme des écarts)', sans: `ans_dist${X}`, tans: `q${X}_err_manhattan`, score: 0,
+                { description: I18N_D.t('geo.node_err_manhattan_dist'), sans: `ans_dist${X}`, tans: `q${X}_err_manhattan`, score: 0,
                     feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.mauvaise_formule_title')}</strong> ${I18N_D.t('geo.dist_manhattan_desc')}`) },
-                { description: "Erreur : soustraction des distances à l'origine", sans: `ans_dist${X}`, tans: `q${X}_err_origine`, score: 0,
+                { description: I18N_D.t('geo.node_err_origine'), sans: `ans_dist${X}`, tans: `q${X}_err_origine`, score: 0,
                     feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.erreur_methode_title')}</strong> ${I18N_D.t('geo.dist_origine_desc')}`) },
-                { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+                { description: I18N_D.t('geo.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                     feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.dist_fallback_desc', {zterm: d3dm ? '+(z_B-z_A)^2' : ''})}`) }
             ];
             diagNodes = _geoDiagNodes(specsDist);
@@ -188,15 +188,15 @@ q${X}_err_nodiv:${errNodiv};`;
             inputXML = mkInput_D({ name: `ans_mid${X}`, tans: `q${X}_ta`, type: 'matrix', boxsize: 15, hint: hintMid, mustverify: 0, showvalidation: 2 });
 
             var specsMid = [
-                { description: 'Réponse correcte', sans: `ans_mid${X}`, tans: `q${X}_ta`, score: 1,
+                { description: I18N_D.t('geo.node_reponse_correcte'), sans: `ans_mid${X}`, tans: `q${X}_ta`, score: 1,
                     feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.milieu_ok_desc')}`) },
-                { description: 'Erreur : inversion de x et y', sans: `ans_mid${X}`, tans: `q${X}_err_swap`, score: 0,
+                { description: I18N_D.t('geo.node_err_swap_xy'), sans: `ans_mid${X}`, tans: `q${X}_err_swap`, score: 0,
                     feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.milieu_swap_title')}</strong> ${I18N_D.t('geo.milieu_swap_desc')}`) },
-                { description: 'Erreur : différence au lieu de la somme', sans: `ans_mid${X}`, tans: `q${X}_err_diff`, score: 0,
+                { description: I18N_D.t('geo.node_err_diff'), sans: `ans_mid${X}`, tans: `q${X}_err_diff`, score: 0,
                     feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.erreur_signe_title')}</strong> ${I18N_D.t('geo.milieu_diff_desc')}`) },
-                { description: 'Erreur : oubli de la division par 2 sur la dernière coordonnée', sans: `ans_mid${X}`, tans: `q${X}_err_nodiv`, score: 0,
+                { description: I18N_D.t('geo.node_err_nodiv'), sans: `ans_mid${X}`, tans: `q${X}_err_nodiv`, score: 0,
                     feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.calcul_incomplet_title')}</strong> ${I18N_D.t('geo.milieu_nodiv_desc')}`) },
-                { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+                { description: I18N_D.t('geo.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                     feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.milieu_fallback_desc', {zterm: d3dm ? '\\;;\\;\\frac{z_A+z_B}{2}' : ''})}`) }
             ];
             diagNodes = _geoDiagNodes(specsMid);
@@ -236,15 +236,15 @@ q${X}_err_sub:${d3n ? `sqrt(abs(q${X}_ux^2+q${X}_uy^2-q${X}_uz^2))` : `sqrt(abs(
         inputXML = mkInput_D({ name: `ans_norm${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
 
         var specsNorm = [
-            { description: 'Réponse correcte (tolérance arrondi)', answertest: 'NumAbsolute', sans: `ans_norm${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
+            { description: I18N_D.t('geo.node_reponse_correcte_tol'), answertest: 'NumAbsolute', sans: `ans_norm${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
                 feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.norme_ok_desc')}`) },
-            { description: "Erreur : a oublié la racine carrée", sans: `ans_norm${X}`, tans: `q${X}_err_nosqrt`, score: 0,
+            { description: I18N_D.t('geo.node_err_racine'), sans: `ans_norm${X}`, tans: `q${X}_err_nosqrt`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.oubli_racine_title')}</strong> ${I18N_D.t('geo.norme_racine_desc')}`) },
-            { description: 'Erreur : somme des valeurs absolues', sans: `ans_norm${X}`, tans: `q${X}_err_manhattan`, score: 0,
+            { description: I18N_D.t('geo.node_err_manhattan_norm'), sans: `ans_norm${X}`, tans: `q${X}_err_manhattan`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.mauvaise_formule_title')}</strong> ${I18N_D.t('geo.norme_manhattan_desc')}`) },
-            { description: 'Erreur : soustraction des carrés sous la racine', sans: `ans_norm${X}`, tans: `q${X}_err_sub`, score: 0,
+            { description: I18N_D.t('geo.node_err_sub_carres'), sans: `ans_norm${X}`, tans: `q${X}_err_sub`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.norme_sub_title')}</strong> ${I18N_D.t('geo.norme_sub_desc')}`) },
-            { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('geo.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.norme_fallback_desc', {zterm: d3n ? '+z^2' : ''})}`) }
         ];
         diagNodes = _geoDiagNodes(specsNorm);
@@ -282,15 +282,15 @@ q${X}_err_moins:-q${X}_b/q${X}_a;`;
         inputXML = mkInput_D({ name: `ans_pente${X}`, tans: `q${X}_ta`, type: 'algebraic', boxsize: 10, forbidfloat: 1, mustverify: 0, showvalidation: 2 });
 
         var specsPente = [
-            { description: 'Réponse correcte', sans: `ans_pente${X}`, tans: `q${X}_ta`, score: 1,
+            { description: I18N_D.t('geo.node_reponse_correcte'), sans: `ans_pente${X}`, tans: `q${X}_ta`, score: 1,
                 feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.pente_ok_desc')}`) },
-            { description: 'Erreur : fraction inversée', sans: `ans_pente${X}`, tans: `q${X}_err_inv`, score: 0,
+            { description: I18N_D.t('geo.node_err_fraction_inv'), sans: `ans_pente${X}`, tans: `q${X}_err_inv`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.pente_inv_title')}</strong> ${I18N_D.t('geo.pente_inv_desc')}`) },
-            { description: 'Erreur : a utilisé la composante z', sans: `ans_pente${X}`, tans: `q${X}_err_z`, score: 0,
+            { description: I18N_D.t('geo.node_err_compo_z'), sans: `ans_pente${X}`, tans: `q${X}_err_z`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.pente_z_title')}</strong> ${I18N_D.t('geo.pente_z_desc')}`) },
-            { description: 'Erreur : erreur de signe', sans: `ans_pente${X}`, tans: `q${X}_err_moins`, score: 0,
+            { description: I18N_D.t('geo.node_err_signe'), sans: `ans_pente${X}`, tans: `q${X}_err_moins`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.erreur_signe_title')}</strong> ${I18N_D.t('geo.pente_moins_desc')}`) },
-            { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('geo.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.pente_fallback_desc')}`) }
         ];
         diagNodes = _geoDiagNodes(specsPente);
@@ -325,17 +325,17 @@ q${X}_err_absc:-q${X}_c/q${X}_a;`;
         inputXML = mkInput_D({ name: `ans_oao${X}`, tans: `q${X}_ta`, type: 'algebraic', boxsize: 10, forbidfloat: 1, mustverify: 0, showvalidation: 2 });
 
         var specsOao = [
-            { description: 'Réponse correcte', sans: `ans_oao${X}`, tans: `q${X}_ta`, score: 1,
+            { description: I18N_D.t('geo.node_reponse_correcte'), sans: `ans_oao${X}`, tans: `q${X}_ta`, score: 1,
                 feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.ordonnee_ok_desc')}`) },
-            { description: 'Erreur : a juste lu la constante c', sans: `ans_oao${X}`, tans: `q${X}_err_const`, score: 0,
+            { description: I18N_D.t('geo.node_err_const_c'), sans: `ans_oao${X}`, tans: `q${X}_err_const`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.ordonnee_const_title')}</strong> ${I18N_D.t('geo.ordonnee_const_desc')}`) },
-            { description: 'Erreur : oubli du signe moins', sans: `ans_oao${X}`, tans: `q${X}_err_sansmoins`, score: 0,
+            { description: I18N_D.t('geo.node_err_sans_moins'), sans: `ans_oao${X}`, tans: `q${X}_err_sansmoins`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.erreur_signe_title')}</strong> ${I18N_D.t('geo.ordonnee_sansmoins_desc')}`) },
-            { description: 'Erreur : a calculé le coefficient directeur', sans: `ans_oao${X}`, tans: `q${X}_err_pente`, score: 0,
+            { description: I18N_D.t('geo.node_err_pente'), sans: `ans_oao${X}`, tans: `q${X}_err_pente`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.ordonnee_pente_title')}</strong> ${I18N_D.t('geo.ordonnee_pente_desc')}`) },
-            { description: "Erreur : a calculé l'abscisse à l'origine", sans: `ans_oao${X}`, tans: `q${X}_err_absc`, score: 0,
+            { description: I18N_D.t('geo.node_err_absc'), sans: `ans_oao${X}`, tans: `q${X}_err_absc`, score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.ordonnee_axe_title')}</strong> ${I18N_D.t('geo.ordonnee_axe_desc')}`) },
-            { description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('geo.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('geo.ordonnee_fallback_desc')}`) }
         ];
         diagNodes = _geoDiagNodes(specsOao);
@@ -387,18 +387,18 @@ q${X}_err_2d:round(float(q${X}_aire2d)*100)/100;`;
         inputXML = mkInput_D({ name: `ans_aire${X}`, tans: `q${X}_ta`, type: 'numerical', boxsize: 10, forbidfloat: 0, mustverify: 0, showvalidation: 2 });
 
         var specsAire = [
-            { description: 'Réponse correcte', answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
+            { description: I18N_D.t('geo.node_reponse_correcte'), answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_ta`, testoptions: '0.005', score: 1,
                 feedback: fbOk || _geoBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('geo.aire_ok_desc')}`) },
-            { description: 'Erreur : aire du parallélogramme (oubli du /2)', answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_para`, testoptions: '0.005', score: 0,
+            { description: I18N_D.t('geo.node_err_para'), answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_para`, testoptions: '0.005', score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.aire_para_title')}</strong> ${I18N_D.t('geo.aire_para_desc')}`) },
-            { description: 'Erreur : a oublié la racine carrée', answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_norac`, testoptions: '0.005', score: 0,
+            { description: I18N_D.t('geo.node_err_racine'), answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_norac`, testoptions: '0.005', score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.oubli_racine_title')}</strong> ${I18N_D.t('geo.aire_norac_desc')}`) }
         ];
         if (d3a) {
-            specsAire.push({ description: "Erreur : a calculé l'aire en 2D (projection)", answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_2d`, testoptions: '0.005', score: 0,
+            specsAire.push({ description: I18N_D.t('geo.node_err_2d'), answertest: 'NumAbsolute', sans: `ans_aire${X}`, tans: `q${X}_err_2d`, testoptions: '0.005', score: 0,
                 feedback: _geoBox('warn', `<strong>${I18N_D.t('geo.aire_2d_title')}</strong> ${I18N_D.t('geo.aire_2d_desc')}`) });
         }
-        specsAire.push({ description: 'Erreur générique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+        specsAire.push({ description: I18N_D.t('geo.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
             feedback: fbWrong || _geoBox('bad', `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${d3a ? I18N_D.t('geo.aire_fallback_3d_desc') : I18N_D.t('geo.aire_fallback_2d_desc')}`) });
         diagNodes = _geoDiagNodes(specsAire);
         var builtAire = geoSeqPrt_D(X, bareme, specsAire, deps);

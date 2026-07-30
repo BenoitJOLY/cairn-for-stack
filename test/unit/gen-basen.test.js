@@ -126,10 +126,11 @@ test('fbOk/fbWrong personnalisés remplacent le feedback du nœud correct/final'
     assert.equal(q.prt.nodes[q.prt.nodes.length - 1].truefeedback, 'Perdu');
 });
 
-test('le nœud correct porte le barème complet, les autres 0', () => {
+test('scores en fraction de 1 (indépendants du barème) : correct=1, presque-correct=0.5, faux=0', () => {
     const q = genBasenCore(1, baseParams({ bareme: 3, toBase: 2 }), DEPS);
-    assert.equal(q.prt.nodes[0].truescore, '3');
-    assert.equal(q.prt.nodes[1].truescore, '0');
+    assert.equal(q.prt.nodes[0].truescore, '1');
+    assert.equal(q.prt.nodes[1].truescore, '0.5');
+    assert.equal(q.prt.nodes[2].truescore, '0');
 });
 
 test('diagNodes expose les nœuds de diagnostic intermédiaires (hors "réponse exacte")', () => {

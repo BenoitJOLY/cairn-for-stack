@@ -13,7 +13,7 @@ function renderPreviewHTML_calcul(state) {
   var scenarioHTML = bodyFrag
     ? _calcTokenizeForPreview(bodyFrag, knownVars)
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement par Maxima (valeurs al\xe9atoires internes \xe0 chaque affichage) — voir l\'aper\xe7u \xe9l\xe8ve ci-dessous pour un exemple concret.</em>';
-  var note = '<p><em style="color:#475569;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es par Maxima \xe0 l\'affichage r\xe9el (tirage al\xe9atoire ou calcul symbolique) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es dans l\'exercice (valeurs fixes, expression saisie, bornes) sont affich\xe9es directement ci-dessus.</em></p>';
+  var note = '<p><em style="color:#475569;font-size:.82rem;">' + I18N.t('calc.preview_maxima_vars_note') + '</em></p>';
   return _hsSimplePreviewHTML({
     badge: I18N.t('badge.calcul'), badgeColor: '#4338ca', noteBg: '#eef2ff', noteColor: '#4338ca',
     prefix: 'calc', bareme: state.bareme || 1,

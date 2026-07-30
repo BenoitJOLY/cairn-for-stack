@@ -61,21 +61,21 @@ function _cpxSubst(text, pmap) {
 
 function _cpxInputRowHTML(scenario) {
   if (scenario === 'module-arg') {
-    return '<p>\\(|z|=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Module de z"></p>'
-         + '<p>\\(\\arg(z)=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Argument de z"></p>';
+    return '<p>\\(|z|=\\) <input class="hs-cpx-input" type="text" disabled aria-label="' + I18N.t('cpx.aria_module') + '"></p>'
+         + '<p>\\(\\arg(z)=\\) <input class="hs-cpx-input" type="text" disabled aria-label="' + I18N.t('cpx.aria_argument') + '"></p>';
   }
   if (scenario === 'equation-2deg') {
-    return '<p>\\(z_1=\\) <input class="hs-cpx-input" type="text" disabled aria-label="z1"></p>'
-         + '<p>\\(z_2=\\) <input class="hs-cpx-input" type="text" disabled aria-label="z2"></p>';
+    return '<p>\\(z_1=\\) <input class="hs-cpx-input" type="text" disabled aria-label="' + I18N.t('cpx.aria_z1') + '"></p>'
+         + '<p>\\(z_2=\\) <input class="hs-cpx-input" type="text" disabled aria-label="' + I18N.t('cpx.aria_z2') + '"></p>';
   }
   if (scenario === 'affixes') {
-    return '<p>\\(z_I=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Affixe du point I"></p>'
-         + '<p>\\(AB=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Distance AB"></p>';
+    return '<p>\\(z_I=\\) <input class="hs-cpx-input" type="text" disabled aria-label="' + I18N.t('cpx.aria_milieu_point_i') + '"></p>'
+         + '<p>\\(AB=\\) <input class="hs-cpx-input" type="text" disabled aria-label="' + I18N.t('cpx.aria_distance_ab') + '"></p>';
   }
   if (scenario === 'conjugue') {
-    return '<p>\\(\\bar{z}=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Conjugué de z"></p>';
+    return '<p>\\(\\bar{z}=\\) <input class="hs-cpx-input" type="text" disabled aria-label="' + I18N.t('cpx.aria_conjugue') + '"></p>';
   }
-  return '<p>\\(z=\\) <input class="hs-cpx-input" type="text" disabled aria-label="z"></p>';
+  return '<p>\\(z=\\) <input class="hs-cpx-input" type="text" disabled aria-label="' + I18N.t('cpx.aria_z') + '"></p>';
 }
 
 function renderPreviewHTML_complexe(state) {
@@ -83,11 +83,11 @@ function renderPreviewHTML_complexe(state) {
   const scenario = state.scenario || 'forme-alg';
   const mode = state.mode || 'fixe';
   const scenarioLabels = {
-    'forme-alg': 'Forme algébrique',
-    'module-arg': 'Module et argument',
-    'equation-2deg': 'Équation z² + bz + c = 0',
-    'affixes': 'Milieu et distance (affixes)',
-    'conjugue': 'Conjugué'
+    'forme-alg': I18N.t('cpx.preview_scenario_forme_alg'),
+    'module-arg': I18N.t('cpx.preview_scenario_module_arg'),
+    'equation-2deg': I18N.t('cpx.preview_scenario_equation'),
+    'affixes': I18N.t('cpx.preview_scenario_affixes'),
+    'conjugue': I18N.t('cpx.preview_scenario_conjugue')
   };
 
   const pmap = _cpxBuildPmap(state);

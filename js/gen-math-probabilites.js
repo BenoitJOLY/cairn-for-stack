@@ -160,9 +160,9 @@ q${X}_ta:binomial(q${X}_n,q${X}_k);`;
         inputXML = mkInput_D({name:`ans_ck${X}`,tans:`q${X}_ta`,boxsize:10,forbidfloat:1,mustverify:0,showvalidation:2});
 
         var specsComb = [
-            { description: 'C(n,k) correct ?', sans: `ans_ck${X}`, tans: `q${X}_ta`, score: 1,
+            { description: I18N_D.t('prob.node_cnk'), sans: `ans_ck${X}`, tans: `q${X}_ta`, score: 1,
                 feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k', tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsComb);
@@ -186,13 +186,13 @@ q${X}_err_nocoef:q${X}_p^q${X}_k*q${X}_q^(q${X}_n-q${X}_k);`;
         inputXML = mkInput_D({name:`ans_prob${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsBinom = [
-            { description: 'P(X=k) correct ?', sans: `ans_prob${X}`, tans: `q${X}_ta`, score: 1,
+            { description: I18N_D.t('prob.node_pxk'), sans: `ans_prob${X}`, tans: `q${X}_ta`, score: 1,
                 feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: 'Erreur : p et (1-p) invers\xe9s', sans: `ans_prob${X}`, tans: `q${X}_err_swap`, score: 0,
+            { description: I18N_D.t('prob.node_err_p_inverse'), sans: `ans_prob${X}`, tans: `q${X}_err_swap`, score: 0,
                 feedback: _probBox('warn', I18N_D.t('prob.err_p_inverse', {pvar:'q'+X+'_p'})) },
-            { description: 'Erreur : oubli du coefficient binomial', sans: `ans_prob${X}`, tans: `q${X}_err_nocoef`, score: 0,
+            { description: I18N_D.t('prob.node_err_oubli_coef'), sans: `ans_prob${X}`, tans: `q${X}_err_nocoef`, score: 0,
                 feedback: _probBox('warn', I18N_D.t('prob.err_oubli_coef')) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_pk', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsBinom);
@@ -212,9 +212,9 @@ q${X}_ta:q${X}_n*q${X}_p;`;
         inputXML = mkInput_D({name:`ans_ex${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsEsp = [
-            { description: 'E(X) correct ?', sans: `ans_ex${X}`, tans: `q${X}_ta`, score: 1,
+            { description: I18N_D.t('prob.node_ex'), sans: `ans_ex${X}`, tans: `q${X}_ta`, score: 1,
                 feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_esp', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsEsp);
@@ -235,9 +235,9 @@ q${X}_ta:q${X}_n*q${X}_p*q${X}_q;`;
         inputXML = mkInput_D({name:`ans_vx${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsVar = [
-            { description: 'V(X) correct ?', sans: `ans_vx${X}`, tans: `q${X}_ta`, score: 1,
+            { description: I18N_D.t('prob.node_vx'), sans: `ans_vx${X}`, tans: `q${X}_ta`, score: 1,
                 feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_var', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsVar);
@@ -262,9 +262,9 @@ q${X}_ta:q${X}_pAD/q${X}_pD;`;
         inputXML = mkInput_D({name:`ans_cond${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsCond = [
-            { description: 'P(A|D) correct ?', sans: `ans_cond${X}`, tans: `q${X}_ta`, score: 1,
+            { description: I18N_D.t('prob.node_cond'), sans: `ans_cond${X}`, tans: `q${X}_ta`, score: 1,
                 feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_cond', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsCond);
@@ -286,9 +286,9 @@ q${X}_ta:q${X}_pA+q${X}_pB-q${X}_pI;`;
         inputXML = mkInput_D({name:`ans_union${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsUnion = [
-            { description: 'P(A∪B) correct ?', sans: `ans_union${X}`, tans: `q${X}_ta`, score: 1,
+            { description: I18N_D.t('prob.node_union'), sans: `ans_union${X}`, tans: `q${X}_ta`, score: 1,
                 feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_union', {tavar:'q'+X+'_ta'})) }
         ];
         diagNodes = _probDiagNodes(specsUnion);

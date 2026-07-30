@@ -25,7 +25,7 @@ function renderPreviewHTML_string(state) {
   const fbGlobalHTML = `
     <div data-str-field="fbc">${wrapFb(_hsRenderMath(state.fbc || ''), true)}</div>
     <div data-str-field="fbe">${wrapFb(_hsRenderMath(state.fbe || ''), false)}</div>
-    ${state.sol ? `<div class="hs-clickable" data-str-field="sol" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin-top:8px;"><strong>Solution :</strong> ${_hsRenderMath(state.sol)}</div>` : ''}`;
+    ${state.sol ? `<div class="hs-clickable" data-str-field="sol" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin-top:8px;"><strong>${I18N.t('str.preview_solution')}</strong> ${_hsRenderMath(state.sol)}</div>` : ''}`;
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -55,7 +55,7 @@ function renderPreviewHTML_string(state) {
   </div>
   <div class="hs-preview-text" data-str-field="text">${text}</div>
   ${paletteHTML}
-  <input class="hs-str-input" type="text" disabled size="${size}" placeholder="Réponse de l'élève…">
+  <input class="hs-str-input" type="text" disabled size="${size}" placeholder="${I18N.t('common.preview_student_placeholder')}">
   <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
   <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>

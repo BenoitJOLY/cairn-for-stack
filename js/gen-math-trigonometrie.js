@@ -72,7 +72,7 @@ q${X}_ta:${fn}(${angle});`;
 <div style="text-align:center;margin:15px 0;font-size:1.2rem;">\\( {@q${X}_fname@}\\left({@q${X}_angle@}\\right) \\)</div>
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_trig${X}]] [[validation:ans_trig${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_trig${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
-        canonicalNodes = [trigNode('Valeur exacte correcte ?', `ans_trig${X}`, `q${X}_ta`,
+        canonicalNodes = [trigNode(I18N_D.t('trig.node_valeur_exacte'), `ans_trig${X}`, `q${X}_ta`,
             `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_cercle_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).</div>`;
 
@@ -86,7 +86,7 @@ q${X}_ta:trigreduce(trigsimp(q${X}_expr));`;
 <div style="text-align:center;margin:15px 0;">\\( {@q${X}_expr@} \\)</div>
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_simp${X}]] [[validation:ans_simp${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_simp${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
-        canonicalNodes = [trigNode('Simplification correcte ?', `ans_simp${X}`, `q${X}_ta`,
+        canonicalNodes = [trigNode(I18N_D.t('trig.node_simplification'), `ans_simp${X}`, `q${X}_ta`,
             `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\).</div>`;
 
@@ -104,7 +104,7 @@ q${X}_ta:if q${X}_r_func=0 then sin(q${X}_angle) elseif q${X}_r_func=1 then cos(
 <div style="text-align:center;margin:15px 0;font-size:1.2rem;">\\( {@q${X}_fname@}\\left({@q${X}_angle@}\\right) \\)</div>
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_trig${X}]] [[validation:ans_trig${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_trig${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
-        canonicalNodes = [trigNode('Valeur exacte correcte ?', `ans_trig${X}`, `q${X}_ta`,
+        canonicalNodes = [trigNode(I18N_D.t('trig.node_valeur_exacte'), `ans_trig${X}`, `q${X}_ta`,
             `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_cercle_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).</div>`;
 
@@ -130,7 +130,7 @@ q${X}_expr:if q${X}_r_tpl=0 then cos(q${X}_p+q${X}_q)+cos(q${X}_p-q${X}_q)
 <div style="text-align:center;margin:15px 0;">\\( {@q${X}_expr@} \\)</div>
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_simp${X}]] [[validation:ans_simp${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_simp${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
-        canonicalNodes = [trigNode('Simplification correcte ?', `ans_simp${X}`, `q${X}_ta`,
+        canonicalNodes = [trigNode(I18N_D.t('trig.node_simplification'), `ans_simp${X}`, `q${X}_ta`,
             `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_simpson_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\) ${I18N_D.t('trig.simpson_note')}.</div>`;
     }

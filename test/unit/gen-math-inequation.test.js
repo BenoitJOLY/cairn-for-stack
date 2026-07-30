@@ -63,9 +63,10 @@ test("mode 'fixe' + scenario 'trinome' construit q1_poly = a*x^2+b*x+c", () => {
     assert.match(q.vars, /q1_poly:q1_a\*x\^2\+q1_b\*x\+q1_c;/);
 });
 
-test("mode 'fixe' + scenario 'valeur-abs' construit |a x + b| op c", () => {
+test("mode 'fixe' + scenario 'valeur-abs' construit |lhs| op c avec lhs = a x + b", () => {
     const q = genInequationCore(1, baseParams({ mode: 'fixe', scenario: 'valeur-abs' }), DEPS);
-    assert.match(q.qnote, /\|\{@q1_a@\}x\+\{@q1_b@\}\|\{@q1_op@\}\{@q1_c@\}/);
+    assert.match(q.vars, /q1_lhs:q1_a\*x\+q1_b;/);
+    assert.match(q.qnote, /\|\{@q1_lhs@\}\|\{@q1_op@\}\{@q1_c@\}/);
 });
 
 test("mode 'aleatoire' + scenario 'lineaire' construit le tirage aléatoire et la formule de solution", () => {
@@ -85,17 +86,18 @@ test("mode 'aleatoire' + scenario 'valeur-abs' construit s1/s2 et sl/su", () => 
     assert.match(q.vars, /q1_sl:min\(q1_s1,q1_s2\);q1_su:max\(q1_s1,q1_s2\);/);
 });
 
-test('un seul nœud PRT AlgEquiv comparant _ic_X à q_X_ta', () => {
+test('PRT à 4 nœuds diagnostiques : garde de format, puis comparaison _ic_X à q_X_ta', () => {
     const q = genInequationCore(1, baseParams(), DEPS);
-    assert.equal(q.prt.nodes.length, 1);
-    assert.equal(q.prt.nodes[0].sans, '_ic1');
-    assert.equal(q.prt.nodes[0].tans, 'q1_ta');
+    assert.equal(q.prt.nodes.length, 4);
+    assert.equal(q.prt.nodes[0].sans, 'is(_ic1=false)');
+    assert.equal(q.prt.nodes[1].sans, '_ic1');
+    assert.equal(q.prt.nodes[1].tans, 'q1_ta');
 });
 
 test('fbOk/fbWrong personnalisés remplacent le feedback par défaut', () => {
     const q = genInequationCore(1, baseParams({ fbOk: 'Bravo', fbWrong: 'Non' }), DEPS);
-    assert.equal(q.prt.nodes[0].truefeedback, 'Bravo');
-    assert.equal(q.prt.nodes[0].falsefeedback, 'Non');
+    assert.equal(q.prt.nodes[1].truefeedback, 'Bravo');
+    assert.equal(q.prt.nodes[3].falsefeedback, 'Non');
 });
 
 test('generalFeedback intègre fbGen via _mkFbGen', () => {

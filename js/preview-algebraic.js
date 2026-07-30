@@ -8,18 +8,18 @@
 // exactement ce que l'élève verra.
 const ALG_FB_DETAIL_META = {
   developpement: [
-    { key: 'partial', desc: 'Vérification développement et réduction' },
-    { key: 'errsigne', desc: 'Détection erreur de signe', needsError: true }
+    { key: 'partial', descKey: 'alg.node_dev_reduction' },
+    { key: 'errsigne', descKey: 'alg.node_err_signe', needsError: true }
   ],
   factorisation: [
-    { key: 'partial', desc: 'Vérification factorisation maximale' }
+    { key: 'partial', descKey: 'alg.node_factorisation_max' }
   ],
   fraction: [
-    { key: 'partial', desc: 'Vérification simplification maximale' }
+    { key: 'partial', descKey: 'alg.node_simplification_max' }
   ],
   expert: [
-    { key: 'partial', desc: 'Vérification développement et réduction' },
-    { key: 'errsigne', desc: 'Détection erreur de signe', needsError: true }
+    { key: 'partial', descKey: 'alg.node_dev_reduction' },
+    { key: 'errsigne', descKey: 'alg.node_err_signe', needsError: true }
   ]
 };
 
@@ -31,7 +31,7 @@ function _algFbDetailHTML(state) {
     const id = 'alg-fb-' + state.mode + '-' + m.key;
     const html = fbDetail[id] || '';
     return `<div class="hs-clickable" data-alg-field="fbdetail:${id}" style="border-left:4px solid #eab308;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;">
-      <div style="font-size:.78rem;font-weight:700;color:#a16207;text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px;">${m.desc}</div>
+      <div style="font-size:.78rem;font-weight:700;color:#a16207;text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px;">${I18N.t(m.descKey)}</div>
       ${_hsRenderMath(html)}
     </div>`;
   }).join('');
@@ -43,13 +43,13 @@ function renderPreviewHTML_algebraic(state) {
   const exprDisplay = state.exprDisplay || '';
   const exprDisplayHTML = exprDisplay ? _hsRenderMath('\\(' + _hsMaximaToLatexSafe(exprDisplay) + '\\)') : '';
   const modeLabels = {
-    libre: 'Libre (AlgEquiv)',
-    developpement: 'Développement / Réduction',
-    factorisation: 'Factorisation maximale',
-    fraction: 'Simplification de fraction',
-    expert: 'Développement expert (erreur classique)'
+    libre: I18N.t('alg.mode_libre'),
+    developpement: I18N.t('alg.mode_dev'),
+    factorisation: I18N.t('alg.mode_fact'),
+    fraction: I18N.t('alg.mode_frac'),
+    expert: I18N.t('alg.mode_expert')
   };
-  const modeLabel = modeLabels[state.mode] || 'Libre (AlgEquiv)';
+  const modeLabel = modeLabels[state.mode] || modeLabels.libre;
 
   const aideOn = !!state.aideOn;
   let aideHTML = '';
@@ -67,7 +67,7 @@ function renderPreviewHTML_algebraic(state) {
 
   const formulaDisplay = state.formula ? _hsRenderMath('\\(' + _hsMaximaToLatexSafe(state.formula) + '\\)') : '—';
   const fbGenHTML = `<div class="hs-clickable" data-alg-field="fbgen" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin:4px 0;">
-    <p style="margin:0 0 4px 0;"><strong>Réponse attendue :</strong> ${formulaDisplay}</p>
+    <p style="margin:0 0 4px 0;"><strong>${I18N.t('common.preview_expected_answer')}</strong> ${formulaDisplay}</p>
     ${state.sol ? `<div style="margin-top:8px;">${_hsRenderMath(state.sol)}</div>` : ''}
   </div>`;
 
@@ -103,8 +103,8 @@ function renderPreviewHTML_algebraic(state) {
   <div class="hs-main-block">
     <div class="hs-preview-text" data-alg-field="text">${text}</div>
     ${exprDisplay ? `<div class="hs-preview-text" data-alg-field="expr-display" style="font-weight:600;">${exprDisplayHTML}</div>` : ''}
-    <div data-alg-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? '<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ Clavier virtuel Maxima inclus dans la question.</div>' : ''}</div>
-    <input class="hs-alg-input" type="text" disabled placeholder="Réponse de l'élève…">
+    <div data-alg-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? `<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ ${I18N.t('common.preview_kbd_note')}</div>` : ''}</div>
+    <input class="hs-alg-input" type="text" disabled placeholder="${I18N.t('common.preview_student_placeholder')}">
     <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
     <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
@@ -138,7 +138,7 @@ function renderPreviewHTML_algebraic(state) {
     var autoPreview = document.getElementById('alg-fbgen-auto-preview');
     if (autoPreview) {
       var formulaDisplay = state.formula ? _hsRenderMath('\\(' + _hsMaximaToLatexSafe(state.formula) + '\\)') : '—';
-      autoPreview.innerHTML = '<p style="margin:0;"><strong>Réponse attendue :</strong> ' + formulaDisplay + '</p>';
+      autoPreview.innerHTML = '<p style="margin:0;"><strong>' + I18N.t('common.preview_expected_answer') + '</strong> ' + formulaDisplay + '</p>';
     }
   }
   window.algRefreshPreview = updateAlgFullPreview;

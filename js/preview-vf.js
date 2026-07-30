@@ -24,9 +24,10 @@ function _vfAutoFbGenListHTML(drawnProps, showFb) {
   return drawnProps.map(function (p) {
     const isV = p.exp !== 'f';
     const fb = isV ? p.fbIfVrai : p.fbIfFaux;
+    const vfLabel = isV ? I18N.t('vf.preview_vrai') : I18N.t('vf.preview_faux');
     return showFb && fb
-      ? `<li>${_hsRenderMath(p.text || '')} — <em>${isV ? 'Vrai' : 'Faux'}</em><br/><span style="color:#4b5563;font-size:.92em;">${_hsRenderMath(fb)}</span></li>`
-      : `<li>${_hsRenderMath(p.text || '')} — <em>${isV ? 'Vrai' : 'Faux'}</em></li>`;
+      ? `<li>${_hsRenderMath(p.text || '')} — <em>${vfLabel}</em><br/><span style="color:#4b5563;font-size:.92em;">${_hsRenderMath(fb)}</span></li>`
+      : `<li>${_hsRenderMath(p.text || '')} — <em>${vfLabel}</em></li>`;
   }).join('');
 }
 
@@ -44,8 +45,8 @@ function renderPreviewHTML_vf(state) {
     return `<tr>
       <td class="hs-vf-td-text hs-clickable" data-vf-field="prop-text" data-vf-index="${idx}">${i + 1}. ${_hsRenderMath(p.text || '')}</td>
       <td class="hs-vf-td-choice">
-        <label class="hs-vf-radio"><input type="radio" name="hs-vf-row-${i}" ${isV ? 'checked' : ''}> Vrai</label>
-        <label class="hs-vf-radio"><input type="radio" name="hs-vf-row-${i}" ${isV ? '' : 'checked'}> Faux</label>
+        <label class="hs-vf-radio"><input type="radio" name="hs-vf-row-${i}" ${isV ? 'checked' : ''}> ${I18N.t('vf.preview_vrai')}</label>
+        <label class="hs-vf-radio"><input type="radio" name="hs-vf-row-${i}" ${isV ? '' : 'checked'}> ${I18N.t('vf.preview_faux')}</label>
       </td>
     </tr>`;
   }).join('');
@@ -54,15 +55,15 @@ function renderPreviewHTML_vf(state) {
     const isV = p.exp !== 'f';
     const idx = props.indexOf(p);
     return `<div style="border-left:4px solid #94a3b8;padding:7px;margin:3px 0">
-      <b>${i + 1}. ${_hsRenderMath(p.text || '')}</b> <span style="font-size:.78rem;color:#64748b;">(réponse attendue : ${isV ? 'Vrai' : 'Faux'})</span>
-      <div class="hs-clickable" data-vf-field="prop-fb-vrai" data-vf-index="${idx}" style="margin-top:5px;">${isV ? '✅' : '❌'} Si coche Vrai : ${p.fbIfVrai ? _hsRenderMath(p.fbIfVrai) : '<span style="color:#475569;">(vide)</span>'}</div>
-      <div class="hs-clickable" data-vf-field="prop-fb-faux" data-vf-index="${idx}" style="margin-top:3px;">${isV ? '❌' : '✅'} Si coche Faux : ${p.fbIfFaux ? _hsRenderMath(p.fbIfFaux) : '<span style="color:#475569;">(vide)</span>'}</div>
+      <b>${i + 1}. ${_hsRenderMath(p.text || '')}</b> <span style="font-size:.78rem;color:#64748b;">(${I18N.t('vf.preview_reponse_attendue', {val: isV ? I18N.t('vf.preview_vrai') : I18N.t('vf.preview_faux')})})</span>
+      <div class="hs-clickable" data-vf-field="prop-fb-vrai" data-vf-index="${idx}" style="margin-top:5px;">${isV ? '✅' : '❌'} ${I18N.t('vf.preview_si_vrai')} ${p.fbIfVrai ? _hsRenderMath(p.fbIfVrai) : '<span style="color:#475569;">' + I18N.t('vf.preview_vide') + '</span>'}</div>
+      <div class="hs-clickable" data-vf-field="prop-fb-faux" data-vf-index="${idx}" style="margin-top:3px;">${isV ? '❌' : '✅'} ${I18N.t('vf.preview_si_faux')} ${p.fbIfFaux ? _hsRenderMath(p.fbIfFaux) : '<span style="color:#475569;">' + I18N.t('vf.preview_vide') + '</span>'}</div>
     </div>`;
   }).join('');
 
   const autoFbGenList = _vfAutoFbGenListHTML(drawn, !!state.fbGenShowFb);
   const fbGenHTML = `<div class="hs-clickable" data-vf-field="fbgen" style="border-left:4px solid #4f46e5;padding:10px 14px;background:#eef2ff;border-radius:4px;margin:4px 0;">
-    <p style="margin:0 0 4px 0;"><strong>Réponses attendues :</strong></p>
+    <p style="margin:0 0 4px 0;"><strong>${I18N.t('vf.preview_reponses_attendues')}</strong></p>
     <ul style="margin:4px 0 0 0;padding-left:1.4em;">${autoFbGenList}</ul>
     ${state.fbGen ? `<div style="margin-top:8px;">${_hsRenderMath(state.fbGen)}</div>` : ''}
   </div>`;
@@ -137,7 +138,7 @@ function renderPreviewHTML_vf(state) {
       var allProps = state.props || [];
       var drawnProps = _vfSimulateDraw(allProps, state.xe, state.xb, state.modeXb);
       var autoList = _vfAutoFbGenListHTML(drawnProps, !!state.fbGenShowFb);
-      autoPreview.innerHTML = '<p style="margin:0 0 4px 0;"><strong>Réponses attendues :</strong></p><ul style="margin:4px 0 0 0;padding-left:1.4em;">' + autoList + '</ul>';
+      autoPreview.innerHTML = '<p style="margin:0 0 4px 0;"><strong>' + I18N.t('vf.preview_reponses_attendues') + '</strong></p><ul style="margin:4px 0 0 0;padding-left:1.4em;">' + autoList + '</ul>';
     }
   }
   window.vfRefreshPreview = updateVFPreview;

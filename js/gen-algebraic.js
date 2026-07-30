@@ -91,39 +91,39 @@ function genAlgebraicCore(X, p, deps){
   const _a='ans'+X, _t='ta'+X, _e='erreur'+X, _te=tansEquiv;
   if(mode==='libre'){
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_t,'', -1,1, -1,0, fbOK,fbKO,
-      'PRT-CORRECT','PRT-WRONG','Vérification de la réponse')];
+      'PRT-CORRECT','PRT-WRONG',I18N_D.t('alg.node_verif_reponse'))];
   }else if(mode==='developpement'){
     const fbPartialDev=wrapFb_D(p.algFb.developpement.partial,false);
     const fbErrSigne=wrapFb_D(p.algFb.developpement.errsigne,false);
     const fn0=hasError?2:-1;
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_te,'', 1,1, fn0,0, '',hasError?'':fbKO,
-      'PRT-EQUAL-GO-ON',hasError?'PRT-NOT-EQUAL-CHECK-ERR':'PRT-WRONG','Vérification algébrique'),
+      'PRT-EQUAL-GO-ON',hasError?'PRT-NOT-EQUAL-CHECK-ERR':'PRT-WRONG',I18N_D.t('alg.node_verif_algebrique')),
       algPrtNodeCanonical_D(X,1,'Expanded',_a,_t,'', -1,1, -1,0.25, fbOK,fbPartialDev,
-      'PRT-CORRECT-MAX','PRT-CORRECT-NOT-REDUCED','Vérification développement et réduction')];
+      'PRT-CORRECT-MAX','PRT-CORRECT-NOT-REDUCED',I18N_D.t('alg.node_dev_reduction'))];
     if(hasError)canonicalNodes.push(algPrtNodeCanonical_D(X,2,'AlgEquiv',_a,_e,'', -1,0.5, -1,0, fbErrSigne,fbKO,
-      'PRT-BUG-ERR-FOUND','PRT-WRONG-TOTAL','Détection erreur de signe'));
+      'PRT-BUG-ERR-FOUND','PRT-WRONG-TOTAL',I18N_D.t('alg.node_err_signe')));
   }else if(mode==='factorisation'){
     const fbPartialFac=wrapFb_D(p.algFb.factorisation.partial,false);
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_te,'', 1,1, -1,0, '','',
-      'PRT-EQUAL-GO-ON','PRT-WRONG','Vérification algébrique'),
+      'PRT-EQUAL-GO-ON','PRT-WRONG',I18N_D.t('alg.node_verif_algebrique')),
       algPrtNodeCanonical_D(X,1,'FacForm',_a,_t,mainVar, -1,1, -1,0.25, fbOK,fbPartialFac,
-      'PRT-FAC-MAX','PRT-NOT-MAX','Vérification factorisation maximale')];
+      'PRT-FAC-MAX','PRT-NOT-MAX',I18N_D.t('alg.node_factorisation_max'))];
   }else if(mode==='fraction'){
     const fbPartialFrac=wrapFb_D(p.algFb.fraction.partial,false);
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_te,'', 1,1, -1,0, '','',
-      'PRT-EQUAL-GO-ON','PRT-WRONG','Vérification algébrique'),
+      'PRT-EQUAL-GO-ON','PRT-WRONG',I18N_D.t('alg.node_verif_algebrique')),
       algPrtNodeCanonical_D(X,1,'FacForm',_a,_t,mainVar, -1,1, -1,0.5, fbOK,fbPartialFrac,
-      'PRT-SIMPLE-MAX','PRT-NOT-SIMPLE','Vérification simplification maximale')];
+      'PRT-SIMPLE-MAX','PRT-NOT-SIMPLE',I18N_D.t('alg.node_simplification_max'))];
   }else{ // expert
     const fbPartialDev=wrapFb_D(p.algFb.expert.partial,false);
     const fbErrSigne=wrapFb_D(p.algFb.expert.errsigne,false);
     const fn0=hasError?2:-1;
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_te,'', 1,1, fn0,0, '',hasError?'':fbKO,
-      'PRT-EQUAL-GO-ON',hasError?'PRT-NOT-EQUAL-CHECK-ERR':'PRT-WRONG','Vérification algébrique'),
+      'PRT-EQUAL-GO-ON',hasError?'PRT-NOT-EQUAL-CHECK-ERR':'PRT-WRONG',I18N_D.t('alg.node_verif_algebrique')),
       algPrtNodeCanonical_D(X,1,'Expanded',_a,_t,'', -1,1, -1,0.25, fbOK,fbPartialDev,
-      'PRT-CORRECT-MAX','PRT-CORRECT-NOT-REDUCED','Vérification développement et réduction')];
+      'PRT-CORRECT-MAX','PRT-CORRECT-NOT-REDUCED',I18N_D.t('alg.node_dev_reduction'))];
     if(hasError)canonicalNodes.push(algPrtNodeCanonical_D(X,2,'AlgEquiv',_a,_e,'', -1,0.5, -1,0, fbErrSigne,fbKO,
-      'PRT-BUG-ERR-FOUND','PRT-WRONG-TOTAL','Détection erreur de signe'));
+      'PRT-BUG-ERR-FOUND','PRT-WRONG-TOTAL',I18N_D.t('alg.node_err_signe')));
   }
   const prtMeta={name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:''};
   const prtXML=buildPrtXml_D(prtMeta, canonicalNodes);

@@ -8,4 +8,7 @@ Veuillez choisir votre langue pour consulter la documentation / Please select yo
 
 🇫🇷 **[Français](./README.fr.md)**
 🇬🇧 **[English](./README.en.md)**
-```
+🇩🇪 **[Deutsch](./README.de.md)**
+🇪🇸 **[Español](./README.es.md)**
+🇳🇱 **[Nederlands](./README.nl.md)**
+``` 

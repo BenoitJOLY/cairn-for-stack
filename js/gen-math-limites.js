@@ -51,7 +51,7 @@ function genLimitesCore(X, p, deps) {
 
     function limNode(falseFb) {
         return {
-            name: '0', description: 'Limite correcte ?', answertest: 'AlgEquiv', sans: `ans_lim${X}`, tans: `q${X}_ta`,
+            name: '0', description: I18N_D.t('lim.node_limite_correcte'), answertest: 'AlgEquiv', sans: `ans_lim${X}`, tans: `q${X}_ta`,
             testoptions: '', quiet: '0',
             truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
             trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>'+I18N_D.t('trig.correct')+'</strong></div>',

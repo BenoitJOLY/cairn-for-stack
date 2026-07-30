@@ -46,6 +46,7 @@ function genEquivalenceCore(X, p, deps) {
     deps = deps || {};
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D      = deps._mkFbGen || _mkFbGen;
+    var I18N_D         = deps.I18N || I18N;
 
     var bareme = p.bareme;
     var scenario = p.scenario;
@@ -69,13 +70,13 @@ function genEquivalenceCore(X, p, deps) {
         };
     }
 
-    var HDR = `<div style="background:#5b21b6;border-left:5px solid #4c1d95;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Raisonnement par équivalence</strong> <span style="background:#4c1d95;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
+    var HDR = `<div style="background:#5b21b6;border-left:5px solid #4c1d95;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('equiv.title')}</strong> <span style="background:#4c1d95;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
 
     var SCENARIO_LABELS = {
-        developpement: 'Développer et simplifier',
-        equation: 'Résoudre l’équation',
-        factorisation: 'Factoriser',
-        systeme: 'Résoudre le système'
+        developpement: I18N_D.t('equiv.qnote_developpement'),
+        equation: I18N_D.t('equiv.qnote_equation'),
+        factorisation: I18N_D.t('equiv.qnote_factorisation'),
+        systeme: I18N_D.t('equiv.qnote_systeme')
     };
 
     // ── Variables Maxima (donnée de départ + résultat canonique calculé) ──
@@ -83,20 +84,20 @@ function genEquivalenceCore(X, p, deps) {
     var qLabel;
     if (scenario === 'developpement') {
         vars += `q${X}_resultat:expand(q${X}_formule);\n`;
-        qLabel = `Développer ${'{@'}q${X}_formule@${'}'}`;
+        qLabel = `${I18N_D.t('equiv.qnote_developpement')} ${'{@'}q${X}_formule@${'}'}`;
     } else if (scenario === 'factorisation') {
         vars += `q${X}_resultat:factor(q${X}_formule);\n`;
-        qLabel = `Factoriser ${'{@'}q${X}_formule@${'}'}`;
+        qLabel = `${I18N_D.t('equiv.qnote_factorisation')} ${'{@'}q${X}_formule@${'}'}`;
     } else if (scenario === 'systeme') {
         vars += `q${X}_vars:[${variables}];\n`;
         vars += `q${X}_sol:linsolve(q${X}_formule, q${X}_vars);\n`;
         vars += `q${X}_resultat:if listp(q${X}_sol) and length(q${X}_sol)>0 then xreduce("and", q${X}_sol) else q${X}_sol;\n`;
-        qLabel = `Résoudre le système ${'{@'}q${X}_formule@${'}'}`;
+        qLabel = `${I18N_D.t('equiv.qnote_systeme')} ${'{@'}q${X}_formule@${'}'}`;
     } else { /* equation */
         vars += `q${X}_var:${variable};\n`;
         vars += `q${X}_sol:solve(q${X}_formule, q${X}_var);\n`;
-        vars += `q${X}_resultat:if listp(q${X}_sol) and length(q${X}_sol)>1 then xreduce(lambda([a,b], concat(a," ou ",b)), map(lambda([s], string(s)), q${X}_sol)) elseif listp(q${X}_sol) and length(q${X}_sol)=1 then q${X}_sol[1] else q${X}_sol;\n`;
-        qLabel = `Résoudre l’équation ${'{@'}q${X}_formule@${'}'}`;
+        vars += `q${X}_resultat:if listp(q${X}_sol) and length(q${X}_sol)>1 then xreduce(lambda([a,b], concat(a," ${I18N_D.t('equiv.ou_lbl')} ",b)), map(lambda([s], string(s)), q${X}_sol)) elseif listp(q${X}_sol) and length(q${X}_sol)=1 then q${X}_sol[1] else q${X}_sol;\n`;
+        qLabel = `${I18N_D.t('equiv.qnote_equation')} ${'{@'}q${X}_formule@${'}'}`;
     }
     if (resultatOverride) {
         vars += `q${X}_resultat:${resultatOverride};\n`;
@@ -111,7 +112,7 @@ function genEquivalenceCore(X, p, deps) {
 
     // ── Énoncé + input equiv (multi-lignes) ──
     var ansName = `ans1_${X}`;
-    var textFrag = `${HDR}${custText}<p>${qLabel}, en détaillant les étapes de calcul.</p>
+    var textFrag = `${HDR}${custText}<p>${I18N_D.t('equiv.instruction', {qlabel: qLabel})}</p>
 [[input:${ansName}]]
 [[validation:${ansName}]]`;
 
@@ -141,24 +142,24 @@ function genEquivalenceCore(X, p, deps) {
     </input>`;
 
     // ── Nœuds PRT : EquivFirst (chaîne) → [étape intermédiaire imposée] → EqualComAss (résultat final) ──
-    var okFb = `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ ${fbOk || '<strong>Votre point de départ est correct et toutes les étapes sont algébriquement équivalentes entre elles.</strong>'}</div>`;
-    var wrongFb = `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${fbWrong || 'Soit votre première ligne ne correspond pas à l’expression de départ, soit une des étapes suivantes n’est pas équivalente à la précédente. Vérifiez chaque ligne de votre raisonnement.'}</div>`;
-    var finalOkFb = `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Vous êtes arrivé au résultat final attendu.</strong></div>`;
-    var finalWrongFb = `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 Vos étapes sont valides, mais votre dernière ligne n’est pas la forme finale attendue.</div>`;
+    var okFb = `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ ${fbOk || `<strong>${I18N_D.t('equiv.fb_ok_default')}</strong>`}</div>`;
+    var wrongFb = `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${fbWrong || I18N_D.t('equiv.fb_wrong_default')}</div>`;
+    var finalOkFb = `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('equiv.fb_final_ok')}</strong></div>`;
+    var finalWrongFb = `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 ${I18N_D.t('equiv.fb_final_wrong')}</div>`;
 
     var canonicalNodes;
     var diagNodes = [];
     if (etapeChecked && etapeVal) {
         canonicalNodes = [
-            eqNode(0, 'Point de départ correct et chaîne d’équivalences valide ?', 'EquivFirst', ansName, `q${X}_ta`,
+            eqNode(0, I18N_D.t('equiv.node_point_depart'), 'EquivFirst', ansName, `q${X}_ta`,
                 1, 0.34, 'PRT-'+X+'-0-T', okFb,
                 -1, 0, 'PRT-'+X+'-0-F', wrongFb),
-            eqNode(1, 'L’étape intermédiaire imposée apparaît-elle dans le raisonnement ?', 'AlgEquiv',
+            eqNode(1, I18N_D.t('equiv.node_etape_intermediaire'), 'AlgEquiv',
                 `not(emptyp(stack_equiv_find_step(q${X}_etape, ${ansName})))`, 'true',
-                2, 0.33, 'PRT-'+X+'-1-T', '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ L’étape intermédiaire imposée est bien présente.</div>',
-                2, 0, 'PRT-'+X+'-1-F', '<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 L’étape intermédiaire imposée n’apparaît pas dans votre raisonnement.</div>',
+                2, 0.33, 'PRT-'+X+'-1-T', `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ ${I18N_D.t('equiv.fb_etape_ok')}</div>`,
+                2, 0, 'PRT-'+X+'-1-F', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 ${I18N_D.t('equiv.fb_etape_wrong')}</div>`,
                 '+', '+'),
-            eqNode(2, 'Résultat final correct ?', 'EqualComAss', `last(${ansName})`, `last(q${X}_ta)`,
+            eqNode(2, I18N_D.t('equiv.node_resultat_final'), 'EqualComAss', `last(${ansName})`, `last(q${X}_ta)`,
                 -1, 0.33, 'PRT-'+X+'-2-T', finalOkFb,
                 -1, 0, 'PRT-'+X+'-2-F', finalWrongFb,
                 '+', '+')
@@ -166,10 +167,10 @@ function genEquivalenceCore(X, p, deps) {
         diagNodes = [{ desc: canonicalNodes[1].description, fb: canonicalNodes[1].truefeedback || canonicalNodes[1].falsefeedback || '' }];
     } else {
         canonicalNodes = [
-            eqNode(0, 'Point de départ correct et chaîne d’équivalences valide ?', 'EquivFirst', ansName, `q${X}_ta`,
+            eqNode(0, I18N_D.t('equiv.node_point_depart'), 'EquivFirst', ansName, `q${X}_ta`,
                 1, 0.5, 'PRT-'+X+'-0-T', okFb,
                 -1, 0, 'PRT-'+X+'-0-F', wrongFb),
-            eqNode(1, 'Résultat final correct ?', 'EqualComAss', `last(${ansName})`, `last(q${X}_ta)`,
+            eqNode(1, I18N_D.t('equiv.node_resultat_final'), 'EqualComAss', `last(${ansName})`, `last(q${X}_ta)`,
                 -1, 1, 'PRT-'+X+'-1-T', finalOkFb,
                 -1, 0.5, 'PRT-'+X+'-1-F', finalWrongFb)
         ];
@@ -178,7 +179,7 @@ function genEquivalenceCore(X, p, deps) {
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '0', feedbackstyle: '1', feedbackvariables: '' };
     var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
-    var generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>Correction :</strong><br>La forme finale attendue est {@q${X}_resultat@}.</div>`;
+    var generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('equiv.fbgen_correction', {resvar: '{@q'+X+'_resultat@}'})}</div>`;
     generalFeedback = mkFbGen_D(generalFeedback, p.fbGenExtra);
 
     return {

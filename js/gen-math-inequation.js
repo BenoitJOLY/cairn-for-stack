@@ -220,7 +220,7 @@ function genInequationCore(X, p, deps) {
     function ineqNodes(falseFb, signFb) {
         return [
             {
-                name: '0', description: 'Format reconnu (notation intervalle) ?', answertest: 'AlgEquiv', sans: `is(_ic${X}=false)`, tans: 'true',
+                name: '0', description: I18N_D.t('ineq.node_format'), answertest: 'AlgEquiv', sans: `is(_ic${X}=false)`, tans: 'true',
                 testoptions: '', quiet: '0',
                 truescoremode: '=', truescore: '0', truepenalty: '', truenextnode: '-1',
                 trueanswernote: 'PRT-'+X+'-FORMAT', truefeedback: I18N_D.t('ineq.fb_format_invalide', {tavar:'q'+X+'_tastr'}), fbKind: 'false',
@@ -228,7 +228,7 @@ function genInequationCore(X, p, deps) {
                 falseanswernote: 'PRT-'+X+'-BOUNDS', falsefeedback: ''
             },
             {
-                name: '1', description: 'Solution correcte (bornes + inclusion) ?', answertest: 'AlgEquiv', sans: `_ic${X}`, tans: `q${X}_ta`,
+                name: '1', description: I18N_D.t('ineq.node_solution'), answertest: 'AlgEquiv', sans: `_ic${X}`, tans: `q${X}_ta`,
                 testoptions: '', quiet: '0',
                 truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
                 trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`, fbKind: 'true',
@@ -236,7 +236,7 @@ function genInequationCore(X, p, deps) {
                 falseanswernote: 'PRT-'+X+'-INCLCHK', falsefeedback: ''
             },
             {
-                name: '2', description: 'Bornes correctes, inclusion/exclusion à vérifier ?', answertest: 'AlgEquiv', sans: `_ibnorm${X}(_ic${X})`, tans: `_ibnorm${X}(q${X}_ta)`,
+                name: '2', description: I18N_D.t('ineq.node_bornes_inclusion'), answertest: 'AlgEquiv', sans: `_ibnorm${X}(_ic${X})`, tans: `_ibnorm${X}(q${X}_ta)`,
                 testoptions: '', quiet: '0',
                 truescoremode: '=', truescore: '0.5', truepenalty: '', truenextnode: '-1',
                 trueanswernote: 'PRT-'+X+'-INCL', truefeedback: I18N_D.t('ineq.fb_bounds_ok_inclusion_wrong', {tavar:'q'+X+'_tastr'}), fbKind: 'partial',
@@ -244,7 +244,7 @@ function genInequationCore(X, p, deps) {
                 falseanswernote: 'PRT-'+X+'-SIGN', falsefeedback: ''
             },
             {
-                name: '3', description: 'Bornes correctes mais du mauvais côté (signe/sens) ?', answertest: 'AlgEquiv', sans: `_ibnorm${X}(_ic${X})`, tans: `_icompl${X}(q${X}_ta)`,
+                name: '3', description: I18N_D.t('ineq.node_signe'), answertest: 'AlgEquiv', sans: `_ibnorm${X}(_ic${X})`, tans: `_icompl${X}(q${X}_ta)`,
                 testoptions: '', quiet: '0',
                 truescoremode: '=', truescore: '0.5', truepenalty: '', truenextnode: '-1',
                 trueanswernote: 'PRT-'+X+'-DIR', truefeedback: signFb, fbKind: 'partial',

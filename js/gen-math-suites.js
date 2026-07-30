@@ -168,15 +168,15 @@ q${X}_err_nok:q${X}_U0+q${X}_r;`;
         inputXML = mkInput_D({name:`ans_un${X}`,tans:`q${X}_ans`,boxsize:20,hint:'U0 + n*r',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsArith = [
-            { description: 'Terme g\xe9n\xe9ral correct ?', sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1,
+            { description: I18N_D.t('sui.node_terme_general'), sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1,
                 feedback: fbOk || _suiBox('ok', I18N_D.t('sui.fb_ok_terme_arith')) },
-            { description: 'Erreur : signe de la raison invers\xe9', sans: `ans_un${X}`, tans: `q${X}_err_inv`, score: 0,
+            { description: I18N_D.t('sui.node_err_signe_inverse'), sans: `ans_un${X}`, tans: `q${X}_err_inv`, score: 0,
                 feedback: _suiBox('warn', I18N_D.t('sui.err_signe_raison', {kvar:'q'+X+'_k', rvar:'q'+X+'_r'})) },
-            { description: 'Erreur : a donn\xe9 U_k au lieu de U_n', sans: `ans_un${X}`, tans: `q${X}_err_const`, score: 0,
+            { description: I18N_D.t('sui.node_err_uk_un'), sans: `ans_un${X}`, tans: `q${X}_err_const`, score: 0,
                 feedback: _suiBox('warn', I18N_D.t('sui.err_confusion_uk', {kvar:'q'+X+'_k'})) },
-            { description: 'Erreur : oubli du facteur n', sans: `ans_un${X}`, tans: `q${X}_err_nok`, score: 0,
+            { description: I18N_D.t('sui.node_err_oubli_n'), sans: `ans_un${X}`, tans: `q${X}_err_nok`, score: 0,
                 feedback: _suiBox('warn', I18N_D.t('sui.err_oubli_facteur_n')) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_terme_arith', {kvar:'q'+X+'_k', rvar:'q'+X+'_r'})) }
         ];
         diagNodes = _suiDiagNodes(specsArith);
@@ -199,9 +199,9 @@ q${X}_ans:q${X}_U0*q${X}_q^n;`;
         inputXML = mkInput_D({name:`ans_un${X}`,tans:`q${X}_ans`,boxsize:20,hint:'U0 * q^n',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsGeo = [
-            { description: 'Terme g\xe9n\xe9ral correct ?', sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1,
+            { description: I18N_D.t('sui.node_terme_general'), sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1,
                 feedback: fbOk || _suiBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong>`) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_terme_geo', {ansvar:'q'+X+'_ans'})) }
         ];
         diagNodes = _suiDiagNodes(specsGeo);
@@ -223,9 +223,9 @@ q${X}_ans:n*(q${X}_U0+q${X}_Un_1)/2;`;
         inputXML = mkInput_D({name:`ans_sn${X}`,tans:`q${X}_ans`,boxsize:25,forbidfloat:1,mustverify:1,showvalidation:2});
 
         var specsSomA = [
-            { description: 'Somme correcte ?', sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1,
+            { description: I18N_D.t('sui.node_somme'), sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1,
                 feedback: fbOk || _suiBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_somme_arith', {ansvar:'q'+X+'_ans'})) }
         ];
         diagNodes = _suiDiagNodes(specsSomA);
@@ -246,9 +246,9 @@ q${X}_ans:q${X}_U0*(1-q${X}_q^n)/(1-q${X}_q);`;
         inputXML = mkInput_D({name:`ans_sn${X}`,tans:`q${X}_ans`,boxsize:25,forbidfloat:1,mustverify:1,showvalidation:2});
 
         var specsSomG = [
-            { description: 'Somme correcte ?', sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1,
+            { description: I18N_D.t('sui.node_somme'), sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1,
                 feedback: fbOk || _suiBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_somme_geo', {ansvar:'q'+X+'_ans'})) }
         ];
         diagNodes = _suiDiagNodes(specsSomG);
@@ -269,9 +269,9 @@ q${X}_ans:0;`;
         inputXML = mkInput_D({name:`ans_lim${X}`,tans:`q${X}_ans`,boxsize:10,allowwords:'inf',hint:'0',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsLim = [
-            { description: 'Limite correcte ?', sans: `ans_lim${X}`, tans: `q${X}_ans`, score: 1,
+            { description: I18N_D.t('sui.node_limite'), sans: `ans_lim${X}`, tans: `q${X}_ans`, score: 1,
                 feedback: fbOk || _suiBox('ok', I18N_D.t('sui.fb_ok_limite_geo')) },
-            { description: 'Erreur g\xe9n\xe9rique (fallback)', sans: 'true', tans: 'true', score: 0, quiet: true,
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
                 feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_limite_geo')) }
         ];
         diagNodes = _suiDiagNodes(specsLim);

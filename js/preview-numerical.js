@@ -13,7 +13,7 @@ function _hsNumToleranceValue(val, tolType, tolVal) {
 function renderPreviewHTML_numerical(state) {
   const bareme = state.bareme || 0;
   const text = _hsRenderMath(state.text || '');
-  const tolLabel = state.tolType === 'absolute' ? 'Absolue (NumAbsolute)' : 'Relative (NumRelative)';
+  const tolLabel = state.tolType === 'absolute' ? I18N.t('num.tol_absolute') : I18N.t('num.tol_relative');
   const tolVal = state.tolVal || '0.05';
 
   const aideOn = !!state.aideOn;
@@ -32,7 +32,7 @@ function renderPreviewHTML_numerical(state) {
   const tolNumeric = _hsNumToleranceValue(state.val, state.tolType, tolVal);
   const tolDisplay = `± ${tolNumeric}`;
   const fbGenHTML = `<div class="hs-clickable" data-num-field="fbgen" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin:4px 0;">
-    <p style="margin:0 0 4px 0;"><strong>Valeur acceptée :</strong> <code>${state.val || '—'} ${tolDisplay}</code> <span style="color:#475569;">(tolérance ${tolLabel})</span></p>
+    <p style="margin:0 0 4px 0;"><strong>${I18N.t('num.preview_valeur_acceptee')}</strong> <code>${state.val || '—'} ${tolDisplay}</code> <span style="color:#475569;">(${I18N.t('common.preview_tolerance').toLowerCase()} ${tolLabel})</span></p>
     ${state.fbGen ? `<div style="margin-top:8px;">${_hsRenderMath(state.fbGen)}</div>` : ''}
   </div>`;
 
@@ -67,8 +67,8 @@ function renderPreviewHTML_numerical(state) {
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-num-field="text">${text}</div>
-    <div data-num-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? '<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ Clavier virtuel Maxima inclus dans la question.</div>' : ''}</div>
-    <input class="hs-num-input" type="text" disabled placeholder="Réponse de l'élève…">
+    <div data-num-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? `<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ ${I18N.t('common.preview_kbd_note')}</div>` : ''}</div>
+    <input class="hs-num-input" type="text" disabled placeholder="${I18N.t('common.preview_student_placeholder')}">
     <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
     <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
@@ -97,10 +97,10 @@ function renderPreviewHTML_numerical(state) {
 
     var autoPreview = document.getElementById('num-fbgen-auto-preview');
     if (autoPreview) {
-      var tolLabel = state.tolType === 'absolute' ? 'Absolue (NumAbsolute)' : 'Relative (NumRelative)';
+      var tolLabel = state.tolType === 'absolute' ? I18N.t('num.tol_absolute') : I18N.t('num.tol_relative');
       var tolVal = state.tolVal || '0.05';
       var tolNumeric = _hsNumToleranceValue(state.val, state.tolType, tolVal);
-      autoPreview.innerHTML = '<p style="margin:0;"><strong>Valeur acceptée :</strong> <code>' + (state.val || '—') + ' ± ' + tolNumeric + '</code> <span style="color:#475569;">(' + I18N.t('common.preview_tolerance').toLowerCase() + ' ' + tolLabel + ')</span></p>';
+      autoPreview.innerHTML = '<p style="margin:0;"><strong>' + I18N.t('num.preview_valeur_acceptee') + '</strong> <code>' + (state.val || '—') + ' ± ' + tolNumeric + '</code> <span style="color:#475569;">(' + I18N.t('common.preview_tolerance').toLowerCase() + ' ' + tolLabel + ')</span></p>';
     }
   }
   window.numRefreshPreview = updateNumFullPreview;

@@ -100,7 +100,7 @@ q${X}_ta:float(median(q${X}_L));`;
         textFrag = `${HDR}${custText}<p>${I18N_D.t('stat.calc_mediane')}</p>${serieHTML(6)}
 <p>${I18N_D.t('stat.lbl_mediane')}[[input:ans_med${X}]] [[validation:ans_med${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_med${X}`,tans:`q${X}_ta`,boxsize:10,forbidfloat:0,mustverify:0,showvalidation:2});
-        canonicalNodes = [statNode('M\xe9diane correcte ?', 'NumAbsolute', `ans_med${X}`, `q${X}_ta`, '0.005',
+        canonicalNodes = [statNode(I18N_D.t('stat.node_mediane'), 'NumAbsolute', `ans_med${X}`, `q${X}_ta`, '0.005',
             fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong> ${I18N_D.t('stat.fb_ok_mediane_suffix', {tavar:'q'+X+'_ta'})}</div>`,
             fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('stat.fb_wrong_mediane', {tavar:'q'+X+'_ta'})}</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('stat.fbgen_mediane', {lvar:'q'+X+'_L', nvar:'q'+X+'_n', tavar:'q'+X+'_ta'})}</div>`;
@@ -118,7 +118,7 @@ q${X}_ta:1.0*round(sqrt(q${X}_var)*100)/100;`;
 <p>\\(\\sigma=\\) [[input:ans_std${X}]] [[validation:ans_std${X}]]</p>
 <p><em>${I18N_D.t('stat.arrondi_deux_decimales')}</em></p>`;
         inputXML = mkInput_D({name:`ans_std${X}`,tans:`q${X}_ta`,type:'numerical',boxsize:10,forbidfloat:0,mustverify:0,showvalidation:2});
-        canonicalNodes = [statNode('\xc9cart-type correct ?', 'NumAbsolute', `ans_std${X}`, `q${X}_ta`, '0.015',
+        canonicalNodes = [statNode(I18N_D.t('stat.node_ecart_type'), 'NumAbsolute', `ans_std${X}`, `q${X}_ta`, '0.015',
             fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
             fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('stat.fb_wrong_ecart_type', {varname:varName, tavar:'q'+X+'_ta'})}</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('stat.fbgen_ecart_type', {varname:varName, moyvar:'q'+X+'_moy', varvar:'q'+X+'_var', tavar:'q'+X+'_ta'})}</div>`;
@@ -134,7 +134,7 @@ q${X}_ta:1.0*round((q${X}_ta_max-q${X}_ta_min)*100)/100;`;
         textFrag = `${HDR}${custText}<p>${I18N_D.t('stat.calc_etendue')}</p>${serieHTML(6)}
 <p>${I18N_D.t('stat.lbl_etendue')}[[input:ans_et${X}]] [[validation:ans_et${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_et${X}`,tans:`q${X}_ta`,type:'numerical',boxsize:10,forbidfloat:0,mustverify:0,showvalidation:2});
-        canonicalNodes = [statNode('\xc9tendue correcte ?', 'NumAbsolute', `ans_et${X}`, `q${X}_ta`, '0.015',
+        canonicalNodes = [statNode(I18N_D.t('stat.node_etendue'), 'NumAbsolute', `ans_et${X}`, `q${X}_ta`, '0.015',
             fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
             fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('stat.fb_wrong_etendue', {maxvar:'q'+X+'_ta_max', minvar:'q'+X+'_ta_min', tavar:'q'+X+'_ta'})}</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('stat.fb_wrong_etendue', {maxvar:'q'+X+'_ta_max', minvar:'q'+X+'_ta_min', tavar:'q'+X+'_ta'})}</div>`;
@@ -148,7 +148,7 @@ q${X}_ta:1.0*round(float(mean(q${X}_L))*100)/100;`;
         textFrag = `${HDR}${custText}<p>${I18N_D.t('stat.calc_moyenne')}</p>${serieHTML(6)}
 <p>\\(\\bar{${varName}}=\\) [[input:ans_moy${X}]] [[validation:ans_moy${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_moy${X}`,tans:`q${X}_ta`,type:'numerical',boxsize:10,forbidfloat:0,mustverify:0,showvalidation:2});
-        canonicalNodes = [statNode('Moyenne correcte ?', 'NumAbsolute', `ans_moy${X}`, `q${X}_ta`, '0.015',
+        canonicalNodes = [statNode(I18N_D.t('stat.node_moyenne'), 'NumAbsolute', `ans_moy${X}`, `q${X}_ta`, '0.015',
             fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
             fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('stat.fb_wrong_moyenne', {varname:varName, tavar:'q'+X+'_ta'})}</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('stat.fbgen_moyenne', {varname:varName, tavar:'q'+X+'_ta'})}</div>`;
@@ -164,7 +164,7 @@ q${X}_ta:1.00*round(float(sum((q${X}_L[i]-q${X}_moy)^2,i,1,q${X}_n)/q${X}_n)*100
         textFrag = `${HDR}${custText}<p>${I18N_D.t('stat.calc_variance')}</p>${serieHTML(5)}
 <p>\\(V=\\) [[input:ans_var${X}]] [[validation:ans_var${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_var${X}`,tans:`q${X}_ta`,type:'numerical',boxsize:10,forbidfloat:0,mustverify:0,showvalidation:2});
-        canonicalNodes = [statNode('Variance correcte ?', 'NumAbsolute', `ans_var${X}`, `q${X}_ta`, '0.015',
+        canonicalNodes = [statNode(I18N_D.t('stat.node_variance'), 'NumAbsolute', `ans_var${X}`, `q${X}_ta`, '0.015',
             fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
             fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('stat.fb_wrong_variance', {varname:varName, tavar:'q'+X+'_ta'})}</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('stat.fbgen_variance', {varname:varName, moyvar:'q'+X+'_moy', tavar:'q'+X+'_ta'})}</div>`;
@@ -180,7 +180,7 @@ q${X}_ta:1.0*q${X}_L[q${X}_pos];`;
         textFrag = `${HDR}${custText}<p>${I18N_D.t('stat.calc_q1')}</p>${serieHTML(8)}
 <p>\\(Q_1=\\) [[input:ans_q1${X}]] [[validation:ans_q1${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_q1${X}`,tans:`q${X}_ta`,boxsize:10,forbidfloat:0,mustverify:0,showvalidation:2});
-        canonicalNodes = [statNode('Q1 correct ?', 'NumAbsolute', `ans_q1${X}`, `q${X}_ta`, '0.005',
+        canonicalNodes = [statNode(I18N_D.t('stat.node_q1'), 'NumAbsolute', `ans_q1${X}`, `q${X}_ta`, '0.005',
             fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
             fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('stat.fb_wrong_q1', {posvar:'q'+X+'_pos', tavar:'q'+X+'_ta'})}</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('stat.fbgen_q1', {posvar:'q'+X+'_pos', tavar:'q'+X+'_ta'})}</div>`;
@@ -196,7 +196,7 @@ q${X}_ta:1.0*q${X}_L[q${X}_pos];`;
         textFrag = `${HDR}${custText}<p>${I18N_D.t('stat.calc_q3')}</p>${serieHTML(8)}
 <p>\\(Q_3=\\) [[input:ans_q3${X}]] [[validation:ans_q3${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_q3${X}`,tans:`q${X}_ta`,boxsize:10,forbidfloat:0,mustverify:0,showvalidation:2});
-        canonicalNodes = [statNode('Q3 correct ?', 'NumAbsolute', `ans_q3${X}`, `q${X}_ta`, '0.005',
+        canonicalNodes = [statNode(I18N_D.t('stat.node_q3'), 'NumAbsolute', `ans_q3${X}`, `q${X}_ta`, '0.005',
             fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
             fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('stat.fb_wrong_q3', {posvar:'q'+X+'_pos', tavar:'q'+X+'_ta'})}</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('stat.fbgen_q3', {posvar:'q'+X+'_pos', tavar:'q'+X+'_ta'})}</div>`;
@@ -217,7 +217,7 @@ q${X}_ta:1.0*round(float(q${X}_S/q${X}_N)*10)/10;`;
 <tr><td style="padding:6px 12px;border:1px solid #cbd5e1;">{@q${X}_v3@}</td><td style="padding:6px 12px;border:1px solid #cbd5e1;">{@q${X}_e3@}</td></tr></table>
 <p>\\(\\bar{${varName}}=\\) [[input:ans_moy${X}]] [[validation:ans_moy${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_moy${X}`,tans:`q${X}_ta`,type:'numerical',boxsize:10,forbidfloat:0,mustverify:0,showvalidation:2});
-        canonicalNodes = [statNode('Moyenne pond\xe9r\xe9e correcte ?', 'NumAbsolute', `ans_moy${X}`, `q${X}_ta`, '0.05',
+        canonicalNodes = [statNode(I18N_D.t('stat.node_moyenne_ponderee'), 'NumAbsolute', `ans_moy${X}`, `q${X}_ta`, '0.05',
             fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
             fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('stat.fb_wrong_moy_ponderee', {varname:varName, tavar:'q'+X+'_ta'})}</div>`)];
         generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('stat.fbgen_moy_ponderee', {varname:varName, svar:'q'+X+'_S', nvar:'q'+X+'_N', tavar:'q'+X+'_ta'})}</div>`;
