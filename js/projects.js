@@ -35,7 +35,10 @@ function _projRestore(data){
       if(typeof attachChipHandlers==='function') attachChipHandlers(chip);
     });
   }
-  if(data.questions) Object.assign(questions, data.questions);
+  if(data.questions){
+    Object.assign(questions, data.questions);
+    if(typeof migrateAllPrtFeedbackStyle==='function') migrateAllPrtFeedbackStyle(questions);
+  }
   if(data.nextQid)   nextQid = data.nextQid;
   if(data.sharedVars && typeof _sharedVars!=='undefined') {
     _sharedVars = data.sharedVars;

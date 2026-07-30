@@ -248,14 +248,6 @@
 }
 [data-theme="dark"] .btn-rich-sm:hover { background: #334155; color: #e2e8f0; }
 
-/* Templates feedback (✅ Vrai / ❌ Faux / 🔶 Partiel) */
-[data-theme="dark"] .prt-fb-tpl-btn {
-  background: #1e293b; border-color: #334155; color: #94a3b8;
-}
-[data-theme="dark"] .prt-fb-tpl-btn:hover { background: #334155; border-color: #475569; color: #e2e8f0; }
-[data-theme="dark"] .prt-fb-tpl-btn.prt-fb-tpl-active {
-  background: #1d4ed8; border-color: #2563eb; color: #fff;
-}
 
 /* Variables disponibles */
 [data-theme="dark"] .prt-var-std { background: #1e3a5f; color: #93c5fd; }

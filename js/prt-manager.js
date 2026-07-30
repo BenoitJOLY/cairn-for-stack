@@ -100,6 +100,42 @@ function buildPrtXml(meta, nodes) {
   return x + '    </prt>';
 }
 
+// ── MIGRATION DES FEEDBACKS (ancien encadré codé en dur → texte pur + fb-box.js) ─────
+// Passe automatiquement au chargement (js/editor.js loadEditorState, js/projects.js
+// _projRestore) : jamais paresseuse, jamais liée à l'ouverture manuelle du PRT Manager.
+// q.prt.nodes reste toujours du texte pur ; q.prtXML est reconstruit avec le style
+// fb-box.js courant, donc correct dès le prochain export sans réouverture de la question.
+function migratePrtFeedbackStyle(q, deps) {
+  deps = deps || {};
+  var unwrapFbBox_D = deps.unwrapFbBox || unwrapFbBox;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
+  var inferFbKind_D = deps.inferFbKind || inferFbKind;
+  var parsePrtXml_D = deps.parsePrtXml || parsePrtXml;
+  var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  if (!q || !q.prtXML) return false;
+  var parsed;
+  try { parsed = parsePrtXml_D(q.prtXML); } catch (e) { return false; }
+  if (!parsed || !parsed.nodes || !parsed.nodes.length) return false;
+  var rawNodes = ((q.prt && q.prt.nodes) || parsed.nodes).map(function (n) {
+    var c = Object.assign({}, n);
+    c.truefeedback = unwrapFbBox_D(c.truefeedback);
+    c.falsefeedback = unwrapFbBox_D(c.falsefeedback);
+    return c;
+  });
+  q.prt = { meta: (q.prt && q.prt.meta) || parsed.meta, nodes: rawNodes };
+  var xmlNodes = rawNodes.map(function (n) {
+    return Object.assign({}, n, {
+      truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
+      falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+    });
+  });
+  q.prtXML = buildPrtXml_D(q.prt.meta, xmlNodes);
+  return true;
+}
+function migrateAllPrtFeedbackStyle(questionsMap, deps) {
+  Object.keys(questionsMap || {}).forEach(function (qid) { migratePrtFeedbackStyle(questionsMap[qid], deps); });
+}
+
 // ── OPEN / CLOSE ─────────────────────────────────────────────────────
 function openPrtManager(qid) {
   var q = questions[qid];
@@ -725,7 +761,6 @@ function renderNodeEditor(idx) {
     '<label class="prt-ne-lbl" for="pne-tan">'+I18N.t('prt.lbl_note_true')+'</label>'+
     '<input class="prt-ne-inp mono" id="pne-tan" value="'+_hesc(n.trueanswernote)+'">'+
     '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_feedback_true')+'</label>'+
-    _fbTplRow('pne-tfb')+
     '<div class="rich-preview prt-rich-prev" id="prev-pne-tfb" tabindex="0" role="button" onclick="prtOpenRich(\'pne-tfb\')" data-ph="'+I18N.t('prt.ph_write_click')+'"></div>'+
     '<textarea id="pne-tfb" style="display:none"></textarea>'+
 
@@ -738,7 +773,6 @@ function renderNodeEditor(idx) {
     '<label class="prt-ne-lbl" for="pne-fan">'+I18N.t('prt.lbl_note_false')+'</label>'+
     '<input class="prt-ne-inp mono" id="pne-fan" value="'+_hesc(n.falseanswernote)+'">'+
     '<label class="prt-ne-lbl">'+I18N.t('prt.lbl_feedback_false')+'</label>'+
-    _fbTplRow('pne-ffb')+
     '<div class="rich-preview prt-rich-prev" id="prev-pne-ffb" tabindex="0" role="button" onclick="prtOpenRich(\'pne-ffb\')" data-ph="'+I18N.t('prt.ph_write_click')+'"></div>'+
     '<textarea id="pne-ffb" style="display:none"></textarea>'+
 
@@ -748,8 +782,6 @@ function renderNodeEditor(idx) {
   if(typeof setRichVal==='function'){
     setRichVal('pne-tfb', n.truefeedback);
     setRichVal('pne-ffb', n.falsefeedback);
-    _prtHighlightTpl('pne-tfb', _prtDetectTpl(n.truefeedback));
-    _prtHighlightTpl('pne-ffb', _prtDetectTpl(n.falsefeedback));
   }
 }
 
@@ -765,61 +797,6 @@ function prtUpdateAtHelp(){
   e.innerHTML=(PRT_AT_HELP_KEYS[s.value]?I18N.t(PRT_AT_HELP_KEYS[s.value]):null)||I18N.t('prt.help_none');
 }
 function prtOpenRich(fieldId){ if(typeof openRich==='function') openRich(fieldId); }
-
-// ── CALQUES DE PRÉSENTATION FEEDBACK ────────────────────────────────
-var _PRT_FB_TPLS = {
-  vrai:    { bg:'#f0fdf4', bd:'#86efac', pfx:'✅ ' },
-  faux:    { bg:'#F9B3A9', bd:'#e2e8f0', pfx:'❌ ' },
-  partiel: { bg:'#F9F2BB', bd:'#EDB465', pfx:'🔶 ' }
-};
-
-function _fbTplRow(fid) {
-  function btn(t,lbl){ return '<button class="prt-fb-tpl-btn" id="tpl-'+fid+'-'+t+'" onclick="prtApplyFbTpl(\''+fid+'\',\''+t+'\')">'+lbl+'</button>'; }
-  return '<div class="prt-fb-tpl-row">'+
-    btn('sans',I18N.t('prt.tpl_sans'))+btn('vrai',I18N.t('prt.tpl_vrai'))+btn('faux',I18N.t('prt.tpl_faux'))+btn('partiel',I18N.t('prt.tpl_partiel'))+
-  '</div>';
-}
-
-function _prtDetectTpl(html) {
-  if (!html) return 'sans';
-  var s = html.trim();
-  if (s.indexOf('background:#f0fdf4') >= 0) return 'vrai';
-  if (s.indexOf('background:#F9B3A9') >= 0 || s.indexOf('background:#f9b3a9') >= 0 || s.indexOf('background:#fafafa') >= 0) return 'faux';
-  if (s.indexOf('background:#F9F2BB') >= 0 || s.indexOf('background:#f9f2bb') >= 0 || s.indexOf('background:#FCDFCF') >= 0 || s.indexOf('background:#fcdfcf') >= 0) return 'partiel';
-  return 'sans';
-}
-
-function _prtUnwrapFb(html) {
-  var s = html.trim();
-  if (!s.startsWith('<div style="padding:12px;background:')) return html;
-  var tagEnd = s.indexOf('>');
-  if (tagEnd < 0) return html;
-  var lastDiv = s.lastIndexOf('</div>');
-  if (lastDiv < 0) return html;
-  return s.slice(tagEnd + 1, lastDiv).replace(/^(?:✅|❌|🔶)\s*/, '');
-}
-
-function _prtWrapFb(html, tpl) {
-  var t = _PRT_FB_TPLS[tpl];
-  if (!t) return html;
-  return '<div style="padding:12px;background:'+t.bg+';border-radius:8px;border:1px solid '+t.bd+'">'+t.pfx+html+'</div>';
-}
-
-function _prtHighlightTpl(fid, tpl) {
-  ['sans','vrai','faux','partiel'].forEach(function(t){
-    var el = document.getElementById('tpl-'+fid+'-'+t);
-    if (el) el.classList.toggle('prt-fb-tpl-active', t === tpl);
-  });
-}
-
-function prtApplyFbTpl(fid, tpl) {
-  if (typeof richVal !== 'function' || typeof setRichVal !== 'function') return;
-  var cur     = richVal(fid);
-  var curTpl  = _prtDetectTpl(cur);
-  var content = curTpl === 'sans' ? cur : _prtUnwrapFb(cur);
-  setRichVal(fid, tpl === 'sans' ? content : _prtWrapFb(content, tpl));
-  _prtHighlightTpl(fid, tpl);
-}
 
 // ── VARIABLES ────────────────────────────────────────────────────────
 function _buildVarsHtml(){
@@ -976,7 +953,13 @@ function savePrtManager(){
       : I18N.t('prt.err_truepath_score', {score: v.score});
     if(!confirm('⚠️ '+msg+'\n\n'+I18N.t('msg.confirm_apply_anyway'))) return;
   }
-  var xml=buildPrtXml(_prtMeta,_prtNodes);
+  var xmlNodes=_prtNodes.map(function(n){
+    return Object.assign({}, n, {
+      truefeedback:  applyFbBox(inferFbKind(n,'true'),  n.truefeedback),
+      falsefeedback: applyFbBox(inferFbKind(n,'false'), n.falsefeedback)
+    });
+  });
+  var xml=buildPrtXml(_prtMeta,xmlNodes);
   if(questions[_prtQid]){
     questions[_prtQid].prtXML=xml;
     // Si la question a un PRT JSON (type migré), on le garde synchronisé : q.prt
@@ -1204,5 +1187,5 @@ function _prtResizeEnd() {
 // Export CommonJS pour les tests Node (test/unit/*.test.js) : seules les fonctions
 // pures (aucune dépendance au DOM) sont exposées. Sans effet dans le navigateur.
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { buildPrtXml: buildPrtXml, parsePrtXml: parsePrtXml };
+    module.exports = { buildPrtXml: buildPrtXml, parsePrtXml: parsePrtXml, migratePrtFeedbackStyle: migratePrtFeedbackStyle, migrateAllPrtFeedbackStyle: migrateAllPrtFeedbackStyle };
 }

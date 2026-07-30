@@ -1,0 +1,6 @@
+Audit atteignabilité PRT — 2026-07-30T08:00:20.786Z
+1 branche(s) morte(s) détectée(s)
+
+[Nombres complexes / forme-alg] nœud 2, branche true inatteignable
+  test dupliqué : AlgEquiv(ans1X, qX_ta)
+  feedback concerné : tpl.cpx_fbdef_formealg_ok2_def

@@ -2882,17 +2882,6 @@ html[data-theme="dark"] .palette-cat-body { background: #0f172a; }
 }
 .btn-rich-sm:hover { background:#e2e8f0; }
 
-/* Calques de présentation feedback */
-.prt-fb-tpl-row { display:flex;gap:4px;margin:3px 0 5px; }
-.prt-fb-tpl-btn {
-  font-size:11px;padding:2px 9px;border-radius:12px;
-  border:1px solid #cbd5e1;background:#f8fafc;
-  cursor:pointer;color:#475569;white-space:nowrap;line-height:1.5;
-}
-.prt-fb-tpl-btn:hover { background:#e2e8f0;border-color:#94a3b8; }
-.prt-fb-tpl-btn.prt-fb-tpl-active {
-  background:#1d4ed8;border-color:#1d4ed8;color:#fff;font-weight:600;
-}
 
 /* Variables disponibles */
 .prt-vars-panel { display:flex;flex-wrap:wrap;gap:5px;padding:6px 0; }

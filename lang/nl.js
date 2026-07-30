@@ -2446,6 +2446,7 @@ I18N.add("nl", {
   "exp.nouvelles_valeurs_title": "Genereer willekeurige waarden opnieuw",
   "exp.nouvelles_valeurs_btn":   "🔀 Nieuwe waarden",
   "exp.feedback_general_lbl":    "💬 Algemene feedback",
+  "exp.feedback_prt_lbl":        "🌳 PRT-feedback",
 
   /* ── Optique géométrique (OPT, panneau) ── */
   "opt.scenario_lbl":                 "Scenario",
@@ -3530,10 +3531,6 @@ I18N.add("nl", {
   "prt.lbl_feedback_false":           "Feedback (onwaar)",
   "prt.opt_end":                      "— EIND —",
   "prt.btn_apply":                    "✓ Toepassen",
-  "prt.tpl_sans":                     "Geen",
-  "prt.tpl_vrai":                     "✅ Waar",
-  "prt.tpl_faux":                     "❌ Onwaar",
-  "prt.tpl_partiel":                  "🔶 Gedeeltelijk",
   "prt.var_title_student":            "Antwoord leerling",
   "prt.var_title_expected":           "Verwacht antwoord",
   "prt.var_title_question":           "Vraagvariabele",

@@ -45,6 +45,35 @@ function applyFbBox(kind, html) {
         + (s.icon ? s.icon + ' ' : '') + html + '</div>';
 }
 
+// unwrapFbBox() : inverse d'applyFbBox(). Reconnaît aussi l'ancien encadré codé en dur
+// de js/prt-manager.js (_prtWrapFb, supprimé) pour pouvoir nettoyer les feedbacks déjà
+// stockés avec ce système. Idempotent : renvoie html inchangé si aucun wrapper connu.
+var _FB_BOX_LEGACY_BG = ['#f0fdf4', '#F9B3A9', '#f9b3a9', '#fafafa', '#F9F2BB', '#f9f2bb', '#FCDFCF', '#fcdfcf'];
+function unwrapFbBox(html) {
+    if (!html) return html;
+    var s = html.trim();
+    var m = /^<div style="([^"]*)">([\s\S]*)<\/div>\s*$/.exec(s);
+    if (!m) return html;
+    var style = m[1], inner = m[2];
+    var isCurrent = /^border(?:-left:4px solid|:1px solid)/.test(style) && style.indexOf('padding:8px 12px;background:') >= 0;
+    var isLegacyBg = _FB_BOX_LEGACY_BG.some(function (bg) { return style.indexOf('background:' + bg) >= 0; });
+    var isLegacy = /^padding:12px;background:/.test(style) && isLegacyBg;
+    if (!isCurrent && !isLegacy) return html;
+    return inner.replace(/^(?:✅|❌|🔶|🔑)\s*/, '');
+}
+
+// inferFbKind() : déduit 'true'/'partial'/'false' à partir du score du nœud PRT, sans
+// stocker de nouveau champ — lu directement depuis truescoremode/truescore déjà présents
+// sur chaque nœud (js/prt-manager.js parsePrtXml/buildPrtXml).
+function inferFbKind(node, branch) {
+    if (!node || branch !== 'true') return 'false';
+    if (node.truescoremode !== '=') return 'true';
+    var score = parseFloat(node.truescore);
+    if (isNaN(score) || score <= 0) return 'false';
+    if (score < 1) return 'partial';
+    return 'true';
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { FB_BOX_DEFAULTS: FB_BOX_DEFAULTS, FB_BOX_STORAGE_KEY: FB_BOX_STORAGE_KEY, getFbBoxStyles: getFbBoxStyles, saveFbBoxStyles: saveFbBoxStyles, resetFbBoxStyles: resetFbBoxStyles, applyFbBox: applyFbBox };
+    module.exports = { FB_BOX_DEFAULTS: FB_BOX_DEFAULTS, FB_BOX_STORAGE_KEY: FB_BOX_STORAGE_KEY, getFbBoxStyles: getFbBoxStyles, saveFbBoxStyles: saveFbBoxStyles, resetFbBoxStyles: resetFbBoxStyles, applyFbBox: applyFbBox, unwrapFbBox: unwrapFbBox, inferFbKind: inferFbKind };
 }

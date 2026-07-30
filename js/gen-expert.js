@@ -67,6 +67,8 @@ function genExpertCore(s, deps){
   deps = deps || {};
   var I18N_D = deps.I18N || I18N;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
+  var inferFbKind_D = deps.inferFbKind || inferFbKind;
 
   var inputs=s.inputs||[];
   var prts=s.prts||[];
@@ -153,12 +155,18 @@ function genExpertCore(s, deps){
   var inputXML = inputs.map(buildInputXml).join('\n');
 
   var prtXML = prts.map(function(prt){
+    var xmlNodes = (prt.nodes||[]).map(function(n){
+      return Object.assign({}, n, {
+        truefeedback:  applyFbBox_D(inferFbKind_D(n,'true'),  n.truefeedback),
+        falsefeedback: applyFbBox_D(inferFbKind_D(n,'false'), n.falsefeedback)
+      });
+    });
     return buildPrtXml_D(
       { name:prt.name, value:String(prt.value||1),
         autosimplify:String(prt.autosimplify===0?0:1),
         feedbackstyle:String(prt.feedbackstyle||2),
         feedbackvariables:prt.feedbackvariables||'' },
-      prt.nodes||[]
+      xmlNodes
     );
   }).join('\n');
 
@@ -174,7 +182,7 @@ function genExpertCore(s, deps){
     inputXML:  inputXML,
     prtXML:    prtXML,
     feedbackRef: feedbackRef,
-    generalFeedback: s.generalfeedback||'',
+    generalFeedback: applyFbBox_D('general', s.generalfeedback||''),
     qnote:     s.questionnote||'',
     name:      s.name||''
   };

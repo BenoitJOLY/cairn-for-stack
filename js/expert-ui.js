@@ -221,9 +221,23 @@ function expRenderPreview(){
   /* Feedback général */
   var gfbEl=document.getElementById('exp-preview-gfb');
   if(gfbEl){
-    var gfbHtml=expGetGfbValue()||'<em>(vide)</em>';
+    var gfbHtml=applyFbBox('general', expGetGfbValue()||'')||'<em>(vide)</em>';
     gfbEl.innerHTML=_expReplaceStackTags(gfbHtml, env);
     _expKatexRender(gfbEl);
+  }
+
+  /* Feedbacks vrai/faux de chaque nœud PRT */
+  var prtEl=document.getElementById('exp-preview-prt');
+  if(prtEl){
+    var rows=[];
+    (s.prts||[]).forEach(function(prt){
+      (prt.nodes||[]).forEach(function(n){
+        if(n.truefeedback)  rows.push(applyFbBox(inferFbKind(n,'true'),  n.truefeedback));
+        if(n.falsefeedback) rows.push(applyFbBox(inferFbKind(n,'false'), n.falsefeedback));
+      });
+    });
+    prtEl.innerHTML=rows.length ? rows.map(function(h){ return _expReplaceStackTags(h, env); }).join('') : '<em>(vide)</em>';
+    _expKatexRender(prtEl);
   }
 }
 

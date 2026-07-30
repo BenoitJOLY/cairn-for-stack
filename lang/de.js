@@ -2446,6 +2446,7 @@ I18N.add("de", {
   "exp.nouvelles_valeurs_title": "Zufallswerte neu generieren",
   "exp.nouvelles_valeurs_btn":   "🔀 Neue Werte",
   "exp.feedback_general_lbl":    "💬 Allgemeines Feedback",
+  "exp.feedback_prt_lbl":        "🌳 PRT-Feedback",
 
   /* ── Optique géométrique (OPT, panneau) ── */
   "opt.scenario_lbl":                 "Handlung",
@@ -3530,10 +3531,6 @@ I18N.add("de", {
   "prt.lbl_feedback_false":           "Feedback (falsch)",
   "prt.opt_end":                      "— ENDE —",
   "prt.btn_apply":                    "✓ Anwenden",
-  "prt.tpl_sans":                     "Ohne",
-  "prt.tpl_vrai":                     "✅ Wahr",
-  "prt.tpl_faux":                     "❌ Falsch",
-  "prt.tpl_partiel":                  "🔶 Teilweise",
   "prt.var_title_student":            "Schülerantwort",
   "prt.var_title_expected":           "Erwartete Antwort",
   "prt.var_title_question":           "Fragevariable",

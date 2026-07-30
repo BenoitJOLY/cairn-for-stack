@@ -2444,6 +2444,7 @@ I18N.add("en", {
   "exp.nouvelles_valeurs_title": "Regenerate random values",
   "exp.nouvelles_valeurs_btn":   "🔀 New values",
   "exp.feedback_general_lbl":    "💬 General feedback",
+  "exp.feedback_prt_lbl":        "🌳 PRT feedback",
 
   /* ── Geometric optics (OPT, panel) ── */
   "opt.scenario_lbl":                 "Scenario",
@@ -3527,10 +3528,6 @@ I18N.add("en", {
   "prt.lbl_feedback_false":           "Feedback (false)",
   "prt.opt_end":                      "— END —",
   "prt.btn_apply":                    "✓ Apply",
-  "prt.tpl_sans":                     "None",
-  "prt.tpl_vrai":                     "✅ True",
-  "prt.tpl_faux":                     "❌ False",
-  "prt.tpl_partiel":                  "🔶 Partial",
   "prt.var_title_student":            "Student answer",
   "prt.var_title_expected":           "Expected answer",
   "prt.var_title_question":           "Question variable",

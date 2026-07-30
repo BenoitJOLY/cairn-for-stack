@@ -528,6 +528,7 @@ function loadEditorState() {
       var parsed = JSON.parse(qs);
       // Merge into questions object
       Object.assign(questions, parsed);
+      if (typeof migrateAllPrtFeedbackStyle === 'function') migrateAllPrtFeedbackStyle(questions);
     }
     if (nq) nextQid = parseInt(nq) || 1;
   } catch(e) {}

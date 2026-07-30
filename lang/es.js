@@ -2446,6 +2446,7 @@ I18N.add("es", {
   "exp.nouvelles_valeurs_title": "Generar valores aleatorios",
   "exp.nouvelles_valeurs_btn":   "🔀 Nuevos valores",
   "exp.feedback_general_lbl":    "💬 Comentarios generales",
+  "exp.feedback_prt_lbl":        "🌳 Comentarios del PRT",
 
   /* ── Optique géométrique (OPT, panneau) ── */
   "opt.scenario_lbl":                 "Guión",
@@ -3530,10 +3531,6 @@ I18N.add("es", {
   "prt.lbl_feedback_false":           "Retroalimentación (falsa)",
   "prt.opt_end":                      "— FIN —",
   "prt.btn_apply":                    "✓ Aplicar",
-  "prt.tpl_sans":                     "Ninguno",
-  "prt.tpl_vrai":                     "✅ Verdadero",
-  "prt.tpl_faux":                     "❌ Falso",
-  "prt.tpl_partiel":                  "🔶 Parcial",
   "prt.var_title_student":            "Respuesta del alumno",
   "prt.var_title_expected":           "Respuesta esperada",
   "prt.var_title_question":           "Variable de la pregunta",

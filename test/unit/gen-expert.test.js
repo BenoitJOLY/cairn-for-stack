@@ -12,11 +12,12 @@ const path = require('node:path');
 
 const { genExpertCore } = require(path.join('..', '..', 'js', 'gen-expert.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox, inferFbKind } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
 };
-const DEPS = { I18N: I18N_STUB, buildPrtXml };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, applyFbBox, inferFbKind };
 
 function simpleNode(id, trueNext, falseNext) {
     return {
