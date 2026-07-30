@@ -49,7 +49,7 @@ function closeHelp(){
         #helpModal .help-body{padding:18px 22px;overflow-y:auto;font-size:.88rem;color:#334155;line-height:1.6;flex:1;}
         #helpModal .help-body p{margin:0 0 10px 0;}
         #helpModal .help-h{margin:16px 0 7px 0;font-size:.92rem;color:#1e3a5f;font-weight:700;border-bottom:2px solid #e2e8f0;padding-bottom:4px;}
-        #helpModal .help-body h4.help-h:first-child{margin-top:0;}
+        #helpModal .help-body h3.help-h:first-child{margin-top:0;}
         #helpModal .help-ul{margin:0 0 10px 0;padding-left:20px;}
         #helpModal .help-ul li{margin-bottom:5px;}
         #helpModal .help-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;font-size:.82em;color:#0f172a;}

@@ -359,7 +359,7 @@ function ggbRenderOutputs() {
     return '<div class="ggb-row ggb-row-out">'
       + '<input class="hs-input ggb-mono" placeholder="' + I18N.t('ggb.ph_ggb_obj') + '" value="' + attrEsc(r.ggbName || '') + '" '
       + 'onchange="ggbUpdateOutput(' + i + ',\'ggbName\',this.value)">'
-      + '<select class="hs-input" onchange="ggbUpdateOutput(' + i + ',\'type\',this.value)">' + typeOpts + '</select>'
+      + '<select class="hs-input" aria-label="Type de la variable de sortie" onchange="ggbUpdateOutput(' + i + ',\'type\',this.value)">' + typeOpts + '</select>'
       + '<input class="hs-input ggb-mono" placeholder="' + I18N.t('ggb.ph_tans') + '" value="' + attrEsc(r.tans || '') + '" '
       + 'onchange="ggbUpdateOutput(' + i + ',\'tans\',this.value)">'
       + (t === 'numerical'

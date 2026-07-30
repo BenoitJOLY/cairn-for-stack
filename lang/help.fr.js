@@ -6,7 +6,7 @@
    ════════════════════════════════════════════════════════════════ */
 (function(){
   "use strict";
-function _hSection(title, html){ return `<h4 class="help-h">${title}</h4>${html}`; }
+function _hSection(title, html){ return `<h3 class="help-h">${title}</h3>${html}`; }
 function _hList(items){ return '<ul class="help-ul">'+items.map(i=>`<li>${i}</li>`).join('')+'</ul>'; }
 
 // Rappel commun affiché en bas de chaque aide (éléments partagés par tous les modules).

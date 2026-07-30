@@ -688,7 +688,7 @@ function renderPreviewHTML_physique(state) {
     .replace(/\[\[validation:[^\]]+\]\]/g, '');
   var scenarioHTML = bodyFrag ? _calcTokenizeForPreview(bodyFrag, knownVars)
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
-  var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
+  var note = '<p><em style="color:#475569;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.physique'), badgeColor: '#7f1d1d', noteBg: '#fff1f2', noteColor: '#7f1d1d',
     prefix: 'phy', bareme: state.bareme || 1,
@@ -1241,7 +1241,7 @@ function renderPreviewHTML_apn(state) {
     .replace(/\[\[validation:[^\]]+\]\]/g, '');
   var scenarioHTML = bodyFrag ? _calcTokenizeForPreview(bodyFrag, knownVars)
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement — voir l\'aper\xe7u \xe9l\xe8ve pour un exemple.</em>';
-  var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
+  var note = '<p><em style="color:#475569;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement.</em></p>';
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.apn'), badgeColor: '#1e3a8a', noteBg: '#eff6ff', noteColor: '#1e3a8a',
     prefix: 'apn', bareme: state.bareme || 1,

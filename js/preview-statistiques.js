@@ -9,13 +9,13 @@ function renderPreviewHTML_statistiques(state) {
   var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
   var bodyFrag = (realParts.textFrag || '')
     .replace(/^<div style="background:#0284c7;border-left:5px solid #0369a1;[\s\S]*?<\/div>/, '')
-    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled style="' + fakeInputStyle + '">')
+    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled aria-label="Aperçu du champ de réponse" style="' + fakeInputStyle + '">')
     .replace(/\[\[validation:[^\]]+\]\]/g, '');
   var scenarioHTML = bodyFrag
     ? _calcTokenizeForPreview(bodyFrag, knownVars)
     : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement (s\xe9rie statistique) — voir l\'aper\xe7u \xe9l\xe8ve ci-dessous pour un exemple concret.</em>';
   var prtBoxes = _hsPrtBoxes(realParts);
-  var note = '<p><em style="color:#6b7280;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement ci-dessus.</em></p>';
+  var note = '<p><em style="color:#475569;font-size:.82rem;">Les variables encore not\xe9es \\(q_{\\dots}\\) sont celles qui restent calcul\xe9es \xe0 l\'affichage r\xe9el (tirage al\xe9atoire) — les valeurs d\xe9j\xe0 d\xe9termin\xe9es sont affich\xe9es directement ci-dessus.</em></p>';
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.statistiques'), badgeColor: '#0f766e', noteBg: '#f0fdfa', noteColor: '#0f766e',
     prefix: 'stat', bareme: state.bareme || 1,

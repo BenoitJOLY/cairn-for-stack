@@ -1036,11 +1036,11 @@ fill="currentColor" stroke="none">
       </div>
       <div class="field" style="display:flex;flex-direction:row;gap:14px;flex-wrap:wrap;align-items:flex-end;">
         <div style="flex:0 0 140px;">
-          <label data-i18n="ggb.width_lbl">Largeur (px)</label>
+          <label for="ggb-width" data-i18n="ggb.width_lbl">Largeur (px)</label>
           <input type="number" class="hs-input" id="ggb-width" value="700" min="100" step="10" onchange="if(typeof ggbRefreshPreview==='function')ggbRefreshPreview()">
         </div>
         <div style="flex:0 0 140px;">
-          <label data-i18n="ggb.height_lbl">Hauteur (px)</label>
+          <label for="ggb-height" data-i18n="ggb.height_lbl">Hauteur (px)</label>
           <input type="number" class="hs-input" id="ggb-height" value="500" min="100" step="10" onchange="if(typeof ggbRefreshPreview==='function')ggbRefreshPreview()">
         </div>
         <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:#374151;">
@@ -2325,7 +2325,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="ineq-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-ineq-text" onclick="openRich('ineq-text')" style="min-height:60px;border-color:#0e7490;background:#ecfeff;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-ineq-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('ineq-text')" style="min-height:60px;border-color:#0e7490;background:#ecfeff;"></div>
         <textarea id="ineq-text" style="display:none"></textarea>
       </div>
 
@@ -2417,7 +2417,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="pol-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-pol-text" onclick="openRich('pol-text')" style="min-height:60px;border-color:#166534;background:#f0fdf4;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-pol-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('pol-text')" style="min-height:60px;border-color:#166534;background:#f0fdf4;"></div>
         <textarea id="pol-text" style="display:none"></textarea>
       </div>
 
@@ -2501,7 +2501,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="eq-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-eq-text" onclick="openRich('eq-text')" style="min-height:60px;border-color:#5b21b6;background:#f5f3ff;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-eq-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('eq-text')" style="min-height:60px;border-color:#5b21b6;background:#f5f3ff;"></div>
         <textarea id="eq-text" style="display:none"></textarea>
       </div>
 
@@ -2588,7 +2588,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="lim-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-lim-text" onclick="openRich('lim-text')" style="min-height:60px;border-color:#1e3a8a;background:#eff6ff;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-lim-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('lim-text')" style="min-height:60px;border-color:#1e3a8a;background:#eff6ff;"></div>
         <textarea id="lim-text" style="display:none"></textarea>
       </div>
 
@@ -3116,7 +3116,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="trig-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-trig-text" onclick="openRich('trig-text')" style="min-height:60px;border-color:#b45309;background:#fffbeb;"></div>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-trig-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('trig-text')" style="min-height:60px;border-color:#b45309;background:#fffbeb;"></div>
         <textarea id="trig-text" style="display:none"></textarea>
       </div>
 
@@ -3204,7 +3204,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="stat-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-stat-text" onclick="openRich('stat-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-stat-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('stat-text')"
              style="min-height:60px;border-color:#0f766e;background:#f0fdfa;"></div>
         <textarea id="stat-text" style="display:none"></textarea>
       </div>
@@ -3339,7 +3339,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="mat-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-mat-text" onclick="openRich('mat-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-mat-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('mat-text')"
              style="min-height:60px;border-color:#7c2d12;background:#fff7ed;"></div>
         <textarea id="mat-text" style="display:none"></textarea>
       </div>
@@ -3408,7 +3408,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="geo-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-geo-text" onclick="openRich('geo-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-geo-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('geo-text')"
              style="min-height:60px;border-color:#1e40af;background:#eff6ff;"></div>
         <textarea id="geo-text" style="display:none"></textarea>
       </div>
@@ -5429,7 +5429,7 @@ fill="currentColor" stroke="none">
             <button class="prt-zoom-btn prt-zoom-reset" onclick="prtZoomReset()" title="Réinitialiser le zoom" data-i18n-title="prt.zoom_reset_title">⊙</button>
           </span>
         </div>
-        <div id="prt-tree-svg-wrap" class="prt-tree-svg-wrap"></div>
+        <div id="prt-tree-svg-wrap" class="prt-tree-svg-wrap" tabindex="0" aria-label="Arbre du PRT"></div>
       </div>
       <div id="prt-resize-handle" class="prt-resize-handle" onmousedown="prtResizePanelStart(event)"></div>
       <div id="prt-node-editor" class="prt-node-editor">
@@ -7509,7 +7509,7 @@ fill="currentColor" stroke="none">
 <!-- ══════════════════════════════════════════════════ -->
 <div id="promptModal" class="modal-backdrop" onclick="if(event.target===this)closePB()" style="z-index:9200;">
   <div class="pb-box" onclick="event.stopPropagation()">
-    <div class="pb-head" id="pb-head" style="background:#6366f1;">
+    <div class="pb-head" id="pb-head" style="background:#4f46e5;">
       <h2 id="pb-head-title"><svg class="hs-ico"><use href="#ico-tool-ai"></use></svg> <span data-i18n="modal.generateur_de_prompt_ia">Générateur de Prompt IA</span></h2>
       <button onclick="closePB()" data-i18n-aria="btn.fermer" style="background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:50%;width:27px;height:27px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">×</button>
     </div>

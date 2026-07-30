@@ -32,7 +32,7 @@ function renderPreviewHTML_numerical(state) {
   const tolNumeric = _hsNumToleranceValue(state.val, state.tolType, tolVal);
   const tolDisplay = `± ${tolNumeric}`;
   const fbGenHTML = `<div class="hs-clickable" data-num-field="fbgen" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin:4px 0;">
-    <p style="margin:0 0 4px 0;"><strong>Valeur acceptée :</strong> <code>${state.val || '—'} ${tolDisplay}</code> <span style="color:#64748b;">(tolérance ${tolLabel})</span></p>
+    <p style="margin:0 0 4px 0;"><strong>Valeur acceptée :</strong> <code>${state.val || '—'} ${tolDisplay}</code> <span style="color:#475569;">(tolérance ${tolLabel})</span></p>
     ${state.fbGen ? `<div style="margin-top:8px;">${_hsRenderMath(state.fbGen)}</div>` : ''}
   </div>`;
 
@@ -100,7 +100,7 @@ function renderPreviewHTML_numerical(state) {
       var tolLabel = state.tolType === 'absolute' ? 'Absolue (NumAbsolute)' : 'Relative (NumRelative)';
       var tolVal = state.tolVal || '0.05';
       var tolNumeric = _hsNumToleranceValue(state.val, state.tolType, tolVal);
-      autoPreview.innerHTML = '<p style="margin:0;"><strong>Valeur acceptée :</strong> <code>' + (state.val || '—') + ' ± ' + tolNumeric + '</code> <span style="color:#64748b;">(' + I18N.t('common.preview_tolerance').toLowerCase() + ' ' + tolLabel + ')</span></p>';
+      autoPreview.innerHTML = '<p style="margin:0;"><strong>Valeur acceptée :</strong> <code>' + (state.val || '—') + ' ± ' + tolNumeric + '</code> <span style="color:#475569;">(' + I18N.t('common.preview_tolerance').toLowerCase() + ' ' + tolLabel + ')</span></p>';
     }
   }
   window.numRefreshPreview = updateNumFullPreview;
