@@ -2,8 +2,8 @@ const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
-const { verifyPassword, createAccount, isSelfRegistered } = require('./accounts');
-const { isUnderQuota, recordUsage, WEEKLY_LIMIT } = require('./usage');
+const { verifyPassword, createAccount, isSelfRegistered, deleteAccount } = require('./accounts');
+const { isUnderQuota, recordUsage, deleteUsage, WEEKLY_LIMIT } = require('./usage');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = process.env.PORT || 3000;
@@ -110,6 +110,21 @@ app.post('/api/generate', (req, res) => {
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message || 'Erreur serveur.' });
   }
+});
+
+// Droit à l'effacement (RGPD) — auto-service, voir index.html modale
+// "Mentions légales". Redemande le mot de passe (le cookie de session seul ne
+// suffit pas à confirmer une action destructive) avant de purger accounts.json
+// ET usage.json, puis détruit la session en cours.
+app.post('/api/account/delete', (req, res) => {
+  const username = req.session.username;
+  const { password } = req.body || {};
+  if (typeof password !== 'string' || !verifyPassword(username, password)) {
+    return res.status(401).json({ error: 'Mot de passe incorrect.' });
+  }
+  deleteAccount(username);
+  deleteUsage(username);
+  req.session.destroy(() => res.json({ ok: true }));
 });
 
 // Relais interne vers stack-api (conteneur "maxima-stack-api-1", réseau Docker

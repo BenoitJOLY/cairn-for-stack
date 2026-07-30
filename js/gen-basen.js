@@ -91,12 +91,13 @@ function genBasenCore(X, p, deps) {
     var vDstRaw    = 'q' + X + '_dstraw';
     var vDstStr    = 'q' + X + '_dststr';
     var vDstStrRev = 'q' + X + '_dststrrev';
-    var vLower     = 'q' + X + '_lower';
-    var vHasSpace  = 'q' + X + '_hasspace';
-    var vHasPrefix = 'q' + X + '_hasprefix';
-    var vHasLetters= 'q' + X + '_hasletters';
-    var vLeadZero  = 'q' + X + '_leadzero';
+    var vStripFn   = 'q' + X + '_lstrip0';
     var vValidChars= 'q' + X + '_validchars';
+    var vNormFn       = 'q' + X + '_normalize';
+    var vAnsNorm      = 'q' + X + '_ansnorm';
+    var vCorrectNorm  = 'q' + X + '_correctnorm';
+    var vSrcStrNorm   = 'q' + X + '_srcstrnorm';
+    var vDstStrRevNorm= 'q' + X + '_dststrrevnorm';
 
     var vMisread10 = 'q' + X + '_misread10';
     var vSrcRevVal = 'q' + X + '_srcrevval';
@@ -158,8 +159,28 @@ function genBasenCore(X, p, deps) {
             qvars += vDstRaw + ': sconcat(smake(max(0, ' + fixedWidth + ' - slength(' + vDstRaw + ')), "0"), ' + vDstRaw + ');\n';
         }
         qvars += vDstStr + ': sconcat("' + prefix + '", ' + vDstRaw + ');\n'
-            + vDstStrRev + ': sconcat("' + prefix + '", sreverse(' + vDstRaw + '));\n'
-            + vLower + ': sdowncase(' + vDstStr + ');\n';
+            + vDstStrRev + ': sconcat("' + prefix + '", sreverse(' + vDstRaw + '));\n';
+
+        // ── Normalisation (espaces / casse / prefixe / zero de tete) ──
+        // Separe une erreur de FORMAT (credit partiel, cf. noeuds PRT plus bas) d'une
+        // erreur de VALEUR (reponse renversee, recopiee, ou carrement fausse), meme
+        // quand l'eleve cumule plusieurs erreurs a la fois (ex. reponse renversee ET
+        // avec des espaces : sans normalisation, seule la 1ere detectee comptait, ce
+        // qui pouvait accorder un credit partiel a une valeur en realite fausse).
+        // Le zero de tete n'est retire que si aucune largeur fixe n'est imposee (auquel
+        // cas les zeros de tete sont des chiffres significatifs du format attendu).
+        qvars += vNormFn + '(s) := block([t, cl],\n'
+            + '    t: simplode(sublist(charlist(s), lambda([c], c # " "))),\n'
+            + '    t: supcase(t),\n'
+            + '    cl: charlist(t),\n'
+            + '    if length(cl) >= 2 and member(simplode([cl[1], cl[2]]), ["0X","0B","0O"]) then t: simplode(rest(cl, 2)),\n'
+            + (fixedWidth ? '' : ('    cl: charlist(t),\n'
+                + '    if length(cl) > 1 then block([i: 1], while i < length(cl) and cl[i] = "0" do i: i+1, t: simplode(rest(cl, i-1))),\n'))
+            + '    t\n'
+            + ');\n'
+            + vCorrectNorm + ': ' + vNormFn + '(' + vDstStr + ');\n'
+            + vSrcStrNorm + ': ' + vNormFn + '(' + vSrcStr + ');\n'
+            + vDstStrRevNorm + ': ' + vNormFn + '(' + vDstStrRev + ');\n';
     }
 
     // ── Pieges classiques utilises seulement quand la base d arrivee est 10 ──
@@ -245,60 +266,26 @@ function genBasenCore(X, p, deps) {
         // au-dessus n'a matche.
         nodes.push({ desc: 'Erreur de calcul generique', test: 'EqualComAss', sans: '1', tans: '1', fb: fbWrongFinal, fbKind: 'false', isFinal: true });
     } else {
-        // ── Diagnostics de format calcules en Maxima (feedbackvariables), pas en RegExp ──
-        // Chaque diagnostic est un booleen precalcule via des fonctions de chaine simples
-        // (ssearch/charlist/member/sublist), teste ensuite par un noeud EqualComAss contre
-        // "true". On evite ainsi toute regex reconstruite au runtime (source du bug ou une
-        // reponse valide, ex. "101011" en base 2, etait signalee comme invalide).
+        // ── Diagnostics calcules en Maxima (feedbackvariables), pas en RegExp ──
+        // vAnsNorm normalise la reponse de l'eleve (espaces/casse/prefixe/zero de tete,
+        // cf. vNormFn ci-dessus) : les noeuds "recopie" et "renverse" comparent ensuite
+        // la forme NORMALISEE, si bien qu'une erreur de valeur reste detectee meme
+        // cumulee avec une erreur de format (ex. reponse renversee ET avec espaces).
         var ansVar = 'ans' + X;
-        fbVars += vHasSpace + ': is(ssearch(" ", ' + ansVar + ') # false);\n';
-        if (toBaseFormat === 'S') {
-            fbVars += vHasPrefix + ': is(ssearch("0b", sdowncase(' + ansVar + ')) = 1 or ssearch("0x", sdowncase(' + ansVar + ')) = 1 or ssearch("0o", sdowncase(' + ansVar + ')) = 1);\n';
-            if (toBase <= 10) {
-                fbVars += vHasLetters + ': is(sublist(charlist(' + ansVar + '), lambda([c], member(c, append(charlist("abcdefghijklmnopqrstuvwxyz"), charlist("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))))) # []);\n';
-            }
-            // Zeros inutiles au debut : diagnostic desactive quand une largeur fixe est imposee,
-            // puisque les zeros de tete sont alors exiges (et non plus une erreur).
-            if (!fixedWidth) {
-                fbVars += vLeadZero + ': if slength(' + ansVar + ') > 1 then is(first(charlist(' + ansVar + ')) = "0") else false;\n';
-            }
-        }
+        fbVars += vAnsNorm + ': ' + vNormFn + '(' + ansVar + ');\n';
         fbVars += vValidChars + ': is(sublist(charlist(' + ansVar + '), lambda([c], not member(c, ' + charsetListLiteral + '))) = []);\n';
 
         nodes.push({ desc: 'Reponse exacte', test: 'String', tans: vDstStr, fb: fbOkFinal, fbKind: 'true', isCorrect: true });
         nodes.push({
-            desc: 'Espaces detectes', test: 'EqualComAss', sans: vHasSpace, tans: 'true',
-            fb: '<strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_espaces_desc'), fbKind: 'partial'
+            desc: 'Valeur correcte, format incorrect', test: 'String', sans: vAnsNorm, tans: vCorrectNorm,
+            fb: '<strong>' + I18N_D.t('bn.fb_presque_correct') + '</strong> ' + I18N_D.t('bn.fb_err_format_desc'), fbKind: 'partial'
         });
-        if (toBaseFormat === 'S') {
-            nodes.push({
-                desc: 'Prefixe interdit detecte', test: 'EqualComAss', sans: vHasPrefix, tans: 'true',
-                fb: '<strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_prefixe_desc'), fbKind: 'false'
-            });
-            if (toBase <= 10) {
-                nodes.push({
-                    desc: 'Lettres interdites detectees', test: 'EqualComAss', sans: vHasLetters, tans: 'true',
-                    fb: '<strong>' + I18N_D.t('bn.fb_format_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_lettres_desc', {toBase: String(toBase)}), fbKind: 'false'
-                });
-            } else {
-                nodes.push({
-                    desc: 'Minuscules utilisees', test: 'String', tans: vLower,
-                    fb: '<strong>' + I18N_D.t('bn.fb_presque_correct') + '</strong> ' + I18N_D.t('bn.fb_err_minuscules_desc'), fbKind: 'partial'
-                });
-            }
-            if (!fixedWidth) {
-                nodes.push({
-                    desc: 'Zeros inutiles au debut', test: 'EqualComAss', sans: vLeadZero, tans: 'true',
-                    fb: '<strong>' + I18N_D.t('bn.fb_presque_correct') + '</strong> ' + I18N_D.t('bn.fb_err_zeros_desc'), fbKind: 'partial'
-                });
-            }
-        }
         nodes.push({
-            desc: 'Recopie de la valeur de depart', test: 'String', tans: vSrcStr,
+            desc: 'Recopie de la valeur de depart', test: 'String', sans: vAnsNorm, tans: vSrcStrNorm,
             fb: '<strong>' + I18N_D.t('apn.fb_wrong_incorrect') + '</strong> ' + I18N_D.t('bn.fb_err_recopie_desc', {toBase: String(toBase)}), fbKind: 'false'
         });
         nodes.push({
-            desc: 'Restes lus a l\'envers', test: 'String', tans: vDstStrRev,
+            desc: 'Restes lus a l\'envers', test: 'String', sans: vAnsNorm, tans: vDstStrRevNorm,
             fb: '<strong>' + I18N_D.t('bn.fb_err_lecture_title') + '</strong> ' + I18N_D.t('bn.fb_err_lecture_desc'), fbKind: 'false'
         });
         nodes.push({
@@ -314,10 +301,14 @@ function genBasenCore(X, p, deps) {
     // buildPrtXml_D() (prt-manager.js) est le SEUL serialiseur XML, partage par tous
     // les types migres. Ainsi la structure editee et la structure exportee sont
     // toujours la meme representation, sans aller-retour XML fragile.
+    // Score en fraction (0 a 1, multipliee par la valeur du PRT), mode '=' -- meme
+    // convention que gen-math-inequation.js. Une erreur purement formelle (espaces,
+    // casse, zero de tete : fbKind 'partial') valorise le calcul correct sous-jacent
+    // avec un credit partiel plutot qu'un 0 sec, contrairement a une erreur de fond
+    // (mauvaise valeur, sens de lecture, caracteres invalides...).
     var canonicalNodes = nodes.map(function(nd, i) {
         var isLast = (i === nodes.length - 1);
-        var trueScoreMode = nd.isCorrect ? '+' : '-';
-        var trueScore = nd.isCorrect ? String(bareme) : '0';
+        var trueFrac = nd.isCorrect ? '1' : (nd.fbKind === 'partial' ? '0.5' : '0');
         return {
             name: String(i),
             description: nd.desc,
@@ -326,13 +317,13 @@ function genBasenCore(X, p, deps) {
             tans: nd.tans,
             testoptions: '',
             quiet: '0',
-            truescoremode: trueScoreMode,
-            truescore: trueScore,
+            truescoremode: '=',
+            truescore: trueFrac,
             truepenalty: '',
             truenextnode: '-1',
             trueanswernote: 'PRT' + X + '-' + i + '-T',
             truefeedback: nd.fb,
-            falsescoremode: '-',
+            falsescoremode: '=',
             falsescore: '0',
             falsepenalty: '',
             falsenextnode: isLast ? '-1' : String(i + 1),

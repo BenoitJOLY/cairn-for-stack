@@ -48,9 +48,10 @@ const { buildKbdStackHTML } = require('../js/keyboard.js');
 const { _mkInput, _mkFbGen } = require('../js/gen-math-shared.js');
 const { _cpxGenFbgen } = require('../js/complexe-ui.js');
 const { htmlEsc, escapeMaximaString, rawEsc } = require('../js/data.js');
+const { applyFbBox } = require('../js/fb-box.js');
 const I18N = require('./i18n-node.js');
 
-const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty, bnStrictParse, bnSyntaxHint, jxgDropChunkedJsString, jxgDropChunkedRaw, CIR_ENGINE_JS, CIR_ATELIER_CSS };
+const DEPS = { I18N, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, _mkInput, _mkFbGen, _cpxGenFbgen, htmlEsc, escapeMaximaString, rawEsc, generateCWMaximaString, renderCWGridHTML, renderCWGridHTMLEmpty, bnStrictParse, bnSyntaxHint, jxgDropChunkedJsString, jxgDropChunkedRaw, CIR_ENGINE_JS, CIR_ATELIER_CSS, applyFbBox };
 
 // Un type migré à la fois — voir PLAN.md, chantier "Backend auto-hébergé NAS",
 // étape 3. Ajouter une entrée ici seulement après audit + test réel Moodle.

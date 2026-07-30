@@ -37,4 +37,12 @@ function recordUsage(username) {
   saveUsage(usage);
 }
 
-module.exports = { isUnderQuota, recordUsage, WEEKLY_LIMIT };
+// Droit à l'effacement (RGPD) — appelée avec deleteAccount() (accounts.js)
+// pour ne laisser aucune trace d'usage une fois le compte supprimé.
+function deleteUsage(username) {
+  const usage = loadUsage();
+  delete usage[username];
+  saveUsage(usage);
+}
+
+module.exports = { isUnderQuota, recordUsage, deleteUsage, WEEKLY_LIMIT };

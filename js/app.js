@@ -1053,6 +1053,39 @@ function closeCopyModal(e) { if(!e||e.target===document.getElementById('copyModa
 function openContactModal() { document.getElementById('contactModal').style.display='flex'; }
 function closeContactModal(e) { if(!e||e.target===document.getElementById('contactModal'))document.getElementById('contactModal').style.display='none'; }
 
+// Droit à l'effacement (RGPD) — n'a d'effet que sur la version hébergée
+// (connectée par compte) ; en usage 100% local, /api n'existe pas et
+// l'appel échoue simplement avec un message réseau, sans casser l'UI.
+async function logoutFromApp() {
+  try {
+    await fetch('/api/logout', { method: 'POST' });
+  } catch (e) { /* pas de backend en usage 100% local */ }
+  window.location.href = '/login.html';
+}
+
+async function deleteAccountFromApp() {
+  var msg = I18N.t('msg.supprimer_compte_confirm') || 'Cette action supprime définitivement votre compte et toutes vos données (identifiant, mot de passe, historique d\'usage). Continuer ?';
+  if (!confirm(msg)) return;
+  var pwdMsg = I18N.t('msg.supprimer_compte_mdp') || 'Confirmez votre mot de passe pour supprimer le compte :';
+  var password = prompt(pwdMsg);
+  if (!password) return;
+  try {
+    var res = await fetch('/api/account/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: password })
+    });
+    if (res.ok) {
+      window.location.href = '/login.html';
+    } else {
+      var data = await res.json().catch(function(){ return {}; });
+      alert(data.error || (I18N.t('msg.supprimer_compte_erreur') || 'Suppression impossible.'));
+    }
+  } catch (e) {
+    alert(I18N.t('msg.supprimer_compte_reseau') || 'Fonctionnalité disponible uniquement sur la version hébergée (connectée).');
+  }
+}
+
 // ── INIT ─────────────────────────────────────────────────────────
 window.onload = function() {
   if (typeof I18N !== 'undefined' && typeof I18N.init === 'function') I18N.init();
