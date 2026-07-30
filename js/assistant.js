@@ -266,7 +266,7 @@
       '<div class="hs-resize" id="hs-resize" title="Glisser pour redimensionner"></div>'+
       '<div class="hs-panel-head"><h2>'+(L().panelTitle||'')+'</h2>'+
         '<button class="hs-panel-off" id="hs-panel-off">'+(L().disable||'')+'</button></div>'+
-      '<div class="hs-panel-body" id="hs-panel-body"></div>';
+      '<div class="hs-panel-body" id="hs-panel-body" tabindex="0"></div>';
     document.body.appendChild(p);
     p.querySelector("#hs-panel-off").addEventListener("click", function(){ setActive(false, true); });
     setupResize(p.querySelector("#hs-resize"));

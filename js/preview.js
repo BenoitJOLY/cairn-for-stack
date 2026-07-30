@@ -16,6 +16,7 @@ function mountPreviewIframe(containerId, htmlString) {
   if (!iframe) {
     iframe = document.createElement('iframe');
     iframe.className = 'hs-preview-iframe';
+    iframe.title = 'Aperçu de la question';
     iframe.setAttribute('sandbox', 'allow-same-origin');
     iframe.style.width = '100%';
     iframe.style.border = 'none';
@@ -53,6 +54,7 @@ function mountPreviewIframeScripted(containerId, htmlString) {
   if (!iframe) {
     iframe = document.createElement('iframe');
     iframe.className = 'hs-preview-iframe';
+    iframe.title = 'Aperçu de la question';
     iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
     iframe.style.width = '100%';
     iframe.style.border = 'none';
@@ -550,9 +552,13 @@ function _hsSimplePreviewHTML(cfg) {
   const extraNodesHTML = (cfg.extraFeedbackNodes && cfg.extraFeedbackNodes.length) ? `
     <div style="font-size:.75rem;color:#64748b;margin:10px 0 4px;font-weight:600;">${cfg.extraFeedbackNodesTitle || I18N.t('common.preview_other_diagnostics_title')}</div>
     ${cfg.extraFeedbackNodes.map(n => `<div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${_hsRenderMath(n.desc || '')}</div>${_hsRenderMath(n.fb || '')}`).join('')}` : '';
+  // fbBoxesPreWrapped : certains appelants (preview-basen.js, preview-inequation.js)
+  // ont déjà encadré fbOk/fbWrong via applyFbBox() au point d'affichage (cf. js/fb-box.js) —
+  // wrapFb() ré-encadrerait alors une seconde fois (boîte dans la boîte). Les autres
+  // types (pas encore migrés vers applyFbBox) continuent de compter sur wrapFb() ici.
   const okWrongHTML = cfg.hideOkWrongBoxes ? '' : `
-    <div data-${cfg.prefix}-field="fbc">${fbOkDescHTML}${wrapFb(_hsRenderMath(cfg.fbOk || '✅ <strong>Bonne réponse !</strong>'), true)}</div>
-    <div data-${cfg.prefix}-field="fbe">${fbWrongDescHTML}${wrapFb(_hsRenderMath(cfg.fbWrong || '❌ <strong>Réponse incorrecte.</strong>'), false)}</div>`;
+    <div data-${cfg.prefix}-field="fbc">${fbOkDescHTML}${cfg.fbBoxesPreWrapped ? _hsRenderMath(cfg.fbOk || '✅ <strong>Bonne réponse !</strong>') : wrapFb(_hsRenderMath(cfg.fbOk || '✅ <strong>Bonne réponse !</strong>'), true)}</div>
+    <div data-${cfg.prefix}-field="fbe">${fbWrongDescHTML}${cfg.fbBoxesPreWrapped ? _hsRenderMath(cfg.fbWrong || '❌ <strong>Réponse incorrecte.</strong>') : wrapFb(_hsRenderMath(cfg.fbWrong || '❌ <strong>Réponse incorrecte.</strong>'), false)}</div>`;
   const fbHTML = `
     ${okWrongHTML}
     ${extraNodesHTML}
@@ -590,13 +596,18 @@ function _hsSimplePreviewHTML(cfg) {
   <div class="hs-preview-header">
     <span class="hs-preview-badge">${cfg.badge}</span>
     <span class="hs-preview-note">/ ${cfg.bareme} pt</span>
+    ${cfg.extraHeaderNote ? `<span class="hs-preview-note">${cfg.extraHeaderNote}</span>` : ''}
   </div>
   ${bodyHTML}
 </body>
 </html>`;
 }
 
-function _hsWireSimplePreview(typeName, prefix, containerId, panelId, renderFn, scripted) {
+// augmentState(state) : callback optionnel invoqué juste après captureState(),
+// avant le rendu — permet à un type d'injecter des données figées hors de l'état
+// du formulaire (ex: aperçu réel via Maxima, voir preview-inequation.js) sans
+// dupliquer toute la logique de branchement DOM ci-dessous pour chaque type.
+function _hsWireSimplePreview(typeName, prefix, containerId, panelId, renderFn, scripted, augmentState) {
   var mountFn = scripted ? mountPreviewIframeScripted : mountPreviewIframe;
   function update() {
     if (typeof currentType === 'undefined' || currentType !== typeName) return;
@@ -605,6 +616,7 @@ function _hsWireSimplePreview(typeName, prefix, containerId, panelId, renderFn, 
     if (!container) return;
     try {
       var state = captureState();
+      if (typeof augmentState === 'function') { try { augmentState(state); } catch (e) {} }
       var iframe = mountFn(containerId, renderFn(state));
       if (iframe && !iframe.__hsClickWired) {
         iframe.__hsClickWired = true;

@@ -43,47 +43,47 @@
 </head>
 <body>
 <div class="depot-wrap">
-  <div class="app-header" style="border-radius:14px 14px 0 0;">
-    <div><strong style="font-size:1.1rem;">📦 Dépôt de questions StackForge</strong></div>
+  <header class="app-header" role="banner" style="border-radius:14px 14px 0 0;">
+    <div><h1 style="font-size:1.1rem;margin:0;">📦 Dépôt de questions StackForge</h1></div>
     <a href="index.html" class="tagline" style="color:#fff;text-decoration:none;">← Retour au générateur</a>
-  </div>
-  <div class="card" style="border-radius:0 0 14px 14px;">
+  </header>
+  <main class="card" style="border-radius:0 0 14px 14px;">
     <div class="depot-body">
-      <div class="depot-sidebar">
+      <nav class="depot-sidebar" aria-label="Filtres de recherche">
         <div class="filter-section">
           <h4>Contexte principal</h4>
           <div class="filter-group">
-            <label>Pays</label>
+            <label for="f-pays">Pays</label>
             <select class="depot-select" id="f-pays" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
           </div>
           <div class="filter-group">
-            <label>Matière</label>
+            <label for="f-matiere">Matière</label>
             <select class="depot-select" id="f-matiere" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
           </div>
           <div class="filter-group">
-            <label>Niveau</label>
+            <label for="f-niveau">Niveau</label>
             <select class="depot-select" id="f-niveau" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
           </div>
         </div>
         <div class="filter-section">
           <h4>Contenu</h4>
           <div class="filter-group">
-            <label>Sous-matière</label>
+            <label for="f-sous-matiere">Sous-matière</label>
             <select class="depot-select" id="f-sous-matiere" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
           </div>
           <div class="filter-group">
-            <label>Chapitre</label>
+            <label for="f-chapitre">Chapitre</label>
             <select class="depot-select" id="f-chapitre" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
           </div>
         </div>
         <div class="filter-section">
           <h4>Pédagogie</h4>
           <div class="filter-group">
-            <label>Taxonomie de Bloom</label>
+            <label for="f-bloom">Taxonomie de Bloom</label>
             <select class="depot-select" id="f-bloom" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
           </div>
           <div class="filter-group">
-            <label>Difficulté</label>
+            <label for="f-difficulte">Difficulté</label>
             <select class="depot-select" id="f-difficulte" onchange="recalculate()"><option value="">-- Indifférent --</option></select>
           </div>
         </div>
@@ -92,7 +92,7 @@
           <div id="optional-tags-buttons"></div>
         </div>
         <button class="clear-btn" onclick="resetAll()">🔄 Tout réinitialiser</button>
-      </div>
+      </nav>
 
       <div class="depot-main">
         <div class="depot-toolbar">
@@ -102,7 +102,7 @@
         <ul id="file-list" class="file-list"><li class="no-result">Chargement…</li></ul>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 
 <script src="lib/fflate/fflate.min.js"></script>

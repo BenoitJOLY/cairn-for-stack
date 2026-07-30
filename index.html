@@ -744,7 +744,7 @@ fill="currentColor" stroke="none">
     <a class="v4-btn-projects" href="depot.html" style="text-decoration:none;" title="Consulter ou télécharger des questions déjà partagées" data-i18n-title="header.bank_title">
       <svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-structure"></use></svg> <span data-i18n="header.bank_label">Banque</span>
     </a>
-    <span id="proj-autosave-lbl" class="proj-autosave-lbl" style="opacity:.45;"></span>
+    <span id="proj-autosave-lbl" class="proj-autosave-lbl" style="opacity:.7;"></span>
   </div>
   <!-- Mode assistant + Options injectés ici par assistant.js / options.js -->
 </header>
@@ -2390,6 +2390,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="ineq-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="ineq-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="ineqRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="ineq-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="ineqShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="ineq-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="ineq-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -2641,6 +2646,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="lim-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="lim-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="limRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="lim-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="limShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="lim-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="lim-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -3167,6 +3177,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="trig-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="trig-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="trigRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="trig-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="trigShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="trig-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="trig-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -4002,6 +4017,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="bn-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="bn-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="bnRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="bn-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="bnShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="bn-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="bn-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -4102,7 +4122,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="cb-cfg">
         <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-random"></use></svg> <span data-i18n-html="cb.info_html"><strong>Nb bonnes réponses</strong> tirées du pool VRAI + complétion tirée du pool FAUX. Note partielle automatique.</span></div>
         <div class="field"><label><span data-i18n="cb.text_lbl">Énoncé</span></label>
-          <div class="rich-preview" tabindex="0" role="button" id="prev-cb-text" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-text')"></div>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-cb-text" aria-label="Énoncé" data-i18n-aria="cb.text_lbl" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cb-text')"></div>
           <textarea id="cb-text" style="display:none"></textarea></div>
         <div class="g2">
           <div class="field">
@@ -5900,55 +5920,55 @@ fill="currentColor" stroke="none">
 
               <!-- Sommets -->
               <span class="g2tri-lbl-sym" style="font-weight:700;">A</span>
-              <input type="text" id="g2tri-lbl-A" class="geo2d-inp g2tri-nm-inp" value="A" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-A" checked onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-A" class="geo2d-inp g2tri-nm-inp" value="A" maxlength="5" aria-label="Nom du sommet A" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-A" checked aria-label="Afficher le sommet A" onchange="_geo2dPreview()">
               <span></span>
 
               <span class="g2tri-lbl-sym" style="font-weight:700;">B</span>
-              <input type="text" id="g2tri-lbl-B" class="geo2d-inp g2tri-nm-inp" value="B" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-B" checked onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-B" class="geo2d-inp g2tri-nm-inp" value="B" maxlength="5" aria-label="Nom du sommet B" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-B" checked aria-label="Afficher le sommet B" onchange="_geo2dPreview()">
               <span></span>
 
               <span class="g2tri-lbl-sym" style="font-weight:700;">C</span>
-              <input type="text" id="g2tri-lbl-C" class="geo2d-inp g2tri-nm-inp" value="C" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-C" checked onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-C" class="geo2d-inp g2tri-nm-inp" value="C" maxlength="5" aria-label="Nom du sommet C" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-C" checked aria-label="Afficher le sommet C" onchange="_geo2dPreview()">
               <span></span>
 
               <div class="g2tri-sep"></div>
 
               <!-- Côtés -->
               <span class="g2tri-lbl-sym" style="font-style:italic;">a</span>
-              <input type="text" id="g2tri-lbl-a" class="geo2d-inp g2tri-nm-inp" value="a" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-a" checked onchange="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-val-a" onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-a" class="geo2d-inp g2tri-nm-inp" value="a" maxlength="5" aria-label="Nom du côté a" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-a" checked aria-label="Afficher le côté a" onchange="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-val-a" aria-label="Afficher la valeur du côté a" onchange="_geo2dPreview()">
 
               <span class="g2tri-lbl-sym" style="font-style:italic;">b</span>
-              <input type="text" id="g2tri-lbl-b" class="geo2d-inp g2tri-nm-inp" value="b" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-b" checked onchange="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-val-b" onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-b" class="geo2d-inp g2tri-nm-inp" value="b" maxlength="5" aria-label="Nom du côté b" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-b" checked aria-label="Afficher le côté b" onchange="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-val-b" aria-label="Afficher la valeur du côté b" onchange="_geo2dPreview()">
 
               <span class="g2tri-lbl-sym" style="font-style:italic;">c</span>
-              <input type="text" id="g2tri-lbl-c" class="geo2d-inp g2tri-nm-inp" value="c" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-c" checked onchange="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-val-c" onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-c" class="geo2d-inp g2tri-nm-inp" value="c" maxlength="5" aria-label="Nom du côté c" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-c" checked aria-label="Afficher le côté c" onchange="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-val-c" aria-label="Afficher la valeur du côté c" onchange="_geo2dPreview()">
 
               <div class="g2tri-sep"></div>
 
               <!-- Angles -->
               <span class="g2tri-lbl-sym">α</span>
-              <input type="text" id="g2tri-lbl-alpha" class="geo2d-inp g2tri-nm-inp" value="α" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-alpha" checked onchange="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-val-alpha" onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-alpha" class="geo2d-inp g2tri-nm-inp" value="α" maxlength="5" aria-label="Nom de l'angle α" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-alpha" checked aria-label="Afficher l'angle α" onchange="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-val-alpha" aria-label="Afficher la valeur de l'angle α" onchange="_geo2dPreview()">
 
               <span class="g2tri-lbl-sym">β</span>
-              <input type="text" id="g2tri-lbl-beta" class="geo2d-inp g2tri-nm-inp" value="β" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-beta" checked onchange="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-val-beta" onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-beta" class="geo2d-inp g2tri-nm-inp" value="β" maxlength="5" aria-label="Nom de l'angle β" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-beta" checked aria-label="Afficher l'angle β" onchange="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-val-beta" aria-label="Afficher la valeur de l'angle β" onchange="_geo2dPreview()">
 
               <span class="g2tri-lbl-sym">γ</span>
-              <input type="text" id="g2tri-lbl-gamma" class="geo2d-inp g2tri-nm-inp" value="γ" maxlength="5" oninput="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-show-gamma" checked onchange="_geo2dPreview()">
-              <input type="checkbox" id="g2tri-val-gamma" onchange="_geo2dPreview()">
+              <input type="text" id="g2tri-lbl-gamma" class="geo2d-inp g2tri-nm-inp" value="γ" maxlength="5" aria-label="Nom de l'angle γ" oninput="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-show-gamma" checked aria-label="Afficher l'angle γ" onchange="_geo2dPreview()">
+              <input type="checkbox" id="g2tri-val-gamma" aria-label="Afficher la valeur de l'angle γ" onchange="_geo2dPreview()">
             </div>
 
             <!-- Codages -->
@@ -5962,30 +5982,30 @@ fill="currentColor" stroke="none">
             <p class="geo2d-hint" style="margin:2px 0 2px;" data-i18n="geo2d.equal_lengths">Longueurs égales :</p>
             <div style="display:grid;grid-template-columns:auto 1fr auto 1fr auto 1fr;gap:3px;align-items:center;margin-bottom:4px;">
               <span class="geo2d-hint">[BC]</span>
-              <select id="g2tri-tick-BC" class="geo2d-inp" style="padding:2px 3px;" onchange="_geo2dPreview()">
+              <select id="g2tri-tick-BC" class="geo2d-inp" style="padding:2px 3px;" aria-label="Marques d'égalité du côté [BC]" onchange="_geo2dPreview()">
                 <option value="0">—</option><option value="1">|</option><option value="2">||</option><option value="3">|||</option>
               </select>
               <span class="geo2d-hint">[AC]</span>
-              <select id="g2tri-tick-AC" class="geo2d-inp" style="padding:2px 3px;" onchange="_geo2dPreview()">
+              <select id="g2tri-tick-AC" class="geo2d-inp" style="padding:2px 3px;" aria-label="Marques d'égalité du côté [AC]" onchange="_geo2dPreview()">
                 <option value="0">—</option><option value="1">|</option><option value="2">||</option><option value="3">|||</option>
               </select>
               <span class="geo2d-hint">[AB]</span>
-              <select id="g2tri-tick-AB" class="geo2d-inp" style="padding:2px 3px;" onchange="_geo2dPreview()">
+              <select id="g2tri-tick-AB" class="geo2d-inp" style="padding:2px 3px;" aria-label="Marques d'égalité du côté [AB]" onchange="_geo2dPreview()">
                 <option value="0">—</option><option value="1">|</option><option value="2">||</option><option value="3">|||</option>
               </select>
             </div>
             <p class="geo2d-hint" style="margin:2px 0 2px;" data-i18n="geo2d.equal_angles">Angles égaux :</p>
             <div style="display:grid;grid-template-columns:auto 1fr auto 1fr auto 1fr;gap:3px;align-items:center;">
               <span class="geo2d-hint">A</span>
-              <select id="g2tri-arc-A" class="geo2d-inp" style="padding:2px 3px;" onchange="_geo2dPreview()">
+              <select id="g2tri-arc-A" class="geo2d-inp" style="padding:2px 3px;" aria-label="Marques d'égalité de l'angle en A" onchange="_geo2dPreview()">
                 <option value="0">—</option><option value="1">⌒</option><option value="2">⌒⌒</option>
               </select>
               <span class="geo2d-hint">B</span>
-              <select id="g2tri-arc-B" class="geo2d-inp" style="padding:2px 3px;" onchange="_geo2dPreview()">
+              <select id="g2tri-arc-B" class="geo2d-inp" style="padding:2px 3px;" aria-label="Marques d'égalité de l'angle en B" onchange="_geo2dPreview()">
                 <option value="0">—</option><option value="1">⌒</option><option value="2">⌒⌒</option>
               </select>
               <span class="geo2d-hint">C</span>
-              <select id="g2tri-arc-C" class="geo2d-inp" style="padding:2px 3px;" onchange="_geo2dPreview()">
+              <select id="g2tri-arc-C" class="geo2d-inp" style="padding:2px 3px;" aria-label="Marques d'égalité de l'angle en C" onchange="_geo2dPreview()">
                 <option value="0">—</option><option value="1">⌒</option><option value="2">⌒⌒</option>
               </select>
             </div>
@@ -7379,14 +7399,25 @@ fill="currentColor" stroke="none">
       <p style="margin-top:10px;" data-i18n-html="copy.auteur"><strong>Auteur :</strong> Benoit Joly — 2026</p>
       <div class="modal-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin:12px 0;">
         <p style="font-weight:700;color:#15803d;margin-bottom:6px;" data-i18n="copy.licence_titre">📄 Licence d'utilisation</p>
-        <p data-i18n-html="copy.licence_body">Utilisation autorisée dans le cadre pédagogique et académique, à titre gratuit et non commercial.<br>
-        Toute redistribution ou modification doit mentionner l'auteur original.</p>
+        <p data-i18n-html="copy.licence_body">Distribué sous licence <strong>GNU AGPLv3</strong>. Utilisation, modification et redistribution libres, y compris à titre commercial.<br>
+        Si vous exploitez une version modifiée sur un serveur accessible à des utilisateurs, l'AGPL vous oblige à leur fournir le code source correspondant.<br>
+        Texte complet : fichier <code>LICENSE.md</code> du dépôt.</p>
       </div>
       <div class="modal-section" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin:12px 0;">
         <p style="font-weight:700;color:#1d4ed8;margin-bottom:6px;" data-i18n="copy.rgpd_titre">🔒 RGPD &amp; Données personnelles</p>
-        <p data-i18n-html="copy.rgpd_body">Cet outil fonctionne <strong>entièrement dans votre navigateur</strong>.<br>
-        Aucune donnée personnelle n'est collectée, stockée sur un serveur, ni transmise à des tiers.<br>
-        Aucun cookie de tracking. Aucune police de caractère externe.</p>
+        <p data-i18n-html="copy.rgpd_body">Utilisé <strong>en local dans votre navigateur</strong>, cet outil n'envoie aucune donnée à un serveur.<br>
+        Sur la <strong>version hébergée</strong> (accès par compte), sont traités : votre identifiant et un hachage non réversible de votre mot de passe, un cookie de session strictement nécessaire à la connexion (aucun cookie de suivi ni publicitaire), et l'horodatage de vos générations pour appliquer le quota hebdomadaire.<br>
+        <strong>Finalité :</strong> gérer l'accès au service et prévenir les abus. <strong>Durée de conservation :</strong> tant que le compte existe.<br>
+        <strong>Responsable de traitement :</strong> Benoit Joly — <a href="mailto:b_joly@orange.fr">b_joly@orange.fr</a>.<br>
+        <strong>Vos droits</strong> (accès, rectification, effacement) : par e-mail, ou directement ci-dessous si vous êtes connecté·e. Vous pouvez aussi déposer une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>.</p>
+      </div>
+      <div class="modal-section" style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:12px;margin:12px 0;">
+        <p style="font-weight:700;color:#be123c;margin-bottom:6px;" data-i18n="copy.compte_titre">👤 Vos droits sur votre compte</p>
+        <p style="margin-bottom:10px;" data-i18n="copy.compte_body">Si vous êtes connecté·e sur la version hébergée, vous pouvez vous déconnecter ou supprimer définitivement votre compte et toutes les données associées (identifiant, mot de passe, historique d'usage).</p>
+        <div style="display:flex;gap:8px;">
+          <button style="flex:1;background:#fff;color:var(--navy);border:1px solid var(--border);padding:9px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem;" onclick="logoutFromApp()" data-i18n="btn.deconnexion">Se déconnecter</button>
+          <button style="flex:1;background:#be123c;color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem;" onclick="deleteAccountFromApp()" data-i18n="btn.supprimer_compte">Supprimer mon compte et mes données</button>
+        </div>
       </div>
       <p style="font-size:.78rem;color:var(--slate);margin-top:8px;" data-i18n="copy.footer_note">Les questions générées appartiennent à leurs auteurs. Stackforge n'est qu'un outil de mise en forme.</p>
     </div>
@@ -7661,7 +7692,7 @@ fill="currentColor" stroke="none">
       <span class="sep">|</span>
       <a href="https://github.com/BJ44-phy/H-stack.git" target="_blank" rel="noopener noreferrer"><svg class="hs-ico"><use href="#ico-footer-docs"></use></svg> <span data-i18n="footer.docs">Documentation</span></a>
     </nav>
-    <p style="font-size:.7rem;color:var(--footer-muted);" data-i18n="footer.privacy">🔒 Aucune donnée collectée · Fonctionne 100% en local · Conforme RGPD</p>
+    <p style="font-size:.7rem;color:var(--footer-muted);" data-i18n="footer.privacy">🔒 Usage local : aucune donnée collectée · Version hébergée : voir mentions légales</p>
   </div>
 </footer>
 <!-- MODALE JSME POUR LE GÉNÉRATEUR -->
@@ -8046,7 +8077,7 @@ fill="currentColor" stroke="none">
      onclick="if(event.target.id==='projectsModal')closeProjectsModal()">
   <div class="proj-modal">
     <div class="proj-modal-head">
-      <span><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-projects"></use></svg> <span data-i18n="proj.title">Projets StackForge</span></span>
+      <span><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-projects"></use></svg> <h2 data-i18n="proj.title" style="margin:0;font:inherit;display:inline;">Projets StackForge</h2></span>
       <button class="proj-close-btn" onclick="closeProjectsModal()" title="Fermer" data-i18n-title="btn.fermer">✕</button>
     </div>
 

@@ -91,7 +91,7 @@ function renderPreviewHTML_checkbox(state) {
     const idx = allProps.indexOf(p);
     return `
       <label class="hs-cb-row" data-cb-field="prop-text" data-cb-index="${idx}">
-        <input type="checkbox" disabled>
+        <input type="checkbox" disabled aria-label="Proposition ${idx + 1}">
         <span class="hs-cb-text">${_hsRenderMath(p.text || '')}</span>
       </label>`;
   }).join('');

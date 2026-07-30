@@ -21,7 +21,7 @@ function renderPreviewHTML_radio(state) {
   const propsHTML = options.map(function (o) {
     return `
       <label class="hs-cb-row" data-ra-field="prop-text" data-ra-array="${o.arr}" data-ra-index="${o.idx}">
-        <input type="radio" name="hs-ra-preview" disabled>
+        <input type="radio" name="hs-ra-preview" disabled aria-label="Proposition ${o.idx + 1}">
         <span class="hs-cb-text">${_hsRenderMath(o.p.text || '')}</span>
       </label>`;
   }).join('');

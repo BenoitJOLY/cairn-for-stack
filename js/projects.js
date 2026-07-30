@@ -147,7 +147,7 @@ function _projUpdateAutosave(){
     el.textContent = I18N.t('proj.autosave', {time: t});
     el.style.opacity = '1';
     clearTimeout(el._fadeTimer);
-    el._fadeTimer = setTimeout(function(){ el.style.opacity='.45'; }, 4000);
+    el._fadeTimer = setTimeout(function(){ el.style.opacity='.7'; }, 4000);
   }
 }
 
