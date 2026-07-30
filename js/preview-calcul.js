@@ -8,7 +8,7 @@ function renderPreviewHTML_calcul(state) {
   var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:110px;';
   var bodyFrag = (realParts.textFrag || '')
     .replace(/^<div style="background:#475569;border-left:5px solid #334155;[\s\S]*?<\/div>/, '')
-    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled style="' + fakeInputStyle + '">')
+    .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled aria-label="Aperçu du champ de réponse" style="' + fakeInputStyle + '">')
     .replace(/\[\[validation:[^\]]+\]\]/g, '');
   var scenarioHTML = bodyFrag
     ? _calcTokenizeForPreview(bodyFrag, knownVars)

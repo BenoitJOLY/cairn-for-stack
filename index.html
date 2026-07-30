@@ -1125,7 +1125,7 @@ fill="currentColor" stroke="none">
             <option value="fixe" data-i18n="vf.mode_fixe">Nombre fixe</option>
             <option value="alea" data-i18n="vf.mode_alea">Aléatoire</option>
           </select>
-          <input type="number" id="vf-xb" value="1" min="1" style="margin-top:5px;" oninput="validateVFDraw();if(typeof vfRefreshPreview==='function')vfRefreshPreview()">
+          <input type="number" id="vf-xb" value="1" min="1" aria-label="Nombre de vraies affichées" data-i18n-aria="vf.xb_lbl" style="margin-top:5px;" oninput="validateVFDraw();if(typeof vfRefreshPreview==='function')vfRefreshPreview()">
           <span class="hint" data-i18n="vf.xb_hint">Parmi les propositions affichées combien sont vraies ?</span>
         </div>
       </div>
@@ -3749,7 +3749,7 @@ fill="currentColor" stroke="none">
       <div class="mpane on" id="calc-cfg">
       <div class="field">
         <label data-i18n="ineq.text_lbl">Énoncé</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-calc-text" onclick="openRich('calc-text')"
+        <div class="rich-preview" tabindex="0" role="button" id="prev-calc-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('calc-text')"
              style="min-height:60px;border-color:#4338ca;background:#eef2ff;"></div>
         <textarea id="calc-text" style="display:none"></textarea>
       </div>

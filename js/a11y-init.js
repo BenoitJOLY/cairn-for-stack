@@ -101,4 +101,26 @@ document.addEventListener('DOMContentLoaded', function () {
     if (name) el.setAttribute('aria-label', name);
   });
 
+  // 5. rich-preview role="button" divs → aria-label from data-ph.
+  //    These are click-to-edit fields (openRich(...)); many are injected later by
+  //    proposition-builder templates (checkbox/radio/dropdown/vrai-faux…), so a single
+  //    DOMContentLoaded pass isn't enough — a MutationObserver keeps labelling new ones.
+  function labelRichPreview(el) {
+    if (el.nodeType !== 1) return;
+    if (el.matches && el.matches('.rich-preview[role="button"]') &&
+        !el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')) {
+      var ph = el.getAttribute('data-ph');
+      if (ph) el.setAttribute('aria-label', ph);
+    }
+  }
+  document.querySelectorAll('.rich-preview[role="button"]').forEach(labelRichPreview);
+  new MutationObserver(function (mutations) {
+    mutations.forEach(function (m) {
+      m.addedNodes.forEach(function (node) {
+        labelRichPreview(node);
+        if (node.querySelectorAll) node.querySelectorAll('.rich-preview[role="button"]').forEach(labelRichPreview);
+      });
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+
 });

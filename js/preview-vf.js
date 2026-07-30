@@ -55,8 +55,8 @@ function renderPreviewHTML_vf(state) {
     const idx = props.indexOf(p);
     return `<div style="border-left:4px solid #94a3b8;padding:7px;margin:3px 0">
       <b>${i + 1}. ${_hsRenderMath(p.text || '')}</b> <span style="font-size:.78rem;color:#64748b;">(réponse attendue : ${isV ? 'Vrai' : 'Faux'})</span>
-      <div class="hs-clickable" data-vf-field="prop-fb-vrai" data-vf-index="${idx}" style="margin-top:5px;">${isV ? '✅' : '❌'} Si coche Vrai : ${p.fbIfVrai ? _hsRenderMath(p.fbIfVrai) : '<span style="color:#94a3b8;">(vide)</span>'}</div>
-      <div class="hs-clickable" data-vf-field="prop-fb-faux" data-vf-index="${idx}" style="margin-top:3px;">${isV ? '❌' : '✅'} Si coche Faux : ${p.fbIfFaux ? _hsRenderMath(p.fbIfFaux) : '<span style="color:#94a3b8;">(vide)</span>'}</div>
+      <div class="hs-clickable" data-vf-field="prop-fb-vrai" data-vf-index="${idx}" style="margin-top:5px;">${isV ? '✅' : '❌'} Si coche Vrai : ${p.fbIfVrai ? _hsRenderMath(p.fbIfVrai) : '<span style="color:#475569;">(vide)</span>'}</div>
+      <div class="hs-clickable" data-vf-field="prop-fb-faux" data-vf-index="${idx}" style="margin-top:3px;">${isV ? '❌' : '✅'} Si coche Faux : ${p.fbIfFaux ? _hsRenderMath(p.fbIfFaux) : '<span style="color:#475569;">(vide)</span>'}</div>
     </div>`;
   }).join('');
 

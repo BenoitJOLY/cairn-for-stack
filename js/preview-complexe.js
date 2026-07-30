@@ -61,21 +61,21 @@ function _cpxSubst(text, pmap) {
 
 function _cpxInputRowHTML(scenario) {
   if (scenario === 'module-arg') {
-    return '<p>\\(|z|=\\) <input class="hs-cpx-input" type="text" disabled></p>'
-         + '<p>\\(\\arg(z)=\\) <input class="hs-cpx-input" type="text" disabled></p>';
+    return '<p>\\(|z|=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Module de z"></p>'
+         + '<p>\\(\\arg(z)=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Argument de z"></p>';
   }
   if (scenario === 'equation-2deg') {
-    return '<p>\\(z_1=\\) <input class="hs-cpx-input" type="text" disabled></p>'
-         + '<p>\\(z_2=\\) <input class="hs-cpx-input" type="text" disabled></p>';
+    return '<p>\\(z_1=\\) <input class="hs-cpx-input" type="text" disabled aria-label="z1"></p>'
+         + '<p>\\(z_2=\\) <input class="hs-cpx-input" type="text" disabled aria-label="z2"></p>';
   }
   if (scenario === 'affixes') {
-    return '<p>\\(z_I=\\) <input class="hs-cpx-input" type="text" disabled></p>'
-         + '<p>\\(AB=\\) <input class="hs-cpx-input" type="text" disabled></p>';
+    return '<p>\\(z_I=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Affixe du point I"></p>'
+         + '<p>\\(AB=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Distance AB"></p>';
   }
   if (scenario === 'conjugue') {
-    return '<p>\\(\\bar{z}=\\) <input class="hs-cpx-input" type="text" disabled></p>';
+    return '<p>\\(\\bar{z}=\\) <input class="hs-cpx-input" type="text" disabled aria-label="Conjugué de z"></p>';
   }
-  return '<p>\\(z=\\) <input class="hs-cpx-input" type="text" disabled></p>';
+  return '<p>\\(z=\\) <input class="hs-cpx-input" type="text" disabled aria-label="z"></p>';
 }
 
 function renderPreviewHTML_complexe(state) {
