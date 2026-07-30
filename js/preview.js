@@ -541,7 +541,7 @@ function _hsSimplePreviewHTML(cfg) {
   }
   const fbGenBody = cfg.fbGenAuto
     ? cfg.fbGenAuto + (cfg.fbGen ? `<p>${_hsRenderMath(cfg.fbGen)}</p>` : '')
-    : (cfg.fbGen ? _hsRenderMath(cfg.fbGen) : '<span style="color:#94a3b8;">' + I18N.t('common.preview_no_general_fb') + '</span>');
+    : (cfg.fbGen ? _hsRenderMath(cfg.fbGen) : '<span style="color:#475569;">' + I18N.t('common.preview_no_general_fb') + '</span>');
   const fbGenHTML = `<div class="hs-clickable" data-${cfg.prefix}-field="fbgen" style="border-left:4px solid ${cfg.badgeColor};padding:10px 14px;background:${cfg.noteBg};border-radius:4px;margin:4px 0;">${fbGenBody}</div>`;
   const fbOkDescHTML = cfg.fbOkDesc ? `<div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${_hsRenderMath(cfg.fbOkDesc)}</div>` : '';
   const fbWrongDescHTML = cfg.fbWrongDesc ? `<div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${_hsRenderMath(cfg.fbWrongDesc)}</div>` : '';
@@ -590,9 +590,13 @@ function _hsSimplePreviewHTML(cfg) {
   .hs-example-box img { max-width: 100%; height: auto; }
   .hs-validate-btn { margin-top: 12px; padding: 8px 18px; border: none; border-radius: 6px; background: #9ca3af; color: #fff; font-weight: 600; cursor: not-allowed; }
   .hs-fb-section-title { margin-top: 22px; padding-top: 10px; border-top: 1px dashed #cbd5e1; font-size: .82rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .02em; }
+  .hs-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 </style>
 </head>
 <body>
+  <h1 class="hs-sr-only">${cfg.badge}</h1>
+  <h2 class="hs-sr-only">${I18N.t('common.preview_fb_after_title')}</h2>
+  <h3 class="hs-sr-only">${I18N.t('common.preview_fbgen_solution_title')}</h3>
   <div class="hs-preview-header">
     <span class="hs-preview-badge">${cfg.badge}</span>
     <span class="hs-preview-note">/ ${cfg.bareme} pt</span>
@@ -1064,9 +1068,9 @@ function renderPreviewHTML_chemical(state) {
       + '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">'
       + '<span style="background:#34495e;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">x₂ Indice</span>'
       + '<span style="background:#34495e;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">xⁿ Exposant</span>'
-      + '<span style="background:#27ae60;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">→ Flèche</span>'
+      + '<span style="background:#15803d;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">→ Flèche</span>'
       + '</div>'
-      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#94a3b8;font-style:italic;">(l\'élève écrit ici sa réaction — aucune équation n\'est pré-remplie)</div>'
+      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#475569;font-style:italic;">(l\'élève écrit ici sa réaction — aucune équation n\'est pré-remplie)</div>'
       + '</div>',
     fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
     fbOk: prtBoxes.okFb, fbWrong: prtBoxes.wrongFb,
@@ -1085,25 +1089,25 @@ function _topoDiagNodes() {
   return [
     { description: 'Fleche',
       truefeedback: '<p><span style="color: green; font-weight: bold;">✓ Bonne flèche de réaction !</span></p>',
-      falsefeedback: '<p><span style="color: red; font-weight: bold;">✗ Mauvaise flèche.</span> Détectée : {@ans_arrow_det' + X + '@}, attendue : {@tans_arrow' + X + '@}</p>' },
+      falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">✗ Mauvaise flèche.</span> Détectée : {@ans_arrow_det' + X + '@}, attendue : {@tans_arrow' + X + '@}</p>' },
     { description: 'Bilan atomes',
       truefeedback: '<p><span style="color: green; font-weight: bold;">✓ Votre réaction est équilibrée du point de vue des éléments chimiques !</span></p>',
       falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">✗ Votre réaction n\'est pas équilibrée du point des éléments chimiques !</span></p>' },
     { description: 'Charges',
       truefeedback: '<p><span style="color: green;">✓ Votre équation est équilibrée électriquement.</span></p>',
-      falsefeedback: '<p><span style="color: red;">✗ Les charges ne sont pas conservées dans votre réaction.</span> Réactifs : {@charge_rea_s' + X + '@}, Produits : {@charge_pro_s' + X + '@}</p>' },
+      falsefeedback: '<p><span style="color: #cc2222;">✗ Les charges ne sont pas conservées dans votre réaction.</span> Réactifs : {@charge_rea_s' + X + '@}, Produits : {@charge_pro_s' + X + '@}</p>' },
     { description: 'Formules',
       truefeedback: '<p><span style="color: green;">✓ Vos formules sont correctes !</span></p>',
-      falsefeedback: '<p><span style="color: red;">✗ Vos formules sont incorrectes.</span></p>' },
+      falsefeedback: '<p><span style="color: #cc2222;">✗ Vos formules sont incorrectes.</span></p>' },
     { description: 'Groupes',
-      truefeedback: '<p><span style="color: orange;">⚠ Bonne compréhension du type de réaction.</span></p>',
-      falsefeedback: '<p><span style="color: red;">✗ Groupes fonctionnels non reconnus.</span></p>' },
+      truefeedback: '<p><span style="color: #b45309;">⚠ Bonne compréhension du type de réaction.</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222;">✗ Groupes fonctionnels non reconnus.</span></p>' },
     { description: 'Coefficients',
       truefeedback: '<p><span style="color: green;">✓ Vos coefficients stœchiométriques sont corrects !</span></p>',
       falsefeedback: '<p><span style="color: #cc2222;">✗ Vos coefficients stœchiométriques sont incorrects !</span></p>' },
     { description: 'Coefs prop', sans: 'is_proportional' + X, tans: 'true',
-      truefeedback: '<p><span style="color: orange;">⚠ Coefficients proportionnels (k={@k_ratio' + X + '@}) mais non réduits.</span></p>',
-      falsefeedback: '<p><span style="color: red;">✗ Coefficients non proportionnels.</span></p>' }
+      truefeedback: '<p><span style="color: #b45309;">⚠ Coefficients proportionnels (k={@k_ratio' + X + '@}) mais non réduits.</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222;">✗ Coefficients non proportionnels.</span></p>' }
   ];
 }
 
@@ -1122,6 +1126,7 @@ function _topoCaptureAnswerHTML() {
       var img = document.createElement('img');
       img.src = cv.toDataURL('image/png');
       img.width = cv.width; img.height = cv.height;
+      img.alt = I18N.t('common.preview_reaction_diagram_alt');
       cloneCanvases[i].replaceWith(img);
     } catch (e) {}
   });

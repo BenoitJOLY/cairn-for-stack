@@ -27,7 +27,7 @@ function doiAddRow(name='', type='contact'){
 
     row.innerHTML = `
         <input type="text" class="doi-input-name doi-name" placeholder="${I18N.t('tpl.doi_nom')}" value="${name}">
-        <select class="doi-input-type doi-type" onchange="doiRefresh()">
+        <select class="doi-input-type doi-type" onchange="doiRefresh()" aria-label="${I18N.t('tpl.doi_type_lbl')}">
             <option value="gravitationnel" ${sel('gravitationnel')}>${I18N.t('tpl.doi_gravitationnel')}</option>
             <option value="magnetique" ${sel('magnetique')}>${I18N.t('tpl.doi_magnetique')}</option>
             <option value="contact" ${sel('contact')}>${I18N.t('tpl.doi_contact')}</option>
@@ -208,7 +208,7 @@ function genDOIEmptyPreviewImage(config = null) {
         c.beginPath(); c.arc(pX, pY, 6, 0, 2 * Math.PI); c.fillStyle = '#000'; c.fill();
     }
 
-    return `<img src="${cvs.toDataURL('image/png')}" style="display:block; margin:0 auto; border-radius:8px; border:1px solid #e2e8f0; max-width:100%; height:auto;">`;
+    return `<img src="${cvs.toDataURL('image/png')}" alt="${I18N.t('tpl.doi_schema_vide_alt')}" style="display:block; margin:0 auto; border-radius:8px; border:1px solid #e2e8f0; max-width:100%; height:auto;">`;
 }
 
 // ────── FONCTION : Réplique statique de l'interface élève (Consigne + boutons + étiquettes + schéma) ──────
@@ -226,7 +226,7 @@ function genDOIStudentPreviewHTML(config = null) {
         });
     }
 
-    const chipsHTML = objects.map(o => `<span style="background:#3B82F6;color:#fff;padding:8px 15px;border-radius:4px;font-weight:bold;display:inline-block;margin:4px;">${o.name}</span>`).join('');
+    const chipsHTML = objects.map(o => `<span style="background:#1d4ed8;color:#fff;padding:8px 15px;border-radius:4px;font-weight:bold;display:inline-block;margin:4px;">${o.name}</span>`).join('');
 
     return `
 <div style="background: #E0F2FE; border-left: 4px solid #0284C7; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
