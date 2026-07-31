@@ -14,6 +14,7 @@ const path = require('node:path');
 
 const { genCompositionCore } = require(path.join('..', '..', 'js', 'gen-composition.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -21,7 +22,7 @@ const I18N_STUB = {
 const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 const buildCompositionJSX = (height, X) => `/* jsx stub height=${height} X=${X} */`;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, buildCompositionJSX };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, buildCompositionJSX, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({

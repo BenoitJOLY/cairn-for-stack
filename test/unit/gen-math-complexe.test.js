@@ -14,6 +14,7 @@ const path = require('node:path');
 
 const { genComplexeCore } = require(path.join('..', '..', 'js', 'gen-math-complexe.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox, inferFbKind } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -30,7 +31,7 @@ function _cpxGenFbgen(scenario, op, complexno) {
 // encore chargé) : on le fournit ici pour activer ce chemin en test.
 global._cpxGenFbgen = _cpxGenFbgen;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkInput, _cpxGenFbgen };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkInput, _cpxGenFbgen, applyFbBox, inferFbKind };
 
 function baseParams(overrides) {
     return Object.assign({

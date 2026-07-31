@@ -2,6 +2,7 @@ function renderPreviewHTML_basen(state) {
   var realParts = {};
   try { realParts = (typeof genBasenCore === 'function' && typeof genBasenParams === 'function') ? genBasenCore(1, genBasenParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
+  _hsUpdateRerollVisibility('bn', _hsHasRandomization(realParts.vars || ''));
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) {
     // Les valeurs issues d'un appel Maxima (string(...), q1_liststr(...), rand(...)...)
@@ -218,7 +219,9 @@ function renderPreviewHTML_basen(state) {
           var rerollBtn = document.getElementById('bn-reroll-preview-btn');
           var showRealBtn = document.getElementById('bn-show-real-preview-btn');
           var configured = typeof maximaConfigured === 'function' && maximaConfigured();
-          if (rerollBtn) rerollBtn.style.display = configured ? '' : 'none';
+          var hasRandom = true;
+          try { hasRandom = _hsHasRandomization(genBasenCore(1, genBasenParams()).vars); } catch (e) { hasRandom = true; }
+          if (rerollBtn) rerollBtn.style.display = (configured && hasRandom) ? '' : 'none';
           if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
           _bnSetRealPreviewStatus('', false);
         }

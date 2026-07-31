@@ -11,7 +11,7 @@ const path = require('node:path');
 
 const { genStringCore, genStringLevenshteinCore } = require(path.join('..', '..', 'js', 'gen-string.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
-const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
+const { applyFbBox, inferFbKind } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -21,7 +21,7 @@ const htmlEsc = (s) => String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').re
 const wrapFb = (html, ok) => `<div class="${ok ? 'ok' : 'ko'}">${html || '&nbsp;'}</div>`;
 const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, rawEsc, htmlEsc, _mkFbGen, applyFbBox };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, rawEsc, htmlEsc, _mkFbGen, applyFbBox, inferFbKind };
 
 function baseParams(overrides) {
     return Object.assign({

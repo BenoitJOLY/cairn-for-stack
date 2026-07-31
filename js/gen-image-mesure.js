@@ -367,6 +367,7 @@ function genImageMesureCore(X, p, deps) {
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var htmlEsc_D = deps.htmlEsc || htmlEsc;
   var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
   var bareme = p.bareme, text = p.text, imgData = p.imgData, imgW = p.imgW, imgH = p.imgH;
   var r1x = p.r1x, r1y = p.r1y, r1v = p.r1v, r2x = p.r2x, r2y = p.r2y, r2v = p.r2v;
@@ -400,8 +401,7 @@ function genImageMesureCore(X, p, deps) {
   // ── Feedback général auto-généré : méthode + corrigé chiffré, indépendant du mode
   // pédagogique (même l'Expert, qui ne donne aucun indice pendant la tentative, doit
   // pouvoir comprendre APRÈS coup comment on obtient la bonne réponse). ──
-  var fbAuto = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-    + '<div style="font-weight:bold;color:#0c4a6e;margin-bottom:10px;">' + I18N_D.t('imm.methode_corrige_lbl') + '</div>'
+  var fbAuto = '<div style="font-weight:bold;color:#0c4a6e;margin-bottom:10px;">' + I18N_D.t('imm.methode_corrige_lbl') + '</div>'
     + '<div style="margin-bottom:10px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:8px;">'
     + '<strong>' + I18N_D.t('imm.echelle_lbl') + '</strong> — ' + I18N_D.t('imm.echelle_full_desc', {r2v: r2v, r1v: r1v, calibDistPx: Math.round(calibDistPx), echelleRounded: echelleRounded, unit: htmlEsc_D(unit)}) + '</div>';
   targets.forEach(function(t, i) {
@@ -418,8 +418,7 @@ function genImageMesureCore(X, p, deps) {
     }
     fbAuto += '</div>';
   });
-  fbAuto += '</div>';
-  var generalFeedback = mkFbGen_D(fbAuto, p.fbGenRaw);
+  var generalFeedback = applyFbBox_D('general', mkFbGen_D(fbAuto, p.fbGenRaw));
 
   // ── Répartition du barème selon le mode ──
   if (mode === 'guide') {
@@ -524,10 +523,15 @@ function genImageMesureCore(X, p, deps) {
     s += '</input>';
     return s;
   }
-  // Boîtes de feedback colorées (mêmes codes que gen-oscilloscope.js : ✅/❌/🔶)
-  function _immOk(txt)   { return '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ ' + txt + '</div>'; }
-  function _immKo(txt)   { return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ ' + txt + '</div>'; }
-  function _immTrap(txt) { return '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 ' + txt + '</div>'; }
+  // Boîtes de feedback colorées : dérivées d'applyFbBox() (js/fb-box.js), qui lit les
+  // couleurs/icônes configurables (localStorage) au lieu de couleurs codées en dur. Ce
+  // fichier construit le XML du PRT directement en chaînes (pas de nœuds canoniques
+  // JSON exposés à prt-manager.js, aucun champ "prt" dans le retour de
+  // genImageMesureCore) : l'habillage est donc appliqué directement ici, à l'unique
+  // point de construction du feedback des nœuds.
+  function _immOk(txt)   { return applyFbBox_D('true', txt); }
+  function _immKo(txt)   { return applyFbBox_D('false', txt); }
+  function _immTrap(txt) { return applyFbBox_D('partial', txt); }
 
   // Nœud PRT générique (même forme que buildPrtXml_D() de prt-manager.js, avec description)
   function _immNode(name, desc, test, sans, tans, testopt, tScoreMode, tScore, tNext, tNote, tFb, fScoreMode, fScore, fNext, fNote, fFb) {

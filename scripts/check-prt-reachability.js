@@ -9,8 +9,12 @@ const path = require('path');
 
 const { computePrtReachability, isPrtFeedbackReachable } = require(path.join('..', 'js', 'prt-reachability.js'));
 const { buildPrtXml } = require(path.join('..', 'js', 'prt-manager.js'));
-const { applyFbBox } = require(path.join('..', 'js', 'fb-box.js'));
+const { applyFbBox, inferFbKind } = require(path.join('..', 'js', 'fb-box.js'));
 const { _mkFbGen, _mkInput } = require(path.join('..', 'js', 'gen-math-shared.js'));
+const { wrapFb, algPrtNodeCanonical } = require(path.join('..', 'js', 'generators.js'));
+const { buildKbdStackHTML } = require(path.join('..', 'js', 'keyboard.js'));
+const { htmlEsc, rawEsc, escapeMaximaString } = require(path.join('..', 'js', 'data.js'));
+const { jxgDropChunkedJsString } = require(path.join('..', 'js', 'gen-jxgdrop.js'));
 
 const I18N_STUB = { t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key };
 
@@ -30,6 +34,15 @@ function _cpxGenFbgen(scenario, op, letter) { return '<p>fbgen:' + scenario + ':
 global._cpxGenFbgen = _cpxGenFbgen;
 
 const BASE_DEPS = { I18N: I18N_STUB, buildPrtXml: buildPrtXml, applyFbBox: applyFbBox, _mkFbGen: _mkFbGen, _mkInput: _mkInput };
+
+// ── Regroupe toutes les dépendances "réelles" (pas de stubs) utilisées par les
+// générateurs à feedback riche (wrapFb, inferFbKind, échappement, clavier...) —
+// chaque cœur ne pioche que ce dont il a besoin via `deps.xxx || xxx`. ──
+const RICH_DEPS = Object.assign({}, BASE_DEPS, {
+    wrapFb: wrapFb, algPrtNodeCanonical: algPrtNodeCanonical, inferFbKind: inferFbKind,
+    buildKbdStackHTML: buildKbdStackHTML, htmlEsc: htmlEsc, rawEsc: rawEsc,
+    escapeMaximaString: escapeMaximaString, jxgDropChunkedJsString: jxgDropChunkedJsString
+});
 
 function baseGeoParams(scenario, dimSel) {
     return { bareme: 1, scenario: scenario, mode: 'fixe', dimSel: dimSel, fbOk: '', fbWrong: '', custText: '', fbGenRaw: '' };
@@ -135,19 +148,211 @@ const TARGETS = [
     },
     {
         label: 'Nombres complexes', module: '../js/gen-math-complexe.js', coreFn: 'genComplexeCore',
-        deps: Object.assign({}, BASE_DEPS, { _cpxGenFbgen: _cpxGenFbgen }),
+        deps: Object.assign({}, BASE_DEPS, { _cpxGenFbgen: _cpxGenFbgen, inferFbKind: inferFbKind }),
         scenarios: ['forme-alg', 'module-arg', 'equation-2deg', 'affixes', 'conjugue'].map(s => ({
             label: s, params: {
                 bareme: 1, scenario: s, complexno: 'i', mode: 'fixe', op: '*', randMin: -5, randMax: 5,
                 custText: '', custFbgen: '', fa: 3, fb: 2, fc: 1, fd: -1, feqb: -2, feqc: 5, fbOverrides: {}
             }
         }))
+    },
+    {
+        label: 'Checkbox', module: '../js/gen-checkbox.js', coreFn: 'genCheckboxCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1, text: '<p>Cochez les affirmations vraies.</p>', Xe: '3', mXb: 'fixe', Xb: '2',
+                props: [
+                    { bool: 'true', text: 'Proposition A (vraie)', fb: 'Justification A', fb2: 'Rappel A' },
+                    { bool: 'false', text: 'Proposition B (fausse)', fb: 'Justification B', fb2: '' },
+                    { bool: 'true', text: 'Proposition C (vraie)', fb: 'Justification C', fb2: 'Rappel C' }
+                ],
+                showOubli: false, cbFbGen: '', cbFbGenShowFb: false
+            }
+        }]
+    },
+    {
+        label: 'Numérique', module: '../js/gen-numerical.js', coreFn: 'genNumericalCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1, text: '<p>Calculez.</p>', val: '42', n: '3', isR: false,
+                fbc: 'Bravo', fbe: 'Perdu', tolType: 'NumAbsolute', tolVal: '0.01', forbid: '1',
+                numFbGen: '', aide: '', useKbd: false
+            }
+        }]
+    },
+    {
+        label: 'Algébrique', module: '../js/gen-algebraic.js', coreFn: 'genAlgebraicCore', deps: RICH_DEPS,
+        scenarios: ['libre', 'developpement', 'factorisation', 'fraction', 'expert'].flatMap(mode => [false, true].map(withError => ({
+            label: mode + (withError ? ' (avec erreur classique)' : ''),
+            params: {
+                bareme: 1, text: '<p>Résolvez.</p>', formula: 'x^2+2*x+1', mode: mode,
+                exprDisplay: '(x+1)^2', errorExpr: withError ? '-x^2+2*x+1' : '',
+                fbc: 'Bravo', fbe: 'Perdu', sol: '', aide: '', useKbd: false,
+                formVars: ['x'], poolVars: [],
+                algFb: {
+                    developpement: { partial: 'Développement incomplet', errsigne: 'Erreur de signe' },
+                    factorisation: { partial: 'Factorisation incomplète' },
+                    fraction: { partial: 'Fraction non simplifiée' },
+                    expert: { partial: 'Développement incomplet', errsigne: 'Erreur de signe' }
+                }
+            }
+        })))
+    },
+    {
+        label: 'Chaîne de caractères', module: '../js/gen-string.js', coreFn: 'genStringCore', deps: RICH_DEPS,
+        scenarios: [false, true].map(levenOn => ({
+            label: levenOn ? 'levenshtein' : 'default',
+            params: {
+                bareme: 1, text: '<p>Nommer.</p>', ansPlain: 'photosynthese', size: 25, test: 'AlgEquiv',
+                fbc: 'Bravo', fbe: 'Non', fbGen: '', solH: '', paletteHtml: '', levenOn: levenOn, altsArr: []
+            }
+        }))
+    },
+    {
+        label: 'Vrai/Faux', module: '../js/gen-vf.js', coreFn: 'genVFCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1, text: '<p>Vrai ou faux ?</p>', fbGen: '', Xe: 2, modeXb: 'fixe', Xb: 2,
+                props: [
+                    { isV: true, text: 'La Terre tourne autour du Soleil', fbIfVrai: 'Correct', fbIfFaux: 'Non, c\'est vrai' },
+                    { isV: false, text: 'Le Soleil tourne autour de la Terre', fbIfVrai: 'Non, c\'est faux', fbIfFaux: 'Correct' }
+                ]
+            }
+        }]
+    },
+    {
+        label: 'Pool (QCM)', module: '../js/gen-pool.js', coreFn: 'genPoolCore', deps: RICH_DEPS,
+        scenarios: ['radio', 'dropdown'].map(type => ({
+            label: type, params: {
+                type: type, label: 'Choix multiple', text: '<p>Choisissez la bonne réponse.</p>', Xe: 3, bareme: 1,
+                poolFbGen: '', poolShowFb: true,
+                propsVrais: [{ text: 'Bonne réponse', fb: 'Explication vraie' }],
+                propsFaux: [{ text: 'Faux 1', fb: 'Explication faux 1' }, { text: 'Faux 2', fb: 'Explication faux 2' }]
+            }
+        }))
+    },
+    {
+        label: 'Clic sur image', module: '../js/gen-imgclick.js', coreFn: 'genImgClickCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1, text: '', fbOkTxt: '', fbWrTxt: '',
+                bgData: 'data:image/png;base64,AAAA', bgW: 400, bgH: 300,
+                zone: { shape: 'rect', x: 10, y: 10, w: 50, h: 20, label: 'Zone A' }, fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Clic sur image (séquence)', module: '../js/gen-imgclick.js', coreFn: 'genImgClickSequenceCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1, text: '', fbOkTxt: '', fbWrTxt: '', seqTime: 5,
+                bgData: 'data:image/png;base64,AAAA', bgW: 400, bgH: 300,
+                zones: [
+                    { shape: 'rect', x: 0, y: 0, w: 20, h: 20, label: 'Un' },
+                    { shape: 'circle', x: 100, y: 100, r: 15, label: 'Deux' }
+                ]
+            }
+        }]
+    },
+    {
+        label: 'Ordonner', module: '../js/gen-ord.js', coreFn: 'genOrdCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1, text: '<p>Ordonnez les étapes suivantes.</p>', isClone: false, fbGenExtra: '',
+                itemTexts: ['Étape 1', 'Étape 2', 'Étape 3']
+            }
+        }]
+    },
+    {
+        label: 'Composition (rédaction)', module: '../js/gen-composition.js', coreFn: 'genCompositionCore',
+        deps: Object.assign({}, RICH_DEPS, { buildCompositionJSX: (height, X) => `/* jsx height=${height} X=${X} */` }),
+        scenarios: [{
+            label: 'default', params: { bareme: 4, text: '<p>Rédigez.</p>', height: '600px', msg: 'Votre réponse sera lue.', fbGenRaw: '' }
+        }]
+    },
+    {
+        label: 'Statistiques', module: '../js/gen-math-statistiques.js', coreFn: 'genStatistiquesCore', deps: RICH_DEPS,
+        scenarios: ['mediane', 'ecart-type', 'etendue', 'moyenne', 'variance', 'q1', 'q3', 'moyenne-ponderee'].map(s => ({
+            label: s, params: {
+                bareme: 1, scenario: s, display: 'liste', fbOk: '', fbWrong: '', custText: '',
+                varName: 'x', dataDecimals: 1, randFormat: 'decimal', fbGen: ''
+            }
+        }))
+    },
+    {
+        label: 'Trigonométrie', module: '../js/gen-math-trigonometrie.js', coreFn: 'genTrigonometrieCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'valeur-exacte', params: {
+                bareme: 1, scenario: 'valeur-exacte', mode: 'aleatoire', fbOk: '', fbWrong: '',
+                custText: '<p>Calculez.</p>', fn: 'sin', angle: '%pi/6', expr: 'sin(x)^2 + cos(x)^2', fbGenExtra: ''
+            }
+        }]
+    },
+    {
+        label: 'Limites', module: '../js/gen-math-limites.js', coreFn: 'genLimitesCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'plus-inf', params: {
+                bareme: 1, scenario: 'plus-inf', mode: 'aleatoire', fbOk: '', fbWrong: '', custText: '',
+                expr: 'x', tans: '0', point: '1', fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'GeoGebra', module: '../js/gen-geogebra.js', coreFn: 'genGeoGebraCore',
+        deps: Object.assign({}, RICH_DEPS, {
+            ggbBuildFilterTag: (X, st) => ({
+                block: `[[geogebra set="s${X}" watch="w${X}"]]`,
+                hiddenInputsHtml: (st.outputs || []).map(o => `[[input:${o.ggbName}]]`).join('\n')
+            }),
+            ggbBuildOutputFeedback: (o) => ({ trueFb: `<ok>${o.ggbName}</ok>`, falseFb: `<ko>${o.ggbName}</ko>` })
+        }),
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1, instruction: '<p>Tracez.</p>', materialId: 'abc123', width: 700, height: 500, showToolbar: false,
+                inputs: [{ ggbName: 'a', expr: '3' }],
+                outputs: [{ ggbName: 'resultat', type: 'numerical', tans: '9', tol: '0.1' }],
+                rememberAttr: '', modelPreset: null, fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Mesure sur image', module: '../js/gen-image-mesure.js', coreFn: 'genImageMesureCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 2, text: '', imgData: 'data:image/jpeg;base64,XXXX', imgW: 400, imgH: 300,
+                r1x: 0, r1y: 0, r1v: 0, r2x: 100, r2y: 0, r2v: 10, unit: 'cm', tol: 5, mode: 'guide',
+                fbOk: 'Bravo', fbWrong: 'Raté', fbGenRaw: '',
+                targets: [{ desc: 'Distance A-B', val: 5, type: 'position', hasPx: true, pxDist: 50 }]
+            }
+        }]
+    },
+    {
+        label: 'Optique — RVB/CMJ', module: '../js/gen-optique.js', coreFn: 'genRvbCmjCore', deps: RICH_DEPS,
+        scenarios: ['rvb', 'cmj'].map(mode => ({
+            label: mode, params: {
+                bareme: 1, text: '<p>Identifiez la couleur.</p>',
+                imgData: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+                mode: mode, nb: false, answer: 1, fbOkTxt: '', fbWrTxt: '', fbGenRaw: ''
+            }
+        }))
     }
 ];
 
+// Une branche est "non terminale" quand elle continue vers un autre nœud
+// (nextnode != '-1'). Le feedback qui y est attaché ne sera JAMAIS montré à
+// l'élève : STACK évalue le nœud suivant et c'est LUI qui décide du feedback
+// final. Un feedback rédigé sur une branche non terminale est donc du texte
+// mort — souvent le signe qu'une branche censée être terminale (nextnode:-1)
+// a été reconnectée par erreur à un autre nœud, ou qu'un feedback a été perdu.
+function isFeedbackNonEmpty(fbText) {
+    return String(fbText || '').replace(/&nbsp;/g, ' ').replace(/<[^>]*>/g, '').trim() !== '';
+}
+
 let bugCount = 0;
+let ntfCount = 0;
 let errorCount = 0;
 const lines = [];
+const ntfLines = [];
 
 TARGETS.forEach(function (t) {
     const mod = require(t.module);
@@ -172,13 +377,23 @@ TARGETS.forEach(function (t) {
         nodes.forEach(function (n, i) {
             ['true', 'false'].forEach(function (branch) {
                 const nodeName = n.name != null ? n.name : String(i);
+                const nextNode = branch === 'true' ? n.truenextnode : n.falsenextnode;
+                const fbText = branch === 'true' ? n.truefeedback : n.falsefeedback;
                 if (!isPrtFeedbackReachable(reach, nodeName, branch)) {
                     bugCount++;
-                    const fbText = branch === 'true' ? n.truefeedback : n.falsefeedback;
                     lines.push(
                         '[' + t.label + ' / ' + sc.label + '] nœud ' + nodeName + ', branche ' + branch + ' inatteignable\n' +
                         '  test dupliqué : ' + n.answertest + '(' + n.sans + ', ' + n.tans + ')\n' +
                         '  feedback concerné : ' + String(fbText || '').replace(/\s+/g, ' ').slice(0, 200) + '\n'
+                    );
+                }
+                const isNonTerminal = nextNode != null && String(nextNode) !== '-1';
+                if (isNonTerminal && isFeedbackNonEmpty(fbText)) {
+                    ntfCount++;
+                    ntfLines.push(
+                        '[' + t.label + ' / ' + sc.label + '] nœud ' + nodeName + ', branche ' + branch +
+                        ' non terminale (→ nœud ' + nextNode + ') mais porte un feedback (jamais affiché à l\'élève)\n' +
+                        '  feedback mort : ' + String(fbText || '').replace(/\s+/g, ' ').slice(0, 200) + '\n'
                     );
                 }
             });
@@ -186,7 +401,11 @@ TARGETS.forEach(function (t) {
     });
 });
 
-const header = 'Audit atteignabilité PRT — ' + new Date().toISOString() + '\n' +
-    bugCount + ' branche(s) morte(s) détectée(s)' + (errorCount ? ', ' + errorCount + ' scénario(s) en erreur' : '') + '\n\n';
-fs.writeFileSync(path.join(__dirname, '..', 'bugPRT.txt'), header + lines.join('\n'));
-console.log(bugCount + ' branche(s) morte(s), ' + errorCount + ' erreur(s) — écrit dans bugPRT.txt');
+const header = 'Audit PRT — ' + new Date().toISOString() + '\n' +
+    bugCount + ' branche(s) morte(s)/inatteignable(s) détectée(s)\n' +
+    ntfCount + ' branche(s) non terminale(s) avec feedback mort détectée(s)' +
+    (errorCount ? ', ' + errorCount + ' scénario(s) en erreur' : '') + '\n\n';
+const section1 = '=== Branches inatteignables (test dupliqué par un ancêtre) ===\n\n' + (lines.join('\n') || '(aucune)\n');
+const section2 = '\n=== Branches non terminales avec feedback (jamais affiché) ===\n\n' + (ntfLines.join('\n') || '(aucune)\n');
+fs.writeFileSync(path.join(__dirname, '..', 'bugPRT.txt'), header + section1 + section2);
+console.log(bugCount + ' branche(s) morte(s), ' + ntfCount + ' branche(s) non terminale(s) avec feedback, ' + errorCount + ' erreur(s) — écrit dans bugPRT.txt');

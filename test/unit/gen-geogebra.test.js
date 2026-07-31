@@ -12,6 +12,7 @@ const path = require('node:path');
 
 const { genGeoGebraCore } = require(path.join('..', '..', 'js', 'gen-geogebra.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -26,7 +27,7 @@ const ggbBuildOutputFeedback = (o) => ({
     falseFb: `<ko>${o.ggbName}</ko>`
 });
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, ggbBuildFilterTag, ggbBuildOutputFeedback };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, ggbBuildFilterTag, ggbBuildOutputFeedback, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({

@@ -159,9 +159,6 @@ function ggbBuildEmbedHtml(X, st, opts) {
   };
 }
 
-function _ggbOk(txt) { return '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:8px;">✅ ' + txt + '</div>'; }
-function _ggbKo(txt) { return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:8px;">❌ ' + txt + '</div>'; }
-
 /* Construit, pour UNE sortie, le feedback pédagogique bonne/mauvaise réponse :
    l'élève doit comprendre QUEL critère a échoué et COMMENT le corriger, pas
    juste obtenir un score global. Si le diagnostic (modèle préréglé) fournit
@@ -169,15 +166,19 @@ function _ggbKo(txt) { return '<div style="border-left:4px solid #dc2626;padding
    on retombe sur la révélation de la valeur attendue, seule information
    disponible. Factorisé pour être réutilisé à la fois par la génération XML
    réelle (genGeoGebra) et par l'aperçu du panneau de configuration
-   (ggbRefreshPreview dans geogebra-ui.js). */
+   (ggbRefreshPreview dans geogebra-ui.js).
+   Retourne du texte BRUT (sans encadré/icône) : l'habillage visuel n'est
+   appliqué qu'au point d'affichage/export (applyFbBox() côté XML, wrapFb()
+   côté aperçu geogebra-ui.js), jamais ici, pour que prt-manager.js montre
+   un texte propre à l'enseignant·e. */
 function ggbBuildOutputFeedback(o, deps) {
   var htmlEsc_D = (deps && deps.htmlEsc) || htmlEsc;
   var label = htmlEsc_D(o.desc || o.ggbName);
-  var trueFb = _ggbOk('<strong>' + label + '</strong> ' + I18N.t('ggb.fb_crit_ok'));
+  var trueFb = '<strong>' + label + '</strong> ' + I18N.t('ggb.fb_crit_ok');
   var remedy = o.hint
     ? htmlEsc_D(o.hint)
     : I18N.t('ggb.fb_expected_value') + ' <code>' + htmlEsc_D(String(o.tans || '')) + '</code>';
-  var falseFb = _ggbKo('<strong>' + label + '</strong> ' + I18N.t('ggb.fb_crit_ko') + '<br>' + remedy);
+  var falseFb = '<strong>' + label + '</strong> ' + I18N.t('ggb.fb_crit_ko') + '<br>' + remedy;
   return {trueFb: trueFb, falseFb: falseFb};
 }
 
@@ -247,6 +248,7 @@ function genGeoGebraCore(X, p, deps) {
   var mkFbGen_D = deps._mkFbGen || _mkFbGen;
   var ggbBuildFilterTag_D = deps.ggbBuildFilterTag || ggbBuildFilterTag;
   var ggbBuildOutputFeedback_D = deps.ggbBuildOutputFeedback || ggbBuildOutputFeedback;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
   var bareme = p.bareme, instruction = p.instruction;
   var materialId = p.materialId, width = p.width, height = p.height, showToolbar = p.showToolbar;
@@ -370,7 +372,13 @@ function genGeoGebraCore(X, p, deps) {
     };
   });
   var prtMeta = {name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVarsMaxima};
-  var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+  var xmlNodes = canonicalNodes.map(function (n) {
+    return Object.assign({}, n, {
+      truefeedback: applyFbBox_D('true', n.truefeedback),
+      falsefeedback: applyFbBox_D('false', n.falsefeedback)
+    });
+  });
+  var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
   var formulaHtml = '';
   if (modelPreset && modelPreset.texFx) {

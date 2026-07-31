@@ -5,7 +5,10 @@ function captureState_statistiques() {
   var s = { type: 'statistiques' };
       s.bareme=v('stat-bareme');s.text=richVal('stat-text');
       s.scenario=v('stat-scenario')||'moyenne';
+      s.mode=v('stat-mode')||'fixe';
       s.data=v('stat-data')||'2,5,8,3,7,4,6';
+      s.vals=v('stat-vals')||'10,20,30,40';
+      s.effs=v('stat-effs')||'3,5,2,4';
       s.display=v('stat-display')||'liste';
       s.dataDecimals=v('stat-data-decimals')||'1';
       s.varName=v('stat-varname')||'x';
@@ -18,7 +21,11 @@ function restoreState_statistiques(s) {
       document.getElementById('stat-bareme').value=s.bareme||1;
       setRichVal('stat-text',s.text||'');
       document.getElementById('stat-scenario').value=s.scenario||'moyenne';
+      document.getElementById('stat-mode').value=s.mode||'fixe';
+      document.querySelectorAll('input[name="stat-mode-radio"]').forEach(function(r){ r.checked=(r.value===(s.mode||'fixe')); });
       document.getElementById('stat-data').value=s.data||'2,5,8,3,7,4,6';
+      document.getElementById('stat-vals').value=s.vals||'10,20,30,40';
+      document.getElementById('stat-effs').value=s.effs||'3,5,2,4';
       document.getElementById('stat-display').value=s.display||'liste';
       document.getElementById('stat-data-decimals').value=s.dataDecimals||'1';
       document.getElementById('stat-varname').value=s.varName||'x';
@@ -34,7 +41,11 @@ function resetForm_statistiques() {
       setRichVal('stat-text','');
       document.getElementById('stat-bareme').value=1;
       document.getElementById('stat-scenario').value='moyenne';
+      document.getElementById('stat-mode').value='fixe';
+      document.querySelectorAll('input[name="stat-mode-radio"]').forEach(function(r){ r.checked=(r.value==='fixe'); });
       document.getElementById('stat-data').value='2,5,8,3,7,4,6';
+      document.getElementById('stat-vals').value='10,20,30,40';
+      document.getElementById('stat-effs').value='3,5,2,4';
       document.getElementById('stat-display').value='liste';
       document.getElementById('stat-data-decimals').value='1';
       document.getElementById('stat-varname').value='x';

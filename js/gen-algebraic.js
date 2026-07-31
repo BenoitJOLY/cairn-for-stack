@@ -1,21 +1,13 @@
 // ── XML GENERATORS: algébrique ──
 
-async function genAlgebraic(X){
+function _algBuildParams(){
   const formula=sanitizeMaxima(v('alg-formula').trim());
   const mode=v('alg-mode')||'libre';
   const exprDisplay=sanitizeMaxima((document.getElementById('alg-expr-display')?.value||'').trim());
   const errorExpr=sanitizeMaxima((document.getElementById('alg-error')?.value||'').trim());
-  if(!formula)throw new Error(I18N.t('msg.err_formule_vide', {n: X}));
-  if(!exprDisplay)throw new Error(I18N.t('msg.err_expr_display_vide', {n: X}));
-  if(typeof algSyntaxIssues==='function'){
-    [[I18N.t('msg.alg_label_reponse_attendue'),formula],[I18N.t('msg.alg_label_expr_affichee'),exprDisplay],[I18N.t('msg.alg_label_erreur_classique'),errorExpr]].forEach(function(pair){
-      const issues=algSyntaxIssues(pair[1]);
-      if(issues.length)throw new Error('Q'+X+' — '+pair[0]+' : '+issues.join(' '));
-    });
-  }
   const formVars=(v('alg-vars')||'').split(',').map(s=>s.trim()).filter(Boolean);
   const poolVars=(typeof getPoolVarNames==='function')?getPoolVarNames():[];
-  const p={
+  return {
     bareme: parseFloat(v('alg-bareme'))||1,
     text: richVal('alg-text'),
     formula, mode, exprDisplay, errorExpr,
@@ -32,6 +24,18 @@ async function genAlgebraic(X){
       expert: { partial: _algFb('expert','partial'), errsigne: _algFb('expert','errsigne') }
     }
   };
+}
+
+async function genAlgebraic(X){
+  const p=_algBuildParams();
+  if(!p.formula)throw new Error(I18N.t('msg.err_formule_vide', {n: X}));
+  if(!p.exprDisplay)throw new Error(I18N.t('msg.err_expr_display_vide', {n: X}));
+  if(typeof algSyntaxIssues==='function'){
+    [[I18N.t('msg.alg_label_reponse_attendue'),p.formula],[I18N.t('msg.alg_label_expr_affichee'),p.exprDisplay],[I18N.t('msg.alg_label_erreur_classique'),p.errorExpr]].forEach(function(pair){
+      const issues=algSyntaxIssues(pair[1]);
+      if(issues.length)throw new Error('Q'+X+' — '+pair[0]+' : '+issues.join(' '));
+    });
+  }
   // Étape 3 (PLAN.md) : tente la génération côté serveur, avec repli
   // automatique sur le calcul local si le serveur échoue ou est absent —
   // aucun risque de casser la génération pendant la migration.
@@ -60,9 +64,9 @@ function genAlgebraicCore(X, p, deps){
   deps = deps || {};
   var I18N_D = deps.I18N || I18N;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-  var wrapFb_D = deps.wrapFb || wrapFb;
   var algPrtNodeCanonical_D = deps.algPrtNodeCanonical || algPrtNodeCanonical;
   var applyFbBox_D = deps.applyFbBox || applyFbBox;
+  var inferFbKind_D = deps.inferFbKind || inferFbKind;
 
   const bareme=p.bareme, text=p.text, formula=p.formula, mode=p.mode;
   const exprDisplay=p.exprDisplay, errorExpr=p.errorExpr;
@@ -83,9 +87,9 @@ function genAlgebraicCore(X, p, deps){
   // l'exposer en questionnote la révélerait à l'élève (cf. Numérique/Logique).
   const qnote='';
   const tansEquiv=hasDisplay?`exp${X}`:`ta${X}`;
-  // Feedback
-  const fbOK=wrapFb_D(fbc,true);
-  const fbKO=wrapFb_D(fbe,false);
+  // Feedback — texte brut ; l'encadré coloré n'est appliqué que sur xmlNodes (export XML)
+  const fbOK=fbc;
+  const fbKO=fbe;
   // PRT nodes — structures alignées sur les fichiers de référence
   let canonicalNodes=[];
   const _a='ans'+X, _t='ta'+X, _e='erreur'+X, _te=tansEquiv;
@@ -93,8 +97,8 @@ function genAlgebraicCore(X, p, deps){
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_t,'', -1,1, -1,0, fbOK,fbKO,
       'PRT-CORRECT','PRT-WRONG',I18N_D.t('alg.node_verif_reponse'))];
   }else if(mode==='developpement'){
-    const fbPartialDev=wrapFb_D(p.algFb.developpement.partial,false);
-    const fbErrSigne=wrapFb_D(p.algFb.developpement.errsigne,false);
+    const fbPartialDev=p.algFb.developpement.partial;
+    const fbErrSigne=p.algFb.developpement.errsigne;
     const fn0=hasError?2:-1;
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_te,'', 1,1, fn0,0, '',hasError?'':fbKO,
       'PRT-EQUAL-GO-ON',hasError?'PRT-NOT-EQUAL-CHECK-ERR':'PRT-WRONG',I18N_D.t('alg.node_verif_algebrique')),
@@ -103,20 +107,20 @@ function genAlgebraicCore(X, p, deps){
     if(hasError)canonicalNodes.push(algPrtNodeCanonical_D(X,2,'AlgEquiv',_a,_e,'', -1,0.5, -1,0, fbErrSigne,fbKO,
       'PRT-BUG-ERR-FOUND','PRT-WRONG-TOTAL',I18N_D.t('alg.node_err_signe')));
   }else if(mode==='factorisation'){
-    const fbPartialFac=wrapFb_D(p.algFb.factorisation.partial,false);
+    const fbPartialFac=p.algFb.factorisation.partial;
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_te,'', 1,1, -1,0, '','',
       'PRT-EQUAL-GO-ON','PRT-WRONG',I18N_D.t('alg.node_verif_algebrique')),
       algPrtNodeCanonical_D(X,1,'FacForm',_a,_t,mainVar, -1,1, -1,0.25, fbOK,fbPartialFac,
       'PRT-FAC-MAX','PRT-NOT-MAX',I18N_D.t('alg.node_factorisation_max'))];
   }else if(mode==='fraction'){
-    const fbPartialFrac=wrapFb_D(p.algFb.fraction.partial,false);
+    const fbPartialFrac=p.algFb.fraction.partial;
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_te,'', 1,1, -1,0, '','',
       'PRT-EQUAL-GO-ON','PRT-WRONG',I18N_D.t('alg.node_verif_algebrique')),
       algPrtNodeCanonical_D(X,1,'FacForm',_a,_t,mainVar, -1,1, -1,0.5, fbOK,fbPartialFrac,
       'PRT-SIMPLE-MAX','PRT-NOT-SIMPLE',I18N_D.t('alg.node_simplification_max'))];
   }else{ // expert
-    const fbPartialDev=wrapFb_D(p.algFb.expert.partial,false);
-    const fbErrSigne=wrapFb_D(p.algFb.expert.errsigne,false);
+    const fbPartialDev=p.algFb.expert.partial;
+    const fbErrSigne=p.algFb.expert.errsigne;
     const fn0=hasError?2:-1;
     canonicalNodes=[algPrtNodeCanonical_D(X,0,'AlgEquiv',_a,_te,'', 1,1, fn0,0, '',hasError?'':fbKO,
       'PRT-EQUAL-GO-ON',hasError?'PRT-NOT-EQUAL-CHECK-ERR':'PRT-WRONG',I18N_D.t('alg.node_verif_algebrique')),
@@ -126,7 +130,13 @@ function genAlgebraicCore(X, p, deps){
       'PRT-BUG-ERR-FOUND','PRT-WRONG-TOTAL',I18N_D.t('alg.node_err_signe')));
   }
   const prtMeta={name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:''};
-  const prtXML=buildPrtXml_D(prtMeta, canonicalNodes);
+  const xmlNodes=canonicalNodes.map(function(n){
+    return Object.assign({}, n, {
+      truefeedback: applyFbBox_D(inferFbKind_D(n,'true'), n.truefeedback),
+      falsefeedback: applyFbBox_D(inferFbKind_D(n,'false'), n.falsefeedback)
+    });
+  });
+  const prtXML=buildPrtXml_D(prtMeta, xmlNodes);
   /* Le bloc clavier (kbdHtml) contient du JS littéral avec de vrais < > &&.
      Le texte de la question passe par plusieurs allers-retours DOM (chip
      replacement, stripMathDivs) qui échappent ces caractères en entités

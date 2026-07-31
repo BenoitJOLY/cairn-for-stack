@@ -52,20 +52,26 @@ function genCalculCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
     var mkInput_D = deps._mkInput || _mkInput;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
     var _calcVarValue_D = function(key) { return p.varValues[key]; };
 
     var bareme = p.bareme, scenario = p.scenario, exprF = p.exprF, boundA = p.boundA, boundB = p.boundB;
     var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
     var vars, qnote, textFrag, inputXML, prtXML, generalFeedback, canonicalNodes, fbVars = '', diagNodes = [];
 
-    function calcNode(name, desc, test, sans, tans, opts, trueMode, trueScore, trueNext, trueNote, trueFb, falseMode, falseScore, falseNext, falseNote, falseFb) {
+    // calcNode() : noeuds PRT au format JSON canonique (meme schema que prt-manager.js).
+    // truefeedback/falsefeedback restent du texte brut (aucun encadre) ; trueFbKind/
+    // falseFbKind sont des champs annexes (ignores par buildPrtXml_D, non serialises en
+    // XML) qui memorisent la couleur d'origine ('true'/'partial'/'false') pour permettre
+    // l'encadre applyFbBox_D() plus bas, uniquement au point d'export XML / apercu.
+    function calcNode(name, desc, test, sans, tans, opts, trueMode, trueScore, trueNext, trueNote, trueFb, falseMode, falseScore, falseNext, falseNote, falseFb, trueFbKind, falseFbKind) {
         return {
             name: String(name), description: desc, answertest: test, sans: sans, tans: tans,
             testoptions: opts || '', quiet: '0',
             truescoremode: trueMode, truescore: String(trueScore), truepenalty: '', truenextnode: String(trueNext),
-            trueanswernote: trueNote, truefeedback: trueFb || '',
+            trueanswernote: trueNote, truefeedback: trueFb || '', trueFbKind: trueFbKind || 'true',
             falsescoremode: falseMode, falsescore: String(falseScore), falsepenalty: '', falsenextnode: String(falseNext),
-            falseanswernote: falseNote, falsefeedback: falseFb || ''
+            falseanswernote: falseNote, falsefeedback: falseFb || '', falseFbKind: falseFbKind || 'false'
         };
     }
 
@@ -80,9 +86,10 @@ q${X}_fp:diff(q${X}_f,x);`;
 <p>\\(f'(x)=\\) [[input:ans_fp${X}]] [[validation:ans_fp${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_fp${X}`,tans:`q${X}_fp`,boxsize:30,checkanswertype:1,mustverify:1,showvalidation:2});
         canonicalNodes = [calcNode(0, 'D\xe9riv\xe9e correcte ?', 'AlgEquiv', `ans_fp${X}`, `q${X}_fp`, '',
-            '=', 1, -1, 'PRT-'+X+'-OK', fbOk || '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>' + I18N_D.t('mat.fb_ok_correct') + '</strong></div>',
-            '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ \\(f'(x)={@q${X}_fp@}\\).</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('calc.correction_lbl')}</strong><br>\\(f(x)={@q${X}_f@}\\)<br>\\(f'(x)={@q${X}_fp@}\\).</div>`;
+            '=', 1, -1, 'PRT-'+X+'-OK', fbOk || '<strong>' + I18N_D.t('mat.fb_ok_correct') + '</strong>',
+            '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `\\(f'(x)={@q${X}_fp@}\\).`,
+            'true', 'false')];
+        generalFeedback = `<strong>${I18N_D.t('calc.correction_lbl')}</strong><br>\\(f(x)={@q${X}_f@}\\)<br>\\(f'(x)={@q${X}_fp@}\\).`;
 
     } else if (scenario === 'primitive') {
         vars = `/* Q${X} Calcul — Primitive (expression libre) */
@@ -94,9 +101,10 @@ q${X}_F:integrate(q${X}_f,x);`;
         inputXML = mkInput_D({name:`ans_F${X}`,tans:`q${X}_F`,boxsize:30,allowwords:'k',mustverify:1,showvalidation:2});
         fbVars = `q${X}_diff:diff(ans_F${X},x);`;
         canonicalNodes = [calcNode(0, "F'=f ?", 'AlgEquiv', `q${X}_diff`, `q${X}_f`, '',
-            '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong> \\(F'(x)=f(x)\\).</div>`,
-            '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ \\(F'(x)={@q${X}_diff@}\\neq f(x)\\).</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('calc.correction_lbl')}</strong><br>\\(f(x)={@q${X}_f@}\\)<br>\\(F(x)={@q${X}_F@}+k\\).</div>`;
+            '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong> \\(F'(x)=f(x)\\).`,
+            '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `\\(F'(x)={@q${X}_diff@}\\neq f(x)\\).`,
+            'true', 'false')];
+        generalFeedback = `<strong>${I18N_D.t('calc.correction_lbl')}</strong><br>\\(f(x)={@q${X}_f@}\\)<br>\\(F(x)={@q${X}_F@}+k\\).`;
 
     } else if (scenario === 'integrale') {
         vars = `/* Q${X} Calcul — Int\xe9grale d\xe9finie (expression libre) */
@@ -109,9 +117,10 @@ q${X}_ta:integrate(q${X}_f,x,q${X}_a,q${X}_b);`;
 <p>${I18N_D.t('calc.reponse_lbl')} [[input:ans_I${X}]] [[validation:ans_I${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_I${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
         canonicalNodes = [calcNode(0, 'Correct ?', 'AlgEquiv', `ans_I${X}`, `q${X}_ta`, '',
-            '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_correct')}</strong></div>`,
-            '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('calc.integrale_fb_wrong', {ta: '{@q'+X+'_ta@}'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('calc.correction_lbl')}</strong><br>\\(\\displaystyle\\int_{{@q${X}_a@}}^{{@q${X}_b@}}{@q${X}_f@}\\,dx={@q${X}_ta@}\\).</div>`;
+            '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`,
+            '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `${I18N_D.t('calc.integrale_fb_wrong', {ta: '{@q'+X+'_ta@}'})}`,
+            'true', 'false')];
+        generalFeedback = `<strong>${I18N_D.t('calc.correction_lbl')}</strong><br>\\(\\displaystyle\\int_{{@q${X}_a@}}^{{@q${X}_b@}}{@q${X}_f@}\\,dx={@q${X}_ta@}\\).`;
 
     } else if (scenario === 'derivee-produit') {
         vars = `/* Q${X} Calcul — D\xe9riv\xe9e d'un produit */
@@ -130,23 +139,22 @@ q${X}_err_plus:(q${X}_u+q${X}_v)*(q${X}_du+q${X}_dv)$`;
         inputXML = mkInput_D({name:`ans_fp${X}`,tans:`q${X}_fp`,boxsize:30,checkanswertype:1,mustverify:1,showvalidation:2});
         canonicalNodes = [
             calcNode(0, 'V\xe9rification de la d\xe9riv\xe9e', 'AlgEquiv', `ans_fp${X}`, `q${X}_fp`, '',
-                '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.produit_fb_ok_desc')}</div>`,
-                '=', 0, 1, 'PRT-'+X+'-NOK', ''),
+                '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.produit_fb_ok_desc')}`,
+                '=', 0, 1, 'PRT-'+X+'-NOK', '', 'true'),
             calcNode(1, 'Erreur : Oubli d\xe9riv\xe9e polyn\xf4me', 'AlgEquiv', `ans_fp${X}`, `q${X}_err_oublie_poly`, '',
-                '=', 0, -1, 'PRT-'+X+'-ERR-POLY', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>${I18N_D.t('calc.produit_err_poly_title')}</strong> ${I18N_D.t('calc.produit_err_poly_desc', {u: '{@q'+X+'_u@}'})}</div>`,
-                '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', ''),
+                '=', 0, -1, 'PRT-'+X+'-ERR-POLY', `<strong>${I18N_D.t('calc.produit_err_poly_title')}</strong> ${I18N_D.t('calc.produit_err_poly_desc', {u: '{@q'+X+'_u@}'})}`,
+                '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', '', 'partial'),
             calcNode(2, 'Erreur : Oubli d\xe9riv\xe9e exponentielle', 'AlgEquiv', `ans_fp${X}`, `q${X}_err_oublie_exp`, '',
-                '=', 0, -1, 'PRT-'+X+'-ERR-EXP', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>${I18N_D.t('calc.produit_err_poly_title')}</strong> ${I18N_D.t('calc.produit_err_exp_desc', {du: '{@q'+X+'_du@}'})}</div>`,
-                '=', 0, 3, 'PRT-'+X+'-ERR-AUTRE2', ''),
+                '=', 0, -1, 'PRT-'+X+'-ERR-EXP', `<strong>${I18N_D.t('calc.produit_err_poly_title')}</strong> ${I18N_D.t('calc.produit_err_exp_desc', {du: '{@q'+X+'_du@}'})}`,
+                '=', 0, 3, 'PRT-'+X+'-ERR-AUTRE2', '', 'partial'),
             calcNode(3, 'Erreur : Multiplication des d\xe9riv\xe9es', 'AlgEquiv', `ans_fp${X}`, `q${X}_err_produit`, '',
-                '=', 0, -1, 'PRT-'+X+'-ERR-PROD', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.produit_err_mult_title')}</strong> ${I18N_D.t('calc.produit_err_mult_desc')}</div>`,
-                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.produit_fb_wrong_desc')}</div>`)
+                '=', 0, -1, 'PRT-'+X+'-ERR-PROD', `<strong>${I18N_D.t('calc.produit_err_mult_title')}</strong> ${I18N_D.t('calc.produit_err_mult_desc')}`,
+                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.produit_fb_wrong_desc')}`,
+                'false', 'false')
         ];
-        diagNodes = [1,2,3].map(function(i){ return { desc: canonicalNodes[i].description, fb: canonicalNodes[i].truefeedback }; });
-        generalFeedback = `<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
-<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
-<div style="font-size:.9rem;">${I18N_D.t('calc.produit_correction_desc', {u: '{@q'+X+'_u@}', du: '{@q'+X+'_du@}', fp_simpl: '{@q'+X+'_fp_simpl@}'})}</div>
-</div>`;
+        diagNodes = [1,2,3].map(function(i){ return { desc: canonicalNodes[i].description, fb: canonicalNodes[i].truefeedback, kind: canonicalNodes[i].trueFbKind }; });
+        generalFeedback = `<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
+<div style="font-size:.9rem;">${I18N_D.t('calc.produit_correction_desc', {u: '{@q'+X+'_u@}', du: '{@q'+X+'_du@}', fp_simpl: '{@q'+X+'_fp_simpl@}'})}</div>`;
 
     } else if (scenario === 'primitive-exp') {
         vars = `/* Q${X} Calcul — Primitive exponentielle */
@@ -162,20 +170,19 @@ q${X}_err_coef:q${X}_b*%e^(q${X}_a*x)+q${X}_c*x$`;
         inputXML = mkInput_D({name:`ans_F${X}`,tans:`q${X}_ta_sans_k+k`,boxsize:30,checkanswertype:1,allowwords:'k',hint:I18N_D.t('calc.hint_exp'),mustverify:1,showvalidation:2});
         canonicalNodes = [
             calcNode(0, 'V\xe9rification par d\xe9rivation', 'AlgEquiv', `diff(ans_F${X},x)`, `q${X}_f`, '',
-                '=', 1, -1, 'PRT-'+X+'-DIFF-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.primexp_fb_ok_desc')}</div>`,
-                '=', 0, 1, 'PRT-'+X+'-DIFF-NOK', ''),
+                '=', 1, -1, 'PRT-'+X+'-DIFF-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.primexp_fb_ok_desc')}`,
+                '=', 0, 1, 'PRT-'+X+'-DIFF-NOK', '', 'true'),
             calcNode(1, 'D\xe9tection oubli de la constante', 'AlgEquiv', `ans_F${X}`, `q${X}_ta_sans_k`, '',
-                '=', 0.5, -1, 'PRT-'+X+'-ERR-K', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>${I18N_D.t('calc.presque_title')}</strong> ${I18N_D.t('calc.primexp_err_k_desc')}</div>`,
-                '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', ''),
+                '=', 0.5, -1, 'PRT-'+X+'-ERR-K', `<strong>${I18N_D.t('calc.presque_title')}</strong> ${I18N_D.t('calc.primexp_err_k_desc')}`,
+                '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', '', 'partial'),
             calcNode(2, 'D\xe9tection erreur de coefficient exp', 'AlgEquiv', `ans_F${X}`, `q${X}_err_coef`, '',
-                '=', 0.25, -1, 'PRT-'+X+'-ERR-COEF', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.err_coef_title')}</strong> ${I18N_D.t('calc.primexp_err_coef_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}</div>`,
-                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.primexp_fb_wrong_desc')}</div>`)
+                '=', 0.25, -1, 'PRT-'+X+'-ERR-COEF', `<strong>${I18N_D.t('calc.err_coef_title')}</strong> ${I18N_D.t('calc.primexp_err_coef_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}`,
+                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.primexp_fb_wrong_desc')}`,
+                'false', 'false')
         ];
-        diagNodes = [1,2].map(function(i){ return { desc: canonicalNodes[i].description, fb: canonicalNodes[i].truefeedback }; });
-        generalFeedback = `<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
-<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
-<div style="font-size:.9rem;">${I18N_D.t('calc.primexp_correction_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}', c: '{@q'+X+'_c@}'})}</div>
-</div>`;
+        diagNodes = [1,2].map(function(i){ return { desc: canonicalNodes[i].description, fb: canonicalNodes[i].truefeedback, kind: canonicalNodes[i].trueFbKind }; });
+        generalFeedback = `<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
+<div style="font-size:.9rem;">${I18N_D.t('calc.primexp_correction_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}', c: '{@q'+X+'_c@}'})}</div>`;
 
     } else if (scenario === 'integrale-def') {
         vars = `/* Q${X} Calcul — Int\xe9grale d\xe9finie */
@@ -193,23 +200,22 @@ q${X}_err_coef:q${X}_c*(%e^(q${X}_d*q${X}_b)-%e^(q${X}_d*q${X}_a))+q${X}_f$`;
         inputXML = mkInput_D({name:`ans_I${X}`,tans:`q${X}_ta_I`,boxsize:30,hint:I18N_D.t('calc.hint_exp'),showvalidation:0});
         canonicalNodes = [
             calcNode(0, 'V\xe9rification r\xe9sultat final', 'AlgEquiv', `ans_I${X}`, `q${X}_ta_I`, '',
-                '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.intdef_fb_ok_desc')}</div>`,
-                '=', 0, 1, 'PRT-'+X+'-NOK', ''),
+                '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.intdef_fb_ok_desc')}`,
+                '=', 0, 1, 'PRT-'+X+'-NOK', '', 'true'),
             calcNode(1, 'Erreur : A donn\xe9 la primitive', 'AlgEquiv', `ans_I${X}`, `q${X}_err_primitive`, '',
-                '=', 0, -1, 'PRT-'+X+'-ERR-PRIM', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>${I18N_D.t('calc.non_termine_title')}</strong> ${I18N_D.t('calc.intdef_err_prim_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}</div>`,
-                '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', ''),
+                '=', 0, -1, 'PRT-'+X+'-ERR-PRIM', `<strong>${I18N_D.t('calc.non_termine_title')}</strong> ${I18N_D.t('calc.intdef_err_prim_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}`,
+                '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', '', 'partial'),
             calcNode(2, 'Erreur : Oubli du terme f x', 'AlgEquiv', `ans_I${X}`, `q${X}_err_no_x`, '',
-                '=', 0.25, -1, 'PRT-'+X+'-ERR-CST', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.oubli_terme_title')}</strong> ${I18N_D.t('calc.intdef_err_nox_desc', {f: '{@q'+X+'_f@}'})}</div>`,
-                '=', 0, 3, 'PRT-'+X+'-ERR-AUTRE2', ''),
+                '=', 0.25, -1, 'PRT-'+X+'-ERR-CST', `<strong>${I18N_D.t('calc.oubli_terme_title')}</strong> ${I18N_D.t('calc.intdef_err_nox_desc', {f: '{@q'+X+'_f@}'})}`,
+                '=', 0, 3, 'PRT-'+X+'-ERR-AUTRE2', '', 'false'),
             calcNode(3, 'Erreur : Coefficient exponentielle', 'AlgEquiv', `ans_I${X}`, `q${X}_err_coef`, '',
-                '=', 0.25, -1, 'PRT-'+X+'-ERR-COEF', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.err_coef_title')}</strong> ${I18N_D.t('calc.intdef_err_coef_desc', {c: '{@q'+X+'_c@}', d: '{@q'+X+'_d@}'})}</div>`,
-                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.intdef_fb_wrong_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}</div>`)
+                '=', 0.25, -1, 'PRT-'+X+'-ERR-COEF', `<strong>${I18N_D.t('calc.err_coef_title')}</strong> ${I18N_D.t('calc.intdef_err_coef_desc', {c: '{@q'+X+'_c@}', d: '{@q'+X+'_d@}'})}`,
+                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.intdef_fb_wrong_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}`,
+                'false', 'false')
         ];
-        diagNodes = [1,2,3].map(function(i){ return { desc: canonicalNodes[i].description, fb: canonicalNodes[i].truefeedback }; });
-        generalFeedback = `<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
-<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
-<div style="font-size:.9rem;">${I18N_D.t('calc.intdef_correction_desc', {fx: '{@q'+X+'_fx@}', c: '{@q'+X+'_c@}', d: '{@q'+X+'_d@}', f: '{@q'+X+'_f@}', a: '{@q'+X+'_a@}', b: '{@q'+X+'_b@}', ta_I: '{@q'+X+'_ta_I@}'})}</div>
-</div>`;
+        diagNodes = [1,2,3].map(function(i){ return { desc: canonicalNodes[i].description, fb: canonicalNodes[i].truefeedback, kind: canonicalNodes[i].trueFbKind }; });
+        generalFeedback = `<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
+<div style="font-size:.9rem;">${I18N_D.t('calc.intdef_correction_desc', {fx: '{@q'+X+'_fx@}', c: '{@q'+X+'_c@}', d: '{@q'+X+'_d@}', f: '{@q'+X+'_f@}', a: '{@q'+X+'_a@}', b: '{@q'+X+'_b@}', ta_I: '{@q'+X+'_ta_I@}'})}</div>`;
 
     } else if (scenario === 'encadrement-tvi') {
         vars = `/* Q${X} Calcul — Encadrement TVI / Dichotomie */
@@ -245,19 +251,20 @@ q${X}_test_encad: is(float(ans_sup${X}) - float(ans_inf${X}) <= 0.02 + q${X}_tol
         canonicalNodes = [
             calcNode(0, 'V\xe9rification borne inf\xe9rieure', 'AlgEquiv', `q${X}_test_inf`, 'true', '',
                 '+', 0.5, 1, 'PRT-'+X+'-INF-OK', '',
-                '=', 0, -1, 'PRT-'+X+'-INF-NOK', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.tvi_borne_inf_title')}</strong> ${I18N_D.t('calc.tvi_borne_inf_desc')}</div>`),
+                '=', 0, -1, 'PRT-'+X+'-INF-NOK', `<strong>${I18N_D.t('calc.tvi_borne_inf_title')}</strong> ${I18N_D.t('calc.tvi_borne_inf_desc')}`,
+                'true', 'false'),
             calcNode(1, 'V\xe9rification borne sup\xe9rieure', 'AlgEquiv', `q${X}_test_sup`, 'true', '',
                 '+', 0.5, 2, 'PRT-'+X+'-SUP-OK', '',
-                '=', 0, -1, 'PRT-'+X+'-SUP-NOK', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.tvi_borne_sup_title')}</strong> ${I18N_D.t('calc.tvi_borne_sup_desc')}</div>`),
+                '=', 0, -1, 'PRT-'+X+'-SUP-NOK', `<strong>${I18N_D.t('calc.tvi_borne_sup_title')}</strong> ${I18N_D.t('calc.tvi_borne_sup_desc')}`,
+                'true', 'false'),
             calcNode(2, 'V\xe9rification amplitude finale', 'AlgEquiv', `q${X}_test_encad`, 'true', '',
-                '=', 0, -1, 'PRT-'+X+'-AMP-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.tvi_fb_ok_desc')}</div>`,
-                '-', 0.25, -1, 'PRT-'+X+'-AMP-NOK', fbWrong || `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">⚠️ <strong>${I18N_D.t('calc.tvi_precision_title')}</strong> ${I18N_D.t('calc.tvi_precision_desc')}</div>`)
+                '=', 0, -1, 'PRT-'+X+'-AMP-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.tvi_fb_ok_desc')}`,
+                '-', 0.25, -1, 'PRT-'+X+'-AMP-NOK', fbWrong || `<strong>${I18N_D.t('calc.tvi_precision_title')}</strong> ${I18N_D.t('calc.tvi_precision_desc')}`,
+                'true', 'partial')
         ];
-        diagNodes = [0,1].map(function(i){ return { desc: canonicalNodes[i].description, fb: canonicalNodes[i].falsefeedback }; });
-        generalFeedback = `<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
-<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
-<div style="font-size:.9rem;">${I18N_D.t('calc.tvi_correction_desc', {k: '{@q'+X+'_k@}', f1: '{@q'+X+'_f1@}', f2: '{@q'+X+'_f2@}', alpha: '{@q'+X+'_alpha@}', alpha_inf: '{@q'+X+'_alpha_inf@}', alpha_sup: '{@q'+X+'_alpha_sup@}'})}</div>
-</div>`;
+        diagNodes = [0,1].map(function(i){ return { desc: canonicalNodes[i].description, fb: canonicalNodes[i].falsefeedback, kind: canonicalNodes[i].falseFbKind }; });
+        generalFeedback = `<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
+<div style="font-size:.9rem;">${I18N_D.t('calc.tvi_correction_desc', {k: '{@q'+X+'_k@}', f1: '{@q'+X+'_f1@}', f2: '{@q'+X+'_f2@}', alpha: '{@q'+X+'_alpha@}', alpha_inf: '{@q'+X+'_alpha_inf@}', alpha_sup: '{@q'+X+'_alpha_sup@}'})}</div>`;
 
     } else if (scenario === 'convexite-tangente') {
         vars = `/* Q${X} Calcul — Convexit\xe9 et position de la tangente */
@@ -281,23 +288,24 @@ q${X}_ta_fpp:q${X}_fpp$ q${X}_ta_fp:q${X}_fp$`;
                 '=', 0, 3, 'PRT-'+X+'-FPP-NOK', ''),
             calcNode(1, 'V\xe9rification convexit\xe9', 'String', `ans_conv${X}`, '"convexe"', '',
                 '=', 0.3, 2, 'PRT-'+X+'-CONV-OK', '',
-                '=', 0, -1, 'PRT-'+X+'-CONV-NOK', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">⚠️ <strong>${I18N_D.t('calc.incoherence_title')}</strong> ${I18N_D.t('calc.convexite_err_conv_desc', {fpp: '{@q'+X+'_fpp@}', k: '{@q'+X+'_k@}'})}</div>`),
+                '=', 0, -1, 'PRT-'+X+'-CONV-NOK', `<strong>${I18N_D.t('calc.incoherence_title')}</strong> ${I18N_D.t('calc.convexite_err_conv_desc', {fpp: '{@q'+X+'_fpp@}', k: '{@q'+X+'_k@}'})}`,
+                'true', 'partial'),
             calcNode(2, 'V\xe9rification position tangente', 'String', `ans_pos${X}`, '"en dessous de"', '',
-                '=', 0.3, -1, 'PRT-'+X+'-POS-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.convexite_fb_ok_desc')}</div>`,
-                '=', 0, -1, 'PRT-'+X+'-POS-NOK', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">⚠️ <strong>${I18N_D.t('calc.attention_propriete_title')}</strong> ${I18N_D.t('calc.convexite_err_pos_desc')}</div>`),
+                '=', 0.3, -1, 'PRT-'+X+'-POS-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.convexite_fb_ok_desc')}`,
+                '=', 0, -1, 'PRT-'+X+'-POS-NOK', `<strong>${I18N_D.t('calc.attention_propriete_title')}</strong> ${I18N_D.t('calc.convexite_err_pos_desc')}`,
+                'true', 'partial'),
             calcNode(3, 'Diagnostic erreur d\xe9riv\xe9e', 'AlgEquiv', `ans_fpp${X}`, `q${X}_ta_fp`, '',
-                '=', 0, -1, 'PRT-'+X+'-ERR-PRIME', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">🚨 <strong>${I18N_D.t('calc.confusion_derivee_title')}</strong> ${I18N_D.t('calc.convexite_err_confusion_desc')}</div>`,
-                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.convexite_fb_wrong_title')}</strong> ${I18N_D.t('calc.convexite_fb_wrong_desc')}</div>`)
+                '=', 0, -1, 'PRT-'+X+'-ERR-PRIME', `<strong>${I18N_D.t('calc.confusion_derivee_title')}</strong> ${I18N_D.t('calc.convexite_err_confusion_desc')}`,
+                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('calc.convexite_fb_wrong_title')}</strong> ${I18N_D.t('calc.convexite_fb_wrong_desc')}`,
+                'false', 'false')
         ];
         diagNodes = [
-            { desc: canonicalNodes[1].description, fb: canonicalNodes[1].falsefeedback },
-            { desc: canonicalNodes[2].description, fb: canonicalNodes[2].falsefeedback },
-            { desc: canonicalNodes[3].description, fb: canonicalNodes[3].truefeedback }
+            { desc: canonicalNodes[1].description, fb: canonicalNodes[1].falsefeedback, kind: canonicalNodes[1].falseFbKind },
+            { desc: canonicalNodes[2].description, fb: canonicalNodes[2].falsefeedback, kind: canonicalNodes[2].falseFbKind },
+            { desc: canonicalNodes[3].description, fb: canonicalNodes[3].truefeedback, kind: canonicalNodes[3].trueFbKind }
         ];
-        generalFeedback = `<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
-<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
-<div style="font-size:.9rem;">${I18N_D.t('calc.convexite_correction_desc', {fp: '{@q'+X+'_fp@}', fpp: '{@q'+X+'_fpp@}', k: '{@q'+X+'_k@}'})}</div>
-</div>`;
+        generalFeedback = `<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
+<div style="font-size:.9rem;">${I18N_D.t('calc.convexite_correction_desc', {fp: '{@q'+X+'_fp@}', fpp: '{@q'+X+'_fpp@}', k: '{@q'+X+'_k@}'})}</div>`;
 
     } else if (scenario === 'tangente-ext') {
         vars = `/* Q${X} Calcul — Tangente passant par un point ext\xe9rieur */
@@ -326,24 +334,24 @@ q${X}_err_point:{q${X}_xM}$`;
                 '=', 0.5, 1, 'PRT-'+X+'-AB-OK', '',
                 '=', 0, 2, 'PRT-'+X+'-AB-NOK', ''),
             calcNode(1, "V\xe9rification d'une \xe9quation de tangente", 'AlgEquiv', `ans_tang${X}`, `q${X}_ta_tang`, '',
-                '=', 0.5, -1, 'PRT-'+X+'-TG-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.tanext_fb_ok_desc')}</div>`,
-                '=', 0, 3, 'PRT-'+X+'-TG-NOK', ''),
+                '=', 0.5, -1, 'PRT-'+X+'-TG-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.tanext_fb_ok_desc')}`,
+                '=', 0, 3, 'PRT-'+X+'-TG-NOK', '', 'true'),
             calcNode(2, 'Diagnostic erreur sur les abscisses', 'AlgEquiv', `ans_ab${X}`, `q${X}_err_point`, '',
-                '=', 0, -1, 'PRT-'+X+'-ERR-XM', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>${I18N_D.t('calc.confusion_point_courbe_title')}</strong> ${I18N_D.t('calc.tanext_err_xm_desc')}</div>`,
-                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.abscisses_incorrectes_title')}</strong> ${I18N_D.t('calc.tanext_err_calc_desc')}</div>`),
+                '=', 0, -1, 'PRT-'+X+'-ERR-XM', `<strong>${I18N_D.t('calc.confusion_point_courbe_title')}</strong> ${I18N_D.t('calc.tanext_err_xm_desc')}`,
+                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', `<strong>${I18N_D.t('calc.abscisses_incorrectes_title')}</strong> ${I18N_D.t('calc.tanext_err_calc_desc')}`,
+                'partial', 'false'),
             calcNode(3, "Diagnostic erreur sur l'\xe9quation", 'AlgEquiv', `ans_tang${X}`, 'false', '',
-                '=', 0, -1, 'PRT-'+X+'-ERR-FORM', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">⚠️ <strong>${I18N_D.t('calc.formule_tangente_title')}</strong> ${I18N_D.t('calc.tanext_err_formule_desc')}</div>`,
-                '=', 0, -1, 'PRT-'+X+'-ERR-CALC-TG', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.equation_incorrecte_title')}</strong> ${I18N_D.t('calc.tanext_fb_wrong_desc')}</div>`)
+                '=', 0, -1, 'PRT-'+X+'-ERR-FORM', `<strong>${I18N_D.t('calc.formule_tangente_title')}</strong> ${I18N_D.t('calc.tanext_err_formule_desc')}`,
+                '=', 0, -1, 'PRT-'+X+'-ERR-CALC-TG', fbWrong || `<strong>${I18N_D.t('calc.equation_incorrecte_title')}</strong> ${I18N_D.t('calc.tanext_fb_wrong_desc')}`,
+                'partial', 'false')
         ];
         diagNodes = [
-            { desc: canonicalNodes[2].description, fb: canonicalNodes[2].truefeedback },
-            { desc: canonicalNodes[2].description, fb: canonicalNodes[2].falsefeedback },
-            { desc: canonicalNodes[3].description, fb: canonicalNodes[3].truefeedback }
+            { desc: canonicalNodes[2].description, fb: canonicalNodes[2].truefeedback, kind: canonicalNodes[2].trueFbKind },
+            { desc: canonicalNodes[2].description, fb: canonicalNodes[2].falsefeedback, kind: canonicalNodes[2].falseFbKind },
+            { desc: canonicalNodes[3].description, fb: canonicalNodes[3].truefeedback, kind: canonicalNodes[3].trueFbKind }
         ];
-        generalFeedback = `<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
-<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
-<div style="font-size:.9rem;">${I18N_D.t('calc.tanext_correction_desc', {k: '{@q'+X+'_k@}', xM: '{@q'+X+'_xM@}', yM: '{@q'+X+'_yM@}', a: '{@q'+X+'_a@}', b: '{@q'+X+'_b@}', tg1: '{@q'+X+'_tg1@}', tg2: '{@q'+X+'_tg2@}'})}</div>
-</div>`;
+        generalFeedback = `<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
+<div style="font-size:.9rem;">${I18N_D.t('calc.tanext_correction_desc', {k: '{@q'+X+'_k@}', xM: '{@q'+X+'_xM@}', yM: '{@q'+X+'_yM@}', a: '{@q'+X+'_a@}', b: '{@q'+X+'_b@}', tg1: '{@q'+X+'_tg1@}', tg2: '{@q'+X+'_tg2@}'})}</div>`;
 
     } else { /* aire-courbes */
         vars = `/* Q${X} Calcul — Aire entre deux courbes */
@@ -365,28 +373,38 @@ ${I18N_D.t('calc.aire_enonce3')}
         canonicalNodes = [
             calcNode(0, "V\xe9rification des abscisses d'intersection", 'AlgEquiv', `ans_ab${X}`, `q${X}_ta_ab`, '',
                 '=', 0.5, 1, 'PRT-'+X+'-AB-OK', '',
-                '=', 0, -1, 'PRT-'+X+'-AB-NOK', `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.abscisses_incorrectes_title')}</strong> ${I18N_D.t('calc.aire_err_ab_desc')}</div>`),
+                '=', 0, -1, 'PRT-'+X+'-AB-NOK', `<strong>${I18N_D.t('calc.abscisses_incorrectes_title')}</strong> ${I18N_D.t('calc.aire_err_ab_desc')}`,
+                'true', 'false'),
             calcNode(1, "V\xe9rification de l'aire finale", 'AlgEquiv', `ans_aire${X}`, `q${X}_ta_aire`, '',
-                '=', 0.5, -1, 'PRT-'+X+'-AIRE-OK', fbOk || `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.aire_fb_ok_desc')}</div>`,
-                '=', 0, 2, 'PRT-'+X+'-AIRE-NOK', ''),
+                '=', 0.5, -1, 'PRT-'+X+'-AIRE-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.aire_fb_ok_desc')}`,
+                '=', 0, 2, 'PRT-'+X+'-AIRE-NOK', '', 'true'),
             calcNode(2, 'D\xe9tection erreur de signe (Aire n\xe9gative)', 'AlgEquiv', `ans_aire${X}`, `q${X}_ta_err_sign`, '',
-                '=', 0.25, -1, 'PRT-'+X+'-ERR-SIGN', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>${I18N_D.t('calc.erreur_signe_title')}</strong> ${I18N_D.t('calc.aire_err_signe_desc')}</div>`,
-                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>${I18N_D.t('calc.aire_incorrecte_title')}</strong> ${I18N_D.t('calc.aire_fb_wrong_desc')}</div>`)
+                '=', 0.25, -1, 'PRT-'+X+'-ERR-SIGN', `<strong>${I18N_D.t('calc.erreur_signe_title')}</strong> ${I18N_D.t('calc.aire_err_signe_desc')}`,
+                '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('calc.aire_incorrecte_title')}</strong> ${I18N_D.t('calc.aire_fb_wrong_desc')}`,
+                'partial', 'false')
         ];
         diagNodes = [
-            { desc: canonicalNodes[0].description, fb: canonicalNodes[0].falsefeedback },
-            { desc: canonicalNodes[2].description, fb: canonicalNodes[2].truefeedback }
+            { desc: canonicalNodes[0].description, fb: canonicalNodes[0].falsefeedback, kind: canonicalNodes[0].falseFbKind },
+            { desc: canonicalNodes[2].description, fb: canonicalNodes[2].truefeedback, kind: canonicalNodes[2].trueFbKind }
         ];
-        generalFeedback = `<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
-<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
-<div style="font-size:.9rem;">${I18N_D.t('calc.aire_correction_desc', {f: '{@q'+X+'_f@}', g: '{@q'+X+'_g@}', k: '{@q'+X+'_k@}', a: '{@q'+X+'_a@}', b: '{@q'+X+'_b@}', cond_sup: '{@q'+X+'_cond_sup@}', ta_aire: '{@q'+X+'_ta_aire@}'})}</div>
-</div>`;
+        generalFeedback = `<div style="font-weight:bold;margin-bottom:10px;">${I18N_D.t('calc.correction_detaillee_lbl')}</div>
+<div style="font-size:.9rem;">${I18N_D.t('calc.aire_correction_desc', {f: '{@q'+X+'_f@}', g: '{@q'+X+'_g@}', k: '{@q'+X+'_k@}', a: '{@q'+X+'_a@}', b: '{@q'+X+'_b@}', cond_sup: '{@q'+X+'_cond_sup@}', ta_aire: '{@q'+X+'_ta_aire@}'})}</div>`;
     }
 
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+    // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
+    // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
+    // presentation. Voir js/fb-box.js (applyFbBox).
+    var xmlNodes = canonicalNodes.map(function(n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(n.trueFbKind || 'true', n.truefeedback),
+            falsefeedback: applyFbBox_D(n.falseFbKind || 'false', n.falsefeedback)
+        });
+    });
+    prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
-    generalFeedback = mkFbGen_D(generalFeedback || '', p.fbGen);
+    generalFeedback = applyFbBox_D('general', mkFbGen_D(generalFeedback || '', p.fbGen));
 
     return {type:'calcul', bareme, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },

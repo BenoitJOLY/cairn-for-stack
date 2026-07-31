@@ -11,6 +11,7 @@ const path = require('node:path');
 
 const { genProbabilitesCore } = require(path.join('..', '..', 'js', 'gen-math-probabilites.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -18,7 +19,7 @@ const I18N_STUB = {
 const _mkInput = (o) => `    <input><name>${o.name}</name><tans>${o.tans}</tans></input>`;
 const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkInput, _mkFbGen };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkInput, _mkFbGen, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({

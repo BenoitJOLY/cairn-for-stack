@@ -91,10 +91,17 @@ function renderPreviewHTML_complexe(state) {
   };
 
   const pmap = _cpxBuildPmap(state);
+  const useReal = !!state.realBodyHTML;
   const rawText = state.text || (typeof _cpxGenEnonce === 'function' ? _cpxGenEnonce(scenario, state.op || '*', state.complexno || 'i') : '');
-  const text = _hsRenderMath(_cpxSubst(rawText, pmap));
+  const text = _hsRenderMath(useReal ? state.realBodyHTML : _cpxSubst(rawText, pmap));
   const inputRow = _hsRenderMath(_cpxInputRowHTML(scenario));
 
+  // state.realFbWrongHTML : HTML du nœud PRT réellement déclenché par une réponse
+  // fausse (sonde), déjà encadré côté serveur — voir _cpxRefreshRealPreview(). On
+  // l'affiche en plus du catalogue local des feedbacks détaillés (pas à sa place :
+  // ce catalogue liste plusieurs textes édités par l'enseignant selon le type
+  // d'erreur, alors que la sonde n'en déclenche qu'un seul à la fois — les cacher
+  // ferait disparaître des feedbacks bien réels aux yeux de l'enseignant).
   let fbGlobalHTML = '';
   if (typeof CPX_FB_DEFS !== 'undefined' && CPX_FB_DEFS[scenario]) {
     fbGlobalHTML = CPX_FB_DEFS[scenario].map(function (item) {
@@ -103,9 +110,15 @@ function renderPreviewHTML_complexe(state) {
       return `<div class="hs-clickable" data-cpx-field="detail:${id}" style="margin-bottom:8px;">${_hsRenderMath(_cpxSubst(raw, pmap))}</div>`;
     }).join('');
   }
+  if (useReal && state.realFbWrongHTML) {
+    fbGlobalHTML = `<div style="margin-bottom:8px;border-left:3px solid #be185d;padding-left:8px;"><em style="font-size:.78rem;color:#9d174d;">🟢 ${I18N.t('common.preview_real_badge')}</em><br>${_hsRenderMath(state.realFbWrongHTML)}</div>` + fbGlobalHTML;
+  }
 
+  // state.realFbGenHTML : generalFeedback déjà rendu par Maxima — remplace le
+  // calcul local approximatif.
   const rawFbGen = state.fbGen || (typeof _cpxGenFbgen === 'function' ? _cpxGenFbgen(scenario, state.op || '*', state.complexno || 'i') : '');
-  const fbGenHTML = `<div class="hs-clickable" data-cpx-field="fbgen">${_hsRenderMath(_cpxSubst(rawFbGen, pmap))}</div>`;
+  const fbGenBody = state.realFbGenHTML || _cpxSubst(rawFbGen, pmap);
+  const fbGenHTML = `<div class="hs-clickable" data-cpx-field="fbgen">${_hsRenderMath(fbGenBody)}</div>`;
 
   let focusFbGen = false;
   try { focusFbGen = document.querySelector('#fp-complexe .mpane.on') && document.querySelector('#fp-complexe .mpane.on').id === 'cpx-fb-gen'; } catch (e) {}
@@ -138,6 +151,7 @@ function renderPreviewHTML_complexe(state) {
     <span class="hs-preview-note">/ ${bareme} pt</span>
     <span class="hs-preview-note">${scenarioLabels[scenario] || scenario}</span>
     ${mode === 'aleatoire' ? `<span class="hs-preview-note">${I18N.t('common.preview_stack_generated_values')}</span>` : ''}
+    <span class="hs-preview-note">${useReal ? ('🟢 ' + I18N.t('common.preview_real_badge')) : ('🎲 ' + I18N.t('common.preview_sim_badge'))}</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-cpx-field="text">${text}</div>
@@ -162,6 +176,10 @@ function renderPreviewHTML_complexe(state) {
     var container = document.getElementById('cpx-preview-container');
     if (!container) return;
     var state = captureState();
+    _cpxAugmentStateWithReal(state);
+    var __cpxHasRandom = true;
+    try { __cpxHasRandom = _hsHasRandomization(genComplexeCore(1, _cpxBuildParams()).vars); } catch (e) { __cpxHasRandom = true; }
+    _hsUpdateRerollVisibility('cpx', __cpxHasRandom);
     var iframe = mountPreviewIframe('cpx-preview-container', renderPreviewHTML_complexe(state));
     if (iframe && !iframe.__hsClickWired) {
       iframe.__hsClickWired = true;
@@ -209,6 +227,147 @@ function renderPreviewHTML_complexe(state) {
     }).observe(panel, { attributes: true });
     hsRegisterPreviewRefresher(updateCpxFullPreview);
   }
+
+  // ── APERÇU RÉEL (via Maxima) ─────────────────────────────────────
+  // Même mécanisme que preview-algebraic.js (_algRefreshRealPreview) : le rendu
+  // réel est fusionné dans `state` juste avant renderPreviewHTML_complexe().
+  var _cpxPreviewSeed = null;
+  var _cpxRealPreviewGen = 0;
+  var _cpxLastReal = null; // { bodyHTML, fbGenHTML, fbWrongHTML }
+
+  function _cpxEnsurePreviewSeed() {
+    if (!_cpxPreviewSeed) _cpxPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    return _cpxPreviewSeed;
+  }
+
+  function _cpxSetRealPreviewStatus(msg, isError) {
+    var el = document.getElementById('cpx-real-preview-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = isError ? '#b91c1c' : '#64748b';
+  }
+
+  function _cpxCleanBodyHTML(html) {
+    return (html || '').replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
+      .replace(/\[\[input:[^\]]+\]\]/g, '').replace(/\[\[validation:[^\]]+\]\]/g, '');
+  }
+
+  function _cpxCleanFbWrongHTML(html) {
+    return (html || '').replace(/^<div class="[a-z]+"><\/div>/, '');
+  }
+
+  // Sondes volontairement fausses mais toujours syntaxiquement valides pour les
+  // inputs algébriques de chaque scénario (X=1, seul cas utilisé pour l'aperçu
+  // réel) : un littéral entier (partie réelle/module/argument) ou complexe
+  // (a+b*%i), dont la probabilité de coïncider avec les valeurs attendues de
+  // l'enseignant est négligeable — même esprit que preview-algebraic.js.
+  function _cpxWrongProbeAnswers(scenario) {
+    var cplx = '999999937+999999937*%i';
+    var real = '999999937';
+    if (scenario === 'module-arg') return { ans_mod1: real, ans_arg1: real };
+    if (scenario === 'equation-2deg') return { ans_z11: cplx, ans_z21: cplx };
+    if (scenario === 'affixes') return { ans_zi1: cplx, ans_ab1: real };
+    if (scenario === 'conjugue') return { ans_zbar1: cplx };
+    return { ans11: cplx }; // forme-alg
+  }
+
+  async function _cpxFetchRealFbWrong(xml, seed, scenario) {
+    try {
+      var gradeRes = await maximaGradeXML(xml, seed, _cpxWrongProbeAnswers(scenario));
+      if (!gradeRes || !gradeRes.isgradable || !gradeRes.prts || !gradeRes.prts.prt1) return null;
+      return _cpxCleanFbWrongHTML(gradeRes.prts.prt1);
+    } catch (e) { return null; }
+  }
+
+  async function _cpxRefreshRealPreview() {
+    if (typeof currentType === 'undefined' || currentType !== 'complexe') return;
+    var gen = ++_cpxRealPreviewGen;
+
+    var p;
+    try { p = _cpxBuildParams(); } catch (e) { return; }
+
+    _cpxSetRealPreviewStatus(I18N.t('common.preview_real_loading'), false);
+
+    var xml;
+    try {
+      var parts = genComplexeCore(1, p);
+      xml = insertDeployedSeeds(buildStandaloneQuestionXML(parts), [_cpxEnsurePreviewSeed()]);
+    } catch (e) {
+      if (gen === _cpxRealPreviewGen) _cpxSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+      return;
+    }
+
+    try {
+      var renderRes = await maximaRenderXML(xml, _cpxPreviewSeed);
+      if (gen !== _cpxRealPreviewGen) return; // réponse obsolète
+
+      if (!renderRes || !renderRes.questionrender) throw new Error('forme inattendue');
+      _cpxLastReal = {
+        bodyHTML: _cpxCleanBodyHTML(renderRes.questionrender),
+        fbGenHTML: renderRes.questionsamplesolutiontext || '',
+        fbWrongHTML: null
+      };
+      updateCpxFullPreview();
+      _cpxSetRealPreviewStatus('', false);
+
+      var fbWrongHTML = await _cpxFetchRealFbWrong(xml, _cpxPreviewSeed, p.scenario);
+      if (gen !== _cpxRealPreviewGen || !_cpxLastReal) return;
+      if (fbWrongHTML) {
+        _cpxLastReal.fbWrongHTML = fbWrongHTML;
+        updateCpxFullPreview();
+      }
+    } catch (e) {
+      if (gen !== _cpxRealPreviewGen) return;
+      _cpxSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+    }
+  }
+
+  function cpxRerollPreviewSeed() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'complexe') return;
+    _cpxPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    _cpxRefreshRealPreview();
+  }
+  window.cpxRerollPreviewSeed = cpxRerollPreviewSeed;
+
+  function cpxShowRealPreview() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'complexe') return;
+    _cpxEnsurePreviewSeed();
+    _cpxRefreshRealPreview();
+  }
+  window.cpxShowRealPreview = cpxShowRealPreview;
+
+  function _cpxAugmentStateWithReal(state) {
+    if (_cpxLastReal) {
+      state.realBodyHTML = _cpxLastReal.bodyHTML;
+      state.realFbGenHTML = _cpxLastReal.fbGenHTML;
+      state.realFbWrongHTML = _cpxLastReal.fbWrongHTML;
+    }
+  }
+
+  // Nouvelle session d'édition (panneau réouvert) → seed réinitialisé, aperçu
+  // réel effacé, boutons affichés/masqués selon que Maxima est configuré.
+  (function wireRealPreviewPanel() {
+    var panel = document.getElementById('fp-complexe');
+    if (!panel) return;
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (m) {
+        if (m.attributeName === 'style' && panel.style.display !== 'none') {
+          _cpxPreviewSeed = null;
+          _cpxLastReal = null;
+          var rerollBtn = document.getElementById('cpx-reroll-preview-btn');
+          var showRealBtn = document.getElementById('cpx-show-real-preview-btn');
+          var configured = typeof maximaConfigured === 'function' && maximaConfigured();
+          var hasRandom = true;
+          try { hasRandom = _hsHasRandomization(genComplexeCore(1, _cpxBuildParams()).vars); } catch (e) { hasRandom = true; }
+          if (rerollBtn) rerollBtn.style.display = (configured && hasRandom) ? '' : 'none';
+          if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
+          _cpxSetRealPreviewStatus('', false);
+        }
+      });
+    }).observe(panel, { attributes: true });
+  })();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', wireCpxPreview);

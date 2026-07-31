@@ -2,6 +2,7 @@ function renderPreviewHTML_limites(state) {
   var realParts = {};
   try { realParts = (typeof genLimitesCore === 'function') ? genLimitesCore(1, _limBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
+  _hsUpdateRerollVisibility('lim', _hsHasRandomization(realParts.vars || ''));
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });
   var prtBoxes = _hsPrtBoxes(realParts);
@@ -139,7 +140,9 @@ function renderPreviewHTML_limites(state) {
           var rerollBtn = document.getElementById('lim-reroll-preview-btn');
           var showRealBtn = document.getElementById('lim-show-real-preview-btn');
           var configured = typeof maximaConfigured === 'function' && maximaConfigured();
-          if (rerollBtn) rerollBtn.style.display = configured ? '' : 'none';
+          var hasRandom = true;
+          try { hasRandom = _hsHasRandomization(genLimitesCore(1, _limBuildParams()).vars); } catch (e) { hasRandom = true; }
+          if (rerollBtn) rerollBtn.style.display = (configured && hasRandom) ? '' : 'none';
           if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
           _limSetRealPreviewStatus('', false);
         }

@@ -1,11 +1,10 @@
 // ── XML GENERATORS: numérique ──
 
-async function genNumerical(X){
+function _numBuildParams(){
   const val=sanitizeMaxima(v('num-val').trim());
-  if(!val)throw new Error(I18N.t('msg.err_valeur_vide', {n: X}));
   const aideOn=document.getElementById('num-aide-on')?.checked||false;
   const useKbd=aideOn&&document.getElementById('num-h-kbd').checked;
-  const p={
+  return {
     bareme: parseFloat(v('num-bareme'))||1,
     text: richVal('num-text'),
     val: val,
@@ -20,6 +19,11 @@ async function genNumerical(X){
     aide: aideOn?buildNumHelp():'',
     useKbd: useKbd
   };
+}
+
+async function genNumerical(X){
+  const p=_numBuildParams();
+  if(!p.val)throw new Error(I18N.t('msg.err_valeur_vide', {n: X}));
   try {
     const res = await fetch('/api/generate', {
       method: 'POST',
@@ -45,8 +49,8 @@ function genNumericalCore(X, p, deps){
   deps = deps || {};
   var I18N_D = deps.I18N || I18N;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-  var wrapFb_D = deps.wrapFb || wrapFb;
   var applyFbBox_D = deps.applyFbBox || applyFbBox;
+  var inferFbKind_D = deps.inferFbKind || inferFbKind;
 
   const bareme=p.bareme, text=p.text, val=p.val, n=p.n, isR=p.isR;
   const fbc=p.fbc, fbe=p.fbe, tolType=p.tolType, tolVal=p.tolVal, forbid=p.forbid;
@@ -64,11 +68,21 @@ function genNumericalCore(X, p, deps){
     name:'0', description:'', answertest:tolType, sans:'ans'+X, tans:'ta'+X,
     testoptions:String(tolVal), quiet:'0',
     truescoremode:'=', truescore:'1', truepenalty:'', truenextnode:'-1',
-    trueanswernote:'PRT-'+X+'-1-T', truefeedback:wrapFb_D(fbc, true),
+    trueanswernote:'PRT-'+X+'-1-T', truefeedback:fbc,
     falsescoremode:'=', falsescore:'0', falsepenalty:'', falsenextnode:'-1',
-    falseanswernote:'PRT-'+X+'-1-F', falsefeedback:wrapFb_D(fbe, false)
+    falseanswernote:'PRT-'+X+'-1-F', falsefeedback:fbe
   }];
-  var prtXML=buildPrtXml_D(prtMeta, canonicalNodes);
+  // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+  // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
+  // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
+  // presentation. Voir js/fb-box.js (applyFbBox).
+  var xmlNodes = canonicalNodes.map(function(n){
+    return Object.assign({}, n, {
+      truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
+      falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+    });
+  });
+  var prtXML=buildPrtXml_D(prtMeta, xmlNodes);
   return{bareme,vars,qnote,kbdRaw:useKbd?kbdHtml:null,
     textFrag:`
       <div style="background:#059669;border-left:5px solid #047857;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">

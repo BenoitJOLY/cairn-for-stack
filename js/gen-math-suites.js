@@ -1,16 +1,11 @@
 // Nœud d'un PRT diagnostique séquentiel : si le test échoue, on enchaîne
 // sur le nœud suivant (falsenextnode) jusqu'au nœud générique final.
 // (même pattern que _geoSeqNode dans gen-math-geometrie.js)
-function _suiBox(kind, html) {
-    var s = kind === 'ok' ? { c: '#15803d', bg: '#f0fdf4' }
-        : kind === 'warn' ? { c: '#f97316', bg: '#fff7ed' }
-        : { c: '#dc2626', bg: '#fff0f0' };
-    var icon = kind === 'ok' ? '✅' : kind === 'warn' ? '🚨' : '❌';
-    return '<div style="border-left:4px solid ' + s.c + ';padding:10px 14px;background:' + s.bg + ';border-radius:4px;">' + icon + ' ' + html + '</div>';
-}
-function _suiGenFbBox(bodyHtml) {
-    return '<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>🔑 Correction</strong><br>' + bodyHtml + '</div>';
-}
+// spec.feedback reste du texte brut (pas d'encadré, pas d'icône) — c'est ce qui
+// finit dans truefeedback, exposé via prt.nodes pour prt-manager.js. spec.kind
+// ('true'/'partial'/'false') n'est utilisé que pour appliquer l'encadré coloré
+// sur la copie xmlNodes servant à prtXML (voir _suiSeqPrt/_suiSeqPrt_D plus bas).
+// Voir js/fb-box.js (applyFbBox) et js/gen-basen.js (pattern de référence).
 function _suiSeqNode(X, idx, isLast, spec) {
     return {
         name: String(idx), description: spec.description || '',
@@ -18,7 +13,7 @@ function _suiSeqNode(X, idx, isLast, spec) {
         testoptions: spec.testoptions || '', quiet: spec.quiet ? '1' : '0',
         truescoremode: '=', truescore: String(spec.score),
         truepenalty: '', truenextnode: '-1',
-        trueanswernote: 'PRT' + X + '-' + idx + '-T', truefeedback: spec.feedback || '',
+        trueanswernote: 'PRT' + X + '-' + idx + '-T', truefeedback: spec.feedback || '', fbKind: spec.kind || 'false',
         falsescoremode: '=', falsescore: '0', falsepenalty: '',
         falsenextnode: isLast ? '-1' : String(idx + 1),
         falseanswernote: 'PRT' + X + '-' + idx + '-F', falsefeedback: ''
@@ -27,12 +22,16 @@ function _suiSeqNode(X, idx, isLast, spec) {
 function _suiSeqPrt(X, bareme, specs) {
     var nodes = specs.map(function (spec, idx) { return _suiSeqNode(X, idx, idx === specs.length - 1, spec); });
     var prtMeta = { name: 'prt' + X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml(prtMeta, nodes) };
+    var xmlNodes = nodes.map(function (n) { return Object.assign({}, n, { truefeedback: applyFbBox(n.fbKind || 'false', n.truefeedback) }); });
+    return { prtMeta: prtMeta, canonicalNodes: nodes, xmlNodes: xmlNodes, prtXML: buildPrtXml(prtMeta, xmlNodes) };
 }
 // Nœuds de diagnostic intermédiaires (entre le nœud "réponse correcte" et le
-// nœud générique final) : exposés à part pour l'aperçu (cf. genGeometrie).
-function _suiDiagNodes(specs) {
-    return specs.slice(1, -1).map(function (s) { return { desc: s.description, fb: s.feedback }; });
+// nœud générique final) : exposés à part pour l'aperçu (cf. genGeometrie). Puise
+// dans xmlNodes (encadrés déjà appliqués via applyFbBox) pour ne rien perdre
+// visuellement dans l'aperçu "Feedbacks du PRT", sans jamais retoucher les
+// nœuds bruts édités par prt-manager.js.
+function _suiDiagNodes(xmlNodes) {
+    return xmlNodes.slice(1, -1).map(function (n) { return { desc: n.description, fb: n.truefeedback }; });
 }
 
 function _suiBuildParams() {
@@ -80,6 +79,7 @@ function genSuitesCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkInput_D = deps._mkInput || _mkInput;
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme, scenario = p.scenario, mode = p.mode;
     var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
@@ -88,7 +88,8 @@ function genSuitesCore(X, p, deps) {
     function _suiSeqPrt_D(X, bareme, specs) {
         var nodes = specs.map(function (spec, idx) { return _suiSeqNode(X, idx, idx === specs.length - 1, spec); });
         var prtMeta = { name: 'prt' + X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-        return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml_D(prtMeta, nodes) };
+        var xmlNodes = nodes.map(function (n) { return Object.assign({}, n, { truefeedback: applyFbBox_D(n.fbKind || 'false', n.truefeedback) }); });
+        return { prtMeta: prtMeta, canonicalNodes: nodes, xmlNodes: xmlNodes, prtXML: buildPrtXml_D(prtMeta, xmlNodes) };
     }
 
     // ── déclarations Maxima : valeurs fixes (saisies) ou aléatoires (bornes saisies) ──
@@ -168,21 +169,21 @@ q${X}_err_nok:q${X}_U0+q${X}_r;`;
         inputXML = mkInput_D({name:`ans_un${X}`,tans:`q${X}_ans`,boxsize:20,hint:'U0 + n*r',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsArith = [
-            { description: I18N_D.t('sui.node_terme_general'), sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', I18N_D.t('sui.fb_ok_terme_arith')) },
-            { description: I18N_D.t('sui.node_err_signe_inverse'), sans: `ans_un${X}`, tans: `q${X}_err_inv`, score: 0,
-                feedback: _suiBox('warn', I18N_D.t('sui.err_signe_raison', {kvar:'q'+X+'_k', rvar:'q'+X+'_r'})) },
-            { description: I18N_D.t('sui.node_err_uk_un'), sans: `ans_un${X}`, tans: `q${X}_err_const`, score: 0,
-                feedback: _suiBox('warn', I18N_D.t('sui.err_confusion_uk', {kvar:'q'+X+'_k'})) },
-            { description: I18N_D.t('sui.node_err_oubli_n'), sans: `ans_un${X}`, tans: `q${X}_err_nok`, score: 0,
-                feedback: _suiBox('warn', I18N_D.t('sui.err_oubli_facteur_n')) },
-            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_terme_arith', {kvar:'q'+X+'_k', rvar:'q'+X+'_r'})) }
+            { description: I18N_D.t('sui.node_terme_general'), sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1, kind: 'true',
+                feedback: fbOk || I18N_D.t('sui.fb_ok_terme_arith') },
+            { description: I18N_D.t('sui.node_err_signe_inverse'), sans: `ans_un${X}`, tans: `q${X}_err_inv`, score: 0, kind: 'partial',
+                feedback: I18N_D.t('sui.err_signe_raison', {kvar:'q'+X+'_k', rvar:'q'+X+'_r'}) },
+            { description: I18N_D.t('sui.node_err_uk_un'), sans: `ans_un${X}`, tans: `q${X}_err_const`, score: 0, kind: 'partial',
+                feedback: I18N_D.t('sui.err_confusion_uk', {kvar:'q'+X+'_k'}) },
+            { description: I18N_D.t('sui.node_err_oubli_n'), sans: `ans_un${X}`, tans: `q${X}_err_nok`, score: 0, kind: 'partial',
+                feedback: I18N_D.t('sui.err_oubli_facteur_n') },
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: 'false',
+                feedback: fbWrong || I18N_D.t('sui.fb_wrong_terme_arith', {kvar:'q'+X+'_k', rvar:'q'+X+'_r'}) }
         ];
-        diagNodes = _suiDiagNodes(specsArith);
         var builtArith = _suiSeqPrt_D(X, bareme, specsArith);
         prtMeta = builtArith.prtMeta; canonicalNodes = builtArith.canonicalNodes; prtXML = builtArith.prtXML;
-        generalFeedback = _suiGenFbBox(I18N_D.t('sui.fbgen_terme_arith', {kvar:'q'+X+'_k', ukmu0var:'q'+X+'_Uk_m_U0', rvar:'q'+X+'_r', ansvar:'q'+X+'_ans'}));
+        diagNodes = _suiDiagNodes(builtArith.xmlNodes);
+        generalFeedback = I18N_D.t('sui.fbgen_terme_arith', {kvar:'q'+X+'_k', ukmu0var:'q'+X+'_Uk_m_U0', rvar:'q'+X+'_r', ansvar:'q'+X+'_ans'});
 
     } else if (scenario === 'terme-geo') {
         vars = `/* Q${X} Suites — Terme g\xe9om\xe9trique */
@@ -199,15 +200,15 @@ q${X}_ans:q${X}_U0*q${X}_q^n;`;
         inputXML = mkInput_D({name:`ans_un${X}`,tans:`q${X}_ans`,boxsize:20,hint:'U0 * q^n',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsGeo = [
-            { description: I18N_D.t('sui.node_terme_general'), sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong>`) },
-            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_terme_geo', {ansvar:'q'+X+'_ans'})) }
+            { description: I18N_D.t('sui.node_terme_general'), sans: `ans_un${X}`, tans: `q${X}_ans`, score: 1, kind: 'true',
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong>` },
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: 'false',
+                feedback: fbWrong || I18N_D.t('sui.fb_wrong_terme_geo', {ansvar:'q'+X+'_ans'}) }
         ];
-        diagNodes = _suiDiagNodes(specsGeo);
         var builtGeo = _suiSeqPrt_D(X, bareme, specsGeo);
         prtMeta = builtGeo.prtMeta; canonicalNodes = builtGeo.canonicalNodes; prtXML = builtGeo.prtXML;
-        generalFeedback = _suiGenFbBox(I18N_D.t('sui.fbgen_terme_geo', {kvar:'q'+X+'_k', qvar:'q'+X+'_q', ansvar:'q'+X+'_ans'}));
+        diagNodes = _suiDiagNodes(builtGeo.xmlNodes);
+        generalFeedback = I18N_D.t('sui.fbgen_terme_geo', {kvar:'q'+X+'_k', qvar:'q'+X+'_q', ansvar:'q'+X+'_ans'});
 
     } else if (scenario === 'somme-arith') {
         vars = `/* Q${X} Suites — Somme arithm\xe9tique */
@@ -223,15 +224,15 @@ q${X}_ans:n*(q${X}_U0+q${X}_Un_1)/2;`;
         inputXML = mkInput_D({name:`ans_sn${X}`,tans:`q${X}_ans`,boxsize:25,forbidfloat:1,mustverify:1,showvalidation:2});
 
         var specsSomA = [
-            { description: I18N_D.t('sui.node_somme'), sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_somme_arith', {ansvar:'q'+X+'_ans'})) }
+            { description: I18N_D.t('sui.node_somme'), sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1, kind: 'true',
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>` },
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: 'false',
+                feedback: fbWrong || I18N_D.t('sui.fb_wrong_somme_arith', {ansvar:'q'+X+'_ans'}) }
         ];
-        diagNodes = _suiDiagNodes(specsSomA);
         var builtSomA = _suiSeqPrt_D(X, bareme, specsSomA);
         prtMeta = builtSomA.prtMeta; canonicalNodes = builtSomA.canonicalNodes; prtXML = builtSomA.prtXML;
-        generalFeedback = _suiGenFbBox(I18N_D.t('sui.fbgen_somme_arith', {un1var:'q'+X+'_Un_1', ansvar:'q'+X+'_ans'}));
+        diagNodes = _suiDiagNodes(builtSomA.xmlNodes);
+        generalFeedback = I18N_D.t('sui.fbgen_somme_arith', {un1var:'q'+X+'_Un_1', ansvar:'q'+X+'_ans'});
 
     } else if (scenario === 'somme-geo') {
         vars = `/* Q${X} Suites — Somme g\xe9om\xe9trique */
@@ -246,15 +247,15 @@ q${X}_ans:q${X}_U0*(1-q${X}_q^n)/(1-q${X}_q);`;
         inputXML = mkInput_D({name:`ans_sn${X}`,tans:`q${X}_ans`,boxsize:25,forbidfloat:1,mustverify:1,showvalidation:2});
 
         var specsSomG = [
-            { description: I18N_D.t('sui.node_somme'), sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_somme_geo', {ansvar:'q'+X+'_ans'})) }
+            { description: I18N_D.t('sui.node_somme'), sans: `ans_sn${X}`, tans: `q${X}_ans`, score: 1, kind: 'true',
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>` },
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: 'false',
+                feedback: fbWrong || I18N_D.t('sui.fb_wrong_somme_geo', {ansvar:'q'+X+'_ans'}) }
         ];
-        diagNodes = _suiDiagNodes(specsSomG);
         var builtSomG = _suiSeqPrt_D(X, bareme, specsSomG);
         prtMeta = builtSomG.prtMeta; canonicalNodes = builtSomG.canonicalNodes; prtXML = builtSomG.prtXML;
-        generalFeedback = _suiGenFbBox(I18N_D.t('sui.fbgen_somme_geo', {ansvar:'q'+X+'_ans'}));
+        diagNodes = _suiDiagNodes(builtSomG.xmlNodes);
+        generalFeedback = I18N_D.t('sui.fbgen_somme_geo', {ansvar:'q'+X+'_ans'});
 
     } else { /* limite-geo */
         vars = `/* Q${X} Suites — Limite g\xe9om\xe9trique */
@@ -269,18 +270,18 @@ q${X}_ans:0;`;
         inputXML = mkInput_D({name:`ans_lim${X}`,tans:`q${X}_ans`,boxsize:10,allowwords:'inf',hint:'0',forbidfloat:1,mustverify:0,showvalidation:0});
 
         var specsLim = [
-            { description: I18N_D.t('sui.node_limite'), sans: `ans_lim${X}`, tans: `q${X}_ans`, score: 1,
-                feedback: fbOk || _suiBox('ok', I18N_D.t('sui.fb_ok_limite_geo')) },
-            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _suiBox('bad', I18N_D.t('sui.fb_wrong_limite_geo')) }
+            { description: I18N_D.t('sui.node_limite'), sans: `ans_lim${X}`, tans: `q${X}_ans`, score: 1, kind: 'true',
+                feedback: fbOk || I18N_D.t('sui.fb_ok_limite_geo') },
+            { description: I18N_D.t('sui.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: 'false',
+                feedback: fbWrong || I18N_D.t('sui.fb_wrong_limite_geo') }
         ];
-        diagNodes = _suiDiagNodes(specsLim);
         var builtLim = _suiSeqPrt_D(X, bareme, specsLim);
         prtMeta = builtLim.prtMeta; canonicalNodes = builtLim.canonicalNodes; prtXML = builtLim.prtXML;
-        generalFeedback = _suiGenFbBox(I18N_D.t('sui.fbgen_limite_geo', {absqvar:'abs(q'+X+'_q)'}));
+        diagNodes = _suiDiagNodes(builtLim.xmlNodes);
+        generalFeedback = I18N_D.t('sui.fbgen_limite_geo', {absqvar:'abs(q'+X+'_q)'});
     }
 
-    generalFeedback = mkFbGen_D(generalFeedback, p.fbGen);
+    generalFeedback = applyFbBox_D('general', mkFbGen_D(generalFeedback, p.fbGen));
 
     return {type:'suites', bareme, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },

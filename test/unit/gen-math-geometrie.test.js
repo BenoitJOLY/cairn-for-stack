@@ -13,6 +13,7 @@ const path = require('node:path');
 
 const { genGeometrieCore } = require(path.join('..', '..', 'js', 'gen-math-geometrie.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -45,7 +46,7 @@ function _geoGenFbBox(bodyHtml) {
     return '<div>' + bodyHtml + '</div>';
 }
 
-const DEPS = { I18N: I18N_STUB, _mkInput, _mkFbGen, _geoSeqPrt, _geoGenFbBox };
+const DEPS = { I18N: I18N_STUB, _mkInput, _mkFbGen, _geoSeqPrt, _geoGenFbBox, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({

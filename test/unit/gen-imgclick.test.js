@@ -13,7 +13,7 @@ const path = require('node:path');
 
 const { genImgClickCore, genImgClickSequenceCore } = require(path.join('..', '..', 'js', 'gen-imgclick.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
-const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
+const { applyFbBox, inferFbKind } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -24,7 +24,7 @@ const rawEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').rep
 const htmlEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const jxgDropChunkedJsString = (str, size) => '"' + (str || '') + '"';
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, wrapFb, rawEsc, htmlEsc, jxgDropChunkedJsString, applyFbBox };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, wrapFb, rawEsc, htmlEsc, jxgDropChunkedJsString, applyFbBox, inferFbKind };
 
 function baseParamsClick(overrides) {
     return Object.assign({

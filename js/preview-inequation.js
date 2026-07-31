@@ -2,6 +2,7 @@ function renderPreviewHTML_inequation(state) {
   var realParts = {};
   try { realParts = (typeof genInequationCore === 'function') ? genInequationCore(1, _ineqBuildParams()) : {}; } catch (e) { realParts = {}; }
   var realGeneralFeedback = realParts.generalFeedback || '';
+  _hsUpdateRerollVisibility('ineq', _hsHasRandomization(realParts.vars || ''));
   var knownVars = _calcExtractKnownVars(realParts.vars || '');
   Object.keys(knownVars).forEach(function(k) { if (/\bri\s*\(/.test(knownVars[k])) delete knownVars[k]; });
   // canonicalNodes[0] est le nœud de garde "format reconnu ?" (voir gen-math-inequation.js
@@ -188,7 +189,9 @@ function renderPreviewHTML_inequation(state) {
           var rerollBtn = document.getElementById('ineq-reroll-preview-btn');
           var showRealBtn = document.getElementById('ineq-show-real-preview-btn');
           var configured = typeof maximaConfigured === 'function' && maximaConfigured();
-          if (rerollBtn) rerollBtn.style.display = configured ? '' : 'none';
+          var hasRandom = true;
+          try { hasRandom = _hsHasRandomization(genInequationCore(1, _ineqBuildParams()).vars); } catch (e) { hasRandom = true; }
+          if (rerollBtn) rerollBtn.style.display = (configured && hasRandom) ? '' : 'none';
           if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
           _ineqSetRealPreviewStatus('', false);
         }

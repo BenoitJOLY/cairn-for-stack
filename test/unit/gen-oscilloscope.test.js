@@ -14,6 +14,7 @@ const path = require('node:path');
 
 const { genOscilloscopeCore } = require(path.join('..', '..', 'js', 'gen-oscilloscope.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -31,7 +32,7 @@ function _oscSimplePair(idPrefix, q1, q2, neutral) {
     ];
 }
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, _oscInputHintsHTML, _oscSimplePair };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, _oscInputHintsHTML, _oscSimplePair, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({

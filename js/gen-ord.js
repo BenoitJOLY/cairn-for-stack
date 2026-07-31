@@ -39,8 +39,8 @@ function genOrdCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D      = deps._mkFbGen || _mkFbGen;
     var rawEsc_D       = deps.rawEsc || rawEsc;
-    var wrapFb_D       = deps.wrapFb || wrapFb;
     var applyFbBox_D   = deps.applyFbBox || applyFbBox;
+    var inferFbKind_D  = deps.inferFbKind || inferFbKind;
 
     var bareme  = p.bareme;
     var text    = p.text;
@@ -94,8 +94,8 @@ function genOrdCore(X, p, deps) {
     var fbVars = 'ord_sa_' + X + ': parsons_decode(ans' + X + ');\n'
         + 'ord_check_' + X + ': elementp(ord_sa_' + X + ', ord_tas_' + X + ');';
 
-    var fbOk    = wrapFb_D('<p>✅ <strong>' + I18N_D.t('ord.fb_ok') + '</strong></p>', true);
-    var fbWrong = wrapFb_D('<p>❌ <strong>' + I18N_D.t('ord.fb_wrong_title') + '</strong> ' + I18N_D.t('ord.fb_wrong_detail') + '</p>', false);
+    var fbOk    = '<p>✅ <strong>' + I18N_D.t('ord.fb_ok') + '</strong></p>';
+    var fbWrong = '<p>❌ <strong>' + I18N_D.t('ord.fb_wrong_title') + '</strong> ' + I18N_D.t('ord.fb_wrong_detail') + '</p>';
 
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
     var canonicalNodes = [{
@@ -106,7 +106,17 @@ function genOrdCore(X, p, deps) {
         falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
     }];
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+    // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
+    // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
+    // presentation. Voir js/fb-box.js (applyFbBox).
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
+            falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     /* ── Question text ── */
     var cloneAttr = isClone ? ' clone="true"' : '';

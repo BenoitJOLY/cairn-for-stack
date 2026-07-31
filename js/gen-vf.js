@@ -1,10 +1,8 @@
 // ── XML GENERATORS: vrai/faux ──
 
-async function genVF(X) {
+function _vfBuildParams() {
     var rows = document.querySelectorAll('#vf-props .vf-row');
-    if (!rows.length) throw new Error(I18N.t('msg.err_props_vide'));
-    if (!validateVFDraw()) throw new Error(I18N.t('msg.err_tirage_pool', {type: I18N.t('tpl.vf_banniere')}));
-    var p = {
+    return {
         bareme: parseFloat(v('vf-bareme')) || 1,
         text:   richVal('vf-text'),
         fbGen:  richVal('vf-fbgen'),
@@ -21,6 +19,13 @@ async function genVF(X) {
             };
         })
     };
+}
+
+async function genVF(X) {
+    var rows = document.querySelectorAll('#vf-props .vf-row');
+    if (!rows.length) throw new Error(I18N.t('msg.err_props_vide'));
+    if (!validateVFDraw()) throw new Error(I18N.t('msg.err_tirage_pool', {type: I18N.t('tpl.vf_banniere')}));
+    var p = _vfBuildParams();
     try {
         const res = await fetch('/api/generate', {
             method: 'POST',
@@ -47,6 +52,7 @@ function genVFCore(X, p, deps) {
     var I18N_D        = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var rawEsc_D       = deps.rawEsc || rawEsc;
+    var applyFbBox_D  = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme, text = p.text, fbGen = p.fbGen;
     var Xe = p.Xe, modeXb = p.modeXb, Xb = p.Xb;
@@ -146,11 +152,20 @@ function genVFCore(X, p, deps) {
         name: '0', description: '', answertest: 'AlgEquiv', sans: 'sc_vf' + X, tans: '1',
         testoptions: '', quiet: '0',
         truescoremode: '=', truescore: '1', truepenalty: '0', truenextnode: '-1',
-        trueanswernote: 'PRT' + X + '-1-T', truefeedback: fbHtml,
+        trueanswernote: 'PRT' + X + '-1-T', truefeedback: fbHtml, fbKind: 'true',
         falsescoremode: '=', falsescore: 'sc_vf' + X, falsepenalty: '0', falsenextnode: '-1',
-        falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbHtml
+        falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbHtml, falseFbKind: 'false'
     }];
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // xmlNodes : copie du/des nœud(s) avec l'encadré coloré appliqué, réservée à
+    // buildPrtXml_D/prtXML (export final) — prt.nodes (canonicalNodes) reste brut
+    // pour l'édition via prt-manager.js. Cf. js/fb-box.js.
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: n.truefeedback ? applyFbBox_D(n.fbKind || 'true', n.truefeedback) : n.truefeedback,
+            falsefeedback: n.falsefeedback ? applyFbBox_D(n.falseFbKind || 'false', n.falsefeedback) : n.falsefeedback
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     /* Question text */
     var tableRows = '';

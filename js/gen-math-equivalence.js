@@ -47,6 +47,7 @@ function genEquivalenceCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D      = deps._mkFbGen || _mkFbGen;
     var I18N_D         = deps.I18N || I18N;
+    var applyFbBox_D   = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme;
     var scenario = p.scenario;
@@ -142,10 +143,10 @@ function genEquivalenceCore(X, p, deps) {
     </input>`;
 
     // ── Nœuds PRT : EquivFirst (chaîne) → [étape intermédiaire imposée] → EqualComAss (résultat final) ──
-    var okFb = `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ ${fbOk || `<strong>${I18N_D.t('equiv.fb_ok_default')}</strong>`}</div>`;
-    var wrongFb = `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${fbWrong || I18N_D.t('equiv.fb_wrong_default')}</div>`;
-    var finalOkFb = `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>${I18N_D.t('equiv.fb_final_ok')}</strong></div>`;
-    var finalWrongFb = `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 ${I18N_D.t('equiv.fb_final_wrong')}</div>`;
+    var okFb = fbOk || `<strong>${I18N_D.t('equiv.fb_ok_default')}</strong>`;
+    var wrongFb = fbWrong || I18N_D.t('equiv.fb_wrong_default');
+    var finalOkFb = `<strong>${I18N_D.t('equiv.fb_final_ok')}</strong>`;
+    var finalWrongFb = I18N_D.t('equiv.fb_final_wrong');
 
     var canonicalNodes;
     var diagNodes = [];
@@ -156,8 +157,8 @@ function genEquivalenceCore(X, p, deps) {
                 -1, 0, 'PRT-'+X+'-0-F', wrongFb),
             eqNode(1, I18N_D.t('equiv.node_etape_intermediaire'), 'AlgEquiv',
                 `not(emptyp(stack_equiv_find_step(q${X}_etape, ${ansName})))`, 'true',
-                2, 0.33, 'PRT-'+X+'-1-T', `<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ ${I18N_D.t('equiv.fb_etape_ok')}</div>`,
-                2, 0, 'PRT-'+X+'-1-F', `<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 ${I18N_D.t('equiv.fb_etape_wrong')}</div>`,
+                2, 0.33, 'PRT-'+X+'-1-T', I18N_D.t('equiv.fb_etape_ok'),
+                2, 0, 'PRT-'+X+'-1-F', I18N_D.t('equiv.fb_etape_wrong'),
                 '+', '+'),
             eqNode(2, I18N_D.t('equiv.node_resultat_final'), 'EqualComAss', `last(${ansName})`, `last(q${X}_ta)`,
                 -1, 0.33, 'PRT-'+X+'-2-T', finalOkFb,
@@ -177,10 +178,25 @@ function genEquivalenceCore(X, p, deps) {
     }
 
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '0', feedbackstyle: '1', feedbackvariables: '' };
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+    // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans encadre,
+    // pour que l'edition manuelle du PRT ne montre jamais de HTML de presentation.
+    // Voir js/fb-box.js (applyFbBox). Ordre des noeuds fixe (depart -> [etape] -> resultat
+    // final) : le noeud de depart est true/false, les noeuds suivants sont true/partial
+    // (etape intermediaire et resultat final sont des demi-succes, jamais un echec sec).
+    var fbKinds = (etapeChecked && etapeVal)
+        ? [{ t: 'true', f: 'false' }, { t: 'true', f: 'partial' }, { t: 'true', f: 'partial' }]
+        : [{ t: 'true', f: 'false' }, { t: 'true', f: 'partial' }];
+    var xmlNodes = canonicalNodes.map(function(n, i) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(fbKinds[i].t, n.truefeedback),
+            falsefeedback: applyFbBox_D(fbKinds[i].f, n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
-    var generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('equiv.fbgen_correction', {resvar: '{@q'+X+'_resultat@}'})}</div>`;
-    generalFeedback = mkFbGen_D(generalFeedback, p.fbGenExtra);
+    var generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('equiv.fbgen_correction', {resvar: '{@q'+X+'_resultat@}'})}`;
+    generalFeedback = applyFbBox_D('general', mkFbGen_D(generalFeedback, p.fbGenExtra));
 
     return {
         type: 'equivalence', bareme, vars, qnote, textFrag, inputXML, prtXML,

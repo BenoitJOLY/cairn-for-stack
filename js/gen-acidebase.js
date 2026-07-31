@@ -56,6 +56,7 @@ function genAcideBaseCore(X, p, deps) {
     var I18N_D        = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D     = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D  = deps.applyFbBox || applyFbBox;
 
     var S = '_' + X;  // suffixe Maxima/inputs pour éviter les collisions entre sous-questions
     var abMethod = p.abMethod;
@@ -433,38 +434,37 @@ function genAcideBaseCore(X, p, deps) {
         canonicalNodes = [
             { name: '0', description: 'Vérification indicateur', answertest: 'AlgEquiv', sans: 'is_ind_ok' + S, tans: 'true',
               testoptions: '', quiet: '0',
-              truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '1', trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
+  truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '1', trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-0-F',
-              falsefeedback: '<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;margin:4px 0;">❌ <strong>Indicateur incorrect.</strong> Le pH à l\'équivalence est d\'environ ' + pHeq.toFixed(2) + '. Le <strong>' + indLabel + '</strong> (zone ' + indZone + ') est le seul indicateur adapté ici.</div>' },
+              falsefeedback: '<strong>Indicateur incorrect.</strong> Le pH à l\'équivalence est d\'environ ' + pHeq.toFixed(2) + '. Le <strong>' + indLabel + '</strong> (zone ' + indZone + ') est le seul indicateur adapté ici.', falseFbKind: 'false' },
             { name: '1', description: 'Vérification volume équivalent', answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '2', trueanswernote: 'PRT' + X + '-1-T', truefeedback: '',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-1-F',
-              falsefeedback: '<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Bon indicateur, mais volume incorrect.</strong> Le virage doit apparaître pour un volume d\'environ ' + targetVol.toFixed(1) + ' mL.</div>' },
+              falsefeedback: '<strong>Bon indicateur, mais volume incorrect.</strong> Le virage doit apparaître pour un volume d\'environ ' + targetVol.toFixed(1) + ' mL.', falseFbKind: 'partial' },
             { name: '2', description: 'Calcul pénalité essais (1 essai)', answertest: 'AlgEquiv', sans: 'tries_val' + S, tans: '1',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(b1), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-2-T',
-              truefeedback: '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">✅ <strong>Parfait !</strong> Indicateur correct et dosage réussi du premier coup.</div>',
+              truefeedback: '<strong>Parfait !</strong> Indicateur correct et dosage réussi du premier coup.', fbKind: 'true',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '3', falseanswernote: 'PRT' + X + '-2-F', falsefeedback: '' },
             { name: '3', description: 'Calcul pénalité essais (2 essais)', answertest: 'AlgEquiv', sans: 'tries_val' + S, tans: '2',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(b2), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-3-T',
-              truefeedback: '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">✅ <strong>Correct.</strong> Vous avez dû recommencer une fois, une pénalité est appliquée.</div>',
+              truefeedback: '<strong>Correct.</strong> Vous avez dû recommencer une fois, une pénalité est appliquée.', fbKind: 'true',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '4', falseanswernote: 'PRT' + X + '-3-F', falsefeedback: '' },
             { name: '4', description: 'Calcul pénalité essais (3 essais ou +)', answertest: 'AlgEquiv', sans: 'true', tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(b3), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-4-T',
-              truefeedback: '<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Correct, mais trop d\'essais.</strong> Vous avez recommencé le dosage à plusieurs reprises. Le score est plafonné.</div>',
+              truefeedback: '<strong>Correct, mais trop d\'essais.</strong> Vous avez recommencé le dosage à plusieurs reprises. Le score est plafonné.', fbKind: 'partial',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-4-F', falsefeedback: '' }
         ];
         prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedbackVarsText };
 
-        generalFeedbackAuto = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">'
-            + '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div>'
+        generalFeedbackAuto = '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;">Réponses attendues</div>'
             + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
             + '<span style="font-weight:bold;color:#1e3a5f;">Q' + X + ' Analyse :</span> Le pH à l\'équivalence est d\'environ ' + pHeq.toFixed(2)
             + '. La <strong>' + indLabel + '</strong> est l\'indicateur dont la zone de virage encadre ce pH. Le volume équivalent théorique est '
-            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code>.</div></div>';
+            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code>.</div>';
 
     // ═══════════════════════════════════════════════════════════════
     //  MÉTHODE 2 — Méthode des tangentes (JSXGraph)
@@ -689,32 +689,43 @@ function genAcideBaseCore(X, p, deps) {
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(t1s), truepenalty: '0', truenextnode: '1', trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0.1', falsenextnode: '2', falseanswernote: 'PRT' + X + '-0-F',
-              falsefeedback: '<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Tangentes non parallèles.</strong> L\'écart entre les pentes est trop grand. Ajustez finement les points T1 et T2 pour qu\'elles aient la même pente.</div>' },
+              falsefeedback: '<strong>Tangentes non parallèles.</strong> L\'écart entre les pentes est trop grand. Ajustez finement les points T1 et T2 pour qu\'elles aient la même pente.', falseFbKind: 'partial' },
             { name: '1', description: 'Vérification volume équivalent', answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(t2s), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-1-T',
-              truefeedback: '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">✅ <strong>Excellent !</strong> La méthode des tangentes est parfaitement maîtrisée et le volume équivalent est correct.</div>',
+              truefeedback: '<strong>Excellent !</strong> La méthode des tangentes est parfaitement maîtrisée et le volume équivalent est correct.', fbKind: 'true',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0.1', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-1-F',
-              falsefeedback: '<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Parallélisme correct.</strong> Cependant, la valeur du volume équivalent lue est incorrecte.</div>' },
+              falsefeedback: '<strong>Parallélisme correct.</strong> Cependant, la valeur du volume équivalent lue est incorrecte.', falseFbKind: 'partial' },
             { name: '2', description: 'Repli : volume équivalent sans tangentes rigoureuses', answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(t3s), truepenalty: '', truenextnode: '-1', trueanswernote: 'PRT' + X + '-2-T',
-              truefeedback: '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">Le volume équivalent est correct mais le travail n\'est pas rigoureux.</div>',
+              truefeedback: 'Le volume équivalent est correct mais le travail n\'est pas rigoureux.', fbKind: 'true',
               falsescoremode: '-', falsescore: '0', falsepenalty: '', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-2-F',
-              falsefeedback: '<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Parallélisme et valeur incorrects.</strong> La méthode des tangentes est à revoir.</div>' }
+              falsefeedback: '<strong>Parallélisme et valeur incorrects.</strong> La méthode des tangentes est à revoir.', falseFbKind: 'partial' }
         ];
         prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedbackVarsText };
 
-        generalFeedbackAuto = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">'
-            + '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div>'
+        generalFeedbackAuto = '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;">Réponses attendues</div>'
             + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
             + '<span style="font-weight:bold;color:#1e3a5f;">Q' + X + ' Méthode :</span> Tangentes aux points d\'inflexion de la pente et '
-            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code></div></div>';
+            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code></div>';
     }
 
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
-    var generalFeedback = mkFbGen_D(generalFeedbackAuto, fbGenExtra);
-    var diagNodes = canonicalNodes.map(function(n) {
+    // Encadrés colorés appliqués uniquement sur la copie xmlNodes servant à prtXML —
+    // canonicalNodes (exposé via prt.nodes pour prt-manager.js) reste du texte brut.
+    // Voir js/fb-box.js (applyFbBox) et js/gen-basen.js (pattern de référence).
+    var xmlNodes = canonicalNodes.map(function(n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(n.fbKind || 'true', n.truefeedback),
+            falsefeedback: applyFbBox_D(n.falseFbKind || 'false', n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
+    var generalFeedback = applyFbBox_D('general', mkFbGen_D(generalFeedbackAuto, fbGenExtra));
+    // diagNodes alimente uniquement l'aperçu (js/preview.js renderPreviewHTML_acideBase,
+    // extraFeedbackNodes) — pas le PRT manager — donc puise dans xmlNodes (encadrés déjà
+    // appliqués) pour ne rien perdre visuellement, sans jamais retoucher canonicalNodes.
+    var diagNodes = xmlNodes.map(function(n) {
         return { desc: n.description || '', fb: n.truefeedback || n.falsefeedback || '' };
     });
 

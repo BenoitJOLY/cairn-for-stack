@@ -11,13 +11,14 @@ const path = require('node:path');
 
 const { genVFCore } = require(path.join('..', '..', 'js', 'gen-vf.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
 };
 const rawEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, rawEsc };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, rawEsc, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({

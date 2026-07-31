@@ -14,6 +14,7 @@ const path = require('node:path');
 const { genImageMesureCore } = require(path.join('..', '..', 'js', 'gen-image-mesure.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
 const { jxgDropChunkedJsString } = require(path.join('..', '..', 'js', 'gen-jxgdrop.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -23,7 +24,7 @@ function _mkFbGen(generalFeedback, fbGen) {
 }
 function htmlEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
-const DEPS = { I18N: I18N_STUB, _mkFbGen, buildPrtXml, htmlEsc, jxgDropChunkedJsString };
+const DEPS = { I18N: I18N_STUB, _mkFbGen, buildPrtXml, htmlEsc, jxgDropChunkedJsString, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({

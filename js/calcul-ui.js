@@ -32,10 +32,11 @@ function _calcRenderVarConfig() {
     if (!specs) { host.style.display = 'none'; return; }
     host.style.display = '';
     var rows = specs.map(function(v) {
+        var labelId = 'calc-var-' + v.key + '-label';
         return '<div style="margin-bottom:8px;">'
-            + '<label style="font-size:.82rem;font-weight:500;">' + I18N.t(v.labelKey) + '</label>'
-            + '<input type="text" class="calc-var-alea-input" id="calc-var-' + v.key + '-alea" value="' + v.domain.join(',') + '" placeholder="' + I18N.t('calc.var_placeholder_valeurs') + '" oninput="calcUpdatePreview()" style="font-family:monospace;">'
-            + '<input type="number" class="calc-var-fixe-input" id="calc-var-' + v.key + '-fixe" value="' + v.domain[0] + '" oninput="calcUpdatePreview()" style="display:none;">'
+            + '<label id="' + labelId + '" style="font-size:.82rem;font-weight:500;">' + I18N.t(v.labelKey) + '</label>'
+            + '<input type="text" class="calc-var-alea-input" id="calc-var-' + v.key + '-alea" aria-labelledby="' + labelId + '" value="' + v.domain.join(',') + '" placeholder="' + I18N.t('calc.var_placeholder_valeurs') + '" oninput="calcUpdatePreview()" style="font-family:monospace;">'
+            + '<input type="number" class="calc-var-fixe-input" id="calc-var-' + v.key + '-fixe" aria-labelledby="' + labelId + '" value="' + v.domain[0] + '" oninput="calcUpdatePreview()" style="display:none;">'
             + '</div>';
     }).join('');
     host.innerHTML = '<label style="font-size:.85rem;color:#3730a3;font-weight:600;">' + I18N.t('calc.var_exercice_lbl') + '</label>'

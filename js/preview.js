@@ -529,6 +529,28 @@ function renderPreviewHTML_redox(state) {
   }
 })();
 
+// Un tirage n'a de sens que si les variables Maxima de la question dépendent
+// effectivement d'un appel aléatoire (rand/ri/random) — sinon rejouer le
+// bouton "Nouveau tirage" produirait un rendu strictement identique (ex :
+// Algébrique, dont la formule est intégralement saisie par l'enseignant).
+function _hsHasRandomization(varsCode) {
+  return /\b(rand|ri|random)\s*\(/.test(varsCode || '');
+}
+
+// Recalcule la visibilité des boutons "Nouveau tirage"/"Aperçu réel". Appelé à
+// CHAQUE rendu (pas seulement à l'ouverture du panneau, cf. wireRealPreviewPanel)
+// pour réagir immédiatement à un bascule fixe/aléatoire alors que le panneau est
+// déjà ouvert (ex: Calcul, Complexes). `hasRandom` : booléen déjà calculé par
+// l'appelant via _hsHasRandomization(varsCode).
+function _hsUpdateRerollVisibility(prefix, hasRandom) {
+  var rerollBtn = document.getElementById(prefix + '-reroll-preview-btn');
+  var showRealBtn = document.getElementById(prefix + '-show-real-preview-btn');
+  if (!rerollBtn && !showRealBtn) return;
+  var configured = typeof maximaConfigured === 'function' && maximaConfigured();
+  if (rerollBtn) rerollBtn.style.display = (configured && hasRandom) ? '' : 'none';
+  if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
+}
+
 function _hsSimplePreviewHTML(cfg) {
   // Auto-détection de l'onglet actif (Config vs Feedback général) via la convention
   // universelle d'id <prefix>-fb-gen, sauf si l'appelant a déjà fourni onlyFbGen/hideFbGen

@@ -1015,9 +1015,19 @@ function _diffInp(n, X, type, tans) {
     + "    </input>";
 }
 
-var _diffOK = '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;">';
-var _diffKO = '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fff0f0;border-radius:4px;">';
-var _diffEnd = "</div>";
+// _diffOK/_diffKO/_diffEnd : fragments d'encadre pre-decoupes (ouverture+icone / fermeture),
+// derives dynamiquement d'applyFbBox() (js/fb-box.js) pour respecter la personnalisation
+// eventuelle des couleurs (getFbBoxStyles/localStorage), au lieu de couleurs codees en dur.
+// Ce fichier construit le XML du PRT directement en chaines (pas de noeuds canoniques
+// JSON comme les autres generateurs) : aucun champ n'est expose pour edition via
+// prt-manager.js, l'encadre n'est donc applique qu'a ce point d'export unique — voir
+// _diffFbBoxParts(), calcule localement dans genDiffractionCore() a partir de applyFbBox_D.
+function _diffFbBoxParts(applyFbBox_D, kind) {
+  var MARK = ' SF_DIFF_FB_MARK ';
+  var wrapped = applyFbBox_D(kind, MARK) || (MARK + '</div>');
+  var idx = wrapped.indexOf(MARK);
+  return { pre: wrapped.slice(0, idx), post: wrapped.slice(idx + MARK.length) };
+}
 
 /* ── Generateur ── */
 function genDiffractionParams() {
@@ -1065,6 +1075,13 @@ function genDiffractionCore(X, p, deps) {
   var I18N_D = deps.I18N || I18N;
   var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
   var _diffBuildSvgPreview_D = deps._diffBuildSvgPreview || _diffBuildSvgPreview;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
+
+  var _diffOKParts = _diffFbBoxParts(applyFbBox_D, 'true');
+  var _diffKOParts = _diffFbBoxParts(applyFbBox_D, 'false');
+  var _diffOK = _diffOKParts.pre;
+  var _diffKO = _diffKOParts.pre;
+  var _diffEnd = _diffOKParts.post;
 
   var type = p.type, mode = p.mode, bareme = p.bareme, text = p.text, isRnd = p.isRnd,
     aFix = p.aFix, DFix = p.DFix, bFix = p.bFix, lambdaFix = p.lambdaFix;

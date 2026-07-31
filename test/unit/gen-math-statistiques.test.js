@@ -11,6 +11,7 @@ const path = require('node:path');
 
 const { genStatistiquesCore } = require(path.join('..', '..', 'js', 'gen-math-statistiques.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -18,7 +19,7 @@ const I18N_STUB = {
 const _mkInput = (o) => `    <input><name>${o.name}</name><tans>${o.tans}</tans></input>`;
 const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkInput, _mkFbGen };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkInput, _mkFbGen, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({
@@ -73,11 +74,11 @@ test("scenario 'variance' calcule la moyenne des écarts au carré", () => {
     assert.match(q.vars, /q1_ta:1\.00\*round\(float\(sum\(\(q1_L\[i\]-q1_moy\)\^2,i,1,q1_n\)\/q1_n\)\*100\)\/100;/);
 });
 
-test("scenario 'quartile-q1' et 'quartile-q3' utilisent des positions n/4 et 3n/4", () => {
-    const q1 = genStatistiquesCore(1, baseParams({ scenario: 'quartile-q1' }), DEPS);
-    assert.match(q1.vars, /q1_pos:q1_n\/4;/);
-    const q3 = genStatistiquesCore(1, baseParams({ scenario: 'quartile-q3' }), DEPS);
-    assert.match(q3.vars, /q1_pos:3\*q1_n\/4;/);
+test("scenario 'q1' et 'q3' utilisent des positions n/4 et 3n/4 (avec floor pour robustesse)", () => {
+    const q1 = genStatistiquesCore(1, baseParams({ scenario: 'q1' }), DEPS);
+    assert.match(q1.vars, /q1_pos:max\(1,floor\(q1_n\/4\)\);/);
+    const q3 = genStatistiquesCore(1, baseParams({ scenario: 'q3' }), DEPS);
+    assert.match(q3.vars, /q1_pos:max\(1,floor\(3\*q1_n\/4\)\);/);
 });
 
 test("scenario 'moyenne-ponderee' construit un tableau valeur/effectif à 3 lignes", () => {
@@ -115,9 +116,45 @@ test('generalFeedback intègre fbGen via _mkFbGen', () => {
 });
 
 test('le XML (prtXML, inputXML) est bien formé pour chaque scenario', () => {
-    ['mediane', 'ecart-type', 'etendue', 'moyenne', 'variance', 'quartile-q1', 'quartile-q3', 'moyenne-ponderee'].forEach(scenario => {
+    ['mediane', 'ecart-type', 'etendue', 'moyenne', 'variance', 'q1', 'q3', 'moyenne-ponderee'].forEach(scenario => {
         const q = genStatistiquesCore(1, baseParams({ scenario }), DEPS);
         assertBalancedTags(q.prtXML, `prtXML[${scenario}]`);
         assertBalancedTags(q.inputXML, `inputXML[${scenario}]`);
     });
+});
+
+// ── Mode "valeurs fixes" (AskUserQuestion "Implémenter le mode fixe") ──────────
+test('mode "fixe" génère q1_L en littéral Maxima, sans aucun ri()/rand()', () => {
+    ['mediane', 'ecart-type', 'etendue', 'moyenne', 'variance', 'q1', 'q3'].forEach(scenario => {
+        const q = genStatistiquesCore(1, baseParams({ scenario, mode: 'fixe', data: [2, 5, 8, 3, 7, 4, 6, 1] }), DEPS);
+        assert.doesNotMatch(q.vars, /\bri\s*\(/, `scenario ${scenario}: vars ne doit pas contenir ri(...)`);
+        assert.match(q.vars, /q1_L:\[/, `scenario ${scenario}: q1_L doit être un littéral`);
+    });
+});
+
+test('mode "fixe" trie la série pour les scenarios qui en dépendent (etendue, q1, q3, mediane)', () => {
+    const q = genStatistiquesCore(1, baseParams({ scenario: 'etendue', mode: 'fixe', data: [8, 2, 5] }), DEPS);
+    assert.match(q.vars, /q1_L:\[2,5,8\];/);
+});
+
+test('mode "fixe" lève une erreur explicite si data est vide', () => {
+    assert.throws(() => genStatistiquesCore(1, baseParams({ scenario: 'moyenne', mode: 'fixe', data: [] }), DEPS));
+});
+
+test('mode "fixe" gère quartile Q1/Q3 avec un nombre de valeurs non multiple de 4 (floor)', () => {
+    const q1 = genStatistiquesCore(1, baseParams({ scenario: 'q1', mode: 'fixe', data: [1, 2, 3, 4, 5] }), DEPS);
+    assertBalancedTags(q1.prtXML, 'prtXML[q1-fixe-5]');
+    assert.match(q1.vars, /q1_pos:max\(1,floor\(q1_n\/4\)\);/);
+});
+
+test('mode "fixe" pour moyenne-ponderee construit q1_V/q1_E à partir de vals/effs de longueur arbitraire', () => {
+    const q = genStatistiquesCore(1, baseParams({ scenario: 'moyenne-ponderee', mode: 'fixe', vals: [10, 20, 30, 40], effs: [3, 5, 2, 4] }), DEPS);
+    assert.match(q.vars, /q1_V:\[10,20,30,40\];/);
+    assert.match(q.vars, /q1_E:\[3,5,2,4\];/);
+    assert.match(q.textFrag, /q1_V\[4\]/);
+    assertBalancedTags(q.prtXML, 'prtXML[moyenne-ponderee-fixe]');
+});
+
+test('mode "fixe" pour moyenne-ponderee lève une erreur si vals/effs de longueurs différentes', () => {
+    assert.throws(() => genStatistiquesCore(1, baseParams({ scenario: 'moyenne-ponderee', mode: 'fixe', vals: [1, 2], effs: [1] }), DEPS));
 });

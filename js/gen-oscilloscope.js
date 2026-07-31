@@ -431,9 +431,15 @@ function _oscNode(name, desc, test, sans, tans, testopt, tScoreMode, tScore, tNe
     falseanswernote: fNote, falsefeedback: fFb
   };
 }
-function _oscOk(txt){ return '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ '+txt+'</div>'; }
-function _oscKo(txt){ return '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ '+txt+'</div>'; }
-function _oscTrap(txt){ return '<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 '+txt+'</div>'; }
+/* _oscOk/_oscKo/_oscTrap : le texte reste BRUT (aucun encadre/icone), seulement marque avec sa
+   nature (true/false/partial) via un petit objet {__fbKind, text}. L'encadre colore n'est
+   applique qu'a l'export XML (voir _oscFinalize -> applyFbBox_D), jamais dans les nœuds
+   canoniques exposes a prt-manager.js (js/fb-box.js). */
+function _oscOk(txt){ return { __fbKind: 'true', text: txt }; }
+function _oscKo(txt){ return { __fbKind: 'false', text: txt }; }
+function _oscTrap(txt){ return { __fbKind: 'partial', text: txt }; }
+function _oscFbKindOf(v){ return (v && typeof v === 'object' && v.__fbKind) ? v.__fbKind : null; }
+function _oscFbTextOf(v){ return (v && typeof v === 'object' && v.__fbKind) ? v.text : v; }
 
 /* Structure simplifiée (Autonome/Expert) : 2 nœuds indépendants, un par grandeur,
    sans décomposition unité/piège. neutral=true (Expert) => feedback d'échec sans indice. */
@@ -595,13 +601,12 @@ function genOscilloscopeCore(X, p, deps){
     }
 
     qnote = 'Type: {@ta'+X+'_type_text@} | f={@ta'+X+'_f@} Hz, T={@ta'+X+'_T@}, f={@ta'+X+'_fq@}';
-    genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-      + '<div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
+    genFb = '<div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
       + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N_D.t('osc.genfb_q1_periode') + '</span> <p>' + I18N_D.t('osc.genfb_periode_explanation', {X: X}) + '</p></div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;">'
       + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N_D.t('osc.genfb_q2_frequence') + '</span> <p>' + I18N_D.t('osc.genfb_frequence_explanation') + '</p>'
-      + '<p>' + I18N_D.t('osc.genfb_frequence_calcul', {X: X}) + '</p></div></div>';
+      + '<p>' + I18N_D.t('osc.genfb_frequence_calcul', {X: X}) + '</p></div>';
 
     var prtMeta = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv };
     return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta, canonicalNodes, genFb, fbGen, jsx, deps);
@@ -682,12 +687,11 @@ function genOscilloscopeCore(X, p, deps){
     }
 
     qnote = 'E={@ta'+X+'_E@} | tau={@ta'+X+'_tau@}';
-    genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-      + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
+    genFb = '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
       + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q1_tau') + '</span> <p>' + I18N_D.t('osc.genfb_tau_explanation', {pct: decharge?I18N_D.t('osc.pct_368'):I18N_D.t('osc.pct_632'), X: X}) + '</p></div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;">'
-      + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q2_tension', {mode: decharge?I18N_D.t('osc.mot_initiale'):I18N_D.t('osc.mot_finale')}) + '</span> <p>' + I18N_D.t('osc.genfb_tension_explanation', {X: X}) + '</p></div></div>';
+      + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q2_tension', {mode: decharge?I18N_D.t('osc.mot_initiale'):I18N_D.t('osc.mot_finale')}) + '</span> <p>' + I18N_D.t('osc.genfb_tension_explanation', {X: X}) + '</p></div>';
 
     var prtMeta2 = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv2 };
     return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta2, canonicalNodes, genFb, fbGen, jsx, deps);
@@ -765,12 +769,11 @@ function genOscilloscopeCore(X, p, deps){
   }
 
   qnote = 'f={@ta'+X+'_f_carrier_val@} Hz | dt={@ta'+X+'_dt@}';
-  genFb = '<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">'
-    + '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
+  genFb = '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
     + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
     + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q1_frequence_retard') + '</span> <p>' + I18N_D.t('osc.genfb_frequence_retard_explanation', {X: X}) + '</p></div>'
     + '<div style="margin-bottom:8px;font-size:.9rem;">'
-    + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q2_retard') + '</span> <p>' + I18N_D.t('osc.genfb_retard_explanation', {X: X}) + '</p></div></div>';
+    + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q2_retard') + '</span> <p>' + I18N_D.t('osc.genfb_retard_explanation', {X: X}) + '</p></div>';
 
   var prtMeta3 = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv3 };
   return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta3, canonicalNodes, genFb, fbGen, jsx, deps);
@@ -801,12 +804,32 @@ function _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, p
   deps = deps || {};
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
-  var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
+
+  // canonicalNodes peut porter des feedbacks "marques" (objets {__fbKind, text} produits par
+  // _oscOk/_oscKo/_oscTrap) : plainNodes en extrait le texte brut (expose via prt.nodes pour
+  // prt-manager.js), xmlNodes y applique l'encadre colore correspondant, uniquement pour
+  // l'export prtXML. Voir js/fb-box.js (applyFbBox).
+  var plainNodes = canonicalNodes.map(function(n) {
+    return Object.assign({}, n, {
+      truefeedback: _oscFbTextOf(n.truefeedback),
+      falsefeedback: _oscFbTextOf(n.falsefeedback)
+    });
+  });
+  var xmlNodes = canonicalNodes.map(function(n) {
+    var tKind = _oscFbKindOf(n.truefeedback), fKind = _oscFbKindOf(n.falsefeedback);
+    var tText = _oscFbTextOf(n.truefeedback), fText = _oscFbTextOf(n.falsefeedback);
+    return Object.assign({}, n, {
+      truefeedback: tKind ? applyFbBox_D(tKind, tText) : tText,
+      falsefeedback: fKind ? applyFbBox_D(fKind, fText) : fText
+    });
+  });
+  var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
   return {
     bareme: bareme, vars: vars, qnote: qnote, textFrag: textFrag, previewFrag: previewFrag,
     inputXML: inputXML, prtXML: prtXML,
-    prt: { meta: prtMeta, nodes: canonicalNodes },
-    generalFeedback: _mkFbGen_D(genFb, fbGen),
+    prt: { meta: prtMeta, nodes: plainNodes },
+    generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFb, fbGen)),
     feedbackRef: '[[feedback:'+prtMeta.name+']]',
     kbdRaw: kbdRaw
   };

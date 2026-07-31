@@ -353,27 +353,22 @@ function genRvbCmjCore(X, p, deps) {
         + 'choices_' + X + ': random_permutation(map(lambda([c],[c, is(c=ta_' + X + '), c]), '
         + '["rouge","vert","bleu","cyan","magenta","jaune","noir","blanc"]))$\n'
         + 'fb_ok_' + X + ': "' + _rvbMx(
-            "<div style='background:#dcfce7;color:#166534;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #16a34a;'>" + I18N_D.t('rvb.fb_ok_prefix') + colorKey + "." + okTxtHtml + "</div>"
+            applyFbBox_D('true', I18N_D.t('rvb.fb_ok_prefix') + colorKey + "." + okTxtHtml)
         ) + '"$\n'
         + 'fb_comp_' + X + ': "' + _rvbMx(
-            "<div style='background:#fef2f2;color:#991b1b;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #dc2626;'>" + I18N_D.t('rvb.fb_comp_prefix') + errComp +
-            I18N_D.t('rvb.fb_comp_mid') + colorKey + "." + wrTxtHtml + "</div>"
+            applyFbBox_D('false', I18N_D.t('rvb.fb_comp_prefix') + errComp +
+            I18N_D.t('rvb.fb_comp_mid') + colorKey + "." + wrTxtHtml)
         ) + '"$\n'
         + 'fb_part1_' + X + ': "' + _rvbMx(
-            "<div style='background:#fef2f2;color:#991b1b;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #dc2626;'>" + I18N_D.t('rvb.fb_part_prefix') + errPartiel1 +
-            I18N_D.t('rvb.fb_part_mid') + colorKey + I18N_D.t('rvb.fb_part_suffix') + wrTxtHtml + "</div>"
+            applyFbBox_D('false', I18N_D.t('rvb.fb_part_prefix') + errPartiel1 +
+            I18N_D.t('rvb.fb_part_mid') + colorKey + I18N_D.t('rvb.fb_part_suffix') + wrTxtHtml)
         ) + '"$\n'
         + 'fb_part2_' + X + ': "' + _rvbMx(
-            "<div style='background:#fef2f2;color:#991b1b;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #dc2626;'>" + I18N_D.t('rvb.fb_part_prefix') + errPartiel2 +
-            I18N_D.t('rvb.fb_part_mid') + colorKey + I18N_D.t('rvb.fb_part_suffix') + wrTxtHtml + "</div>"
+            applyFbBox_D('false', I18N_D.t('rvb.fb_part_prefix') + errPartiel2 +
+            I18N_D.t('rvb.fb_part_mid') + colorKey + I18N_D.t('rvb.fb_part_suffix') + wrTxtHtml)
         ) + '"$\n'
         + 'fb_finale_' + X + ': "' + _rvbMx(
-            "<div style='background:#f8fafc;color:#475569;padding:8px 12px;border-radius:6px;" +
-            "border-left:4px solid #94a3b8;'>" + I18N_D.t('rvb.fb_finale_text') + wrTxtHtml + "</div>"
+            applyFbBox_D('general', I18N_D.t('rvb.fb_finale_text') + wrTxtHtml)
         ) + '"$';
 
     /* ── Input XML : dropdown, mélangé côté Maxima (choices_X) ── */
@@ -819,27 +814,21 @@ function _genOptiqueLentilleImageCore(X, p, deps) {
         + '    </input>';
 
     /* ── Feedback messages ── */
-    var fbOk = wrapFb_D(
-        '<p>' + I18N_D.t('opt.fb_ok_title')
+    var fbOk = '<p>' + I18N_D.t('opt.fb_ok_title')
         + (fbOkTxt ? ' ' + htmlEsc(fbOkTxt) : '')
         + '</p><p style="font-size:.88em;">'
         + 'OA\'&nbsp;≈&nbsp;{@round(opt_x_' + X + '*100)/100@}&nbsp;cm'
         + I18N_D.t('opt.fb_attendu_prefix') + OAp.toFixed(2) + '&nbsp;cm) —&nbsp;'
         + 'A\'B\'&nbsp;≈&nbsp;{@round(opt_y_' + X + '*100)/100@}&nbsp;cm'
         + I18N_D.t('opt.fb_attendu_prefix') + ABp.toFixed(2) + '&nbsp;cm)'
-        + '</p>',
-        true
-    );
-    var fbWrong = wrapFb_D(
-        '<p>' + I18N_D.t('opt.fb_wrong_title')
+        + '</p>';
+    var fbWrong = '<p>' + I18N_D.t('opt.fb_wrong_title')
         + (fbWrTxt ? ' ' + htmlEsc(fbWrTxt) : '')
         + '</p><p style="font-size:.88em;">'
         + I18N_D.t('opt.fb_wrong_placed_prefix') + '({@round(opt_x_' + X + '*100)/100@}&nbsp;cm&nbsp;;&nbsp;'
         + '{@round(opt_y_' + X + '*100)/100@}&nbsp;cm). '
         + I18N_D.t('opt.fb_wrong_formula')
-        + '</p>',
-        false
-    );
+        + '</p>';
 
     /* ── PRT XML ── */
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
@@ -851,7 +840,13 @@ function _genOptiqueLentilleImageCore(X, p, deps) {
         falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
     }];
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     /* ── Encart données affiché à l'élève ── */
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
@@ -1154,7 +1149,13 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var prtXML  = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
     var genFbDefault = "<p>Deux quelconques des trois rayons particuliers suivants permettent de construire B' :</p>\n<ul>\n"
         + "<li>Le rayon issu de B, parallèle à l'axe, émerge de la lentille en passant par le foyer image F'.</li>\n"
@@ -1428,7 +1429,13 @@ function _genOptiqueLentilleDivergenteCore(X, p, deps) {
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var prtXML  = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
     var genFbDefault = "<p>Deux quelconques des trois rayons particuliers suivants permettent de construire B' :</p>\n<ul>\n"
         + "<li>Le rayon issu de B, parallèle à l'axe, émerge de la lentille en semblant provenir du foyer image F' (situé du même côté que l'objet).</li>\n"
@@ -2561,7 +2568,13 @@ function _genOptiqueMiroirCoreImpl(X, p, deps) {
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var prtXML  = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
     var ray2Bullet = convexe
         ? "<li>le rayon issu de B dirigé vers le centre C (virtuel, derrière le miroir), qui atteint le miroir sous incidence normale et se réfléchit sur lui-même ;</li>\n"
@@ -3187,7 +3200,13 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var prtXML  = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
     var genFbDefault = "<p>La lunette astronomique est afocale : l'objectif L&#8321; (f'&#8321;) et l'oculaire L&#8322; (f'&#8322;) sont séparés de"
         + ' d&nbsp;=&nbsp;f\'&#8321;&nbsp;+&nbsp;f\'&#8322;&nbsp;=&nbsp;' + _n(d) + '&nbsp;cm, de sorte que leurs foyers F\'&#8321; et F&#8322; sont confondus.</p>\n<ul>\n'
@@ -3727,7 +3746,13 @@ function _genOptiqueMiroirPlanCore(X, p, deps) {
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var prtXML  = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
     var raysListHtml = "<li>le rayon issu de B, perpendiculaire au miroir (incidence normale), qui se réfléchit sur lui-même ;</li>\n"
         + "<li>le rayon issu de B arrivant au sommet S, qui repart symétriquement par rapport à l'axe optique.</li>";
@@ -3958,7 +3983,13 @@ function _genOptiqueMiroirSpheriqueCore(X, p, deps) {
         falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
     }];
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     var typeLabel = (msType === 'concave') ? I18N_D.t('opt.ms_type_concave') : I18N_D.t('opt.ms_type_convexe');
     var SAp = -xAp;
@@ -4483,7 +4514,13 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var prtXML  = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
     var genFbDefault = "<p>Le miroir primaire concave du télescope, de distance focale f'&#8321;&nbsp;=&nbsp;" + _n(f1) + '&nbsp;cm, forme'
         + " l'image d'une étoile à l'infini dans son plan focal (x&nbsp;=&nbsp;-f&#8321;).</p>\n<ul>\n"
@@ -5061,7 +5098,13 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
-    var prtXML  = buildPrtXml_D(prtMeta, canonicalNodes);
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
     var genFbDefault = "<p>L'objectif L&#8321; (f'&#8321;&nbsp;=&nbsp;" + _n(f1) + '&nbsp;cm) forme, de l\'objet réel AB (au-delà de son foyer objet F&#8321;),'
         + ' une image réelle intermédiaire A&#8321;B&#8321;, renversée et agrandie (grandissement γ&nbsp;=&nbsp;' + _n(gam) + ').</p>\n<ul>\n'

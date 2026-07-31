@@ -70,8 +70,12 @@ function _cpxGenEnonce(scenario, op, letter) {
     return '';
 }
 
+// Contenu brut, sans encadre (pas de <div class="cpx-fbgen-box">) : ce texte est
+// inséré tel quel dans le champ éditable "cpx-fbgen", qui ne doit jamais montrer de
+// HTML de présentation (voir js/fb-box.js). L'encadré est appliqué uniquement au
+// moment de l'export XML, par gen-math-complexe.js via applyFbBox('general', ...).
 function _cpxGenFbgen(scenario, op, letter) {
-    var s = '<div class="cpx-fbgen-box">';
+    var s = '';
     s += '<strong>' + I18N.t('tpl.cpx_correction_titre') + '</strong><br><br>';
 
     if (scenario === 'forme-alg') {
@@ -133,7 +137,6 @@ function _cpxGenFbgen(scenario, op, letter) {
         s += '\\(z \\times \\bar{z} = |z|^2\\) (' + I18N.t('tpl.cpx_reel_positif') + ')';
     }
 
-    s += '</div>';
     return s;
 }
 

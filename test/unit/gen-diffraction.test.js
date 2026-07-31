@@ -10,6 +10,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 
 const { genDiffractionCore } = require(path.join('..', '..', 'js', 'gen-diffraction.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -21,7 +22,7 @@ function _diffBuildSvgPreview() {
     return { svg: '<svg>preview</svg>', meas: 'mesure: 1.00 mm' };
 }
 
-const DEPS = { I18N: I18N_STUB, _mkFbGen, _diffBuildSvgPreview };
+const DEPS = { I18N: I18N_STUB, _mkFbGen, _diffBuildSvgPreview, applyFbBox };
 
 function baseParams(overrides) {
     return Object.assign({

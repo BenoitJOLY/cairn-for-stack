@@ -39,9 +39,12 @@ function _algFbDetailHTML(state) {
 
 function renderPreviewHTML_algebraic(state) {
   const bareme = state.bareme || 0;
-  const text = _hsRenderMath(state.text || '');
+  const useReal = !!state.realBodyHTML;
+  const text = _hsRenderMath(useReal ? state.realBodyHTML : (state.text || ''));
   const exprDisplay = state.exprDisplay || '';
-  const exprDisplayHTML = exprDisplay ? _hsRenderMath('\\(' + _hsMaximaToLatexSafe(exprDisplay) + '\\)') : '';
+  // En mode réel, exprDisplay est déjà inclus dans state.realBodyHTML (voir
+  // gen-algebraic.js textFrag) : pas de second rendu séparé, sous peine de doublon.
+  const exprDisplayHTML = (!useReal && exprDisplay) ? _hsRenderMath('\\(' + _hsMaximaToLatexSafe(exprDisplay) + '\\)') : '';
   const modeLabels = {
     libre: I18N.t('alg.mode_libre'),
     developpement: I18N.t('alg.mode_dev'),
@@ -60,15 +63,22 @@ function renderPreviewHTML_algebraic(state) {
   let focusFbGen = false;
   try { focusFbGen = document.querySelector('#fp-algebraic .mpane.on') && document.querySelector('#fp-algebraic .mpane.on').id === 'alg-fb-gen'; } catch (e) {}
 
+  // state.realFbWrongHTML : HTML du nœud PRT réellement déclenché par une réponse
+  // fausse (sonde), déjà encadré côté serveur (applyFbBox_D appliqué dans
+  // genAlgebraicCore avant export) — pas de wrapFb() local dans ce cas.
+  const fbWrongBody = state.realFbWrongHTML || wrapFb(_hsRenderMath(state.fbe || FB_FAUX_DEFAULT), false);
   const fbGlobalHTML = `
     <div data-alg-field="fbc">${wrapFb(_hsRenderMath(state.fbc || FB_JUSTE_DEFAULT), true)}</div>
-    <div data-alg-field="fbe">${wrapFb(_hsRenderMath(state.fbe || FB_FAUX_DEFAULT), false)}</div>`;
+    <div data-alg-field="fbe">${fbWrongBody}</div>`;
   const fbDetailHTML = _algFbDetailHTML(state);
 
   const formulaDisplay = state.formula ? _hsRenderMath('\\(' + _hsMaximaToLatexSafe(state.formula) + '\\)') : '—';
+  // state.realFbGenHTML : generalFeedback déjà rendu par Maxima (voir
+  // _algRefreshRealPreview) — remplace le calcul local ta approximatif.
+  const fbGenBody = state.realFbGenHTML || `<p style="margin:0 0 4px 0;"><strong>${I18N.t('common.preview_expected_answer')}</strong> ${formulaDisplay}</p>
+    ${state.sol ? `<div style="margin-top:8px;">${_hsRenderMath(state.sol)}</div>` : ''}`;
   const fbGenHTML = `<div class="hs-clickable" data-alg-field="fbgen" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin:4px 0;">
-    <p style="margin:0 0 4px 0;"><strong>${I18N.t('common.preview_expected_answer')}</strong> ${formulaDisplay}</p>
-    ${state.sol ? `<div style="margin-top:8px;">${_hsRenderMath(state.sol)}</div>` : ''}
+    ${_hsRenderMath(fbGenBody)}
   </div>`;
 
   return `<!DOCTYPE html>
@@ -99,10 +109,11 @@ function renderPreviewHTML_algebraic(state) {
     <span class="hs-preview-badge">${I18N.t('type.algebraic')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
     <span class="hs-preview-note">${modeLabel}</span>
+    <span class="hs-preview-note">${useReal ? ('🟢 ' + I18N.t('common.preview_real_badge')) : ('🎲 ' + I18N.t('common.preview_sim_badge'))}</span>
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-alg-field="text">${text}</div>
-    ${exprDisplay ? `<div class="hs-preview-text" data-alg-field="expr-display" style="font-weight:600;">${exprDisplayHTML}</div>` : ''}
+    ${exprDisplayHTML ? `<div class="hs-preview-text" data-alg-field="expr-display" style="font-weight:600;">${exprDisplayHTML}</div>` : ''}
     <div data-alg-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? `<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ ${I18N.t('common.preview_kbd_note')}</div>` : ''}</div>
     <input class="hs-alg-input" type="text" disabled placeholder="${I18N.t('common.preview_student_placeholder')}">
     <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
@@ -129,6 +140,10 @@ function renderPreviewHTML_algebraic(state) {
     var container = document.getElementById('alg-preview-container');
     if (!container) return;
     var state = captureState();
+    _algAugmentStateWithReal(state);
+    var __algHasRandom = true;
+    try { __algHasRandom = _hsHasRandomization(genAlgebraicCore(1, _algBuildParams()).vars); } catch (e) { __algHasRandom = true; }
+    _hsUpdateRerollVisibility('alg', __algHasRandom);
     var iframe = mountPreviewIframe('alg-preview-container', renderPreviewHTML_algebraic(state));
     if (iframe && !iframe.__hsClickWired) {
       iframe.__hsClickWired = true;
@@ -197,6 +212,139 @@ function renderPreviewHTML_algebraic(state) {
 
     hsRegisterPreviewRefresher(updateAlgFullPreview);
   }
+
+  // ── APERÇU RÉEL (via Maxima) ─────────────────────────────────────
+  // Même mécanisme que preview-inequation.js (_ineqRefreshRealPreview), adapté à
+  // l'architecture propre à ce fichier (HTML custom + captureState(), pas
+  // _hsWireSimplePreview) : le rendu réel est fusionné dans `state` juste avant
+  // renderPreviewHTML_algebraic(), au lieu de passer par un augmentState callback.
+  var _algPreviewSeed = null;
+  var _algRealPreviewGen = 0;
+  var _algLastReal = null; // { bodyHTML, fbGenHTML, fbWrongHTML }
+
+  function _algEnsurePreviewSeed() {
+    if (!_algPreviewSeed) _algPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    return _algPreviewSeed;
+  }
+
+  function _algSetRealPreviewStatus(msg, isError) {
+    var el = document.getElementById('alg-real-preview-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = isError ? '#b91c1c' : '#64748b';
+  }
+
+  function _algCleanBodyHTML(html) {
+    return (html || '').replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
+      .replace(/\[\[input:[^\]]+\]\]/g, '').replace(/\[\[validation:[^\]]+\]\]/g, '');
+  }
+
+  function _algCleanFbWrongHTML(html) {
+    return (html || '').replace(/^<div class="[a-z]+"><\/div>/, '');
+  }
+
+  // Sonde volontairement fausse mais toujours syntaxiquement valide pour un input
+  // de type algebraic (strictsyntax/forbidfloat) : un entier littéral n'utilisant
+  // aucun des mots autorisés, dont la probabilité de coïncider avec la formule
+  // attendue de l'enseignant est négligeable.
+  async function _algFetchRealFbWrong(xml, seed) {
+    try {
+      var gradeRes = await maximaGradeXML(xml, seed, { ans1: '999999937' });
+      if (!gradeRes || !gradeRes.isgradable || !gradeRes.prts || !gradeRes.prts.prt1) return null;
+      return _algCleanFbWrongHTML(gradeRes.prts.prt1);
+    } catch (e) { return null; }
+  }
+
+  async function _algRefreshRealPreview() {
+    if (typeof currentType === 'undefined' || currentType !== 'algebraic') return;
+    var gen = ++_algRealPreviewGen;
+
+    var p;
+    try { p = _algBuildParams(); } catch (e) { return; }
+
+    _algSetRealPreviewStatus(I18N.t('common.preview_real_loading'), false);
+
+    var xml;
+    try {
+      var parts = genAlgebraicCore(1, p);
+      xml = insertDeployedSeeds(buildStandaloneQuestionXML(parts), [_algEnsurePreviewSeed()]);
+    } catch (e) {
+      if (gen === _algRealPreviewGen) _algSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+      return;
+    }
+
+    try {
+      var renderRes = await maximaRenderXML(xml, _algPreviewSeed);
+      if (gen !== _algRealPreviewGen) return; // réponse obsolète
+
+      if (!renderRes || !renderRes.questionrender) throw new Error('forme inattendue');
+      _algLastReal = {
+        bodyHTML: _algCleanBodyHTML(renderRes.questionrender),
+        fbGenHTML: renderRes.questionsamplesolutiontext || '',
+        fbWrongHTML: null
+      };
+      updateAlgFullPreview();
+      _algSetRealPreviewStatus('', false);
+
+      var fbWrongHTML = await _algFetchRealFbWrong(xml, _algPreviewSeed);
+      if (gen !== _algRealPreviewGen || !_algLastReal) return;
+      if (fbWrongHTML) {
+        _algLastReal.fbWrongHTML = fbWrongHTML;
+        updateAlgFullPreview();
+      }
+    } catch (e) {
+      if (gen !== _algRealPreviewGen) return;
+      _algSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+    }
+  }
+
+  function algRerollPreviewSeed() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'algebraic') return;
+    _algPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    _algRefreshRealPreview();
+  }
+  window.algRerollPreviewSeed = algRerollPreviewSeed;
+
+  function algShowRealPreview() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'algebraic') return;
+    _algEnsurePreviewSeed();
+    _algRefreshRealPreview();
+  }
+  window.algShowRealPreview = algShowRealPreview;
+
+  function _algAugmentStateWithReal(state) {
+    if (_algLastReal) {
+      state.realBodyHTML = _algLastReal.bodyHTML;
+      state.realFbGenHTML = _algLastReal.fbGenHTML;
+      state.realFbWrongHTML = _algLastReal.fbWrongHTML;
+    }
+  }
+
+  // Nouvelle session d'édition (panneau réouvert) → seed réinitialisé, aperçu réel
+  // effacé, boutons affichés/masqués selon que Maxima est configuré (même
+  // convention que preview-inequation.js).
+  (function wireRealPreviewPanel() {
+    var panel = document.getElementById('fp-algebraic');
+    if (!panel) return;
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (m) {
+        if (m.attributeName === 'style' && panel.style.display !== 'none') {
+          _algPreviewSeed = null;
+          _algLastReal = null;
+          var rerollBtn = document.getElementById('alg-reroll-preview-btn');
+          var showRealBtn = document.getElementById('alg-show-real-preview-btn');
+          var configured = typeof maximaConfigured === 'function' && maximaConfigured();
+          var hasRandom = true;
+          try { hasRandom = _hsHasRandomization(genAlgebraicCore(1, _algBuildParams()).vars); } catch (e) { hasRandom = true; }
+          if (rerollBtn) rerollBtn.style.display = (configured && hasRandom) ? '' : 'none';
+          if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
+          _algSetRealPreviewStatus('', false);
+        }
+      });
+    }).observe(panel, { attributes: true });
+  })();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', wireAlgPreview);

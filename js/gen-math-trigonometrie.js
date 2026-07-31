@@ -42,6 +42,7 @@ function genTrigonometrieCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
     var mkInput_D = deps._mkInput || _mkInput;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme, scenario = p.scenario, mode = p.mode;
     var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
@@ -52,7 +53,7 @@ function genTrigonometrieCore(X, p, deps) {
             name: '0', description: desc, answertest: 'AlgEquiv', sans: sans, tans: tans,
             testoptions: '', quiet: '0',
             truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
-            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>'+I18N_D.t('trig.correct')+'</strong></div>',
+            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || '<strong>'+I18N_D.t('trig.correct')+'</strong>',
             falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'PRT-'+X+'-NOK', falsefeedback: fbWrong || falseFb
         };
@@ -73,8 +74,8 @@ q${X}_ta:${fn}(${angle});`;
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_trig${X}]] [[validation:ans_trig${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_trig${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
         canonicalNodes = [trigNode(I18N_D.t('trig.node_valeur_exacte'), `ans_trig${X}`, `q${X}_ta`,
-            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_cercle_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).</div>`;
+            `${I18N_D.t('trig.fb_wrong_cercle_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).`;
 
     } else if (mode === 'fixe') { /* fixe + identite */
         var expr = p.expr;
@@ -87,8 +88,8 @@ q${X}_ta:trigreduce(trigsimp(q${X}_expr));`;
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_simp${X}]] [[validation:ans_simp${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_simp${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
         canonicalNodes = [trigNode(I18N_D.t('trig.node_simplification'), `ans_simp${X}`, `q${X}_ta`,
-            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\).</div>`;
+            `${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\).`;
 
     } else if (scenario === 'valeur-exacte') {
         vars = `/* Q${X} Trig — Valeur exacte */
@@ -105,8 +106,8 @@ q${X}_ta:if q${X}_r_func=0 then sin(q${X}_angle) elseif q${X}_r_func=1 then cos(
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_trig${X}]] [[validation:ans_trig${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_trig${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
         canonicalNodes = [trigNode(I18N_D.t('trig.node_valeur_exacte'), `ans_trig${X}`, `q${X}_ta`,
-            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_cercle_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).</div>`;
+            `${I18N_D.t('trig.fb_wrong_cercle_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_fname@}\\left({@q${X}_angle@}\\right)={@q${X}_ta@}\\).`;
 
     } else { /* aleatoire + identite */
         vars = `/* Q${X} Trig — Simplifier expression */
@@ -131,14 +132,24 @@ q${X}_expr:if q${X}_r_tpl=0 then cos(q${X}_p+q${X}_q)+cos(q${X}_p-q${X}_q)
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_simp${X}]] [[validation:ans_simp${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_simp${X}`,tans:`q${X}_ta`,boxsize:15,forbidfloat:1,mustverify:1,showvalidation:2});
         canonicalNodes = [trigNode(I18N_D.t('trig.node_simplification'), `ans_simp${X}`, `q${X}_ta`,
-            `<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('trig.fb_wrong_simpson_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\) ${I18N_D.t('trig.simpson_note')}.</div>`;
+            `${I18N_D.t('trig.fb_wrong_simpson_prefix')}${I18N_D.t('trig.reponse_lbl')}{@q${X}_ta@}.`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>\\({@q${X}_expr@}={@q${X}_ta@}\\) ${I18N_D.t('trig.simpson_note')}.`;
     }
 
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-    prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+    // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans encadre,
+    // pour que l'edition manuelle du PRT ne montre jamais de HTML de presentation.
+    // Voir js/fb-box.js (applyFbBox).
+    var xmlNodes = canonicalNodes.map(function(n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D('true', n.truefeedback),
+            falsefeedback: applyFbBox_D('false', n.falsefeedback)
+        });
+    });
+    prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
-    generalFeedback = mkFbGen_D(generalFeedback, p.fbGenExtra);
+    generalFeedback = applyFbBox_D('general', mkFbGen_D(generalFeedback, p.fbGenExtra));
 
     return {type:'trigonometrie', bareme, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },

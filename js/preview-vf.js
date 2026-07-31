@@ -33,7 +33,8 @@ function _vfAutoFbGenListHTML(drawnProps, showFb) {
 
 function renderPreviewHTML_vf(state) {
   const bareme = state.bareme || 0;
-  const text = _hsRenderMath(state.text || '');
+  const useReal = !!state.realBodyHTML;
+  const text = _hsRenderMath(useReal ? state.realBodyHTML : (state.text || ''));
   const props = state.props || [];
   const drawn = _vfSimulateDraw(props, state.xe, state.xb, state.modeXb);
   let focusFbGen = false;
@@ -51,7 +52,11 @@ function renderPreviewHTML_vf(state) {
     </tr>`;
   }).join('');
 
-  const fbItemsHTML = drawn.map(function (p, i) {
+  // state.realFbWrongHTML : HTML du nœud PRT réellement déclenché par une sonde
+  // "tout faux" (voir _vfRefreshRealPreview) — remplace la simulation locale
+  // item-par-item, puisque le vrai fbHtml (truefeedback === falsefeedback dans
+  // genVFCore) montre déjà la répartition ✅/❌ pour tous les slots.
+  const fbItemsHTML = (useReal && state.realFbWrongHTML) ? state.realFbWrongHTML : drawn.map(function (p, i) {
     const isV = p.exp !== 'f';
     const idx = props.indexOf(p);
     return `<div style="border-left:4px solid #94a3b8;padding:7px;margin:3px 0">
@@ -61,11 +66,14 @@ function renderPreviewHTML_vf(state) {
     </div>`;
   }).join('');
 
+  // state.realFbGenHTML : generalFeedback déjà rendu par Maxima — remplace le
+  // calcul local approximatif.
   const autoFbGenList = _vfAutoFbGenListHTML(drawn, !!state.fbGenShowFb);
+  const fbGenBody = state.realFbGenHTML || `<ul style="margin:4px 0 0 0;padding-left:1.4em;">${autoFbGenList}</ul>
+    ${state.fbGen ? `<div style="margin-top:8px;">${_hsRenderMath(state.fbGen)}</div>` : ''}`;
   const fbGenHTML = `<div class="hs-clickable" data-vf-field="fbgen" style="border-left:4px solid #4f46e5;padding:10px 14px;background:#eef2ff;border-radius:4px;margin:4px 0;">
     <p style="margin:0 0 4px 0;"><strong>${I18N.t('vf.preview_reponses_attendues')}</strong></p>
-    <ul style="margin:4px 0 0 0;padding-left:1.4em;">${autoFbGenList}</ul>
-    ${state.fbGen ? `<div style="margin-top:8px;">${_hsRenderMath(state.fbGen)}</div>` : ''}
+    ${fbGenBody}
   </div>`;
 
   return `<!DOCTYPE html>
@@ -97,10 +105,12 @@ function renderPreviewHTML_vf(state) {
   <div class="hs-preview-header">
     <span class="hs-preview-badge">${I18N.t('type.vf')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
+    <span class="hs-preview-note">${useReal ? ('🟢 ' + I18N.t('common.preview_real_badge')) : ('🎲 ' + I18N.t('common.preview_sim_badge'))}</span>
   </div>
   <div class="hs-main-block">
-    <div class="hs-preview-text" data-vf-field="text">${text}</div>
-    <table class="hs-vf-table"><tbody>${rowsHTML}</tbody></table>
+    ${useReal
+      ? `<div class="hs-preview-text">${text}</div>`
+      : `<div class="hs-preview-text" data-vf-field="text">${text}</div><table class="hs-vf-table"><tbody>${rowsHTML}</tbody></table>`}
     <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
     <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
@@ -125,6 +135,10 @@ function renderPreviewHTML_vf(state) {
     var container = document.getElementById('vf-preview-container');
     if (!container) return;
     var state = captureState();
+    _vfAugmentStateWithReal(state);
+    var __vfHasRandom = true;
+    try { __vfHasRandom = _hsHasRandomization(genVFCore(1, _vfBuildParams()).vars); } catch (e) { __vfHasRandom = true; }
+    _hsUpdateRerollVisibility('vf', __vfHasRandom);
     var iframe = mountPreviewIframe('vf-preview-container', renderPreviewHTML_vf(state));
     if (iframe && !iframe.__hsClickWired) {
       iframe.__hsClickWired = true;
@@ -208,6 +222,158 @@ function renderPreviewHTML_vf(state) {
 
     hsRegisterPreviewRefresher(updateVFPreview);
   }
+
+  // ── APERÇU RÉEL (via Maxima) ─────────────────────────────────────
+  // Même mécanisme que preview-algebraic.js (_algRefreshRealPreview) : le rendu
+  // réel est fusionné dans `state` juste avant renderPreviewHTML_vf().
+  var _vfPreviewSeed = null;
+  var _vfRealPreviewGen = 0;
+  var _vfLastReal = null; // { bodyHTML, fbGenHTML, fbWrongHTML }
+
+  function _vfEnsurePreviewSeed() {
+    if (!_vfPreviewSeed) _vfPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    return _vfPreviewSeed;
+  }
+
+  function _vfSetRealPreviewStatus(msg, isError) {
+    var el = document.getElementById('vf-real-preview-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = isError ? '#b91c1c' : '#64748b';
+  }
+
+  // [[input:ansXpNN]] n'est pas remplacé par /render (voir maxima-client.js) —
+  // contrairement aux autres types (un seul input en fin d'énoncé, simplement
+  // masqué), le VF a un input par ligne DANS le tableau : les remplacer par de
+  // faux boutons radio désactivés garde le tableau lisible plutôt que des
+  // cellules vides.
+  function _vfCleanBodyHTML(html) {
+    var fakeRadios = '<label class="hs-vf-radio"><input type="radio" disabled> ' + I18N.t('vf.preview_vrai') + '</label>'
+      + '<label class="hs-vf-radio"><input type="radio" disabled> ' + I18N.t('vf.preview_faux') + '</label>';
+    return (html || '').replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
+      .replace(/\[\[input:[^\]]+\]\]/g, fakeRadios).replace(/\[\[validation:[^\]]+\]\]/g, '');
+  }
+
+  function _vfCleanFbWrongHTML(html) {
+    return (html || '').replace(/^<div class="[a-z]+"><\/div>/, '');
+  }
+
+  // Le PRT du VF ne connaît la bonne réponse de chaque slot qu'après le tirage
+  // aléatoire côté Maxima (banque + permutation) : impossible de la deviner
+  // côté client. On récupère donc la réponse de référence par input via
+  // renderRes.questioninputs[name].samplesolution[""] (même contrat que
+  // generateDeployedSeeds dans maxima-client.js) puis on l'inverse (1<->2) pour
+  // garantir une soumission entièrement fausse.
+  function _vfFlipAnswers(xml, renderRes) {
+    var names = _extractInputNames(xml);
+    var answers = {};
+    names.forEach(function (name) {
+      var ir = renderRes && renderRes.questioninputs && renderRes.questioninputs[name];
+      var sol = ir && ir.samplesolution;
+      var correct = (sol && sol[''] !== undefined) ? String(sol['']) : '1';
+      answers[name] = (correct === '1') ? '2' : '1';
+    });
+    return answers;
+  }
+
+  async function _vfFetchRealFbWrong(xml, seed, renderRes) {
+    try {
+      var answers = _vfFlipAnswers(xml, renderRes);
+      var gradeRes = await maximaGradeXML(xml, seed, answers);
+      if (!gradeRes || !gradeRes.isgradable || !gradeRes.prts || !gradeRes.prts.prt1) return null;
+      return _vfCleanFbWrongHTML(gradeRes.prts.prt1);
+    } catch (e) { return null; }
+  }
+
+  async function _vfRefreshRealPreview() {
+    if (typeof currentType === 'undefined' || currentType !== 'vf') return;
+    var gen = ++_vfRealPreviewGen;
+
+    var p;
+    try { p = _vfBuildParams(); } catch (e) { return; }
+
+    _vfSetRealPreviewStatus(I18N.t('common.preview_real_loading'), false);
+
+    var xml;
+    try {
+      var parts = genVFCore(1, p);
+      xml = insertDeployedSeeds(buildStandaloneQuestionXML(parts), [_vfEnsurePreviewSeed()]);
+    } catch (e) {
+      if (gen === _vfRealPreviewGen) _vfSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+      return;
+    }
+
+    try {
+      var renderRes = await maximaRenderXML(xml, _vfPreviewSeed);
+      if (gen !== _vfRealPreviewGen) return; // réponse obsolète
+
+      if (!renderRes || !renderRes.questionrender) throw new Error('forme inattendue');
+      _vfLastReal = {
+        bodyHTML: _vfCleanBodyHTML(renderRes.questionrender),
+        fbGenHTML: renderRes.questionsamplesolutiontext || '',
+        fbWrongHTML: null
+      };
+      updateVFPreview();
+      _vfSetRealPreviewStatus('', false);
+
+      var fbWrongHTML = await _vfFetchRealFbWrong(xml, _vfPreviewSeed, renderRes);
+      if (gen !== _vfRealPreviewGen || !_vfLastReal) return;
+      if (fbWrongHTML) {
+        _vfLastReal.fbWrongHTML = fbWrongHTML;
+        updateVFPreview();
+      }
+    } catch (e) {
+      if (gen !== _vfRealPreviewGen) return;
+      _vfSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+    }
+  }
+
+  function vfRerollPreviewSeed() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'vf') return;
+    _vfPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    _vfRefreshRealPreview();
+  }
+  window.vfRerollPreviewSeed = vfRerollPreviewSeed;
+
+  function vfShowRealPreview() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'vf') return;
+    _vfEnsurePreviewSeed();
+    _vfRefreshRealPreview();
+  }
+  window.vfShowRealPreview = vfShowRealPreview;
+
+  function _vfAugmentStateWithReal(state) {
+    if (_vfLastReal) {
+      state.realBodyHTML = _vfLastReal.bodyHTML;
+      state.realFbGenHTML = _vfLastReal.fbGenHTML;
+      state.realFbWrongHTML = _vfLastReal.fbWrongHTML;
+    }
+  }
+
+  // Nouvelle session d'édition (panneau réouvert) → seed réinitialisé, aperçu
+  // réel effacé, boutons affichés/masqués selon que Maxima est configuré.
+  (function wireRealPreviewPanel() {
+    var panel = document.getElementById('fp-vf');
+    if (!panel) return;
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (m) {
+        if (m.attributeName === 'style' && panel.style.display !== 'none') {
+          _vfPreviewSeed = null;
+          _vfLastReal = null;
+          var rerollBtn = document.getElementById('vf-reroll-preview-btn');
+          var showRealBtn = document.getElementById('vf-show-real-preview-btn');
+          var configured = typeof maximaConfigured === 'function' && maximaConfigured();
+          var hasRandom = true;
+          try { hasRandom = _hsHasRandomization(genVFCore(1, _vfBuildParams()).vars); } catch (e) { hasRandom = true; }
+          if (rerollBtn) rerollBtn.style.display = (configured && hasRandom) ? '' : 'none';
+          if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
+          _vfSetRealPreviewStatus('', false);
+        }
+      });
+    }).observe(panel, { attributes: true });
+  })();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', wireVFPreview);

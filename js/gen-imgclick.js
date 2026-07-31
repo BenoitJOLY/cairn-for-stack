@@ -67,10 +67,10 @@ function genImgClickCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
-    var wrapFb_D = deps.wrapFb || wrapFb;
     var htmlEsc_D = deps.htmlEsc || htmlEsc;
     var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
     var applyFbBox_D = deps.applyFbBox || applyFbBox;
+    var inferFbKind_D = deps.inferFbKind || inferFbKind;
 
     var bareme = p.bareme, text = p.text, fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
     var BGW = p.bgW, BGH = p.bgH;
@@ -120,10 +120,10 @@ function genImgClickCore(X, p, deps) {
 
     /* ── Feedback ── */
     var labelPart = zoneLabel ? ' <em>' + htmlEsc_D(zoneLabel) + '</em>' : '';
-    var fbOk    = wrapFb_D('<p>✅ <strong>' + I18N_D.t('ic.fb_ok_title') + '</strong>' + labelPart + '</p>'
-                       + (fbOkTxt ? '<p>' + htmlEsc_D(fbOkTxt) + '</p>' : ''), true);
-    var fbWrong = wrapFb_D('<p>❌ <strong>' + I18N_D.t('ic.fb_wrong_title') + '</strong>'
-                       + (fbWrTxt ? ' ' + htmlEsc_D(fbWrTxt) : '') + '</p>', false);
+    var fbOk    = '<p>✅ <strong>' + I18N_D.t('ic.fb_ok_title') + '</strong>' + labelPart + '</p>'
+                       + (fbOkTxt ? '<p>' + htmlEsc_D(fbOkTxt) + '</p>' : '');
+    var fbWrong = '<p>❌ <strong>' + I18N_D.t('ic.fb_wrong_title') + '</strong>'
+                       + (fbWrTxt ? ' ' + htmlEsc_D(fbWrTxt) : '') + '</p>';
 
     /* ── PRT ── */
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
@@ -135,7 +135,17 @@ function genImgClickCore(X, p, deps) {
         falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
     }];
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+    // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
+    // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
+    // presentation. Voir js/fb-box.js (applyFbBox).
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
+            falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     /* ── JSXGraph code ── */
     /* Coordinate system: boundingbox [0,BGH,BGW,0] pixels image, y math up (convention gen-jxgdrop.js/genImgClickSequence) */
@@ -214,11 +224,11 @@ function genImgClickSequenceCore(X, p, deps) {
     var I18N_D = deps.I18N || I18N;
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
-    var wrapFb_D = deps.wrapFb || wrapFb;
     var htmlEsc_D = deps.htmlEsc || htmlEsc;
     var rawEsc_D = deps.rawEsc || rawEsc;
     var jxgDropChunkedJsString_D = deps.jxgDropChunkedJsString || jxgDropChunkedJsString;
     var applyFbBox_D = deps.applyFbBox || applyFbBox;
+    var inferFbKind_D = deps.inferFbKind || inferFbKind;
 
     var bareme = p.bareme, text = p.text, fbOkTxt = p.fbOkTxt, fbWrTxt = p.fbWrTxt;
     var seqTime = p.seqTime;
@@ -249,10 +259,10 @@ function genImgClickSequenceCore(X, p, deps) {
         + '    </input>';
 
     /* ── Feedback ── */
-    var fbOk    = wrapFb_D('<p>✅ <strong>' + I18N_D.t('ic.fb_ok_seq') + '</strong></p>'
-                       + (fbOkTxt ? '<p>' + htmlEsc_D(fbOkTxt) + '</p>' : ''), true);
-    var fbWrong = wrapFb_D('<p>❌ <strong>' + I18N_D.t('ic.fb_wrong_seq_title') + '</strong> ' + I18N_D.t('ic.fb_wrong_seq_detail') + '</p>'
-                       + (fbWrTxt ? '<p>' + htmlEsc_D(fbWrTxt) + '</p>' : ''), false);
+    var fbOk    = '<p>✅ <strong>' + I18N_D.t('ic.fb_ok_seq') + '</strong></p>'
+                       + (fbOkTxt ? '<p>' + htmlEsc_D(fbOkTxt) + '</p>' : '');
+    var fbWrong = '<p>❌ <strong>' + I18N_D.t('ic.fb_wrong_seq_title') + '</strong> ' + I18N_D.t('ic.fb_wrong_seq_detail') + '</p>'
+                       + (fbWrTxt ? '<p>' + htmlEsc_D(fbWrTxt) + '</p>' : '');
 
     /* ── PRT ── */
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
@@ -264,7 +274,17 @@ function genImgClickSequenceCore(X, p, deps) {
         falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
         falseanswernote: 'PRT' + X + '-1-F', falsefeedback: fbWrong
     }];
-    var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+    // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
+    // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
+    // presentation. Voir js/fb-box.js (applyFbBox).
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
+            falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+        });
+    });
+    var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     /* ── Dimensions d'affichage (l'image peut être plus grande que l'écran) ── */
     var MAX_DISP_W = 700;

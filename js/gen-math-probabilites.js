@@ -1,15 +1,23 @@
 // Nœud d'un PRT diagnostique séquentiel : si le test échoue, on enchaîne
 // sur le nœud suivant (falsenextnode) jusqu'au nœud générique final.
 // (même pattern que _suiSeqNode dans gen-math-suites.js / _geoSeqNode dans gen-math-geometrie.js)
+// _probKind : correspondance entre les alias 'ok'/'warn'/'bad' (utilisés dans tout ce
+// fichier pour choisir la couleur du feedback) et les kinds 'true'/'partial'/'false'
+// attendus par applyFbBox (js/fb-box.js).
+function _probKind(kind) {
+    return kind === 'ok' ? 'true' : kind === 'warn' ? 'partial' : 'false';
+}
+// _probBox : ne renvoie plus que le contenu BRUT (pas d'encadré ni d'icône) — le
+// nœud PRT édité via prt-manager.js doit rester du texte simple. L'encadré coloré
+// n'est appliqué qu'au moment de construire xmlNodes/prtXML (voir _probSeqPrt_D),
+// jamais dans les nœuds exposés via prt.nodes. kind reste passé par les appelants
+// pour lisibilité (ancien schéma) mais n'influence plus le rendu ici ; c'est le
+// champ spec.kind (assigné à chaque appel) qui pilote l'encadré en aval.
 function _probBox(kind, html) {
-    var s = kind === 'ok' ? { c: '#15803d', bg: '#f0fdf4' }
-        : kind === 'warn' ? { c: '#f97316', bg: '#fff7ed' }
-        : { c: '#dc2626', bg: '#fff0f0' };
-    var icon = kind === 'ok' ? '✅' : kind === 'warn' ? '🚨' : '❌';
-    return '<div style="border-left:4px solid ' + s.c + ';padding:10px 14px;background:' + s.bg + ';border-radius:4px;">' + icon + ' ' + html + '</div>';
+    return html;
 }
 function _probGenFbBox(bodyHtml) {
-    return '<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>🔑 Correction</strong><br>' + bodyHtml + '</div>';
+    return '<strong>Correction</strong><br>' + bodyHtml;
 }
 function _probSeqNode(X, idx, isLast, spec) {
     return {
@@ -18,10 +26,10 @@ function _probSeqNode(X, idx, isLast, spec) {
         testoptions: spec.testoptions || '', quiet: spec.quiet ? '1' : '0',
         truescoremode: '=', truescore: String(spec.score),
         truepenalty: '', truenextnode: '-1',
-        trueanswernote: 'PRT' + X + '-' + idx + '-T', truefeedback: spec.feedback || '',
+        trueanswernote: 'PRT' + X + '-' + idx + '-T', truefeedback: spec.feedback || '', fbKind: spec.kind || 'true',
         falsescoremode: '=', falsescore: '0', falsepenalty: '',
         falsenextnode: isLast ? '-1' : String(idx + 1),
-        falseanswernote: 'PRT' + X + '-' + idx + '-F', falsefeedback: ''
+        falseanswernote: 'PRT' + X + '-' + idx + '-F', falsefeedback: '', falseFbKind: 'false'
     };
 }
 function _probSeqPrt(X, bareme, specs) {
@@ -36,13 +44,25 @@ function _probSeqPrt(X, bareme, specs) {
         built = specs.slice(0, -1);
     }
     var nodes = built.map(function (spec, idx) { return _probSeqNode(X, idx, idx === built.length - 1, spec); });
-    if (fallback) nodes[nodes.length - 1].falsefeedback = fallback.feedback || '';
+    if (fallback) {
+        nodes[nodes.length - 1].falsefeedback = fallback.feedback || '';
+        nodes[nodes.length - 1].falseFbKind = fallback.kind || 'false';
+    }
     var prtMeta = { name: 'prt' + X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml(prtMeta, nodes) };
+    // nodes (exposé via prt.nodes pour prt-manager.js) reste brut, sans encadré :
+    // xmlNodes n'est qu'une copie avec l'encadré appliqué, réservée à l'export XML
+    // final — voir js/fb-box.js.
+    var xmlNodes = nodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: n.truefeedback ? applyFbBox(n.fbKind || 'true', n.truefeedback) : n.truefeedback,
+            falsefeedback: n.falsefeedback ? applyFbBox(n.falseFbKind || 'false', n.falsefeedback) : n.falsefeedback
+        });
+    });
+    return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml(prtMeta, xmlNodes) };
 }
 // Nœuds de diagnostic intermédiaires, exposés à part pour l'aperçu.
 function _probDiagNodes(specs) {
-    return specs.slice(1, -1).map(function (s) { return { desc: s.description, fb: s.feedback }; });
+    return specs.slice(1, -1).map(function (s) { return { desc: s.description, fb: s.feedback, kind: s.kind }; });
 }
 
 function _probBuildParams() {
@@ -91,6 +111,7 @@ function genProbabilitesCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkInput_D = deps._mkInput || _mkInput;
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme, scenario = p.scenario, mode = p.mode;
     var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
@@ -106,9 +127,21 @@ function genProbabilitesCore(X, p, deps) {
             built = specs.slice(0, -1);
         }
         var nodes = built.map(function (spec, idx) { return _probSeqNode(X, idx, idx === built.length - 1, spec); });
-        if (fallback) nodes[nodes.length - 1].falsefeedback = fallback.feedback || '';
+        if (fallback) {
+            nodes[nodes.length - 1].falsefeedback = fallback.feedback || '';
+            nodes[nodes.length - 1].falseFbKind = fallback.kind || 'false';
+        }
         var prtMeta = { name: 'prt' + X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-        return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml_D(prtMeta, nodes) };
+        // nodes (exposé via prt.nodes pour prt-manager.js) reste brut, sans encadré :
+        // xmlNodes n'est qu'une copie avec l'encadré appliqué, réservée à l'export XML
+        // final — voir js/fb-box.js.
+        var xmlNodes = nodes.map(function (n) {
+            return Object.assign({}, n, {
+                truefeedback: n.truefeedback ? applyFbBox_D(n.fbKind || 'true', n.truefeedback) : n.truefeedback,
+                falsefeedback: n.falsefeedback ? applyFbBox_D(n.falseFbKind || 'false', n.falsefeedback) : n.falsefeedback
+            });
+        });
+        return { prtMeta: prtMeta, canonicalNodes: nodes, prtXML: buildPrtXml_D(prtMeta, xmlNodes) };
     }
 
     // ── déclarations Maxima : valeurs fixes (saisies) ou aléatoires (bornes saisies) ──
@@ -160,10 +193,10 @@ q${X}_ta:binomial(q${X}_n,q${X}_k);`;
         inputXML = mkInput_D({name:`ans_ck${X}`,tans:`q${X}_ta`,boxsize:10,forbidfloat:1,mustverify:0,showvalidation:2});
 
         var specsComb = [
-            { description: I18N_D.t('prob.node_cnk'), sans: `ans_ck${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k', tavar:'q'+X+'_ta'})) }
+            { description: I18N_D.t('prob.node_cnk'), sans: `ans_ck${X}`, tans: `q${X}_ta`, score: 1, kind: _probKind('ok'),
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>` },
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: _probKind('bad'),
+                feedback: fbWrong || I18N_D.t('prob.fb_wrong_combinaison', {nvar:'q'+X+'_n', kvar:'q'+X+'_k', tavar:'q'+X+'_ta'}) }
         ];
         diagNodes = _probDiagNodes(specsComb);
         var builtComb = _probSeqPrt_D(X, bareme, specsComb);
@@ -186,14 +219,14 @@ q${X}_err_nocoef:q${X}_p^q${X}_k*q${X}_q^(q${X}_n-q${X}_k);`;
         inputXML = mkInput_D({name:`ans_prob${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsBinom = [
-            { description: I18N_D.t('prob.node_pxk'), sans: `ans_prob${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: I18N_D.t('prob.node_err_p_inverse'), sans: `ans_prob${X}`, tans: `q${X}_err_swap`, score: 0,
-                feedback: _probBox('warn', I18N_D.t('prob.err_p_inverse', {pvar:'q'+X+'_p'})) },
-            { description: I18N_D.t('prob.node_err_oubli_coef'), sans: `ans_prob${X}`, tans: `q${X}_err_nocoef`, score: 0,
-                feedback: _probBox('warn', I18N_D.t('prob.err_oubli_coef')) },
-            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_pk', {tavar:'q'+X+'_ta'})) }
+            { description: I18N_D.t('prob.node_pxk'), sans: `ans_prob${X}`, tans: `q${X}_ta`, score: 1, kind: _probKind('ok'),
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>` },
+            { description: I18N_D.t('prob.node_err_p_inverse'), sans: `ans_prob${X}`, tans: `q${X}_err_swap`, score: 0, kind: _probKind('warn'),
+                feedback: I18N_D.t('prob.err_p_inverse', {pvar:'q'+X+'_p'}) },
+            { description: I18N_D.t('prob.node_err_oubli_coef'), sans: `ans_prob${X}`, tans: `q${X}_err_nocoef`, score: 0, kind: _probKind('warn'),
+                feedback: I18N_D.t('prob.err_oubli_coef') },
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: _probKind('bad'),
+                feedback: fbWrong || I18N_D.t('prob.fb_wrong_binom_pk', {tavar:'q'+X+'_ta'}) }
         ];
         diagNodes = _probDiagNodes(specsBinom);
         var builtBinom = _probSeqPrt_D(X, bareme, specsBinom);
@@ -212,10 +245,10 @@ q${X}_ta:q${X}_n*q${X}_p;`;
         inputXML = mkInput_D({name:`ans_ex${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsEsp = [
-            { description: I18N_D.t('prob.node_ex'), sans: `ans_ex${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_esp', {tavar:'q'+X+'_ta'})) }
+            { description: I18N_D.t('prob.node_ex'), sans: `ans_ex${X}`, tans: `q${X}_ta`, score: 1, kind: _probKind('ok'),
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>` },
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: _probKind('bad'),
+                feedback: fbWrong || I18N_D.t('prob.fb_wrong_binom_esp', {tavar:'q'+X+'_ta'}) }
         ];
         diagNodes = _probDiagNodes(specsEsp);
         var builtEsp = _probSeqPrt_D(X, bareme, specsEsp);
@@ -235,10 +268,10 @@ q${X}_ta:q${X}_n*q${X}_p*q${X}_q;`;
         inputXML = mkInput_D({name:`ans_vx${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsVar = [
-            { description: I18N_D.t('prob.node_vx'), sans: `ans_vx${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_binom_var', {tavar:'q'+X+'_ta'})) }
+            { description: I18N_D.t('prob.node_vx'), sans: `ans_vx${X}`, tans: `q${X}_ta`, score: 1, kind: _probKind('ok'),
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>` },
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: _probKind('bad'),
+                feedback: fbWrong || I18N_D.t('prob.fb_wrong_binom_var', {tavar:'q'+X+'_ta'}) }
         ];
         diagNodes = _probDiagNodes(specsVar);
         var builtVar = _probSeqPrt_D(X, bareme, specsVar);
@@ -262,10 +295,10 @@ q${X}_ta:q${X}_pAD/q${X}_pD;`;
         inputXML = mkInput_D({name:`ans_cond${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsCond = [
-            { description: I18N_D.t('prob.node_cond'), sans: `ans_cond${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_cond', {tavar:'q'+X+'_ta'})) }
+            { description: I18N_D.t('prob.node_cond'), sans: `ans_cond${X}`, tans: `q${X}_ta`, score: 1, kind: _probKind('ok'),
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>` },
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: _probKind('bad'),
+                feedback: fbWrong || I18N_D.t('prob.fb_wrong_cond', {tavar:'q'+X+'_ta'}) }
         ];
         diagNodes = _probDiagNodes(specsCond);
         var builtCond = _probSeqPrt_D(X, bareme, specsCond);
@@ -286,10 +319,10 @@ q${X}_ta:q${X}_pA+q${X}_pB-q${X}_pI;`;
         inputXML = mkInput_D({name:`ans_union${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
 
         var specsUnion = [
-            { description: I18N_D.t('prob.node_union'), sans: `ans_union${X}`, tans: `q${X}_ta`, score: 1,
-                feedback: fbOk || _probBox('ok', `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`) },
-            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true,
-                feedback: fbWrong || _probBox('bad', I18N_D.t('prob.fb_wrong_union', {tavar:'q'+X+'_ta'})) }
+            { description: I18N_D.t('prob.node_union'), sans: `ans_union${X}`, tans: `q${X}_ta`, score: 1, kind: _probKind('ok'),
+                feedback: fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>` },
+            { description: I18N_D.t('prob.node_err_generique'), sans: 'true', tans: 'true', score: 0, quiet: true, kind: _probKind('bad'),
+                feedback: fbWrong || I18N_D.t('prob.fb_wrong_union', {tavar:'q'+X+'_ta'}) }
         ];
         diagNodes = _probDiagNodes(specsUnion);
         var builtUnion = _probSeqPrt_D(X, bareme, specsUnion);
@@ -297,7 +330,7 @@ q${X}_ta:q${X}_pA+q${X}_pB-q${X}_pI;`;
         generalFeedback = _probGenFbBox(I18N_D.t('prob.fbgen_union', {pAvar:'q'+X+'_pA', pBvar:'q'+X+'_pB', pIvar:'q'+X+'_pI', tavar:'q'+X+'_ta'}));
     }
 
-    generalFeedback = mkFbGen_D(generalFeedback, p.fbGen);
+    generalFeedback = applyFbBox_D('general', mkFbGen_D(generalFeedback, p.fbGen));
 
     return {type:'probabilites', bareme, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },

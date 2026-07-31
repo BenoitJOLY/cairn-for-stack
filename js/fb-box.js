@@ -49,17 +49,26 @@ function applyFbBox(kind, html) {
 // de js/prt-manager.js (_prtWrapFb, supprimé) pour pouvoir nettoyer les feedbacks déjà
 // stockés avec ce système. Idempotent : renvoie html inchangé si aucun wrapper connu.
 var _FB_BOX_LEGACY_BG = ['#f0fdf4', '#F9B3A9', '#f9b3a9', '#fafafa', '#F9F2BB', '#f9f2bb', '#FCDFCF', '#fcdfcf'];
+// Ancien encadré "feedback général" imbriqué (titre + contenu séparés), utilisé par
+// js/app.js et plusieurs générateurs avant la refonte centrale (chantier "encadrés
+// de feedback configurables") — nettoyé pour les projets déjà enregistrés.
+var _FB_BOX_LEGACY_GENERAL_RE = /^<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">\s*<div style="font-weight:bold;margin-bottom:10px;">[^<]*<\/div>\s*<div style="font-size:\.9rem;">([\s\S]*)<\/div>\s*<\/div>\s*$/;
 function unwrapFbBox(html) {
     if (!html) return html;
     var s = html.trim();
+    var mGen = _FB_BOX_LEGACY_GENERAL_RE.exec(s);
+    if (mGen) return mGen[1];
     var m = /^<div style="([^"]*)">([\s\S]*)<\/div>\s*$/.exec(s);
     if (!m) return html;
     var style = m[1], inner = m[2];
     var isCurrent = /^border(?:-left:4px solid|:1px solid)/.test(style) && style.indexOf('padding:8px 12px;background:') >= 0;
     var isLegacyBg = _FB_BOX_LEGACY_BG.some(function (bg) { return style.indexOf('background:' + bg) >= 0; });
     var isLegacy = /^padding:12px;background:/.test(style) && isLegacyBg;
-    if (!isCurrent && !isLegacy) return html;
-    return inner.replace(/^(?:✅|❌|🔶|🔑)\s*/, '');
+    // Ancien encadré par nœud (avant la refonte centrale) : border-left/border pleine,
+    // padding:10px 14px, border-radius:4px, avec une couleur de la palette fb-box.
+    var isLegacyNode = /^border(?:-left:4px solid|:1px solid)\s*#[0-9a-fA-F]{6};padding:10px 14px;background:#[0-9a-fA-F]{6};border-radius:4px;?$/.test(style);
+    if (!isCurrent && !isLegacy && !isLegacyNode) return html;
+    return inner.replace(/^(?:✅|❌|⚠️|⚠|🔶|🚨|🔄|🔑)\s*/, '');
 }
 
 // inferFbKind() : déduit 'true'/'partial'/'false' à partir du score du nœud PRT, sans

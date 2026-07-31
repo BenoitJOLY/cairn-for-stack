@@ -104,7 +104,10 @@ function buildXML() {
       q.vars += '\nq'+X+'_ta_arg_neg:-q'+X+'_ta_arg;';
     }
   });
-  // Fallback PRT pour chips complexe dont le prtXML stale n'a pas assez de nœuds
+  // Fallback PRT pour chips complexe dont le prtXML stale n'a pas assez de nœuds.
+  // Construit via _cpxNode()/buildPrtXml() (mêmes helpers que gen-math-complexe.js),
+  // jamais de HTML de présentation dans le texte brut : l'encadré coloré n'est
+  // appliqué que sur la copie xmlNodes servant à prtXML (voir js/fb-box.js).
   orderedQ.forEach(function(q) {
     if (q.type !== 'complexe') return;
     var X = q.id, sc = (q.state && q.state.scenario) || 'forme-alg';
@@ -114,132 +117,61 @@ function buildXML() {
     var need = (sc === 'forme-alg') ? 3 : 4;
     if (nodeCount >= need) return;
     var cn = (q.state && q.state.complexno) || q.complexno || 'i';
+    var prtMeta = { name: 'prt'+X, value: b7, autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
+    var canonicalNodes;
     // PRT stale — reconstruire avec la structure riche
     if (sc === 'forme-alg') {
-      q.prtXML = '    <prt>\n'
-        + '      <name>prt'+X+'</name>\n      <value>'+b7+'</value>\n'
-        + '      <autosimplify>1</autosimplify><feedbackstyle>1</feedbackstyle>\n'
-        + '      <feedbackvariables><text></text></feedbackvariables>\n'
-        + '      <node>\n        <name>0</name><description>R\xe9ponse exacte</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans1'+X+'</sans><tans>q'+X+'_ta</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>1</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>-1</truenextnode><trueanswernote>PRT-'+X+'-OK</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Parfait !</strong> La forme alg\xe9brique est correcte.</div>]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>1</falsenextnode><falseanswernote>PRT-'+X+'-NOK</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[]]></text></falsefeedback>\n'
-        + '      </node>\n'
-        + '      <node>\n        <name>1</name><description>Conjugu\xe9 (signe Im invers\xe9)</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans1'+X+'</sans><tans>q'+X+'_ta_conj</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>0.5</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>-1</truenextnode><trueanswernote>PRT-'+X+'-CONJ</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #eab308;padding:10px 14px;background:#fefce8;border-radius:4px;">⚠️ Signe de la partie imaginaire invers\xe9. V\xe9rifiez \\(i^2=-1\\).</div>]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>2</falsenextnode><falseanswernote>PRT-'+X+'-NOK2</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[]]></text></falsefeedback>\n'
-        + '      </node>\n'
-        + '      <node>\n        <name>2</name><description>Erreur g\xe9n\xe9rique</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans1'+X+'</sans><tans>q'+X+'_ta</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>1</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>-1</truenextnode><trueanswernote>PRT-'+X+'-OK2</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ Correct !</div>]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>-1</falsenextnode><falseanswernote>PRT-'+X+'-ERR</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ La r\xe9ponse correcte est \\({@q'+X+'_ta@}\\).</div>]]></text></falsefeedback>\n'
-        + '      </node>\n    </prt>';
+      canonicalNodes = [
+        _cpxNode(0, 'R\xe9ponse exacte', 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta',
+            -1, 1, 'PRT-'+X+'-OK', '<strong>Parfait !</strong> La forme alg\xe9brique est correcte.',
+            1, 0, 'PRT-'+X+'-NOK', ''),
+        _cpxNode(1, 'Conjugu\xe9 (signe Im invers\xe9)', 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta_conj',
+            -1, 0.5, 'PRT-'+X+'-CONJ', 'Signe de la partie imaginaire invers\xe9. V\xe9rifiez \\(i^2=-1\\).',
+            2, 0, 'PRT-'+X+'-NOK2', ''),
+        _cpxNode(2, 'Erreur g\xe9n\xe9rique', 'AlgEquiv', 'ans1'+X, 'q'+X+'_ta',
+            -1, 1, 'PRT-'+X+'-OK2', 'Correct !',
+            -1, 0, 'PRT-'+X+'-ERR', 'La r\xe9ponse correcte est \\({@q'+X+'_ta@}\\).')
+      ];
     } else if (sc === 'module-arg') {
-      q.prtXML = '    <prt>\n'
-        + '      <name>prt'+X+'</name>\n      <value>'+b7+'</value>\n'
-        + '      <autosimplify>1</autosimplify><feedbackstyle>1</feedbackstyle>\n'
-        + '      <feedbackvariables><text></text></feedbackvariables>\n'
-        + '      <node>\n        <name>0</name><description>Module correct ?</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans_mod'+X+'</sans><tans>q'+X+'_ta_mod</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>1</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>1</truenextnode><trueanswernote>PRT-'+X+'-MOD-OK</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>2</falsenextnode><falseanswernote>PRT-'+X+'-MOD-NOK</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[]]></text></falsefeedback>\n'
-        + '      </node>\n'
-        + '      <node>\n        <name>1</name><description>Module OK — Argument correct ?</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans_arg'+X+'</sans><tans>q'+X+'_ta_arg</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>1</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>-1</truenextnode><trueanswernote>PRT-'+X+'-ARG-OK</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Parfait !</strong> Module et argument corrects.</div>]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0.5</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>3</falsenextnode><falseanswernote>PRT-'+X+'-ARG-NOK</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[]]></text></falsefeedback>\n'
-        + '      </node>\n'
-        + '      <node>\n        <name>2</name><description>Module faux — Argument correct ?</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans_arg'+X+'</sans><tans>q'+X+'_ta_arg</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>0.5</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>-1</truenextnode><trueanswernote>PRT-'+X+'-MOD-NOK-ARG-OK</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #eab308;padding:10px 14px;background:#fefce8;border-radius:4px;">⚠️ Argument correct, mais module faux. \\(|z|={@q'+X+'_ta_mod@}\\).</div>]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>-1</falsenextnode><falseanswernote>PRT-'+X+'-TOUT-NOK</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ \\(|z|={@q'+X+'_ta_mod@}\\) — \\(\\arg(z)={@q'+X+'_ta_arg@}\\).</div>]]></text></falsefeedback>\n'
-        + '      </node>\n'
-        + '      <node>\n        <name>3</name><description>Erreur de quadrant (arg oppos\xe9) ?</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans_arg'+X+'</sans><tans>q'+X+'_ta_arg_neg</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>0.25</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>-1</truenextnode><trueanswernote>PRT-'+X+'-QUADRANT</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🚨 <strong>Erreur de quadrant !</strong> Bonne valeur absolue mais mauvais signe. V\xe9rifiez le quadrant du nombre complexe.</div>]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>-1</falsenextnode><falseanswernote>PRT-'+X+'-ARG-ERR</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ \\(\\arg(z)={@q'+X+'_ta_arg@}\\). Utilisez le cercle trigonom\xe9trique.</div>]]></text></falsefeedback>\n'
-        + '      </node>\n    </prt>';
+      canonicalNodes = [
+        _cpxNode(0, 'Module correct ?', 'AlgEquiv', 'ans_mod'+X, 'q'+X+'_ta_mod',
+            1, 1, 'PRT-'+X+'-MOD-OK', '',
+            2, 0, 'PRT-'+X+'-MOD-NOK', ''),
+        _cpxNode(1, 'Module OK — Argument correct ?', 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg',
+            -1, 1, 'PRT-'+X+'-ARG-OK', '<strong>Parfait !</strong> Module et argument corrects.',
+            3, 0.5, 'PRT-'+X+'-ARG-NOK', ''),
+        _cpxNode(2, 'Module faux — Argument correct ?', 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg',
+            -1, 0.5, 'PRT-'+X+'-MOD-NOK-ARG-OK', 'Argument correct, mais module faux. \\(|z|={@q'+X+'_ta_mod@}\\).',
+            -1, 0, 'PRT-'+X+'-TOUT-NOK', '\\(|z|={@q'+X+'_ta_mod@}\\) — \\(\\arg(z)={@q'+X+'_ta_arg@}\\).'),
+        _cpxNode(3, 'Erreur de quadrant (arg oppos\xe9) ?', 'AlgEquiv', 'ans_arg'+X, 'q'+X+'_ta_arg_neg',
+            -1, 0.25, 'PRT-'+X+'-QUADRANT', '<strong>Erreur de quadrant !</strong> Bonne valeur absolue mais mauvais signe. V\xe9rifiez le quadrant du nombre complexe.',
+            -1, 0, 'PRT-'+X+'-ARG-ERR', '\\(\\arg(z)={@q'+X+'_ta_arg@}\\). Utilisez le cercle trigonom\xe9trique.')
+      ];
     } else if (sc === 'equation-2deg') {
-      q.prtXML = '    <prt>\n'
-        + '      <name>prt'+X+'</name>\n      <value>'+b7+'</value>\n'
-        + '      <autosimplify>1</autosimplify><feedbackstyle>1</feedbackstyle>\n'
-        + '      <feedbackvariables><text></text></feedbackvariables>\n'
-        + '      <node>\n        <name>0</name><description>z1 (Im positif) ?</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans_z1'+X+'</sans><tans>q'+X+'_ta1</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>1</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>1</truenextnode><trueanswernote>PRT-'+X+'-Z1-OK</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>2</falsenextnode><falseanswernote>PRT-'+X+'-Z1-NOK</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[]]></text></falsefeedback>\n'
-        + '      </node>\n'
-        + '      <node>\n        <name>1</name><description>z1 OK — z2 correct ?</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans_z2'+X+'</sans><tans>q'+X+'_ta2</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>1</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>-1</truenextnode><trueanswernote>PRT-'+X+'-Z2-OK</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Parfait !</strong> Les deux racines sont correctes et dans le bon ordre.</div>]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0.5</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>-1</falsenextnode><falseanswernote>PRT-'+X+'-Z2-NOK</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #eab308;padding:10px 14px;background:#fefce8;border-radius:4px;">⚠️ \\(z_1\\) correct, mais \\(z_2\\) faux. V\xe9rifiez le signe de la partie imaginaire.</div>]]></text></falsefeedback>\n'
-        + '      </node>\n'
-        + '      <node>\n        <name>2</name><description>A-t-il invers\xe9 z1 et z2 ?</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans_z1'+X+'</sans><tans>q'+X+'_ta2</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>1</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>3</truenextnode><trueanswernote>PRT-'+X+'-SWAP</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>-1</falsenextnode><falseanswernote>PRT-'+X+'-TOUT-NOK</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ \\(z_1={@q'+X+'_ta1@}\\) et \\(z_2={@q'+X+'_ta2@}\\). Appliquez \\(z=\\frac{-b\\pm i\\sqrt{-\\Delta}}{2a}\\).</div>]]></text></falsefeedback>\n'
-        + '      </node>\n'
-        + '      <node>\n        <name>3</name><description>Inversion — z2=z1 attendu ?</description>\n'
-        + '        <answertest>AlgEquiv</answertest>\n'
-        + '        <sans>ans_z2'+X+'</sans><tans>q'+X+'_ta1</tans><testoptions></testoptions><quiet>0</quiet>\n'
-        + '        <truescoremode>=</truescoremode><truescore>0.5</truescore><truepenalty></truepenalty>\n'
-        + '        <truenextnode>-1</truenextnode><trueanswernote>PRT-'+X+'-SWAP-TOTAL</trueanswernote>\n'
-        + '        <truefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;">🔄 <strong>Racines invers\xe9es !</strong> Calculs justes mais \\(z_1\\) doit avoir la partie imaginaire <strong>positive</strong>.</div>]]></text></truefeedback>\n'
-        + '        <falsescoremode>=</falsescoremode><falsescore>0.25</falsescore><falsepenalty></falsepenalty>\n'
-        + '        <falsenextnode>-1</falsenextnode><falseanswernote>PRT-'+X+'-SWAP-PARTIAL</falseanswernote>\n'
-        + '        <falsefeedback format="html"><text><![CDATA[<div style="border-left:4px solid #eab308;padding:10px 14px;background:#fefce8;border-radius:4px;">⚠️ Vous avez mis \\({@q'+X+'_ta2@}\\) dans \\(z_1\\), mais \\(z_2\\) est \xe9galement faux.</div>]]></text></falsefeedback>\n'
-        + '      </node>\n    </prt>';
+      canonicalNodes = [
+        _cpxNode(0, 'z1 (Im positif) ?', 'AlgEquiv', 'ans_z1'+X, 'q'+X+'_ta1',
+            1, 1, 'PRT-'+X+'-Z1-OK', '',
+            2, 0, 'PRT-'+X+'-Z1-NOK', ''),
+        _cpxNode(1, 'z1 OK — z2 correct ?', 'AlgEquiv', 'ans_z2'+X, 'q'+X+'_ta2',
+            -1, 1, 'PRT-'+X+'-Z2-OK', '<strong>Parfait !</strong> Les deux racines sont correctes et dans le bon ordre.',
+            -1, 0.5, 'PRT-'+X+'-Z2-NOK', '\\(z_1\\) correct, mais \\(z_2\\) faux. V\xe9rifiez le signe de la partie imaginaire.'),
+        _cpxNode(2, 'A-t-il invers\xe9 z1 et z2 ?', 'AlgEquiv', 'ans_z1'+X, 'q'+X+'_ta2',
+            3, 1, 'PRT-'+X+'-SWAP', '',
+            -1, 0, 'PRT-'+X+'-TOUT-NOK', '\\(z_1={@q'+X+'_ta1@}\\) et \\(z_2={@q'+X+'_ta2@}\\). Appliquez \\(z=\\frac{-b\\pm i\\sqrt{-\\Delta}}{2a}\\).'),
+        _cpxNode(3, 'Inversion — z2=z1 attendu ?', 'AlgEquiv', 'ans_z2'+X, 'q'+X+'_ta1',
+            -1, 0.5, 'PRT-'+X+'-SWAP-TOTAL', '<strong>Racines invers\xe9es !</strong> Calculs justes mais \\(z_1\\) doit avoir la partie imaginaire <strong>positive</strong>.',
+            -1, 0.25, 'PRT-'+X+'-SWAP-PARTIAL', 'Vous avez mis \\({@q'+X+'_ta2@}\\) dans \\(z_1\\), mais \\(z_2\\) est \xe9galement faux.')
+      ];
+    }
+    if (canonicalNodes) {
+      var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+          truefeedback: applyFbBox(inferFbKind(n, 'true'), n.truefeedback),
+          falsefeedback: applyFbBox(inferFbKind(n, 'false'), n.falsefeedback)
+        });
+      });
+      q.prt = { meta: prtMeta, nodes: canonicalNodes };
+      q.prtXML = buildPrtXml(prtMeta, xmlNodes);
     }
   });
   // Fallback inputXML pour chips complexe dont les inputs stale sont incomplets
@@ -267,19 +199,15 @@ function buildXML() {
   orderedQ.forEach(function(q) {
     if (q.type !== 'complexe' || q.generalFeedback) return;
     var X = q.id, sc = (q.state && q.state.scenario) || 'forme-alg', op = (q.state && q.state.op) || '*';
-    var _FB = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">🔑 Correction détaillée</div>'
-            + '<div style="font-size:.9rem;">';
+    var content;
     if (sc === 'module-arg') {
-      q.generalFeedback = _FB
+      content = ''
         + 'Formule : \\(|z|=\\sqrt{x^2+y^2}\\) &nbsp;—&nbsp; \\(\\arg(z)\\) dépend du quadrant.<br><br>'
-        + 'Module : \\({@q'+X+'_ta_mod@}\\) &nbsp;—&nbsp; Argument : \\({@q'+X+'_ta_arg@}\\)'
-        + '</div></div>';
+        + 'Module : \\({@q'+X+'_ta_mod@}\\) &nbsp;—&nbsp; Argument : \\({@q'+X+'_ta_arg@}\\)';
     } else if (sc === 'equation-2deg') {
-      q.generalFeedback = _FB
+      content = ''
         + 'Discriminant : \\({@q'+X+'_delta@}\\)<br><br>'
-        + '\\(z_1 = {@q'+X+'_ta1@}\\) &nbsp;—&nbsp; \\(z_2 = {@q'+X+'_ta2@}\\)'
-        + '</div></div>';
+        + '\\(z_1 = {@q'+X+'_ta1@}\\) &nbsp;—&nbsp; \\(z_2 = {@q'+X+'_ta2@}\\)';
     } else {
       var _fbM = {'*':'\\left({@q'+X+'_z1@}\\right)\\times\\left({@q'+X+'_z2@}\\right)',
                   '/':'\\dfrac{{@q'+X+'_z1@}}{{@q'+X+'_z2@}}',
@@ -289,16 +217,16 @@ function buildXML() {
                      '/':'On multiplie numérateur et dénominateur par le <strong>conjugué</strong> du dénominateur.',
                      '-':'On soustrait les <strong>parties réelles</strong> entre elles et les <strong>parties imaginaires</strong> entre elles.',
                      '+':'On additionne les <strong>parties réelles</strong> entre elles et les <strong>parties imaginaires</strong> entre elles.'};
-      q.generalFeedback = _FB
+      content = ''
         + (_fbHint[op]||'') + '<br><br>'
         + '\\[' + (_fbM[op]||'{@q'+X+'_ta@}') + ' = {@q'+X+'_ta@}\\]'
-        + 'Partie réelle : \\({@q'+X+'_ta_re@}\\) &nbsp;—&nbsp; Partie imaginaire : \\({@q'+X+'_ta_im@}\\)'
-        + '</div></div>';
+        + 'Partie réelle : \\({@q'+X+'_ta_re@}\\) &nbsp;—&nbsp; Partie imaginaire : \\({@q'+X+'_ta_im@}\\)';
     }
+    q.generalFeedback = applyFbBox('general', content);
   });
   var generalFeedbackContent = moodleLatex(stripMathDivs(orderedQ.map(function(q){
     if (q.generalFeedback) return q.generalFeedback;
-    if (q.solution) return '<div style="margin-top:8px;padding:10px;background:#f8f9fa;border-left:4px solid #94a3b8;border-radius:4px;">' + q.solution + '</div>';
+    if (q.solution) return applyFbBox('general', q.solution);
     return '';
   }).filter(Boolean).join('\n')));
   allTexts = moodleLatex(stripMathDivs(allTexts));

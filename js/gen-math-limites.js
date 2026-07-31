@@ -42,6 +42,7 @@ function genLimitesCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkInput_D = deps._mkInput || _mkInput;
     var mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
     var bareme = p.bareme, scenario = p.scenario, mode = p.mode;
     var fbOk = p.fbOk, fbWrong = p.fbWrong, custText = p.custText;
@@ -49,14 +50,17 @@ function genLimitesCore(X, p, deps) {
 
     var HDR = `<div style="background:#0ea5e9;border-left:5px solid #0284c7;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('lim.banniere')}</strong> <span style="background:#0284c7;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
 
+    // limNode() : le contenu texte reste brut (pas d'encadré, pas d'icône) — l'encadré
+    // coloré n'est appliqué que sur la copie xmlNodes servant à prtXML (voir plus bas),
+    // jamais sur canonicalNodes exposé via prt.nodes pour prt-manager.js.
     function limNode(falseFb) {
         return {
             name: '0', description: I18N_D.t('lim.node_limite_correcte'), answertest: 'AlgEquiv', sans: `ans_lim${X}`, tans: `q${X}_ta`,
             testoptions: '', quiet: '0',
             truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
-            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || '<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>'+I18N_D.t('trig.correct')+'</strong></div>',
+            trueanswernote: 'PRT-'+X+'-OK', truefeedback: fbOk || '<strong>'+I18N_D.t('trig.correct')+'</strong>', fbKind: 'true',
             falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
-            falseanswernote: 'PRT-'+X+'-NOK', falsefeedback: fbWrong || falseFb
+            falseanswernote: 'PRT-'+X+'-NOK', falsefeedback: fbWrong || falseFb, falseFbKind: 'false'
         };
     }
 
@@ -74,8 +78,8 @@ q${X}_ta:${tans};`;
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_lim${X}]] [[validation:ans_lim${X}]]</p>
 <p><em>${I18N_D.t('lim.taper_inf_ou_moins_inf')}</em></p>`;
         inputXML = mkInput_D({name:`ans_lim${X}`,tans:`q${X}_ta`,boxsize:15,allowwords:'inf',forbidfloat:1,mustverify:0,showvalidation:2});
-        canonicalNodes = [limNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('lim.fb_wrong_fixe', {tavar: 'q'+X+'_ta'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_fixe', {tavar: 'q'+X+'_ta'})}</div>`;
+        canonicalNodes = [limNode(`${I18N_D.t('lim.fb_wrong_fixe', {tavar: 'q'+X+'_ta'})}`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_fixe', {tavar: 'q'+X+'_ta'})}`;
 
     } else if (scenario === 'plus-inf') {
         vars = `/* Q${X} Limites — Limite en +inf */
@@ -97,8 +101,8 @@ q${X}_lcd:ratcoef(q${X}_den,x,q${X}_degd);`;
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_lim${X}]] [[validation:ans_lim${X}]]</p>
 <p><em>${I18N_D.t('lim.taper_inf')}</em></p>`;
         inputXML = mkInput_D({name:`ans_lim${X}`,tans:`q${X}_ta`,boxsize:15,allowwords:'inf',forbidfloat:1,mustverify:0,showvalidation:2});
-        canonicalNodes = [limNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('lim.fb_wrong_plus_inf', {numvar:'q'+X+'_num', degnvar:'q'+X+'_degn', lcnvar:'q'+X+'_lcn', denvar:'q'+X+'_den', degdvar:'q'+X+'_degd', lcdvar:'q'+X+'_lcd', tavar:'q'+X+'_ta'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_plus_inf', {numvar:'q'+X+'_num', degnvar:'q'+X+'_degn', lcnvar:'q'+X+'_lcn', denvar:'q'+X+'_den', degdvar:'q'+X+'_degd', lcdvar:'q'+X+'_lcd', tavar:'q'+X+'_ta'})}</div>`;
+        canonicalNodes = [limNode(`${I18N_D.t('lim.fb_wrong_plus_inf', {numvar:'q'+X+'_num', degnvar:'q'+X+'_degn', lcnvar:'q'+X+'_lcn', denvar:'q'+X+'_den', degdvar:'q'+X+'_degd', lcdvar:'q'+X+'_lcd', tavar:'q'+X+'_ta'})}`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_plus_inf', {numvar:'q'+X+'_num', degnvar:'q'+X+'_degn', lcnvar:'q'+X+'_lcn', denvar:'q'+X+'_den', degdvar:'q'+X+'_degd', lcdvar:'q'+X+'_lcd', tavar:'q'+X+'_ta'})}`;
 
     } else if (scenario === 'moins-inf') {
         vars = `/* Q${X} Limites — Limite en -inf */
@@ -120,8 +124,8 @@ q${X}_lcd:ratcoef(q${X}_den,x,q${X}_degd);`;
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_lim${X}]] [[validation:ans_lim${X}]]</p>
 <p><em>${I18N_D.t('lim.taper_moins_inf')}</em></p>`;
         inputXML = mkInput_D({name:`ans_lim${X}`,tans:`q${X}_ta`,boxsize:15,allowwords:'inf',forbidfloat:1,mustverify:0,showvalidation:2});
-        canonicalNodes = [limNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('lim.fb_wrong_moins_inf', {numvar:'q'+X+'_num', degnvar:'q'+X+'_degn', lcnvar:'q'+X+'_lcn', denvar:'q'+X+'_den', degdvar:'q'+X+'_degd', lcdvar:'q'+X+'_lcd', tavar:'q'+X+'_ta'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_moins_inf', {numvar:'q'+X+'_num', degnvar:'q'+X+'_degn', lcnvar:'q'+X+'_lcn', denvar:'q'+X+'_den', degdvar:'q'+X+'_degd', lcdvar:'q'+X+'_lcd', tavar:'q'+X+'_ta'})}</div>`;
+        canonicalNodes = [limNode(`${I18N_D.t('lim.fb_wrong_moins_inf', {numvar:'q'+X+'_num', degnvar:'q'+X+'_degn', lcnvar:'q'+X+'_lcn', denvar:'q'+X+'_den', degdvar:'q'+X+'_degd', lcdvar:'q'+X+'_lcd', tavar:'q'+X+'_ta'})}`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_moins_inf', {numvar:'q'+X+'_num', degnvar:'q'+X+'_degn', lcnvar:'q'+X+'_lcn', denvar:'q'+X+'_den', degdvar:'q'+X+'_degd', lcdvar:'q'+X+'_lcd', tavar:'q'+X+'_ta'})}`;
 
     } else if (scenario === 'point-fini') {
         vars = `/* Q${X} Limites — Limite en point fini */
@@ -140,8 +144,8 @@ q${X}_ta:ev(q${X}_Q,x=q${X}_a);`;
 <div style="text-align:center;margin:15px 0;">\\( \\displaystyle\\lim_{x\\to{@q${X}_a@}}\\frac{{@q${X}_num@}}{{@q${X}_den@}} \\)</div>
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_lim${X}]] [[validation:ans_lim${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_lim${X}`,tans:`q${X}_ta`,boxsize:10,checkanswertype:1,mustverify:1,showvalidation:2});
-        canonicalNodes = [limNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('lim.fb_wrong_point_fini', {avar:'q'+X+'_a', numvar:'q'+X+'_num', qvar:'q'+X+'_Q', tavar:'q'+X+'_ta'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_point_fini', {avar:'q'+X+'_a', numvar:'q'+X+'_num', qvar:'q'+X+'_Q', tavar:'q'+X+'_ta'})}</div>`;
+        canonicalNodes = [limNode(`${I18N_D.t('lim.fb_wrong_point_fini', {avar:'q'+X+'_a', numvar:'q'+X+'_num', qvar:'q'+X+'_Q', tavar:'q'+X+'_ta'})}`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_point_fini', {avar:'q'+X+'_a', numvar:'q'+X+'_num', qvar:'q'+X+'_Q', tavar:'q'+X+'_ta'})}`;
 
     } else if (scenario === 'droite-racine') {
         vars = `/* Q${X} Limites — Limite \xe0 droite (racine) */
@@ -156,8 +160,8 @@ q${X}_ta:inf;`;
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_lim${X}]] [[validation:ans_lim${X}]]</p>
 <p><em>${I18N_D.t('lim.taper_inf')}</em></p>`;
         inputXML = mkInput_D({name:`ans_lim${X}`,tans:`q${X}_ta`,boxsize:10,allowwords:'inf',forbidfloat:1,mustverify:0,showvalidation:2});
-        canonicalNodes = [limNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('lim.fb_wrong_droite', {avar:'q'+X+'_a'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_droite', {avar:'q'+X+'_a'})}</div>`;
+        canonicalNodes = [limNode(`${I18N_D.t('lim.fb_wrong_droite', {avar:'q'+X+'_a'})}`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_droite', {avar:'q'+X+'_a'})}`;
 
     } else { /* gauche-racine */
         vars = `/* Q${X} Limites — Limite \xe0 gauche (racine) */
@@ -172,14 +176,22 @@ q${X}_ta:-inf;`;
 <p>${I18N_D.t('trig.reponse_lbl')}[[input:ans_lim${X}]] [[validation:ans_lim${X}]]</p>
 <p><em>${I18N_D.t('lim.taper_moins_inf')}</em></p>`;
         inputXML = mkInput_D({name:`ans_lim${X}`,tans:`q${X}_ta`,boxsize:10,allowwords:'inf',forbidfloat:1,mustverify:0,showvalidation:2});
-        canonicalNodes = [limNode(`<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ ${I18N_D.t('lim.fb_wrong_gauche', {avar:'q'+X+'_a'})}</div>`)];
-        generalFeedback = `<div style="padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;"><strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_gauche', {avar:'q'+X+'_a'})}</div>`;
+        canonicalNodes = [limNode(`${I18N_D.t('lim.fb_wrong_gauche', {avar:'q'+X+'_a'})}`)];
+        generalFeedback = `<strong>${I18N_D.t('trig.correction_title')}</strong><br>${I18N_D.t('lim.fbgen_gauche', {avar:'q'+X+'_a'})}`;
     }
 
-    generalFeedback = mkFbGen_D(generalFeedback, p.fbGen);
+    generalFeedback = applyFbBox_D('general', mkFbGen_D(generalFeedback, p.fbGen));
 
     var prtMeta = { name: 'prt'+X, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-    prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // Encadrés colorés appliqués uniquement sur la copie servant à prtXML — canonicalNodes
+    // (exposé via prt.nodes pour prt-manager.js) reste du texte brut. Voir js/fb-box.js.
+    var xmlNodes = canonicalNodes.map(function(n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(n.fbKind || 'true', n.truefeedback),
+            falsefeedback: applyFbBox_D(n.falseFbKind || 'false', n.falsefeedback)
+        });
+    });
+    prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     return {type:'limites', bareme, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },

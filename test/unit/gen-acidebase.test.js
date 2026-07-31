@@ -14,13 +14,14 @@ const path = require('node:path');
 
 const { genAcideBaseCore } = require(path.join('..', '..', 'js', 'gen-acidebase.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
 };
 const _mkFbGen = (generalFeedback, fbGen) => fbGen ? generalFeedback + '<p>' + fbGen + '</p>' : generalFeedback;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, applyFbBox };
 
 // Jeu de paramètres de référence : acide faible / base forte, monoacide, pKa=4.8.
 function baseParams(overrides) {

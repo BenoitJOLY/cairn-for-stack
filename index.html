@@ -1163,6 +1163,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="vf-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="vf-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="vfRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="vf-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="vfShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="vf-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="vf-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -2479,6 +2484,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="pol-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="pol-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="polRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="pol-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="polShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="pol-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="pol-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -2981,6 +2991,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="sui-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="sui-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="suiRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="sui-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="suiShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="sui-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="sui-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -3094,6 +3109,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="prob-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="prob-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="probRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="prob-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="probShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="prob-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="prob-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -3317,6 +3337,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="stat-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="stat-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="statRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="stat-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="statShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="stat-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="stat-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -3386,6 +3411,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="mat-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="mat-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="matRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="mat-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="matShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="mat-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="mat-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -3503,6 +3533,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="geo-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="geo-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="geoRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="geo-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="geoShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="geo-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="geo-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -3727,6 +3762,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="cpx-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="cpx-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="cpxRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="cpx-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="cpxShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="cpx-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="cpx-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -3817,6 +3857,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="calc-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="calc-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="calcRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="calc-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="calcShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="calc-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="calc-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -4419,6 +4464,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="alg-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="alg-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="algRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="alg-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="algShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="alg-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="alg-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -4496,6 +4546,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="num-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="num-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="numRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="num-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="numShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="num-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="num-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
@@ -4645,6 +4700,11 @@ fill="currentColor" stroke="none">
     </div>
   <div class="field hs-preview-panel" id="str-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="str-reroll-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="strRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="str-show-real-preview-btn" style="display:none;background:#fff;color:var(--navy);border:1px solid var(--navy);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;" onclick="strShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="str-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
     <div id="str-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>

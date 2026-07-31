@@ -75,12 +75,11 @@ function genStrPaletteHTML(X){
   return `<div style="background:#f8f4ff;border:1px solid #e9d5ff;border-radius:8px;padding:8px 10px;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;"><span style="font-size:.72rem;font-weight:700;color:#6b21a8;margin-right:4px;">${I18N.t('tpl.str_aide')}</span>${btnHTML}</div><p><scr`+`ipt>${sc}<`+`/scr`+`ipt></p>`;
 }
 
-async function genString(X){
+function _strBuildParams(X){
   const bareme=parseFloat(v('str-bareme'))||1;
   const text=richVal('str-text');
   const ansRich=richVal('str-ans-rich');
   const ansPlain=ansRich.replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
-  if(!ansPlain)throw new Error(I18N.t('msg.err_string_vide', {n: X}));
   document.getElementById('str-ans').value=ansPlain;
   const size=v('str-size'),test=v('str-test');
   const fbc=resolveFb('str-fbc',FB_JUSTE_DEFAULT);
@@ -93,7 +92,12 @@ async function genString(X){
   const solH=sol?`<hr style="margin:8px 0"/><div style="padding:8px;background:#f8f9fa;border-radius:4px;">${sol}</div>`:'';
   const altsRaw=(document.getElementById('str-alts')||{value:''}).value.trim();
   const altsArr=altsRaw?altsRaw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;}) : [];
-  const p={bareme,text,ansPlain,size,test,fbc,fbe,fbGen,solH,paletteHtml,levenOn,altsArr};
+  return {bareme,text,ansPlain,size,test,fbc,fbe,fbGen,solH,paletteHtml,levenOn,altsArr};
+}
+
+async function genString(X){
+  const p=_strBuildParams(X);
+  if(!p.ansPlain)throw new Error(I18N.t('msg.err_string_vide', {n: X}));
   try {
     const res = await fetch('/api/generate', {
       method: 'POST',
@@ -120,10 +124,10 @@ function genStringCore(X,p,deps){
   const I18N_D=deps.I18N||I18N;
   const buildPrtXml_D=deps.buildPrtXml||buildPrtXml;
   const mkFbGen_D=deps._mkFbGen||_mkFbGen;
-  const wrapFb_D=deps.wrapFb||wrapFb;
   const rawEsc_D=deps.rawEsc||rawEsc;
   const htmlEsc_D=deps.htmlEsc||htmlEsc;
   const applyFbBox_D=deps.applyFbBox||applyFbBox;
+  const inferFbKind_D=deps.inferFbKind||inferFbKind;
 
   const bareme=p.bareme, text=p.text, ansPlain=p.ansPlain, size=p.size, test=p.test;
   const fbc=p.fbc, fbe=p.fbe, fbGen=p.fbGen, solH=p.solH, paletteHtml=p.paletteHtml, altsArr=p.altsArr;
@@ -148,14 +152,24 @@ function genStringCore(X,p,deps){
     name:'0', description:'', answertest:testName, sans:sansExpr, tans:tansExpr,
     testoptions:'', quiet:'0',
     truescoremode:'=', truescore:'1', truepenalty:'', truenextnode:'-1',
-    trueanswernote:`PRT-${X}-1-T`, truefeedback:wrapFb_D(fbc, true),
+    trueanswernote:`PRT-${X}-1-T`, truefeedback:fbc,
     falsescoremode:'=', falsescore:'0', falsepenalty:'', falsenextnode:'-1',
-    falseanswernote:`PRT-${X}-1-F`, falsefeedback:wrapFb_D(fbe, false)+solH
+    falseanswernote:`PRT-${X}-1-F`, falsefeedback:fbe+solH
   };};
+  // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+  // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
+  // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
+  // presentation. Voir js/fb-box.js (applyFbBox).
+  const toXmlNodes=function(nds){return nds.map(function(n){
+    return Object.assign({}, n, {
+      truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
+      falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+    });
+  });};
   if(!altsArr.length){
     const canonicalNodes=[mkNode(test,'ans'+X,'ta'+X)];
     const prtMeta={name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:''};
-    const prtXML=buildPrtXml_D(prtMeta, canonicalNodes);
+    const prtXML=buildPrtXml_D(prtMeta, toXmlNodes(canonicalNodes));
     return{bareme,vars,qnote,generalFeedback:applyFbBox_D('general',mkFbGen_D('',fbGen)),textFrag,inputXML,
       prtXML,feedbackRef,prt:{meta:prtMeta,nodes:canonicalNodes}};
   }
@@ -166,7 +180,7 @@ function genStringCore(X,p,deps){
   const fbVars=studentNorm+'\nvalid_norms_'+X+': ['+allAnsList+']$\nis_correct_'+X+': member(stud_norm_'+X+', valid_norms_'+X+')$ ';
   const canonicalNodes=[mkNode('AlgEquiv','is_correct_'+X,'true')];
   const prtMeta={name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:fbVars};
-  const prtXML=buildPrtXml_D(prtMeta, canonicalNodes);
+  const prtXML=buildPrtXml_D(prtMeta, toXmlNodes(canonicalNodes));
   return{bareme,vars,qnote,generalFeedback:mkFbGen_D('',fbGen),textFrag,inputXML,
     prtXML,feedbackRef,prt:{meta:prtMeta,nodes:canonicalNodes}};
 }

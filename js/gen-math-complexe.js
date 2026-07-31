@@ -67,7 +67,7 @@ function _cpxFb(scenario, key, X, pmap) {
     return _cpxReplace(raw, X, pmap);
 }
 
-async function genComplexe(X) {
+function _cpxBuildParams() {
     var gs  = function(id){ var e=document.getElementById(id); return e?e.value:''; };
     var gn  = function(id){ return parseFloat(gs(id)) || 0; };
     var bareme    = parseFloat(gs('cpx-bareme')) || 1;
@@ -92,12 +92,16 @@ async function genComplexe(X) {
         });
     });
 
-    var p = {
+    return {
         bareme: bareme, scenario: scenario, complexno: complexno, mode: mode, op: op,
         randMin: randMin, randMax: randMax, custText: custText, custFbgen: custFbgen,
         fa: fa, fb: fb, fc: fc, fd: fd, feqb: feqb, feqc: feqc,
         fbOverrides: fbOverrides
     };
+}
+
+async function genComplexe(X) {
+    var p = _cpxBuildParams();
     // Étape 3 (PLAN.md) : tente la génération côté serveur, avec repli
     // automatique sur le calcul local si le serveur échoue ou est absent.
     try {
@@ -125,6 +129,8 @@ function genComplexeCore(X, p, deps) {
     var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
     var mkInput_D = deps._mkInput || _mkInput;
     var cpxGenFbgen_D = deps._cpxGenFbgen || _cpxGenFbgen;
+    var applyFbBox_D = deps.applyFbBox || applyFbBox;
+    var inferFbKind_D = deps.inferFbKind || inferFbKind;
 
     function _cpxFb_D(scenario, key, X, pmap) {
         var defs = CPX_FB_DEFS[scenario] || [];
@@ -197,9 +203,7 @@ function genComplexeCore(X, p, deps) {
                     : op === '*' ? I18N_D.t('tpl.cpx_hint_op_mul')
                     : op === '-' ? I18N_D.t('tpl.cpx_hint_op_sub')
                     :              I18N_D.t('tpl.cpx_hint_op_add');
-        generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
-            + '<div style="font-size:.9rem;">'
+        generalFeedback = '<strong>' + I18N_D.t('tpl.cpx_correction_titre') + '</strong><br><br>'
             + _fbHint + '<br><br>'
             + '\\[' + _fbOp + ' = {@q'+X+'_ta@}\\]'
             + I18N_D.t('tpl.cpx_partie_reelle') + ' : \\({@q'+X+'_ta_re@}\\) &nbsp;—&nbsp; ' + I18N_D.t('tpl.cpx_partie_imaginaire') + ' : \\({@q'+X+'_ta_im@}\\)'
@@ -245,9 +249,7 @@ function genComplexeCore(X, p, deps) {
                         + '\n' + mkInput_D({name:'ans_arg'+X, tans:'q'+X+'_ta_arg', boxsize:15,
                             hint:'%pi/4', checkanswertype:1, mustverify:1, showvalidation:2});
         pmap            = {'Z':'{@q'+X+'_z@}', 'MOD':'{@q'+X+'_ta_mod@}', 'ARG':'{@q'+X+'_ta_arg@}'};
-        generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
-            + '<div style="font-size:.9rem;">'
+        generalFeedback = '<strong>' + I18N_D.t('tpl.cpx_correction_titre') + '</strong><br><br>'
             + I18N_D.t('tpl.cpx_formule_modarg') + '<br><br>'
             + I18N_D.t('tpl.cpx_module') + ' : \\({@q'+X+'_ta_mod@}\\) &nbsp;—&nbsp; ' + I18N_D.t('tpl.cpx_argument') + ' : \\({@q'+X+'_ta_arg@}\\)'
             + '</div></div>';
@@ -307,9 +309,7 @@ function genComplexeCore(X, p, deps) {
             'Z1':'{@q'+X+'_ta1@}',  'Z2':'{@q'+X+'_ta2@}',
             'DELTA':'{@q'+X+'_delta@}'
         };
-        generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
-            + '<div style="font-size:.9rem;">'
+        generalFeedback = '<strong>' + I18N_D.t('tpl.cpx_correction_titre') + '</strong><br><br>'
             + I18N_D.t('tpl.cpx_discriminant') + ' : \\({@q'+X+'_delta@}\\)<br><br>'
             + '\\(z_1 = {@q'+X+'_ta1@}\\) &nbsp;—&nbsp; \\(z_2 = {@q'+X+'_ta2@}\\)'
             + '</div></div>';
@@ -358,9 +358,7 @@ function genComplexeCore(X, p, deps) {
                         + '\n' + mkInput_D({name:'ans_ab'+X, tans:'q'+X+'_ab', boxsize:15,
                             hint:'sqrt(...)', checkanswertype:1, mustverify:1, showvalidation:2});
         pmap            = {'ZA':'{@q'+X+'_za@}', 'ZB':'{@q'+X+'_zb@}', 'ZI':'{@q'+X+'_zi@}', 'AB':'{@q'+X+'_ab@}'};
-        generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
-            + '<div style="font-size:.9rem;">'
+        generalFeedback = '<strong>' + I18N_D.t('tpl.cpx_correction_titre') + '</strong><br><br>'
             + I18N_D.t('tpl.cpx_milieu') + ' : \\(z_I=\\dfrac{z_A+z_B}{2}\\) &nbsp;—&nbsp; ' + I18N_D.t('tpl.cpx_distance') + ' : \\(AB=|z_B-z_A|\\)<br><br>'
             + '\\(z_I={@q'+X+'_zi@}\\) &nbsp;—&nbsp; \\(AB={@q'+X+'_ab@}\\)'
             + '</div></div>';
@@ -398,9 +396,7 @@ function genComplexeCore(X, p, deps) {
         inputXML        = mkInput_D({name:'ans_zbar'+X, tans:'q'+X+'_zbar', boxsize:20,
                             hint:'a+b*%'+complexno, checkanswertype:1, mustverify:1, showvalidation:2});
         pmap            = {'Z':'{@q'+X+'_z@}', 'ZBAR':'{@q'+X+'_zbar@}'};
-        generalFeedback = '<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">'
-            + '<div style="font-weight:bold;margin-bottom:10px;">' + I18N_D.t('tpl.cpx_correction_titre') + '</div>'
-            + '<div style="font-size:.9rem;">'
+        generalFeedback = '<strong>' + I18N_D.t('tpl.cpx_correction_titre') + '</strong><br><br>'
             + I18N_D.t('tpl.cpx_text_conj_formule',{c:complexno}) + '<br><br>'
             + '\\(z={@q'+X+'_z@}\\) &nbsp;→&nbsp; \\(\\bar z={@q'+X+'_zbar@}\\)'
             + '</div></div>';
@@ -417,7 +413,17 @@ function genComplexeCore(X, p, deps) {
     }
 
     var prtMeta = { name: 'prt'+X, value: b7, autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
-    prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+    // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans encadre,
+    // pour que l'edition manuelle du PRT ne montre jamais de HTML de presentation.
+    // Voir js/fb-box.js (applyFbBox) et js/gen-basen.js (meme pattern, pilote valide).
+    var xmlNodes = canonicalNodes.map(function (n) {
+        return Object.assign({}, n, {
+            truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
+            falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+        });
+    });
+    prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
     var textDesc = custText ? _cpxReplace(custText, X, pmap) : textDescDefault;
     var textFrag = HDR + textDesc + '\n' + inputLine;
@@ -425,7 +431,7 @@ function genComplexeCore(X, p, deps) {
     // La correction détaillée (cpx-fbgen) est éditable par l'enseignant et préremplie
     // par cpxGenFbgen_D() ; sans quoi genComplexe() renvoyait un résumé bien plus succinct.
     var fbgenDetailed = (typeof _cpxGenFbgen === 'function') ? cpxGenFbgen_D(scenario, op, complexno) : generalFeedback;
-    generalFeedback = _cpxReplace(custFbgen || fbgenDetailed, X, pmap);
+    generalFeedback = applyFbBox_D('general', _cpxReplace(custFbgen || fbgenDetailed, X, pmap));
 
     return {type:'complexe', bareme, complexno, vars, qnote, textFrag, inputXML, prtXML,
         prt: { meta: prtMeta, nodes: canonicalNodes },

@@ -415,6 +415,7 @@ function genCompositionCore(X, p, deps) {
   var mkFbGen_D = deps._mkFbGen || _mkFbGen;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var buildCompositionJSX_D = deps.buildCompositionJSX || buildCompositionJSX;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
 
   var bareme = p.bareme, text = p.text, height = p.height, msg = p.msg;
 
@@ -495,11 +496,21 @@ function genCompositionCore(X, p, deps) {
     answertest: 'AlgEquiv', sans: '1', tans: '1', testoptions: '', quiet: '0',
     truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
     trueanswernote: 'PRT-' + X + '-1-T',
-    truefeedback: '<p style="padding:10px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:4px;color:#166534;">✅ ' + I18N_D.t('comp.fb_enregistre') + '</p>',
+    truefeedback: I18N_D.t('comp.fb_enregistre'),
     falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
     falseanswernote: 'PRT-' + X + '-1-F', falsefeedback: ''
   }];
-  var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+  // ── Encadré coloré : appliqué uniquement sur la copie servant à l'export XML ──
+  // canonicalNodes (exposé via prt.nodes pour prt-manager.js) reste en texte brut,
+  // sans encadré, pour que l'édition manuelle du PRT ne montre jamais de HTML de
+  // présentation. Voir js/fb-box.js (applyFbBox).
+  var xmlNodes = canonicalNodes.map(function(n) {
+    return Object.assign({}, n, {
+      truefeedback: applyFbBox_D('true', n.truefeedback),
+      falsefeedback: applyFbBox_D('false', n.falsefeedback)
+    });
+  });
+  var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
   return {
     bareme     : bareme,

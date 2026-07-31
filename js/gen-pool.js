@@ -40,9 +40,9 @@ function genPoolCore(X, p, deps){
   deps = deps || {};
   var I18N_D = deps.I18N || I18N;
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
-  var wrapFb_D = deps.wrapFb || wrapFb;
   var rawEsc_D = deps.rawEsc || rawEsc;
   var applyFbBox_D = deps.applyFbBox || applyFbBox;
+  var inferFbKind_D = deps.inferFbKind || inferFbKind;
 
   const type=p.type, label=p.label, text=p.text, Xe=p.Xe, bareme=p.bareme;
   const poolFbGen=p.poolFbGen, poolShowFb=p.poolShowFb;
@@ -67,11 +67,21 @@ function genPoolCore(X, p, deps){
     name: '0', description: '', answertest: 'AlgEquiv', sans: 'ans'+X, tans: 'vid'+X,
     testoptions: '', quiet: '0',
     truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
-    trueanswernote: 'PRT-'+X+'-1-T', truefeedback: wrapFb_D('{@fbe' + X + '@}', true),
+    trueanswernote: 'PRT-'+X+'-1-T', truefeedback: '{@fbe' + X + '@}',
     falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
-    falseanswernote: 'PRT-'+X+'-1-F', falsefeedback: wrapFb_D('{@fbe' + X + '@}', false)
+    falseanswernote: 'PRT-'+X+'-1-F', falsefeedback: '{@fbe' + X + '@}'
   }];
-  const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+  // ── Encadres colores : appliques uniquement sur la copie servant a l'export XML ──
+  // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
+  // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
+  // presentation. Voir js/fb-box.js (applyFbBox).
+  const xmlNodes = canonicalNodes.map(function(n){
+    return Object.assign({}, n, {
+      truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
+      falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+    });
+  });
+  const prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
   return{bareme,vars,qnote,
     textFrag:`

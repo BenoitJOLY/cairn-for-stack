@@ -18,14 +18,20 @@ function _strPaletteBarHTML(palettes) {
 
 function renderPreviewHTML_string(state) {
   const bareme = state.bareme || 0;
-  const text = _hsRenderMath(state.text || '');
+  const useReal = !!state.realBodyHTML;
+  const text = _hsRenderMath(useReal ? state.realBodyHTML : (state.text || ''));
   const size = state.size || 15;
   const paletteHTML = state.aideOn ? _strPaletteBarHTML(state.palettes) : '';
 
+  // state.realFbWrongHTML : HTML du nœud PRT réellement déclenché par une réponse
+  // fausse (sonde), déjà encadré côté serveur — voir _strRefreshRealPreview().
+  // Il inclut déjà la solution (falsefeedback:fbe+solH dans genStringCore), donc
+  // on masque le bloc "sol" local en mode réel pour éviter le doublon.
+  const fbWrongBody = state.realFbWrongHTML || wrapFb(_hsRenderMath(state.fbe || ''), false);
   const fbGlobalHTML = `
     <div data-str-field="fbc">${wrapFb(_hsRenderMath(state.fbc || ''), true)}</div>
-    <div data-str-field="fbe">${wrapFb(_hsRenderMath(state.fbe || ''), false)}</div>
-    ${state.sol ? `<div class="hs-clickable" data-str-field="sol" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin-top:8px;"><strong>${I18N.t('str.preview_solution')}</strong> ${_hsRenderMath(state.sol)}</div>` : ''}`;
+    <div data-str-field="fbe">${fbWrongBody}</div>
+    ${(!useReal && state.sol) ? `<div class="hs-clickable" data-str-field="sol" style="border-left:4px solid #7c3aed;padding:10px 14px;background:#f5f3ff;border-radius:4px;margin-top:8px;"><strong>${I18N.t('str.preview_solution')}</strong> ${_hsRenderMath(state.sol)}</div>` : ''}`;
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -52,6 +58,7 @@ function renderPreviewHTML_string(state) {
   <div class="hs-preview-header">
     <span class="hs-preview-badge">${I18N.t('badge.string_answer')}</span>
     <span class="hs-preview-note">/ ${bareme} pt</span>
+    <span class="hs-preview-note">${useReal ? ('🟢 ' + I18N.t('common.preview_real_badge')) : ('🎲 ' + I18N.t('common.preview_sim_badge'))}</span>
   </div>
   <div class="hs-preview-text" data-str-field="text">${text}</div>
   ${paletteHTML}
@@ -71,6 +78,10 @@ function renderPreviewHTML_string(state) {
     var container = document.getElementById('str-preview-container');
     if (!container) return;
     var state = captureState();
+    _strAugmentStateWithReal(state);
+    var __strHasRandom = true;
+    try { __strHasRandom = _hsHasRandomization(genStringCore(1, _strBuildParams(1)).vars); } catch (e) { __strHasRandom = true; }
+    _hsUpdateRerollVisibility('str', __strHasRandom);
     var iframe = mountPreviewIframe('str-preview-container', renderPreviewHTML_string(state));
     if (iframe && !iframe.__hsClickWired) {
       iframe.__hsClickWired = true;
@@ -115,6 +126,138 @@ function renderPreviewHTML_string(state) {
     }).observe(panel, { attributes: true });
     hsRegisterPreviewRefresher(updateStrFullPreview);
   }
+
+  // ── APERÇU RÉEL (via Maxima) ─────────────────────────────────────
+  // Même mécanisme que preview-algebraic.js (_algRefreshRealPreview) : le rendu
+  // réel est fusionné dans `state` juste avant renderPreviewHTML_string().
+  var _strPreviewSeed = null;
+  var _strRealPreviewGen = 0;
+  var _strLastReal = null; // { bodyHTML, fbGenHTML, fbWrongHTML }
+
+  function _strEnsurePreviewSeed() {
+    if (!_strPreviewSeed) _strPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    return _strPreviewSeed;
+  }
+
+  function _strSetRealPreviewStatus(msg, isError) {
+    var el = document.getElementById('str-real-preview-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = isError ? '#b91c1c' : '#64748b';
+  }
+
+  function _strCleanBodyHTML(html) {
+    return (html || '').replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
+      .replace(/\[\[input:[^\]]+\]\]/g, '').replace(/\[\[validation:[^\]]+\]\]/g, '');
+  }
+
+  function _strCleanFbWrongHTML(html) {
+    return (html || '').replace(/^<div class="[a-z]+"><\/div>/, '');
+  }
+
+  // Sonde volontairement fausse pour l'input string (ans1, X=1 en aperçu) :
+  // chaîne longue (>30 caractères) pour garantir, côté variante Levenshtein
+  // (genStringLevenshteinCore), une distance renvoyée à 100 (m>30 → return(100))
+  // et donc l'atterrissage sur le nœud "catch-all" fb6 ; côté variantes simples
+  // (comparaison directe / alternatives), une chaîne aussi improbable est de
+  // toute façon rejetée par la comparaison — même sonde couvre les deux cas.
+  async function _strFetchRealFbWrong(xml, seed) {
+    try {
+      var gradeRes = await maximaGradeXML(xml, seed, { ans1: 'reponse_totalement_fausse_999999937' });
+      if (!gradeRes || !gradeRes.isgradable || !gradeRes.prts || !gradeRes.prts.prt1) return null;
+      return _strCleanFbWrongHTML(gradeRes.prts.prt1);
+    } catch (e) { return null; }
+  }
+
+  async function _strRefreshRealPreview() {
+    if (typeof currentType === 'undefined' || currentType !== 'string') return;
+    var gen = ++_strRealPreviewGen;
+
+    var p;
+    try { p = _strBuildParams(1); } catch (e) { return; }
+
+    _strSetRealPreviewStatus(I18N.t('common.preview_real_loading'), false);
+
+    var xml;
+    try {
+      var parts = genStringCore(1, p);
+      xml = insertDeployedSeeds(buildStandaloneQuestionXML(parts), [_strEnsurePreviewSeed()]);
+    } catch (e) {
+      if (gen === _strRealPreviewGen) _strSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+      return;
+    }
+
+    try {
+      var renderRes = await maximaRenderXML(xml, _strPreviewSeed);
+      if (gen !== _strRealPreviewGen) return; // réponse obsolète
+
+      if (!renderRes || !renderRes.questionrender) throw new Error('forme inattendue');
+      _strLastReal = {
+        bodyHTML: _strCleanBodyHTML(renderRes.questionrender),
+        fbGenHTML: renderRes.questionsamplesolutiontext || '',
+        fbWrongHTML: null
+      };
+      updateStrFullPreview();
+      _strSetRealPreviewStatus('', false);
+
+      var fbWrongHTML = await _strFetchRealFbWrong(xml, _strPreviewSeed);
+      if (gen !== _strRealPreviewGen || !_strLastReal) return;
+      if (fbWrongHTML) {
+        _strLastReal.fbWrongHTML = fbWrongHTML;
+        updateStrFullPreview();
+      }
+    } catch (e) {
+      if (gen !== _strRealPreviewGen) return;
+      _strSetRealPreviewStatus('⚠️ ' + I18N.t('common.preview_real_fallback'), true);
+    }
+  }
+
+  function strRerollPreviewSeed() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'string') return;
+    _strPreviewSeed = Math.floor(Math.random() * 1000000) + 1;
+    _strRefreshRealPreview();
+  }
+  window.strRerollPreviewSeed = strRerollPreviewSeed;
+
+  function strShowRealPreview() {
+    if (typeof maximaConfigured !== 'function' || !maximaConfigured()) return;
+    if (typeof currentType === 'undefined' || currentType !== 'string') return;
+    _strEnsurePreviewSeed();
+    _strRefreshRealPreview();
+  }
+  window.strShowRealPreview = strShowRealPreview;
+
+  function _strAugmentStateWithReal(state) {
+    if (_strLastReal) {
+      state.realBodyHTML = _strLastReal.bodyHTML;
+      state.realFbGenHTML = _strLastReal.fbGenHTML;
+      state.realFbWrongHTML = _strLastReal.fbWrongHTML;
+    }
+  }
+
+  // Nouvelle session d'édition (panneau réouvert) → seed réinitialisé, aperçu
+  // réel effacé, boutons affichés/masqués selon que Maxima est configuré.
+  (function wireRealPreviewPanel() {
+    var panel = document.getElementById('fp-string');
+    if (!panel) return;
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (m) {
+        if (m.attributeName === 'style' && panel.style.display !== 'none') {
+          _strPreviewSeed = null;
+          _strLastReal = null;
+          var rerollBtn = document.getElementById('str-reroll-preview-btn');
+          var showRealBtn = document.getElementById('str-show-real-preview-btn');
+          var configured = typeof maximaConfigured === 'function' && maximaConfigured();
+          var hasRandom = true;
+          try { hasRandom = _hsHasRandomization(genStringCore(1, _strBuildParams(1)).vars); } catch (e) { hasRandom = true; }
+          if (rerollBtn) rerollBtn.style.display = (configured && hasRandom) ? '' : 'none';
+          if (showRealBtn) showRealBtn.style.display = configured ? '' : 'none';
+          _strSetRealPreviewStatus('', false);
+        }
+      });
+    }).observe(panel, { attributes: true });
+  })();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', wireStrPreview);
