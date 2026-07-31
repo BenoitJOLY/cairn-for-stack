@@ -478,6 +478,14 @@ function validateCurrentType(){
 // Auto-fill empty feedbacks with defaults
 function resolveFb(fieldId,defaultHtml){
   const current=richVal(fieldId).trim().replace(/<\/?[^>]+>/g,'').trim();
-  if(!current){setRichVal(fieldId,defaultHtml);return defaultHtml;}
+  if(!current){
+    // Ne pas écrire un défaut vide : setRichVal est enveloppé (voir
+    // hsRegisterPreviewRefresher, js/preview.js) pour redéclencher tous les
+    // aperçus après chaque appel. Un défaut vide laisse le champ vide, donc
+    // le prochain appel de resolveFb() le re-déclenche indéfiniment
+    // (récursion infinie setRichVal → refreshers → _xxxBuildParams → resolveFb).
+    if(defaultHtml)setRichVal(fieldId,defaultHtml);
+    return defaultHtml;
+  }
   return richVal(fieldId);
 }
