@@ -5254,6 +5254,123 @@ fill="currentColor" stroke="none">
 </div>
 </div>
 </div>
+  <!-- ══════════════════════════════════════════════════
+       NOMENCLATURE CHIMIQUE (molécules organiques)
+       ══════════════════════════════════════════════════ -->
+  <div class="form-panel" id="fp-nomenclature">
+    <div class="form-panel-head" style="background:#0e7490;color:#fff;">
+      <svg class="hs-ico" style="color:#fff;"><use href="#ico-type-chemistry"></use></svg>
+      <span data-i18n="nom.title">Nomenclature chimique</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="nom-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="nom-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('nom','cfg',this);if(typeof nomRefreshPreview==='function')nomRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('nom','fb-gen',this);if(typeof nomRefreshPreview==='function')nomRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="nom-cfg">
+      <div class="field">
+        <label data-i18n="ineq.text_lbl">Énoncé</label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-nom-text" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('nom-text')"
+             style="min-height:60px;border-color:#0e7490;background:#ecfeff;"></div>
+        <textarea id="nom-text" style="display:none"></textarea>
+      </div>
+
+      <!-- Mode de question -->
+      <div class="field">
+        <label data-i18n="nom.mode_lbl">Mode</label>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+            <input type="radio" name="nom-mode-radio" value="fixe" checked onchange="nomModeChange('fixe')"> <span data-i18n="nom.mode_fixe">Molécule imposée</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+            <input type="radio" name="nom-mode-radio" value="aleatoire" onchange="nomModeChange('aleatoire')"> <span data-i18n="nom.mode_aleatoire">Générateur aléatoire</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+            <input type="radio" name="nom-mode-radio" value="checkbox" onchange="nomModeChange('checkbox')"> <span data-i18n="nom.mode_checkbox">Analyse fonctionnelle (cases à cocher)</span>
+          </label>
+        </div>
+      </div>
+      <input type="hidden" id="nom-mode" value="fixe">
+
+      <!-- Mode Fixe : molécule imposée + nom attendu (RegExp tolérant) -->
+      <div id="nom-section-fixe">
+        <div class="field">
+          <label data-i18n="nom.fixe_smiles_lbl">SMILES de la molécule</label>
+          <input type="text" id="nom-fixe-smiles" value="CC(C)CC(C)(C)C" style="font-family:monospace;">
+        </div>
+        <div class="g2">
+          <div class="field">
+            <label data-i18n="nom.fixe_nom_lbl">Nom IUPAC attendu</label>
+            <input type="text" id="nom-fixe-nom" value="2,2,4-triméthylpentane">
+          </div>
+          <div class="field">
+            <label data-i18n="nom.fixe_famille_lbl">Famille attendue</label>
+            <input type="text" id="nom-fixe-famille" value="Alcanes" list="nom-familles-datalist">
+          </div>
+        </div>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="nom.fixe_hint">La correspondance du nom accepte tirets/espaces/casse indifféremment (regex tolérant).</div>
+      </div>
+
+      <!-- Mode Aléatoire : tirage filtré par famille + nombre de carbones max -->
+      <div id="nom-section-aleatoire" style="display:none">
+        <div class="g2">
+          <div class="field">
+            <label data-i18n="nom.param_famille_lbl">Famille</label>
+            <select id="nom-param-famille"><option value="Toutes">Toutes</option></select>
+          </div>
+          <div class="field">
+            <label data-i18n="nom.param_carbones_max_lbl">Nombre de carbones max (optionnel)</label>
+            <input type="number" id="nom-param-carbones-max" min="1" step="1" placeholder="Illimité">
+          </div>
+        </div>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="nom.aleatoire_hint">Une molécule est tirée au hasard parmi celles qui correspondent aux filtres (repli sur l'ensemble complet si aucune ne correspond). L'élève identifie le nom et la famille.</div>
+      </div>
+
+      <!-- Mode Checkbox : molécule imposée + groupes fonctionnels vrais/faux -->
+      <div id="nom-section-checkbox" style="display:none">
+        <div class="field">
+          <label data-i18n="nom.cb_smiles_lbl">SMILES de la molécule</label>
+          <input type="text" id="nom-cb-smiles" value="NC(CC(=O)O)C" style="font-family:monospace;">
+        </div>
+        <div class="g2">
+          <div class="field">
+            <label data-i18n="nom.cb_vrais_lbl">Groupes présents (séparés par des virgules)</label>
+            <input type="text" id="nom-cb-vrais" value="Amine, Acide carboxylique">
+          </div>
+          <div class="field">
+            <label data-i18n="nom.cb_faux_lbl">Groupes leurres, absents (séparés par des virgules)</label>
+            <input type="text" id="nom-cb-faux" value="Alcool, Aldéhyde, Ester">
+          </div>
+        </div>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="nom.cb_hint">Les groupes vrais et leurres sont mélangés aléatoirement dans la liste proposée à l'élève ; le score est proportionnel au nombre de bonnes coches moins les mauvaises.</div>
+      </div>
+
+      <datalist id="nom-familles-datalist"></datalist>
+      </div>
+      <div class="mpane" id="nom-fb-gen">
+        <p class="hint" data-i18n="nom.fbgen_auto_desc">La correction (nom, famille, groupes) est générée automatiquement selon le mode choisi dans Config.</p>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-nom-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('nom-fbgen')"></div>
+          <textarea id="nom-fbgen" style="display:none"></textarea></div>
+        <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
+      </div>
+    </div>
+    </div>
+  <div class="field hs-preview-panel" id="nom-preview-panel">
+    <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="nom-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="nomRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="nom-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="nomShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="nom-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
+    <div id="nom-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+  </div>
+    </div>
+  </div>
+
   <!-- ══════════════════════════════════════════════════ -->
   <!-- QUESTION EXPERT (STACK complet)                  -->
   <!-- ══════════════════════════════════════════════════ -->
@@ -8025,6 +8142,7 @@ fill="currentColor" stroke="none">
 <script src="js/gen-oscilloscope.js"></script>
 <script src="js/gen-diffraction.js"></script>
 <script src="js/gen-image-mesure.js"></script>
+<script src="js/gen-nomenclature.js"></script>
 
 <!-- V4 nouveaux modules -->
 <script src="js/editor.js"></script>
@@ -8056,6 +8174,7 @@ fill="currentColor" stroke="none">
 <script src="js/config-panel-logique.js"></script>
 <script src="js/config-panel-match.js"></script>
 <script src="js/config-panel-matrices.js"></script>
+<script src="js/config-panel-nomenclature.js"></script>
 <script src="js/config-panel-nuclear.js"></script>
 <script src="js/config-panel-numerical.js"></script>
 <script src="js/config-panel-optique.js"></script>
@@ -8230,6 +8349,7 @@ fill="currentColor" stroke="none">
 <script src="js/preview-logique.js"></script>
 <script src="js/preview-match.js"></script>
 <script src="js/preview-matrices.js"></script>
+<script src="js/preview-nomenclature.js"></script>
 <script src="js/preview-numerical.js"></script>
 <script src="js/preview-ord.js"></script>
 <script src="js/preview-polynomes.js"></script>

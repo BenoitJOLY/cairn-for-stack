@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- Type 2 : Molecule imposee / Nomenclature IUPAC - saisie tolerante via RegExp -->
+  <question type="stack">
+    <name>
+      <text>Nomenclature - Type 2 (Molécule imposée)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<h4><br></h4><br>
+
+<iframe src="https://mon-domaine.com/viewer.html?smiles={@molecule_smiles_url@}" width="300" height="300" style="border:0;" loading="lazy" title="Représentation de la molécule"></iframe><br>
+<p></p><p>Quel est le nom de cette molécule en nomenclature IUPAC ?</p>[[input:ans1]] [[validation:ans1]]<p></p>
+<p><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024072400</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* ==================================================================
+   ZONE DE CONFIGURATION ENSEIGNANT (a editer uniquement ici)
+   STACK n'offre pas de panneau JSON dedie : ces trois lignes sont
+   l'equivalent editable sans toucher au reste du code Maxima.
+   smiles_dessin      : chaine SMILES de la molecule imposee
+   nom_attendu        : nom IUPAC exact attendu de l'eleve
+   famille_attendue   : famille chimique (affichee en feedback)
+   ================================================================== */
+smiles_dessin : "CC(C)CC(C)(C)C"$
+nom_attendu : "2,2,4-triméthylpentane"$
+famille_attendue : "Alcanes"$
+/* ================================================================== */
+
+molecule_smiles : smiles_dessin$
+famille : famille_attendue$
+nom : nom_attendu$
+
+molecule_smiles_url : molecule_smiles$
+molecule_smiles_url : ssubst("%5C", "\\", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%2F", "/", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%28", "(", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%29", ")", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%3D", "=", molecule_smiles_url)$
+
+/* Construction d'un pattern RegExp tolerant (casse, tirets/espaces
+   interchangeables) en un seul passage caractere par caractere, pour
+   eviter toute collision de substitutions successives. */
+regexify_nom(s) := block([chars, out, c],
+  chars : charlist(s),
+  out : "(?i)^",
+  for c in chars do (
+    out : if c = "(" then sconcat(out, "\\(")
+          elseif c = ")" then sconcat(out, "\\)")
+          elseif c = "-" then sconcat(out, "[- ]?")
+          elseif c = " " then sconcat(out, "[- ]?")
+          else sconcat(out, c)
+  ),
+  out : sconcat(out, "$"),
+  out)$
+
+nom_pattern : regexify_nom(nom_attendu)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[[[feedback:prt1]]<br><br>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">molécule imposée : {@nom@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:green;"><i class="fa fa-check"></i></span> Réponse correcte, bravo&nbsp;!]]></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:red;"><i class="fa fa-times"></i></span> Réponse incorrecte.]]></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>string</type>
+      <tans>nom_attendu</tans>
+      <boxsize>30</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>1</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>nom IUPAC tolerant</description>
+        <answertest>RegExp</answertest>
+        <sans>ans1</sans>
+        <tans>nom_pattern</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">C'est le bon nom (famille : {@famille_attendue@}).</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Ce n'est pas le bon nom. Réponse attendue : {@nom_attendu@} (famille : {@famille_attendue@}).</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

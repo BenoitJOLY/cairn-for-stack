@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- Type 1 : Generateur aleatoire / Drill - piochage filtre par famille + nombre de carbones -->
+  <question type="stack">
+    <name>
+      <text>Nomenclature - Type 1 (Generateur aleatoire)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<h4><br></h4><br>
+
+<iframe src="https://mon-domaine.com/viewer.html?smiles={@molecule_smiles_url@}" width="300" height="300" style="border:0;" loading="lazy" title="Représentation de la molécule"></iframe><br>
+<p></p><p>Cette molécule fait partie de quelle famille</p><p><br></p><p>[[input:ans2]] [[validation:ans2]]<br></p><p>Quel est le nom de cette molécule ? (ne pas oublier la majuscule au début du nom)</p>[[input:ans1]] [[validation:ans1]]<p></p>
+<p><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>2</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024072400</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* ==================================================================
+   ZONE DE CONFIGURATION ENSEIGNANT (a editer uniquement ici)
+   STACK n'offre pas de panneau JSON dedie : ces deux lignes sont
+   l'equivalent editable sans toucher au reste du code Maxima.
+   param_famille       : nom exact d'une famille ci-dessous, ou "Toutes"
+   param_carbones_max  : entier, ou false pour aucune limite
+   ================================================================== */
+param_famille : "Toutes"$
+param_carbones_max : false$
+/* ================================================================== */
+
+donnes : [
+["Alcanes", "Méthane", "C"],
+["Alcanes", "Éthane", "CC"],
+["Alcanes", "Propane", "CCC"],
+["Alcanes", "Butane", "CCCC"],
+["Alcanes", "Pentane", "CCCCC"],
+["Alcanes", "Hexane", "CCCCCC"],
+["Alcanes", "2-Méthylpropane", "CC(C)C"],
+["Alcanes", "2-Méthylbutane", "CC(C)CC"],
+["Alcanes", "2,2-Diméthylpropane", "C(C)(C)C"],
+["Alcanes", "2-Méthylpentane", "CC(C)CCC"],
+["Alcanes", "3-Méthylpentane", "CCC(C)CC"],
+["Alcanes", "2,2-Diméthylbutane", "CC(C)(C)C"],
+["Alcanes", "2,3-Diméthylbutane", "CC(C)C(C)"],
+["Alcools", "Méthanol", "CO"],
+["Alcools", "Éthanol", "CCO"],
+["Alcools", "Propan-1-ol", "CCCO"],
+["Alcools", "Butan-1-ol", "CCCCO"],
+["Alcools", "Pentan-1-ol", "CCCCCO"],
+["Alcools", "Hexan-1-ol", "CCCCCCO"],
+["Alcools", "Propan-2-ol", "CC(O)C"],
+["Alcools", "Butan-2-ol", "CC(O)CC"],
+["Alcools", "2-Méthylpropan-1-ol", "CC(C)O"],
+["Alcools", "2-Méthylpropan-2-ol", "CC(C)(C)O"],
+["Alcools", "Pentan-2-ol", "CC(O)CCC"],
+["Alcools", "Pentan-3-ol", "CCC(O)CC"],
+["Alcools", "2-Méthylbutan-1-ol", "CC(C)CCO"],
+["Alcools", "3-Méthylbutan-1-ol", "CCC(C)CO"],
+["Alcools", "2-Méthylbutan-2-ol", "CC(C)(O)CC"],
+["Alcools", "3-Méthylbutan-2-ol", "CCC(O)C(C)"],
+["Alcools", "Cyclopropanol", "C1C(O)C1"],
+["Alcools", "Cyclobutanol", "C1CC(O)C1"],
+["Alcools", "Cyclopentanol", "C1CCC(O)C1"],
+["Alcools", "Cyclohexanol", "C1CCCC(O)C1"],
+["Aldéhydes", "Méthanal", "C=O"],
+["Aldéhydes", "Éthanal", "CC=O"],
+["Aldéhydes", "Propanal", "CCC=O"],
+["Aldéhydes", "Butanal", "CCCC=O"],
+["Aldéhydes", "Pentanal", "CCCCC=O"],
+["Aldéhydes", "Hexanal", "CCCCCC=O"],
+["Aldéhydes", "2-Méthylpropanal", "C(C=O)(C)C"],
+["Aldéhydes", "2-Méthylbutanal", "C(C=O)(C)CC=O"],
+["Aldéhydes", "3-Méthylbutanal", "C(C=O)C(C)C"],
+["Aldéhydes", "2,2-Diméthylpropanal", "C(C=O)(C)(C)C"],
+["Aldéhydes", "2-Éthylbutanal", "C(C=O)(CC)CC"],
+["Aldéhydes", "2,3-Diméthylbutanal", "C(C=O)(C)C(C)C"],
+["Alcènes", "Éthène", "C=C"],
+["Alcènes", "Propène", "CC=C"],
+["Alcènes", "But-1-ène", "CCC=C"],
+["Alcènes", "(E) But-2-ène", "C/C=C\\C"],
+["Alcènes", "(Z) But-2-ène", "C/C=C/C"],
+["Alcènes", "Pent-1-ène", "CCCC=C"],
+["Alcènes", "(E) Pent-2-ène", "CC/C=C\\C"],
+["Alcènes", "(Z) Pent-2-ène", "CC/C=C/C"],
+["Alcènes", "Hex-1-ène", "CCCCC=C"],
+["Alcènes", "(E) Hex-3-ène", "CC/C=C\\CC"],
+["Alcènes", "(Z) Hex-3-ène", "CC/C=C/CC"],
+["Alcènes", "(E) Hex-2-ène", "CCC/C=C\\C"],
+["Alcènes", "(Z) Hex-2-ène", "CCC/C=C/C"],
+["Cétones", "Propanone", "CC(=O)C"],
+["Cétones", "Butan-2-one", "CCC(=O)C"],
+["Cétones", "Pentan-2-one", "CCCC(=O)C"],
+["Cétones", "Pentan-3-one", "CCC(=O)CC"],
+["Cétones", "Hexan-2-one", "CCCCC(=O)C"],
+["Cétones", "Hexan-3-one", "CCCC(=O)CC"],
+["Cétones", "3-Méthylbutan-2-one", "CC(C)C(=O)C"],
+["Cétones", "3,3-Diméthylbutan-2-one", "CC(C)(C)C(=O)C"],
+["Cétones", "Cyclopropanone", "C1CC1=O"],
+["Cétones", "Cyclobutanone", "C1CCC1=O"],
+["Cétones", "Cyclopentanone", "C1CCCC1=O"],
+["Cétones", "Cyclohexanone", "C1CCCCC1=O"],
+["Acides carboxyliques", "Acide méthanoïque", "C(=O)O"],
+["Acides carboxyliques", "Acide éthanoïque", "CC(=O)O"],
+["Acides carboxyliques", "Acide propanoïque", "CCC(=O)O"],
+["Acides carboxyliques", "Acide butanoïque", "CCCC(=O)O"],
+["Acides carboxyliques", "Acide pentanoïque", "CCCCC(=O)O"],
+["Acides carboxyliques", "Acide hexanoïque", "CCCCCC(=O)O"],
+["Acides carboxyliques", "Acide 2-méthylbutanoïque", "CCC(C)C(=O)O"],
+["Acides carboxyliques", "Acide 3-méthylbutanoïque", "CC(C)CC(=O)O"],
+["Acides carboxyliques", "Acide 2,2-diméthylpropanoïque", "CC(C)(C)C(=O)O"],
+["Acides carboxyliques", "Acide 2-éthylbutanoïque", "CCC(CC)C(=O)O"],
+["Acides carboxyliques", "Acide 2,3-diméthylbutanoïque", "CC(C)C(C)C(=O)O"],
+["Acides carboxyliques", "Acide cyclopropanecarboxylique", "C1CC1C(=O)O"],
+["Acides carboxyliques", "Acide cyclobutanecarboxylique", "C1CCC1C(=O)O"],
+["Acides carboxyliques", "Acide cyclopentanecarboxylique", "C1CCCC1C(=O)O"],
+["Acides carboxyliques", "Acide cyclohexanecarboxylique", "C1CCCCC1C(=O)O"],
+["Esters", "Méthanoate de méthyle", "COC=O"],
+["Esters", "Éthanoate d'éthyle", "CC(=O)OCC"],
+["Esters", "Propanoate de méthyle", "CCC(=O)OC"],
+["Esters", "Propanoate d'éthyle", "CCC(=O)OCC"],
+["Esters", "Butanoate de méthyle", "CCCC(=O)OC"],
+["Esters", "Butanoate d'éthyle", "CCCC(=O)OCC"],
+["Esters", "Pentanoate de méthyle", "CCCCC(=O)OC"],
+["Esters", "2-Méthylpropanoate de méthyle", "CC(C)C(=O)OC"],
+["Esters", "2-Méthylpropanoate d'éthyle", "CC(C)C(=O)OCC"],
+["Esters", "2-Méthylbutanoate de méthyle", "CC(C)CC(=O)OC"],
+["Esters", "3-Méthylbutanoate d'éthyle", "CCC(C)C(=O)OCC"],
+["Esters", "2,2-Diméthylpropanoate de méthyle", "CC(C)(C)C(=O)OC"],
+["Esters", "2,2-Diméthylpropanoate d'éthyle", "CC(C)(C)C(=O)OCC"]
+]$
+
+carbon_count(s) := slength(s) - slength(ssubst("", "C", s))$
+
+donnes_filtres : sublist(donnes, lambda([m],
+  is((param_famille = "Toutes" or m[1] = param_famille)
+     and (param_carbones_max = false or carbon_count(m[3]) <= param_carbones_max))))$
+filtre_vide : is(length(donnes_filtres) = 0)$
+donnes_pool : if filtre_vide then donnes else donnes_filtres$
+
+choix : rand(length(donnes_pool))+1$
+molecule : donnes_pool[choix]$
+famille : molecule[1]$
+nom : molecule[2]$
+molecule_smiles : molecule[3]$
+
+strip_accents(s) := block([s2],
+  s2 : s,
+  s2 : ssubst("e","é",s2), s2 : ssubst("e","è",s2), s2 : ssubst("e","ê",s2), s2 : ssubst("e","ë",s2),
+  s2 : ssubst("a","à",s2), s2 : ssubst("a","â",s2),
+  s2 : ssubst("i","î",s2), s2 : ssubst("i","ï",s2),
+  s2 : ssubst("o","ô",s2), s2 : ssubst("u","ù",s2), s2 : ssubst("u","û",s2), s2 : ssubst("c","ç",s2),
+  s2 : ssubst("E","É",s2), s2 : ssubst("E","È",s2), s2 : ssubst("A","À",s2), s2 : ssubst("C","Ç",s2),
+  s2)$
+
+liste_familles : sort(listify(setify(map(lambda([m], m[1]), donnes))), lambda([a,b], orderlessp(strip_accents(a), strip_accents(b))))$
+options_famille : map(lambda([f], [f, is(f=famille), f]), liste_familles)$
+
+molecule_smiles_url : molecule_smiles$
+molecule_smiles_url : ssubst("%5C", "\\", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%2F", "/", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%28", "(", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%29", ")", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%3D", "=", molecule_smiles_url)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[[[feedback:prt2]][[feedback:prt1]]<br><br>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">molécule de {@nom@} (pool filtré : {@length(donnes_pool)@} molécule(s), filtre vide : {@filtre_vide@})</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:green;"><i class="fa fa-check"></i></span> Réponse correcte, bravo&nbsp;!]]></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:orange;"><i class="fa fa-adjust"></i></span> Réponse partiellement correcte.]]></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:red;"><i class="fa fa-times"></i></span> Réponse incorrecte.]]></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>string</type>
+      <tans>nom</tans>
+      <boxsize>25</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>1</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>dropdown</type>
+      <tans>options_famille</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>nom</description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans>nom</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">c'est le bon nom</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">ce n'est pas le bon nom (réponse attendue : {@nom@})</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <prt>
+      <name>prt2</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>famille</description>
+        <answertest>String</answertest>
+        <sans>ans2</sans>
+        <tans>famille</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt2-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Cette molécule fait bien partie de la famille des {@ans2@}</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt2-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Cette molécule ne fait pas partie de la famille des {@ans2@}. Elle fait partie de la famille des {@famille@}</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

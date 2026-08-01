@@ -71,7 +71,8 @@
     oscilloscope:  "type-oscilloscope",
     diffraction:   "type-diffraction",
     expert:        "type-expert",
-    "stack-raw":   "type-stack-import"
+    "stack-raw":   "type-stack-import",
+    nomenclature:  "type-chemistry"
   };
 
   function iconForType(typeKey, opts) {

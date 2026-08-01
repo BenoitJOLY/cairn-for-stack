@@ -99,7 +99,8 @@ async function _generateAndStoreQuestion(qid, type) {
     imgclick: W.genImgClick, rvbcmj: W.genRvbCmj, optique: W.genOptique, 'acide-base': W.genAcideBase, 'redox': W.genRedox, 'basen': W.genBasen, 'circuit': W.genCircuit, 'logique': W.genLogique, 'complexe': W.genComplexe, 'calcul': W.genCalcul, 'statistiques': W.genStatistiques, 'matrices': W.genMatrices, 'geometrie': W.genGeometrie, 'suites': W.genSuites, 'probabilites': W.genProbabilites, 'trigonometrie': W.genTrigonometrie, 'polynomes': W.genPolynomes, 'equivalence': W.genEquivalence, 'limites': W.genLimites, 'physique': W.genPhysique, 'oscilloscope': W.genOscilloscope, 'inequation': W.genInequation, 'diffraction': W.genDiffraction, 'image-mesure': W.genImageMesure, 'apn': W.genApn,
     'stack-raw': W.genStackRaw,
     'expert': W.genExpert,
-    'geogebra': W.genGeoGebra
+    'geogebra': W.genGeoGebra,
+    'nomenclature': W.genNomenclature
   };
 
   var gen = genMap[type];

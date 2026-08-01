@@ -113,7 +113,8 @@ const TYPE_ICON_MAP = {
   imgclick:'imgclick', rvbcmj:'rvbcmj', optique:'optique', 'acide-base':'acide-base', 'redox':'redox', 'basen':'basen', 'circuit':'circuit', 'logique':'logique', 'complexe':'complexe', 'calcul':'calcul', 'statistiques':'statistiques', 'matrices':'matrices', 'geometrie':'geometrie', 'suites':'suites', 'probabilites':'probabilites', 'trigonometrie':'trigonometrie', 'polynomes':'polynomes', 'limites':'limites', 'physique':'physique', 'oscilloscope':'oscilloscope', 'inequation':'inequation', 'diffraction':'diffraction', 'image-mesure':'image-mesure', 'equivalence':'equivalence',
   'stack-raw':'stack-import',
   'expert':'expert',
-  'geogebra':'geogebra'
+  'geogebra':'geogebra',
+  'nomenclature':'chemistry'
 };
 
 function initEditor() {
