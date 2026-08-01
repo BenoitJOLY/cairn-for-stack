@@ -633,11 +633,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .chem-editor sup { color: #2980b9; font-size: 0.75em; }
 
 /* Prévisualisation KaTeX interne */
-.chem-preview { 
-  text-align: center; padding: 10px; background: #f8fafc; 
-  border: 1px dashed var(--border); border-radius: 6px; margin-top: 10px; 
+.chem-preview {
+  text-align: center; padding: 10px; background: #f8fafc;
+  border: 1px dashed var(--border); border-radius: 6px; margin-top: 10px;
   min-height: 40px; font-size: 1.2rem;
 }
+
+/* Variante compacte du mini-éditeur de formule (indice/exposant réutilisé
+   ligne par ligne, ex: espèces du tableau d'avancement) — même mécanique que
+   .chem-editor/.chem-btn, taille réduite pour tenir dans une ligne de tableau. */
+.chem-editor-sm {
+  border: 1.5px solid var(--border); border-radius: 6px; background: #fff;
+  padding: 4px 8px; font-size: 0.95rem; min-height: 18px; min-width: 90px;
+  outline: none; line-height: 1.4; font-family: 'Segoe UI', sans-serif;
+  display: inline-block;
+}
+.chem-editor-sm:focus { border-color: var(--chem); }
+.chem-editor-sm sub { color: #e67e22; font-size: 0.75em; }
+.chem-editor-sm sup { color: #2980b9; font-size: 0.75em; }
+.chem-editor-sm:empty::before { content: attr(data-ph); color: #94a3b8; font-style: italic; }
+.chem-toolbar-sm { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
+.chem-btn-sm {
+  padding: 2px 6px; cursor: pointer; background: #34495e; color: #fff;
+  border: none; border-radius: 3px; font-weight: bold; font-size: 0.72rem;
+}
+.chem-btn-sm:hover { background: #2c3e50; }
+.chem-btn-sm.sub-mode { background: var(--chem); }
+.chem-btn-sm.sup-mode { background: #3498db; }
+html[data-theme="dark"] .chem-editor-sm { background:#0f172a; border-color:#334155; color:#e2e8f0; }
 
 /* ══════════════════════════════════════════════════
    STYLES POUR LE TYPE "RELIER" (MATCHING)
@@ -3062,7 +3085,8 @@ html[data-theme="dark"] .hs-preview-panel {
 #q-config-modal:has(#fp-geogebra[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-nomenclature[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-incertitude[style*="display: block"]) .q-config-modal-box,
-#q-config-modal:has(#fp-zscore[style*="display: block"]) .q-config-modal-box {
+#q-config-modal:has(#fp-zscore[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-avancement[style*="display: block"]) .q-config-modal-box {
   width: min(1200px, 96vw);
 }
 @media (max-width: 1000px) {
@@ -3077,7 +3101,7 @@ html[data-theme="dark"] .hs-preview-panel {
   #fp-rvbcmj[style*="display: block"], #fp-imgclick[style*="display: block"], #fp-jxgdrop[style*="display: block"], #fp-ord[style*="display: block"],
   #fp-chemical[style*="display: block"], #fp-chemical_topo[style*="display: block"], #fp-nuclear[style*="display: block"], #fp-composition[style*="display: block"],
   #fp-crossword[style*="display: block"], #fp-doi[style*="display: block"], #fp-image-mesure[style*="display: block"], #fp-apn[style*="display: block"],
-  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"] { display: block !important; }
+  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"], #fp-avancement[style*="display: block"] { display: block !important; }
   .hs-split-row { display: block; }
   .hs-split-left, .hs-preview-panel { max-width: none; }
   .hs-preview-panel { margin-top: 15px; border-top: 1px dashed #ccc; }

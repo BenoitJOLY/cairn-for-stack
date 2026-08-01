@@ -116,7 +116,8 @@ const TYPE_ICON_MAP = {
   'geogebra':'geogebra',
   'nomenclature':'nomenclature',
   'incertitude':'incertitude',
-  'zscore':'zscore'
+  'zscore':'zscore',
+  'avancement':'avancement'
 };
 
 function initEditor() {

@@ -102,7 +102,8 @@ async function _generateAndStoreQuestion(qid, type) {
     'geogebra': W.genGeoGebra,
     'nomenclature': W.genNomenclature,
     'incertitude': W.genIncertitude,
-    'zscore': W.genZscore
+    'zscore': W.genZscore,
+    'avancement': W.genAvancement
   };
 
   var gen = genMap[type];

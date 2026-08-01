@@ -47,13 +47,14 @@ var PALETTE_TYPES = [
   {type:'nomenclature', label:'Nomenclature chimique (molécules organiques)'},
   {type:'incertitude',  label:'Incertitude de mesure (GUM : type A/B, arrondi, écriture finale)'},
   {type:'zscore',       label:'Z-score (compatibilité métrologique, valeur mesurée vs référence)'},
+  {type:'avancement',   label:"Tableau d'avancement (réaction chimique)"},
   {type:'expert',       label:'Question Expert STACK'}
 ];
 
 var PALETTE_CATEGORIES = [
   {id:'choix',       label:'Choix multiples',       types:['checkbox','radio','dropdown','vf']},
   {id:'numerique',   label:'Mathématiques',   types:['numerical','algebraic','complexe','calcul','statistiques','matrices','geometrie','suites','probabilites','trigonometrie','polynomes','limites','inequation','equivalence','geogebra']},
-  {id:'physchim',    label:'Physique-Chimie',        types:['units','doi','chemical','chemical_topo','nuclear','optique','acide-base','redox','circuit','physique','oscilloscope','diffraction','rvbcmj','apn','nomenclature','incertitude','zscore']},
+  {id:'physchim',    label:'Physique-Chimie',        types:['units','doi','chemical','chemical_topo','nuclear','optique','acide-base','redox','circuit','physique','oscilloscope','diffraction','rvbcmj','apn','nomenclature','incertitude','zscore','avancement']},
   {id:'info',        label:'Informatique',           types:['basen','logique']},
   {id:'textuelle',   label:'Réponse textuelle',      types:['string','composition']},
   {id:'organisation',label:'Organisation',           types:['match','crossword','ord']},

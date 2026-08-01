@@ -655,6 +655,27 @@ const HELP_CONTENT = {
         'La conclusion de compatibilité est une liste déroulante (Compatible / Incompatible), pas un champ numérique.',
         'Aucune génération aléatoire n\'est disponible dans cette version (MVP en valeurs fixes uniquement).'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── TABLEAU D'AVANCEMENT (PHYSIQUE-CHIMIE)
+  avancement: {
+    title: '<svg class="hs-ico"><use href="#ico-type-avancement"></use></svg> Tableau d\'avancement — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>L\'élève complète un <b>tableau d\'avancement</b> (état initial / en cours / état final, en fonction de l\'avancement x) pour une réaction chimique, puis détermine l\'<b>avancement maximal x_max</b> (réactif limitant). Deux modes sont proposés selon que l\'équation de réaction est donnée par le professeur ou a été écrite par l\'élève lui-même à une question précédente.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Mode</b> : « Le professeur écrit la réaction » (question autonome, l\'énoncé fournit l\'équation) ou « Prolongement d\'une question chimie » (la réaction a été écrite/équilibrée par l\'élève à une question « Chimie (Éq.) » ou « Chimie (Topo.) » précédente du même quiz).',
+        'En mode « prolongement », indiquez le <b>type</b> et le <b>numéro (Q…)</b> de cette question précédente : la correction utilisera automatiquement les coefficients que l\'élève y a proposés — pas ceux du professeur — pour ne pas pénaliser deux fois une équation mal équilibrée.',
+        '<b>Espèces chimiques</b> : ajoutez une ligne par espèce. La formule se saisit avec le même éditeur que le type « Chimie (Éq.) » (boutons <b>Indice<\b>/<b>Exposant<\b>, aucune syntaxe à connaître), plus le coefficient stœchiométrique, le rôle Réactif/Produit, la quantité initiale n₀, la case « excès » et la case « solvant ». L\'<b>ordre des lignes doit être : tous les réactifs puis tous les produits</b>, dans le même ordre que l\'équation de la question précédente (essentiel en mode « prolongement »).',
+        'Une espèce cochée « solvant » est <b>exclue du tableau</b> affiché à l\'élève (comme H₂O dans une réaction en solution aqueuse), mais reste comptée comme non limitante dans le calcul de x_max.',
+        'Une espèce cochée « en excès » est également exclue du calcul de x_max (jamais réactif limitant), mais reste affichée dans le tableau si elle n\'est pas aussi solvant.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'La correction est ligne par ligne (État initial / En cours / Final), chaque ligne comptant pour un tiers du barème ; x_max est un champ informatif supplémentaire (0 point), affiché après les trois lignes.',
+        'En mode « prolongement », si la question précédente n\'a pas encore été enregistrée (ou n\'est pas du type sélectionné) dans le quiz, la génération refuse avec un message explicite — enregistrez d\'abord cette question.',
+        'En mode « prolongement », si l\'élève n\'a pas du tout répondu à la question précédente (ou a soumis des coefficients invalides), la correction retombe automatiquement sur les coefficients du professeur — le tableau reste toujours corrigeable.',
+        'Aucune génération aléatoire dans cette version : les quantités initiales et coefficients sont des valeurs fixes saisies par le professeur.'
+      ])) + _HELP_COMMON
   }
 };
 

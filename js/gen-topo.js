@@ -1055,13 +1055,23 @@ stpf${X}: sort(map(sort,tpf${X}));`;
 //  Miroir de htmlToLatex/htmlToPlain utilisés par genChemical() ci-dessus,
 //  pour que l'aperçu affiché à l'enseignant pendant la saisie corresponde
 //  exactement à ce que verra l'élève dans le XML exporté.
+//
+//  MULTI-INSTANCE (depuis le type "avancement") : ces fonctions pilotaient à
+//  l'origine un unique éditeur singleton (#chem-editor-text). Elles acceptent
+//  maintenant un `id` optionnel (le module reste rétro-compatible : appelé
+//  sans argument, on retombe sur 'chem-editor-text', exactement le comportement
+//  historique du panneau "Équation Chimique"). L'état volatile (mode indice/
+//  exposant en cours, nœud <sub>/<sup> ouvert, sélection sauvegardée) n'est
+//  plus stocké dans des variables de module (qui ne pouvaient piloter qu'un
+//  seul éditeur à la fois) mais directement sur l'élément DOM de l'éditeur
+//  (editor.__mode/__modeNode/__savedSel) — chaque éditeur de formule (une
+//  ligne d'espèce du tableau d'avancement, par ex.) a ainsi son propre état
+//  indépendant. Les boutons Indice/Exposant se rattachent à leur éditeur via
+//  data-chem-target="<id de l'éditeur>" (voir _chemUpdateBtnStates).
 // ══════════════════════════════════════════════════════
-var _chemMode = 'none';
-var _chemModeNode = null;
-var _chemSavedSel = null;
 var _chemImgTimer = null;
 
-function _chemEditor() { return document.getElementById('chem-editor-text'); }
+function _chemEditor(id) { return document.getElementById(id || 'chem-editor-text'); }
 
 // Verrouille la zone de saisie de l'équation (éditeur + boutons Indice/Exposant/
 // Flèche/Équilibre/Mésomérie) tant que l'énoncé (chem-text) est vide — l'énoncé est
@@ -1087,8 +1097,8 @@ if (typeof document !== 'undefined') {
   });
 }
 
-function _chemRestoreSel() {
-  const editor = _chemEditor();
+function _chemRestoreSel(id) {
+  const editor = _chemEditor(id);
   if (!editor) return;
   editor.focus();
   const sel = window.getSelection();
@@ -1096,14 +1106,18 @@ function _chemRestoreSel() {
     const range = sel.getRangeAt(0);
     if (!range.collapsed && editor.contains(range.commonAncestorContainer)) return;
   }
-  if (_chemSavedSel) { sel.removeAllRanges(); sel.addRange(_chemSavedSel); }
+  if (editor.__savedSel) { sel.removeAllRanges(); sel.addRange(editor.__savedSel); }
 }
 
-function _chemUpdateBtnStates() {
-  const btnSub = document.getElementById('chem-btn-sub');
-  const btnSup = document.getElementById('chem-btn-sup');
-  if (btnSub) btnSub.classList.toggle('sub-mode', _chemMode === 'sub');
-  if (btnSup) btnSup.classList.toggle('sup-mode', _chemMode === 'sup');
+function _chemUpdateBtnStates(id) {
+  const eid = id || 'chem-editor-text';
+  const editor = _chemEditor(eid);
+  const mode = editor ? (editor.__mode || 'none') : 'none';
+  document.querySelectorAll('[data-chem-target="' + eid + '"]').forEach(function (btn) {
+    var kind = btn.getAttribute('data-chem-btn');
+    btn.classList.toggle('sub-mode', kind === 'sub' && mode === 'sub');
+    btn.classList.toggle('sup-mode', kind === 'sup' && mode === 'sup');
+  });
 }
 
 // _chemEndMode : sort du mode indice/exposant. Le nœud <sub>/<sup> a été créé dès
@@ -1112,44 +1126,47 @@ function _chemUpdateBtnStates() {
 // logiquement à l'intérieur du nœud et la frappe suivante continue en indice/
 // exposant même après avoir "désactivé" le mode (bug remonté : désélectionner
 // Exposant ne revenait pas en mode normal).
-function _chemEndMode() {
-  const editor = _chemEditor();
-  if (_chemModeNode) {
+function _chemEndMode(id) {
+  const editor = _chemEditor(id);
+  if (!editor) return;
+  const modeNode = editor.__modeNode;
+  if (modeNode) {
     const range = document.createRange();
-    if (_chemModeNode.textContent === '') {
-      const parent = _chemModeNode.parentNode;
+    if (modeNode.textContent === '') {
+      const parent = modeNode.parentNode;
       if (parent) {
-        range.setStartBefore(_chemModeNode);
+        range.setStartBefore(modeNode);
         range.collapse(true);
-        parent.removeChild(_chemModeNode);
+        parent.removeChild(modeNode);
       }
     } else {
-      range.setStartAfter(_chemModeNode);
+      range.setStartAfter(modeNode);
       range.collapse(true);
     }
     const sel = window.getSelection();
     sel.removeAllRanges(); sel.addRange(range);
   }
-  _chemMode = 'none'; _chemModeNode = null; _chemUpdateBtnStates();
-  if (editor) editor.focus();
+  editor.__mode = 'none'; editor.__modeNode = null; _chemUpdateBtnStates(editor.id);
+  editor.focus();
 }
 
 // _chemStartMode : active le mode et crée tout de suite le nœud <sub>/<sup> (comme
 // une parenthèse ouvrante), caret placé dedans — _chemInsertModeChar n'a alors qu'à
 // insérer le texte, _chemEndMode ferme la "parenthèse" (ou l'efface si rien n'a été
 // tapé).
-function _chemStartMode(kind, tag) {
-  _chemRestoreSel();
-  const editor = _chemEditor();
-  const sel = window.getSelection(); if (!sel.rangeCount) { if (editor) editor.focus(); return; }
+function _chemStartMode(kind, tag, id) {
+  _chemRestoreSel(id);
+  const editor = _chemEditor(id);
+  if (!editor) return;
+  const sel = window.getSelection(); if (!sel.rangeCount) { editor.focus(); return; }
   let range = sel.getRangeAt(0); range.deleteContents();
-  _chemModeNode = document.createElement(tag);
-  range.insertNode(_chemModeNode);
+  const node = document.createElement(tag);
+  range.insertNode(node);
   const r2 = document.createRange();
-  r2.setStart(_chemModeNode, 0); r2.collapse(true);
+  r2.setStart(node, 0); r2.collapse(true);
   sel.removeAllRanges(); sel.addRange(r2);
-  _chemMode = kind; _chemUpdateBtnStates();
-  if (editor) editor.focus();
+  editor.__mode = kind; editor.__modeNode = node; _chemUpdateBtnStates(editor.id);
+  editor.focus();
 }
 
 // chemToggleSub/chemToggleSup : deux flux distincts (miroir du widget exporté,
@@ -1159,27 +1176,34 @@ function _chemStartMode(kind, tag) {
 // charge ionique. On bascule alors dans un mode manuel : chaque caractère tapé est
 // explicitement inséré dans un vrai nœud <sub>/<sup> créé à la main (voir
 // _chemInsertModeChar dans _chemWireEditor), sans dépendre de execCommand.
-function chemToggleSub() {
-  _chemRestoreSel();
+// `id` optionnel : identifiant DOM de l'éditeur ciblé (défaut 'chem-editor-text',
+// le panneau "Équation Chimique" historique) — voir commentaire multi-instance
+// en tête de section.
+function chemToggleSub(id) {
+  _chemRestoreSel(id);
+  const editor = _chemEditor(id);
+  if (!editor) return;
   const sel = window.getSelection();
-  if (sel.rangeCount && !sel.getRangeAt(0).collapsed) { document.execCommand('subscript', false, null); if (_chemMode !== 'none') { _chemEndMode(); } const ed=_chemEditor(); if(ed){ed.focus();ed.dispatchEvent(new Event('input',{bubbles:true}));} return; }
-  if (_chemMode === 'sub') { _chemEndMode(); const ed=_chemEditor(); if(ed) ed.dispatchEvent(new Event('input',{bubbles:true})); return; }
-  if (_chemMode === 'sup') { _chemEndMode(); }
-  _chemStartMode('sub', 'sub');
+  if (sel.rangeCount && !sel.getRangeAt(0).collapsed) { document.execCommand('subscript', false, null); if ((editor.__mode || 'none') !== 'none') { _chemEndMode(id); } editor.focus(); editor.dispatchEvent(new Event('input',{bubbles:true})); return; }
+  if (editor.__mode === 'sub') { _chemEndMode(id); editor.dispatchEvent(new Event('input',{bubbles:true})); return; }
+  if (editor.__mode === 'sup') { _chemEndMode(id); }
+  _chemStartMode('sub', 'sub', id);
 }
 
-function chemToggleSup() {
-  _chemRestoreSel();
+function chemToggleSup(id) {
+  _chemRestoreSel(id);
+  const editor = _chemEditor(id);
+  if (!editor) return;
   const sel = window.getSelection();
-  if (sel.rangeCount && !sel.getRangeAt(0).collapsed) { document.execCommand('superscript', false, null); if (_chemMode !== 'none') { _chemEndMode(); } const ed=_chemEditor(); if(ed){ed.focus();ed.dispatchEvent(new Event('input',{bubbles:true}));} return; }
-  if (_chemMode === 'sup') { _chemEndMode(); const ed=_chemEditor(); if(ed) ed.dispatchEvent(new Event('input',{bubbles:true})); return; }
-  if (_chemMode === 'sub') { _chemEndMode(); }
-  _chemStartMode('sup', 'sup');
+  if (sel.rangeCount && !sel.getRangeAt(0).collapsed) { document.execCommand('superscript', false, null); if ((editor.__mode || 'none') !== 'none') { _chemEndMode(id); } editor.focus(); editor.dispatchEvent(new Event('input',{bubbles:true})); return; }
+  if (editor.__mode === 'sup') { _chemEndMode(id); editor.dispatchEvent(new Event('input',{bubbles:true})); return; }
+  if (editor.__mode === 'sub') { _chemEndMode(id); }
+  _chemStartMode('sup', 'sup', id);
 }
 
-function _chemInsertPlainText(text) {
-  _chemRestoreSel();
-  const editor = _chemEditor();
+function _chemInsertPlainText(text, id) {
+  _chemRestoreSel(id);
+  const editor = _chemEditor(id);
   if (!editor) return;
   const sel = window.getSelection();
   if (sel.rangeCount) {
@@ -1195,22 +1219,25 @@ function _chemInsertPlainText(text) {
   editor.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-function chemInsert(text) { _chemInsertPlainText(text); }
+function chemInsert(text, id) { _chemInsertPlainText(text, id); }
 
-function _chemInsertModeChar(tag, ch) {
-  _chemRestoreSel();
-  const editor = _chemEditor();
+function _chemInsertModeChar(tag, ch, id) {
+  _chemRestoreSel(id);
+  const editor = _chemEditor(id);
   if (!editor) return;
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
   let range = sel.getRangeAt(0);
   range.deleteContents();
-  const useExisting = _chemModeNode && _chemModeNode.isConnected && range.collapsed && _chemModeNode.contains(range.startContainer);
+  const modeNode = editor.__modeNode;
+  const useExisting = modeNode && modeNode.isConnected && range.collapsed && modeNode.contains(range.startContainer);
+  let targetNode = modeNode;
   if (!useExisting) {
-    _chemModeNode = document.createElement(tag);
-    range.insertNode(_chemModeNode);
+    targetNode = document.createElement(tag);
+    range.insertNode(targetNode);
     range = document.createRange();
-    range.setStart(_chemModeNode, 0); range.collapse(true);
+    range.setStart(targetNode, 0); range.collapse(true);
+    editor.__modeNode = targetNode;
   }
   const t = document.createTextNode(ch);
   range.insertNode(t);
@@ -1220,27 +1247,28 @@ function _chemInsertModeChar(tag, ch) {
 }
 
 function _chemWireEditor(editor) {
-  if (editor.__chemWired) return;
+  if (!editor || editor.__chemWired) return;
   editor.__chemWired = true;
   editor.addEventListener('blur', function () {
     const sel = window.getSelection();
-    if (sel.rangeCount) _chemSavedSel = sel.getRangeAt(0).cloneRange();
+    if (sel.rangeCount) editor.__savedSel = sel.getRangeAt(0).cloneRange();
   });
   editor.addEventListener('keydown', function (e) {
     const key = e.key;
     if (key.length !== 1) return;
-    if (_chemMode === 'sub') {
-      if (/^\d$/.test(key)) { e.preventDefault(); _chemInsertModeChar('sub', key); return; }
-      _chemEndMode();
+    const mode = editor.__mode || 'none';
+    if (mode === 'sub') {
+      if (/^\d$/.test(key)) { e.preventDefault(); _chemInsertModeChar('sub', key, editor.id); return; }
+      _chemEndMode(editor.id);
       return;
     }
-    if (_chemMode === 'sup') {
+    if (mode === 'sup') {
       if (/^\d$/.test(key) || key === '+' || key === '-') {
-        e.preventDefault(); _chemInsertModeChar('sup', key);
-        if (key === '+' || key === '-') { _chemEndMode(); }
+        e.preventDefault(); _chemInsertModeChar('sup', key, editor.id);
+        if (key === '+' || key === '-') { _chemEndMode(editor.id); }
         return;
       }
-      _chemEndMode();
+      _chemEndMode(editor.id);
     }
   });
 }
