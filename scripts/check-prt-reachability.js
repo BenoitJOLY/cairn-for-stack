@@ -7,7 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const { computePrtReachability, isPrtFeedbackReachable } = require(path.join('..', 'js', 'prt-reachability.js'));
+const { computePrtReachability, isPrtFeedbackReachable, findDanglingNodeRefs } = require(path.join('..', 'js', 'prt-reachability.js'));
 const { buildPrtXml } = require(path.join('..', 'js', 'prt-manager.js'));
 const { applyFbBox, inferFbKind } = require(path.join('..', 'js', 'fb-box.js'));
 const { _mkFbGen, _mkInput } = require(path.join('..', 'js', 'gen-math-shared.js'));
@@ -15,6 +15,10 @@ const { wrapFb, algPrtNodeCanonical } = require(path.join('..', 'js', 'generator
 const { buildKbdStackHTML } = require(path.join('..', 'js', 'keyboard.js'));
 const { htmlEsc, rawEsc, escapeMaximaString } = require(path.join('..', 'js', 'data.js'));
 const { jxgDropChunkedJsString } = require(path.join('..', 'js', 'gen-jxgdrop.js'));
+const { _incTypeAVars, _incTypeBVars, _incRoundingVars, _incFinalRegex } = require(path.join('..', 'js', 'gen-incertitude-calc.js'));
+const { _incStepDefs } = require(path.join('..', 'js', 'gen-incertitude-steps.js'));
+const { _incStudentFactor, _incStudentConfidence, _incStudentDf } = require(path.join('..', 'js', 'gen-incertitude-student.js'));
+const { _zsVars } = require(path.join('..', 'js', 'gen-zscore-calc.js'));
 
 const I18N_STUB = { t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key };
 
@@ -32,6 +36,19 @@ function _cpxGenFbgen(scenario, op, letter) { return '<p>fbgen:' + scenario + ':
 // genComplexeCore lit le global bare `_cpxGenFbgen` (pas deps._cpxGenFbgen) — garde héritée
 // de l'ordre de chargement navigateur, cf. test/unit/gen-math-complexe.test.js.
 global._cpxGenFbgen = _cpxGenFbgen;
+// gen-incertitude.js/gen-zscore.js appellent leurs helpers Maxima purs en GLOBAL BARE
+// (partage de scope <script> en navigateur) — même republication que dans
+// test/unit/gen-incertitude.test.js et test/unit/gen-zscore.test.js.
+global.htmlEsc = htmlEsc;
+global._incTypeAVars = _incTypeAVars;
+global._incTypeBVars = _incTypeBVars;
+global._incRoundingVars = _incRoundingVars;
+global._incFinalRegex = _incFinalRegex;
+global._incStepDefs = _incStepDefs;
+global._incStudentFactor = _incStudentFactor;
+global._incStudentConfidence = _incStudentConfidence;
+global._incStudentDf = _incStudentDf;
+global._zsVars = _zsVars;
 
 const BASE_DEPS = { I18N: I18N_STUB, buildPrtXml: buildPrtXml, applyFbBox: applyFbBox, _mkFbGen: _mkFbGen, _mkInput: _mkInput };
 
@@ -335,6 +352,55 @@ const TARGETS = [
                 mode: mode, nb: false, answer: 1, fbOkTxt: '', fbWrTxt: '', fbGenRaw: ''
             }
         }))
+    },
+    {
+        label: 'Tableau d\'avancement', module: '../js/gen-avancement.js', coreFn: 'genAvancementCore', deps: RICH_DEPS,
+        scenarios: ['teacher', 'follow_from'].map(mode => ({
+            label: mode, params: {
+                bareme: 3, text: '', mode: mode, sourceType: 'chemical_topo', sourceX: 1, fbGen: '',
+                species: [
+                    { nom: 'H_2O_2', coeff: 2, role: 'reactif', n0: '0.20', exces: false, solvant: false },
+                    { nom: 'H^{+}', coeff: 2, role: 'reactif', n0: '0.5', exces: true, solvant: false },
+                    { nom: 'H_2O', coeff: 2, role: 'produit', n0: '0', exces: false, solvant: true },
+                    { nom: 'O_2', coeff: 1, role: 'produit', n0: '0', exces: false, solvant: false }
+                ]
+            }
+        }))
+    },
+    {
+        label: 'Nomenclature chimique', module: '../js/gen-nomenclature.js', coreFn: 'genNomenclatureCore', deps: RICH_DEPS,
+        scenarios: [
+            { label: 'fixe', params: { bareme: 1, text: '<p>Nommez cette molécule.</p>', mode: 'fixe', fixeSmiles: 'CC(C)CC(C)(C)C', fixeNom: '2,2,4-triméthylpentane', fixeFamille: 'Alcanes', fbGen: '' } },
+            { label: 'aleatoire', params: { bareme: 2, text: '<p>Identifiez cette molécule.</p>', mode: 'aleatoire', paramFamille: 'Alcanes', paramCarbonesMax: '4', fbGen: '' } },
+            { label: 'checkbox', params: { bareme: 1, text: '<p>Cochez les groupes présents.</p>', mode: 'checkbox', cbSmiles: 'NC(CC(=O)O)C', cbVrais: 'Amine, Acide carboxylique', cbFaux: 'Alcool, Aldéhyde, Ester', fbGen: '' } }
+        ]
+    },
+    {
+        label: 'Incertitude (mesure GUM)', module: '../js/gen-incertitude.js', coreFn: 'genIncertitudeCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 7,
+                context: { grandeur: 'Longueur', symbole: 'L', unite: 'cm', intro: '' },
+                typeA: { mode: 'manuel', data: [12.3, 12.5, 12.2, 12.4, 12.6], moyenneVraie: '', ecartTypePop: '', n: 0, decimales: 2 },
+                typeB: { source: 'resolution', q: '0.1', delta: '', ucert: '', kcert: '', valeur: '' },
+                rounding: { sigfig: 1, roundup: false, k: 1 },
+                steps: { moyenne: true, s: false, uA: false, uB: false, uc: false, U: true, ecriture: true },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Z-score (compatibilité métrologique)', module: '../js/gen-zscore.js', coreFn: 'genZscoreCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 4,
+                context: { grandeur: 'Masse volumique', symbole: '\\rho', unite: 'g/cm^3', intro: '' },
+                grandeurs: { xMes: '10.5', xRef: '10', uc: '0.3' },
+                seuil: '2',
+                steps: { z: true, conclusion: true },
+                fbGen: ''
+            }
+        }]
     }
 ];
 
@@ -351,8 +417,10 @@ function isFeedbackNonEmpty(fbText) {
 let bugCount = 0;
 let ntfCount = 0;
 let errorCount = 0;
+let danglingCount = 0;
 const lines = [];
 const ntfLines = [];
+const danglingLines = [];
 
 TARGETS.forEach(function (t) {
     const mod = require(t.module);
@@ -373,6 +441,16 @@ TARGETS.forEach(function (t) {
         }
         const nodes = (result && result.prt && result.prt.nodes) || [];
         if (!nodes.length) return;
+
+        findDanglingNodeRefs(nodes).forEach(function (d) {
+            danglingCount++;
+            danglingLines.push(
+                '[' + t.label + ' / ' + sc.label + '] nœud "' + d.name + '", branche ' + d.branch +
+                ' pointe vers "' + d.target + '" qui ne correspond au <name> d\'aucun nœud du PRT ' +
+                '(import Moodle cassé : "Unsupported operand types: string + int")\n'
+            );
+        });
+
         const reach = computePrtReachability(nodes);
         nodes.forEach(function (n, i) {
             ['true', 'false'].forEach(function (branch) {
@@ -402,10 +480,17 @@ TARGETS.forEach(function (t) {
 });
 
 const header = 'Audit PRT — ' + new Date().toISOString() + '\n' +
+    danglingCount + ' référence(s) de nœud orpheline(s) détectée(s) (import Moodle cassé)\n' +
     bugCount + ' branche(s) morte(s)/inatteignable(s) détectée(s)\n' +
     ntfCount + ' branche(s) non terminale(s) avec feedback mort détectée(s)' +
     (errorCount ? ', ' + errorCount + ' scénario(s) en erreur' : '') + '\n\n';
-const section1 = '=== Branches inatteignables (test dupliqué par un ancêtre) ===\n\n' + (lines.join('\n') || '(aucune)\n');
+const section0 = '=== Références de nœud orphelines (truenextnode/falsenextnode sans nœud <name> correspondant) ===\n\n' + (danglingLines.join('\n') || '(aucune)\n');
+const section1 = '\n=== Branches inatteignables (test dupliqué par un ancêtre) ===\n\n' + (lines.join('\n') || '(aucune)\n');
 const section2 = '\n=== Branches non terminales avec feedback (jamais affiché) ===\n\n' + (ntfLines.join('\n') || '(aucune)\n');
-fs.writeFileSync(path.join(__dirname, '..', 'bugPRT.txt'), header + section1 + section2);
-console.log(bugCount + ' branche(s) morte(s), ' + ntfCount + ' branche(s) non terminale(s) avec feedback, ' + errorCount + ' erreur(s) — écrit dans bugPRT.txt');
+fs.writeFileSync(path.join(__dirname, '..', 'bugPRT.txt'), header + section0 + section1 + section2);
+console.log(danglingCount + ' référence(s) orpheline(s), ' + bugCount + ' branche(s) morte(s), ' + ntfCount + ' branche(s) non terminale(s) avec feedback, ' + errorCount + ' erreur(s) — écrit dans bugPRT.txt');
+
+// Fait échouer `npm run check-prt` (et donc la CI) dès qu'un import Moodle serait cassé
+// ou qu'un scénario plante — les branches mortes/non-terminales restent seulement
+// informatives (nombreux faux positifs pédagogiques légitimes, jamais bloquantes).
+if (danglingCount || errorCount) process.exitCode = 1;

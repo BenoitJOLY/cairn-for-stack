@@ -1,6 +1,142 @@
-Audit atteignabilité PRT — 2026-07-30T08:00:20.786Z
-1 branche(s) morte(s) détectée(s)
+Audit PRT — 2026-08-01T22:36:02.717Z
+0 référence(s) de nœud orpheline(s) détectée(s) (import Moodle cassé)
+1 branche(s) morte(s)/inatteignable(s) détectée(s)
+42 branche(s) non terminale(s) avec feedback mort détectée(s)
+
+=== Références de nœud orphelines (truenextnode/falsenextnode sans nœud <name> correspondant) ===
+
+(aucune)
+
+=== Branches inatteignables (test dupliqué par un ancêtre) ===
 
 [Nombres complexes / forme-alg] nœud 2, branche true inatteignable
   test dupliqué : AlgEquiv(ans1X, qX_ta)
   feedback concerné : tpl.cpx_fbdef_formealg_ok2_def
+
+=== Branches non terminales avec feedback (jamais affiché) ===
+
+[Acide-Base / tangentes] nœud 0, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <strong>Tangentes non parallèles.</strong> L'écart entre les pentes est trop grand. Ajustez finement les points T1 et T2 pour qu'elles aient la même pente.
+
+[Polynômes / racines] nœud 0, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : pol.fb_ok_x1correct
+
+[Polynômes / racines] nœud 1, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : pol.err_x1_swap
+
+[Polynômes / racines] nœud 1, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : pol.fb_wrong_x1:{"ta1var":"qX_ta1"}
+
+[Nucléaire / default] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : {@fb_error_reactantsX@}
+
+[Nucléaire / default] nœud 1, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : {@fb_error_productsX@}
+
+[Nucléaire / default] nœud 3, branche false non terminale (→ nœud 4) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : {@fb_reactants_coeffsX@}
+
+[Nucléaire / default] nœud 5, branche false non terminale (→ nœud 6) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : {@fb_asteriskX@}
+
+[Topo (chimie, équilibrage) / default] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: green; font-weight: bold;">✓ Bonne flèche de réaction !</span></p>
+
+[Topo (chimie, équilibrage) / default] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: red; font-weight: bold;">✗ Mauvaise flèche.</span> Détectée : {@ans_arrow_detX@}, attendue : {@tans_arrowX@}</p>
+
+[Topo (chimie, équilibrage) / default] nœud 1, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: green; font-weight: bold;">✓ Votre réaction est équilibrée du point de vue des éléments chimiques !</span></p>
+
+[Topo (chimie, équilibrage) / default] nœud 1, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: #cc2222; font-weight: bold;">✗ Votre réaction n'est pas équilibrée du point des éléments chimiques !</span></p>
+
+[Topo (chimie, équilibrage) / default] nœud 2, branche true non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: green;">✓ Votre équation est équilibrée électriquement.</span></p>
+
+[Topo (chimie, équilibrage) / default] nœud 2, branche false non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: red;">✗ Les charges ne sont pas conservées dans votre réaction.</span> Réactifs : {@charge_rea_sX@}, Produits : {@charge_pro_sX@}</p>
+
+[Topo (chimie, équilibrage) / default] nœud 3, branche true non terminale (→ nœud 5) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: green;">✓ Vos formules sont correctes !</span></p>
+
+[Topo (chimie, équilibrage) / default] nœud 3, branche false non terminale (→ nœud 4) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: red;">✗ Vos formules sont incorrectes.</span> Réactifs : {@nb_rea_sX@}/2, Produits : {@nb_pro_sX@}/1</p>
+
+[Topo (chimie, équilibrage) / default] nœud 4, branche true non terminale (→ nœud 5) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: orange;">⚠ Bonne compréhension du type de réaction.</span></p>
+
+[Topo (chimie, équilibrage) / default] nœud 4, branche false non terminale (→ nœud 5) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: red;">✗ Groupes fonctionnels non reconnus.</span></p>
+
+[Topo (chimie, équilibrage) / default] nœud 5, branche false non terminale (→ nœud 6) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p><span style="color: #cc2222;">✗ Vos coefficients stœchiométriques sont incorrects !</span></p>
+
+[Chemical (chimie, formule) / default] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;margin-bottom:10px;"><strong>✅ Flèche correcte</strong> — Le type de flèche correspond bien à la nature de la réa
+
+[Chemical (chimie, formule) / default] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#F9B3A9;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:10px;"><strong>✗ Flèche incorrecte</strong> — La flèche utilisée ({@fleche_el_dispX@}) ne correspon
+
+[Chemical (chimie, formule) / default] nœud 1, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;margin-bottom:10px;"><strong>✅ Réactifs corrects</strong> — Vous avez bien identifié les {@nb_rsX@} réactifs.</di
+
+[Chemical (chimie, formule) / default] nœud 2, branche true non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;margin-bottom:10px;"><strong>✅ Produits corrects</strong> — Vous avez bien identifié les {@nb_psX@} produits.</di
+
+[Chemical (chimie, formule) / default] nœud 3, branche true non terminale (→ nœud 4) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;margin-bottom:10px;"><strong>✅ Conservation des charges</strong> — Les charges sont bien équilibrées ({@sch_rsX@}
+
+[Chemical (chimie, formule) / default] nœud 4, branche true non terminale (→ nœud 5) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;margin-bottom:10px;"><strong>✅ Valeur de charge correcte</strong> — La charge globale ({@sch_rsX@}) est celle att
+
+[Chemical (chimie, formule) / default] nœud 4, branche false non terminale (→ nœud 5) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#F9B3A9;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:10px;"><strong>✗ Valeur de charge incorrecte</strong> — Obtenue : {@sch_rsX@}, attendue : {@sch_rtX
+
+[Chemical (chimie, formule) / default] nœud 5, branche true non terminale (→ nœud 7) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;margin-bottom:10px;"><strong>✅ Coefficients corrects</strong> — Les coefficients stœchiométriques sont parfaiteme
+
+[Chemical (chimie, formule) / default] nœud 6, branche true non terminale (→ nœud 7) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;margin-bottom:10px;"><strong>✅ Coefficients proportionnels</strong> — Corrects mais multipliés par {@kX@}. Pensez
+
+[Tableau d'avancement / teacher] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ av.fb_init_true</div>
+
+[Tableau d'avancement / teacher] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ av.fb_init_false</div>
+
+[Tableau d'avancement / teacher] nœud 1, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ av.fb_enc_true</div>
+
+[Tableau d'avancement / teacher] nœud 1, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ av.fb_enc_false</div>
+
+[Tableau d'avancement / teacher] nœud 2, branche true non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ av.fb_fin_true</div>
+
+[Tableau d'avancement / teacher] nœud 2, branche false non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ av.fb_fin_false</div>
+
+[Tableau d'avancement / follow_from] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ av.fb_init_true</div>
+
+[Tableau d'avancement / follow_from] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ av.fb_init_false</div>
+
+[Tableau d'avancement / follow_from] nœud 1, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ av.fb_enc_true<p style="font-size:.85em;color:#6b7280;margin-top:.4em;">ℹ️ av.fol
+
+[Tableau d'avancement / follow_from] nœud 1, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ av.fb_enc_false<p style="font-size:.85em;color:#6b7280;margin-top:.4em;">ℹ️ av.fo
+
+[Tableau d'avancement / follow_from] nœud 2, branche true non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ av.fb_fin_true<p style="font-size:.85em;color:#6b7280;margin-top:.4em;">ℹ️ av.fol
+
+[Tableau d'avancement / follow_from] nœud 2, branche false non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ av.fb_fin_false<p style="font-size:.85em;color:#6b7280;margin-top:.4em;">ℹ️ av.fo
+
+[Nomenclature chimique / aleatoire] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>C'est le bon nom.</p>
+
+[Nomenclature chimique / aleatoire] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>Ce n'est pas le bon nom (réponse attendue : {@nomX@}).</p>

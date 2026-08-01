@@ -59,6 +59,34 @@ function isPrtFeedbackReachable(reachMap, nodeName, branch) {
     return branch === 'true' ? r.trueReachable : r.falseReachable;
 }
 
+// findDanglingNodeRefs : détecte un truenextnode/falsenextnode qui ne correspond au
+// <name> d'AUCUN nœud du PRT (autre que '-1', qui signifie "nœud terminal"). C'est
+// précisément la classe de bug qui a cassé l'import Moodle du type "avancement" : un
+// nœud nommé de façon descriptive (ex. "ninit1") au lieu de son indice séquentiel de
+// position, alors que d'autres nœuds le référençaient par cet indice — Moodle ne
+// retrouve alors plus le nœud suivant et l'import échoue ("Unsupported operand types:
+// string + int"). computePrtReachability() ne la détecte PAS : elle est fail-open sur
+// les références inconnues (byName[name] undefined -> visit() retourne silencieusement).
+function findDanglingNodeRefs(nodes) {
+    var problems = [];
+    if (!nodes || !nodes.length) return problems;
+    var names = {};
+    nodes.forEach(function (n) { names[n.name] = true; });
+    nodes.forEach(function (n) {
+        ['true', 'false'].forEach(function (branch) {
+            var target = branch === 'true' ? n.truenextnode : n.falsenextnode;
+            if (target != null && String(target) !== '-1' && !names[target]) {
+                problems.push({ name: n.name, branch: branch, target: target });
+            }
+        });
+    });
+    return problems;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { computePrtReachability: computePrtReachability, isPrtFeedbackReachable: isPrtFeedbackReachable };
+    module.exports = {
+        computePrtReachability: computePrtReachability,
+        isPrtFeedbackReachable: isPrtFeedbackReachable,
+        findDanglingNodeRefs: findDanglingNodeRefs
+    };
 }
