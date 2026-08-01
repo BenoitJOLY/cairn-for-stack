@@ -114,7 +114,9 @@ const TYPE_ICON_MAP = {
   'stack-raw':'stack-import',
   'expert':'expert',
   'geogebra':'geogebra',
-  'nomenclature':'chemistry'
+  'nomenclature':'nomenclature',
+  'incertitude':'incertitude',
+  'zscore':'zscore'
 };
 
 function initEditor() {

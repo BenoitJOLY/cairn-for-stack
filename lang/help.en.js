@@ -608,6 +608,45 @@ const HELP_CONTENT = {
       ])) +
       _hSection('Teaching principle',
         '<p>In RGB: a red filter only passes the red component — a green object appears dark through a red filter. In CMY: a cyan filter absorbs red, letting green and blue through.</p>') + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── MEASUREMENT UNCERTAINTY
+  incertitude: {
+    title: '<svg class="hs-ico"><use href="#ico-type-incertitude"></use></svg> Measurement uncertainty — Help',
+    body:
+      _hSection('What it is for',
+        '<p>The student processes a series of <b>experimental measurements</b> and computes the <b>measurement uncertainty</b> (GUM method): type A uncertainty (statistical, from the measurements), type B uncertainty (instrumental), combined uncertainty, expanded uncertainty, and the final result notation <code>X = x̄ ± U</code>. Each checked step is graded independently.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Quantity / Symbol / Unit</b>: describe the measurement (e.g. Length, L, cm) — used to automatically generate the feedback.',
+        '<b>Type A</b>: either a manually entered <i>list of measurements</i>, or a <i>randomly generated</i> set calibrated on a target mean and standard deviation.',
+        '<b>Type B</b>: choose the source of instrumental error — <i>resolution</i> (u_B = q/√12), <i>manufacturer tolerance</i> (u_B = Δ/√3), <i>calibration certificate</i> (u_B = U_cert/k_cert), or a directly <i>imposed value</i>.',
+        '<b>Result presentation</b>: number of significant figures of U (1 or 2), optional round-up, coverage factor k (1 or 2).',
+        '<b>Evaluated steps</b>: check which steps the student must compute (mean, standard deviation, uA, uB, uc, U, final notation) — each generates its own separately graded answer field.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'The Type A random mode uses calibrated uniform noise (not a true normal distribution) to exactly match the requested standard deviation.',
+        'The "Final notation" step expects the format <code>X = x̄ ± U</code> (including unit) — grading tolerates spaces, the <code>+/-</code> notation, and trailing zeros.',
+        'The Student\'s t-factor (small n, confidence level) is not yet available in this module — planned for a future iteration.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── Z-SCORE (METROLOGICAL COMPATIBILITY)
+  zscore: {
+    title: '<svg class="hs-ico"><use href="#ico-type-zscore"></use></svg> Z-score — Help',
+    body:
+      _hSection('What it is for',
+        '<p>The student compares a <b>measured value</b> to a <b>reference value</b> by computing the <b>metrological compatibility score</b>: <code>z = |x_measured - x_reference| / u_c</code>, then concludes whether the result is compatible with the reference (z below a configurable threshold) or not.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Quantity / Symbol / Unit</b>: describe the measurement — used to automatically generate the question text and feedback.',
+        '<b>Given values</b>: x_measured, x_reference and u_c are entered directly by the teacher (fixed values, no random generation) and automatically shown in the question text.',
+        '<b>Compatibility threshold</b>: comparison value for the conclusion (compatible if z &lt; threshold) — 2 by default, but fully configurable.',
+        '<b>Evaluated steps</b>: check "Z-score calculation" and/or "Compatibility conclusion" — each generates its own separately graded answer field.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'This module is a standalone type, distinct from the "Measurement uncertainty" type: it does not reuse any data entered elsewhere.',
+        'The compatibility conclusion is a dropdown (Compatible / Incompatible), not a numeric field.',
+        'No random generation is available in this version (fixed-value MVP only).'
+      ])) + _HELP_COMMON
   }
 };
 

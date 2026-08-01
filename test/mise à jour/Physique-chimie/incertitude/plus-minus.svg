@@ -1,0 +1,7 @@
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bloc supérieur gauche avec le signe + -->
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M 12 2 C 7.3 2 4.9 2 3.5 3.5 C 2 4.9 2 7.3 2 12 C 2 16.1 2 18.5 3 20 L 20 3 C 18.5 2 16.1 2 12 2 Z M 8.5 5.5 H 9.5 V 7.5 H 11.5 V 8.5 H 9.5 V 10.5 H 8.5 V 8.5 H 6.5 V 7.5 H 8.5 V 5.5 Z" fill="#1C274D"/>
+
+  <!-- Bloc inférieur droit avec le signe - -->
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M 22 12 C 22 16.7 22 19.1 20.5 20.5 C 19.1 22 16.7 22 12 22 C 7.9 22 5.5 22 4 21 L 21 4 C 22 5.5 22 7.9 22 12 Z M 12.5 15.5 H 17.5 V 16.5 H 12.5 V 15.5 Z" fill="#1C274D"/>
+</svg>

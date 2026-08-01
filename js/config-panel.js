@@ -100,7 +100,9 @@ async function _generateAndStoreQuestion(qid, type) {
     'stack-raw': W.genStackRaw,
     'expert': W.genExpert,
     'geogebra': W.genGeoGebra,
-    'nomenclature': W.genNomenclature
+    'nomenclature': W.genNomenclature,
+    'incertitude': W.genIncertitude,
+    'zscore': W.genZscore
   };
 
   var gen = genMap[type];

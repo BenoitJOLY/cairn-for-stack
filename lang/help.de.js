@@ -616,6 +616,45 @@ const HELP_CONTENT = {
       ])) +
       _hSection('Didaktisches Prinzip',
         '<p>Bei RGB: ein roter Filter lässt nur die rote Komponente durch — ein grünes Objekt erscheint durch einen roten Filter dunkel. Bei CMY: ein Cyan-Filter absorbiert Rot und lässt Grün und Blau durch.</p>') + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── MESSUNSICHERHEIT
+  incertitude: {
+    title: '<svg class="hs-ico"><use href="#ico-type-incertitude"></use></svg> Messunsicherheit — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Der Schüler wertet eine Reihe von <b>experimentellen Messwerten</b> aus und berechnet die <b>Messunsicherheit</b> (GUM-Methode): Unsicherheit Typ A (statistisch, aus den Messwerten), Unsicherheit Typ B (instrumentell), kombinierte Unsicherheit, erweiterte Unsicherheit und die endgültige Ergebnisschreibweise <code>X = x̄ ± U</code>. Jeder angekreuzte Schritt wird unabhängig bewertet.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Größe / Symbol / Einheit</b>: beschreiben die Messung (z. B. Länge, L, cm) — werden zur automatischen Erzeugung der Feedbacks verwendet.',
+        '<b>Typ A</b>: entweder eine manuell eingegebene <i>Messwertliste</i>, oder eine <i>zufällig erzeugte</i> Reihe, kalibriert auf einen Zielmittelwert und eine Ziel-Standardabweichung.',
+        '<b>Typ B</b>: wählen Sie die Quelle des instrumentellen Fehlers — <i>Auflösung</i> (u_B = q/√12), <i>Herstellertoleranz</i> (u_B = Δ/√3), <i>Kalibrierzertifikat</i> (u_B = U_cert/k_cert), oder ein direkt <i>vorgegebener Wert</i>.',
+        '<b>Darstellung des Ergebnisses</b>: Anzahl der signifikanten Stellen von U (1 oder 2), optionales Aufrunden, Erweiterungsfaktor k (1 oder 2).',
+        '<b>Bewertete Schritte</b>: wählen Sie aus, welche Schritte der Schüler berechnen muss (Mittelwert, Standardabweichung, uA, uB, uc, U, Endschreibweise) — jeder Schritt erzeugt ein eigenes, separat bewertetes Antwortfeld.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Der Zufallsmodus Typ A verwendet gleichverteiltes, kalibriertes Rauschen (keine echte Normalverteilung), um exakt die gewünschte Standardabweichung zu erreichen.',
+        'Der Schritt „Endschreibweise" erwartet das Format <code>X = x̄ ± U</code> (inklusive Einheit) — die Bewertung toleriert Leerzeichen, die Schreibweise <code>+/-</code> und nachgestellte Nullen.',
+        'Der Student-t-Faktor (kleines n, Vertrauensniveau) ist in diesem Modul noch nicht verfügbar — für eine spätere Iteration geplant.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── Z-SCORE (METROLOGISCHE KOMPATIBILITÄT)
+  zscore: {
+    title: '<svg class="hs-ico"><use href="#ico-type-zscore"></use></svg> Z-Score — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Der Schüler vergleicht einen <b>Messwert</b> mit einem <b>Referenzwert</b>, indem er den <b>metrologischen Kompatibilitätsscore</b> berechnet: <code>z = |x_gemessen - x_Referenz| / u_c</code>, und schließt daraus, ob das Ergebnis mit der Referenz kompatibel ist (z unter einer konfigurierbaren Schwelle) oder nicht.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Größe / Symbol / Einheit</b>: beschreiben die Messung — werden zur automatischen Erzeugung des Aufgabentextes und der Feedbacks verwendet.',
+        '<b>Gegebene Werte</b>: x_gemessen, x_Referenz und u_c werden direkt vom Lehrer eingegeben (feste Werte, keine Zufallsgenerierung) und automatisch im Aufgabentext angezeigt.',
+        '<b>Kompatibilitätsschwelle</b>: Vergleichswert für die Schlussfolgerung (kompatibel, wenn z &lt; Schwelle) — standardmäßig 2, aber vollständig konfigurierbar.',
+        '<b>Bewertete Schritte</b>: kreuzen Sie „Berechnung des Z-Scores" und/oder „Kompatibilitätsschluss" an — jeder Schritt erzeugt ein eigenes, separat bewertetes Antwortfeld.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Dieses Modul ist ein eigenständiger Fragetyp, unabhängig vom Typ „Messunsicherheit": es verwendet keine an anderer Stelle eingegebenen Daten.',
+        'Der Kompatibilitätsschluss ist ein Dropdown (Kompatibel / Inkompatibel), kein numerisches Feld.',
+        'In dieser Version ist keine Zufallsgenerierung verfügbar (MVP nur mit festen Werten).'
+      ])) + _HELP_COMMON
   }
 };
 

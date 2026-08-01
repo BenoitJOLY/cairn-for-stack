@@ -3060,7 +3060,9 @@ html[data-theme="dark"] .hs-preview-panel {
 #q-config-modal:has(#fp-apn[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-equivalence[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-geogebra[style*="display: block"]) .q-config-modal-box,
-#q-config-modal:has(#fp-nomenclature[style*="display: block"]) .q-config-modal-box {
+#q-config-modal:has(#fp-nomenclature[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-incertitude[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-zscore[style*="display: block"]) .q-config-modal-box {
   width: min(1200px, 96vw);
 }
 @media (max-width: 1000px) {
@@ -3075,7 +3077,7 @@ html[data-theme="dark"] .hs-preview-panel {
   #fp-rvbcmj[style*="display: block"], #fp-imgclick[style*="display: block"], #fp-jxgdrop[style*="display: block"], #fp-ord[style*="display: block"],
   #fp-chemical[style*="display: block"], #fp-chemical_topo[style*="display: block"], #fp-nuclear[style*="display: block"], #fp-composition[style*="display: block"],
   #fp-crossword[style*="display: block"], #fp-doi[style*="display: block"], #fp-image-mesure[style*="display: block"], #fp-apn[style*="display: block"],
-  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"] { display: block !important; }
+  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"] { display: block !important; }
   .hs-split-row { display: block; }
   .hs-split-left, .hs-preview-panel { max-width: none; }
   .hs-preview-panel { margin-top: 15px; border-top: 1px dashed #ccc; }

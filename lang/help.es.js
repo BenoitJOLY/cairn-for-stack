@@ -616,6 +616,45 @@ const HELP_CONTENT = {
       ])) +
       _hSection('Principio pedagógico',
         '<p>En RGB: un filtro rojo solo deja pasar la componente roja — un objeto verde aparecerá oscuro a través de un filtro rojo. En CMY: un filtro cian absorbe el rojo, dejando pasar verde y azul.</p>') + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── INCERTIDUMBRE DE MEDIDA
+  incertitude: {
+    title: '<svg class="hs-ico"><use href="#ico-type-incertitude"></use></svg> Incertidumbre de medida — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>El estudiante procesa una serie de <b>medidas experimentales</b> y calcula la <b>incertidumbre de medida</b> (método GUM): incertidumbre de tipo A (estadística, a partir de las medidas), incertidumbre de tipo B (instrumental), incertidumbre combinada, incertidumbre expandida, y la escritura final del resultado <code>X = x̄ ± U</code>. Cada paso marcado se califica de forma independiente.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Magnitud / Símbolo / Unidad</b>: describen la medida (p. ej. Longitud, L, cm) — se usan para generar automáticamente los comentarios.',
+        '<b>Tipo A</b>: bien una <i>lista de medidas</i> introducida manualmente, bien un conjunto <i>generado aleatoriamente</i> calibrado sobre una media y una desviación típica objetivo.',
+        '<b>Tipo B</b>: elija el origen del error instrumental — <i>resolución</i> (u_B = q/√12), <i>tolerancia del fabricante</i> (u_B = Δ/√3), <i>certificado de calibración</i> (u_B = U_cert/k_cert), o un <i>valor impuesto</i> directamente.',
+        '<b>Presentación del resultado</b>: número de cifras significativas de U (1 o 2), redondeo por exceso opcional, factor de cobertura k (1 o 2).',
+        '<b>Pasos evaluados</b>: marque los pasos que el estudiante debe calcular (media, desviación típica, uA, uB, uc, U, escritura final) — cada uno genera su propio campo de respuesta calificado por separado.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'El modo aleatorio de tipo A usa ruido uniforme calibrado (no una distribución normal real) para alcanzar exactamente la desviación típica solicitada.',
+        'El paso «Escritura final» espera el formato <code>X = x̄ ± U</code> (unidad incluida) — la corrección tolera espacios, la notación <code>+/-</code> y ceros finales.',
+        'El factor de Student (n pequeño, nivel de confianza) todavía no está disponible en este módulo — previsto para una iteración posterior.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── Z-SCORE (COMPATIBILIDAD METROLÓGICA)
+  zscore: {
+    title: '<svg class="hs-ico"><use href="#ico-type-zscore"></use></svg> Z-score — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>El estudiante compara un <b>valor medido</b> con un <b>valor de referencia</b> calculando el <b>score de compatibilidad metrológica</b>: <code>z = |x_medido - x_referencia| / u_c</code>, y concluye si el resultado es compatible con la referencia (z por debajo de un umbral configurable) o no.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Magnitud / Símbolo / Unidad</b>: describen la medida — se usan para generar automáticamente el enunciado y los comentarios.',
+        '<b>Valores dados</b>: x_medido, x_referencia y u_c se introducen directamente por el profesor (valores fijos, sin generación aleatoria) y se muestran automáticamente en el enunciado.',
+        '<b>Umbral de compatibilidad</b>: valor de comparación para la conclusión (compatible si z &lt; umbral) — 2 por defecto, pero totalmente configurable.',
+        '<b>Pasos evaluados</b>: marque «Cálculo del z-score» y/o «Conclusión de compatibilidad» — cada uno genera su propio campo de respuesta calificado por separado.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Este módulo es un tipo autónomo, distinto del tipo «Incertidumbre de medida»: no reutiliza ningún dato introducido en otro lugar.',
+        'La conclusión de compatibilidad es una lista desplegable (Compatible / Incompatible), no un campo numérico.',
+        'No hay generación aleatoria disponible en esta versión (MVP solo con valores fijos).'
+      ])) + _HELP_COMMON
   }
 };
 

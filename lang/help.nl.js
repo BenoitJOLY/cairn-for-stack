@@ -616,6 +616,45 @@ const HELP_CONTENT = {
       ])) +
       _hSection('Didactisch principe',
         '<p>Bij RGB: een rood filter laat alleen de rode component door — een groen object zal donker verschijnen door een rood filter. Bij CMY: een cyaan filter absorbeert rood en laat groen en blauw door.</p>') + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── METEONZEKERHEID
+  incertitude: {
+    title: '<svg class="hs-ico"><use href="#ico-type-incertitude"></use></svg> Meetonzekerheid — Hulp',
+    body:
+      _hSection('Waarvoor dient het?',
+        '<p>De student verwerkt een reeks <b>experimentele metingen</b> en berekent de <b>meetonzekerheid</b> (GUM-methode): onzekerheid type A (statistisch, uit de metingen), onzekerheid type B (instrumenteel), gecombineerde onzekerheid, uitgebreide onzekerheid en de uiteindelijke resultaatschrijfwijze <code>X = x̄ ± U</code>. Elke aangevinkte stap wordt onafhankelijk beoordeeld.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Grootheid / Symbool / Eenheid</b>: beschrijven de meting (bv. Lengte, L, cm) — worden gebruikt om automatisch de feedback te genereren.',
+        '<b>Type A</b>: ofwel een handmatig ingevoerde <i>lijst met metingen</i>, ofwel een <i>willekeurig gegenereerde</i> reeks gekalibreerd op een doelgemiddelde en doelstandaardafwijking.',
+        '<b>Type B</b>: kies de bron van de instrumentele fout — <i>resolutie</i> (u_B = q/√12), <i>fabriekstolerantie</i> (u_B = Δ/√3), <i>kalibratiecertificaat</i> (u_B = U_cert/k_cert), of een direct <i>opgelegde waarde</i>.',
+        '<b>Weergave van het resultaat</b>: aantal significante cijfers van U (1 of 2), optioneel naar boven afronden, dekkingsfactor k (1 of 2).',
+        '<b>Beoordeelde stappen</b>: vink aan welke stappen de student moet berekenen (gemiddelde, standaardafwijking, uA, uB, uc, U, eindschrijfwijze) — elke stap genereert een eigen, apart beoordeeld antwoordveld.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'De willekeurige modus van type A gebruikt gekalibreerde uniforme ruis (geen echte normale verdeling) om precies de gevraagde standaardafwijking te bereiken.',
+        'De stap "Eindschrijfwijze" verwacht het formaat <code>X = x̄ ± U</code> (inclusief eenheid) — de beoordeling tolereert spaties, de notatie <code>+/-</code> en afsluitende nullen.',
+        'De Student-t-factor (kleine n, betrouwbaarheidsniveau) is nog niet beschikbaar in deze module — gepland voor een latere iteratie.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── Z-SCORE (METROLOGISCHE COMPATIBILITEIT)
+  zscore: {
+    title: '<svg class="hs-ico"><use href="#ico-type-zscore"></use></svg> Z-score — Hulp',
+    body:
+      _hSection('Waarvoor dient het?',
+        '<p>De student vergelijkt een <b>gemeten waarde</b> met een <b>referentiewaarde</b> door de <b>metrologische compatibiliteitsscore</b> te berekenen: <code>z = |x_gemeten - x_referentie| / u_c</code>, en concludeert vervolgens of het resultaat compatibel is met de referentie (z onder een instelbare drempel) of niet.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Grootheid / Symbool / Eenheid</b>: beschrijven de meting — worden gebruikt om automatisch de opgave en de feedback te genereren.',
+        '<b>Gegeven waarden</b>: x_gemeten, x_referentie en u_c worden rechtstreeks door de docent ingevoerd (vaste waarden, geen willekeurige generatie) en automatisch in de opgave getoond.',
+        '<b>Compatibiliteitsdrempel</b>: vergelijkingswaarde voor de conclusie (compatibel als z &lt; drempel) — standaard 2, maar volledig instelbaar.',
+        '<b>Beoordeelde stappen</b>: vink "Berekening van de z-score" en/of "Conclusie over compatibiliteit" aan — elke stap genereert een eigen, apart beoordeeld antwoordveld.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Deze module is een zelfstandig vraagtype, los van het type "Meetonzekerheid": het hergebruikt geen elders ingevoerde gegevens.',
+        'De compatibiliteitsconclusie is een keuzelijst (Compatibel / Incompatibel), geen numeriek veld.',
+        'In deze versie is geen willekeurige generatie beschikbaar (alleen MVP met vaste waarden).'
+      ])) + _HELP_COMMON
   }
 };
 

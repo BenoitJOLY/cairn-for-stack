@@ -616,6 +616,45 @@ const HELP_CONTENT = {
       ])) +
       _hSection('Principe pédagogique',
         '<p>En RVB : un filtre rouge laisse passer uniquement la composante rouge — un objet vert apparaîtra sombre à travers un filtre rouge. En CMJ : un filtre cyan absorbe le rouge, laissant passer vert et bleu.</p>') + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── INCERTITUDE DE MESURE
+  incertitude: {
+    title: '<svg class="hs-ico"><use href="#ico-type-incertitude"></use></svg> Incertitude de mesure — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>L\'élève traite une série de <b>mesures expérimentales</b> et calcule l\'<b>incertitude de mesure</b> (méthode GUM) : incertitude de type A (statistique, à partir des mesures), incertitude de type B (instrumentale), incertitude composée, incertitude élargie, et l\'écriture finale du résultat <code>X = x̄ ± U</code>. Chaque étape cochée est notée indépendamment.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Grandeur / Symbole / Unité</b> : décrivent la mesure (ex. Longueur, L, cm) — utilisés pour générer automatiquement les feedbacks.',
+        '<b>Type A</b> : soit une <i>liste de mesures</i> saisie manuellement, soit une génération <i>aléatoire</i> calibrée sur une moyenne et un écart-type ciblés.',
+        '<b>Type B</b> : choisissez la source de l\'erreur instrumentale — <i>résolution</i> (u_B = q/√12), <i>tolérance constructeur</i> (u_B = Δ/√3), <i>certificat d\'étalonnage</i> (u_B = U_cert/k_cert), ou une <i>valeur imposée</i> directement.',
+        '<b>Présentation du résultat</b> : nombre de chiffres significatifs de U (1 ou 2), arrondi par excès optionnel, facteur d\'élargissement k (1 ou 2).',
+        '<b>Étapes évaluées</b> : cochez les étapes que l\'élève doit calculer (moyenne, écart-type, uA, uB, uc, U, écriture finale) — chacune génère son propre champ de réponse noté séparément.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Le mode aléatoire Type A utilise un bruit uniforme calibré (et non une vraie loi normale) pour cibler exactement l\'écart-type demandé.',
+        'L\'étape « Écriture finale » attend le format <code>X = x̄ ± U</code> (unité comprise) — la correction tolère espaces, notation <code>+/-</code> et zéros finaux.',
+        'Le facteur de Student (n petit, niveau de confiance) n\'est pas encore disponible dans ce module — prévu dans une itération ultérieure.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── Z-SCORE (COMPATIBILITÉ MÉTROLOGIQUE)
+  zscore: {
+    title: '<svg class="hs-ico"><use href="#ico-type-zscore"></use></svg> Z-score — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>L\'élève compare une <b>valeur mesurée</b> à une <b>valeur de référence</b> en calculant le <b>score de compatibilité métrologique</b> : <code>z = |x_mesuré - x_référence| / u_c</code>, puis conclut si le résultat est compatible avec la référence (z inférieur à un seuil configurable) ou non.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Grandeur / Symbole / Unité</b> : décrivent la mesure — utilisés pour générer automatiquement l\'énoncé et les feedbacks.',
+        '<b>Valeurs données</b> : x_mesuré, x_référence et u_c sont saisis directement par le professeur (valeurs fixes, pas de génération aléatoire) et affichés automatiquement dans l\'énoncé.',
+        '<b>Seuil de compatibilité</b> : valeur de comparaison pour la conclusion (compatible si z &lt; seuil) — 2 par défaut, mais entièrement configurable.',
+        '<b>Étapes évaluées</b> : cochez « Calcul du z-score » et/ou « Conclusion de compatibilité » — chacune génère son propre champ de réponse noté séparément.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Ce module est un type autonome, distinct du type « Incertitude de mesure » : il ne réutilise aucune donnée saisie ailleurs.',
+        'La conclusion de compatibilité est une liste déroulante (Compatible / Incompatible), pas un champ numérique.',
+        'Aucune génération aléatoire n\'est disponible dans cette version (MVP en valeurs fixes uniquement).'
+      ])) + _HELP_COMMON
   }
 };
 
