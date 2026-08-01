@@ -54,16 +54,20 @@ html{ font-size: var(--hs-base-font); }
   }
 }
 
-/* Atténuation des zones non concernées (clics TOUJOURS possibles) */
+/* Atténuation des zones non concernées (clics TOUJOURS possibles).
+   Un filter (et non opacity) : opacity fait fondre le texte vers le fond et
+   écrase son contraste (échecs WCAG AA en mode sombre) ; grayscale+brightness
+   dégrade la lecture sans réduire la luminance relative dans les mêmes
+   proportions. */
 body.hs-assist-on .quiz-name-bar,
 body.hs-assist-on .q-list-box,
 body.hs-assist-on .type-grid,
 body.hs-assist-on .form-panel,
 body.hs-assist-on .action-bar{
-  opacity:.4; transition: opacity .25s, box-shadow .25s, outline-color .25s;
+  filter: grayscale(60%) brightness(.75); transition: filter .25s, box-shadow .25s, outline-color .25s;
 }
 body.hs-assist-on .hs-focus{
-  opacity:1 !important;
+  filter:none !important;
   outline:2.5px solid #2563eb; outline-offset:4px;
   border-radius:12px; box-shadow:0 0 0 6px rgba(37,99,235,.12);
 }
@@ -211,8 +215,8 @@ body.hs-assist-on #quiz-name,
 body.hs-assist-on #v4-editor,
 body.hs-assist-on #palette-zone,
 body.hs-assist-on .v4-subbar{
-  opacity:.4; transition: opacity .25s, box-shadow .25s;
+  filter: grayscale(60%) brightness(.75); transition: filter .25s, box-shadow .25s;
 }
-body.hs-assist-on .v4-subbar.hs-focus{ opacity:1 !important; }
-/* Le modal config est toujours full-opacity (il recouvre tout) */
-body.hs-assist-on #q-config-modal .q-config-modal-box{ opacity:1 !important; }
+body.hs-assist-on .v4-subbar.hs-focus{ filter:none !important; }
+/* Le modal config est toujours net (il recouvre tout) */
+body.hs-assist-on #q-config-modal .q-config-modal-box{ filter:none !important; }

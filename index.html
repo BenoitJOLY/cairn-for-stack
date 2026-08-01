@@ -7517,7 +7517,7 @@ fill="currentColor" stroke="none">
       <div class="geo2d-params-wrap">
 
         <!-- Paramètres communs perspective -->
-        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;margin-bottom:6px;">
+        <div class="modal-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;margin-bottom:6px;">
           <label class="geo2d-lbl"><span data-i18n="geo2d.leak_angle_label">Angle fuite (°)</span> <input type="number" id="g3-angle" class="geo2d-inp-n" value="45" min="10" max="80" oninput="_geo3dPreview()"></label>
           <label class="geo2d-lbl"><span data-i18n="geo2d.reduction_label">Réduction (%)</span> <input type="number" id="g3-k" class="geo2d-inp-n" value="50" min="20" max="80" oninput="_geo3dPreview()"></label>
         </div>
@@ -7530,14 +7530,14 @@ fill="currentColor" stroke="none">
           <div class="g2car-section" style="margin-top:6px;">
             <div class="g2car-title" data-i18n="geo2d.rename_vertices">Renommer les sommets</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <input type="text" id="g3pave-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pave-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pave-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pave-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pave-lbl-E" class="geo2d-inp" value="E" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pave-lbl-F" class="geo2d-inp" value="F" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pave-lbl-G" class="geo2d-inp" value="G" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pave-lbl-H" class="geo2d-inp" value="H" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
+              <input type="text" id="g3pave-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet A" data-i18n-aria="geo2d.vertex_aria_a">
+              <input type="text" id="g3pave-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet B" data-i18n-aria="geo2d.vertex_aria_b">
+              <input type="text" id="g3pave-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet C" data-i18n-aria="geo2d.vertex_aria_c">
+              <input type="text" id="g3pave-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet D" data-i18n-aria="geo2d.vertex_aria_d">
+              <input type="text" id="g3pave-lbl-E" class="geo2d-inp" value="E" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet E" data-i18n-aria="geo2d.vertex_aria_e">
+              <input type="text" id="g3pave-lbl-F" class="geo2d-inp" value="F" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet F" data-i18n-aria="geo2d.vertex_aria_f">
+              <input type="text" id="g3pave-lbl-G" class="geo2d-inp" value="G" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet G" data-i18n-aria="geo2d.vertex_aria_g">
+              <input type="text" id="g3pave-lbl-H" class="geo2d-inp" value="H" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet H" data-i18n-aria="geo2d.vertex_aria_h">
             </div>
           </div>
           <div class="g2car-section">
@@ -7561,14 +7561,14 @@ fill="currentColor" stroke="none">
           <div class="g2car-section" style="margin-top:6px;">
             <div class="g2car-title" data-i18n="geo2d.rename_vertices_base">Renommer les sommets (base)</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <input type="text" id="g3pri-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pri-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pri-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pri-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pri-lbl-E" class="geo2d-inp" value="E" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pri-lbl-F" class="geo2d-inp" value="F" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pri-lbl-G" class="geo2d-inp" value="G" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pri-lbl-H" class="geo2d-inp" value="H" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
+              <input type="text" id="g3pri-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet A" data-i18n-aria="geo2d.vertex_aria_a">
+              <input type="text" id="g3pri-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet B" data-i18n-aria="geo2d.vertex_aria_b">
+              <input type="text" id="g3pri-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet C" data-i18n-aria="geo2d.vertex_aria_c">
+              <input type="text" id="g3pri-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet D" data-i18n-aria="geo2d.vertex_aria_d">
+              <input type="text" id="g3pri-lbl-E" class="geo2d-inp" value="E" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet E" data-i18n-aria="geo2d.vertex_aria_e">
+              <input type="text" id="g3pri-lbl-F" class="geo2d-inp" value="F" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet F" data-i18n-aria="geo2d.vertex_aria_f">
+              <input type="text" id="g3pri-lbl-G" class="geo2d-inp" value="G" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet G" data-i18n-aria="geo2d.vertex_aria_g">
+              <input type="text" id="g3pri-lbl-H" class="geo2d-inp" value="H" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet H" data-i18n-aria="geo2d.vertex_aria_h">
             </div>
             <p style="font-size:.68rem;color:#94a3b8;margin:2px 0 0;" data-i18n="geo2d.top_vertices_note">Les sommets du dessus reprennent le même nom + "'"</p>
           </div>
@@ -7591,9 +7591,9 @@ fill="currentColor" stroke="none">
           <div class="g2car-section" style="margin-top:6px;">
             <div class="g2car-title" data-i18n="geo2d.rename_vertices_base">Renommer les sommets (base)</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <input type="text" id="g3ptri-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3ptri-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3ptri-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
+              <input type="text" id="g3ptri-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet A" data-i18n-aria="geo2d.vertex_aria_a">
+              <input type="text" id="g3ptri-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet B" data-i18n-aria="geo2d.vertex_aria_b">
+              <input type="text" id="g3ptri-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet C" data-i18n-aria="geo2d.vertex_aria_c">
             </div>
             <p style="font-size:.68rem;color:#94a3b8;margin:2px 0 0;" data-i18n="geo2d.top_vertices_note">Les sommets du dessus reprennent le même nom + "'"</p>
           </div>
@@ -7616,11 +7616,11 @@ fill="currentColor" stroke="none">
           <div class="g2car-section" style="margin-top:6px;">
             <div class="g2car-title" data-i18n="geo2d.rename_vertices">Renommer les sommets</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <input type="text" id="g3pyrc-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pyrc-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pyrc-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pyrc-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pyrc-lbl-S" class="geo2d-inp" value="S" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
+              <input type="text" id="g3pyrc-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet A" data-i18n-aria="geo2d.vertex_aria_a">
+              <input type="text" id="g3pyrc-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet B" data-i18n-aria="geo2d.vertex_aria_b">
+              <input type="text" id="g3pyrc-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet C" data-i18n-aria="geo2d.vertex_aria_c">
+              <input type="text" id="g3pyrc-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet D" data-i18n-aria="geo2d.vertex_aria_d">
+              <input type="text" id="g3pyrc-lbl-S" class="geo2d-inp" value="S" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet S" data-i18n-aria="geo2d.vertex_aria_s">
             </div>
           </div>
           <div class="g2car-section">
@@ -7642,10 +7642,10 @@ fill="currentColor" stroke="none">
           <div class="g2car-section" style="margin-top:6px;">
             <div class="g2car-title" data-i18n="geo2d.rename_vertices">Renommer les sommets</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <input type="text" id="g3pyrt-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pyrt-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pyrt-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3pyrt-lbl-S" class="geo2d-inp" value="S" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
+              <input type="text" id="g3pyrt-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet A" data-i18n-aria="geo2d.vertex_aria_a">
+              <input type="text" id="g3pyrt-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet B" data-i18n-aria="geo2d.vertex_aria_b">
+              <input type="text" id="g3pyrt-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet C" data-i18n-aria="geo2d.vertex_aria_c">
+              <input type="text" id="g3pyrt-lbl-S" class="geo2d-inp" value="S" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet S" data-i18n-aria="geo2d.vertex_aria_s">
             </div>
           </div>
           <div class="g2car-section">
@@ -7662,7 +7662,7 @@ fill="currentColor" stroke="none">
 
         <!-- Tronc de pyramide -->
         <div id="geo3d-params-tronc" class="geo2d-params" style="display:none">
-          <p style="font-size:.77rem;color:#475569;margin:0 0 4px" data-i18n="geo2d.bottom_face_label">Face du dessous</p>
+          <p class="geo2d-hint" style="margin:0 0 4px" data-i18n="geo2d.bottom_face_label">Face du dessous</p>
           <label class="geo2d-lbl"><span data-i18n="geo2d.length_label">Longueur</span>   <input type="number" id="g3tronc-L"   class="geo2d-inp-n" value="5"  min="0.1" step="0.5" oninput="_geo3dPreview()"></label>
           <label class="geo2d-lbl"><span data-i18n="geo2d.depth_label">Profondeur</span> <input type="number" id="g3tronc-P"   class="geo2d-inp-n" value="5"  min="0.1" step="0.5" oninput="_geo3dPreview()"></label>
           <label class="geo2d-lbl"><span data-i18n="geo2d.top_face_pct_label">Face dessus (%)</span> <input type="number" id="g3tronc-pct" class="geo2d-inp-n" value="50" min="10" max="99" oninput="_geo3dPreview()"></label>
@@ -7670,14 +7670,14 @@ fill="currentColor" stroke="none">
           <div class="g2car-section" style="margin-top:6px;">
             <div class="g2car-title" data-i18n="geo2d.rename_vertices">Renommer les sommets</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <input type="text" id="g3tronc-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3tronc-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3tronc-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3tronc-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3tronc-lbl-E" class="geo2d-inp" value="E" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3tronc-lbl-F" class="geo2d-inp" value="F" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3tronc-lbl-G" class="geo2d-inp" value="G" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3tronc-lbl-H" class="geo2d-inp" value="H" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
+              <input type="text" id="g3tronc-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet A" data-i18n-aria="geo2d.vertex_aria_a">
+              <input type="text" id="g3tronc-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet B" data-i18n-aria="geo2d.vertex_aria_b">
+              <input type="text" id="g3tronc-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet C" data-i18n-aria="geo2d.vertex_aria_c">
+              <input type="text" id="g3tronc-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet D" data-i18n-aria="geo2d.vertex_aria_d">
+              <input type="text" id="g3tronc-lbl-E" class="geo2d-inp" value="E" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet E" data-i18n-aria="geo2d.vertex_aria_e">
+              <input type="text" id="g3tronc-lbl-F" class="geo2d-inp" value="F" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet F" data-i18n-aria="geo2d.vertex_aria_f">
+              <input type="text" id="g3tronc-lbl-G" class="geo2d-inp" value="G" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet G" data-i18n-aria="geo2d.vertex_aria_g">
+              <input type="text" id="g3tronc-lbl-H" class="geo2d-inp" value="H" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet H" data-i18n-aria="geo2d.vertex_aria_h">
             </div>
           </div>
           <div class="g2car-section">
@@ -7720,11 +7720,11 @@ fill="currentColor" stroke="none">
           <div class="g2car-section" style="margin-top:6px;">
             <div class="g2car-title" data-i18n="geo2d.rename_vertices">Renommer les sommets</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <input type="text" id="g3cr-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3cr-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3cr-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3cr-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3cr-lbl-S" class="geo2d-inp" value="S" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
+              <input type="text" id="g3cr-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet A" data-i18n-aria="geo2d.vertex_aria_a">
+              <input type="text" id="g3cr-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet B" data-i18n-aria="geo2d.vertex_aria_b">
+              <input type="text" id="g3cr-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet C" data-i18n-aria="geo2d.vertex_aria_c">
+              <input type="text" id="g3cr-lbl-D" class="geo2d-inp" value="D" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet D" data-i18n-aria="geo2d.vertex_aria_d">
+              <input type="text" id="g3cr-lbl-S" class="geo2d-inp" value="S" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet S" data-i18n-aria="geo2d.vertex_aria_s">
             </div>
           </div>
           <div class="g2car-section">
@@ -7746,10 +7746,10 @@ fill="currentColor" stroke="none">
           <div class="g2car-section" style="margin-top:6px;">
             <div class="g2car-title" data-i18n="geo2d.rename_vertices">Renommer les sommets</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <input type="text" id="g3ct-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3ct-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3ct-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
-              <input type="text" id="g3ct-lbl-S" class="geo2d-inp" value="S" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()">
+              <input type="text" id="g3ct-lbl-A" class="geo2d-inp" value="A" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet A" data-i18n-aria="geo2d.vertex_aria_a">
+              <input type="text" id="g3ct-lbl-B" class="geo2d-inp" value="B" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet B" data-i18n-aria="geo2d.vertex_aria_b">
+              <input type="text" id="g3ct-lbl-C" class="geo2d-inp" value="C" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet C" data-i18n-aria="geo2d.vertex_aria_c">
+              <input type="text" id="g3ct-lbl-S" class="geo2d-inp" value="S" maxlength="3" style="width:26px;text-align:center;padding:1px 2px;" oninput="_geo3dPreview()" aria-label="Sommet S" data-i18n-aria="geo2d.vertex_aria_s">
             </div>
           </div>
           <div class="g2car-section">

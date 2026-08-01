@@ -21,7 +21,7 @@ function _geo3dSelectShape(shape) {
   document.querySelectorAll('.geo3d-shape-btn').forEach(function(b) {
     b.classList.toggle('geo3d-sel', b.dataset.shape === shape);
   });
-  document.querySelectorAll('.geo3d-params').forEach(function(p) {
+  document.querySelectorAll('.geo2d-params').forEach(function(p) {
     p.style.display = p.id === 'geo3d-params-' + shape ? '' : 'none';
   });
   _geo3dPreview();
@@ -453,8 +453,8 @@ function _g3CoinRect() {
     [0,0,0],[L,0,0],[L,0,P],[0,0,P], // A B C D (0-3) base
     [0,H,0]                           // S (4) apex
   ];
-  var sol = [[0,1],[2,3],[0,4],[1,4],[2,4]];
-  var dsh = [[0,3],[1,2],[3,4]]; // AD, BC, SD hidden
+  var sol = [[0,1],[1,2],[0,4],[1,4],[2,4]];
+  var dsh = [[0,3],[2,3],[3,4]]; // AD, CD, SD hidden
   var def = ['A','B','C','D','S'];
   var nm  = def.map(function(l){ return _3S('g3cr-lbl-'+l, l); });
   var off = [[-13,5],[6,5],[6,8],[-13,8],[-14,-10]];
