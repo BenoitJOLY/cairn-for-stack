@@ -856,6 +856,33 @@ html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] 
 html[data-theme="dark"] p{ color:#e2e8f0; }
 html[data-theme="dark"] .hs-opt-box{ background:#1e293b; color:#e2e8f0; }
 
+/* Titres de section avec couleur d'accent en inline style (incertitude/zscore/
+   avancement/cinematique) : la règle générique "html[data-theme=dark] label"
+   ci-dessus ne peut pas battre un style inline sans !important — override
+   explicite par sélecteur pour rester conforme WCAG 2 AA en mode sombre. */
+html[data-theme="dark"] label[data-i18n="inc.typea_title"],
+html[data-theme="dark"] label[data-i18n="inc.typeb_title"],
+html[data-theme="dark"] label[data-i18n="inc.rounding_title"],
+html[data-theme="dark"] label[data-i18n="inc.steps_title"]{ color:#d8b4fe !important; }
+html[data-theme="dark"] label[data-i18n="zs.givens_title"],
+html[data-theme="dark"] label[data-i18n="zs.steps_title"]{ color:#c4b5fd !important; }
+html[data-theme="dark"] label[data-i18n="av.mode_title"],
+html[data-theme="dark"] label[data-i18n="av.species_title"]{ color:#5eead4 !important; }
+html[data-theme="dark"] label[data-i18n="cin.track_title"],
+html[data-theme="dark"] label[data-i18n="cin.freeflight_title"]{ color:#a5b4fc !important; }
+
+/* Atelier cinématique — cartes de segment (js/cinematique-ui.js) */
+.cin-seg-card{ border:1px solid #d1d5db; border-radius:6px; padding:8px 10px; margin-bottom:8px; background:#f9fafb; }
+.cin-seg-title{ font-weight:600; font-size:.85rem; color:#111827; }
+.cin-seg-fieldlabel{ display:flex; flex-direction:column; gap:2px; font-size:.78rem; color:#374151; }
+.cin-seg-actbtn{ padding:2px 7px; font-size:12px; border:1px solid #9ca3af; border-radius:4px; background:#fff; cursor:pointer; color:#111827; }
+.cin-seg-actbtn.cin-seg-del{ color:#dc2626; border-color:#dc2626; }
+html[data-theme="dark"] .cin-seg-card{ background:#172033; border-color:#334155; }
+html[data-theme="dark"] .cin-seg-title{ color:#e2e8f0; }
+html[data-theme="dark"] .cin-seg-fieldlabel{ color:#cbd5e1; }
+html[data-theme="dark"] .cin-seg-actbtn{ background:#1e293b; border-color:#475569; color:#e2e8f0; }
+html[data-theme="dark"] .cin-seg-actbtn.cin-seg-del{ color:#fca5a5; border-color:#fca5a5; }
+
 /* ════════════════════════════════════════════════════════════════
    ICÔNES DES BANDEAUX DE FORMULAIRE
    ════════════════════════════════════════════════════════════════ */
@@ -1058,6 +1085,17 @@ html[data-theme="dark"] .tag-modal-box{ background:#1e293b; }
 html[data-theme="dark"] .tm-btn{ background:#172033; }
 html[data-theme="dark"] .tm-divider{ border-top-color:#334155; }
 html[data-theme="dark"] .tm-autre-input{ background:#0f172a; color:#e2e8f0; border-color:#334155; }
+/* .tm-title utilise var(--navy) (#0f172a, quasi noir) — invisible sur le fond de modale
+   #1e293b en dark mode. .tm-mat/niv/bloom/diff/tool (couleurs saturées -600/-700) tombent
+   sous 4.5:1 sur le fond de bouton assombri #172033 : repli sur les teintes -300 déjà
+   utilisées ailleurs dans ce fichier pour du texte coloré sur fond sombre (ex: .tm-recap-title,
+   .exp-pv-chip) plutôt qu'une nouvelle palette inventée. */
+html[data-theme="dark"] .tm-title{ color:#e2e8f0; }
+html[data-theme="dark"] .tm-mat{ border-color:#93c5fd; color:#93c5fd; }
+html[data-theme="dark"] .tm-niv{ border-color:#86efac; color:#86efac; }
+html[data-theme="dark"] .tm-bloom{ border-color:#c4b5fd; color:#c4b5fd; }
+html[data-theme="dark"] .tm-diff{ border-color:#fdba74; color:#fdba74; }
+html[data-theme="dark"] .tm-tool{ border-color:#cbd5e1; color:#cbd5e1; }
 
 /* ════ Générateur de Prompt IA ════ */
 html[data-theme="dark"] .pb-box{ background:#1e293b; }
@@ -3086,7 +3124,8 @@ html[data-theme="dark"] .hs-preview-panel {
 #q-config-modal:has(#fp-nomenclature[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-incertitude[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-zscore[style*="display: block"]) .q-config-modal-box,
-#q-config-modal:has(#fp-avancement[style*="display: block"]) .q-config-modal-box {
+#q-config-modal:has(#fp-avancement[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-cinematique[style*="display: block"]) .q-config-modal-box {
   width: min(1200px, 96vw);
 }
 @media (max-width: 1000px) {
@@ -3101,7 +3140,7 @@ html[data-theme="dark"] .hs-preview-panel {
   #fp-rvbcmj[style*="display: block"], #fp-imgclick[style*="display: block"], #fp-jxgdrop[style*="display: block"], #fp-ord[style*="display: block"],
   #fp-chemical[style*="display: block"], #fp-chemical_topo[style*="display: block"], #fp-nuclear[style*="display: block"], #fp-composition[style*="display: block"],
   #fp-crossword[style*="display: block"], #fp-doi[style*="display: block"], #fp-image-mesure[style*="display: block"], #fp-apn[style*="display: block"],
-  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"], #fp-avancement[style*="display: block"] { display: block !important; }
+  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"], #fp-avancement[style*="display: block"], #fp-cinematique[style*="display: block"] { display: block !important; }
   .hs-split-row { display: block; }
   .hs-split-left, .hs-preview-panel { max-width: none; }
   .hs-preview-panel { margin-top: 15px; border-top: 1px dashed #ccc; }

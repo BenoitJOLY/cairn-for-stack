@@ -117,7 +117,8 @@ const TYPE_ICON_MAP = {
   'nomenclature':'nomenclature',
   'incertitude':'incertitude',
   'zscore':'zscore',
-  'avancement':'avancement'
+  'avancement':'avancement',
+  'cinematique':'cinematique'
 };
 
 function initEditor() {

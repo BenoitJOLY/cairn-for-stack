@@ -500,6 +500,7 @@ fill="currentColor" stroke="none">
 <symbol id="ico-type-nomenclature" viewBox="0 0 247.038 247.038" fill="currentColor"><path d="M104.564,63.636l-32.09-18.528c-1.289-0.746-2.877-0.734-4.158,0.024L35.801,64.393c-1.956,1.158-2.603,3.685-1.444,5.641c0.768,1.297,2.139,2.019,3.547,2.019c0.714,0,1.435-0.185,2.095-0.575l30.443-18.033l30.005,17.324c1.968,1.134,4.485,0.458,5.625-1.508C107.209,67.291,106.535,64.774,104.564,63.636z"/><path d="M232.587,52.017l-51.789-29.901c0.229-1.162,0.363-2.36,0.363-3.589C181.16,8.311,172.85,0,162.633,0c-10.217,0-18.528,8.311-18.528,18.528c0,10.217,8.311,18.528,18.528,18.528c6.03,0,11.344-2.939,14.73-7.413L226.41,57.96v57.007l-49.367,28.502l-49.368-28.502V55.584c0-1.423-0.766-2.614-1.863-3.354c-0.096-0.067-0.174-0.153-0.276-0.212l-0.27-0.156c-0.048-0.021-0.085-0.057-0.133-0.077L72.051,21.137c-1.275-0.736-2.843-0.736-4.117,0l-53.485,30.88c-1.275,0.736-2.059,2.095-2.059,3.566v61.76c0,1.472,0.784,2.831,2.059,3.566l51.466,29.715v61.417c0,1.472,0.784,2.831,2.059,3.566l53.485,30.88c0.637,0.368,1.347,0.551,2.059,0.551c0.712,0,1.421-0.183,2.059-0.551l49.726-28.71c3.247,2.801,7.419,4.557,12.034,4.557c10.217,0,18.528-8.311,18.528-18.528c0-10.217-8.311-18.528-18.528-18.528c-10.217,0-18.528,8.311-18.528,18.528c0,2.605,0.552,5.079,1.526,7.33l-46.816,27.03l-49.367-28.501v-59.087l49.367-28.503l51.466,29.715c0.637,0.368,1.347,0.551,2.059,0.551c0.711,0,1.421-0.183,2.059-0.551l53.485-30.88c1.275-0.736,2.059-2.095,2.059-3.566v-61.76C234.644,54.112,233.86,52.753,232.587,52.017z M162.633,28.821c-5.675,0-10.293-4.618-10.293-10.293s4.618-10.293,10.293-10.293c5.675,0,10.293,4.618,10.293,10.293S168.308,28.821,162.633,28.821z M187.336,193.513c5.675,0,10.293,4.618,10.293,10.293c0,5.675-4.618,10.293-10.293,10.293c-2.371,0-4.53-0.838-6.272-2.191c-0.02-0.658-0.143-1.316-0.495-1.926c-0.584-1.008-1.533-1.665-2.582-1.926c-0.594-1.299-0.945-2.731-0.945-4.25C177.042,198.131,181.66,193.513,187.336,193.513z M69.993,143.469l-49.368-28.502V57.96l49.367-28.502L119.36,57.96l0.001,57.007L69.993,143.469z"/></symbol>
 <symbol id="ico-type-zscore" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4H20V7.5L9.5 16.5H20V20H4V16.5L14.5 7.5H4V4Z"/></symbol>
 <symbol id="ico-type-avancement" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="4" x2="9" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/></symbol>
+<symbol id="ico-type-cinematique" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="19" r="1.4" fill="currentColor" stroke="none"/><circle cx="10" cy="14" r="1.4" fill="currentColor" stroke="none"/><circle cx="14" cy="9" r="1.4" fill="currentColor" stroke="none"/><path d="M5 19 10 14 14 9"/><path d="M14 9 L20 4 M14 9 L18 11" /></symbol>
 <symbol id="ico-action-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle>
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line></symbol>
 <symbol id="ico-action-cancel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle>
@@ -5801,6 +5802,116 @@ fill="currentColor" stroke="none">
     </div>
   </div>
 
+  <!-- CINÉMATIQUE DU POINT (vecteur vitesse, relation de Chasles) -->
+  <div class="form-panel" id="fp-cinematique" style="display:none">
+    <div class="form-panel-head" style="background:#4f46e5;color:#fff;">
+      <svg class="hs-ico" style="color:#fff;"><use href="#ico-type-cinematique"></use></svg>
+      <span data-i18n="cin.title">Cinématique du point</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="cin-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="cin-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('cin','cfg',this);if(typeof cinRefreshPreview==='function')cinRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('cin','fb-gen',this);if(typeof cinRefreshPreview==='function')cinRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="cin-cfg">
+      <div class="info-box" style="border-color:#4f46e5;background:#eef2ff;color:#312e81;" data-i18n="cin.info_box">
+        Chronophotographie d'un point M en mouvement : l'élève mesure les normes des vecteurs vitesse vᵢ et vᵢ₊₁ (par différences de positions), puis construit Δvᵢ = vᵢ₊₁ − vᵢ par la relation de Chasles (clonage, sélection, inversion, accroche magnétique).
+      </div>
+
+      <!-- Énoncé -->
+      <div class="field">
+        <label><span data-i18n="ineq.text_lbl">Énoncé</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-cin-text" aria-label="Énoncé" onclick="openRich('cin-text')" style="min-height:60px;border-color:#4f46e5;background:#eef2ff;"></div>
+        <textarea id="cin-text" style="display:none"></textarea>
+      </div>
+
+      <!-- Atelier de digitalisation : l'enseignant pointe lui-même M0, M1, M2… -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#4f46e5;" data-i18n="cin.atelier_title">Atelier de digitalisation des points</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="cin.atelier_hint">Pointez chaque position M0, M1, M2… dans l'ordre chronologique, sur fond libre ou sur une image importée. L'image sert uniquement de guide visuel : elle n'est jamais enregistrée ni exportée, seuls les points cliqués et la calibration le sont.</div>
+      </div>
+
+      <div class="field">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <label class="jd-upload-btn">
+            <svg class="hs-ico" aria-hidden="true"><use href="#ico-file-open"></use></svg> <span data-i18n="cin.atelier_upload_btn">Charger une image (guide, non conservée)…</span>
+            <input type="file" id="cin-atelier-img-file" accept="image/*" style="display:none" onchange="cinAtelierLoadImage(this)">
+          </label>
+          <button type="button" id="cin-atelier-remove-img" class="jd-tool jd-tool-del" style="display:none" onclick="cinAtelierRemoveImage()" data-i18n="cin.atelier_remove_img_btn">Retirer l'image</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="jd-toolbar">
+          <button id="cin-atelier-tool-points" class="jd-tool jd-tool-active" onclick="cinSetMode('points')" data-i18n="cin.atelier_tool_points">Points</button>
+          <button id="cin-atelier-tool-calib" class="jd-tool" onclick="cinSetMode('calib')" data-i18n="cin.atelier_tool_calib">Calibration</button>
+          <button id="cin-atelier-tool-select" class="jd-tool" onclick="cinSetMode('select')" data-i18n="jd.tool_select">Sélectionner</button>
+        </div>
+        <div class="jd-canvas-area">
+          <div class="jd-canvas-container">
+            <canvas id="cin-atelier-canvas" width="700" height="460" style="display:block;max-width:100%;cursor:crosshair;" onclick="cinAtelierCanvasClick(event)"></canvas>
+          </div>
+        </div>
+        <p class="hint" id="cin-atelier-hint" style="font-size:.78rem;color:#6b7280;margin-top:4px;"></p>
+      </div>
+
+      <div class="g2">
+        <div class="field"><label data-i18n="cin.calib_dist_lbl" title="Distance réelle, en mètres, entre les 2 repères de calibration posés en mode Calibration.">Distance réelle entre les 2 repères (m)</label><input type="number" id="cin-calib-dist" value="1" step="0.01" min="0.01" onchange="cinAtelierSetCalibDist(this.value)"></div>
+        <div class="field" style="justify-content:center;"><span id="cin-atelier-echelle-info" style="font-size:.78rem;color:#0891b2;font-weight:600;"></span></div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="cin.atelier_point_list_lbl">Points digitalisés</label>
+        <div id="cin-atelier-point-list"></div>
+      </div>
+
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <div class="field"><label data-i18n="cin.dt_lbl" title="Écart de temps entre deux points M consécutifs sur la chronophotographie.">Intervalle entre 2 photos (s)</label><input type="number" id="cin-dt" value="0.15" step="0.01" min="0.01"></div>
+      </div>
+
+      <!-- Méthode de calcul de vi/vi+1 : point d'après (défaut, prog. 2019) ou dérivée symétrique -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#4f46e5;" data-i18n="cin.method_lbl">Méthode de calcul de la vitesse</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="cin.method_hint">« Point d'après » (programme 2019) utilise MᵢMᵢ₊₁/Δt. « Dérivée symétrique » utilise Mᵢ₋₁Mᵢ₊₁/(2Δt) : recommandée pour les mouvements circulaires ou paraboliques, où elle donne une direction tangente correcte.</div>
+        <select id="cin-method">
+          <option value="apres" selected data-i18n="cin.method_apres">Point d'après (MᵢMᵢ₊₁/Δt)</option>
+          <option value="symetrique" data-i18n="cin.method_symetrique">Dérivée symétrique (Mᵢ₋₁Mᵢ₊₁/2Δt)</option>
+        </select>
+      </div>
+
+      <!-- Indice du point de mesure (vi/vi+1), choisi par l'enseignant -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#4f46e5;" data-i18n="cin.iidx_title">Point de mesure des vecteurs vitesse</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="cin.iidx_hint">Indice i du premier point utilisé : l'élève tracera M_iM_{i+1} (pour vᵢ) puis M_{i+1}M_{i+2} (pour vᵢ₊₁) sur le graphique. Un message d'erreur s'affiche dans l'aperçu si i est hors limites pour ce réglage de piste.</div>
+      </div>
+      <div class="field">
+        <label data-i18n="cin.iidx_lbl">Indice i du point de départ</label>
+        <input type="number" id="cin-iidx" value="2" step="1" min="0">
+      </div>
+
+      </div>
+      <div class="mpane" id="cin-fb-gen">
+        <p style="font-size:.85rem;color:#6b7280;" data-i18n="cin.fbgen_auto_desc">La correction (norme vᵢ et construction Δvᵢ) est générée automatiquement. Ce champ permet d'ajouter un commentaire pédagogique complémentaire.</p>
+        <div class="field">
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-cin-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('cin-fbgen')"></div>
+          <textarea id="cin-fbgen" style="display:none"></textarea>
+        </div>
+        <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
+      </div>
+
+    </div>
+    </div>
+  <div class="field hs-preview-panel" id="cin-preview-panel">
+    <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div id="cin-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+  </div>
+    </div>
+  </div>
+
   <!-- ══════════════════════════════════════════════════ -->
   <!-- QUESTION EXPERT (STACK complet)                  -->
   <!-- ══════════════════════════════════════════════════ -->
@@ -8580,6 +8691,9 @@ fill="currentColor" stroke="none">
 <script src="js/gen-zscore-calc.js"></script>
 <script src="js/gen-zscore.js"></script>
 <script src="js/gen-avancement.js"></script>
+<script src="js/gen-cinematique-physics.js"></script>
+<script src="js/gen-cinematique-jsx.js"></script>
+<script src="js/gen-cinematique.js"></script>
 
 <!-- V4 nouveaux modules -->
 <script src="js/editor.js"></script>
@@ -8632,6 +8746,7 @@ fill="currentColor" stroke="none">
 <script src="js/config-panel-vf.js"></script>
 <script src="js/config-panel-zscore.js"></script>
 <script src="js/config-panel-avancement.js"></script>
+<script src="js/config-panel-cinematique.js"></script>
 <script src="js/xml-lint.js"></script>
 <script src="js/app.js"></script>
 
@@ -8663,6 +8778,7 @@ fill="currentColor" stroke="none">
 <script src="js/incertitude-ui.js"></script>
 <script src="js/zscore-ui.js"></script>
 <script src="js/avancement-ui.js"></script>
+<script src="js/cinematique-ui.js"></script>
 <script src="js/verif.js"></script>
 <script src="js/maxima-client.js"></script>
 <script src="js/doi.js"></script>
@@ -8806,6 +8922,7 @@ fill="currentColor" stroke="none">
 <script src="js/preview-vf.js"></script>
 <script src="js/preview-zscore.js"></script>
 <script src="js/preview-avancement.js"></script>
+<script src="js/preview-cinematique.js"></script>
 </body>
 </html>
 

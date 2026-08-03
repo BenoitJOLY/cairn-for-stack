@@ -3939,5 +3939,28 @@ I18N.add("fr", {
   "av.err_all_solvant": "Au moins une espèce non-solvant doit figurer dans le tableau.",
   "av.err_bad_source": "Q{x} n'est pas une question de type « {type} » déjà enregistrée dans ce quiz.",
   "av.err_nom_manquant": "Espèce n°{n} : le nom (formule LaTeX) est obligatoire.",
-  "av.err_coeff_invalide": "Espèce n°{n} : le coefficient stœchiométrique doit être > 0."
+  "av.err_coeff_invalide": "Espèce n°{n} : le coefficient stœchiométrique doit être > 0.",
+
+  /* ── Cinématique du point (vecteur vitesse, relation de Chasles) ── */
+  "type.cinematique":        "Cinématique du point (vecteur vitesse, relation de Chasles)",
+  "data.label.cinematique":  "🏃 Cinématique du point",
+  "cin.title": "Cinématique du point",
+  "cin.info_box": "Chronophotographie d'un point M en mouvement : l'élève trace lui-même les vecteurs déplacement M_iM_{i+1} et M_{i+1}M_{i+2} sur le graphique, en déduit les normes des vecteurs vitesse vᵢ et vᵢ₊₁, puis construit Δvᵢ = vᵢ₊₁ − vᵢ par la relation de Chasles (clonage, sélection, inversion, accroche magnétique).",
+  "cin.atelier_title": "Atelier de digitalisation des points",
+  "cin.atelier_hint": "Pointez chaque position M0, M1, M2… dans l'ordre chronologique, sur fond libre ou sur une image importée. L'image sert uniquement de guide visuel : elle n'est jamais enregistrée ni exportée, seuls les points cliqués et la calibration le sont.",
+  "cin.atelier_upload_btn": "Charger une image (guide, non conservée)…",
+  "cin.atelier_remove_img_btn": "Retirer l'image",
+  "cin.atelier_tool_points": "Points",
+  "cin.atelier_tool_calib": "Calibration",
+  "cin.calib_dist_lbl": "Distance réelle entre les 2 repères (m)",
+  "cin.atelier_point_list_lbl": "Points digitalisés",
+  "cin.dt_lbl": "Intervalle entre 2 photos (s)",
+  "cin.method_lbl": "Méthode de calcul de la vitesse",
+  "cin.method_hint": "« Point d'après » (programme 2019) utilise MᵢMᵢ₊₁/Δt. « Dérivée symétrique » utilise Mᵢ₋₁Mᵢ₊₁/(2Δt) : recommandée pour les mouvements circulaires ou paraboliques, où elle donne une direction tangente correcte.",
+  "cin.method_apres": "Point d'après (MᵢMᵢ₊₁/Δt)",
+  "cin.method_symetrique": "Dérivée symétrique (Mᵢ₋₁Mᵢ₊₁/2Δt)",
+  "cin.iidx_title": "Point de mesure des vecteurs vitesse",
+  "cin.iidx_hint": "Indice i du premier point utilisé : l'élève tracera M_iM_{i+1} (pour vᵢ) puis M_{i+1}M_{i+2} (pour vᵢ₊₁) sur le graphique. Un message d'erreur s'affiche dans l'aperçu si i est hors limites pour le nombre de points digitalisés.",
+  "cin.iidx_lbl": "Indice i du point de départ",
+  "cin.fbgen_auto_desc": "La correction (norme vᵢ et construction Δvᵢ) est générée automatiquement. Ce champ permet d'ajouter un commentaire pédagogique complémentaire."
 }, { name: "Français", dir: "ltr" });

@@ -103,7 +103,8 @@ async function _generateAndStoreQuestion(qid, type) {
     'nomenclature': W.genNomenclature,
     'incertitude': W.genIncertitude,
     'zscore': W.genZscore,
-    'avancement': W.genAvancement
+    'avancement': W.genAvancement,
+    'cinematique': W.genCinematique
   };
 
   var gen = genMap[type];
