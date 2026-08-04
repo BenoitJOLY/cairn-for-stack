@@ -413,9 +413,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 #tm-group-sous .tm-btn.active{background:#7c3aed;border-color:#7c3aed;color:#fff;}
 #tm-group-chap .tm-btn{border-color:#6ee7b7;color:#065f46;background:#ecfdf5;}
 #tm-group-chap .tm-btn:hover{background:#d1fae5;border-color:#10b981;}
-#tm-group-chap .tm-btn.active{background:#059669;border-color:#059669;color:#fff;}
+#tm-group-chap .tm-btn.active{background:#047857;border-color:#047857;color:#fff;}
 #tm-group-mat .tm-btn.active{background:var(--navy2);border-color:var(--navy2);color:#fff;}
-#tm-group-niv .tm-btn.active{background:#0284c7;border-color:#0284c7;color:#fff;}
+#tm-group-niv .tm-btn.active{background:#0369a1;border-color:#0369a1;color:#fff;}
 .tm-btn.active{color:white;}
 .tm-mat{border-color:#2563eb;color:#2563eb;}.tm-mat.active{background:#2563eb;}
 .tm-niv{border-color:#059669;color:#059669;}.tm-niv.active{background:#059669;}
@@ -1089,13 +1089,16 @@ html[data-theme="dark"] .tm-autre-input{ background:#0f172a; color:#e2e8f0; bord
    #1e293b en dark mode. .tm-mat/niv/bloom/diff/tool (couleurs saturées -600/-700) tombent
    sous 4.5:1 sur le fond de bouton assombri #172033 : repli sur les teintes -300 déjà
    utilisées ailleurs dans ce fichier pour du texte coloré sur fond sombre (ex: .tm-recap-title,
-   .exp-pv-chip) plutôt qu'une nouvelle palette inventée. */
+   .exp-pv-chip) plutôt qu'une nouvelle palette inventée. :not(.active) sur bloom/diff/tool car
+   sans lui ce override (plus spécifique : attribut+classe) écrasait le color:#fff de
+   .tm-btn.active, rendant les boutons sélectionnés visuellement indiscernables des non-sélectionnés
+   en dark mode (texte clair sur fond plein de même teinte). */
 html[data-theme="dark"] .tm-title{ color:#e2e8f0; }
 html[data-theme="dark"] .tm-mat{ border-color:#93c5fd; color:#93c5fd; }
 html[data-theme="dark"] .tm-niv{ border-color:#86efac; color:#86efac; }
-html[data-theme="dark"] .tm-bloom{ border-color:#c4b5fd; color:#c4b5fd; }
-html[data-theme="dark"] .tm-diff{ border-color:#fdba74; color:#fdba74; }
-html[data-theme="dark"] .tm-tool{ border-color:#cbd5e1; color:#cbd5e1; }
+html[data-theme="dark"] .tm-bloom:not(.active){ border-color:#c4b5fd; color:#c4b5fd; }
+html[data-theme="dark"] .tm-diff:not(.active){ border-color:#fdba74; color:#fdba74; }
+html[data-theme="dark"] .tm-tool:not(.active){ border-color:#cbd5e1; color:#cbd5e1; }
 
 /* ════ Générateur de Prompt IA ════ */
 html[data-theme="dark"] .pb-box{ background:#1e293b; }
