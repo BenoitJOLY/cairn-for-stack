@@ -140,6 +140,7 @@ I18N.add("es", {
   /* ── Pied de page ── */
   "footer.privacy":    "🔒 Uso local: no se recopilan datos · Versión alojada: ver avisos legales",
   "footer.docs":       "Documentación",
+  "footer.code_source": "Código fuente",
   "footer.legal":      "Aviso legal y derechos de uso",
   "footer.contact":    "Contacto y asistencia técnica"
 ,
@@ -3560,7 +3561,7 @@ I18N.add("es", {
   "copy.intro":                      "<strong>Stackforge</strong> es una herramienta de código abierto diseñada para facilitar la creación de preguntas STACK para la plataforma Moodle.",
   "copy.auteur":                     "<strong>Autor:</strong> Benoit Joly — 2026",
   "copy.licence_titre":              "📄 Licencia de uso",
-  "copy.licence_body":               "Distribuido bajo licencia <strong>GNU AGPLv3</strong>. Uso, modificación y redistribución libres, incluso con fines comerciales.<br>Si ejecuta una versión modificada en un servidor accesible a usuarios, la AGPL le obliga a proporcionarles el código fuente correspondiente.<br>Texto completo: archivo <code>LICENSE.md</code> del repositorio.",
+  "copy.licence_body":               "Distribuido bajo licencia <strong>GNU AGPLv3</strong>. Uso, modificación y redistribución libres, incluso con fines comerciales.<br>Si ejecuta una versión modificada en un servidor accesible a usuarios, la AGPL le obliga a proporcionarles el código fuente correspondiente.<br>Código fuente y texto completo de la licencia: <a href=\"https://github.com/BenoitJOLY/stackforge\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/stackforge</a>.",
   "copy.rgpd_titre":                 "🔒 RGPD & Datos personales",
   "copy.rgpd_body":                  "Usada <strong>localmente en su navegador</strong>, esta herramienta no envía ningún dato a un servidor.<br>En la <strong>versión alojada</strong> (acceso mediante cuenta), se trata: su nombre de usuario y un hash no reversible de su contraseña, una cookie de sesión estrictamente necesaria para el inicio de sesión (sin cookies de seguimiento ni publicitarias), y las marcas de tiempo de sus generaciones para aplicar la cuota semanal.<br><strong>Finalidad:</strong> gestionar el acceso al servicio y prevenir abusos. <strong>Duración de conservación:</strong> mientras exista la cuenta.<br><strong>Responsable del tratamiento:</strong> Benoit Joly — <a href=\"mailto:b_joly@orange.fr\">b_joly@orange.fr</a>.<br><strong>Sus derechos</strong> (acceso, rectificación, supresión): por correo electrónico, o directamente abajo si ha iniciado sesión. También puede presentar una reclamación ante la <a href=\"https://www.cnil.fr\" target=\"_blank\" rel=\"noopener\">CNIL</a> (autoridad francesa de protección de datos).",
   "copy.compte_titre":               "👤 Sus derechos sobre su cuenta",

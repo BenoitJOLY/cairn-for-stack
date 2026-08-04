@@ -13,9 +13,11 @@ Ce fichier est la référence unique et persistante du projet. Toute session de 
 3. **Un type à la fois.** On ne commence pas le type suivant tant que le précédent n'est pas `✅ validé` ou explicitement mis de côté par l'utilisateur.
 4. **Pas de gros commit fourre-tout.** Un commit = un type, ou une action isolée (ex: split d'un fichier sans changement de comportement).
 
-## ⚠️ Changement de plateforme Moodle — toutes les validations antérieures sont à reconfirmer
+## ⚠️ Changement de plateforme Moodle — statut au 2026-08-04
 
-La plateforme Moodle utilisée pour les tests a changé : **Moodle 4.5.12, plugin qtype_stack 4.11.1**. Tous les statuts `✅ validé` présents dans ce document (aussi bien dans "Problèmes connus" que dans le tableau "État par type") reflètent une validation faite **sur l'ancienne plateforme**, avant ce changement. **Aucun type ne doit être considéré comme fonctionnel tant qu'il n'a pas été retesté et reconfirmé sur la nouvelle plateforme** — même ceux marqués `✅ validé` ci-dessous. Ne pas réinterpréter un `✅ validé` existant comme une garantie de fonctionnement actuel : c'est un historique de ce qui marchait avant le changement, pas un état présent.
+La plateforme Moodle utilisée pour les tests a changé : **Moodle 4.5.12, plugin qtype_stack 4.11.1**. Tous les statuts `✅ validé` présents dans ce document reflétaient à l'origine une validation faite **sur l'ancienne plateforme**, avant ce changement.
+
+**Mise à jour (2026-08-04)** : l'utilisateur confirme "tout fonctionne sur Moodle à l'heure actuelle" — ce doute général sur la nouvelle plateforme est donc levé pour les types du tableau "État par type" marqués `✅`. **Exception explicite** : les types construits depuis le 2026-08-01 (Nomenclature chimique, Incertitude/GUM, Z-score, Tableau d'avancement, PRT feedback refonte centrale, Statistiques mode valeurs fixes, Cinématique — méthode dérivée symétrique) restent chacun `NOT yet validated live` tant qu'un retour explicite par type n'a pas été donné (règle #3 : un type à la fois, `✅` seulement après confirmation nommée) — la confirmation générale ne les couvre pas automatiquement. Physique/Thermo et Expert restent également explicitement "à revoir" (voir tableau "État par type").
 
 ## Chantier de consolidation structurelle (ouvert 2026-07-17)
 
@@ -817,6 +819,23 @@ Ordre des lignes aligné sur l'ordre d'affichage des chips de la palette (`js/pa
 Idées exprimées par l'utilisateur, non commencées, pas encore de XML de référence collecté :
 
 - **Polarimétrie** — dosage/mesure par polarimétrie (pouvoir rotatoire, loi de Biot, concentration).
+
+## Backlog — avant publication (liste établie 2026-08-04)
+
+Demandé par l'utilisateur ("dans les choses qui restent à faire") + points relevés en réponse à "vois-tu autre chose avant de publier mon programme ?" :
+
+1. **Génération IA → copie directe dans l'Énoncé.** Le texte produit par le prompt de génération IA doit pouvoir être lié/copié directement dans le champ Énoncé plutôt que nécessiter une étape manuelle intermédiaire. Non commencé.
+2. **Gestion des tableaux dans l'éditeur riche** : impossible actuellement de supprimer ou modifier un tableau une fois inséré. Non commencé.
+3. **Mention légale à élargir** pour tenir sur une seule page (actuellement trop longue/scrollée). Non commencé.
+4. **Ajout de titres H2/H3/H4 dans l'éditeur de texte riche** (actuellement absents des options de formatage). Non commencé.
+5. **Finir les parties non traduites** — recoupe [[project_i18n_ui_sweep]] (`i18n-walk/content.js` de/es/nl, fichiers de nettoyage mineurs restants).
+6. **Revoir Incertitude et Physique générale** (Physique/Thermo, `js/gen-math-*.js`) — les deux sont déjà marqués "à revoir"/non validés dans le tableau "État par type" ci-dessus ; confirmation explicite de l'utilisateur nécessaire avant `✅`.
+7. **Marqueurs invisibles anti-copie** dans le code : pas un dispositif anti-copie au sens strict (l'AGPLv3 autorise déjà la copie/modification/redistribution) mais une **preuve d'origine mobilisable si le programme est repris sans citation de l'auteur** — utile en cas de non-respect des obligations d'attribution/de mention de licence de l'AGPL (clarifié par l'utilisateur le 2026-08-04, précédente lecture "contradiction avec l'AGPL" écartée). Non commencé. Voir aussi [[project_monetization_fonctionnaire]] pour le contexte légal fonctionnaire/monétisation, à trancher avant toute publication élargie.
+8. **En-têtes de licence dans les fichiers sources + lien "code source" clair dans l'app** (relevé lors de la revue pré-publication, en lien direct avec le point 7 : ces textes sont ce qui permet de prouver/faire valoir l'attribution). **Décision prise (2026-08-04)** : `BJ44-phy/H-stack` abandonné au profit de `BenoitJOLY/stackforge` comme dépôt public officiel — corrigé dans `index.html` (nouveau lien "Code source" en pied de page + lien cliquable direct dans la modale "Mentions légales", en plus du lien "Documentation" déjà présent) et dans les 5 `lang/*.js` (clé `footer.code_source` + `copy.licence_body` reformulé avec lien), ainsi que dans `ROADMAP_INSTITUTIONNALISATION.md`. **Reste à faire** : ajouter les en-têtes de copyright/licence recommandés par la FSF en tête des fichiers sources — aucun fichier `.js`/`.html` n'en porte actuellement.
+
+**Autres points relevés lors de la revue (non demandés explicitement, signalés par prudence)** :
+- Deux "Problèmes connus" listés plus haut sont explicitement encore ouverts/non corrigés : **#4** (divergence Config ↔ Arbre PRT — une retouche manuelle de l'arbre PRT est silencieusement écrasée si l'enseignant ré-enregistre ensuite la Config) et **#6** (fallback heuristique codé en dur pour le type `complexe` dans `buildXML`, qui peut réécrire silencieusement PRT/inputs/feedback produits par `gen-math-complexe.js`).
+- `auditdevtool.txt` et `moodle-qbank_gitsync-1.2.0-beta.zip` traînent toujours non suivis à la racine du dépôt (scratch de sessions précédentes) — à supprimer avant publication.
 
 ## Prochaine action (à faire avant tout le reste)
 

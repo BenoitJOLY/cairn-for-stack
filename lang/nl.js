@@ -140,6 +140,7 @@ I18N.add("nl", {
   /* ── Pied de page ── */
   "footer.privacy":    "🔒 Lokaal gebruik: geen gegevens verzameld · Gehoste versie: zie juridische vermeldingen",
   "footer.docs":       "Documentatie",
+  "footer.code_source": "Broncode",
   "footer.legal":      "Juridische mededelingen en gebruiksrechten",
   "footer.contact":    "Contact en ondersteuning"
 ,
@@ -3560,7 +3561,7 @@ I18N.add("nl", {
   "copy.intro":                      "<strong>Stackforge</strong> is een opensource-tool die het maken van STACK-vragen voor het Moodle-platform vergemakkelijkt.",
   "copy.auteur":                     "<strong>Auteur:</strong> Benoit Joly — 2026",
   "copy.licence_titre":              "📄 Gebruikslicentie",
-  "copy.licence_body":               "Uitgebracht onder de <strong>GNU AGPLv3</strong>-licentie. Vrij gebruik, wijziging en herverspreiding, ook voor commerciële doeleinden.<br>Als u een gewijzigde versie op een voor gebruikers toegankelijke server draait, verplicht de AGPL u om hen de bijbehorende broncode te verstrekken.<br>Volledige tekst: bestand <code>LICENSE.md</code> in de repository.",
+  "copy.licence_body":               "Uitgebracht onder de <strong>GNU AGPLv3</strong>-licentie. Vrij gebruik, wijziging en herverspreiding, ook voor commerciële doeleinden.<br>Als u een gewijzigde versie op een voor gebruikers toegankelijke server draait, verplicht de AGPL u om hen de bijbehorende broncode te verstrekken.<br>Broncode en volledige licentietekst: <a href=\"https://github.com/BenoitJOLY/stackforge\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/stackforge</a>.",
   "copy.rgpd_titre":                 "🔒 AVG & Persoonsgegevens",
   "copy.rgpd_body":                  "Bij <strong>lokaal gebruik in uw browser</strong> stuurt deze tool geen gegevens naar een server.<br>Bij de <strong>gehoste versie</strong> (toegang via account) worden verwerkt: uw gebruikersnaam en een niet-omkeerbare hash van uw wachtwoord, een sessiecookie die strikt noodzakelijk is voor het inloggen (geen tracking- of advertentiecookies), en tijdstempels van uw generaties om het wekelijkse quotum toe te passen.<br><strong>Doel:</strong> toegang tot de dienst beheren en misbruik voorkomen. <strong>Bewaartermijn:</strong> zolang het account bestaat.<br><strong>Verwerkingsverantwoordelijke:</strong> Benoit Joly — <a href=\"mailto:b_joly@orange.fr\">b_joly@orange.fr</a>.<br><strong>Uw rechten</strong> (inzage, rectificatie, verwijdering): per e-mail, of hieronder rechtstreeks als u bent ingelogd. U kunt ook een klacht indienen bij de <a href=\"https://www.cnil.fr\" target=\"_blank\" rel=\"noopener\">CNIL</a> (Franse toezichthouder gegevensbescherming).",
   "copy.compte_titre":               "👤 Uw rechten met betrekking tot uw account",

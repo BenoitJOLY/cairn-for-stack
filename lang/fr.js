@@ -140,6 +140,7 @@ I18N.add("fr", {
   /* ── Pied de page ── */
   "footer.privacy":    "🔒 Usage local : aucune donnée collectée · Version hébergée : voir mentions légales",
   "footer.docs":       "Documentation",
+  "footer.code_source": "Code source",
   "footer.legal":      "Mentions légales & Droits d'utilisation",
   "footer.contact":    "Contact & Support"
 ,
@@ -3561,7 +3562,7 @@ I18N.add("fr", {
   "copy.intro":                      "<strong>Stackforge</strong> est un outil open-source conçu pour faciliter la création de questions STACK pour la plateforme Moodle.",
   "copy.auteur":                     "<strong>Auteur :</strong> Benoit Joly — 2026",
   "copy.licence_titre":              "📄 Licence d'utilisation",
-  "copy.licence_body":               "Distribué sous licence <strong>GNU AGPLv3</strong>. Utilisation, modification et redistribution libres, y compris à titre commercial.<br>Si vous exploitez une version modifiée sur un serveur accessible à des utilisateurs, l'AGPL vous oblige à leur fournir le code source correspondant.<br>Texte complet : fichier <code>LICENSE.md</code> du dépôt.",
+  "copy.licence_body":               "Distribué sous licence <strong>GNU AGPLv3</strong>. Utilisation, modification et redistribution libres, y compris à titre commercial.<br>Si vous exploitez une version modifiée sur un serveur accessible à des utilisateurs, l'AGPL vous oblige à leur fournir le code source correspondant.<br>Code source et texte complet de la licence : <a href=\"https://github.com/BenoitJOLY/stackforge\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/stackforge</a>.",
   "copy.rgpd_titre":                 "🔒 RGPD & Données personnelles",
   "copy.rgpd_body":                  "Utilisé <strong>en local dans votre navigateur</strong>, cet outil n'envoie aucune donnée à un serveur.<br>Sur la <strong>version hébergée</strong> (accès par compte), sont traités : votre identifiant et un hachage non réversible de votre mot de passe, un cookie de session strictement nécessaire à la connexion (aucun cookie de suivi ni publicitaire), et l'horodatage de vos générations pour appliquer le quota hebdomadaire.<br><strong>Finalité :</strong> gérer l'accès au service et prévenir les abus. <strong>Durée de conservation :</strong> tant que le compte existe.<br><strong>Responsable de traitement :</strong> Benoit Joly — <a href=\"mailto:b_joly@orange.fr\">b_joly@orange.fr</a>.<br><strong>Vos droits</strong> (accès, rectification, effacement) : par e-mail, ou directement ci-dessous si vous êtes connecté·e. Vous pouvez aussi déposer une réclamation auprès de la <a href=\"https://www.cnil.fr\" target=\"_blank\" rel=\"noopener\">CNIL</a>.",
   "copy.compte_titre":               "👤 Vos droits sur votre compte",

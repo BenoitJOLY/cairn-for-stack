@@ -138,6 +138,7 @@ I18N.add("en", {
   /* ── Footer ── */
   "footer.privacy":    "🔒 Local use: no data collected · Hosted version: see legal notices",
   "footer.docs":       "Documentation",
+  "footer.code_source": "Source code",
   "footer.legal":      "Legal notice & Usage rights",
   "footer.contact":    "Contact & Support"
 ,
@@ -3557,7 +3558,7 @@ I18N.add("en", {
   "copy.intro":                      "<strong>Stackforge</strong> is an open-source tool designed to make it easier to create STACK questions for the Moodle platform.",
   "copy.auteur":                     "<strong>Author:</strong> Benoit Joly — 2026",
   "copy.licence_titre":              "📄 License terms",
-  "copy.licence_body":               "Distributed under the <strong>GNU AGPLv3</strong> license. Free use, modification and redistribution, including for commercial purposes.<br>If you run a modified version on a server accessible to users, the AGPL requires you to provide them with the corresponding source code.<br>Full text: <code>LICENSE.md</code> file in the repository.",
+  "copy.licence_body":               "Distributed under the <strong>GNU AGPLv3</strong> license. Free use, modification and redistribution, including for commercial purposes.<br>If you run a modified version on a server accessible to users, the AGPL requires you to provide them with the corresponding source code.<br>Source code and full license text: <a href=\"https://github.com/BenoitJOLY/stackforge\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/stackforge</a>.",
   "copy.rgpd_titre":                 "🔒 GDPR & personal data",
   "copy.rgpd_body":                  "Used <strong>locally in your browser</strong>, this tool sends no data to any server.<br>On the <strong>hosted version</strong> (account-based access), the following is processed: your username and a non-reversible hash of your password, a session cookie strictly necessary for login (no tracking or advertising cookies), and timestamps of your generations to enforce the weekly quota.<br><strong>Purpose:</strong> managing service access and preventing abuse. <strong>Retention period:</strong> for as long as the account exists.<br><strong>Data controller:</strong> Benoit Joly — <a href=\"mailto:b_joly@orange.fr\">b_joly@orange.fr</a>.<br><strong>Your rights</strong> (access, rectification, erasure): by e-mail, or directly below if you are logged in. You may also lodge a complaint with the <a href=\"https://www.cnil.fr\" target=\"_blank\" rel=\"noopener\">CNIL</a> (French data protection authority).",
   "copy.compte_titre":               "👤 Your account rights",

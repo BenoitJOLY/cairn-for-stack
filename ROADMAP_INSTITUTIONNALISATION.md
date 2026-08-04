@@ -157,7 +157,7 @@ Issues identifiées lors du développement V4 :
 | Projet | StackForge V4 |
 | Répertoire local | `c:\Users\phy_j\Downloads\stackforgeV4` |
 | Contact développeur | b_joly@orange.fr |
-| Dépôt GitHub | https://github.com/BJ44-phy/H-stack.git |
+| Dépôt GitHub | https://github.com/BenoitJOLY/stackforge |
 | Documentation STACK | https://docs.stack-assessment.org |
 
 ---

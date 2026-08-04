@@ -140,6 +140,7 @@ I18N.add("de", {
   /* ── Pied de page ── */
   "footer.privacy":    "🔒 Lokale Nutzung: keine Datenerfassung · Gehostete Version: siehe Rechtliche Hinweise",
   "footer.docs":       "Dokumentation",
+  "footer.code_source": "Quellcode",
   "footer.legal":      "Rechtliche Hinweise & Nutzungsrechte",
   "footer.contact":    "Kontakt & Support"
 ,
@@ -3560,7 +3561,7 @@ I18N.add("de", {
   "copy.intro":                      "<strong>Stackforge</strong> ist ein Open-Source-Tool, das die Erstellung von STACK-Fragen für die Moodle-Plattform erleichtert.",
   "copy.auteur":                     "<strong>Autor:</strong> Benoit Joly — 2026",
   "copy.licence_titre":              "📄 Nutzungslizenz",
-  "copy.licence_body":               "Veröffentlicht unter der Lizenz <strong>GNU AGPLv3</strong>. Freie Nutzung, Änderung und Weiterverbreitung, auch für kommerzielle Zwecke.<br>Wenn Sie eine geänderte Version auf einem für Nutzer zugänglichen Server betreiben, verpflichtet Sie die AGPL, ihnen den entsprechenden Quellcode zur Verfügung zu stellen.<br>Vollständiger Text: Datei <code>LICENSE.md</code> im Repository.",
+  "copy.licence_body":               "Veröffentlicht unter der Lizenz <strong>GNU AGPLv3</strong>. Freie Nutzung, Änderung und Weiterverbreitung, auch für kommerzielle Zwecke.<br>Wenn Sie eine geänderte Version auf einem für Nutzer zugänglichen Server betreiben, verpflichtet Sie die AGPL, ihnen den entsprechenden Quellcode zur Verfügung zu stellen.<br>Quellcode und vollständiger Lizenztext: <a href=\"https://github.com/BenoitJOLY/stackforge\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/stackforge</a>.",
   "copy.rgpd_titre":                 "🔒 DSGVO & personenbezogene Daten",
   "copy.rgpd_body":                  "Bei <strong>lokaler Nutzung im Browser</strong> sendet dieses Tool keine Daten an einen Server.<br>Bei der <strong>gehosteten Version</strong> (Zugang per Konto) werden verarbeitet: Ihr Benutzername und ein nicht umkehrbarer Hash Ihres Passworts, ein für die Anmeldung unbedingt erforderliches Sitzungs-Cookie (keine Tracking- oder Werbe-Cookies) sowie Zeitstempel Ihrer Generierungen zur Durchsetzung des wöchentlichen Kontingents.<br><strong>Zweck:</strong> Verwaltung des Dienstzugangs und Missbrauchsprävention. <strong>Speicherdauer:</strong> solange das Konto besteht.<br><strong>Verantwortlicher:</strong> Benoit Joly — <a href=\"mailto:b_joly@orange.fr\">b_joly@orange.fr</a>.<br><strong>Ihre Rechte</strong> (Auskunft, Berichtigung, Löschung): per E-Mail oder direkt unten, wenn Sie angemeldet sind. Sie können auch eine Beschwerde bei der <a href=\"https://www.cnil.fr\" target=\"_blank\" rel=\"noopener\">CNIL</a> (französische Datenschutzbehörde) einreichen.",
   "copy.compte_titre":               "👤 Ihre Rechte zu Ihrem Konto",
