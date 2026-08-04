@@ -338,9 +338,9 @@ function buildXML() {
 
 var _lastXML = null, _lastQName = null;
 
-async function confirmAndPreview() {
+async function buildXMLForExport() {
   var orderedQ = getQuestionsInDOMOrder();
-  if (!orderedQ.length) { toast(I18N.t('msg.aucune_question_a_previsualiser') || 'Aucune question à prévisualiser.'); return; }
+  if (!orderedQ.length) { toast(I18N.t('msg.aucune_question_a_previsualiser') || 'Aucune question à prévisualiser.'); return null; }
 
   var built;
   try {
@@ -348,7 +348,7 @@ async function confirmAndPreview() {
   } catch(e) {
     console.error(e);
     toast((I18N.t('msg.erreur_xml') || 'Erreur XML : ') + e.message);
-    return;
+    return null;
   }
 
   _lastXML = built.xml;
@@ -363,7 +363,7 @@ async function confirmAndPreview() {
         + lintWarnings.map(function(w,i){ return (i+1) + '. ' + w; }).join('\n\n')
         + '\n\nExporter quand même ?'
       );
-      if (!proceed) return;
+      if (!proceed) return null;
     }
   }
 
@@ -408,6 +408,13 @@ async function confirmAndPreview() {
       }
     }
   }
+
+  return built;
+}
+
+async function confirmAndPreview() {
+  var built = await buildXMLForExport();
+  if (!built) return;
 
   closeTagModal();
   try {
@@ -627,10 +634,31 @@ function updateTagRecap() {
 // Chaque enseignant fournit son propre jeton (fine-grained PAT, écriture
 // limitée à ce dépôt) : le fichier XML est committé directement dans
 // a_verifier/ sur une branche dédiée, jamais sur main, pour relecture.
-var GH_OWNER = 'bjoly-stackforge';
-var GH_REPO = 'H-stack';
-var GH_REVIEW_BRANCH = 'depot-a-verifier';
-var GH_REVIEW_FOLDER = 'a_verifier';
+// La "zone de mutualisation" (repo/branche/dossier) est configurée par
+// l'administrateur de l'instance (admin.html) — ces variables démarrent
+// vides et sont peuplées au boot par fetchInstanceConfig() depuis
+// GET /api/config/public. Le jeton personnel (ghGetToken) reste inchangé.
+var GH_OWNER = '';
+var GH_REPO = '';
+var GH_REVIEW_BRANCH = '';
+var GH_REVIEW_FOLDER = '';
+
+async function fetchInstanceConfig() {
+  try {
+    var res = await fetch('/api/config/public');
+    if (!res.ok) return;
+    var cfg = await res.json();
+    var m = cfg.mutualisation || {};
+    GH_OWNER = m.ghOwner || '';
+    GH_REPO = m.ghRepo || '';
+    GH_REVIEW_BRANCH = m.ghReviewBranch || '';
+    GH_REVIEW_FOLDER = m.ghReviewFolder || '';
+    window._instanceMaximaUrl = cfg.maximaUrl || '';
+  } catch (e) {
+    console.error('fetchInstanceConfig:', e);
+  }
+}
+fetchInstanceConfig();
 
 function ghGetToken() {
   var t = localStorage.getItem('stackforge_gh_token');
@@ -668,6 +696,11 @@ function ghBase64Utf8(str) {
 }
 
 async function depositForReview() {
+  if (!GH_OWNER || !GH_REPO) {
+    toast('Zone de mutualisation non configurée par l\'administrateur.');
+    return;
+  }
+
   var orderedQ = getQuestionsInDOMOrder();
   if (!orderedQ.length) { toast(I18N.t('msg.aucune_question_a_previsualiser') || 'Aucune question à déposer.'); return; }
 
@@ -989,6 +1022,53 @@ async function logoutFromApp() {
     await fetch('/api/logout', { method: 'POST' });
   } catch (e) { /* pas de backend en usage 100% local */ }
   window.location.href = '/login.html';
+}
+
+// Clé IA personnelle (repli après la clé institutionnelle — voir plan §8).
+// Comme logoutFromApp(), échoue silencieusement en usage 100% local (pas de
+// /api) plutôt que de casser l'UI.
+async function refreshMyAiKeyStatus() {
+  var el = document.getElementById('ai-perso-status');
+  if (!el) return;
+  try {
+    var res = await fetch('/api/account/ai-key');
+    if (!res.ok) { el.textContent = ''; return; }
+    var data = await res.json();
+    el.textContent = data.configured ? '✓ ' + (I18N.t('ai.cle_perso_configuree') || 'Clé enregistrée.') : '';
+    el.style.color = '#198754';
+  } catch (e) { el.textContent = ''; }
+}
+
+async function saveMyAiKey() {
+  var input = document.getElementById('ai-perso-key');
+  var el = document.getElementById('ai-perso-status');
+  var key = input ? input.value.trim() : '';
+  if (!key) return;
+  try {
+    var res = await fetch('/api/account/ai-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: key }),
+    });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Échec.');
+    if (input) input.value = '';
+    if (el) { el.textContent = '✓ ' + (I18N.t('ai.cle_perso_enregistree') || 'Clé enregistrée.'); el.style.color = '#198754'; }
+  } catch (e) {
+    if (el) { el.textContent = e.message; el.style.color = '#b91c1c'; }
+  }
+}
+
+async function clearMyAiKey() {
+  var el = document.getElementById('ai-perso-status');
+  try {
+    var res = await fetch('/api/account/ai-key', { method: 'DELETE' });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Échec.');
+    if (el) { el.textContent = I18N.t('ai.cle_perso_effacee') || 'Clé effacée.'; el.style.color = '#64748b'; }
+  } catch (e) {
+    if (el) { el.textContent = e.message; el.style.color = '#b91c1c'; }
+  }
 }
 
 async function deleteAccountFromApp() {

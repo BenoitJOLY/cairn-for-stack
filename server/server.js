@@ -2,7 +2,10 @@ const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
-const { verifyPassword, createAccount, isSelfRegistered, deleteAccount } = require('./accounts');
+const {
+  verifyPassword, createAccount, isSelfRegistered, deleteAccount, getRole, setRole, loadAccounts,
+  setAiKey, clearAiKey, hasAiKey, setAiProvider,
+} = require('./accounts');
 const { isUnderQuota, recordUsage, deleteUsage, WEEKLY_LIMIT } = require('./usage');
 
 const ROOT = path.join(__dirname, '..');
@@ -86,6 +89,144 @@ function requireAuth(req, res, next) {
 
 app.use(requireAuth);
 
+// 'admin' est un sur-ensemble de 'validateur' (voir plan) : un admin contrôle
+// déjà le jeton GitHub institutionnel utilisé par la promotion, lui interdire
+// l'accès à la file de validation n'apporterait aucune barrière réelle.
+function requireRole(role) {
+  return function (req, res, next) {
+    const r = getRole(req.session.username);
+    if (r === 'admin' || r === role) return next();
+    if (req.path.startsWith('/api/')) return res.status(403).json({ error: 'Accès réservé.' });
+    return res.redirect('/index.html');
+  };
+}
+
+app.get('/api/whoami', (req, res) => {
+  res.json({ username: req.session.username, role: getRole(req.session.username) });
+});
+
+const instanceConfig = require('./instance-config');
+
+// Champs non-secrets consommés par tout compte connecté : câblage de la zone
+// de mutualisation (js/app.js, depositForReview) et du serveur Maxima/JSmol
+// par défaut (js/maxima-client.js) — voir plan §6/§7.
+app.get('/api/config/public', (req, res) => {
+  const cfg = instanceConfig.getPublicConfig();
+  res.json({ mutualisation: cfg.mutualisation, maximaUrl: cfg.maximaUrl });
+});
+
+app.get('/api/admin/config', requireRole('admin'), (req, res) => {
+  res.json(instanceConfig.getPublicConfig());
+});
+
+app.post('/api/admin/config', requireRole('admin'), (req, res) => {
+  const { mutualisation, maximaUrl, ai } = req.body || {};
+  if (mutualisation && typeof mutualisation === 'object') {
+    instanceConfig.setMutualisationConfig(mutualisation);
+  }
+  if (typeof maximaUrl === 'string') {
+    instanceConfig.setMaximaUrl(maximaUrl);
+  }
+  if (ai && typeof ai === 'object') {
+    instanceConfig.setAiProviderConfig(ai);
+  }
+  res.json(instanceConfig.getPublicConfig());
+});
+
+const SECRET_NAMES = new Set(['ghToken', 'aiKey']);
+
+app.post('/api/admin/config/secret/:name', requireRole('admin'), (req, res) => {
+  if (!SECRET_NAMES.has(req.params.name)) return res.status(404).json({ error: 'Secret inconnu.' });
+  const { value } = req.body || {};
+  if (typeof value !== 'string' || !value.trim()) {
+    return res.status(400).json({ error: 'Valeur requise.' });
+  }
+  try {
+    instanceConfig.setSecret(req.params.name, value.trim());
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+  res.json({ configured: true });
+});
+
+app.delete('/api/admin/config/secret/:name', requireRole('admin'), (req, res) => {
+  if (!SECRET_NAMES.has(req.params.name)) return res.status(404).json({ error: 'Secret inconnu.' });
+  instanceConfig.clearSecret(req.params.name);
+  res.json({ configured: false });
+});
+
+// Gestion des rôles — décision actée : panneau in-app dès cette itération,
+// pas uniquement CLI (voir server/set-role.js pour l'équivalent SSH).
+app.get('/api/admin/accounts', requireRole('admin'), (req, res) => {
+  const accounts = loadAccounts().map((a) => ({
+    username: a.username,
+    role: a.role || null,
+    selfRegistered: !!a.selfRegistered,
+  }));
+  res.json({ accounts });
+});
+
+app.post('/api/admin/accounts/:username/role', requireRole('admin'), (req, res) => {
+  const { role } = req.body || {};
+  const normalized = role === 'none' || !role ? null : role;
+  try {
+    setRole(req.params.username, normalized);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+  res.json({ ok: true, role: normalized });
+});
+
+app.get('/admin.html', requireRole('admin'), (req, res) => res.sendFile(path.join(ROOT, 'admin.html')));
+
+// Workflow validateur — relecture faite sur un Moodle réel, hors StackForge
+// (pas de prévisualisation in-app pour le moment) ; la promotion utilise le
+// jeton institutionnel exclusivement côté serveur (server/gh-validation.js).
+const ghValidation = require('./gh-validation');
+
+app.get('/api/validation/deposits', requireRole('validateur'), async (req, res) => {
+  try {
+    res.json({ deposits: await ghValidation.listDeposits() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/validation/deposits/raw', requireRole('validateur'), async (req, res) => {
+  const p = req.query.path;
+  if (typeof p !== 'string' || !p) return res.status(400).json({ error: 'Paramètre path requis.' });
+  try {
+    const file = await ghValidation.getRawFile(p);
+    res.type('text/xml').send(file.content);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/validation/deposits/valider', requireRole('validateur'), async (req, res) => {
+  const { path: p } = req.body || {};
+  if (typeof p !== 'string' || !p) return res.status(400).json({ error: 'Paramètre path requis.' });
+  try {
+    await ghValidation.promoteDeposit(p);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/validation/deposits/rejeter', requireRole('validateur'), async (req, res) => {
+  const { path: p } = req.body || {};
+  if (typeof p !== 'string' || !p) return res.status(400).json({ error: 'Paramètre path requis.' });
+  try {
+    await ghValidation.rejectDeposit(p);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/validation.html', requireRole('validateur'), (req, res) => res.sendFile(path.join(ROOT, 'validation.html')));
+
 const { generate } = require('./generate');
 
 // Un type de question migré à la fois — voir PLAN.md, chantier
@@ -125,6 +266,52 @@ app.post('/api/account/delete', (req, res) => {
   deleteAccount(username);
   deleteUsage(username);
   req.session.destroy(() => res.json({ ok: true }));
+});
+
+// Génération IA (RA/DD uniquement) — cascade institutionnelle → personnelle →
+// fallback vers le flux manuel copier/coller déjà en place (js/prompt.js,
+// aiGenerateAndImport). Voir server/ai-generate.js pour la cascade complète.
+const aiGenerate = require('./ai-generate');
+
+app.get('/api/ai/status', (req, res) => {
+  res.json(aiGenerate.status(req.session.username));
+});
+
+app.post('/api/ai/generate', async (req, res) => {
+  const { prompt, targetType } = req.body || {};
+  try {
+    const result = await aiGenerate.generate(req.session.username, prompt, targetType);
+    res.json(result);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || 'Erreur serveur.' });
+  }
+});
+
+// Clé IA personnelle — write-only, surfacée dans #copyModal (index.html),
+// même contrat que les secrets d'instance (jamais renvoyée en clair).
+app.post('/api/account/ai-key', (req, res) => {
+  const { key, baseUrl, model } = req.body || {};
+  if (typeof key !== 'string' || !key.trim()) {
+    return res.status(400).json({ error: 'Clé requise.' });
+  }
+  try {
+    setAiKey(req.session.username, key.trim());
+    if (typeof baseUrl === 'string' || typeof model === 'string') {
+      setAiProvider(req.session.username, { baseUrl, model });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+  res.json({ configured: true });
+});
+
+app.delete('/api/account/ai-key', (req, res) => {
+  clearAiKey(req.session.username);
+  res.json({ configured: false });
+});
+
+app.get('/api/account/ai-key', (req, res) => {
+  res.json({ configured: hasAiKey(req.session.username) });
 });
 
 // Relais interne vers stack-api (conteneur "maxima-stack-api-1", réseau Docker

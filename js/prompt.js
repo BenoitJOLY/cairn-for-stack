@@ -4,6 +4,18 @@ let _pbType = null;  // 'CB' | 'RA' | 'DD'
 // State for the cascade inside the prompt builder
 const _pb = {mat:null, niv:null, sous:null, chap:null};
 
+// Cascade IA (institutionnelle → personnelle → aucune) — voir plan §8.
+// Récupéré une fois au chargement pour savoir si le bouton "Générer avec l'IA"
+// doit être proposé à côté du copier/coller manuel (v1 scopée à RA/DD).
+let _aiStatus = { available: false, tier: 'none' };
+async function _fetchAiStatus(){
+  try {
+    const res = await fetch('/api/ai/status');
+    if(res.ok) _aiStatus = await res.json();
+  } catch(e) { console.error('_fetchAiStatus:', e); }
+}
+_fetchAiStatus();
+
 // ── MODAL MANAGEMENT ─────────────────────────────────────────────────────────
 
 function openPromptBuilder(type){
@@ -54,7 +66,12 @@ function openPromptBuilder(type){
   // Rebuild cascade buttons and initial preview
   pbInitMat();
   pbBuild();
-  
+
+  // Génération IA v1 scopée à RA/DD (js/prompt.js, applyRAJSON/applyDDJSON) —
+  // masqué pour CB/VF et si aucune clé (institutionnelle ou perso) n'est disponible.
+  const aiBtn=document.getElementById('pb-ai-btn');
+  if(aiBtn) aiBtn.style.display=((type==='RA'||type==='DD')&&_aiStatus.available)?'':'none';
+
   const modal=document.getElementById('promptModal');
   if(modal){modal.style.display='flex';FocusTrap.trap(modal,closePB);}
 }
@@ -390,6 +407,60 @@ function pbFallbackCopy(text){
   document.body.removeChild(ta);
 }
 
+// ── GÉNÉRATION IA (RA/DD uniquement, cascade institutionnelle/perso — plan §8) ──
+
+// Même injection de la question dans le champ énoncé que pbCopy(), pour que le
+// résultat soit identique que l'utilisateur passe par l'IA ou le copier/coller.
+function _pbInjectQuestionText(){
+  const question=(document.getElementById('pb-question')?.value||'').trim();
+  if(!question) return;
+  const textIdMap={CB:'cb-text',RA:'ra-text',DD:'dd-text',VF:'vf-text'};
+  const textId=textIdMap[_pbType];
+  if(!textId) return;
+  const current=richVal(textId);
+  setRichVal(textId,(current||'')+`<p>${question}</p>`);
+}
+
+function pbGenerateWithAI(){
+  const applyFn=_pbType==='RA'?applyRAJSON:(_pbType==='DD'?applyDDJSON:null);
+  if(!applyFn) return;
+  aiGenerateAndImport(_pbType,applyFn);
+}
+
+// Appelle /api/ai/generate ; sur {fallback:true} (aucune clé IA disponible),
+// bascule silencieusement vers le flux manuel actuel (window.prompt()) plutôt
+// que d'afficher une erreur — comportement identique à aujourd'hui pour un
+// enseignant sans clé configurée.
+async function aiGenerateAndImport(targetType,applyFn){
+  const promptText=window._pbPromptText||'';
+  if(!promptText){ toast(I18N.t('msg.aucun_prompt_a_copier')); return; }
+  const btn=document.getElementById('pb-ai-btn');
+  const originalLabel=btn?btn.innerHTML:'';
+  if(btn){ btn.disabled=true; btn.textContent=I18N.t('ai.generation_en_cours')||'Génération…'; }
+  try{
+    const res=await fetch('/api/ai/generate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:promptText,targetType:targetType})
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||'Échec de la génération IA.');
+    if(data.fallback){
+      if(targetType==='RA') importRAJSON(); else importDDJSON();
+      return;
+    }
+    _pbInjectQuestionText();
+    applyFn(data.data);
+    toast(I18N.t('msg.json_importe'));
+    closePB();
+  }catch(e){
+    console.error('aiGenerateAndImport:',e);
+    toast(e.message);
+  }finally{
+    if(btn){ btn.disabled=false; btn.innerHTML=originalLabel; }
+  }
+}
+
 // ── JSON IMPORT/EXPORT UTILITIES ─────────────────────────────────────────────
 
 function exportVFJSON(){
@@ -418,17 +489,20 @@ function exportCBJSON(){
   dlJSON(d,'cb_config.json');
 }
 
+function applyRAJSON(d){
+  document.getElementById('ra-vrais').innerHTML='';
+  document.getElementById('ra-faux').innerHTML='';
+  if(d.xe)document.getElementById('ra-xe').value=d.xe;
+  (d.vrais||[]).forEach(p=>addPoolRow('ra-vrais',true,p.t,p.f,true));
+  (d.faux||[]).forEach(p=>addPoolRow('ra-faux',false,p.t,p.f,true));
+  checkPoolWarn('ra');
+}
+
 function importRAJSON(){
   const r=prompt('JSON : {xe,vrais:[{t,f},...],faux:[{t,f},...]}');
   if(!r)return;
   try{
-    const d=JSON.parse(r);
-    document.getElementById('ra-vrais').innerHTML='';
-    document.getElementById('ra-faux').innerHTML='';
-    if(d.xe)document.getElementById('ra-xe').value=d.xe;
-    (d.vrais||[]).forEach(p=>addPoolRow('ra-vrais',true,p.t,p.f,true));
-    (d.faux||[]).forEach(p=>addPoolRow('ra-faux',false,p.t,p.f,true));
-    checkPoolWarn('ra');
+    applyRAJSON(JSON.parse(r));
     toast(I18N.t('msg.json_importe'));
   }catch(e){toast(I18N.t('msg.json_invalide'));}
 }
@@ -440,16 +514,19 @@ function exportRAJSON(){
   dlJSON(d,'ra_config.json');
 }
 
+function applyDDJSON(d){
+  document.getElementById('dd-vrais').innerHTML='';
+  document.getElementById('dd-faux').innerHTML='';
+  (d.vrais||[]).forEach(p=>addPoolRow('dd-vrais',true,p.t,p.f,true));
+  (d.faux||[]).forEach(p=>addPoolRow('dd-faux',false,p.t,p.f,true));
+  checkPoolWarn('dd');
+}
+
 function importDDJSON(){
   const r=prompt('JSON : {vrais:[{t,f},...],faux:[{t,f},...]}');
   if(!r)return;
   try{
-    const d=JSON.parse(r);
-    document.getElementById('dd-vrais').innerHTML='';
-    document.getElementById('dd-faux').innerHTML='';
-    (d.vrais||[]).forEach(p=>addPoolRow('dd-vrais',true,p.t,p.f,true));
-    (d.faux||[]).forEach(p=>addPoolRow('dd-faux',false,p.t,p.f,true));
-    checkPoolWarn('dd');
+    applyDDJSON(JSON.parse(r));
     toast(I18N.t('msg.json_importe'));
   }catch(e){toast(I18N.t('msg.json_invalide'));}
 }

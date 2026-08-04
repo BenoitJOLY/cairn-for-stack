@@ -77,7 +77,14 @@
       '<button data-mode="normal"></button><button data-mode="expert"></button></div>' +
       '<p class="hs-opt-hint" id="hs-opt-mode-hint"></p></section>' +
       '<section class="hs-opt-sec"><label id="hs-opt-fbbox-lbl"></label>' +
-      '<div class="hs-opt-row"><button id="hs-opt-fbbox-btn" type="button"></button></div></section>';
+      '<div class="hs-opt-row"><button id="hs-opt-fbbox-btn" type="button"></button></div></section>' +
+      '<section class="hs-opt-sec"><label id="hs-opt-aikey-lbl"></label>' +
+      '<p class="hs-opt-hint" id="hs-opt-aikey-hint"></p>' +
+      '<div class="hs-opt-row">' +
+      '<input type="password" id="ai-perso-key" class="hs-opt-input">' +
+      '<button type="button" id="hs-opt-aikey-save"></button>' +
+      '<button type="button" id="hs-opt-aikey-clear"></button>' +
+      '</div><div id="ai-perso-status" class="hs-opt-hint"></div></section>';
     back.appendChild(box);
     document.body.appendChild(back);
 
@@ -116,6 +123,13 @@
       closeModal();
       if (typeof openFbBoxOptionsModal === "function") openFbBoxOptionsModal();
     });
+    // clé IA personnelle (js/app.js : saveMyAiKey/clearMyAiKey/refreshMyAiKeyStatus)
+    box.querySelector("#hs-opt-aikey-save").addEventListener("click", function () {
+      if (typeof saveMyAiKey === "function") saveMyAiKey();
+    });
+    box.querySelector("#hs-opt-aikey-clear").addEventListener("click", function () {
+      if (typeof clearMyAiKey === "function") clearMyAiKey();
+    });
 
     relabel();
     syncLangButtons();
@@ -151,6 +165,12 @@
     set("hs-opt-mode-hint", t("opt.mode_hint", "Mode Expert : accès aux variables partagées et à l'importation XML."));
     set("hs-opt-fbbox-lbl", t("opt.fbbox_lbl", "Feedbacks"));
     set("hs-opt-fbbox-btn", t("opt.fbbox_btn", "🎨 Personnaliser les encadrés"));
+    set("hs-opt-aikey-lbl", t("ai.cle_perso_titre", "🤖 Clé IA personnelle"));
+    set("hs-opt-aikey-hint", t("ai.cle_perso_body", "Utilisée pour la génération IA (types Radio/Dropdown) si votre établissement n'a pas configuré de clé institutionnelle. Jamais renvoyée en clair une fois enregistrée."));
+    set("hs-opt-aikey-save", t("btn.save", "Enregistrer"));
+    set("hs-opt-aikey-clear", t("ai.effacer_cle", "Effacer"));
+    var aikeyInput = document.getElementById("ai-perso-key");
+    if (aikeyInput) aikeyInput.setAttribute("placeholder", t("ai.cle_perso_placeholder", "Nouvelle clé API IA"));
     var box = document.getElementById("hs-opt-themes");
     if (box) {
       box.querySelector('[data-theme="light"]').textContent = t("opt.light", "☀ Clair");
@@ -165,7 +185,11 @@
     if (trig) trig.textContent = "⚙ " + t("opt.title", "Options");
   }
 
-  function openModal() { buildModal(); document.getElementById("hs-opt-modal").classList.add("show"); }
+  function openModal() {
+    buildModal();
+    document.getElementById("hs-opt-modal").classList.add("show");
+    if (typeof refreshMyAiKeyStatus === "function") refreshMyAiKeyStatus();
+  }
   function closeModal() { var m = document.getElementById("hs-opt-modal"); if (m) m.classList.remove("show"); }
 
   /* ── Déclencheur « ⚙ Options » sous le Mode assistant ── */

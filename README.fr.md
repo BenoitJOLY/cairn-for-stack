@@ -78,8 +78,24 @@ bash
   
  
  
-sudo docker exec -it stackforge node server/create-account.js <identifiant> <mot_de_passe>
+sudo docker exec -it stackforge node server/create-account.js <identifiant> <mot_de_passe> [admin|validateur]
  
+ 
+
+Le rôle est optionnel (un compte sans rôle est un enseignant classique). Pour changer
+le rôle d'un compte existant :
+bash
+ 
+  
+ 
+ 
+sudo docker exec -it stackforge node server/set-role.js <identifiant> <admin|validateur|none>
+ 
+ 
+
+Le tout premier compte admin peut aussi être créé automatiquement au démarrage du
+conteneur en renseignant `ACCOUNT_USERNAME`, `ACCOUNT_PASSWORD` et `ACCOUNT_ROLE=admin`
+dans le `.env` avant le premier `docker compose up`.
  
 🏗️ Architecture du Code (Pour les contributeurs)
 

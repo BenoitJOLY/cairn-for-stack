@@ -716,17 +716,9 @@ I18N.add("es", {
   "btn.tester_maxima":          "Probarlo con Maxima",
 
   /* ── Connexion Maxima réelle (STACK-API) ── */
-  "footer.maxima":              "Servidor Maxima",
-  "maxima.titre_reglages":      "Servidor Maxima (STACK-API)",
-  "maxima.explication":         "Introduce la dirección de tu propio servidor STACK-API para probar las preguntas generadas en un Maxima real. Esta dirección es específica de tu instalación y nunca se comparte ni se guarda en ningún otro lugar que no sea tu navegador.",
-  "maxima.label_url":           "URL del servidor STACK-API",
-  "maxima.btn_tester":          "Comprobar la conexión",
-  "maxima.msg_config_enregistree": "Se ha guardado la dirección del servidor Maxima.",
-  "maxima.msg_config_effacee":  "Se ha borrado la dirección del servidor Maxima.",
   "maxima.msg_test_en_cours":   "Prueba de conexión en curso…",
-  "maxima.msg_connexion_ok":    "Se ha establecido correctamente la conexión con el servidor Maxima.",
   "maxima.msg_rendu_ok":        "Maxima ha validado correctamente la pregunta.",
-  "maxima.err_non_configure":   "No hay ningún servidor Maxima configurado. Abre la configuración (⚙️ Servidor Maxima) para introducir su dirección.",
+  "maxima.err_non_configure":   "No hay ningún servidor Maxima configurado para este centro. Contacta con tu administrador.",
   "maxima.err_connexion":       "No se ha podido establecer contacto con el servidor Maxima ({msg}).",
 
   /* ── Recuadros de feedback configurables (Opciones) ── */
@@ -3892,5 +3884,16 @@ I18N.add("es", {
   "zs.compatible_choice": "Compatible",
   "zs.incompatible_choice": "Incompatible",
   "zs.fb_wrong_ccl": "Incorrecto. El criterio es z &lt; {seuil}.",
-  "zs.fbgen": "<p>Z-score: {@{zvar}@}</p><p>Umbral de compatibilidad: {seuil}</p><p>Conclusión: {ccl}</p>"
+  "zs.fbgen": "<p>Z-score: {@{zvar}@}</p><p>Umbral de compatibilidad: {seuil}</p><p>Conclusión: {ccl}</p>",
+
+  /* ── Generación por IA (institucional/personal) ── */
+  "ai.generer_avec_ia": "Generar con IA",
+  "ai.generation_en_cours": "Generando…",
+  "ai.cle_perso_titre": "🤖 Clave de IA personal",
+  "ai.cle_perso_body": "Se usa para la generación con IA (tipos Radio/Dropdown) si su institución no ha configurado una clave institucional. Nunca se devuelve en texto claro una vez guardada.",
+  "ai.cle_perso_placeholder": "Nueva clave API de IA",
+  "ai.effacer_cle": "Borrar",
+  "ai.cle_perso_configuree": "Clave guardada.",
+  "ai.cle_perso_enregistree": "Clave guardada.",
+  "ai.cle_perso_effacee": "Clave borrada."
 }, { name: "Español", dir: "ltr" });

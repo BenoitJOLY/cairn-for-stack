@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const { encrypt, decrypt } = require('./secrets');
 
 const DATA_DIR = path.join(__dirname, 'data');
 const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
@@ -15,13 +16,23 @@ function saveAccounts(accounts) {
   fs.writeFileSync(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2));
 }
 
+const VALID_ROLES = ['admin', 'validateur'];
+
 function createAccount(username, password, opts) {
   opts = opts || {};
+  if (opts.role != null && !VALID_ROLES.includes(opts.role)) {
+    throw new Error(`Rôle "${opts.role}" invalide (attendu: ${VALID_ROLES.join('|')}).`);
+  }
   const accounts = loadAccounts();
   if (accounts.some((a) => a.username === username)) {
     throw new Error(`Le compte "${username}" existe déjà.`);
   }
-  accounts.push({ username, passwordHash: bcrypt.hashSync(password, 12), selfRegistered: !!opts.selfRegistered });
+  accounts.push({
+    username,
+    passwordHash: bcrypt.hashSync(password, 12),
+    selfRegistered: !!opts.selfRegistered,
+    role: opts.role || null,
+  });
   saveAccounts(accounts);
 }
 
@@ -48,4 +59,68 @@ function isSelfRegistered(username) {
   return !!(account && account.selfRegistered);
 }
 
-module.exports = { loadAccounts, saveAccounts, createAccount, verifyPassword, isSelfRegistered, deleteAccount };
+// Rôle unique par compte (null = enseignant). 'admin' est traité comme un
+// sur-ensemble de 'validateur' par les middlewares côté serveur (server.js),
+// pas ici — cette fonction retourne le rôle brut tel qu'enregistré.
+function getRole(username) {
+  const account = loadAccounts().find((a) => a.username === username);
+  return (account && account.role) || null;
+}
+
+function setRole(username, role) {
+  if (role != null && !VALID_ROLES.includes(role)) {
+    throw new Error(`Rôle "${role}" invalide (attendu: ${VALID_ROLES.join('|')}).`);
+  }
+  const accounts = loadAccounts();
+  const account = accounts.find((a) => a.username === username);
+  if (!account) throw new Error(`Le compte "${username}" n'existe pas.`);
+  account.role = role || null;
+  saveAccounts(accounts);
+}
+
+// Clé IA personnelle par compte (repli après la clé institutionnelle — voir
+// plan §8), chiffrée au repos via server/secrets.js. Jamais renvoyée en HTTP.
+function setAiKey(username, value) {
+  const accounts = loadAccounts();
+  const account = accounts.find((a) => a.username === username);
+  if (!account) throw new Error(`Le compte "${username}" n'existe pas.`);
+  account.aiKeyEncrypted = value ? encrypt(value) : null;
+  saveAccounts(accounts);
+}
+
+function clearAiKey(username) {
+  setAiKey(username, null);
+}
+
+function hasAiKey(username) {
+  const account = loadAccounts().find((a) => a.username === username);
+  return !!(account && account.aiKeyEncrypted);
+}
+
+function getAiKey(username) {
+  const account = loadAccounts().find((a) => a.username === username);
+  if (!account || !account.aiKeyEncrypted) return null;
+  return decrypt(account.aiKeyEncrypted);
+}
+
+// Fournisseur perso optionnel (baseUrl/model) : si absents, la cascade IA
+// hérite des valeurs institutionnelles non-secrètes (server/ai-generate.js).
+function setAiProvider(username, fields) {
+  const accounts = loadAccounts();
+  const account = accounts.find((a) => a.username === username);
+  if (!account) throw new Error(`Le compte "${username}" n'existe pas.`);
+  account.aiBaseUrl = (fields && fields.baseUrl) || '';
+  account.aiModel = (fields && fields.model) || '';
+  saveAccounts(accounts);
+}
+
+function getAiProvider(username) {
+  const account = loadAccounts().find((a) => a.username === username);
+  return { baseUrl: (account && account.aiBaseUrl) || '', model: (account && account.aiModel) || '' };
+}
+
+module.exports = {
+  loadAccounts, saveAccounts, createAccount, verifyPassword, isSelfRegistered, deleteAccount,
+  getRole, setRole, VALID_ROLES,
+  setAiKey, clearAiKey, hasAiKey, getAiKey, setAiProvider, getAiProvider,
+};

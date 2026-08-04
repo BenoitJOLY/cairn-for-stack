@@ -716,17 +716,9 @@ I18N.add("de", {
   "btn.tester_maxima":          "Mit Maxima testen",
 
   /* ── Connexion Maxima réelle (STACK-API) ── */
-  "footer.maxima":              "Maxima-Server",
-  "maxima.titre_reglages":      "Maxima-Server (STACK-API)",
-  "maxima.explication":         "Geben Sie die Adresse Ihres eigenen STACK-API-Servers ein, um die generierten Aufgaben mit einem echten Maxima-System zu testen. Diese Adresse ist spezifisch für Ihre Installation und wird niemals weitergegeben oder anderswo als in Ihrem Browser gespeichert.",
-  "maxima.label_url":           "URL des STACK-API-Servers",
-  "maxima.btn_tester":          "Verbindung testen",
-  "maxima.msg_config_enregistree": "Die Adresse des Maxima-Servers wurde gespeichert.",
-  "maxima.msg_config_effacee":  "Die Adresse des Maxima-Servers wurde gelöscht.",
   "maxima.msg_test_en_cours":   "Verbindungstest läuft…",
-  "maxima.msg_connexion_ok":    "Die Verbindung zum Maxima-Server wurde erfolgreich hergestellt.",
   "maxima.msg_rendu_ok":        "Die Frage wurde von Maxima erfolgreich bestätigt.",
-  "maxima.err_non_configure":   "Es ist kein Maxima-Server konfiguriert. Öffnen Sie die Einstellungen (⚙️ Maxima-Server), um die Adresse einzugeben.",
+  "maxima.err_non_configure":   "Für diese Einrichtung ist kein Maxima-Server konfiguriert. Wenden Sie sich an Ihren Administrator.",
   "maxima.err_connexion":       "Der Maxima-Server ({msg}) konnte nicht kontaktiert werden.",
 
   /* ── Konfigurierbare Feedback-Kästen (Optionen) ── */
@@ -3892,5 +3884,16 @@ I18N.add("de", {
   "zs.compatible_choice": "Kompatibel",
   "zs.incompatible_choice": "Inkompatibel",
   "zs.fb_wrong_ccl": "Falsch. Das Kriterium ist z &lt; {seuil}.",
-  "zs.fbgen": "<p>Z-Score: {@{zvar}@}</p><p>Kompatibilitätsschwelle: {seuil}</p><p>Schlussfolgerung: {ccl}</p>"
+  "zs.fbgen": "<p>Z-Score: {@{zvar}@}</p><p>Kompatibilitätsschwelle: {seuil}</p><p>Schlussfolgerung: {ccl}</p>",
+
+  /* ── KI-Generierung (institutionell/persönlich) ── */
+  "ai.generer_avec_ia": "Mit KI generieren",
+  "ai.generation_en_cours": "Generierung läuft…",
+  "ai.cle_perso_titre": "🤖 Persönlicher KI-Schlüssel",
+  "ai.cle_perso_body": "Wird für die KI-Generierung (Typen Radio/Dropdown) verwendet, falls Ihre Einrichtung keinen institutionellen Schlüssel konfiguriert hat. Wird nach dem Speichern nie im Klartext zurückgesendet.",
+  "ai.cle_perso_placeholder": "Neuer KI-API-Schlüssel",
+  "ai.effacer_cle": "Löschen",
+  "ai.cle_perso_configuree": "Schlüssel gespeichert.",
+  "ai.cle_perso_enregistree": "Schlüssel gespeichert.",
+  "ai.cle_perso_effacee": "Schlüssel gelöscht."
 }, { name: "Deutsch", dir: "ltr" });

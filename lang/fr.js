@@ -716,17 +716,9 @@ I18N.add("fr", {
   "btn.tester_maxima":          "Tester avec Maxima",
 
   /* ── Connexion Maxima réelle (STACK-API) ── */
-  "footer.maxima":              "Serveur Maxima",
-  "maxima.titre_reglages":      "Serveur Maxima (STACK-API)",
-  "maxima.explication":         "Renseignez l'adresse de votre propre serveur STACK-API pour tester les questions générées sur un vrai Maxima. Cette adresse est propre à votre installation et n'est jamais partagée ni enregistrée ailleurs que dans votre navigateur.",
-  "maxima.label_url":           "URL du serveur STACK-API",
-  "maxima.btn_tester":          "Tester la connexion",
-  "maxima.msg_config_enregistree": "Adresse du serveur Maxima enregistrée.",
-  "maxima.msg_config_effacee":  "Adresse du serveur Maxima effacée.",
   "maxima.msg_test_en_cours":   "Test de connexion en cours…",
-  "maxima.msg_connexion_ok":    "Connexion au serveur Maxima réussie.",
   "maxima.msg_rendu_ok":        "La question a été validée avec succès par Maxima.",
-  "maxima.err_non_configure":   "Aucun serveur Maxima configuré. Ouvrez les réglages (⚙️ Serveur Maxima) pour renseigner son adresse.",
+  "maxima.err_non_configure":   "Aucun serveur Maxima configuré pour cet établissement. Contactez votre administrateur.",
   "maxima.err_connexion":       "Impossible de contacter le serveur Maxima ({msg}).",
 
   /* ── Encadrés de feedback configurables (Options) ── */
@@ -3962,5 +3954,16 @@ I18N.add("fr", {
   "cin.iidx_title": "Point de mesure des vecteurs vitesse",
   "cin.iidx_hint": "Indice i du premier point utilisé : l'élève tracera M_iM_{i+1} (pour vᵢ) puis M_{i+1}M_{i+2} (pour vᵢ₊₁) sur le graphique. Un message d'erreur s'affiche dans l'aperçu si i est hors limites pour le nombre de points digitalisés.",
   "cin.iidx_lbl": "Indice i du point de départ",
-  "cin.fbgen_auto_desc": "La correction (norme vᵢ et construction Δvᵢ) est générée automatiquement. Ce champ permet d'ajouter un commentaire pédagogique complémentaire."
+  "cin.fbgen_auto_desc": "La correction (norme vᵢ et construction Δvᵢ) est générée automatiquement. Ce champ permet d'ajouter un commentaire pédagogique complémentaire.",
+
+  /* ── Génération IA (institutionnelle/personnelle) ── */
+  "ai.generer_avec_ia": "Générer avec l'IA",
+  "ai.generation_en_cours": "Génération…",
+  "ai.cle_perso_titre": "🤖 Clé IA personnelle",
+  "ai.cle_perso_body": "Utilisée pour la génération IA (types Radio/Dropdown) si votre établissement n'a pas configuré de clé institutionnelle. Jamais renvoyée en clair une fois enregistrée.",
+  "ai.cle_perso_placeholder": "Nouvelle clé API IA",
+  "ai.effacer_cle": "Effacer",
+  "ai.cle_perso_configuree": "Clé enregistrée.",
+  "ai.cle_perso_enregistree": "Clé enregistrée.",
+  "ai.cle_perso_effacee": "Clé effacée."
 }, { name: "Français", dir: "ltr" });

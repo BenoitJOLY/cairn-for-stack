@@ -1,35 +1,25 @@
 // ── CONNEXION MAXIMA RÉELLE (serveur STACK-API / Goemaxima) ──
-// Aucune URL n'est codée en dur ici : chaque installation doit renseigner la
-// sienne via le panneau de réglages (⚙️ Serveur Maxima), stockée uniquement
-// dans le localStorage du navigateur de l'utilisateur — jamais dans le code
-// livré ni commit. Voir PLAN.md pour le contexte (chantier "Connexion Maxima réelle").
-
-var MAXIMA_CONFIG_KEY = 'stackforge_maxima_config';
-
-function getMaximaConfig() {
-  try {
-    var raw = localStorage.getItem(MAXIMA_CONFIG_KEY);
-    if (!raw) return { url: '' };
-    var cfg = JSON.parse(raw);
-    return { url: cfg.url || '' };
-  } catch(e) { return { url: '' }; }
-}
-
-function setMaximaConfig(cfg) {
-  var url = (cfg && cfg.url || '').trim().replace(/\/+$/, '');
-  localStorage.setItem(MAXIMA_CONFIG_KEY, JSON.stringify({ url: url }));
-}
+// Aucune URL n'est codée en dur ici : chaque installation renseigne la sienne
+// dans admin.html (URL institutionnelle uniquement, pas de repli personnel —
+// contrairement à la clé IA, un serveur Maxima est un prérequis d'infrastructure
+// déjà fourni par l'établissement pour tous les enseignants).
 
 function maximaConfigured() {
-  return !!getMaximaConfig().url;
+  return !!effectiveMaximaUrl();
+}
+
+// URL par défaut de l'instance, peuplée au boot par fetchInstanceConfig()
+// (js/app.js) depuis GET /api/config/public.
+function effectiveMaximaUrl() {
+  return (typeof window !== 'undefined' && window._instanceMaximaUrl) || '';
 }
 
 async function _maximaPost(route, body) {
-  var cfg = getMaximaConfig();
-  if (!cfg.url) throw new Error(I18N.t('maxima.err_non_configure'));
+  var url = effectiveMaximaUrl();
+  if (!url) throw new Error(I18N.t('maxima.err_non_configure'));
   var res;
   try {
-    res = await fetch(cfg.url + route, {
+    res = await fetch(url + route, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
@@ -245,58 +235,11 @@ async function generateDeployedSeeds(xml, count, opts) {
   };
 }
 
-// ── UI : panneau de réglages ──────────────────────────────────────
-function openMaximaConfigModal() {
-  var cfg = getMaximaConfig();
-  var input = document.getElementById('maxima-url-input');
-  if (input) input.value = cfg.url;
-  var statusEl = document.getElementById('maxima-config-status');
-  if (statusEl) { statusEl.textContent = ''; }
-  var modal = document.getElementById('maximaConfigModal');
-  if (modal) {
-    modal.style.display = 'flex';
-    if (typeof FocusTrap !== 'undefined') FocusTrap.trap(modal, closeMaximaConfigModal);
-  }
-}
-
-function closeMaximaConfigModal(e) {
-  if (e && e.target !== e.currentTarget) return;
-  var modal = document.getElementById('maximaConfigModal');
-  if (modal) modal.style.display = 'none';
-  if (typeof FocusTrap !== 'undefined') FocusTrap.release();
-}
-
-function saveMaximaConfigFromUI() {
-  var input = document.getElementById('maxima-url-input');
-  var url = input ? input.value.trim() : '';
-  setMaximaConfig({ url: url });
-  toast(url ? I18N.t('maxima.msg_config_enregistree') : I18N.t('maxima.msg_config_effacee'));
-}
-
-async function testMaximaConnectionFromUI() {
-  var statusEl = document.getElementById('maxima-config-status');
-  var input = document.getElementById('maxima-url-input');
-  var url = input ? input.value.trim() : '';
-  setMaximaConfig({ url: url });
-  if (!url) {
-    if (statusEl) { statusEl.textContent = I18N.t('maxima.err_non_configure'); statusEl.style.color = '#b91c1c'; }
-    return;
-  }
-  if (statusEl) { statusEl.textContent = I18N.t('maxima.msg_test_en_cours'); statusEl.style.color = '#64748b'; }
-  try {
-    await maximaTestConnection();
-    if (statusEl) { statusEl.textContent = '✅ ' + I18N.t('maxima.msg_connexion_ok'); statusEl.style.color = '#059669'; }
-  } catch(e) {
-    if (statusEl) { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#b91c1c'; }
-  }
-}
-
 // ── UI : test d'un XML avec Maxima, avec affichage du statut dans `resultElId` ──
 async function _testXMLWithMaxima(xml, resultElId) {
   var resultEl = document.getElementById(resultElId);
   if (!maximaConfigured()) {
     if (resultEl) { resultEl.textContent = I18N.t('maxima.err_non_configure'); resultEl.style.color = '#b91c1c'; }
-    openMaximaConfigModal();
     return;
   }
   if (resultEl) { resultEl.textContent = I18N.t('maxima.msg_test_en_cours'); resultEl.style.color = '#64748b'; }
@@ -338,7 +281,8 @@ function testCurrentXMLWithMaxima() {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    getMaximaConfig: getMaximaConfig, setMaximaConfig: setMaximaConfig, maximaConfigured: maximaConfigured,
+    maximaConfigured: maximaConfigured,
+    effectiveMaximaUrl: effectiveMaximaUrl,
     maximaTestConnection: maximaTestConnection, maximaRenderXML: maximaRenderXML, maximaValidateInput: maximaValidateInput,
     maximaGradeXML: maximaGradeXML, insertDeployedSeeds: insertDeployedSeeds, generateDeployedSeeds: generateDeployedSeeds,
     buildStandaloneQuestionXML: buildStandaloneQuestionXML

@@ -9,6 +9,8 @@ services:
     volumes:
       - ./index.html:/app/index.html
       - ./depot.html:/app/depot.html
+      - ./admin.html:/app/admin.html
+      - ./validation.html:/app/validation.html
       - ./login.html:/app/login.html
       - ./register.html:/app/register.html
       - ./js:/app/js
@@ -21,6 +23,8 @@ services:
     environment:
       - ACCOUNT_USERNAME=${ACCOUNT_USERNAME:-}
       - ACCOUNT_PASSWORD=${ACCOUNT_PASSWORD:-}
+      - ACCOUNT_ROLE=${ACCOUNT_ROLE:-}
+      - SECRETS_KEY=${SECRETS_KEY:-}
     restart: unless-stopped
     networks:
       - default

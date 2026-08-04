@@ -716,17 +716,9 @@ I18N.add("nl", {
   "btn.tester_maxima":          "Proeven met Máxima",
 
   /* ── Connexion Maxima réelle (STACK-API) ── */
-  "footer.maxima":              "Maxima Server",
-  "maxima.titre_reglages":      "Maxima Server (STACK-API)",
-  "maxima.explication":         "Voer het adres van uw eigen STACK-API-server in om de gegenereerde vragen op een echte Maxima te testen. Dit adres is specifiek voor uw installatie en wordt nooit ergens anders gedeeld of opgeslagen dan in uw browser.",
-  "maxima.label_url":           "STACK-API-server-URL",
-  "maxima.btn_tester":          "Test de verbinding",
-  "maxima.msg_config_enregistree": "Geregistreerd Maxima-serveradres.",
-  "maxima.msg_config_effacee":  "Maxima serveradres verwijderd.",
   "maxima.msg_test_en_cours":   "Verbindingstest bezig...",
-  "maxima.msg_connexion_ok":    "Verbinding met Maxima-server gelukt.",
   "maxima.msg_rendu_ok":        "De vraag is succesvol gevalideerd door Maxima.",
-  "maxima.err_non_configure":   "Geen Maxima-servers geconfigureerd. Open de instellingen (⚙️ Maxima Server) om het adres in te voeren.",
+  "maxima.err_non_configure":   "Geen Maxima-server geconfigureerd voor deze instelling. Neem contact op met uw beheerder.",
   "maxima.err_connexion":       "Kan geen contact maken met de Maxima-server ({msg}).",
 
   /* ── Instelbare feedbackkaders (Opties) ── */
@@ -3892,5 +3884,16 @@ I18N.add("nl", {
   "zs.compatible_choice": "Compatibel",
   "zs.incompatible_choice": "Incompatibel",
   "zs.fb_wrong_ccl": "Onjuist. Het criterium is z &lt; {seuil}.",
-  "zs.fbgen": "<p>Z-score: {@{zvar}@}</p><p>Compatibiliteitsdrempel: {seuil}</p><p>Conclusie: {ccl}</p>"
+  "zs.fbgen": "<p>Z-score: {@{zvar}@}</p><p>Compatibiliteitsdrempel: {seuil}</p><p>Conclusie: {ccl}</p>",
+
+  /* ── AI-generatie (institutioneel/persoonlijk) ── */
+  "ai.generer_avec_ia": "Genereren met AI",
+  "ai.generation_en_cours": "Genereren…",
+  "ai.cle_perso_titre": "🤖 Persoonlijke AI-sleutel",
+  "ai.cle_perso_body": "Gebruikt voor AI-generatie (typen Radio/Dropdown) als uw instelling geen institutionele sleutel heeft geconfigureerd. Wordt na opslaan nooit in leesbare vorm teruggestuurd.",
+  "ai.cle_perso_placeholder": "Nieuwe AI API-sleutel",
+  "ai.effacer_cle": "Wissen",
+  "ai.cle_perso_configuree": "Sleutel opgeslagen.",
+  "ai.cle_perso_enregistree": "Sleutel opgeslagen.",
+  "ai.cle_perso_effacee": "Sleutel gewist."
 }, { name: "Nederlands", dir: "ltr" });

@@ -714,17 +714,9 @@ I18N.add("en", {
   "btn.tester_maxima":          "Test with Maxima",
 
   /* ── Real Maxima connection (STACK-API) ── */
-  "footer.maxima":              "Maxima server",
-  "maxima.titre_reglages":      "Maxima server (STACK-API)",
-  "maxima.explication":         "Enter the address of your own STACK-API server to test generated questions against a real Maxima. This address is specific to your installation and is never shared or stored anywhere but in your browser.",
-  "maxima.label_url":           "STACK-API server URL",
-  "maxima.btn_tester":          "Test connection",
-  "maxima.msg_config_enregistree": "Maxima server address saved.",
-  "maxima.msg_config_effacee":  "Maxima server address cleared.",
   "maxima.msg_test_en_cours":   "Testing connection…",
-  "maxima.msg_connexion_ok":    "Successfully connected to the Maxima server.",
   "maxima.msg_rendu_ok":        "The question was successfully validated by Maxima.",
-  "maxima.err_non_configure":   "No Maxima server configured. Open settings (⚙️ Maxima server) to enter its address.",
+  "maxima.err_non_configure":   "No Maxima server configured for this institution. Contact your administrator.",
   "maxima.err_connexion":       "Could not reach the Maxima server ({msg}).",
 
   /* ── Configurable feedback boxes (Options) ── */
@@ -3889,5 +3881,16 @@ I18N.add("en", {
   "zs.compatible_choice": "Compatible",
   "zs.incompatible_choice": "Incompatible",
   "zs.fb_wrong_ccl": "Incorrect. The criterion is z &lt; {seuil}.",
-  "zs.fbgen": "<p>Z-score: {@{zvar}@}</p><p>Compatibility threshold: {seuil}</p><p>Conclusion: {ccl}</p>"
+  "zs.fbgen": "<p>Z-score: {@{zvar}@}</p><p>Compatibility threshold: {seuil}</p><p>Conclusion: {ccl}</p>",
+
+  /* ── AI generation (institutional/personal) ── */
+  "ai.generer_avec_ia": "Generate with AI",
+  "ai.generation_en_cours": "Generating…",
+  "ai.cle_perso_titre": "🤖 Personal AI key",
+  "ai.cle_perso_body": "Used for AI generation (Radio/Dropdown types) if your institution hasn't configured an institutional key. Never sent back in clear text once saved.",
+  "ai.cle_perso_placeholder": "New AI API key",
+  "ai.effacer_cle": "Clear",
+  "ai.cle_perso_configuree": "Key saved.",
+  "ai.cle_perso_enregistree": "Key saved.",
+  "ai.cle_perso_effacee": "Key cleared."
 }, { name: "English", dir: "ltr" });
