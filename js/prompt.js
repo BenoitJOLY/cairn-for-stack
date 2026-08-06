@@ -247,15 +247,15 @@ function pbBuild(){
   const xbr = (_pbType==='RA'||_pbType==='DD') ? (parseInt(document.getElementById('pb-xbr')?.value||'2')) : 1;
 
   // Resolved context
-  const mat  = _pb.mat || (document.getElementById('pb-mat-libre')?.value||'').trim() || '[matière]';
-  const niv  = _pb.niv || (document.getElementById('pb-niv-libre')?.value||'').trim() || '[niveau]';
-  const sous = _pb.sous || '[sous-matière]';
-  const chap = _pb.chap || (document.getElementById('pb-chap-libre')?.value||'').trim() || '[chapitre]';
+  const mat  = _pb.mat || (document.getElementById('pb-mat-libre')?.value||'').trim() || I18N.t('pb.ph_matiere');
+  const niv  = _pb.niv || (document.getElementById('pb-niv-libre')?.value||'').trim() || I18N.t('pb.ph_niveau');
+  const sous = _pb.sous || I18N.t('pb.ph_sous_matiere');
+  const chap = _pb.chap || (document.getElementById('pb-chap-libre')?.value||'').trim() || I18N.t('pb.ph_chapitre');
 
   // Language Logic
   const langSelect = document.getElementById('pb-lang-select')?.value || 'Français';
   const langInput = document.getElementById('pb-lang-libre')?.value?.trim() || '';
-  const langFinal = (langSelect === 'Autre') ? (langInput || '[Langue à préciser]') : langSelect;
+  const langFinal = (langSelect === 'Autre') ? (langInput || I18N.t('pb.ph_langue')) : langSelect;
 
   // Options
   const bloomOn  = document.getElementById('pb-opt-bloom')?.checked;
@@ -273,30 +273,30 @@ function pbBuild(){
   const opts = [];
   if(!isVF && bloomOn && bloomVals.length){
     opts.push(bloomVals.length===1
-      ? `Le niveau de Bloom ciblé est : ${bloomVals[0]}.`
-      : `Les niveaux de Bloom ciblés sont : ${bloomVals.join(', ')}. Répartis les questions sur ces différents niveaux taxonomiques.`);
+      ? I18N.t('pb.opt_bloom_single', {niveau: bloomVals[0]})
+      : I18N.t('pb.opt_bloom_multi', {niveaux: bloomVals.join(', ')}));
   }
-  if(erreurOn) opts.push(`Chaque distracteur doit correspondre à une catégorie d'erreur spécifique : 1. Erreur de calcul, 2. Confusion de termes, 3. Inversion de logique (cause/conséquence).`);
-  if(piegeOn)  opts.push(`Intègre une proposition 'piège' qui semble correcte au premier abord mais qui est fausse à cause d'une nuance technique ou d'une exception à la règle.`);
-  if(latexOn)  opts.push(`Utilise la notation LaTeX pour les formules. RÈGLES : utilise $...$ pour les formules inline et $$...$$ pour les formules display. Exemple inline : "La période $T = \\frac{1}{f}$ est l'inverse de la fréquence." Exemple display : "$$\\lambda = v \\times T$$". Écris les commandes LaTeX normalement (\\frac, \\times, etc.) sans doubler les backslashes.`);
+  if(erreurOn) opts.push(I18N.t('pb.opt_erreur'));
+  if(piegeOn)  opts.push(I18N.t('pb.opt_piege'));
+  if(latexOn)  opts.push(I18N.t('pb.opt_latex'));
 
   // ── VF branch ───────────────────────────────────────────────────
   if(isVF){
     let p = '';
-    p += `Agis en ingénieur expert en pédagogie. Ta mission est de concevoir un exercice de type "Vrai / Faux". La question posée à l'élève est : "${hasQ?question:'[INDIQUER LA QUESTION ICI]'}".\n`;
-    p += `Langue de réponse : ${langFinal}.\n`;
-    p += `Cible : Niveau ${niv} en ${mat}, chapitre "${chap}".\n`;
-    if(opts.length){ p += `\nCONSIGNES PÉDAGOGIQUES SUPPLÉMENTAIRES :\n`; opts.forEach(o=>{ p += `• ${o}\n`; }); }
-    p += `\nCONSIGNES DE RÉDACTION :\n`;
-    p += `1. Génère exactement ${xe} propositions, avec un équilibre entre vraies et fausses.\n`;
-    p += `2. Chaque proposition doit être une affirmation claire et non ambiguë.\n`;
-    p += `3. Pour chaque proposition, le champ "fbIfVrai" est le message affiché à l'élève s'il coche "Vrai", et "fbIfFaux" le message affiché s'il coche "Faux" (quel que soit le champ "reponse").\n`;
-    p += `\nCONTRAINTE TECHNIQUE (STRICT JSON) :\nAucun texte avant ou après le bloc JSON. Pas de markdown.\n`;
-    if(latexOn){ p += `LATEX : $...$ inline, $$...$$ display. Dans du JSON, double les backslashes (\\\\frac, etc.).\n`; }
-    p += `\nFormat attendu :\n`;
+    p += `${I18N.t('pb.role_vf')} ${I18N.t('pb.question_posee', {question: hasQ?question:I18N.t('pb.ph_question')})}\n`;
+    p += `${I18N.t('pb.langue_reponse', {lang: langFinal})}\n`;
+    p += `${I18N.t('pb.cible_vf', {niv, mat, chap})}\n`;
+    if(opts.length){ p += `\n${I18N.t('pb.consignes_pedago_title')}\n`; opts.forEach(o=>{ p += `• ${o}\n`; }); }
+    p += `\n${I18N.t('pb.consignes_redaction_title')}\n`;
+    p += `1. ${I18N.t('pb.vf_consigne1', {xe})}\n`;
+    p += `2. ${I18N.t('pb.vf_consigne2')}\n`;
+    p += `3. ${I18N.t('pb.vf_consigne3')}\n`;
+    p += `\n${I18N.t('pb.contrainte_json_title')}\n${I18N.t('pb.vf_contrainte_json_body')}\n`;
+    if(latexOn){ p += `${I18N.t('pb.vf_latex_json')}\n`; }
+    p += `\n${I18N.t('pb.format_attendu_title')}\n`;
     p += `{\n  "vf": [\n`;
-    p += `    {"texte": "Affirmation vraie", "reponse": "v", "fbIfVrai": "Exact !", "fbIfFaux": "Incorrect, c'est pourtant vrai car..."},\n`;
-    p += `    {"texte": "Affirmation fausse", "reponse": "f", "fbIfVrai": "Incorrect, c'est faux car...", "fbIfFaux": "Exact !"}\n`;
+    p += `    {"texte": "${I18N.t('pb.vf_ex_affirmation_vraie')}", "reponse": "v", "fbIfVrai": "${I18N.t('pb.vf_ex_exact')}", "fbIfFaux": "${I18N.t('pb.vf_ex_incorrect_vrai')}"},\n`;
+    p += `    {"texte": "${I18N.t('pb.vf_ex_affirmation_fausse')}", "reponse": "f", "fbIfVrai": "${I18N.t('pb.vf_ex_incorrect_faux')}", "fbIfFaux": "${I18N.t('pb.vf_ex_exact')}"}\n`;
     p += `  ]\n}`;
     const prev=document.getElementById('pb-preview');
     if(prev) prev.textContent=p;
@@ -309,57 +309,59 @@ function pbBuild(){
 
   // Build prompt
   let p = '';
-  p += `Agis en ingénieur expert en pédagogie et en docimologie. Ta mission est de concevoir `;
-  p += isRA ? `un exercice de type "QCM à choix unique"` : `un exercice de type "QCM à choix multiples"`;
-  p += `.\nLa question posée à l'élève est : "${hasQ?question:'[INDIQUER LA QUESTION ICI]'}".\n`;
-  p += `Langue de réponse : ${langFinal}.\n`;
-  p += `Cible : Niveau ${niv} en ${mat}, plus particulièrement en ${sous}, dans le chapitre "${chap}".\n`;
+  const qcmType = I18N.t(isRA ? 'pb.qcm_type_unique' : 'pb.qcm_type_multiple');
+  p += I18N.t('pb.role_qcm', {type: qcmType});
+  p += `\n${I18N.t('pb.question_posee', {question: hasQ?question:I18N.t('pb.ph_question')})}\n`;
+  p += `${I18N.t('pb.langue_reponse', {lang: langFinal})}\n`;
+  p += `${I18N.t('pb.cible_qcm', {niv, mat, sous, chap})}\n`;
 
   // opts déjà construit avant la branche VF
 
   if(opts.length){
-    p += `\nCONSIGNES PÉDAGOGIQUES SUPPLÉMENTAIRES :\n`;
+    p += `\n${I18N.t('pb.consignes_pedago_title')}\n`;
     opts.forEach(o=>{ p += `• ${o}\n`; });
   }
 
-  p += `\nCONSIGNES DE RÉDACTION :\n`;
-  p += `1. Génère exactement ${xe} propositions.\n`;
+  p += `\n${I18N.t('pb.consignes_redaction_title')}\n`;
+  p += `1. ${I18N.t('pb.qcm_consigne1', {xe})}\n`;
   if(isRA){
-    p += `2. Génère ${xbr} bonne${xbr>1?'s':''} réponse${xbr>1?'s':''} (pour le pool "vrais") et ${parseInt(xe)-1} distracteurs plausibles (basés sur des erreurs classiques d'élèves). À chaque test, une seule bonne réponse sera tirée aléatoirement parmi les ${xbr}.\n`;
+    const distracteurs = parseInt(xe)-1;
+    p += `2. ${I18N.t(xbr>1?'pb.qcm_ra_plural':'pb.qcm_ra_singular', {xbr, distracteurs})}\n`;
   } else {
-    p += `2. Équilibre : Inclus précisément ${xb} réponses exactes et ${parseInt(xe)-parseInt(xb)} distracteurs plausibles (basés sur des erreurs classiques d'élèves).\n`;
+    const distracteurs = parseInt(xe)-parseInt(xb);
+    p += `2. ${I18N.t('pb.qcm_cb_consigne2', {xb, distracteurs})}\n`;
   }
-  if(syntaxeOn) p += `3. Toutes les propositions doivent avoir une longueur approximativement égale et une structure syntaxique identique (commencer par un verbe, ou par un nom, etc.).\n`;
-  p += `${syntaxeOn?'4':'3'}. Rigueur des feedbacks : pour chaque distracteur, NOMME la confusion ou l'erreur précise qu'il révèle (ne te contente jamais d'écrire « faux » ou « incorrect »), puis réaffirme le principe, la loi ou la méthode correcte. Pour la bonne réponse, explique brièvement pourquoi elle est exacte.\n`;
+  if(syntaxeOn) p += `3. ${I18N.t('pb.qcm_syntaxe')}\n`;
+  p += `${syntaxeOn?'4':'3'}. ${I18N.t('pb.qcm_rigueur_feedback')}\n`;
 
-  p += `\nCONTRAINTE TECHNIQUE (STRICT JSON) :\n`;
-  p += `Tu ne dois générer AUCUN texte avant ou après le bloc JSON. Pas de balises markdown, pas de commentaires. La sortie doit être directement exploitable par un parseur JSON.\n`;
+  p += `\n${I18N.t('pb.contrainte_json_title')}\n`;
+  p += `${I18N.t('pb.qcm_contrainte_json_body')}\n`;
   if(latexOn){
-    p += `LATEX (dans du JSON) : place les formules entre $...$ (en ligne) ou $$...$$ (bloc). Comme la sortie est du JSON, DOUBLE chaque antislash : écris \\\\frac, \\\\times, \\\\lambda (et jamais \\frac). Exemple de valeur JSON valide : "La période $T = \\\\frac{1}{f}$ est l'inverse de la fréquence."\n`;
+    p += `${I18N.t('pb.qcm_latex_json')}\n`;
   } else {
-    p += `CARACTÈRES SPÉCIAUX : N'utilise aucune notation LaTeX ni formule mathématique.\n`;
+    p += `${I18N.t('pb.qcm_no_latex')}\n`;
   }
-  p += `ÉCHAPPEMENT JSON : à l'intérieur des chaînes, double tout antislash (\\\\) et échappe les guillemets internes (\\"), afin que le JSON reste valide tel quel.\n`;
-  p += `CARACTÈRES INTERDITS : N'utilise jamais les caractères § et ! dans aucun champ. Remplace ! par un point ou reformule.\n`;
-  const _verifNb = isRA ? `exactement ${xbr} bonne${xbr>1?'s':''} réponse${xbr>1?'s':''} dans "vrais" et ${parseInt(xe)-1} distracteurs dans "faux"` : `exactement ${xe} propositions dont ${xb} correctes`;
-  p += `CONTRÔLE FINAL (avant de répondre) : vérifie que (1) le JSON est syntaxiquement valide, (2) il contient ${_verifNb}, (3) aucun caractère § ou !, (4) chaque antislash est doublé, (5) aucun texte hors du bloc JSON. Si tu ne peux pas respecter ces contraintes, renvoie un objet JSON vide {}.\n\n`;
+  p += `${I18N.t('pb.qcm_echappement_json')}\n`;
+  p += `${I18N.t('pb.qcm_interdits')}\n`;
+  const distracteursVerif = parseInt(xe)-1;
+  const _verifNb = isRA
+    ? I18N.t(xbr>1?'pb.qcm_verif_ra_plural':'pb.qcm_verif_ra', {xbr, distracteurs: distracteursVerif})
+    : I18N.t('pb.qcm_verif_cb', {xe, xb});
+  p += `${I18N.t('pb.qcm_controle_final', {verif: _verifNb})}\n\n`;
 
   if(isRA){
-    const vraisEx = Array.from({length:xbr},(_,i)=>
-      `    {\n      "t": "Intitulé de la bonne réponse ${xbr>1?i+1:''}".trimEnd(),\n      "f": "explication pédagogique spécifique"\n    }`
-    ).join(',\n');
+    const bonneReponseLabel = I18N.t('pb.ex_bonne_reponse_label');
+    const distracteurLabel = I18N.t('pb.ex_distracteur_label');
+    const explicationPedago = I18N.t('pb.ex_explication_pedago');
     const fauxCount = Math.max(1, parseInt(xe)-1);
-    const fauxEx = Array.from({length:Math.min(fauxCount,3)},(_,i)=>
-      `    {\n      "t": "Intitulé du distracteur ${i+1}",\n      "f": "explication pédagogique spécifique"\n    }`
-    ).join(',\n');
-    p += `{\n  "xe": ${xe},\n  "vrais": [\n${Array.from({length:xbr},(_,i)=>`    {\n      "t": "Intitulé de la bonne réponse${xbr>1?' '+(i+1):''}",\n      "f": "explication pédagogique spécifique"\n    }`).join(',\n')}\n  ],\n  "faux": [\n${Array.from({length:Math.min(fauxCount,2)},(_,i)=>`    {\n      "t": "Intitulé du distracteur ${i+1}",\n      "f": "explication pédagogique spécifique"\n    }`).join(',\n')}\n  ]\n}`;
+    p += `{\n  "xe": ${xe},\n  "vrais": [\n${Array.from({length:xbr},(_,i)=>`    {\n      "t": "${bonneReponseLabel}${xbr>1?' '+(i+1):''}",\n      "f": "${explicationPedago}"\n    }`).join(',\n')}\n  ],\n  "faux": [\n${Array.from({length:Math.min(fauxCount,2)},(_,i)=>`    {\n      "t": "${distracteurLabel} ${i+1}",\n      "f": "${explicationPedago}"\n    }`).join(',\n')}\n  ]\n}`;
   } else {
     const showOubliCB = _pbType==='CB' && document.getElementById('cb-show-oubli')?.checked;
     if(showOubliCB){
-      p += `• Pour chaque proposition VRAIE, inclus un champ "feedback_oubli" : ce texte s'affiche à l'élève quand il N'A PAS coché cette proposition. Explique pourquoi il était important de la sélectionner.\n`;
-      p += `{\n  "xe": ${xe},\n  "xb": ${xb},\n  "propositions": [\n    {\n      "valeur": true,\n      "texte": "Énoncé de la proposition vraie",\n      "feedback": "Analyse pédagogique si cochée",\n      "feedback_oubli": "Explication de pourquoi cette proposition devait être cochée"\n    },\n    {\n      "valeur": false,\n      "texte": "Énoncé d'une proposition fausse",\n      "feedback": "Analyse pédagogique"\n    }\n  ]\n}`;
+      p += `• ${I18N.t('pb.cb_feedback_oubli_instr')}\n`;
+      p += `{\n  "xe": ${xe},\n  "xb": ${xb},\n  "propositions": [\n    {\n      "valeur": true,\n      "texte": "${I18N.t('pb.ex_enonce_prop_vraie')}",\n      "feedback": "${I18N.t('pb.ex_analyse_si_cochee')}",\n      "feedback_oubli": "${I18N.t('pb.ex_explication_oubli')}"\n    },\n    {\n      "valeur": false,\n      "texte": "${I18N.t('pb.ex_enonce_prop_fausse')}",\n      "feedback": "${I18N.t('pb.ex_analyse_pedago')}"\n    }\n  ]\n}`;
     } else {
-      p += `{\n  "xe": ${xe},\n  "xb": ${xb},\n  "propositions": [\n    {\n      "valeur": true,\n      "texte": "Énoncé de la proposition",\n      "feedback": "Analyse pédagogique"\n    }\n  ]\n}`;
+      p += `{\n  "xe": ${xe},\n  "xb": ${xb},\n  "propositions": [\n    {\n      "valeur": true,\n      "texte": "${I18N.t('pb.ex_enonce_proposition')}",\n      "feedback": "${I18N.t('pb.ex_analyse_pedago')}"\n    }\n  ]\n}`;
     }
   }
 
@@ -444,7 +446,7 @@ async function aiGenerateAndImport(targetType,applyFn){
       body:JSON.stringify({prompt:promptText,targetType:targetType})
     });
     const data=await res.json();
-    if(!res.ok) throw new Error(data.error||'Échec de la génération IA.');
+    if(!res.ok) throw new Error(data.error||I18N.t('ai.echec_generation'));
     if(data.fallback){
       if(targetType==='RA') importRAJSON(); else importDDJSON();
       return;
