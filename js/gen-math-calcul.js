@@ -85,7 +85,7 @@ q${X}_fp:diff(q${X}_f,x);`;
         textFrag = `${HDR}${custText}${`<p>${I18N_D.t('calc.derivee_enonce', {f: '{@q'+X+'_f@}'})}</p>`}
 <p>\\(f'(x)=\\) [[input:ans_fp${X}]] [[validation:ans_fp${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_fp${X}`,tans:`q${X}_fp`,boxsize:30,checkanswertype:1,mustverify:1,showvalidation:2});
-        canonicalNodes = [calcNode(0, 'D\xe9riv\xe9e correcte ?', 'AlgEquiv', `ans_fp${X}`, `q${X}_fp`, '',
+        canonicalNodes = [calcNode(0, I18N_D.t('calc.node_derivee_correcte'), 'AlgEquiv', `ans_fp${X}`, `q${X}_fp`, '',
             '=', 1, -1, 'PRT-'+X+'-OK', fbOk || '<strong>' + I18N_D.t('mat.fb_ok_correct') + '</strong>',
             '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `\\(f'(x)={@q${X}_fp@}\\).`,
             'true', 'false')];
@@ -100,7 +100,7 @@ q${X}_F:integrate(q${X}_f,x);`;
 <p>\\(F(x)=\\) [[input:ans_F${X}]] [[validation:ans_F${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_F${X}`,tans:`q${X}_F`,boxsize:30,allowwords:'k',mustverify:1,showvalidation:2});
         fbVars = `q${X}_diff:diff(ans_F${X},x);`;
-        canonicalNodes = [calcNode(0, "F'=f ?", 'AlgEquiv', `q${X}_diff`, `q${X}_f`, '',
+        canonicalNodes = [calcNode(0, I18N_D.t('calc.node_primitive_verif'), 'AlgEquiv', `q${X}_diff`, `q${X}_f`, '',
             '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong> \\(F'(x)=f(x)\\).`,
             '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `\\(F'(x)={@q${X}_diff@}\\neq f(x)\\).`,
             'true', 'false')];
@@ -116,7 +116,7 @@ q${X}_ta:integrate(q${X}_f,x,q${X}_a,q${X}_b);`;
         textFrag = `${HDR}${custText}${`<p>${I18N_D.t('calc.calculer_lbl')} \\( \\displaystyle\\int_{{@q${X}_a@}}^{{@q${X}_b@}} {@q${X}_f@}\\,dx \\)</p>`}
 <p>${I18N_D.t('calc.reponse_lbl')} [[input:ans_I${X}]] [[validation:ans_I${X}]]</p>`;
         inputXML = mkInput_D({name:`ans_I${X}`,tans:`q${X}_ta`,boxsize:20,checkanswertype:1,mustverify:1,showvalidation:2});
-        canonicalNodes = [calcNode(0, 'Correct ?', 'AlgEquiv', `ans_I${X}`, `q${X}_ta`, '',
+        canonicalNodes = [calcNode(0, I18N_D.t('calc.node_integrale_correct'), 'AlgEquiv', `ans_I${X}`, `q${X}_ta`, '',
             '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_correct')}</strong>`,
             '=', 0, -1, 'PRT-'+X+'-NOK', fbWrong || `${I18N_D.t('calc.integrale_fb_wrong', {ta: '{@q'+X+'_ta@}'})}`,
             'true', 'false')];
@@ -138,16 +138,16 @@ q${X}_err_plus:(q${X}_u+q${X}_v)*(q${X}_du+q${X}_dv)$`;
 <div>\\(f'(x) = \\) [[input:ans_fp${X}]] [[validation:ans_fp${X}]]</div>`;
         inputXML = mkInput_D({name:`ans_fp${X}`,tans:`q${X}_fp`,boxsize:30,checkanswertype:1,mustverify:1,showvalidation:2});
         canonicalNodes = [
-            calcNode(0, 'V\xe9rification de la d\xe9riv\xe9e', 'AlgEquiv', `ans_fp${X}`, `q${X}_fp`, '',
+            calcNode(0, I18N_D.t('calc.node_produit_verif_derivee'), 'AlgEquiv', `ans_fp${X}`, `q${X}_fp`, '',
                 '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.produit_fb_ok_desc')}`,
                 '=', 0, 1, 'PRT-'+X+'-NOK', '', 'true'),
-            calcNode(1, 'Erreur : Oubli d\xe9riv\xe9e polyn\xf4me', 'AlgEquiv', `ans_fp${X}`, `q${X}_err_oublie_poly`, '',
+            calcNode(1, I18N_D.t('calc.node_produit_err_oubli_poly'), 'AlgEquiv', `ans_fp${X}`, `q${X}_err_oublie_poly`, '',
                 '=', 0, -1, 'PRT-'+X+'-ERR-POLY', `<strong>${I18N_D.t('calc.produit_err_poly_title')}</strong> ${I18N_D.t('calc.produit_err_poly_desc', {u: '{@q'+X+'_u@}'})}`,
                 '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', '', 'partial'),
-            calcNode(2, 'Erreur : Oubli d\xe9riv\xe9e exponentielle', 'AlgEquiv', `ans_fp${X}`, `q${X}_err_oublie_exp`, '',
+            calcNode(2, I18N_D.t('calc.node_produit_err_oubli_exp'), 'AlgEquiv', `ans_fp${X}`, `q${X}_err_oublie_exp`, '',
                 '=', 0, -1, 'PRT-'+X+'-ERR-EXP', `<strong>${I18N_D.t('calc.produit_err_poly_title')}</strong> ${I18N_D.t('calc.produit_err_exp_desc', {du: '{@q'+X+'_du@}'})}`,
                 '=', 0, 3, 'PRT-'+X+'-ERR-AUTRE2', '', 'partial'),
-            calcNode(3, 'Erreur : Multiplication des d\xe9riv\xe9es', 'AlgEquiv', `ans_fp${X}`, `q${X}_err_produit`, '',
+            calcNode(3, I18N_D.t('calc.node_produit_err_multiplication'), 'AlgEquiv', `ans_fp${X}`, `q${X}_err_produit`, '',
                 '=', 0, -1, 'PRT-'+X+'-ERR-PROD', `<strong>${I18N_D.t('calc.produit_err_mult_title')}</strong> ${I18N_D.t('calc.produit_err_mult_desc')}`,
                 '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.produit_fb_wrong_desc')}`,
                 'false', 'false')
@@ -169,13 +169,13 @@ q${X}_err_coef:q${X}_b*%e^(q${X}_a*x)+q${X}_c*x$`;
 <div>\\(F(x) = \\) [[input:ans_F${X}]] [[validation:ans_F${X}]]</div>`;
         inputXML = mkInput_D({name:`ans_F${X}`,tans:`q${X}_ta_sans_k+k`,boxsize:30,checkanswertype:1,allowwords:'k',hint:I18N_D.t('calc.hint_exp'),mustverify:1,showvalidation:2});
         canonicalNodes = [
-            calcNode(0, 'V\xe9rification par d\xe9rivation', 'AlgEquiv', `diff(ans_F${X},x)`, `q${X}_f`, '',
+            calcNode(0, I18N_D.t('calc.node_primexp_verif_derivation'), 'AlgEquiv', `diff(ans_F${X},x)`, `q${X}_f`, '',
                 '=', 1, -1, 'PRT-'+X+'-DIFF-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.primexp_fb_ok_desc')}`,
                 '=', 0, 1, 'PRT-'+X+'-DIFF-NOK', '', 'true'),
-            calcNode(1, 'D\xe9tection oubli de la constante', 'AlgEquiv', `ans_F${X}`, `q${X}_ta_sans_k`, '',
+            calcNode(1, I18N_D.t('calc.node_primexp_detect_oubli_k'), 'AlgEquiv', `ans_F${X}`, `q${X}_ta_sans_k`, '',
                 '=', 0.5, -1, 'PRT-'+X+'-ERR-K', `<strong>${I18N_D.t('calc.presque_title')}</strong> ${I18N_D.t('calc.primexp_err_k_desc')}`,
                 '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', '', 'partial'),
-            calcNode(2, 'D\xe9tection erreur de coefficient exp', 'AlgEquiv', `ans_F${X}`, `q${X}_err_coef`, '',
+            calcNode(2, I18N_D.t('calc.node_primexp_detect_err_coef'), 'AlgEquiv', `ans_F${X}`, `q${X}_err_coef`, '',
                 '=', 0.25, -1, 'PRT-'+X+'-ERR-COEF', `<strong>${I18N_D.t('calc.err_coef_title')}</strong> ${I18N_D.t('calc.primexp_err_coef_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}`,
                 '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.primexp_fb_wrong_desc')}`,
                 'false', 'false')
@@ -199,16 +199,16 @@ q${X}_err_coef:q${X}_c*(%e^(q${X}_d*q${X}_b)-%e^(q${X}_d*q${X}_a))+q${X}_f$`;
 <div>\\(I = \\) [[input:ans_I${X}]] [[validation:ans_I${X}]]</div>`;
         inputXML = mkInput_D({name:`ans_I${X}`,tans:`q${X}_ta_I`,boxsize:30,hint:I18N_D.t('calc.hint_exp'),showvalidation:0});
         canonicalNodes = [
-            calcNode(0, 'V\xe9rification r\xe9sultat final', 'AlgEquiv', `ans_I${X}`, `q${X}_ta_I`, '',
+            calcNode(0, I18N_D.t('calc.node_intdef_verif_resultat'), 'AlgEquiv', `ans_I${X}`, `q${X}_ta_I`, '',
                 '=', 1, -1, 'PRT-'+X+'-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.intdef_fb_ok_desc')}`,
                 '=', 0, 1, 'PRT-'+X+'-NOK', '', 'true'),
-            calcNode(1, 'Erreur : A donn\xe9 la primitive', 'AlgEquiv', `ans_I${X}`, `q${X}_err_primitive`, '',
+            calcNode(1, I18N_D.t('calc.node_intdef_err_primitive'), 'AlgEquiv', `ans_I${X}`, `q${X}_err_primitive`, '',
                 '=', 0, -1, 'PRT-'+X+'-ERR-PRIM', `<strong>${I18N_D.t('calc.non_termine_title')}</strong> ${I18N_D.t('calc.intdef_err_prim_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}`,
                 '=', 0, 2, 'PRT-'+X+'-ERR-AUTRE', '', 'partial'),
-            calcNode(2, 'Erreur : Oubli du terme f x', 'AlgEquiv', `ans_I${X}`, `q${X}_err_no_x`, '',
+            calcNode(2, I18N_D.t('calc.node_intdef_err_oubli_fx'), 'AlgEquiv', `ans_I${X}`, `q${X}_err_no_x`, '',
                 '=', 0.25, -1, 'PRT-'+X+'-ERR-CST', `<strong>${I18N_D.t('calc.oubli_terme_title')}</strong> ${I18N_D.t('calc.intdef_err_nox_desc', {f: '{@q'+X+'_f@}'})}`,
                 '=', 0, 3, 'PRT-'+X+'-ERR-AUTRE2', '', 'false'),
-            calcNode(3, 'Erreur : Coefficient exponentielle', 'AlgEquiv', `ans_I${X}`, `q${X}_err_coef`, '',
+            calcNode(3, I18N_D.t('calc.node_intdef_err_coef'), 'AlgEquiv', `ans_I${X}`, `q${X}_err_coef`, '',
                 '=', 0.25, -1, 'PRT-'+X+'-ERR-COEF', `<strong>${I18N_D.t('calc.err_coef_title')}</strong> ${I18N_D.t('calc.intdef_err_coef_desc', {c: '{@q'+X+'_c@}', d: '{@q'+X+'_d@}'})}`,
                 '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('apn.fb_wrong_incorrect')}</strong> ${I18N_D.t('calc.intdef_fb_wrong_desc', {b: '{@q'+X+'_b@}', a: '{@q'+X+'_a@}'})}`,
                 'false', 'false')
@@ -249,15 +249,15 @@ q${X}_test_inf: float(ans_inf${X}) <= q${X}_alpha + q${X}_tol and q${X}_alpha - 
 q${X}_test_sup: float(ans_sup${X}) >= q${X}_alpha - q${X}_tol and float(ans_sup${X}) - q${X}_alpha <= 0.01 + q${X}_tol;
 q${X}_test_encad: is(float(ans_sup${X}) - float(ans_inf${X}) <= 0.02 + q${X}_tol);`;
         canonicalNodes = [
-            calcNode(0, 'V\xe9rification borne inf\xe9rieure', 'AlgEquiv', `q${X}_test_inf`, 'true', '',
+            calcNode(0, I18N_D.t('calc.node_tvi_verif_borne_inf'), 'AlgEquiv', `q${X}_test_inf`, 'true', '',
                 '+', 0.5, 1, 'PRT-'+X+'-INF-OK', '',
                 '=', 0, -1, 'PRT-'+X+'-INF-NOK', `<strong>${I18N_D.t('calc.tvi_borne_inf_title')}</strong> ${I18N_D.t('calc.tvi_borne_inf_desc')}`,
                 'true', 'false'),
-            calcNode(1, 'V\xe9rification borne sup\xe9rieure', 'AlgEquiv', `q${X}_test_sup`, 'true', '',
+            calcNode(1, I18N_D.t('calc.node_tvi_verif_borne_sup'), 'AlgEquiv', `q${X}_test_sup`, 'true', '',
                 '+', 0.5, 2, 'PRT-'+X+'-SUP-OK', '',
                 '=', 0, -1, 'PRT-'+X+'-SUP-NOK', `<strong>${I18N_D.t('calc.tvi_borne_sup_title')}</strong> ${I18N_D.t('calc.tvi_borne_sup_desc')}`,
                 'true', 'false'),
-            calcNode(2, 'V\xe9rification amplitude finale', 'AlgEquiv', `q${X}_test_encad`, 'true', '',
+            calcNode(2, I18N_D.t('calc.node_tvi_verif_amplitude'), 'AlgEquiv', `q${X}_test_encad`, 'true', '',
                 '=', 0, -1, 'PRT-'+X+'-AMP-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.tvi_fb_ok_desc')}`,
                 '-', 0.25, -1, 'PRT-'+X+'-AMP-NOK', fbWrong || `<strong>${I18N_D.t('calc.tvi_precision_title')}</strong> ${I18N_D.t('calc.tvi_precision_desc')}`,
                 'true', 'partial')
@@ -283,18 +283,18 @@ q${X}_ta_fpp:q${X}_fpp$ q${X}_ta_fp:q${X}_fp$`;
                  + '\n' + mkInput_D({name:`ans_conv${X}`,type:'dropdown',tans:`<![CDATA[[["convexe", true, "convexe"], ["concave", false, "concave"], ["autre", false, "ni convexe ni concave"]]]]>`,boxsize:15,showvalidation:0})
                  + '\n' + mkInput_D({name:`ans_pos${X}`,type:'dropdown',tans:`<![CDATA[[["en dessous de", true, "en dessous de"], ["au-dessus de", false, "au-dessus de"], ["confondue avec", false, "confondue avec"]]]]>`,boxsize:15,showvalidation:0});
         canonicalNodes = [
-            calcNode(0, 'V\xe9rification d\xe9riv\xe9e seconde', 'AlgEquiv', `ans_fpp${X}`, `q${X}_ta_fpp`, '',
+            calcNode(0, I18N_D.t('calc.node_convexite_verif_derivee_seconde'), 'AlgEquiv', `ans_fpp${X}`, `q${X}_ta_fpp`, '',
                 '=', 0.4, 1, 'PRT-'+X+'-FPP-OK', '',
                 '=', 0, 3, 'PRT-'+X+'-FPP-NOK', ''),
-            calcNode(1, 'V\xe9rification convexit\xe9', 'String', `ans_conv${X}`, '"convexe"', '',
+            calcNode(1, I18N_D.t('calc.node_convexite_verif_convexite'), 'String', `ans_conv${X}`, '"convexe"', '',
                 '=', 0.3, 2, 'PRT-'+X+'-CONV-OK', '',
                 '=', 0, -1, 'PRT-'+X+'-CONV-NOK', `<strong>${I18N_D.t('calc.incoherence_title')}</strong> ${I18N_D.t('calc.convexite_err_conv_desc', {fpp: '{@q'+X+'_fpp@}', k: '{@q'+X+'_k@}'})}`,
                 'true', 'partial'),
-            calcNode(2, 'V\xe9rification position tangente', 'String', `ans_pos${X}`, '"en dessous de"', '',
+            calcNode(2, I18N_D.t('calc.node_convexite_verif_position'), 'String', `ans_pos${X}`, '"en dessous de"', '',
                 '=', 0.3, -1, 'PRT-'+X+'-POS-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.convexite_fb_ok_desc')}`,
                 '=', 0, -1, 'PRT-'+X+'-POS-NOK', `<strong>${I18N_D.t('calc.attention_propriete_title')}</strong> ${I18N_D.t('calc.convexite_err_pos_desc')}`,
                 'true', 'partial'),
-            calcNode(3, 'Diagnostic erreur d\xe9riv\xe9e', 'AlgEquiv', `ans_fpp${X}`, `q${X}_ta_fp`, '',
+            calcNode(3, I18N_D.t('calc.node_convexite_diag_err_derivee'), 'AlgEquiv', `ans_fpp${X}`, `q${X}_ta_fp`, '',
                 '=', 0, -1, 'PRT-'+X+'-ERR-PRIME', `<strong>${I18N_D.t('calc.confusion_derivee_title')}</strong> ${I18N_D.t('calc.convexite_err_confusion_desc')}`,
                 '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('calc.convexite_fb_wrong_title')}</strong> ${I18N_D.t('calc.convexite_fb_wrong_desc')}`,
                 'false', 'false')
@@ -330,17 +330,17 @@ q${X}_err_point:{q${X}_xM}$`;
         inputXML = mkInput_D({name:`ans_ab${X}`,tans:`q${X}_ta_sol`,boxsize:15,hint:'{a, b}',mustverify:0,showvalidation:0})
                  + '\n' + mkInput_D({name:`ans_tang${X}`,tans:`q${X}_ta_tang`,boxsize:20,hint:'...',checkanswertype:1,mustverify:1,showvalidation:2});
         canonicalNodes = [
-            calcNode(0, 'V\xe9rification des abscisses des tangentes', 'AlgEquiv', `ans_ab${X}`, `q${X}_ta_sol`, '',
+            calcNode(0, I18N_D.t('calc.node_tanext_verif_abscisses'), 'AlgEquiv', `ans_ab${X}`, `q${X}_ta_sol`, '',
                 '=', 0.5, 1, 'PRT-'+X+'-AB-OK', '',
                 '=', 0, 2, 'PRT-'+X+'-AB-NOK', ''),
-            calcNode(1, "V\xe9rification d'une \xe9quation de tangente", 'AlgEquiv', `ans_tang${X}`, `q${X}_ta_tang`, '',
+            calcNode(1, I18N_D.t('calc.node_tanext_verif_equation'), 'AlgEquiv', `ans_tang${X}`, `q${X}_ta_tang`, '',
                 '=', 0.5, -1, 'PRT-'+X+'-TG-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.tanext_fb_ok_desc')}`,
                 '=', 0, 3, 'PRT-'+X+'-TG-NOK', '', 'true'),
-            calcNode(2, 'Diagnostic erreur sur les abscisses', 'AlgEquiv', `ans_ab${X}`, `q${X}_err_point`, '',
+            calcNode(2, I18N_D.t('calc.node_tanext_diag_err_abscisses'), 'AlgEquiv', `ans_ab${X}`, `q${X}_err_point`, '',
                 '=', 0, -1, 'PRT-'+X+'-ERR-XM', `<strong>${I18N_D.t('calc.confusion_point_courbe_title')}</strong> ${I18N_D.t('calc.tanext_err_xm_desc')}`,
                 '=', 0, -1, 'PRT-'+X+'-ERR-CALC', `<strong>${I18N_D.t('calc.abscisses_incorrectes_title')}</strong> ${I18N_D.t('calc.tanext_err_calc_desc')}`,
                 'partial', 'false'),
-            calcNode(3, "Diagnostic erreur sur l'\xe9quation", 'AlgEquiv', `ans_tang${X}`, 'false', '',
+            calcNode(3, I18N_D.t('calc.node_tanext_diag_err_equation'), 'AlgEquiv', `ans_tang${X}`, 'false', '',
                 '=', 0, -1, 'PRT-'+X+'-ERR-FORM', `<strong>${I18N_D.t('calc.formule_tangente_title')}</strong> ${I18N_D.t('calc.tanext_err_formule_desc')}`,
                 '=', 0, -1, 'PRT-'+X+'-ERR-CALC-TG', fbWrong || `<strong>${I18N_D.t('calc.equation_incorrecte_title')}</strong> ${I18N_D.t('calc.tanext_fb_wrong_desc')}`,
                 'partial', 'false')
@@ -371,14 +371,14 @@ ${I18N_D.t('calc.aire_enonce3')}
         inputXML = mkInput_D({name:`ans_ab${X}`,tans:`q${X}_ta_ab`,boxsize:15,hint:'{a, b}',mustverify:0,showvalidation:0})
                  + '\n' + mkInput_D({name:`ans_aire${X}`,tans:`q${X}_ta_aire`,boxsize:15,mustverify:0,showvalidation:0});
         canonicalNodes = [
-            calcNode(0, "V\xe9rification des abscisses d'intersection", 'AlgEquiv', `ans_ab${X}`, `q${X}_ta_ab`, '',
+            calcNode(0, I18N_D.t('calc.node_aire_verif_abscisses'), 'AlgEquiv', `ans_ab${X}`, `q${X}_ta_ab`, '',
                 '=', 0.5, 1, 'PRT-'+X+'-AB-OK', '',
                 '=', 0, -1, 'PRT-'+X+'-AB-NOK', `<strong>${I18N_D.t('calc.abscisses_incorrectes_title')}</strong> ${I18N_D.t('calc.aire_err_ab_desc')}`,
                 'true', 'false'),
-            calcNode(1, "V\xe9rification de l'aire finale", 'AlgEquiv', `ans_aire${X}`, `q${X}_ta_aire`, '',
+            calcNode(1, I18N_D.t('calc.node_aire_verif_aire'), 'AlgEquiv', `ans_aire${X}`, `q${X}_ta_aire`, '',
                 '=', 0.5, -1, 'PRT-'+X+'-AIRE-OK', fbOk || `<strong>${I18N_D.t('mat.fb_ok_parfait')}</strong> ${I18N_D.t('calc.aire_fb_ok_desc')}`,
                 '=', 0, 2, 'PRT-'+X+'-AIRE-NOK', '', 'true'),
-            calcNode(2, 'D\xe9tection erreur de signe (Aire n\xe9gative)', 'AlgEquiv', `ans_aire${X}`, `q${X}_ta_err_sign`, '',
+            calcNode(2, I18N_D.t('calc.node_aire_detect_err_signe'), 'AlgEquiv', `ans_aire${X}`, `q${X}_ta_err_sign`, '',
                 '=', 0.25, -1, 'PRT-'+X+'-ERR-SIGN', `<strong>${I18N_D.t('calc.erreur_signe_title')}</strong> ${I18N_D.t('calc.aire_err_signe_desc')}`,
                 '=', 0, -1, 'PRT-'+X+'-ERR-CALC', fbWrong || `<strong>${I18N_D.t('calc.aire_incorrecte_title')}</strong> ${I18N_D.t('calc.aire_fb_wrong_desc')}`,
                 'partial', 'false')

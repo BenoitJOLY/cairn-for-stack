@@ -13,8 +13,8 @@ function renderPreviewHTML_calcul(state) {
   // directement le texte saisi par l'enseignant (état déjà utilisé avant l'aperçu réel),
   // simplement encadré via applyFbBox pour pouvoir accueillir realFbWrongHTML sans double
   // encadré (cf. commentaire fbBoxesPreWrapped dans js/preview.js).
-  var fbOkHTML = applyFbBox('true', state.fbOk || '✅ <strong>Bonne réponse !</strong>');
-  var wrongFbHTML = applyFbBox('false', state.fbWrong || '❌ <strong>Réponse incorrecte.</strong>');
+  var fbOkHTML = applyFbBox('true', state.fbOk || FB_JUSTE_DEFAULT());
+  var wrongFbHTML = applyFbBox('false', state.fbWrong || FB_FAUX_DEFAULT());
   var scenarioHTML, fbGenBody;
   if (state.realBodyHTML) {
     // Tirage réellement calculé par Maxima (voir _calcRefreshRealPreview plus bas) :
@@ -30,7 +30,7 @@ function renderPreviewHTML_calcul(state) {
       .replace(/\[\[validation:[^\]]+\]\]/g, '');
     scenarioHTML = bodyFrag
       ? _calcTokenizeForPreview(bodyFrag, knownVars)
-      : '<em style="color:#6b7280;">Question g\xe9n\xe9r\xe9e automatiquement par Maxima (valeurs al\xe9atoires internes \xe0 chaque affichage) — voir l\'aper\xe7u \xe9l\xe8ve ci-dessous pour un exemple concret.</em>';
+      : '<em style="color:#6b7280;">' + I18N.t('calc.preview_auto_maxima') + '</em>';
     var note = '<p><em style="color:#475569;font-size:.82rem;">' + I18N.t('calc.preview_maxima_vars_note') + '</em></p>';
     fbGenBody = _calcTokenizeForPreview(realGeneralFeedback, knownVars) + note;
   }
