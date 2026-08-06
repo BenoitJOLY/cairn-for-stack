@@ -3079,6 +3079,9 @@ I18N.add("de", {
   "ic.fbgen_auto_note":       "Die Korrektur des angeklickten Bereichs erfolgt automatisch. In diesem Feld können Sie einen zusätzlichen pädagogischen Kommentar hinzufügen, der zusätzlich zur erwarteten Lösung angezeigt wird.",
   "ic.seq_no_zones":          "Es gibt keine Felder. Klicken Sie auf das Bild oben, um welche zu platzieren.",
   "ic.err_no_image":          "Laden Sie zunächst ein Bild hoch.",
+  "ic.preview_default_statement":  "Automatische Aufgabenstellung: Klicken Sie auf die richtige Zone des Bildes.",
+  "ic.preview_needs_zone_hint":    "Laden Sie ein Bild hoch und setzen Sie die Zone (Reiter Konfiguration), um die interaktive Vorschau zu sehen.",
+  "ic.preview_needs_zones_hint":   "Laden Sie ein Bild hoch und fügen Sie mindestens eine Zone hinzu (Reiter Konfiguration), um die interaktive Vorschau zu sehen.",
   /* ── Clés GLR partagées par d'autres panneaux (Lecture graphique retirée) ── */
   "glr.size_lbl":       "Abmessungen des Graphen",
   "glr.w_lbl":          "Breite (px)",

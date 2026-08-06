@@ -3079,6 +3079,9 @@ I18N.add("nl", {
   "ic.fbgen_auto_note":       "De correctie van het aangeklikte gebied gebeurt automatisch. In dit veld kunt u een aanvullende educatieve opmerking toevoegen, die naast de verwachte oplossing wordt weergegeven.",
   "ic.seq_no_zones":          "Geen streek. Klik op de afbeelding hierboven om het te vragen.",
   "ic.err_no_image":          "Laad eerst een afbeelding.",
+  "ic.preview_default_statement":  "Automatische opgave: klik op de juiste zone van de afbeelding.",
+  "ic.preview_needs_zone_hint":    "Laad een afbeelding en plaats de zone (tabblad Config) om de interactieve preview te zien.",
+  "ic.preview_needs_zones_hint":   "Laad een afbeelding en voeg minstens één zone toe (tabblad Config) om de interactieve preview te zien.",
   /* ── Clés GLR partagées par d'autres panneaux (Lecture graphique retirée) ── */
   "glr.size_lbl":       "Grafiekafmetingen",
   "glr.w_lbl":          "Breedte (px)",

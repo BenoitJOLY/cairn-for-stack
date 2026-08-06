@@ -3078,6 +3078,9 @@ I18N.add("fr", {
   "ic.fbgen_auto_note":       "La correction de la zone cliquée est automatique. Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.",
   "ic.seq_no_zones":          "Aucune zone. Cliquez sur l'image ci-dessus pour en poser.",
   "ic.err_no_image":          "Chargez d'abord une image.",
+  "ic.preview_default_statement":  "Énoncé automatique : cliquer sur la bonne zone de l'image.",
+  "ic.preview_needs_zone_hint":    "Chargez une image et posez la zone (onglet Config) pour voir l'aperçu interactif.",
+  "ic.preview_needs_zones_hint":   "Chargez une image et ajoutez au moins une zone (onglet Config) pour voir l'aperçu interactif.",
   /* ── Clés GLR partagées par d'autres panneaux (Lecture graphique retirée) ── */
   "glr.size_lbl":       "Dimensions du graphe",
   "glr.w_lbl":          "Largeur (px)",

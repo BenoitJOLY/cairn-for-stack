@@ -3079,6 +3079,9 @@ I18N.add("es", {
   "ic.fbgen_auto_note":       "La corrección de la zona seleccionada es automática. Este campo permite añadir un comentario didáctico complementario, que se muestra además de la solución esperada.",
   "ic.seq_no_zones":          "No hay ninguna zona. Haz clic en la imagen de arriba para crear una.",
   "ic.err_no_image":          "Primero, carga una imagen.",
+  "ic.preview_default_statement":  "Enunciado automático: haz clic en la zona correcta de la imagen.",
+  "ic.preview_needs_zone_hint":    "Carga una imagen y coloca la zona (pestaña Config) para ver la vista previa interactiva.",
+  "ic.preview_needs_zones_hint":   "Carga una imagen y añade al menos una zona (pestaña Config) para ver la vista previa interactiva.",
   /* ── Clés GLR partagées par d'autres panneaux (Lecture graphique retirée) ── */
   "glr.size_lbl":       "Dimensiones del grafo",
   "glr.w_lbl":          "Ancho (px)",
