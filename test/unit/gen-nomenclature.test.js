@@ -14,7 +14,11 @@ const { genNomenclatureCore, NOM_DONNES, _nomFamilies } = require(path.join('..'
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
 
 const escapeMaximaString = (s) => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-const DEPS = { buildPrtXml, escapeMaximaString };
+// Stub I18N minimal : suffisant pour genNomenclatureCore, qui n'utilise que t().
+const I18N_STUB = {
+    t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
+};
+const DEPS = { buildPrtXml, escapeMaximaString, I18N: I18N_STUB };
 
 function assertBalancedTags(xml, label) {
     const stripped = xml.replace(/<!\[CDATA\[[\s\S]*?\]\]>/g, '');

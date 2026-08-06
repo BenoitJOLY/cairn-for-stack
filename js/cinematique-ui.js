@@ -86,9 +86,9 @@ function cinSetMode(mode) {
   });
   var hint = document.getElementById('cin-atelier-hint');
   if (hint) {
-    if (mode === 'points') hint.textContent = 'Cliquez sur le fond pour poser le point suivant (M' + _cinAtelier.points.length + ').';
-    else if (mode === 'calib') hint.textContent = 'Cliquez sur le 1er repère de calibration.';
-    else hint.textContent = 'Cliquez sur un point pour le sélectionner (suppression via la liste).';
+    if (mode === 'points') hint.textContent = I18N.t('cin.hint_points', { n: _cinAtelier.points.length });
+    else if (mode === 'calib') hint.textContent = I18N.t('cin.hint_calib1');
+    else hint.textContent = I18N.t('cin.hint_select');
   }
   var canvas = document.getElementById('cin-atelier-canvas');
   if (canvas) canvas.style.cursor = mode === 'select' ? 'default' : 'crosshair';
@@ -121,7 +121,7 @@ function cinAtelierCanvasClick(e) {
     _cinRedraw();
     cinNotifyPreview();
     var hint = document.getElementById('cin-atelier-hint');
-    if (hint) hint.textContent = 'Cliquez sur le fond pour poser le point suivant (M' + _cinAtelier.points.length + ').';
+    if (hint) hint.textContent = I18N.t('cin.hint_points', { n: _cinAtelier.points.length });
     return;
   }
 
@@ -130,11 +130,11 @@ function cinAtelierCanvasClick(e) {
     if (_cinAtelier.calibStage === 0) {
       _cinAtelier.calib = { x1: Math.round(c.x), y1: Math.round(c.y), x2: 0, y2: 0, realDist: (_cinAtelier.calib && _cinAtelier.calib.realDist) || 1 };
       _cinAtelier.calibStage = 1;
-      if (hint2) hint2.textContent = 'Cliquez sur le 2e repère de calibration.';
+      if (hint2) hint2.textContent = I18N.t('cin.hint_calib2');
     } else {
       _cinAtelier.calib.x2 = Math.round(c.x); _cinAtelier.calib.y2 = Math.round(c.y);
       _cinAtelier.calibStage = 0;
-      if (hint2) hint2.textContent = 'Calibration posée. Renseignez la distance réelle entre les 2 repères ci-dessous.';
+      if (hint2) hint2.textContent = I18N.t('cin.hint_calib_done');
     }
     _cinRedraw();
     _cinUpdateEchelleInfo();
@@ -154,7 +154,7 @@ function _cinRenderPointList() {
   var list = document.getElementById('cin-atelier-point-list');
   if (!list) return;
   if (!_cinAtelier.points.length) {
-    list.innerHTML = '<p class="dd-empty-hint">Aucun point. Cliquez sur le fond ci-dessus pour poser M0.</p>';
+    list.innerHTML = '<p class="dd-empty-hint">' + I18N.t('cin.point_list_empty') + '</p>';
     return;
   }
   list.innerHTML = _cinAtelier.points.map(function (p, i) {
@@ -162,7 +162,7 @@ function _cinRenderPointList() {
     return '<div class="ic-seq-order-row' + (isSel ? ' ic-seq-order-row-sel' : '') + '">'
       + '<span class="ord-num">M' + i + '</span>'
       + '<span class="ic-seq-order-label">(' + p.x + ', ' + p.y + ') px</span>'
-      + '<button class="btn-del" onclick="cinAtelierDeletePoint(' + i + ')" aria-label="Supprimer">✕</button>'
+      + '<button class="btn-del" onclick="cinAtelierDeletePoint(' + i + ')" aria-label="' + I18N.t('btn.supprimer') + '">✕</button>'
       + '</div>';
   }).join('');
 }
@@ -184,7 +184,7 @@ function _cinUpdateEchelleInfo() {
   var pxDist = Math.hypot(c.x2 - c.x1, c.y2 - c.y1);
   if (pxDist <= 0 || !(c.realDist > 0)) { info.textContent = ''; return; }
   var echelle = c.realDist / pxDist;
-  info.textContent = 'Échelle déduite : ' + echelle.toFixed(4) + ' m/px (' + Math.round(pxDist) + ' px ↔ ' + c.realDist + ' m).';
+  info.textContent = I18N.t('cin.echelle_deduite', { echelle: echelle.toFixed(4), px: Math.round(pxDist), m: c.realDist });
 }
 
 function cinAtelierSetCalibDist(val) {

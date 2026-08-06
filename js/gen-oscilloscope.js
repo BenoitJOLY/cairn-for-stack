@@ -450,8 +450,8 @@ function _oscSimplePair(idPrefix, q1, q2, neutral){
   var fb1fail = neutral ? neutralFb : _oscKo('<strong>'+q1.label+I18N.t('osc.fb_incorrecte_suffix'));
   var fb2fail = neutral ? neutralFb : _oscKo('<strong>'+q2.label+I18N.t('osc.fb_incorrecte_suffix'));
   return [
-    _oscNode('0','Vérification '+q1.label,'UnitsRelative',q1.sans,q1.tans,q1.testopt,'+',0.5,1,idPrefix+'-0-T',fb1ok,'-',0,1,idPrefix+'-0-F',fb1fail),
-    _oscNode('1','Vérification '+q2.label,'UnitsRelative',q2.sans,q2.tans,q2.testopt,'+',0.5,-1,idPrefix+'-1-T',fb2ok,'-',0,-1,idPrefix+'-1-F',fb2fail)
+    _oscNode('0',I18N.t('tpl.osc_desc_verif_prefix')+q1.label,'UnitsRelative',q1.sans,q1.tans,q1.testopt,'+',0.5,1,idPrefix+'-0-T',fb1ok,'-',0,1,idPrefix+'-0-F',fb1fail),
+    _oscNode('1',I18N.t('tpl.osc_desc_verif_prefix')+q2.label,'UnitsRelative',q2.sans,q2.tans,q2.testopt,'+',0.5,-1,idPrefix+'-1-T',fb2ok,'-',0,-1,idPrefix+'-1-F',fb2fail)
   ];
 }
 
@@ -586,12 +586,12 @@ function genOscilloscopeCore(X, p, deps){
 
     if(pedMode==='guide'){
       canonicalNodes = [
-        _oscNode('0','Vérification de l\'unité de T','UnitsAbsolute','eleve_unit_T'+X,'teacher_unit_T'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_periode_unite_ko',{X:X}))),
-        _oscNode('1','Vérification de la valeur de T (conversion unité)','UnitsRelative','ans_T'+X,'ta'+X+'_T','ta'+X+'_precision_T','+',0.25,2,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_periode_ok')),'-',0,4,'prt'+X+'-1-F',_oscKo(I18N_D.t('osc.fb_periode_valeur_ko'))),
-        _oscNode('2','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_F'+X,'teacher_unit_F'+X,'0','+',0.25,3,'prt'+X+'-2-T','','-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_frequence_unite_ko',{X:X}))),
-        _oscNode('3','Vérification de la valeur de f','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0.05','+',0.25,-1,'prt'+X+'-3-T',_oscOk(I18N_D.t('osc.fb_frequence_ok')),'-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_frequence_valeur_ko'))),
-        _oscNode('4','Unité de f dans le cas où T est faux','UnitsRelative','ans_F'+X,'ta'+X+'_fq','0','+',0,5,'prt'+X+'-4-T','','-',0,-1,'prt'+X+'-4-F',_oscKo(I18N_D.t('osc.fb_frequence_unite_incoherente'))),
-        _oscNode('5','Cohérence f = 1/T (réponse élève)','UnitsRelative','ans_F'+X,'1/ans_T'+X,'0.05','+',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_frequence_coherente_trap')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N_D.t('osc.fb_frequence_incoherente')))
+        _oscNode('0',I18N_D.t('tpl.osc_desc_unite_t'),'UnitsAbsolute','eleve_unit_T'+X,'teacher_unit_T'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_periode_unite_ko',{X:X}))),
+        _oscNode('1',I18N_D.t('tpl.osc_desc_valeur_t'),'UnitsRelative','ans_T'+X,'ta'+X+'_T','ta'+X+'_precision_T','+',0.25,2,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_periode_ok')),'-',0,4,'prt'+X+'-1-F',_oscKo(I18N_D.t('osc.fb_periode_valeur_ko'))),
+        _oscNode('2',I18N_D.t('tpl.osc_desc_unite_f'),'UnitsAbsolute','eleve_unit_F'+X,'teacher_unit_F'+X,'0','+',0.25,3,'prt'+X+'-2-T','','-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_frequence_unite_ko',{X:X}))),
+        _oscNode('3',I18N_D.t('tpl.osc_desc_valeur_f'),'UnitsRelative','ans_F'+X,'ta'+X+'_fq','0.05','+',0.25,-1,'prt'+X+'-3-T',_oscOk(I18N_D.t('osc.fb_frequence_ok')),'-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_frequence_valeur_ko'))),
+        _oscNode('4',I18N_D.t('tpl.osc_desc_unite_f_incoherente'),'UnitsRelative','ans_F'+X,'ta'+X+'_fq','0','+',0,5,'prt'+X+'-4-T','','-',0,-1,'prt'+X+'-4-F',_oscKo(I18N_D.t('osc.fb_frequence_unite_incoherente'))),
+        _oscNode('5',I18N_D.t('tpl.osc_desc_coherence_f'),'UnitsRelative','ans_F'+X,'1/ans_T'+X,'0.05','+',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_frequence_coherente_trap')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N_D.t('osc.fb_frequence_incoherente')))
       ];
     } else {
       canonicalNodes = _oscSimplePair_D('prt'+X,
@@ -672,12 +672,12 @@ function genOscilloscopeCore(X, p, deps){
 
     if(pedMode==='guide'){
       canonicalNodes = [
-        _oscNode('0','Vérification de l\'unité de tau','UnitsAbsolute','eleve_unit_tau'+X,'teacher_unit_tau'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_tau_unite_ko',{X:X}))),
-        _oscNode('1','Vérification de la valeur de tau','UnitsRelative','ans_tau'+X,'ta'+X+'_tau','ta'+X+'_precision_q','+',0.25,3,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_tau_correcte')),'-',0,2,'prt'+X+'-1-F',''),
-        _oscNode('2','Piège Tau — A-t-il mis E ?','UnitsRelative','ans_tau'+X,'ta'+X+'_E','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N_D.t('osc.fb_tau_trap_e')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_tau_valeur_ko',{pct: decharge?I18N_D.t('osc.pct_368'):I18N_D.t('osc.pct_632')}))),
-        _oscNode('3','Vérification de l\'unité de E','UnitsAbsolute','eleve_unit_E'+X,'teacher_unit_E'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_tension_unite_ko',{X:X}))),
-        _oscNode('4','Vérification de la valeur de E','UnitsRelative','ans_E'+X,'ta'+X+'_E','0.05','+',0.25,-1,'prt'+X+'-4-T',_oscOk(I18N_D.t('osc.fb_tension_correcte')),'-',0,5,'prt'+X+'-4-F',''),
-        _oscNode('5','Piège E — A-t-il mis tau ?','UnitsRelative','ans_E'+X,'ta'+X+'_tau','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_tension_trap_tau')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N_D.t('osc.fb_tension_valeur_ko')))
+        _oscNode('0',I18N_D.t('tpl.osc_desc_unite_tau'),'UnitsAbsolute','eleve_unit_tau'+X,'teacher_unit_tau'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_tau_unite_ko',{X:X}))),
+        _oscNode('1',I18N_D.t('tpl.osc_desc_valeur_tau'),'UnitsRelative','ans_tau'+X,'ta'+X+'_tau','ta'+X+'_precision_q','+',0.25,3,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_tau_correcte')),'-',0,2,'prt'+X+'-1-F',''),
+        _oscNode('2',I18N_D.t('tpl.osc_desc_piege_tau_e'),'UnitsRelative','ans_tau'+X,'ta'+X+'_E','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N_D.t('osc.fb_tau_trap_e')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_tau_valeur_ko',{pct: decharge?I18N_D.t('osc.pct_368'):I18N_D.t('osc.pct_632')}))),
+        _oscNode('3',I18N_D.t('tpl.osc_desc_unite_e'),'UnitsAbsolute','eleve_unit_E'+X,'teacher_unit_E'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_tension_unite_ko',{X:X}))),
+        _oscNode('4',I18N_D.t('tpl.osc_desc_valeur_e'),'UnitsRelative','ans_E'+X,'ta'+X+'_E','0.05','+',0.25,-1,'prt'+X+'-4-T',_oscOk(I18N_D.t('osc.fb_tension_correcte')),'-',0,5,'prt'+X+'-4-F',''),
+        _oscNode('5',I18N_D.t('tpl.osc_desc_piege_e_tau'),'UnitsRelative','ans_E'+X,'ta'+X+'_tau','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_tension_trap_tau')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N_D.t('osc.fb_tension_valeur_ko')))
       ];
     } else {
       canonicalNodes = _oscSimplePair_D('prt'+X,
@@ -753,13 +753,13 @@ function genOscilloscopeCore(X, p, deps){
 
   if(pedMode==='guide'){
     canonicalNodes = [
-      _oscNode('0','Vérification de l\'unité de f','UnitsAbsolute','eleve_unit_f'+X,'teacher_unit_f'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_freq_unite_ko_retard',{X:X}))),
-      _oscNode('1','Vérification de la valeur de f','UnitsRelative','ans_fc'+X,'ta'+X+'_fc','ta'+X+'_precision_q','+',0.75,3,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_freq_correcte_retard')),'-',0,2,'prt'+X+'-1-F',''),
-      _oscNode('2','Piège — Mesure de la fréquence de la salve','UnitsRelative','ans_fc'+X,'ta'+X+'_fm','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N_D.t('osc.fb_freq_trap_salve')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_freq_valeur_ko_retard'))),
-      _oscNode('3','Vérification de l\'unité du retard','UnitsAbsolute','eleve_unit_dt'+X,'teacher_unit_dt'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_retard_unite_ko',{X:X}))),
-      _oscNode('4','Vérification de la valeur du retard','UnitsRelative','ans_dt'+X,'ta'+X+'_dt','0.05','+',0.75,-1,'prt'+X+'-4-T',_oscOk(I18N_D.t('osc.fb_retard_correct')),'-',0,5,'prt'+X+'-4-F',''),
-      _oscNode('5','Piège Retard — A-t-il mis la période du signal ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_periode','0.05','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_retard_trap_periode')),'-',0,6,'prt'+X+'-5-F',''),
-      _oscNode('6','Piège Retard — A-t-il mis T/2 ?','UnitsRelative','ans_dt'+X,'ta'+X+'_err_demi_periode','0.05','-',0,-1,'prt'+X+'-6-T',_oscTrap(I18N_D.t('osc.fb_retard_trap_demi_periode')),'-',0,-1,'prt'+X+'-6-F',_oscKo(I18N_D.t('osc.fb_retard_valeur_ko')))
+      _oscNode('0',I18N_D.t('tpl.osc_desc_unite_f'),'UnitsAbsolute','eleve_unit_f'+X,'teacher_unit_f'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_freq_unite_ko_retard',{X:X}))),
+      _oscNode('1',I18N_D.t('tpl.osc_desc_valeur_f'),'UnitsRelative','ans_fc'+X,'ta'+X+'_fc','ta'+X+'_precision_q','+',0.75,3,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_freq_correcte_retard')),'-',0,2,'prt'+X+'-1-F',''),
+      _oscNode('2',I18N_D.t('tpl.osc_desc_piege_freq_salve'),'UnitsRelative','ans_fc'+X,'ta'+X+'_fm','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N_D.t('osc.fb_freq_trap_salve')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_freq_valeur_ko_retard'))),
+      _oscNode('3',I18N_D.t('tpl.osc_desc_unite_retard'),'UnitsAbsolute','eleve_unit_dt'+X,'teacher_unit_dt'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_retard_unite_ko',{X:X}))),
+      _oscNode('4',I18N_D.t('tpl.osc_desc_valeur_retard'),'UnitsRelative','ans_dt'+X,'ta'+X+'_dt','0.05','+',0.75,-1,'prt'+X+'-4-T',_oscOk(I18N_D.t('osc.fb_retard_correct')),'-',0,5,'prt'+X+'-4-F',''),
+      _oscNode('5',I18N_D.t('tpl.osc_desc_piege_retard_periode'),'UnitsRelative','ans_dt'+X,'ta'+X+'_err_periode','0.05','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_retard_trap_periode')),'-',0,6,'prt'+X+'-5-F',''),
+      _oscNode('6',I18N_D.t('tpl.osc_desc_piege_retard_demi_periode'),'UnitsRelative','ans_dt'+X,'ta'+X+'_err_demi_periode','0.05','-',0,-1,'prt'+X+'-6-T',_oscTrap(I18N_D.t('osc.fb_retard_trap_demi_periode')),'-',0,-1,'prt'+X+'-6-F',_oscKo(I18N_D.t('osc.fb_retard_valeur_ko')))
     ];
   } else {
     canonicalNodes = _oscSimplePair_D('prt'+X,

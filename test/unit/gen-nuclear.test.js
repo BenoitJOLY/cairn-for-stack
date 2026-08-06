@@ -23,8 +23,9 @@ function _mkFbGen(generalFeedback, fbGen) {
 function _nucRenderKatex(latex) {
     return '<span class="katex-stub">' + latex + '</span>';
 }
+const escapeMaximaString = (s) => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, _nucRenderKatex };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, _mkFbGen, _nucRenderKatex, escapeMaximaString };
 
 function baseParams(overrides) {
     return Object.assign({

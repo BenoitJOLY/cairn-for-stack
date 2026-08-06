@@ -216,15 +216,20 @@ function genAvancementCore(X, p, deps) {
   // vers ce texte : Moodle ne retrouve alors plus le nœud suivant à l'import.
   var nInit = '0', nEnc = '1', nFin = '2', nXmax = '3';
 
-  var fbInitTrue = applyFbBox_D('true', I18N_D.t('av.fb_init_true') || 'Ligne « État initial » correcte.');
-  var fbInitFalse = applyFbBox_D('false', I18N_D.t('av.fb_init_false') || "Ligne « État initial » incorrecte : vérifie la quantité initiale de chaque espèce (0 pour les espèces formées).");
-  var fbEncTrue = applyFbBox_D('true', (I18N_D.t('av.fb_enc_true') || 'Ligne « En cours » correcte.') + followNote);
-  var fbEncFalse = applyFbBox_D('false', (I18N_D.t('av.fb_enc_false') || "Ligne « En cours » incorrecte : exprime chaque quantité en fonction de x à l'aide des coefficients stœchiométriques et du signe (- pour un réactif, + pour un produit).") + followNote);
-  var fbFinTrue = applyFbBox_D('true', (I18N_D.t('av.fb_fin_true') || 'Ligne « État final » correcte.') + followNote);
-  var fbFinFalse = applyFbBox_D('false', (I18N_D.t('av.fb_fin_false') || "Ligne « État final » incorrecte : remplace x par x_max dans la ligne « En cours ».") + followNote);
-  var fbXmaxTrue = applyFbBox_D('true', 'x_max ' + (I18N_D.t('av.fb_xmax_true') || 'correct.') + followNote);
-  var fbXmaxFalse = applyFbBox_D('false', (I18N_D.t('av.fb_xmax_false') || 'x_max incorrect : cherche le réactif limitant (hors espèces en excès et hors solvant).') + followNote);
+  var fbInitTrue = I18N_D.t('av.fb_init_true') || 'Ligne « État initial » correcte.';
+  var fbInitFalse = I18N_D.t('av.fb_init_false') || "Ligne « État initial » incorrecte : vérifie la quantité initiale de chaque espèce (0 pour les espèces formées).";
+  var fbEncTrue = (I18N_D.t('av.fb_enc_true') || 'Ligne « En cours » correcte.') + followNote;
+  var fbEncFalse = (I18N_D.t('av.fb_enc_false') || "Ligne « En cours » incorrecte : exprime chaque quantité en fonction de x à l'aide des coefficients stœchiométriques et du signe (- pour un réactif, + pour un produit).") + followNote;
+  var fbFinTrue = (I18N_D.t('av.fb_fin_true') || 'Ligne « État final » correcte.') + followNote;
+  var fbFinFalse = (I18N_D.t('av.fb_fin_false') || "Ligne « État final » incorrecte : remplace x par x_max dans la ligne « En cours ».") + followNote;
+  var fbXmaxTrue = 'x_max ' + (I18N_D.t('av.fb_xmax_true') || 'correct.') + followNote;
+  var fbXmaxFalse = (I18N_D.t('av.fb_xmax_false') || 'x_max incorrect : cherche le réactif limitant (hors espèces en excès et hors solvant).') + followNote;
 
+  // nodes reste en texte BRUT (pas de fbBox ici) : c'est cette version qui est
+  // exposée via prt.nodes pour la preview (js/preview-avancement.js applique
+  // applyFbBox elle-même) et pour prt-manager.js. Seul xmlNodes (copie) porte
+  // les encadrés colorés, pour l'export XML — voir js/gen-acidebase.js/gen-redox.js
+  // pour le même patron.
   var nodes = [
     { name: nInit, description: 'État initial', answertest: 'AlgEquiv', sans: '[' + iNames.join(',') + ']', tans: iTans,
       truescoremode: '+', truescore: '1/3', truenextnode: '1', trueanswernote: prtName + '-1-T', truefeedback: fbInitTrue,
@@ -240,7 +245,13 @@ function genAvancementCore(X, p, deps) {
       falsescoremode: '+', falsescore: '0', falsenextnode: '-1', falseanswernote: prtName + '-4-F', falsefeedback: fbXmaxFalse }
   ];
   var prtMeta = { name: prtName, value: bareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedbackVars };
-  var prtXML = buildPrtXml_D(prtMeta, nodes);
+  var xmlNodes = nodes.map(function (n) {
+    return Object.assign({}, n, {
+      truefeedback: applyFbBox_D('true', n.truefeedback),
+      falsefeedback: applyFbBox_D('false', n.falsefeedback)
+    });
+  });
+  var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
 
   var generalFeedback = applyFbBox_D('general', mkFbGen_D(
     '<p>' + (I18N_D.t('av.gf_intro') || "Corrigé du tableau d'avancement :") + '</p>'

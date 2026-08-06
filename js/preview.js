@@ -867,7 +867,7 @@ function renderPreviewHTML_acideBase(state) {
     var jsBody = 'var ' + refSlopesVar + ' = null; var stack_jxg = { bind_point: function(){} };\n' + jxgJs;
     exampleHTML = '<div id="' + boardId + '" style="position:relative;width:100%;max-width:' + dispW + 'px;height:' + dispH + 'px;margin:0 auto;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;background:#fff;"></div>'
       + '<script src="lib/jsxgraph/jsxgraphcore.js"><\/script>'
-      + '<script>(function(){ try { var divid = ' + JSON.stringify(boardId) + '; ' + jsBody + ' } catch(e){ var el=document.getElementById(' + JSON.stringify(boardId) + '); if(el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">Erreur JSXGraph : " + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; console.error(e); } })();<\/script>';
+      + '<script>(function(){ try { var divid = ' + JSON.stringify(boardId) + '; ' + jsBody + ' } catch(e){ var el=document.getElementById(' + JSON.stringify(boardId) + '); if(el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">" + ' + JSON.stringify(I18N.t('common.preview_jsxgraph_error_prefix')) + ' + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; console.error(e); } })();<\/script>';
   }
   if (textAfter) exampleHTML += '<div style="margin-top:10px;">' + textAfter + '</div>';
   exampleHTML = '<div style="background:#fef9c3;border:1px solid #eab308;color:#713f12;font-size:.78rem;padding:6px 10px;border-radius:6px;margin-bottom:10px;">⚠️ Aperçu — la simulation ci-dessous est visuelle uniquement : les interactions (clics, glisser, saisie) ne sont pas prises en compte dans le calcul du score ici. La correction réelle se fait dans Moodle.</div>' + exampleHTML;
@@ -879,7 +879,7 @@ function renderPreviewHTML_acideBase(state) {
     exampleLabel: '',
     exampleHTML: exampleHTML,
     hideOkWrongBoxes: true,
-    extraFeedbackNodesTitle: "Feedbacks du PRT (dans l'ordre d'évaluation) :",
+    extraFeedbackNodesTitle: I18N.t('ab.preview_prt_feedback_title'),
     extraFeedbackNodes: realParts.diagNodes || [],
     fbGenAuto: _hsRenderMath(realParts.generalFeedbackAuto || ''),
     fbGen: state.fbGen
@@ -893,7 +893,7 @@ function renderPreviewHTML_circuit(state) {
     return _hsSimplePreviewHTML({
       badge: I18N.t('type.circuit'), badgeColor: '#c2410c', noteBg: '#fff7ed', noteColor: '#9a3412',
       prefix: 'cir', bareme: state.bareme || 1,
-      text: '<p><em style="color:#6b7280;">Construisez un circuit mod\xe8le dans l\'atelier ci-contre pour voir l\'aper\xe7u \xe9l\xe8ve.</em></p>',
+      text: '<p><em style="color:#6b7280;">' + I18N.t('cir.preview_no_model_placeholder') + '</em></p>',
       hideExampleBox: true, hideOkWrongBoxes: true,
       fbGenAuto: '', fbGen: state.fbGen
     });
@@ -913,12 +913,12 @@ function renderPreviewHTML_rvbcmj(state) {
   // Reflète genFbDefault de js/gen-optique.js (image originale sans filtre,
   // toujours ajoutée au feedback général réel) pour que l'aperçu ne mente pas.
   var fbGenAuto = (rawDataEl && rawDataEl.value)
-    ? '<p>Voici l\'image originale sans filtre pour vérifier&nbsp;:</p><p><img src="' + rawDataEl.value + '" alt="scène originale" style="max-width:600px;border-radius:6px;"></p>'
+    ? '<p>' + I18N.t('rvb.genfb_text') + '</p><p><img src="' + rawDataEl.value + '" alt="' + I18N.t('rvb.genfb_alt') + '" style="max-width:600px;border-radius:6px;"></p>'
     : '';
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.rvbcmj'), badgeColor: '#7E22CE', noteBg: '#faf5ff', noteColor: '#581c87',
     prefix: 'rvb', bareme: state.bareme || 1,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : identifier la couleur d\'un objet à travers des filtres.</em></p>'),
+    text: _hsRenderMath(state.text || '<p><em>' + I18N.t('rvb.preview_placeholder') + '</em></p>'),
     exampleHTML: _hsRenderMath(exampleHTML),
     fbGenAuto: fbGenAuto,
     fbOk: state.fbOk, fbWrong: state.fbWrong, fbGen: state.fbGen
@@ -930,8 +930,8 @@ function renderPreviewHTML_optique(state) {
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.optique'), badgeColor: '#0369a1', noteBg: '#f0f9ff', noteColor: '#0c4a6e',
     prefix: 'opt', bareme: state.bareme || 1,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : construction géométrique (lentille, miroir ou instrument optique).</em></p>'),
-    exampleHTML: '<p style="color:#475569;font-style:italic;">Le schéma interactif JSXGraph n\'est visible que dans l\'export Moodle final.</p>',
+    text: _hsRenderMath(state.text || '<p><em>' + I18N.t('opt.preview_placeholder') + '</em></p>'),
+    exampleHTML: '<p style="color:#475569;font-style:italic;">' + I18N.t('opt.preview_jsxgraph_note') + '</p>',
     fbOk: state.fbOk, fbWrong: state.fbWrong, fbGen: state.fbGen
   });
 }
@@ -942,7 +942,7 @@ function renderPreviewHTML_diffraction(state) {
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.diffraction'), badgeColor: '#4338ca', noteBg: '#f5f3ff', noteColor: '#4c1d95',
     prefix: 'diff', bareme: state.bareme || 1,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : diffraction ou interférences lumineuses.</em></p>'),
+    text: _hsRenderMath(state.text || '<p><em>' + I18N.t('diff.preview_statement_placeholder') + '</em></p>'),
     exampleHTML: _hsRenderMath(liveEl ? liveEl.innerHTML : ''),
     fbOk: state.fbOk, fbWrong: state.fbWrong, fbGen: state.fbGen
   });
@@ -980,13 +980,13 @@ function _oscBuildLivePreviewJS(state) {
     }
     var umaxVal = parseFloat(state.umax) || 3;
     jsxBlock = buildOscJSXCode_PeriodeFrequence({ si: svIdx, ti: shIdx, freqExpr: String(freqVal), umExpr: String(umaxVal), typeExpr: String(typeVal) });
-    modeLabel = 'Période / Fréquence';
+    modeLabel = I18N.t('osc.mode_periode_frequence');
   } else if (mode === 'rc_charge' || mode === 'rc_decharge') {
     var decharge = (mode === 'rc_decharge');
     var evVal = parseFloat(state.evoltBase) || 2000;
     var tauVal = parseFloat(state.tauBase) || 1000;
     jsxBlock = buildOscJSXCode_RC({ si: svIdx, ti: shIdx, evExpr: String(evVal), tauExpr: String(tauVal), decharge: decharge });
-    modeLabel = decharge ? 'Décharge RC' : 'Charge RC';
+    modeLabel = decharge ? I18N.t('osc.mode_decharge_rc') : I18N.t('osc.mode_charge_rc');
   } else {
     var fcVal = parseFloat(state.fcarrier) || 4000000;
     var dtMinVal = parseFloat(state.dtMin) || 4;
@@ -994,7 +994,7 @@ function _oscBuildLivePreviewJS(state) {
     var dtSec = ((dtMinVal + dtMaxVal) / 2) * 0.000001;
     var svIdxB = Math.min(OSC_SV.length - 1, svIdx + 1);
     jsxBlock = buildOscJSXCode_Retard({ siA: svIdx, siB: svIdxB, ti: shIdx, fcExpr: String(fcVal), dtExpr: String(dtSec) });
-    modeLabel = 'Retard ultrasonore';
+    modeLabel = I18N.t('osc.mode_retard_ultrasonore');
   }
 
   return { jsBody: _oscStripJXGWrapper(jsxBlock), modeLabel: modeLabel };
@@ -1008,7 +1008,7 @@ function renderPreviewHTML_oscilloscope(state) {
     ? '<div id="' + boardId + '" style="position:relative;width:100%;max-width:520px;height:370px;margin:0 auto;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;background:#fff;"></div>'
       + '<script src="lib/jsxgraph/jsxgraphcore.js"><\/script>'
       + '<script>(function(){ try { var divid = ' + JSON.stringify(boardId) + '; ' + live.jsBody + ' } catch(e){ var el=document.getElementById(' + JSON.stringify(boardId) + '); if(el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">Erreur JSXGraph : " + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; console.error(e); } })();<\/script>'
-    : '<p style="color:#94a3b8;font-style:italic;">L\'oscilloscope JSXGraph interactif n\'a pas pu être généré pour l\'aperçu.</p>';
+    : '<p style="color:#94a3b8;font-style:italic;">' + I18N.t('osc.preview_jsxgraph_build_failed') + '</p>';
 
   // Jetons {@expr@} restés bruts (non calculables cote JS) : on les rend en \texttt{}
   // LaTeX plutot qu'en HTML <code>, sinon le HTML casse le rendu KaTeX quand le jeton
@@ -1048,15 +1048,15 @@ function renderPreviewHTML_oscilloscope(state) {
     exampleHTML += '<div style="margin-top:10px;">' + questionsBlockHTML + '</div>';
   }
   var extraFeedbackNodes = ((realParts.prt && realParts.prt.nodes) || []).map(function(n) {
-    var fb = (n.truefeedback ? '<div><strong>Si correct :</strong> ' + _oscTokenizeStack(n.truefeedback) + '</div>' : '')
-      + (n.falsefeedback ? '<div><strong>Si incorrect :</strong> ' + _oscTokenizeStack(n.falsefeedback) + '</div>' : '');
+    var fb = (n.truefeedback ? '<div><strong>' + I18N.t('common.preview_if_correct') + ':</strong> ' + _oscTokenizeStack(n.truefeedback) + '</div>' : '')
+      + (n.falsefeedback ? '<div><strong>' + I18N.t('common.preview_if_wrong') + ':</strong> ' + _oscTokenizeStack(n.falsefeedback) + '</div>' : '');
     return { desc: n.description, fb: fb };
   }).filter(function(n) { return n.fb; });
 
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.oscilloscope') + ' — ' + live.modeLabel, badgeColor: '#0c4a6e', noteBg: '#eff6ff', noteColor: '#1e3a5f',
     prefix: 'osc', bareme: state.bareme || 1,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : mesure sur oscilloscope interactif (curseurs ▪X/▪Y).</em></p>'),
+    text: _hsRenderMath(state.text || '<p><em>' + I18N.t('osc.preview_statement_placeholder') + '</em></p>'),
     exampleLabel: '',
     exampleHTML: exampleHTML,
     fbOk: state.fbOk, fbWrong: state.fbWrong,
@@ -1084,15 +1084,15 @@ function renderPreviewHTML_chemical(state) {
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.chemical'), badgeColor: '#2F855E', noteBg: '#f0fdf4', noteColor: '#166534',
     prefix: 'chem', bareme: state.bareme || 2,
-    text: _hsRenderMath(state.text || '<p style="color:#b91c1c;"><em>⚠️ Aucun énoncé saisi — l\'élève ne verra aucune consigne au-dessus de l\'éditeur d\'équation. Rédigez l\'énoncé (ex. "Écrire l\'équation de combustion du méthane").</em></p>'),
-    exampleLabel: 'Ce que voit l\'élève (zone de saisie vide, il compose sa propre équation) :',
+    text: _hsRenderMath(state.text || '<p style="color:#b91c1c;"><em>' + I18N.t('chem.preview_no_text_warning') + '</em></p>'),
+    exampleLabel: I18N.t('chem.preview_example_label'),
     exampleHTML: '<div style="text-align:left;">'
       + '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">'
-      + '<span style="background:#34495e;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">x₂ Indice</span>'
-      + '<span style="background:#34495e;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">xⁿ Exposant</span>'
-      + '<span style="background:#15803d;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">→ Flèche</span>'
+      + '<span style="background:#34495e;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">x₂ ' + I18N.t('tpl.chem_btn_indice') + '</span>'
+      + '<span style="background:#34495e;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">xⁿ ' + I18N.t('tpl.chem_btn_exposant') + '</span>'
+      + '<span style="background:#15803d;color:#fff;padding:4px 10px;border-radius:4px;font-size:.8rem;">→ ' + I18N.t('tpl.chem_desc_fleche') + '</span>'
       + '</div>'
-      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#475569;font-style:italic;">(l\'élève écrit ici sa réaction — aucune équation n\'est pré-remplie)</div>'
+      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#475569;font-style:italic;">' + I18N.t('chem.preview_editor_placeholder') + '</div>'
       + '</div>',
     fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
     fbOk: prtBoxes.okFb, fbWrong: prtBoxes.wrongFb,
@@ -1109,27 +1109,27 @@ window.chemRefreshPreview = _hsWireSimplePreview('chemical', 'chem', 'chem-previ
 function _topoDiagNodes() {
   var X = '';
   return [
-    { description: 'Fleche',
-      truefeedback: '<p><span style="color: green; font-weight: bold;">✓ Bonne flèche de réaction !</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">✗ Mauvaise flèche.</span> Détectée : {@ans_arrow_det' + X + '@}, attendue : {@tans_arrow' + X + '@}</p>' },
-    { description: 'Bilan atomes',
-      truefeedback: '<p><span style="color: green; font-weight: bold;">✓ Votre réaction est équilibrée du point de vue des éléments chimiques !</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">✗ Votre réaction n\'est pas équilibrée du point des éléments chimiques !</span></p>' },
-    { description: 'Charges',
-      truefeedback: '<p><span style="color: green;">✓ Votre équation est équilibrée électriquement.</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">✗ Les charges ne sont pas conservées dans votre réaction.</span> Réactifs : {@charge_rea_s' + X + '@}, Produits : {@charge_pro_s' + X + '@}</p>' },
-    { description: 'Formules',
-      truefeedback: '<p><span style="color: green;">✓ Vos formules sont correctes !</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">✗ Vos formules sont incorrectes.</span></p>' },
-    { description: 'Groupes',
-      truefeedback: '<p><span style="color: #b45309;">⚠ Bonne compréhension du type de réaction.</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">✗ Groupes fonctionnels non reconnus.</span></p>' },
-    { description: 'Coefficients',
-      truefeedback: '<p><span style="color: green;">✓ Vos coefficients stœchiométriques sont corrects !</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">✗ Vos coefficients stœchiométriques sont incorrects !</span></p>' },
-    { description: 'Coefs prop', sans: 'is_proportional' + X, tans: 'true',
-      truefeedback: '<p><span style="color: #b45309;">⚠ Coefficients proportionnels (k={@k_ratio' + X + '@}) mais non réduits.</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">✗ Coefficients non proportionnels.</span></p>' }
+    { description: I18N.t('tpl.topo_desc_fleche'),
+      truefeedback: '<p><span style="color: green; font-weight: bold;">' + I18N.t('tpl.topo_fb_fleche_ok') + '</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">' + I18N.t('tpl.topo_fb_fleche_ko', { det: '{@ans_arrow_det' + X + '@}', att: '{@tans_arrow' + X + '@}' }) + '</span></p>' },
+    { description: I18N.t('tpl.topo_desc_atomes'),
+      truefeedback: '<p><span style="color: green; font-weight: bold;">' + I18N.t('tpl.topo_fb_atomes_ok') + '</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">' + I18N.t('tpl.topo_fb_atomes_ko') + '</span></p>' },
+    { description: I18N.t('tpl.topo_desc_charges'),
+      truefeedback: '<p><span style="color: green;">' + I18N.t('tpl.topo_fb_charges_ok') + '</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_charges_ko', { rea: '{@charge_rea_s' + X + '@}', pro: '{@charge_pro_s' + X + '@}' }) + '</span></p>' },
+    { description: I18N.t('tpl.topo_desc_formules'),
+      truefeedback: '<p><span style="color: green;">' + I18N.t('tpl.topo_fb_formules_ok') + '</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_formules_ko', { rea: '{@nb_rea_s' + X + '@}', pro: '{@nb_pro_s' + X + '@}' }) + '</span></p>' },
+    { description: I18N.t('tpl.topo_desc_groupes'),
+      truefeedback: '<p><span style="color: #b45309;">' + I18N.t('tpl.topo_fb_groupes_ok') + '</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_groupes_ko') + '</span></p>' },
+    { description: I18N.t('tpl.topo_desc_coefficients'),
+      truefeedback: '<p><span style="color: green;">' + I18N.t('tpl.topo_fb_coefs_ok') + '</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_coefs_ko') + '</span></p>' },
+    { description: I18N.t('tpl.topo_desc_coefsprop'), sans: 'is_proportional' + X, tans: 'true',
+      truefeedback: '<p><span style="color: #b45309;">' + I18N.t('tpl.topo_fb_coefsprop_ok', { k: '{@k_ratio' + X + '@}' }) + '</span></p>',
+      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_coefsprop_ko') + '</span></p>' }
   ];
 }
 
@@ -1161,8 +1161,8 @@ function renderPreviewHTML_topo(state) {
   var extraNodes = [];
   topoNodes.forEach(function (n, i) {
     var isFirst = i === 0, isLast = i === topoNodes.length - 1;
-    if (!isFirst && n.truefeedback) extraNodes.push({ desc: n.description + ' (succès)', fb: n.truefeedback });
-    if (!isLast && n.falsefeedback) extraNodes.push({ desc: n.description + ' (échec)', fb: n.falsefeedback });
+    if (!isFirst && n.truefeedback) extraNodes.push({ desc: n.description + I18N.t('common.diag_success_suffix'), fb: n.truefeedback });
+    if (!isLast && n.falsefeedback) extraNodes.push({ desc: n.description + I18N.t('common.diag_failure_suffix'), fb: n.falsefeedback });
   });
   var widgetHTML = '<div style="font-family:sans-serif;background:#fff;border:1px solid #d1d8dd;border-radius:8px;padding:15px;margin-top:10px;">'
     + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">'
@@ -1177,7 +1177,7 @@ function renderPreviewHTML_topo(state) {
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.chemical_topo'), badgeColor: '#8f2b33', noteBg: '#fef2f2', noteColor: '#8f2b33',
     prefix: 'topo', bareme: state.bareme || 2,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : compléter la réaction (structures moléculaires).</em></p>') + widgetHTML,
+    text: _hsRenderMath(state.text || '<p><em>' + I18N.t('topo.preview_statement_placeholder') + '</em></p>') + widgetHTML,
     hideExampleBox: true,
     fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
     fbOk: prtBoxes.okFb, fbWrong: prtBoxes.wrongFb,
@@ -1213,11 +1213,11 @@ function renderPreviewHTML_nuclear(state) {
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.nuclear'), badgeColor: '#5b21b6', noteBg: '#f5f3ff', noteColor: '#5b21b6',
     prefix: 'nuc', bareme: state.bareme || 2,
-    text: _hsRenderMath(state.text || '<p style="color:#b91c1c;"><em>⚠️ Aucun énoncé saisi — l\'élève ne verra aucune consigne au-dessus de l\'éditeur de réaction. Rédigez l\'énoncé (ex. "Compléter la réaction de fission de l\'uranium 235").</em></p>'),
-    exampleLabel: 'Ce que voit l\'élève (zone de saisie vide, il compose sa propre réaction) :',
+    text: _hsRenderMath(state.text || '<p style="color:#b91c1c;"><em>' + I18N.t('nuc.preview_no_text_warning') + '</em></p>'),
+    exampleLabel: I18N.t('nuc.preview_example_label'),
     exampleHTML: '<div style="text-align:left;">'
       + '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">' + nucChips + '</div>'
-      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#64748b;font-style:italic;">(l\'élève écrit ici sa réaction — aucune réaction n\'est pré-remplie)</div>'
+      + '<div style="border:2px solid #34495e;border-radius:8px;padding:12px;min-height:40px;background:#fff;color:#64748b;font-style:italic;">' + I18N.t('nuc.preview_editor_placeholder') + '</div>'
       + '</div>',
     fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
     fbOk: prtBoxes.okFb, fbWrong: prtBoxes.wrongFb,

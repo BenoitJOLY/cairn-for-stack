@@ -223,14 +223,14 @@ cursorCode,
                       + 'rx_v_ok:is(abs(rx_vcur-rx_vtgt)<=' + tolVol.toFixed(3) + ');\n'
                       + 'rx_c_ok:is(abs(rx_ccur-rx_ctgt)<=' + tolC.toFixed(4) + ');\n';
 
-        var vWrongFb = fbBox(RED, REDBG, '❌ <strong>Le volume équivalent lu n\'est pas correct.</strong> '
+        var vWrongFb = fbBox(RED, REDBG, '❌ <strong>' + I18Nd.t('rx.fb_calc_vwrong_title') + '</strong> '
             + dirHint('rx_vcur', 'rx_vtgt',
-                'Ta lecture est trop faible : repère l\'endroit où le potentiel bascule brutalement (saut de potentiel), plus loin sur l\'axe des volumes.',
-                'Ta lecture est trop grande : le saut de potentiel se situe plus tôt sur la courbe.')
-            + '<br>Méthode : Veq est l\'abscisse du saut brutal de potentiel (rupture de pente, matérialisée par le pointillé).');
-        var cWrongFb = fbBox(ORANGE, ORANGEBG, '⚠️ <strong>Bonne lecture de Veq, mais le calcul de C₂ est incorrect.</strong> '
-            + 'Méthode : à l\'équivalence, les quantités de matière échangées sont proportionnelles aux électrons : n₁·C₁·Veq = n₂·C₂·V₂, donc C₂ = (n₁·C₁·Veq)/(n₂·V₂).');
-        var okFb = fbBox(GREEN, GREENBG, '✅ <strong>Lecture du graphe et calcul corrects !</strong>');
+                I18Nd.t('rx.fb_calc_vwrong_low'),
+                I18Nd.t('rx.fb_calc_vwrong_high'))
+            + '<br>' + I18Nd.t('rx.fb_calc_vwrong_method'));
+        var cWrongFb = fbBox(ORANGE, ORANGEBG, '⚠️ <strong>' + I18Nd.t('rx.fb_calc_cwrong_title') + '</strong> '
+            + I18Nd.t('rx.fb_calc_cwrong_method'));
+        var okFb = fbBox(GREEN, GREENBG, '✅ <strong>' + I18Nd.t('rx.fb_calc_ok') + '</strong>');
 
         var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedVars };
         var canonicalNodes = [
@@ -245,8 +245,8 @@ cursorCode,
         ];
         var prtXML = buildPrtXml_(prtMeta, canonicalNodes);
 
-        var genFb = fbBox(GREEN, GREENBG, '<strong>🔑 Méthode et résultat :</strong> Le saut de potentiel a lieu à Veq = ' + Veq.toFixed(2) + ' mL. '
-            + 'À l\'équivalence : n₁·C₁·Veq = n₂·C₂·V₂, soit C₂ = (' + n1 + '×' + c1 + '×' + Veq.toFixed(2) + ')/(' + n2 + '×' + v2 + ') = ' + c2Target.toFixed(4) + ' mol/L.');
+        var genFb = fbBox(GREEN, GREENBG, '<strong>🔑 ' + I18Nd.t('rx.genfb_label') + '</strong> ' + I18Nd.t('rx.genfb_calc_1', {veq: Veq.toFixed(2)}) + ' '
+            + I18Nd.t('rx.genfb_calc_2', {n1: String(n1), c1: String(c1), veq: Veq.toFixed(2), n2: String(n2), v2: String(v2), c2: c2Target.toFixed(4)}));
 
         var questionLabel = I18Nd.t('rx.qnote_calc_fallback', {n: String(X)});
         var questionText  = banner + '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML
@@ -282,31 +282,31 @@ cursorCode,
     // ── Textes pédagogiques par mode (indices de méthode, sans révéler la valeur) ──
     var RX_METHOD = {
         equivalence: {
-            vWrong: 'Veq est le volume où la courbe présente un <strong>saut brutal de potentiel</strong> (rupture de pente) : c\'est là que le réactif titré vient d\'être totalement consommé.',
-            genLabel: 'Veq = ' + Veq.toFixed(2) + ' mL (saut de potentiel)'
+            vWrong: I18Nd.t('rx.method_equivalence_vwrong'),
+            genLabel: I18Nd.t('rx.method_equivalence_label', {veq: Veq.toFixed(2)})
         },
         eo1: {
-            eWrong: 'Après un <strong>grand excès de titrant</strong> (V ≫ Veq), la quasi-totalité du titrant ajouté reste sous forme oxydée : le potentiel se stabilise près de E°₁ (palier après le saut).',
-            genLabel: 'E°₁ = ' + e1.toFixed(3) + ' V (palier après le saut, V ≫ Veq)'
+            eWrong: I18Nd.t('rx.method_eo1_ewrong'),
+            genLabel: I18Nd.t('rx.method_eo1_label', {e1: e1.toFixed(3)})
         },
         eo2: {
-            eWrong: 'Juste <strong>avant l\'équivalence</strong>, l\'espèce titrée est encore largement présente : le potentiel reste proche de E°₂ (palier avant le saut).',
-            genLabel: 'E°₂ = ' + e2.toFixed(3) + ' V (palier avant le saut, V ≪ Veq)'
+            eWrong: I18Nd.t('rx.method_eo2_ewrong'),
+            genLabel: I18Nd.t('rx.method_eo2_label', {e2: e2.toFixed(3)})
         },
         demi: {
-            vWrong: 'La demi-équivalence correspond à <strong>V = Veq / 2</strong>, c\'est-à-dire la moitié du volume où intervient le saut de potentiel.',
-            eWrong: 'À la demi-équivalence, les concentrations des deux formes du couple titré sont égales ([Ox₂] = [Red₂]) : dans la relation de Nernst, le terme logarithmique s\'annule, donc <strong>E = E°₂</strong>.',
-            genLabel: 'Demi-équivalence : V = Veq/2 = ' + (Veq/2).toFixed(2) + ' mL, E = E°₂ = ' + e2.toFixed(3) + ' V'
+            vWrong: I18Nd.t('rx.method_demi_vwrong'),
+            eWrong: I18Nd.t('rx.method_demi_ewrong'),
+            genLabel: I18Nd.t('rx.method_demi_label', {v: (Veq/2).toFixed(2), e2: e2.toFixed(3)})
         },
         double: {
-            vWrong: 'Le point à double équivalence correspond à <strong>V = 2 × Veq</strong> : l\'excès de titrant ajouté égale alors la quantité initiale d\'espèce titrée.',
-            eWrong: 'Dans cet excès, les concentrations des deux formes du couple titrant sont égales ([Ox₁] = [Red₁]) : d\'après Nernst, <strong>E = E°₁</strong>.',
-            genLabel: 'Double équivalence : V = 2·Veq = ' + (Veq*2).toFixed(2) + ' mL, E = E°₁ = ' + e1.toFixed(3) + ' V'
+            vWrong: I18Nd.t('rx.method_double_vwrong'),
+            eWrong: I18Nd.t('rx.method_double_ewrong'),
+            genLabel: I18Nd.t('rx.method_double_label', {v: (Veq*2).toFixed(2), e1: e1.toFixed(3)})
         },
         eeq: {
-            vWrong: 'Le point d\'équivalence se situe exactement à l\'abscisse du <strong>saut brutal de potentiel</strong> (V = Veq).',
-            eWrong: 'Le potentiel à l\'équivalence est une <strong>moyenne pondérée par les électrons échangés</strong> : Eeq = (n₁·E°₁ + n₂·E°₂)/(n₁+n₂).',
-            genLabel: 'Point d\'équivalence : V = Veq = ' + Veq.toFixed(2) + ' mL, Eeq = ' + Eeq.toFixed(3) + ' V'
+            vWrong: I18Nd.t('rx.method_eeq_vwrong'),
+            eWrong: I18Nd.t('rx.method_eeq_ewrong'),
+            genLabel: I18Nd.t('rx.method_eeq_label', {v: Veq.toFixed(2), eeq: Eeq.toFixed(3)})
         }
     };
     var meth = RX_METHOD[rxFind] || {};
@@ -319,8 +319,8 @@ cursorCode,
         feedVars = 'rx_vcur:float(ans' + X + '[1]);\n'
                  + 'rx_vtgt:' + Vt.toFixed(4) + ';\n'
                  + 'rx_v_ok:is(abs(rx_vcur-rx_vtgt)<=' + tolVol.toFixed(3) + ');\n';
-        var vWrongFbX = fbBox(RED, REDBG, '❌ <strong>Ce n\'est pas le bon volume.</strong> '
-            + dirHint('rx_vcur', 'rx_vtgt', 'Tu es trop tôt sur la courbe : continue vers la droite.', 'Tu es allé trop loin : reviens vers la gauche.')
+        var vWrongFbX = fbBox(RED, REDBG, '❌ <strong>' + I18Nd.t('rx.fb_x_wrong_title') + '</strong> '
+            + dirHint('rx_vcur', 'rx_vtgt', I18Nd.t('rx.fb_x_wrong_low'), I18Nd.t('rx.fb_x_wrong_high'))
             + (meth.vWrong ? '<br>' + meth.vWrong : ''));
         canonicalNodes = [{
             name: '0', description: '', answertest: 'AlgEquiv', sans: 'rx_v_ok', tans: 'true',
@@ -335,8 +335,8 @@ cursorCode,
         feedVars = 'rx_ecur:float(ans' + X + '[2]);\n'
                  + 'rx_etgt:' + Et.toFixed(4) + ';\n'
                  + 'rx_e_ok:is(abs(rx_ecur-rx_etgt)<=' + tolE.toFixed(3) + ');\n';
-        var eWrongFbY = fbBox(RED, REDBG, '❌ <strong>Ce n\'est pas le bon potentiel.</strong> '
-            + dirHint('rx_ecur', 'rx_etgt', 'Ta valeur est trop basse : place le curseur plus haut.', 'Ta valeur est trop haute : redescends.')
+        var eWrongFbY = fbBox(RED, REDBG, '❌ <strong>' + I18Nd.t('rx.fb_y_wrong_title') + '</strong> '
+            + dirHint('rx_ecur', 'rx_etgt', I18Nd.t('rx.fb_y_wrong_low'), I18Nd.t('rx.fb_y_wrong_high'))
             + (meth.eWrong ? '<br>' + meth.eWrong : ''));
         canonicalNodes = [{
             name: '0', description: '', answertest: 'AlgEquiv', sans: 'rx_e_ok', tans: 'true',
@@ -354,11 +354,11 @@ cursorCode,
                  + 'rx_etgt:' + Et.toFixed(4) + ';\n'
                  + 'rx_v_ok:is(abs(rx_vcur-rx_vtgt)<=' + tolVol.toFixed(3) + ');\n'
                  + 'rx_e_ok:is(abs(rx_ecur-rx_etgt)<=' + tolE.toFixed(3) + ');\n';
-        var vWrongFbXY = fbBox(RED, REDBG, '❌ <strong>Le volume n\'est pas correct.</strong> '
-            + dirHint('rx_vcur', 'rx_vtgt', 'Tu es trop tôt sur la courbe.', 'Tu es allé trop loin.')
+        var vWrongFbXY = fbBox(RED, REDBG, '❌ <strong>' + I18Nd.t('rx.fb_xy_vwrong_title') + '</strong> '
+            + dirHint('rx_vcur', 'rx_vtgt', I18Nd.t('rx.fb_xy_vwrong_low'), I18Nd.t('rx.fb_xy_vwrong_high'))
             + (meth.vWrong ? '<br>' + meth.vWrong : ''));
-        var eWrongFbXY = fbBox(ORANGE, ORANGEBG, '⚠️ <strong>Bon volume, mais le potentiel n\'est pas bon.</strong> '
-            + dirHint('rx_ecur', 'rx_etgt', 'Ta valeur est trop basse.', 'Ta valeur est trop haute.')
+        var eWrongFbXY = fbBox(ORANGE, ORANGEBG, '⚠️ <strong>' + I18Nd.t('rx.fb_xy_ewrong_title') + '</strong> '
+            + dirHint('rx_ecur', 'rx_etgt', I18Nd.t('rx.fb_xy_ewrong_low'), I18Nd.t('rx.fb_xy_ewrong_high'))
             + (meth.eWrong ? '<br>' + meth.eWrong : ''));
         canonicalNodes = [
             { name: '0', description: 'Vérification volume', answertest: 'AlgEquiv', sans: 'rx_v_ok', tans: 'true',
@@ -376,7 +376,7 @@ cursorCode,
     }
     var prtXML = buildPrtXml_(prtMeta, canonicalNodes);
 
-    var genFb = meth.genLabel ? fbBox(GREEN, GREENBG, '<strong>🔑 Méthode et résultat :</strong> ' + meth.genLabel + '.') : '';
+    var genFb = meth.genLabel ? fbBox(GREEN, GREENBG, '<strong>🔑 ' + I18Nd.t('rx.genfb_label') + '</strong> ' + meth.genLabel + '.') : '';
 
     var questionLabel = I18Nd.t('rx.qnote_fallback', {n: String(X)});
     var questionText  = banner + '<p>' + (textFrag || questionLabel) + '</p>' + jxgXML

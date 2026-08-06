@@ -176,11 +176,12 @@ function genNomenclatureCore(X, p, deps){
   deps = deps || {};
   const buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   const escapeMaximaString_D = deps.escapeMaximaString || escapeMaximaString;
+  const I18N_D = deps.I18N || I18N;
 
   const bareme = p.bareme, text = p.text||'';
   const fbGen = p.fbGen||'';
   const banniere = `<div style="background:#0e7490;border-left:5px solid #155e75;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — Nomenclature chimique</strong>
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('nom.title')}</strong>
         <span style="background:#155e75;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span>
       </div>`;
 
@@ -226,18 +227,18 @@ ${urlChain()}`;
         testoptions:'', quiet:'0',
         truescoremode:'+', truescore:'0.5', truepenalty:'', truenextnode:'1',
         trueanswernote:`prt${X}-1-T`,
-        truefeedback:`<p>C'est le bon nom.</p>`,
+        truefeedback:`<p>${I18N_D.t('nom.fb_nom_ok')}</p>`,
         falsescoremode:'=', falsescore:'0', falsepenalty:'', falsenextnode:'1',
         falseanswernote:`prt${X}-1-F`,
-        falsefeedback:`<p>Ce n'est pas le bon nom (réponse attendue : {@nom${X}@}).</p>` },
+        falsefeedback:`<p>${I18N_D.t('nom.fb_nom_ko', {nom: '{@nom'+X+'@}'})}</p>` },
       { name:'1', description:'famille', answertest:'String', sans:`ans${X}f`, tans:`famille${X}`,
         testoptions:'', quiet:'0',
         truescoremode:'+', truescore:'0.5', truepenalty:'', truenextnode:'-1',
         trueanswernote:`prt${X}-2-T`,
-        truefeedback:`<p>Cette molécule fait bien partie de la famille des {@famille${X}@}.</p>`,
+        truefeedback:`<p>${I18N_D.t('nom.fb_famille_ok', {famille: '{@famille'+X+'@}'})}</p>`,
         falsescoremode:'=', falsescore:'0', falsepenalty:'', falsenextnode:'-1',
         falseanswernote:`prt${X}-2-F`,
-        falsefeedback:`<p>Cette molécule ne fait pas partie de la famille indiquée. Famille attendue : {@famille${X}@}.</p>` }
+        falsefeedback:`<p>${I18N_D.t('nom.fb_famille_ko', {famille: '{@famille'+X+'@}'})}</p>` }
     ];
     const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
@@ -245,8 +246,8 @@ ${urlChain()}`;
       textFrag: `${banniere}
       <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
       ${_nomIframe(X)}<br>
-      <p>Cette molécule fait partie de quelle famille ? [[input:ans${X}f]] [[validation:ans${X}f]]</p>
-      <p>Quel est le nom de cette molécule ? [[input:ans${X}n]] [[validation:ans${X}n]]</p>`,
+      <p>${I18N_D.t('nom.q_famille')} [[input:ans${X}f]] [[validation:ans${X}f]]</p>
+      <p>${I18N_D.t('nom.q_nom')} [[input:ans${X}n]] [[validation:ans${X}n]]</p>`,
       inputXML: `    <input>
       <name>ans${X}n</name>
       <type>string</type>
@@ -284,7 +285,7 @@ ${urlChain()}`;
       <options></options>
     </input>`,
       prtXML,
-      generalFeedback: `<p>Molécule : {@nom${X}@} (famille : {@famille${X}@}).</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
+      generalFeedback: `<p>${I18N_D.t('nom.genfb_aleatoire', {nom: '{@nom'+X+'@}', famille: '{@famille'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
       feedbackRef:`[[feedback:prt${X}]]`, prt:{meta:prtMeta,nodes:canonicalNodes} };
   }
 
@@ -313,9 +314,9 @@ pct${X} : floor(sc${X}*100)$
 manques${X} : listify(setdifference(setify(bons${X}), setify(idx${X})))$
 coches_faux${X} : listify(intersection(setify(idx${X}), setify(groupes_faux${X})))$
 coches_bons${X} : listify(intersection(setify(idx${X}), setify(bons${X})))$
-fb_bons${X} : if length(coches_bons${X}) > 0 then sconcat("<div style='color:green;border-left:4px solid green;padding:7px;margin:3px 0'><b>Groupes correctement identifiés :</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), coches_bons${X})), "</ul></div>") else ""$
-fb_faux${X} : if length(coches_faux${X}) > 0 then sconcat("<div style='color:red;border-left:4px solid red;padding:7px;margin:3px 0'><b>Groupes cochés à tort (absents de la molécule) :</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), coches_faux${X})), "</ul></div>") else ""$
-fb_manques${X} : if length(manques${X}) > 0 then sconcat("<div style='color:#92400e;background:#fffbeb;border-left:4px solid #f59e0b;padding:7px;margin:3px 0'><b>Groupes présents mais oubliés :</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), manques${X})), "</ul></div>") else ""$`;
+fb_bons${X} : if length(coches_bons${X}) > 0 then sconcat("<div style='color:green;border-left:4px solid green;padding:7px;margin:3px 0'><b>${escapeMaximaString_D(I18N_D.t('nom.fb_groupes_ok_title'))}</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), coches_bons${X})), "</ul></div>") else ""$
+fb_faux${X} : if length(coches_faux${X}) > 0 then sconcat("<div style='color:red;border-left:4px solid red;padding:7px;margin:3px 0'><b>${escapeMaximaString_D(I18N_D.t('nom.fb_groupes_faux_title'))}</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), coches_faux${X})), "</ul></div>") else ""$
+fb_manques${X} : if length(manques${X}) > 0 then sconcat("<div style='color:#92400e;background:#fffbeb;border-left:4px solid #f59e0b;padding:7px;margin:3px 0'><b>${escapeMaximaString_D(I18N_D.t('nom.fb_groupes_manques_title'))}</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), manques${X})), "</ul></div>") else ""$`;
 
     const prtMeta = { name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbVars };
     const canonicalNodes = [
@@ -323,10 +324,10 @@ fb_manques${X} : if length(manques${X}) > 0 then sconcat("<div style='color:#924
         testoptions:'', quiet:'0',
         truescoremode:'=', truescore:'1', truepenalty:'', truenextnode:'-1',
         trueanswernote:`prt${X}-1-T`,
-        truefeedback:`<div style="padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #86efac;"><strong>✅ Score : 100%</strong>{@fb_bons${X}@}</div>`,
+        truefeedback:`<div style="padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #86efac;"><strong>✅ ${I18N_D.t('nom.fb_score_100')}</strong>{@fb_bons${X}@}</div>`,
         falsescoremode:'=', falsescore:`sc${X}`, falsepenalty:'', falsenextnode:'-1',
         falseanswernote:`prt${X}-1-F`,
-        falsefeedback:`<div style="padding:12px;background:#fafafa;border-radius:8px;border:1px solid #e2e8f0"><p><strong>Score : {@pct${X}@}%</strong></p>{@fb_bons${X}@}{@fb_faux${X}@}{@fb_manques${X}@}</div>` }
+        falsefeedback:`<div style="padding:12px;background:#fafafa;border-radius:8px;border:1px solid #e2e8f0"><p><strong>${I18N_D.t('nom.fb_score_pct', {pct: '{@pct'+X+'@}'})}</strong></p>{@fb_bons${X}@}{@fb_faux${X}@}{@fb_manques${X}@}</div>` }
     ];
     const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
@@ -334,7 +335,7 @@ fb_manques${X} : if length(manques${X}) > 0 then sconcat("<div style='color:#924
       textFrag: `${banniere}
       <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
       ${_nomIframe(X)}<br>
-      <p>Cochez le ou les groupe(s) caractéristique(s) réellement présent(s) dans cette molécule : [[input:ans${X}]] [[validation:ans${X}]]</p>`,
+      <p>${I18N_D.t('nom.q_checkbox')} [[input:ans${X}]] [[validation:ans${X}]]</p>`,
       inputXML: `    <input>
       <name>ans${X}</name>
       <type>checkbox</type>
@@ -354,7 +355,7 @@ fb_manques${X} : if length(manques${X}) > 0 then sconcat("<div style='color:#924
       <options></options>
     </input>`,
       prtXML,
-      generalFeedback: `<p>Groupes présents : {@groupes_vrais${X}@}.</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
+      generalFeedback: `<p>${I18N_D.t('nom.genfb_checkbox', {groupes: '{@groupes_vrais'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
       feedbackRef:`[[feedback:prt${X}]]`, prt:{meta:prtMeta,nodes:canonicalNodes} };
   }
 
@@ -385,10 +386,10 @@ nom_pattern${X} : regexify_nom${X}(nom_attendu${X})$`;
       testoptions:'', quiet:'0',
       truescoremode:'=', truescore:'1', truepenalty:'', truenextnode:'-1',
       trueanswernote:`prt${X}-1-T`,
-      truefeedback:`<p>C'est le bon nom (famille : {@famille_attendue${X}@}).</p>`,
+      truefeedback:`<p>${I18N_D.t('nom.fb_fixe_ok', {famille: '{@famille_attendue'+X+'@}'})}</p>`,
       falsescoremode:'=', falsescore:'0', falsepenalty:'', falsenextnode:'-1',
       falseanswernote:`prt${X}-1-F`,
-      falsefeedback:`<p>Ce n'est pas le bon nom. Réponse attendue : {@nom_attendu${X}@} (famille : {@famille_attendue${X}@}).</p>` }
+      falsefeedback:`<p>${I18N_D.t('nom.fb_fixe_ko', {nom: '{@nom_attendu'+X+'@}', famille: '{@famille_attendue'+X+'@}'})}</p>` }
   ];
   const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
 
@@ -396,7 +397,7 @@ nom_pattern${X} : regexify_nom${X}(nom_attendu${X})$`;
     textFrag: `${banniere}
     <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
     ${_nomIframe(X)}<br>
-    <p>Quel est le nom de cette molécule en nomenclature IUPAC ? [[input:ans${X}]] [[validation:ans${X}]]</p>`,
+    <p>${I18N_D.t('nom.q_nom_iupac')} [[input:ans${X}]] [[validation:ans${X}]]</p>`,
     inputXML: `    <input>
       <name>ans${X}</name>
       <type>string</type>

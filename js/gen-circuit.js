@@ -55,6 +55,7 @@ function genCircuitCore(X, p, deps) {
     var mkFbGen_D      = deps._mkFbGen || _mkFbGen;
     var CIR_ENGINE_JS_D  = deps.CIR_ENGINE_JS  || (typeof cirEngineRun !== 'undefined' ? cirEngineRun.toString() : '');
     var CIR_ATELIER_CSS_D = deps.CIR_ATELIER_CSS || (typeof CIR_ATELIER_CSS !== 'undefined' ? CIR_ATELIER_CSS : '');
+    var cirBuildLabels_D = deps.cirBuildLabels || (typeof cirBuildLabels !== 'undefined' ? cirBuildLabels : function () { return {}; });
 
     var model    = p.model || {};
     var bareme   = p.bareme;
@@ -94,37 +95,37 @@ function genCircuitCore(X, p, deps) {
         + _cirInput(nameV, mTaValues, 40);
 
     // ── Bloc iframe : moteur JS embarqué à l'identique (CIR_ENGINE_JS), mode 'student' ──
-    var bootCfg = { mode: 'student', inputNames: { s: nameS, c: nameC, w: nameW, v: nameV } };
+    var bootCfg = { mode: 'student', inputNames: { s: nameS, c: nameC, w: nameW, v: nameV }, labels: cirBuildLabels_D(I18N_D) };
     var scriptModule = 'import {stack_js} from \'[[cors src="stackjsiframe.js"/]]\';\n\n'
         + CIR_ENGINE_JS_D + '\n\n'
         + 'cirEngineRun(' + JSON.stringify(bootCfg) + ');\n';
 
-    var atelierBody = '<h1 class="sc">🔌 Atelier circuits électriques</h1>\n'
-        + '<p class="sub">Clique sur un composant à droite pour le placer. Clique sur un composant du schéma pour le <strong>sélectionner</strong> : un repère carré gris apparaît, glisse-le pour déplacer le composant. <strong>⟳</strong> pour tourner, l\'étiquette (✎) pour changer une valeur. Clique sur deux bornes pour tirer un câble. Un interrupteur déjà sélectionné bascule quand on reclique dessus.</p>\n'
+    var atelierBody = '<h1 class="sc">🔌 ' + I18N_D.t('cir.atelier_title') + '</h1>\n'
+        + '<p class="sub">' + I18N_D.t('cir.atelier_instructions') + '</p>\n'
         + '<div class="layout">\n'
         + '  <div class="left">\n'
         + '    <div class="toolbar">\n'
-        + '      <button id="btnScissors" type="button">✂️ Ciseau</button>\n'
-        + '      <button id="btnUndo" type="button">← Annuler point</button>\n'
-        + '      <button id="btnReset" type="button">↺ Vider tout</button>\n'
+        + '      <button id="btnScissors" type="button">✂️ ' + I18N_D.t('cir.btn_scissors') + '</button>\n'
+        + '      <button id="btnUndo" type="button">← ' + I18N_D.t('cir.btn_undo') + '</button>\n'
+        + '      <button id="btnReset" type="button">↺ ' + I18N_D.t('cir.btn_reset') + '</button>\n'
         + '    </div>\n'
         + '    <div id="board" role="img"></div>\n'
-        + '    <div id="feedback">Choisis un composant à droite pour commencer.</div>\n'
+        + '    <div id="feedback">' + I18N_D.t('cir.feedback_placeholder') + '</div>\n'
         + '  </div>\n'
         + '  <div class="right">\n'
-        + '    <h2 class="sc">Composants</h2>\n'
+        + '    <h2 class="sc">' + I18N_D.t('cir.heading_components') + '</h2>\n'
         + '    <div class="palette" id="palette"></div>\n'
-        + '    <h2 class="sc">Valeur</h2>\n'
+        + '    <h2 class="sc">' + I18N_D.t('cir.heading_value') + '</h2>\n'
         + '    <div id="valBox">\n'
-        + '      <div id="valName">Sélectionne un composant</div>\n'
+        + '      <div id="valName">' + I18N_D.t('cir.valname_placeholder') + '</div>\n'
         + '      <div class="valrow">\n'
         + '        <input id="valInput" type="number" step="any" min="0" disabled>\n'
         + '        <span id="valUnit"></span>\n'
         + '      </div>\n'
-        + '      <div id="valHint">Clique sur un composant du schéma pour régler sa valeur.</div>\n'
+        + '      <div id="valHint">' + I18N_D.t('cir.valhint') + '</div>\n'
         + '    </div>\n'
-        + '    <h2 class="sc">Validation</h2>\n'
-        + '    <button id="btnExport" type="button">✅ Valider le circuit</button>\n'
+        + '    <h2 class="sc">' + I18N_D.t('cir.heading_validation') + '</h2>\n'
+        + '    <button id="btnExport" type="button">✅ ' + I18N_D.t('cir.btn_export') + '</button>\n'
         + '  </div>\n'
         + '</div>\n';
 
@@ -134,9 +135,8 @@ function genCircuitCore(X, p, deps) {
         + '[[script type="module"]]\n' + scriptModule + '[[/script]]\n'
         + '[[/iframe]]\n';
 
-    var instrText = text || ('<p><strong>Consigne :</strong> Utilisez l\'atelier ci-dessous pour construire un circuit identique à celui attendu. '
-        + 'Une fois terminé, cliquez sur le bouton <strong>✅ Valider le circuit</strong> dans l\'atelier pour verrouiller votre travail, '
-        + 'puis soumettez votre réponse avec le bouton habituel de la page.</p>');
+    var instrText = text || ('<p><strong>' + I18N_D.t('cir.default_instruction_lead') + '</strong> ' + I18N_D.t('cir.default_instruction_body1') + ' '
+        + I18N_D.t('cir.default_instruction_body2_pre') + ' <strong>✅ ' + I18N_D.t('cir.btn_export') + '</strong> ' + I18N_D.t('cir.default_instruction_body2_post') + '</p>');
 
     var questionText = instrText
         + '<div style="display: none;" aria-hidden="true" tabindex="-1">\n'
@@ -155,31 +155,31 @@ function genCircuitCore(X, p, deps) {
     var prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedVars };
     var canonicalNodes = [
         {
-            name: '0', description: 'Bons composants placés (et circuit validé) ?', answertest: 'String',
+            name: '0', description: I18N_D.t('tpl.cir_desc_composants'), answertest: 'String',
             sans: nameC, tans: mTaComponents, testoptions: '', quiet: '0',
             truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '1',
             trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
             falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
             falseanswernote: 'PRT' + X + '-0-F',
-            falsefeedback: '<p>Les composants placés ne correspondent pas à ceux attendus, ou vous n\'avez pas cliqué sur "✅ Valider le circuit" dans l\'atelier.</p>'
+            falsefeedback: '<p>' + I18N_D.t('tpl.cir_fb_composants_ko', { btn: '✅ ' + I18N_D.t('cir.btn_export') }) + '</p>'
         },
         {
-            name: '1', description: 'Les branchements (topologie du circuit) sont-ils corrects ?', answertest: 'String',
+            name: '1', description: I18N_D.t('tpl.cir_desc_topologie'), answertest: 'String',
             sans: nameS, tans: mTaSignature, testoptions: '', quiet: '0',
             truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '2',
             trueanswernote: 'PRT' + X + '-1-T', truefeedback: '',
             falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1',
             falseanswernote: 'PRT' + X + '-1-F',
-            falsefeedback: '<p>Les composants sont bons mais le câblage (branchements) ne correspond pas au circuit attendu.</p>'
+            falsefeedback: '<p>' + I18N_D.t('tpl.cir_fb_topologie_ko') + '</p>'
         },
         {
-            name: '2', description: 'Les valeurs des composants sont-elles correctes ?', answertest: 'String',
+            name: '2', description: I18N_D.t('tpl.cir_desc_valeurs'), answertest: 'String',
             sans: mValEleve, tans: mTaValues, testoptions: '', quiet: '0',
             truescoremode: '+', truescore: String(bareme), truepenalty: '0', truenextnode: '-1',
-            trueanswernote: 'PRT' + X + '-2-T', truefeedback: '<p>Circuit correct et bien réglé, bravo !</p>',
+            trueanswernote: 'PRT' + X + '-2-T', truefeedback: '<p>' + I18N_D.t('tpl.cir_fb_valeurs_ok') + '</p>',
             falsescoremode: '+', falsescore: String(+(bareme * 0.5).toFixed(4)), falsepenalty: '0', falsenextnode: '-1',
             falseanswernote: 'PRT' + X + '-2-F',
-            falsefeedback: '<p>Le câblage est correct mais certaines valeurs de composants ne correspondent pas à celles attendues.</p>'
+            falsefeedback: '<p>' + I18N_D.t('tpl.cir_fb_valeurs_ko') + '</p>'
         }
     ];
     var prtXML = buildPrtXml_D(prtMeta, canonicalNodes);

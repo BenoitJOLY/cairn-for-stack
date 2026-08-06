@@ -207,6 +207,28 @@ function _nucRenderKatex(latex) {
   }
 }
 
+// Construit l'appel Maxima sconcat(...) de la phrase "Pour {particle} : coeff {got} au lieu
+// de {expected}" traduite (tpl = résultat de I18N_D.t() avec des jetons @@P@@/@@G@@/@@E@@ en
+// guise de vars, pour préserver l'ordre des mots propre à chaque langue) en alternant les
+// fragments de texte fixe (échappés via escFn) et les expressions Maxima runtime (p_latex,
+// s_sorted[i][1], t_sorted[i][1] — calculées dans get_coeffs_errors, pas connues côté JS).
+function _nucCoeffFragSconcat(tpl, escFn) {
+  const exprMap = {
+    P: 'sconcat("\\\\( ", p_latex, " \\\\)")',
+    G: 's_sorted[i][1]',
+    E: 't_sorted[i][1]'
+  };
+  const re = /@@(P|G|E)@@/g;
+  let last = 0, m, parts = [];
+  while ((m = re.exec(tpl))) {
+    if (m.index > last) parts.push('"' + escFn(tpl.slice(last, m.index)) + '"');
+    parts.push(exprMap[m[1]]);
+    last = re.lastIndex;
+  }
+  if (last < tpl.length) parts.push('"' + escFn(tpl.slice(last)) + '"');
+  return 'sconcat(' + parts.join(', ') + ')';
+}
+
 // ══════════════════════════════════════════════════════
 //  JSXGRAPH CODE (interface élève dans Moodle)
 // ══════════════════════════════════════════════════════
@@ -227,12 +249,18 @@ function buildNuclearJSXOpen(X) {
 // l'équation chimique (voir gen-topo.js/genChemical, feedback_jsxgraph_export_bug).
 // Fix : ce script est restitué APRÈS coup via q.kbdRaw + marqueur <!--HS-KBD:X-->
 // (js/app.js ~L300, jamais touché par stripMathDivs).
-function buildNuclearJSXCode(X) {
+function buildNuclearJSXCode(X, labels) {
   // Noms des refs STACK — correspondent aux input-ref-* du [[jsxgraph]]
   const refAns  = `refA${X}`;   // raw LaTeX
   const refSent = `refS${X}`;   // sentinel ("0" quand réponse saisie)
   const refRea  = `refR${X}`;   // réactifs parsés [[coeff,A,Z,"X"],...]
   const refPro  = `refP${X}`;   // produits parsés
+
+  // Labels traduits (langue active au moment de l'export), injectés en JSON.stringify
+  // pour une intégration sûre dans ce template JS-source (voir gen-cinematique-jsx.js).
+  labels = labels || {};
+  const lblPreview      = JSON.stringify(labels.preview || 'Aperçu de la réaction...');
+  const lblPreviewEmpty = JSON.stringify(labels.previewEmpty || 'Aperçu...');
 
   return `
 // --- 1. UTILITAIRE ---
@@ -285,7 +313,7 @@ box.appendChild(toolbar);
 
 var previewContainer = document.createElement('div');
 previewContainer.style.cssText = 'background:white; border:1px solid #bdc3c7; border-radius:4px; padding:15px; height:80px; flex-shrink:0; text-align:center; font-size:1.5rem; color:#333; display:flex; align-items:center; justify-content:center; overflow:auto; width:100%;';
-previewContainer.innerHTML = '<span style="color:#999; font-style:italic;">Aperçu de la réaction...</span>';
+previewContainer.innerHTML = '<span style="color:#999; font-style:italic;">' + ${lblPreview} + '</span>';
 box.appendChild(previewContainer);
 
 var editor = document.createElement('div');
@@ -310,7 +338,7 @@ function getLatexString() {
 
 function updateLivePreview() {
     var str = getLatexString();
-    if (str === '') { previewContainer.innerHTML = '<span style="color:#999; font-style:italic;">Aperçu...</span>'; return; }
+    if (str === '') { previewContainer.innerHTML = '<span style="color:#999; font-style:italic;">' + ${lblPreviewEmpty} + '</span>'; return; }
     var img = document.createElement('img');
     img.src = 'https://latex.codecogs.com/svg.image?\\\\displaystyle ' + encodeURIComponent(str);
     img.style.maxWidth = '100%';
@@ -422,6 +450,7 @@ function genNuclearCore(X, p, deps) {
   const buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   const mkFbGen_D = deps._mkFbGen || _mkFbGen;
   const nucRenderKatex_D = deps._nucRenderKatex || _nucRenderKatex;
+  const escapeMaximaString_D = deps.escapeMaximaString || escapeMaximaString;
 
   const bareme = p.bareme, text = p.text, rawEq = p.rawEq;
 
@@ -461,7 +490,10 @@ nuc${X}_latex: "${latexForMaxima}"`;
   // <!--HS-KBD:X--> restent dans textFrag ; le vrai JS est restitué après coup via
   // q.kbdRaw (js/app.js ~L300).
   const jsxOpen = buildNuclearJSXOpen(X);
-  const kbdRaw  = buildNuclearJSXCode(X);
+  const kbdRaw  = buildNuclearJSXCode(X, {
+    preview: I18N_D.t('nuc.jsx_preview_placeholder'),
+    previewEmpty: I18N_D.t('nuc.jsx_preview_empty')
+  });
 
   const textFrag =
 `<div style="background:#EAB308;border-left:5px solid #676863;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -561,6 +593,26 @@ ${jsxOpen}
       <options></options>
     </input>`;
 
+  // ── Traductions du bloc fbVars (texte HTML statique embarqué dans les sconcat Maxima) ──
+  // fb_reactants_title/fb_products_title/fb_coeffs_*_title/fb_success_*/fb_asterisk_title
+  // réutilisent les clés déjà posées pour diagPreviewText (émoji inclus dans la traduction).
+  const fbTReactantsWrong  = escapeMaximaString_D(I18N_D.t('nuc.fb_reactants_title'));
+  const fbTProductsWrong   = escapeMaximaString_D(I18N_D.t('nuc.fb_products_title'));
+  const fbTYourAnswer      = escapeMaximaString_D(I18N_D.t('nuc.fb_your_answer'));
+  const fbTExpectedAnswer  = escapeMaximaString_D(I18N_D.t('nuc.fb_expected_answer'));
+  const fbTUnknownError    = escapeMaximaString_D(I18N_D.t('nuc.fb_unknown_error'));
+  const fbTCoeffsReactants = escapeMaximaString_D(I18N_D.t('nuc.fb_coeffs_reactants_title'));
+  const fbTCoeffsProducts  = escapeMaximaString_D(I18N_D.t('nuc.fb_coeffs_products_title'));
+  const fbTSuccessTitle    = escapeMaximaString_D(I18N_D.t('nuc.fb_success_title'));
+  const fbTSuccessText     = escapeMaximaString_D(I18N_D.t('nuc.fb_success_text'));
+  const fbTAsteriskTitle   = escapeMaximaString_D(I18N_D.t('nuc.fb_asterisk_title'));
+  const fbTAsteriskText    = escapeMaximaString_D(I18N_D.t('nuc.fb_asterisk_text'));
+  const fbTTermCount       = escapeMaximaString_D(I18N_D.t('nuc.fb_err_term_count'));
+  const fbTEmpty            = escapeMaximaString_D(I18N_D.t('nuc.fb_empty_placeholder'));
+  // Phrase runtime (coefficients comparés côté Maxima) : voir _nucCoeffFragSconcat.
+  const fbCoeffTpl = I18N_D.t('nuc.fb_coeff_mismatch', { particle: '@@P@@', got: '@@G@@', expected: '@@E@@' });
+  const fbCoeffSconcat = _nucCoeffFragSconcat(fbCoeffTpl, escapeMaximaString_D);
+
   // ── Feedback Variables Maxima (calquées sur la référence) ──
   const fbVars =
 `/* 1. FONCTIONS UTILITAIRES */
@@ -591,13 +643,13 @@ get_coeffs_errors${X}(s_raw, t_raw) := block(
    t_sorted : sort_nuclei${X}(t_raw),
    errors : [],
    if length(s_sorted) # length(t_sorted) then (
-      return(["Attention : Le nombre de termes est incorrect (ex: 2n et non n+n)."])
+      return(["${fbTTermCount}"])
    ),
    for i:1 thru length(s_sorted) do (
       if s_sorted[i][1] # t_sorted[i][1] then (
          p_latex : get_particle_latex${X}(t_sorted[i]),
          errors : endcons(
-           sconcat("Pour \\( ", p_latex, " \\) : coeff ", s_sorted[i][1], " au lieu de ", t_sorted[i][1]),
+           ${fbCoeffSconcat},
            errors
          )
       )
@@ -618,52 +670,52 @@ list_errors_coeffs_reactants${X}: get_coeffs_errors${X}(tmp_r${X}, nuc${X}_rea);
 list_errors_coeffs_products${X}:  get_coeffs_errors${X}(tmp_p${X}, nuc${X}_pro);
 
 /* 3. FEEDBACKS */
-if list_reactants_student${X} = [] then list_reactants_student${X}: ["(vide)"];
-if list_reactants_teacher${X} = [] then list_reactants_teacher${X}: ["(vide)"];
+if list_reactants_student${X} = [] then list_reactants_student${X}: ["${fbTEmpty}"];
+if list_reactants_teacher${X} = [] then list_reactants_teacher${X}: ["${fbTEmpty}"];
 fb_error_reactants${X}: sconcat(
    "<div style='padding:15px;background:#fff5f5;border-radius:8px;border-left:5px solid #e74c3c;'>",
-   "<h4 style='margin-top:0;color:#c0392b;'>❌ Les réactifs sont incorrects</h4>",
-   "<strong style='color:#d9534f;'>Votre réponse :</strong>",
+   "<h4 style='margin-top:0;color:#c0392b;'>${fbTReactantsWrong}</h4>",
+   "<strong style='color:#d9534f;'>${fbTYourAnswer}</strong>",
    "<ul style='color:#333;margin-top:5px;'><li>", simplode(list_reactants_student${X}, "</li><li>"), "</li></ul>",
-   "<strong style='color:#555;'>Réponse attendue :</strong>",
+   "<strong style='color:#555;'>${fbTExpectedAnswer}</strong>",
    "<ul style='color:#333;margin-top:5px;'><li>", simplode(list_reactants_teacher${X}, "</li><li>"), "</li></ul>",
    "</div>"
 );
-if list_products_student${X} = [] then list_products_student${X}: ["(vide)"];
-if list_products_teacher${X} = [] then list_products_teacher${X}: ["(vide)"];
+if list_products_student${X} = [] then list_products_student${X}: ["${fbTEmpty}"];
+if list_products_teacher${X} = [] then list_products_teacher${X}: ["${fbTEmpty}"];
 fb_error_products${X}: sconcat(
    "<div style='padding:15px;background:#fff5f5;border-radius:8px;border-left:5px solid #e74c3c;'>",
-   "<h4 style='margin-top:0;color:#c0392b;'>❌ Les produits sont incorrects</h4>",
-   "<strong style='color:#d9534f;'>Votre réponse :</strong>",
+   "<h4 style='margin-top:0;color:#c0392b;'>${fbTProductsWrong}</h4>",
+   "<strong style='color:#d9534f;'>${fbTYourAnswer}</strong>",
    "<ul style='color:#333;margin-top:5px;'><li>", simplode(list_products_student${X}, "</li><li>"), "</li></ul>",
-   "<strong style='color:#555;'>Réponse attendue :</strong>",
+   "<strong style='color:#555;'>${fbTExpectedAnswer}</strong>",
    "<ul style='color:#333;margin-top:5px;'><li>", simplode(list_products_teacher${X}, "</li><li>"), "</li></ul>",
    "</div>"
 );
 if list_errors_coeffs_reactants${X} = [] then (
-   fb_reactants_coeffs${X}: "<strong>Erreur inconnue.</strong>"
+   fb_reactants_coeffs${X}: "<strong>${fbTUnknownError}</strong>"
 ) else (
    fb_reactants_coeffs${X}: sconcat(
       "<div style='padding:15px;background:#fffbf0;border-radius:8px;border-left:5px solid #f39c12;'>",
-      "<h4 style='margin-top:0;color:#d35400;'>⚠️ Attention aux coefficients (Réactifs)</h4>",
+      "<h4 style='margin-top:0;color:#d35400;'>${fbTCoeffsReactants}</h4>",
       "<span style='color:#e67e22;font-weight:bold;'>", simplode(list_errors_coeffs_reactants${X}, "<br/><br/>"), "</span>",
       "</div>"
    )
 );
 if list_errors_coeffs_products${X} = [] then (
-   fb_products_coeffs${X}: "<strong>Erreur inconnue.</strong>"
+   fb_products_coeffs${X}: "<strong>${fbTUnknownError}</strong>"
 ) else (
    fb_products_coeffs${X}: sconcat(
       "<div style='padding:15px;background:#fffbf0;border-radius:8px;border-left:5px solid #f39c12;'>",
-      "<h4 style='margin-top:0;color:#d35400;'>⚠️ Attention aux coefficients (Produits)</h4>",
+      "<h4 style='margin-top:0;color:#d35400;'>${fbTCoeffsProducts}</h4>",
       "<span style='color:#e67e22;font-weight:bold;'>", simplode(list_errors_coeffs_products${X}, "<br/><br/>"), "</span>",
       "</div>"
    )
 );
 fb_success${X}: sconcat(
    "<div style='padding:15px;background:#f0fff4;border-radius:8px;border-left:5px solid #27ae60;'>",
-   "<h4 style='margin-top:0;color:#27ae60;'>✅ Excellent !</h4>",
-   "<span style='color:#2ecc71;'>La réaction est correctement équilibrée.</span>",
+   "<h4 style='margin-top:0;color:#27ae60;'>${fbTSuccessTitle}</h4>",
+   "<span style='color:#2ecc71;'>${fbTSuccessText}</span>",
    "</div>"
 );
 
@@ -680,8 +732,8 @@ verif_total_precise${X}: if (setify(tmp_r${X}) = setify(nuc${X}_rea)) and (setif
 asterisk_missing${X}: if verif_total${X} and not verif_total_precise${X} then true else false;
 fb_asterisk${X}: sconcat(
    "<div style='padding:15px;background:#fffbf0;border-radius:8px;border-left:5px solid #f39c12;'>",
-   "<h4 style='margin-top:0;color:#d35400;'>⚠️ Attention aux états excités</h4>",
-   "<span style='color:#e67e22;'>La structure est correcte, mais vérifiez les états excités (*).</span>",
+   "<h4 style='margin-top:0;color:#d35400;'>${fbTAsteriskTitle}</h4>",
+   "<span style='color:#e67e22;'>${fbTAsteriskText}</span>",
    "</div>"
 );`;
 
@@ -696,25 +748,25 @@ fb_asterisk${X}: sconcat(
   });
 
   const canonicalNodes=[
-    mkCanonNode(0,'verif réactifs',
+    mkCanonNode(0,I18N_D.t('tpl.nuc_desc_reactifs'),
       `setify(map(lambda([x], rest(x)), ans${X}r))`, `setify(map(lambda([x], rest(x)), nuc${X}_rea))`,
       0.3,1,0,1, '', `{@fb_error_reactants${X}@}`, '+', '='),
-    mkCanonNode(1,'verif produits',
+    mkCanonNode(1,I18N_D.t('tpl.nuc_desc_produits'),
       `setify(map(lambda([x], rest(x)), ans${X}p))`, `setify(map(lambda([x], rest(x)), nuc${X}_pro))`,
       0.3,2,0,2, '', `{@fb_error_products${X}@}`),
-    mkCanonNode(2,'arret si espèces incorrectes',
+    mkCanonNode(2,I18N_D.t('tpl.nuc_desc_especes_ko'),
       `verif_especes${X}`, 'true',
       0,3,0,-1, '', ''),
-    mkCanonNode(3,'Vérification Coefficients Réactifs',
+    mkCanonNode(3,I18N_D.t('tpl.nuc_desc_coefs_reactifs'),
       `setify(ans${X}r)`, `setify(nuc${X}_rea)`,
       0.2,4,0,4, '', `{@fb_reactants_coeffs${X}@}`),
-    mkCanonNode(4,'Vérification Coefficients Produits',
+    mkCanonNode(4,I18N_D.t('tpl.nuc_desc_coefs_produits'),
       `setify(ans${X}p)`, `setify(nuc${X}_pro)`,
       0.2,5,0,-1, '', `{@fb_products_coeffs${X}@}`),
-    mkCanonNode(5,'il manque les états excités',
+    mkCanonNode(5,I18N_D.t('tpl.nuc_desc_etats_excites'),
       `asterisk_missing${X}`, 'false',
       0,6,0.2,6, '', `{@fb_asterisk${X}@}`),
-    mkCanonNode(6,'Tout est bon',
+    mkCanonNode(6,I18N_D.t('tpl.nuc_desc_tout_bon'),
       `verif_total${X}`, 'true',
       0,-1,0,-1, `{@fb_success${X}@}`, '')
   ];
@@ -741,8 +793,8 @@ fb_asterisk${X}: sconcat(
   const diagNodes = [];
   canonicalNodes.forEach((n, i) => {
     const isFirst = i === 0, isLast = i === canonicalNodes.length - 1;
-    if (!isFirst && n.truefeedback) diagNodes.push({ desc: n.description + ' (succès)', fb: diagPreviewText[i + 't'] || n.truefeedback });
-    if (!isLast && n.falsefeedback) diagNodes.push({ desc: n.description + ' (échec)', fb: diagPreviewText[i + 'f'] || n.falsefeedback });
+    if (!isFirst && n.truefeedback) diagNodes.push({ desc: n.description + I18N_D.t('common.diag_success_suffix'), fb: diagPreviewText[i + 't'] || n.truefeedback });
+    if (!isLast && n.falsefeedback) diagNodes.push({ desc: n.description + I18N_D.t('common.diag_failure_suffix'), fb: diagPreviewText[i + 'f'] || n.falsefeedback });
   });
 
   // Encart "réponse attendue" injecté directement dans generalFeedback — sans lui,

@@ -113,6 +113,7 @@ function genCinematiqueCore(X, p, deps){
   var buildCinJSX_Phase2_D = deps.buildCinJSX_Phase2 || buildCinJSX_Phase2;
   var _mkInput_D = deps._mkInput || _mkInput;
   var _cinFinalize_D = deps._cinFinalize || _cinFinalize;
+  var I18N_D = deps.I18N || I18N;
 
   var bareme = p.bareme, text = p.text, fbGen = p.fbGen;
 
@@ -120,11 +121,12 @@ function genCinematiqueCore(X, p, deps){
   if (!d.ok) {
     var reason;
     if (d.failReason === 'notEnoughPoints') {
-      reason = 'Il faut au moins 3 points M₀, M₁, M₂… digitalisés dans l\'atelier pour générer la question. Pointez d\'autres positions sur le fond (libre ou image importée).';
+      reason = I18N_D.t('cin.err_not_enough_points');
     } else if (d.failReason === 'badCalib') {
-      reason = 'La calibration de l\'échelle est incomplète ou dégénérée : posez 2 points de calibration distincts et renseignez une distance réelle strictement positive entre eux.';
+      reason = I18N_D.t('cin.err_bad_calib');
     } else {
-      reason = 'L\'indice i choisi (' + d.iIdx + ') est hors limites pour le nombre de points digitalisés : il doit être compris entre ' + d.iMin + ' et ' + d.iMax + '. Ajustez le champ « Indice i du point de départ » dans l\'atelier' + (d.iMin > 0 ? ' (la méthode de la dérivée symétrique nécessite un point avant M' + d.iMin + ')' : '') + '.';
+      var extra = d.iMin > 0 ? I18N_D.t('cin.err_bad_index_extra', {iMin: d.iMin}) : '';
+      reason = I18N_D.t('cin.err_bad_index', {iIdx: d.iIdx, iMin: d.iMin, iMax: d.iMax, extra: extra});
     }
     throw new Error(reason);
   }
@@ -155,7 +157,7 @@ function genCinematiqueCore(X, p, deps){
     + 'tol_dv_'+X+': 0.20$\n'
     + 'kv_'+X+': ' + _cinFmt(d.kv) + '$\n';
 
-  var header = _cinHeader(X, bareme, 'Cinématique du point — vecteurs déplacement et relation de Chasles', {bg:'#1e1b4b', accent:'#4f46e5'}, '🏹', 'Physique-Chimie');
+  var header = _cinHeader(X, bareme, I18N_D.t('cin.header_title'), {bg:'#1e1b4b', accent:'#4f46e5'}, '🏹', I18N_D.t('palette.cat.physchim'));
 
   var phase1JSX = buildCinJSX_Phase1_D({
     width: '620px', height: '460px',
@@ -163,7 +165,12 @@ function genCinematiqueCore(X, p, deps){
     MlistExpr: '{#Mlist_'+X+'#}', iIdxExpr: '{#iIdx_'+X+'#}',
     MlistPxExpr: MlistPxStr, echelle: _cinFmt(d.echelle), method: d.method,
     refVec1X: 'refVec1X'+X, refVec1Y: 'refVec1Y'+X, refVec2X: 'refVec2X'+X, refVec2Y: 'refVec2Y'+X,
-    nameVec1X: 'ans_vec1_x'+X, nameVec1Y: 'ans_vec1_y'+X, nameVec2X: 'ans_vec2_x'+X, nameVec2Y: 'ans_vec2_y'+X
+    nameVec1X: 'ans_vec1_x'+X, nameVec1Y: 'ans_vec1_y'+X, nameVec2X: 'ans_vec2_x'+X, nameVec2Y: 'ans_vec2_y'+X,
+    lblVec1: I18N_D.t('cin.jsx_lbl_vec1'), lblVec2: I18N_D.t('cin.jsx_lbl_vec2'),
+    lblErase: I18N_D.t('cin.jsx_lbl_erase'),
+    lblEchellePrefix: I18N_D.t('cin.jsx_echelle_prefix'), lblEchelleSuffix: I18N_D.t('cin.jsx_echelle_suffix'),
+    lblClickInstruction: I18N_D.t('cin.jsx_click_instruction'),
+    lblVec1Done: I18N_D.t('cin.jsx_vec1_done'), lblVec2Done: I18N_D.t('cin.jsx_vec2_done')
   });
 
   /* Boundingbox Phase 2 (littéral, comme la Phase 1 : points/calib/dt/iIdx ne sont
@@ -189,35 +196,31 @@ function genCinematiqueCore(X, p, deps){
     MlistExpr: '{#Mlist_'+X+'#}', iIdxExpr: '{#iIdx_'+X+'#}',
     viExpr: '{#vi_'+X+'#}', vip1Expr: '{#vip1_'+X+'#}', kvExpr: '{#kv_'+X+'#}',
     refDvX: 'refDvX'+X, refDvY: 'refDvY'+X, refVi: 'refVi'+X, refVip1: 'refVip1'+X,
-    nameDvX: 'ans_dv_x'+X, nameDvY: 'ans_dv_y'+X, nameVi: 'ans_vi'+X, nameVip1: 'ans_vip1'+X
+    nameDvX: 'ans_dv_x'+X, nameDvY: 'ans_dv_y'+X, nameVi: 'ans_vi'+X, nameVip1: 'ans_vip1'+X,
+    lblPlaceholderA: I18N_D.t('cin.jsx_placeholder_a'), lblPlaceholderB: I18N_D.t('cin.jsx_placeholder_b'), lblPlaceholderC: I18N_D.t('cin.jsx_placeholder_c'),
+    lblCloner: I18N_D.t('cin.jsx_lbl_cloner'), lblInverser: I18N_D.t('cin.jsx_lbl_inverser'),
+    lblTracerDv: I18N_D.t('cin.jsx_lbl_tracer_dv'), lblRecommencer: I18N_D.t('cin.jsx_lbl_recommencer')
   });
 
   var kbdRaw = phase1JSX
     + '\n<div style="display: none;" aria-hidden="true" tabindex="-1">[[input:ans_vec1_x'+X+']] [[input:ans_vec1_y'+X+']] [[input:ans_vec2_x'+X+']] [[input:ans_vec2_y'+X+']]</div>\n'
     + '<p><strong>v<sub>' + iIdx + '</sub> = </strong> [[input:ans_vi'+X+']] m/s [[validation:ans_vi'+X+']] '
     + '&nbsp;&nbsp;<strong>v<sub>' + (iIdx+1) + '</sub> = </strong> [[input:ans_vip1'+X+']] m/s [[validation:ans_vip1'+X+']]</p>\n'
-    + '<p><strong>Étape 2 — Construction de Δv<sub>' + iIdx + '</sub> par la relation de Chasles</strong></p>'
-    + '<p>Une fois v<sub>' + iIdx + '</sub> et v<sub>' + (iIdx+1) + '</sub> renseignés ci-dessus, les vecteurs v<sub>' + iIdx + '</sub> (bleu, depuis '
-    + 'M<sub>' + iIdx + '</sub>) et v<sub>' + (iIdx+1) + '</sub> (vert, depuis M<sub>' + (iIdx+1) + '</sub>) apparaissent ci-dessous. '
-    + 'Clonez-les (boutons dédiés), positionnez et orientez les clones (accroche automatique lorsque vous approchez une pointe existante) pour '
-    + 'construire Δv<sub>' + iIdx + '</sub> = v<sub>' + (iIdx+1) + '</sub> − v<sub>' + iIdx + '</sub> par la relation de Chasles, puis tracez le '
-    + 'vecteur résultat (rouge) avec le bouton dédié.</p>\n'
+    + '<p><strong>' + I18N_D.t('cin.step2_title', {i: iIdx}) + '</strong></p>'
+    + '<p>' + I18N_D.t('cin.step2_instruction', {i: iIdx, ip1: (iIdx+1)}) + '</p>\n'
     + '<div style="display: none;" aria-hidden="true" tabindex="-1">[[input:ans_dv_x'+X+']] [[input:ans_dv_y'+X+']]</div>\n'
     + phase2JSX;
 
   var textFrag = header
     + '<div style="margin-bottom:14px;">' + (text||'') + '</div>\n'
-    + '<p><strong>Étape 1 — Vecteurs déplacement et vitesse</strong></p>'
-    + '<p>Sur le graphique ci-dessous, tracez le vecteur déplacement M<sub>' + a1 + '</sub>M<sub>' + b1 + '</sub> '
-    + 'puis M<sub>' + a2 + '</sub>M<sub>' + b2 + '</sub> (boutons dédiés), puis déduisez-en les normes '
-    + 'des vecteurs vitesse v<sub>' + iIdx + '</sub> et v<sub>' + (iIdx+1) + '</sub> en m/s (durée du segment : '
-    + '{#dtEff_'+X+'#} s).</p>\n'
+    + '<p><strong>' + I18N_D.t('cin.step1_title') + '</strong></p>'
+    + '<p>' + I18N_D.t('cin.step1_instruction', {a1: a1, b1: b1, a2: a2, b2: b2, i: iIdx, ip1: (iIdx+1), dtEff: '{#dtEff_'+X+'#}'}) + '</p>\n'
     + '<div><!--HS-KBD:'+X+'--></div>';
 
   var previewFrag = header
     + '<div style="margin-bottom:10px;">'+(text||'')+'</div>\n'
     + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#1e3a5f;font-family:monospace;font-size:.85rem;">'
-    + '📐 Tracé des vecteurs déplacement + construction de Δv<sub>i</sub> (aperçu live à droite)'
+    + I18N_D.t('cin.preview_placeholder')
     + '</div>';
 
   var inputVec1X = _mkInput_D({
@@ -257,34 +260,34 @@ function genCinematiqueCore(X, p, deps){
   var stepBareme = bareme / 5;
 
   var nodeVec1 = _cinNode('0', 'Vecteur déplacement M_'+a1+'M_'+b1, 'NumAbsolute', 'err_vec1_'+X, '0', 'tol_vec_'+X,
-    '=', 1, -1, 'PRT-'+X+'-vec1-OK', _cinOk('<p>Vecteur M<sub>'+a1+'</sub>M<sub>'+b1+'</sub> correctement tracé.</p>'),
-    '=', 0, -1, 'PRT-'+X+'-vec1-NOK', _cinKo('<p>Le vecteur tracé ne correspond pas à M<sub>'+a1+'</sub>M<sub>'+b1+'</sub> : vérifiez les 2 points cliqués (départ puis arrivée).</p>'));
+    '=', 1, -1, 'PRT-'+X+'-vec1-OK', _cinOk('<p>' + I18N_D.t('cin.fb_vec_ok', {a: a1, b: b1}) + '</p>'),
+    '=', 0, -1, 'PRT-'+X+'-vec1-NOK', _cinKo('<p>' + I18N_D.t('cin.fb_vec_ko', {a: a1, b: b1}) + '</p>'));
   var metaVec1 = {
     name: 'prt'+X+'a', value: stepBareme.toFixed(7), autosimplify: '1', feedbackstyle: '1',
     feedbackvariables: 'err_vec1_'+X+': sqrt((ans_vec1_x'+X+'-vec1_'+X+'[1])^2+(ans_vec1_y'+X+'-vec1_'+X+'[2])^2)$'
   };
 
   var nodeVec2 = _cinNode('0', 'Vecteur déplacement M_'+a2+'M_'+b2, 'NumAbsolute', 'err_vec2_'+X, '0', 'tol_vec_'+X,
-    '=', 1, -1, 'PRT-'+X+'-vec2-OK', _cinOk('<p>Vecteur M<sub>'+a2+'</sub>M<sub>'+b2+'</sub> correctement tracé.</p>'),
-    '=', 0, -1, 'PRT-'+X+'-vec2-NOK', _cinKo('<p>Le vecteur tracé ne correspond pas à M<sub>'+a2+'</sub>M<sub>'+b2+'</sub> : vérifiez les 2 points cliqués (départ puis arrivée).</p>'));
+    '=', 1, -1, 'PRT-'+X+'-vec2-OK', _cinOk('<p>' + I18N_D.t('cin.fb_vec_ok', {a: a2, b: b2}) + '</p>'),
+    '=', 0, -1, 'PRT-'+X+'-vec2-NOK', _cinKo('<p>' + I18N_D.t('cin.fb_vec_ko', {a: a2, b: b2}) + '</p>'));
   var metaVec2 = {
     name: 'prt'+X+'b', value: stepBareme.toFixed(7), autosimplify: '1', feedbackstyle: '1',
     feedbackvariables: 'err_vec2_'+X+': sqrt((ans_vec2_x'+X+'-vec2_'+X+'[1])^2+(ans_vec2_y'+X+'-vec2_'+X+'[2])^2)$'
   };
 
   var nodeVi = _cinNode('0', 'Norme de v_i', 'NumAbsolute', 'ans_vi'+X, 'vi_norm_'+X, 'tol_vi_'+X,
-    '=', 1, -1, 'PRT-'+X+'-vi-OK', _cinOk('<p>Norme de v<sub>'+iIdx+'</sub> correcte.</p>'),
-    '=', 0, -1, 'PRT-'+X+'-vi-NOK', _cinKo('<p>Norme de v<sub>'+iIdx+'</sub> incorrecte : reprenez la longueur du vecteur M<sub>'+a1+'</sub>M<sub>'+b1+'</sub> (via l\'échelle) et divisez par {@dtEff_'+X+'@} s.</p>'));
+    '=', 1, -1, 'PRT-'+X+'-vi-OK', _cinOk('<p>' + I18N_D.t('cin.fb_norme_ok', {i: iIdx}) + '</p>'),
+    '=', 0, -1, 'PRT-'+X+'-vi-NOK', _cinKo('<p>' + I18N_D.t('cin.fb_norme_ko', {i: iIdx, a: a1, b: b1, dtEff: '{@dtEff_'+X+'@}'}) + '</p>'));
   var metaVi = { name: 'prt'+X+'c', value: stepBareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
 
   var nodeVip1 = _cinNode('0', 'Norme de v_{i+1}', 'NumAbsolute', 'ans_vip1'+X, 'vip1_norm_'+X, 'tol_vip1_'+X,
-    '=', 1, -1, 'PRT-'+X+'-vip1-OK', _cinOk('<p>Norme de v<sub>'+(iIdx+1)+'</sub> correcte.</p>'),
-    '=', 0, -1, 'PRT-'+X+'-vip1-NOK', _cinKo('<p>Norme de v<sub>'+(iIdx+1)+'</sub> incorrecte : reprenez la longueur du vecteur M<sub>'+a2+'</sub>M<sub>'+b2+'</sub> (via l\'échelle) et divisez par {@dtEff_'+X+'@} s.</p>'));
+    '=', 1, -1, 'PRT-'+X+'-vip1-OK', _cinOk('<p>' + I18N_D.t('cin.fb_norme_ok', {i: (iIdx+1)}) + '</p>'),
+    '=', 0, -1, 'PRT-'+X+'-vip1-NOK', _cinKo('<p>' + I18N_D.t('cin.fb_norme_ko', {i: (iIdx+1), a: a2, b: b2, dtEff: '{@dtEff_'+X+'@}'}) + '</p>'));
   var metaVip1 = { name: 'prt'+X+'d', value: stepBareme.toFixed(7), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
 
   var nodeDv = _cinNode('0', 'Vecteur Δv_i (relatif, indépendant du placement)', 'NumAbsolute', 'err_dv_'+X, '0', 'tol_dv_'+X,
-    '=', 1, -1, 'PRT-'+X+'-dv-OK', _cinOk('<p>Construction correcte : votre vecteur Δv<sub>'+iIdx+'</sub> correspond bien à v<sub>'+(iIdx+1)+'</sub> − v<sub>'+iIdx+'</sub>.</p>'),
-    '=', 0, -1, 'PRT-'+X+'-dv-NOK', _cinKo('<p>Le vecteur tracé ne correspond pas à v<sub>'+(iIdx+1)+'</sub> − v<sub>'+iIdx+'</sub> : reprenez la construction par la relation de Chasles (clonez v<sub>'+iIdx+'</sub> et v<sub>'+(iIdx+1)+'</sub>, positionnez-les bout à bout, inversez si besoin).</p>'));
+    '=', 1, -1, 'PRT-'+X+'-dv-OK', _cinOk('<p>' + I18N_D.t('cin.fb_dv_ok', {i: iIdx, ip1: (iIdx+1)}) + '</p>'),
+    '=', 0, -1, 'PRT-'+X+'-dv-NOK', _cinKo('<p>' + I18N_D.t('cin.fb_dv_ko', {i: iIdx, ip1: (iIdx+1)}) + '</p>'));
   var metaDv = {
     name: 'prt'+X+'e', value: stepBareme.toFixed(7), autosimplify: '1', feedbackstyle: '1',
     feedbackvariables: 'err_dv_'+X+': sqrt((ans_dv_x'+X+'-dv_'+X+'[1])^2+(ans_dv_y'+X+'-dv_'+X+'[2])^2)$'
@@ -292,12 +295,12 @@ function genCinematiqueCore(X, p, deps){
 
   var qnote = 'v_i={@vi_norm_'+X+'@} m/s, v_{i+1}={@vip1_norm_'+X+'@} m/s, Δv_i=({@dv_'+X+'[1]@};{@dv_'+X+'[2]@}) m/s';
 
-  var genFb = '<p><strong>Étape 1 — vecteurs déplacement et vitesses attendus :</strong></p>'
-    + '<p>M<sub>'+a1+'</sub>M<sub>'+b1+'</sub> = ({@vec1_'+X+'[1]@} ; {@vec1_'+X+'[2]@}) m, donc v<sub>'+iIdx+'</sub> = M<sub>'+a1+'</sub>M<sub>'+b1+'</sub> / {@dtEff_'+X+'@} = {@vi_norm_'+X+'@} m/s.</p>'
-    + '<p>M<sub>'+a2+'</sub>M<sub>'+b2+'</sub> = ({@vec2_'+X+'[1]@} ; {@vec2_'+X+'[2]@}) m, donc v<sub>'+(iIdx+1)+'</sub> = M<sub>'+a2+'</sub>M<sub>'+b2+'</sub> / {@dtEff_'+X+'@} = {@vip1_norm_'+X+'@} m/s.</p>'
-    + '<p><strong>Étape 2 — construction de Δv<sub>'+iIdx+'</sub> par la relation de Chasles :</strong></p>'
-    + '<p>Δv<sub>'+iIdx+'</sub> = v<sub>'+(iIdx+1)+'</sub> − v<sub>'+iIdx+'</sub> = ({@dv_'+X+'[1]@} ; {@dv_'+X+'[2]@}) m/s.</p>'
-    + '<p>Construction attendue : clonez v<sub>'+iIdx+'</sub> et inversez le clone pour obtenir −v<sub>'+iIdx+'</sub> ; clonez v<sub>'+(iIdx+1)+'</sub> et accrochez son origine à la pointe de −v<sub>'+iIdx+'</sub> ; le vecteur allant de l\'origine de −v<sub>'+iIdx+'</sub> à la pointe de v<sub>'+(iIdx+1)+'</sub> est alors Δv<sub>'+iIdx+'</sub>.</p>';
+  var genFb = '<p><strong>' + I18N_D.t('cin.genfb_step1_title') + '</strong></p>'
+    + '<p>' + I18N_D.t('cin.genfb_step1_vec', {a: a1, b: b1, i: iIdx, vecx: '{@vec1_'+X+'[1]@}', vecy: '{@vec1_'+X+'[2]@}', dtEff: '{@dtEff_'+X+'@}', norm: '{@vi_norm_'+X+'@}'}) + '</p>'
+    + '<p>' + I18N_D.t('cin.genfb_step1_vec', {a: a2, b: b2, i: (iIdx+1), vecx: '{@vec2_'+X+'[1]@}', vecy: '{@vec2_'+X+'[2]@}', dtEff: '{@dtEff_'+X+'@}', norm: '{@vip1_norm_'+X+'@}'}) + '</p>'
+    + '<p><strong>' + I18N_D.t('cin.genfb_step2_title', {i: iIdx}) + '</strong></p>'
+    + '<p>' + I18N_D.t('cin.genfb_dv', {i: iIdx, ip1: (iIdx+1), dvx: '{@dv_'+X+'[1]@}', dvy: '{@dv_'+X+'[2]@}'}) + '</p>'
+    + '<p>' + I18N_D.t('cin.genfb_construction', {i: iIdx, ip1: (iIdx+1)}) + '</p>';
 
   return _cinFinalize_D(X, bareme, vars, qnote, textFrag, previewFrag, inputXML,
     [{meta: metaVec1, node: nodeVec1}, {meta: metaVec2, node: nodeVec2},

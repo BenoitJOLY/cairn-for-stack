@@ -457,7 +457,7 @@ function genRvbCmjCore(X, p, deps) {
     var jsBlock = '[[javascript]]\n'
         + 'let rvbUrlPromise' + X + ' = stack_js.get_content(\'[[quid id="' + qidImg + '"/]]\');\n\n'
         + 'rvbUrlPromise' + X + '.then(function(base64Data) {\n'
-        + '    if (!base64Data) { stack_js.display_error("Image introuvable."); return; }\n\n'
+        + '    if (!base64Data) { stack_js.display_error("' + I18N_D.t('rvb.err_image_notfound') + '"); return; }\n\n'
         + '    var img = new Image();\n'
         + '    img.onload = function() {\n'
         + '        var maxW = 450;\n'
@@ -992,7 +992,7 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
         f: f, OA: OA, AB: AB,
         X_MIN: _n(-halfX), X_MAX: _n(halfX), Y_MIN: _n(-halfY), Y_MAX: _n(halfY),
         lensHeight: _n(lensH), dispW: dispW
-    });
+    }, I18N_D);
 
     /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
     var vars = 'f: ' + _n(f) + '$\n'
@@ -1019,7 +1019,7 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
         + _opticsConstructionMaximaHelpers()
         + '\nrequire_mc(mc) := block(\n'
         + '  if not is(safe_op(mc) = "lentille_construction") or not is(length(mc) = 2) then\n'
-        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction lentille_construction(rayons,points))."\n'
+        + '    "' + I18N_D.t('opt.err_require_mc', { fn: 'lentille_construction' }) + '"\n'
         + '  else\n'
         + '    true\n'
         + ')$\n\n'
@@ -1095,16 +1095,11 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
         + 'c_point: is(found_point(ptList, xAp, ABp, 0.3))$\n'
         + 'abp_status: is(found_AB_status(rayList, xAp, 0, ABp, 0.3, 0.3, ' + (virtuelle ? 2 : 1) + '))$';
 
-    var fbBilan = '<p><strong>Bilan des rayons particuliers :</strong></p>\n'
-        + '[[if test="any_attempt"]]<ul>\n'
-        + '[[if test="att1"]]<li>Rayon // axe &rarr; F\' : [[if test="c1s"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et droite émergente)</span>[[else]][[if test="l1_ok"]]<span style="color:#d68910;">le tracé est bien positionné, mais le tronçon émergent n\'a pas le bon statut réel/virtuel</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]][[/if]]</li>[[/if]]\n'
-        + '[[if test="att2"]]<li>Rayon par le centre optique O : [[if test="c2s"]]<span style="color:#1e7e34;">&#10003; correct et entièrement réel</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais n\'est pas entièrement marqué réel</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att3"]]<li>Rayon par le foyer F : [[if test="c3s"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et droite émergente)</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais un ou plusieurs tronçons n\'ont pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n'
-        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+    var fbBilan = I18N_D.t('opt.rc_fb_bilan');
 
     var canonicalNodes = [
         {
-            name: '0', description: 'Rayons particuliers — score proportionnel', answertest: 'AlgEquiv',
+            name: '0', description: I18N_D.t('opt.rc_desc_rayons'), answertest: 'AlgEquiv',
             sans: 'true', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: 'score_rayons*3/5', truepenalty: '', truenextnode: '1',
             trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
@@ -1112,40 +1107,24 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
             falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
         },
         {
-            name: '1', description: "Point image B'", answertest: 'AlgEquiv',
+            name: '1', description: I18N_D.t('opt.rc_desc_point_bp'), answertest: 'AlgEquiv',
             sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/5', truepenalty: '', truenextnode: '2',
             trueanswernote: 'prt' + X + '-1-T',
-            truefeedback: "<p>Le point B' est correctement placé à l'intersection des deux rayons émergents.</p>",
+            truefeedback: I18N_D.t('opt.rc_fb_point_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '2',
             falseanswernote: 'prt' + X + '-1-F',
-            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B'. [[if test=\"have2\"]]Vous avez bien"
-                + ' deux rayons particuliers géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B\' est placé'
-                + ' précisément à l\'intersection de leurs <em>tronçons émergents</em> (la partie du tracé <em>après</em> la lentille), et'
-                + ' non ailleurs sur l\'un des deux rayons.[[else]]Le point B\' ne peut être placé correctement que si deux rayons'
-                + ' particuliers sont d\'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>'
+            falsefeedback: I18N_D.t('opt.rc_fb_point_false')
         },
         {
-            name: '2', description: "Nature réelle/virtuelle du segment A'B'", answertest: 'AlgEquiv',
+            name: '2', description: I18N_D.t('opt.rc_desc_statut_abp'), answertest: 'AlgEquiv',
             sans: 'abp_status', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/5', truepenalty: '', truenextnode: '-1',
             trueanswernote: 'prt' + X + '-2-T',
-            truefeedback: virtuelle
-                ? "<p>Le segment A'B' est correctement marqué virtuel : l'objet AB étant placé entre le foyer objet F et le centre optique O"
-                  + ' (OA&nbsp;=&nbsp;' + _n(OA) + '&nbsp;cm &lt; f\'&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), l\'image obtenue est bien virtuelle.</p>'
-                : "<p>Le segment A'B' est correctement marqué réel : l'objet AB étant placé au-delà du foyer objet F"
-                  + ' (OA&nbsp;=&nbsp;' + _n(OA) + '&nbsp;cm &gt; f\'&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), l\'image obtenue est bien réelle.</p>',
+            truefeedback: I18N_D.t(virtuelle ? 'opt.rc_fb_statut_true_virtuelle' : 'opt.rc_fb_statut_true_reelle', { oa: _n(OA), f: _n(f) }),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'prt' + X + '-2-F',
-            falsefeedback: virtuelle
-                ? "<p>Le segment A'B', représentant l'image, doit être marqué <strong>virtuel</strong> dans cette configuration :"
-                  + ' l\'objet AB est placé entre le foyer objet F et le centre optique O (OA&nbsp;=&nbsp;' + _n(OA) + '&nbsp;cm &lt; f\'&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), donc l\'image obtenue est virtuelle. Tracez (ou'
-                  + ' retracez) le tronçon entre A\' et B\' avec l\'outil « Tracer A\' (perpendiculaire) », puis cliquez dessus jusqu\'à'
-                  + ' ce qu\'il soit marqué virtuel.</p>'
-                : "<p>Le segment A'B', représentant l'image, doit être marqué <strong>réel</strong> dans cette configuration :"
-                  + ' l\'objet AB est placé au-delà du foyer objet F (OA&nbsp;=&nbsp;' + _n(OA) + '&nbsp;cm &gt; f\'&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), donc l\'image obtenue est réelle. Tracez (ou'
-                  + ' retracez) le tronçon entre A\' et B\' avec l\'outil « Tracer A\' (perpendiculaire) », puis cliquez dessus jusqu\'à'
-                  + ' ce qu\'il soit marqué réel.</p>'
+            falsefeedback: I18N_D.t(virtuelle ? 'opt.rc_fb_statut_false_virtuelle' : 'opt.rc_fb_statut_false_reelle', { oa: _n(OA), f: _n(f) })
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
@@ -1157,37 +1136,22 @@ function _genOptiqueLentilleRayonsCore(X, p, deps) {
     });
     var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
-    var genFbDefault = "<p>Deux quelconques des trois rayons particuliers suivants permettent de construire B' :</p>\n<ul>\n"
-        + "<li>Le rayon issu de B, parallèle à l'axe, émerge de la lentille en passant par le foyer image F'.</li>\n"
-        + "<li>Le rayon issu de B et passant par le centre optique O n'est pas dévié.</li>\n"
-        + "<li>Le rayon issu de B et passant par le foyer objet F émerge de la lentille parallèle à l'axe optique.</li>\n</ul>\n"
-        + (virtuelle
-            ? '<p>L\'objet étant placé entre le foyer objet F et le centre optique O (OA&nbsp;=&nbsp;' + _n(OA) + '&nbsp;cm &lt; f\'&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), le prolongement virtuel des rayons émergents donne'
-              + ' l\'image B\' = (' + _n(xAp) + '&nbsp;;&nbsp;' + _n(ABp) + '), d\'où A\'B\' = ' + _n(ABp) + '&nbsp;cm (image virtuelle).</p>'
-            : '<p>L\'objet étant au-delà du foyer objet F (OA&nbsp;=&nbsp;' + _n(OA) + '&nbsp;cm &gt; f\'&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), leur intersection donne'
-              + ' l\'image B\' = (' + _n(xAp) + '&nbsp;;&nbsp;' + _n(ABp) + '), d\'où A\'B\' = ' + _n(ABp) + '&nbsp;cm (image réelle).</p>');
+    var genFbDefault = I18N_D.t('opt.rc_genfb_common')
+        + I18N_D.t(virtuelle ? 'opt.rc_genfb_virtuelle' : 'opt.rc_genfb_reelle', { oa: _n(OA), f: _n(f), xap: _n(xAp), abp: _n(ABp) });
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> f\'&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm, '
+        + I18N_D.t('opt.data_label') + 'f\'&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm, '
         + 'OA&nbsp;=&nbsp;' + _n(OA) + '&nbsp;cm, AB&nbsp;=&nbsp;' + _n(AB) + '&nbsp;cm</p>\n';
 
     var instructions = '<div class="stack-comment">'
-        + '<h2>Construction — Lentille mince convergente</h2>'
-        + '<p>La lentille convergente a une distance focale f\' = ' + _n(f) + ' cm (OF = OF\' = ' + _n(f) + ' cm). L\'objet AB, de taille ' + _n(AB) + ' cm, est placé'
-        + ' perpendiculairement à l\'axe optique à OA = ' + _n(OA) + ' cm du centre optique O, '
-        + (virtuelle ? '<strong>entre le foyer objet F et le centre optique O</strong>.</p>' : '<strong>au-delà du foyer objet F</strong>.</p>')
-        + '<p>À l\'aide des outils ci-dessous, <strong>tracez au moins deux des trois rayons particuliers issus de B</strong> et'
-        + ' faites-les traverser la lentille pour construire l\'image B\' de B :</p><ul>'
-        + '<li>le rayon issu de B, parallèle à l\'axe optique, qui émerge de la lentille en passant par le foyer image F\' ;</li>'
-        + '<li>le rayon issu de B passant par le centre optique O, qui n\'est pas dévié ;</li>'
-        + '<li>le rayon issu de B passant par le foyer objet F, qui émerge de la lentille parallèle à l\'axe optique.</li></ul>'
-        + '<p>Une fois deux rayons émergents tracés, utilisez le bouton <strong>« Intersection (2 clics) &rarr; point B\' »</strong>'
-        + ' et cliquez successivement sur les deux rayons émergents (la partie du tracé <em>après</em> la lentille) pour'
-        + ' construire précisément le point B\'.</p>'
-        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
-        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
-        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> : ne cliquez que pour marquer un tronçon'
-        + ' virtuel, ou pour l\'effacer s\'il ne doit pas apparaître.</p></div>';
+        + '<h2>' + I18N_D.t('opt.rc_instr_h2') + '</h2>'
+        + I18N_D.t(virtuelle ? 'opt.rc_instr_p1_virtuelle' : 'opt.rc_instr_p1_reelle', { f: _n(f), ab: _n(AB), oa: _n(OA) })
+        + I18N_D.t('opt.rc_instr_p2')
+        + I18N_D.t('opt.rc_instr_li1')
+        + I18N_D.t('opt.rc_instr_li2')
+        + I18N_D.t('opt.rc_instr_li3')
+        + I18N_D.t('opt.rc_instr_p3')
+        + I18N_D.t('opt.rc_instr_p4') + '</div>';
 
     var textFrag = '<div style="background:#0284c7;border-left:5px solid #0369a1;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -1294,7 +1258,7 @@ function _genOptiqueLentilleDivergenteCore(X, p, deps) {
         f: f, OA: OA, AB: AB,
         X_MIN: _n(-halfX), X_MAX: _n(halfX), Y_MIN: _n(-halfY), Y_MAX: _n(halfY),
         lensHeight: _n(lensH), convergente: false, dispW: dispW
-    });
+    }, I18N_D);
 
     var vars = 'f: ' + _n(f) + '$\n'
         + 'lensHeight: ' + _n(lensH) + '$\n'
@@ -1320,7 +1284,7 @@ function _genOptiqueLentilleDivergenteCore(X, p, deps) {
         + _opticsConstructionMaximaHelpers()
         + '\nrequire_mc(mc) := block(\n'
         + '  if not is(safe_op(mc) = "lentille_construction") or not is(length(mc) = 2) then\n'
-        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction lentille_construction(rayons,points))."\n'
+        + '    "' + I18N_D.t('opt.err_require_mc', { fn: 'lentille_construction' }) + '"\n'
         + '  else\n'
         + '    true\n'
         + ')$\n\n'
@@ -1383,16 +1347,11 @@ function _genOptiqueLentilleDivergenteCore(X, p, deps) {
         + 'c_point: is(found_point(ptList, xAp, ABp, 0.3))$\n'
         + 'abp_status: is(found_AB_status(rayList, xAp, 0, ABp, 0.3, 0.3, 2))$';
 
-    var fbBilan = '<p><strong>Bilan des rayons particuliers :</strong></p>\n'
-        + '[[if test="any_attempt"]]<ul>\n'
-        + '[[if test="att1"]]<li>Rayon // axe &rarr; semblant venir de F\' : [[if test="c1s"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et prolongement virtuel)</span>[[else]][[if test="l1_ok"]]<span style="color:#d68910;">le tracé est bien positionné, mais le tronçon émergent n\'a pas le bon statut réel/virtuel</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]][[/if]]</li>[[/if]]\n'
-        + '[[if test="att2"]]<li>Rayon par le centre optique O : [[if test="c2s"]]<span style="color:#1e7e34;">&#10003; correct et entièrement réel</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais n\'est pas entièrement marqué réel</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att3"]]<li>Rayon vers le foyer F : [[if test="c3s"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et prolongement virtuel)</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais un ou plusieurs tronçons n\'ont pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n'
-        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+    var fbBilan = I18N_D.t('opt.rd_fb_bilan');
 
     var canonicalNodes = [
         {
-            name: '0', description: 'Rayons particuliers — score proportionnel', answertest: 'AlgEquiv',
+            name: '0', description: I18N_D.t('opt.rc_desc_rayons'), answertest: 'AlgEquiv',
             sans: 'true', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: 'score_rayons*3/5', truepenalty: '', truenextnode: '1',
             trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
@@ -1400,32 +1359,24 @@ function _genOptiqueLentilleDivergenteCore(X, p, deps) {
             falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
         },
         {
-            name: '1', description: "Point image B'", answertest: 'AlgEquiv',
+            name: '1', description: I18N_D.t('opt.rc_desc_point_bp'), answertest: 'AlgEquiv',
             sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/5', truepenalty: '', truenextnode: '2',
             trueanswernote: 'prt' + X + '-1-T',
-            truefeedback: "<p>Le point B' est correctement placé à l'intersection des deux rayons émergents (prolongés en pointillés).</p>",
+            truefeedback: I18N_D.t('opt.rd_fb_point_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '2',
             falseanswernote: 'prt' + X + '-1-F',
-            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B'. [[if test=\"have2\"]]Vous avez bien"
-                + ' deux rayons particuliers géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B\' est placé'
-                + ' précisément à l\'intersection de leurs <em>prolongements virtuels</em> (la partie en pointillés, en arrière de la'
-                + ' lentille), et non ailleurs sur l\'un des deux rayons.[[else]]Le point B\' ne peut être placé correctement que si deux'
-                + ' rayons particuliers sont d\'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>'
+            falsefeedback: I18N_D.t('opt.rd_fb_point_false')
         },
         {
-            name: '2', description: "Nature réelle/virtuelle du segment A'B'", answertest: 'AlgEquiv',
+            name: '2', description: I18N_D.t('opt.rc_desc_statut_abp'), answertest: 'AlgEquiv',
             sans: 'abp_status', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/5', truepenalty: '', truenextnode: '-1',
             trueanswernote: 'prt' + X + '-2-T',
-            truefeedback: "<p>Le segment A'B' est correctement marqué virtuel : une lentille divergente donne toujours une image"
-                + ' virtuelle, quelle que soit la position de l\'objet.</p>',
+            truefeedback: I18N_D.t('opt.rd_fb_statut_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'prt' + X + '-2-F',
-            falsefeedback: "<p>Le segment A'B', représentant l'image, doit être marqué <strong>virtuel</strong> : une lentille"
-                + ' divergente donne toujours une image virtuelle, quelle que soit la position de l\'objet. Tracez (ou retracez) le'
-                + ' tronçon entre A\' et B\' avec l\'outil « Tracer A\' (perpendiculaire) », puis cliquez dessus jusqu\'à ce qu\'il soit'
-                + ' marqué virtuel.</p>'
+            falsefeedback: I18N_D.t('opt.rd_fb_statut_false')
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
@@ -1437,40 +1388,22 @@ function _genOptiqueLentilleDivergenteCore(X, p, deps) {
     });
     var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
-    var genFbDefault = "<p>Deux quelconques des trois rayons particuliers suivants permettent de construire B' :</p>\n<ul>\n"
-        + "<li>Le rayon issu de B, parallèle à l'axe, émerge de la lentille en semblant provenir du foyer image F' (situé du même côté que l'objet).</li>\n"
-        + "<li>Le rayon issu de B et passant par le centre optique O n'est pas dévié.</li>\n"
-        + "<li>Le rayon issu de B et dirigé vers le foyer objet F (situé de l'autre côté de la lentille) émerge de la lentille parallèle à l'axe optique.</li>\n</ul>\n"
-        + '<p>Une lentille divergente donnant toujours une image virtuelle, le prolongement en arrière de la lentille des rayons émergents donne'
-        + ' l\'image B\' = (' + _n(xAp) + '&nbsp;;&nbsp;' + _n(ABp) + '), d\'où A\'B\' = ' + _n(ABp) + '&nbsp;cm (image virtuelle).</p>';
+    var genFbDefault = I18N_D.t('opt.rd_genfb_common')
+        + I18N_D.t('opt.rd_genfb_result', { xap: _n(xAp), abp: _n(ABp) });
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> f&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm, '
+        + I18N_D.t('opt.data_label') + 'f&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm, '
         + 'OA&nbsp;=&nbsp;' + _n(OA) + '&nbsp;cm, AB&nbsp;=&nbsp;' + _n(AB) + '&nbsp;cm</p>\n';
 
     var instructions = '<div class="stack-comment">'
-        + '<h2>Construction — Lentille mince divergente</h2>'
-        + '<p>La lentille divergente a une distance focale de valeur absolue f = ' + _n(f) + ' cm (OF = OF\' = ' + _n(f) + ' cm, mais les foyers sont'
-        + ' inversés par rapport à une lentille convergente : le foyer image F\' est du <strong>même côté que l\'objet</strong>,'
-        + ' et le foyer objet F est de l\'autre côté). L\'objet AB, de taille ' + _n(AB) + ' cm, est placé perpendiculairement à l\'axe'
-        + ' optique à OA = ' + _n(OA) + ' cm du centre optique O.</p>'
-        + '<p>À l\'aide des outils ci-dessous, <strong>tracez au moins deux des trois rayons particuliers issus de B</strong> et'
-        + ' faites-les traverser la lentille pour construire l\'image B\' de B. Une lentille divergente donne <em>toujours</em>'
-        + ' une image virtuelle, quelle que soit la position de l\'objet : les rayons émergents divergent après la lentille et'
-        + ' il faut prolonger leur trajet <em>en arrière</em> de la lentille (en pointillés, virtuel), du même côté que l\'objet,'
-        + ' pour les faire se croiser et construire l\'image virtuelle B\' :</p><ul>'
-        + '<li>le rayon issu de B, parallèle à l\'axe optique, qui émerge de la lentille en semblant provenir du foyer image F\''
-        + ' (situé du même côté que l\'objet) ;</li>'
-        + '<li>le rayon issu de B passant par le centre optique O, qui n\'est pas dévié ;</li>'
-        + '<li>le rayon issu de B dirigé vers le foyer objet F (situé de l\'autre côté de la lentille), qui émerge de la'
-        + ' lentille parallèle à l\'axe optique.</li></ul>'
-        + '<p>Une fois deux rayons émergents tracés, utilisez le bouton <strong>« Intersection (2 clics) &rarr; point B\' »</strong>'
-        + ' et cliquez successivement sur les deux rayons émergents (la partie du tracé <em>après</em> la lentille, prolongée en'
-        + ' pointillés) pour construire précisément le point B\'.</p>'
-        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
-        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
-        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> : ne cliquez que pour marquer un tronçon'
-        + ' virtuel, ou pour l\'effacer s\'il ne doit pas apparaître.</p></div>';
+        + '<h2>' + I18N_D.t('opt.rd_instr_h2') + '</h2>'
+        + I18N_D.t('opt.rd_instr_p1', { f: _n(f), ab: _n(AB), oa: _n(OA) })
+        + I18N_D.t('opt.rd_instr_p2')
+        + I18N_D.t('opt.rd_instr_li1')
+        + I18N_D.t('opt.rd_instr_li2')
+        + I18N_D.t('opt.rd_instr_li3')
+        + I18N_D.t('opt.rd_instr_p3')
+        + I18N_D.t('opt.rd_instr_p4') + '</div>';
 
     var textFrag = '<div style="background:#0284c7;border-left:5px solid #0369a1;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -1581,7 +1514,7 @@ function _opticsConstructionMaximaHelpers() {
    f/OA/AB et de la fenêtre d'affichage. Enveloppé dans une IIFE (var au lieu
    de let/const) pour rester isolé si plusieurs instances de ce scénario
    coexistent sur une même page. */
-function _lentilleConstructionJXG(X, p) {
+function _lentilleConstructionJXG(X, p, I18N_D) {
     var f = p.f, OA = p.OA, AB = p.AB;
     var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
     var lensHeight = p.lensHeight;
@@ -1633,7 +1566,7 @@ function _lentilleConstructionJXG(X, p) {
         + "board.create('point', [xObj, AB], { name: 'B', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });\n"
         + "board.create('arrow', [[xObj, 0], [xObj, AB]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n\n"
         + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
-        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + 'var DEFAULT_MSG = "' + I18N_D.t('opt.jxg_default_msg') + '";\n\n'
         + "var instructionsEl = document.createElement('p');\n"
         + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
         + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
@@ -1685,7 +1618,7 @@ function _lentilleConstructionJXG(X, p) {
         + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
         + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
         + 'function deleteSelectedSegment() {\n'
-        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    if (!selectedSegment) { setInstructions("' + I18N_D.t('opt.jxg_msg_select_first') + '"); return; }\n'
         + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
         + '    board.removeObject(seg);\n'
         + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
@@ -1795,17 +1728,17 @@ function _lentilleConstructionJXG(X, p) {
         + '    var x = coords[0], y = coords[1];\n\n'
         + "    if (toolMode !== '') {\n"
         + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
-        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('" + I18N_D.t('opt.jxg_msg_rayon_2') + "'); }\n"
         + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
         + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
-        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
-        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_2') + "'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_3') + "'); }\n"
         + "        else if (toolMode === 'par3') {\n"
         + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
         + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
         + "        else if (toolMode === 'inter1') {\n"
         + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
-        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon émergent.\"); }\n"
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"" + I18N_D.t('opt.jxg_msg_inter2_emergent') + "\"); }\n"
         + '        }\n'
         + "        else if (toolMode === 'inter2') {\n"
         + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
@@ -1825,8 +1758,8 @@ function _lentilleConstructionJXG(X, p) {
         + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
         + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
         + '                        syncState();\n'
-        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
-        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                    } else { setInstructions("' + I18N_D.t('opt.jxg_msg_lines_cross_outside') + '"); }\n'
+        + '                } else { setInstructions("' + I18N_D.t('opt.jxg_msg_parallel_segments') + '"); }\n'
         + '                resetTool();\n            }\n        }\n'
         + "        else if (toolMode === 'perp') {\n"
         + '            addRayFromPieces(null, null, true, x, [[0, y, 1]]);\n'
@@ -1837,13 +1770,13 @@ function _lentilleConstructionJXG(X, p) {
         + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
         + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
         + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
-        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
-        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ (ex : B).\");\n"
-        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
-        + "addToolButton(\"Intersection (2 clics) → point B'\", 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon émergent.');\n"
-        + "addToolButton(\"Tracer A' (perpendiculaire)\", 'perp', \"PERPENDICULAIRE : cliquez sur B' pour tracer A' (le trait tracé pourra ensuite être marqué réel/virtuel).\");\n"
-        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
-        + "addToolButton('Tout effacer', null, function(){\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon') + "', 'pt1', '" + I18N_D.t('opt.jxg_msg_rayon_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_par_axe') + "\", 'axp1', \"" + I18N_D.t('opt.jxg_msg_par_axe_ex') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon_parallele') + "', 'par1', '" + I18N_D.t('opt.jxg_msg_par_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_intersection_bp') + "\", 'inter1', '" + I18N_D.t('opt.jxg_msg_inter1_emergent') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_tracer_ap') + "\", 'perp', \"" + I18N_D.t('opt.jxg_msg_perp') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_effacer_selection') + "', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_tout_effacer') + "', null, function(){\n"
         + '    selectedSegment = null;\n'
         + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
         + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
@@ -1894,7 +1827,7 @@ function _lentilleConstructionJXG(X, p) {
         + '    if (ro) {\n'
         + "        board.containerObj.style.pointerEvents = 'none';\n"
         + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
-        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        setInstructions("' + I18N_D.t('opt.jxg_msg_construction_validee') + '");\n'
         + '        return true;\n    }\n    return false;\n}\n'
         + 'if (!freezeIfReadonly()) {\n'
         + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
@@ -1907,7 +1840,7 @@ function _lentilleConstructionJXG(X, p) {
    avec glyphe miroir (segment vertical + hachures, biseaux vers l'intérieur pour
    un miroir concave / vers l'extérieur pour un miroir convexe), points S/F/C,
    objet repéré par SA (au lieu de OA), et fonction miroir_construction(...).  */
-function _miroirConstructionJXG(X, p) {
+function _miroirConstructionJXG(X, p, I18N_D) {
     var f = p.f, SA = p.SA, AB = p.AB;
     var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
     var mirrorHeight = p.mirrorHeight;
@@ -1958,7 +1891,7 @@ function _miroirConstructionJXG(X, p) {
         + "board.create('point', [xObj, AB], { name: 'B', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });\n"
         + "board.create('arrow', [[xObj, 0], [xObj, AB]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n\n"
         + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
-        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + 'var DEFAULT_MSG = "' + I18N_D.t('opt.jxg_default_msg') + '";\n\n'
         + "var instructionsEl = document.createElement('p');\n"
         + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
         + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
@@ -2010,7 +1943,7 @@ function _miroirConstructionJXG(X, p) {
         + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
         + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
         + 'function deleteSelectedSegment() {\n'
-        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    if (!selectedSegment) { setInstructions("' + I18N_D.t('opt.jxg_msg_select_first') + '"); return; }\n'
         + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
         + '    board.removeObject(seg);\n'
         + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
@@ -2120,18 +2053,18 @@ function _miroirConstructionJXG(X, p) {
         + '    var x = coords[0], y = coords[1];\n\n'
         + "    if (toolMode !== '') {\n"
         + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
-        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('" + I18N_D.t('opt.jxg_msg_rayon_2') + "'); }\n"
         + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
         + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
-        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
-        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_2') + "'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_3') + "'); }\n"
         + "        else if (toolMode === 'par3') {\n"
         + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
         + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
         + "        else if (toolMode === 'sym') { addCustomRay(0, 0, x, -y); resetTool(); }\n"
         + "        else if (toolMode === 'inter1') {\n"
         + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
-        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon réfléchi.\"); }\n"
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"" + I18N_D.t('opt.jxg_msg_inter2_reflechi') + "\"); }\n"
         + '        }\n'
         + "        else if (toolMode === 'inter2') {\n"
         + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
@@ -2151,8 +2084,8 @@ function _miroirConstructionJXG(X, p) {
         + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
         + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
         + '                        syncState();\n'
-        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
-        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                    } else { setInstructions("' + I18N_D.t('opt.jxg_msg_lines_cross_outside') + '"); }\n'
+        + '                } else { setInstructions("' + I18N_D.t('opt.jxg_msg_parallel_segments') + '"); }\n'
         + '                resetTool();\n            }\n        }\n'
         + "        else if (toolMode === 'perp') {\n"
         + '            addRayFromPieces(null, null, true, x, [[0, y, 1]]);\n'
@@ -2163,14 +2096,14 @@ function _miroirConstructionJXG(X, p) {
         + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
         + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
         + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
-        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
-        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ (ex : B).\");\n"
-        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
-        + "addToolButton(\"Symétrique / axe (1 clic)\", 'sym', \"SYMÉTRIQUE PAR RAPPORT À L'AXE : cliquez un point du rayon incident (vers S) ; le rayon réfléchi symétrique sera tracé depuis S.\");\n"
-        + "addToolButton(\"Intersection (2 clics) → point B'\", 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon réfléchi.');\n"
-        + "addToolButton(\"Tracer A' (perpendiculaire)\", 'perp', \"PERPENDICULAIRE : cliquez sur B' pour tracer A' (le trait tracé pourra ensuite être marqué réel/virtuel).\");\n"
-        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
-        + "addToolButton('Tout effacer', null, function(){\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon') + "', 'pt1', '" + I18N_D.t('opt.jxg_msg_rayon_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_par_axe') + "\", 'axp1', \"" + I18N_D.t('opt.jxg_msg_par_axe_ex') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon_parallele') + "', 'par1', '" + I18N_D.t('opt.jxg_msg_par_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_symetrique') + "\", 'sym', \"" + I18N_D.t('opt.jxg_msg_symetrique') + "\");\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_intersection_bp') + "\", 'inter1', '" + I18N_D.t('opt.jxg_msg_inter1_reflechi') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_tracer_ap') + "\", 'perp', \"" + I18N_D.t('opt.jxg_msg_perp') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_effacer_selection') + "', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_tout_effacer') + "', null, function(){\n"
         + '    selectedSegment = null;\n'
         + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
         + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
@@ -2221,7 +2154,7 @@ function _miroirConstructionJXG(X, p) {
         + '    if (ro) {\n'
         + "        board.containerObj.style.pointerEvents = 'none';\n"
         + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
-        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        setInstructions("' + I18N_D.t('opt.jxg_msg_construction_validee') + '");\n'
         + '        return true;\n    }\n    return false;\n}\n'
         + 'if (!freezeIfReadonly()) {\n'
         + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
@@ -2341,7 +2274,7 @@ function _genOptiqueMiroirCoreImpl(X, p, deps) {
         f: f, SA: SA, AB: AB,
         X_MIN: _n(-halfX), X_MAX: _n(halfX), Y_MIN: _n(-halfY), Y_MAX: _n(halfY),
         mirrorHeight: _n(mirH), convexe: convexe, dispW: dispW
-    });
+    }, I18N_D);
 
     /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
     var vars = 'f: ' + _n(f) + '$\n'
@@ -2370,7 +2303,7 @@ function _genOptiqueMiroirCoreImpl(X, p, deps) {
         + _opticsConstructionMaximaHelpers()
         + '\nrequire_mc(mc) := block(\n'
         + '  if not is(safe_op(mc) = "miroir_construction") or not is(length(mc) = 2) then\n'
-        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction miroir_construction(rayons,points))."\n'
+        + '    "' + I18N_D.t('opt.err_require_mc', { fn: 'miroir_construction' }) + '"\n'
         + '  else\n'
         + '    true\n'
         + ')$\n\n'
@@ -2494,23 +2427,14 @@ function _genOptiqueMiroirCoreImpl(X, p, deps) {
         + 'c_point: is(found_point(ptList, xAp, ABp, 0.3))$\n'
         + 'abp_status: is(found_AB_status(rayList, xAp, 0, ABp, 0.3, 0.3, ' + (virtuelle ? 2 : 1) + '))$';
 
-    var rayLabel2 = convexe ? 'Rayon dirigé vers le centre C' : 'Rayon par le centre C';
-    var rayLabel3 = convexe ? "Rayon dirigé vers le foyer F'" : "Rayon par le foyer F'";
+    var rayLabel2 = I18N_D.t(convexe ? 'opt.mcc_ray_label2_convexe' : 'opt.mcc_ray_label2_concave');
+    var rayLabel3 = I18N_D.t(convexe ? 'opt.mcc_ray_label3_convexe' : 'opt.mcc_ray_label3_concave');
 
-    var fbBilan = '<p><strong>Bilan des rayons remarquables :</strong></p>\n'
-        + '[[if test="any_attempt"]]<ul>\n'
-        + '[[if test="att1"]]<li>Rayon // axe &rarr; F\' : [[if test="c1s"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et droite réfléchie)</span>[[else]][[if test="c1"]]<span style="color:#d68910;">le tracé est bien positionné, mais un ou plusieurs tronçons n\'ont pas le bon statut réel/virtuel/enlevé</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]][[/if]]</li>[[/if]]\n'
-        + '[[if test="att2"]]<li>' + rayLabel2 + ' : [[if test="c2s"]]<span style="color:#1e7e34;">&#10003; correct'
-        + (virtuelle ? ' et statut réel/virtuel conforme</span>[[else]][[if test="c2"]]<span style="color:#d68910;">le tracé est bien positionné, mais le statut réel/virtuel n\'est pas entièrement conforme</span>'
-                     : ' et entièrement réel</span>[[else]][[if test="c2"]]<span style="color:#d68910;">le tracé est bien positionné, mais n\'est pas entièrement marqué réel</span>')
-        + '[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]][[/if]]</li>[[/if]]\n'
-        + '[[if test="att3"]]<li>' + rayLabel3 + ' : [[if test="c3s"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et droite réfléchie)</span>[[else]][[if test="c3"]]<span style="color:#d68910;">le tracé est bien positionné, mais un ou plusieurs tronçons n\'ont pas le bon statut réel/virtuel/enlevé</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]][[/if]]</li>[[/if]]\n'
-        + '[[if test="att4"]]<li>Rayon arrivant en S : [[if test="c4s"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et droite réfléchie)</span>[[else]][[if test="c4"]]<span style="color:#d68910;">le tracé est bien positionné, mais un ou plusieurs tronçons n\'ont pas le bon statut réel/virtuel/enlevé</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]][[/if]]</li>[[/if]]\n'
-        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+    var fbBilan = I18N_D.t(virtuelle ? 'opt.mcc_fb_bilan_virtuelle' : 'opt.mcc_fb_bilan_reelle', { raylabel2: rayLabel2, raylabel3: rayLabel3 });
 
     var canonicalNodes = [
         {
-            name: '0', description: 'Rayons remarquables — score proportionnel', answertest: 'AlgEquiv',
+            name: '0', description: I18N_D.t('opt.mcc_desc_rayons'), answertest: 'AlgEquiv',
             sans: 'true', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: 'score_rayons*5/7', truepenalty: '', truenextnode: '1',
             trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
@@ -2518,53 +2442,28 @@ function _genOptiqueMiroirCoreImpl(X, p, deps) {
             falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
         },
         {
-            name: '1', description: "Point image B'", answertest: 'AlgEquiv',
+            name: '1', description: I18N_D.t('opt.rc_desc_point_bp'), answertest: 'AlgEquiv',
             sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/7', truepenalty: '', truenextnode: '2',
             trueanswernote: 'prt' + X + '-1-T',
-            truefeedback: "<p>Le point B' est correctement placé à l'intersection des deux rayons réfléchis.</p>",
+            truefeedback: I18N_D.t('opt.mcc_fb_point_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '2',
             falseanswernote: 'prt' + X + '-1-F',
-            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B'. [[if test=\"have2\"]]Vous avez bien"
-                + ' deux rayons remarquables géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B\' est placé'
-                + ' précisément à l\'intersection de leurs <em>tronçons réfléchis</em> (la partie du tracé <em>après</em> le miroir), et'
-                + ' non ailleurs sur l\'un des deux rayons.[[else]]Le point B\' ne peut être placé correctement que si deux rayons'
-                + ' remarquables sont d\'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>'
+            falsefeedback: I18N_D.t('opt.mcc_fb_point_false')
         },
         {
-            name: '2', description: "Nature réelle/virtuelle du segment A'B'", answertest: 'AlgEquiv',
+            name: '2', description: I18N_D.t('opt.rc_desc_statut_abp'), answertest: 'AlgEquiv',
             sans: 'abp_status', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/7', truepenalty: '', truenextnode: '-1',
             trueanswernote: 'prt' + X + '-2-T',
             truefeedback: convexe
-                ? "<p>Le segment A'B' est correctement marqué virtuel : le miroir étant convexe, le foyer F' et le centre C sont"
-                  + ' virtuels, si bien que les rayons réfléchis divergent toujours devant le miroir. L\'image ne se forme qu\'en'
-                  + ' prolongeant ces rayons derrière le miroir : elle est donc virtuelle.</p>'
-                : (virtuelle
-                    ? "<p>Le segment A'B' est correctement marqué virtuel : l'objet AB étant placé entre le sommet S et le foyer F'"
-                      + ' (SA&nbsp;=&nbsp;' + _n(SA) + '&nbsp;cm &lt; f&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), les rayons réfléchis divergent et l\'image ne se forme'
-                      + ' qu\'en prolongeant ces rayons derrière le miroir : elle est donc virtuelle.</p>'
-                    : "<p>Le segment A'B' est correctement marqué réel : l'objet AB étant placé au-delà du foyer F'"
-                      + ' (SA&nbsp;=&nbsp;' + _n(SA) + '&nbsp;cm &gt; f&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), les rayons réfléchis convergent réellement'
-                      + ' devant le miroir : l\'image obtenue est bien réelle.</p>'),
+                ? I18N_D.t('opt.mcc_fb_statut_true_convexe')
+                : I18N_D.t(virtuelle ? 'opt.mcc_fb_statut_true_virtuelle' : 'opt.mcc_fb_statut_true_reelle', { sa: _n(SA), f: _n(f) }),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'prt' + X + '-2-F',
             falsefeedback: convexe
-                ? "<p>Le segment A'B', représentant l'image, doit être marqué <strong>virtuel</strong> dans cette configuration :"
-                  + ' le miroir étant convexe, le foyer F\' et le centre C sont virtuels, donc les rayons réfléchis divergent toujours'
-                  + ' devant le miroir et l\'image ne se forme qu\'en les prolongeant (en pointillés) derrière le miroir. Tracez (ou'
-                  + ' retracez) le tronçon entre A\' et B\' avec l\'outil « Tracer A\' (perpendiculaire) », puis cliquez dessus pour le'
-                  + ' marquer virtuel.</p>'
-                : (virtuelle
-                    ? "<p>Le segment A'B', représentant l'image, doit être marqué <strong>virtuel</strong> dans cette configuration :"
-                      + ' l\'objet AB est placé entre le sommet S et le foyer F\' (SA&nbsp;=&nbsp;' + _n(SA) + '&nbsp;cm &lt; f&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), donc les'
-                      + ' rayons réfléchis divergent et l\'image ne se forme qu\'en les prolongeant (en pointillés) derrière le miroir.'
-                      + ' Tracez (ou retracez) le tronçon entre A\' et B\' avec l\'outil « Tracer A\' (perpendiculaire) », puis cliquez'
-                      + ' dessus pour le marquer virtuel.</p>'
-                    : "<p>Le segment A'B', représentant l'image, doit être marqué <strong>réel</strong> dans cette configuration :"
-                      + ' l\'objet AB est placé au-delà du foyer F\' (SA&nbsp;=&nbsp;' + _n(SA) + '&nbsp;cm &gt; f&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm), donc les rayons'
-                      + ' réfléchis convergent réellement devant le miroir. Tracez (ou retracez) le tronçon entre A\' et B\' avec'
-                      + ' l\'outil « Tracer A\' (perpendiculaire) », puis cliquez dessus jusqu\'à ce qu\'il soit marqué réel.</p>')
+                ? I18N_D.t('opt.mcc_fb_statut_false_convexe')
+                : I18N_D.t(virtuelle ? 'opt.mcc_fb_statut_false_virtuelle' : 'opt.mcc_fb_statut_false_reelle', { sa: _n(SA), f: _n(f) })
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
@@ -2576,67 +2475,32 @@ function _genOptiqueMiroirCoreImpl(X, p, deps) {
     });
     var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
-    var ray2Bullet = convexe
-        ? "<li>le rayon issu de B dirigé vers le centre C (virtuel, derrière le miroir), qui atteint le miroir sous incidence normale et se réfléchit sur lui-même ;</li>\n"
-        : "<li>le rayon issu de B passant par le centre C, qui se réfléchit sur lui-même ;</li>\n";
-    var ray3Bullet = convexe
-        ? "<li>le rayon issu de B dirigé vers le foyer F' (virtuel, derrière le miroir), qui ressort parallèle à l'axe optique ;</li>\n"
-        : "<li>le rayon issu de B passant par le foyer F', qui ressort parallèle à l'axe optique ;</li>\n";
-    var raysListHtml = "<li>le rayon issu de B, parallèle à l'axe optique, qui ressort du miroir en semblant provenir du foyer F' ;</li>\n"
+    var ray2Bullet = I18N_D.t(convexe ? 'opt.mcc_ray2_bullet_convexe' : 'opt.mcc_ray2_bullet_concave');
+    var ray3Bullet = I18N_D.t(convexe ? 'opt.mcc_ray3_bullet_convexe' : 'opt.mcc_ray3_bullet_concave');
+    var raysListHtml = I18N_D.t('opt.mcc_rays_list_first')
         + ray2Bullet + ray3Bullet
-        + "<li>le rayon issu de B arrivant au sommet S, qui repart symétriquement par rapport à l'axe optique.</li>";
+        + I18N_D.t('opt.mcc_rays_list_last');
 
-    var genFbDefault = "<p>Deux quelconques des quatre rayons remarquables suivants permettent de construire B' :</p>\n<ul>\n"
-        + "<li>Le rayon issu de B, parallèle à l'axe, ressort du miroir en semblant provenir du foyer F'" + (convexe ? ' (virtuel)' : '') + ".</li>\n"
-        + '<li>Le rayon issu de B ' + (convexe ? 'dirigé vers le centre C (virtuel) atteint' : 'et passant par le centre C atteint') + " le miroir sous incidence normale et repart sur lui-même.</li>\n"
-        + '<li>Le rayon issu de B ' + (convexe ? "dirigé vers le foyer F' (virtuel)" : "et passant par le foyer F'") + " ressort parallèle à l'axe optique.</li>\n"
-        + "<li>Le rayon issu de B et arrivant au sommet S repart symétriquement par rapport à l'axe optique.</li>\n</ul>\n"
-        + (convexe
-            ? '<p>Le miroir étant convexe, F\' et C sont virtuels : les rayons réfléchis divergent toujours devant le miroir, quelle'
-              + ' que soit la position de l\'objet. C\'est le prolongement de leurs tronçons derrière le miroir (virtuel, en pointillés)'
-              + ' qui se croise pour donner l\'image B\' = (' + _n(xAp) + '&nbsp;;&nbsp;' + _n(ABp) + '), d\'où A\'B\' = ' + _n(ABp) + '&nbsp;cm (image virtuelle).</p>'
-            : (virtuelle
-                ? '<p>L\'objet étant entre S et F, les rayons réfléchis divergent devant le miroir : c\'est le prolongement de leurs'
-                  + ' tronçons derrière le miroir (virtuel, en pointillés) qui se croise pour donner l\'image B\' = (' + _n(xAp) + '&nbsp;;&nbsp;' + _n(ABp) + '),'
-                  + ' d\'où A\'B\' = ' + _n(ABp) + '&nbsp;cm (image virtuelle).</p>'
-                : '<p>L\'objet étant au-delà de F\', les rayons réfléchis convergent réellement devant le miroir, donnant l\'image'
-                  + ' B\' = (' + _n(xAp) + '&nbsp;;&nbsp;' + _n(ABp) + '), d\'où A\'B\' = ' + _n(ABp) + '&nbsp;cm (image réelle).</p>'));
+    var genFbDefault = convexe
+        ? I18N_D.t('opt.mcc_genfb_convexe', { xap: _n(xAp), abp: _n(ABp) })
+        : I18N_D.t(virtuelle ? 'opt.mcc_genfb_virtuelle' : 'opt.mcc_genfb_reelle', { xap: _n(xAp), abp: _n(ABp) });
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> f&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm, '
+        + I18N_D.t('opt.data_label') + 'f&nbsp;=&nbsp;' + _n(f) + '&nbsp;cm, '
         + 'SA&nbsp;=&nbsp;' + _n(SA) + '&nbsp;cm, AB&nbsp;=&nbsp;' + _n(AB) + '&nbsp;cm</p>\n';
 
     var instructionsIntro = convexe
-        ? '<p>Le miroir convexe a une distance focale f = ' + _n(f) + ' cm. Contrairement au miroir concave, le foyer F\' et le centre C'
-          + ' sont <strong>virtuels</strong> : ils se trouvent <em>derrière</em> le miroir. L\'objet AB, de taille ' + _n(AB) + ' cm, est'
-          + ' placé perpendiculairement à l\'axe optique à SA&nbsp;=&nbsp;' + _n(SA) + ' cm devant le miroir.</p>'
-        : '<p>Le miroir concave a une distance focale f = ' + _n(f) + ' cm. L\'objet AB, de taille ' + _n(AB) + ' cm, est placé'
-          + ' perpendiculairement à l\'axe optique à SA&nbsp;=&nbsp;' + _n(SA) + ' cm du sommet S, '
-          + (virtuelle ? '<strong>entre le sommet S et le foyer F\'</strong>.</p>' : '<strong>au-delà du foyer F\'</strong>.</p>');
+        ? I18N_D.t('opt.mcc_instr_intro_convexe', { f: _n(f), ab: _n(AB), sa: _n(SA) })
+        : I18N_D.t(virtuelle ? 'opt.mcc_instr_intro_concave_virtuelle' : 'opt.mcc_instr_intro_concave_reelle', { f: _n(f), ab: _n(AB), sa: _n(SA) });
     var instructionsCross = convexe
-        ? '<p>À l\'aide des outils ci-dessous, <strong>tracez au moins deux des quatre rayons remarquables issus de B</strong> et'
-          + ' faites-les se réfléchir sur le miroir pour construire l\'image B\' de B. Avec un miroir convexe, les rayons réfléchis'
-          + ' divergent toujours devant le miroir, quelle que soit la position de l\'objet : il faut prolonger leur trajet'
-          + ' <em>derrière</em> le miroir (en pointillés, virtuel) pour les faire se croiser et construire l\'image virtuelle B\' :</p>'
-        : (virtuelle
-            ? '<p>À l\'aide des outils ci-dessous, <strong>tracez au moins deux des quatre rayons remarquables issus de B</strong> et'
-              + ' faites-les se réfléchir sur le miroir pour construire l\'image B\' de B. Dans cette configuration, les rayons'
-              + ' réfléchis divergent devant le miroir : il faut prolonger leur trajet <em>derrière</em> le miroir (en pointillés,'
-              + ' virtuel) pour les faire se croiser et construire l\'image virtuelle B\' :</p>'
-            : '<p>À l\'aide des outils ci-dessous, <strong>tracez au moins deux des quatre rayons remarquables issus de B</strong> et'
-              + ' faites-les se réfléchir sur le miroir pour construire l\'image B\' de B. Dans cette configuration, les rayons'
-              + ' réfléchis convergent réellement devant le miroir :</p>');
+        ? I18N_D.t('opt.mcc_instr_cross_convexe')
+        : I18N_D.t(virtuelle ? 'opt.mcc_instr_cross_virtuelle' : 'opt.mcc_instr_cross_reelle');
     var instructions = '<div class="stack-comment">'
-        + '<h2>Construction — Miroir sphérique ' + (convexe ? 'convexe' : 'concave') + '</h2>'
+        + '<h2>' + I18N_D.t(convexe ? 'opt.mcc_instr_h2_convexe' : 'opt.mcc_instr_h2_concave') + '</h2>'
         + instructionsIntro + instructionsCross
         + '<ul>' + raysListHtml + '</ul>'
-        + '<p>Une fois deux rayons réfléchis tracés, utilisez le bouton <strong>« Intersection (2 clics) &rarr; point B\' »</strong>'
-        + ' et cliquez successivement sur les deux rayons réfléchis (la partie du tracé <em>après</em> le miroir'
-        + (convexe || virtuelle ? ', en pointillés' : '') + ') pour construire précisément le point B\'.</p>'
-        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
-        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
-        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> : ne cliquez que pour marquer un tronçon'
-        + ' virtuel, ou pour l\'effacer s\'il ne doit pas apparaître.</p></div>';
+        + I18N_D.t(convexe || virtuelle ? 'opt.mcc_instr_p3_pointilles' : 'opt.mcc_instr_p3_plein')
+        + I18N_D.t('opt.rc_instr_p4') + '</div>';
 
     var textFrag = '<div style="background:#0284c7;border-left:5px solid #0369a1;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -2682,7 +2546,7 @@ function _genOptiqueMiroirConvexe(X) { return _genOptiqueMiroirCore(X, true); }
    intersection est nommé B1 (image intermédiaire réelle dans le plan
    focal commun F'1=F2), et la fonction de sérialisation est
    lunette_construction(rayons, points). */
-function _lunetteConstructionJXG(X, p) {
+function _lunetteConstructionJXG(X, p, I18N_D) {
     var f1 = p.f1, f2 = p.f2, d = p.d, beamH = p.beamH, tanA = p.tanA;
     var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
     var lens1H = p.lens1H, lens2H = p.lens2H;
@@ -2732,9 +2596,9 @@ function _lunetteConstructionJXG(X, p) {
         + "board.create('arrow', [[segX1, -tanA*segX1], [segX2, -tanA*segX2]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
         + "board.create('segment', [[segX1, -tanA*segX1+beamH], [segX2, -tanA*segX2+beamH]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
         + "board.create('arrow', [[segX1, -tanA*segX1+beamH], [segX2, -tanA*segX2+beamH]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
-        + "board.create('text', [segX1, -tanA*segX1+beamH+0.8, \"Objet \\u00e0 l'infini : rayons incidents parall\\u00e8les (angle \\u03b1)\"], { fixed: true, fontSize: 11, color: '#c0392b', highlight: false, tabindex: null });\n\n"
+        + "board.create('text', [segX1, -tanA*segX1+beamH+0.8, \"" + I18N_D.t('opt.jxg_label_objet_infini') + "\"], { fixed: true, fontSize: 11, color: '#c0392b', highlight: false, tabindex: null });\n\n"
         + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
-        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + 'var DEFAULT_MSG = "' + I18N_D.t('opt.jxg_default_msg') + '";\n\n'
         + "var instructionsEl = document.createElement('p');\n"
         + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
         + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
@@ -2786,7 +2650,7 @@ function _lunetteConstructionJXG(X, p) {
         + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
         + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
         + 'function deleteSelectedSegment() {\n'
-        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    if (!selectedSegment) { setInstructions("' + I18N_D.t('opt.jxg_msg_select_first') + '"); return; }\n'
         + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
         + '    board.removeObject(seg);\n'
         + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
@@ -2899,17 +2763,17 @@ function _lunetteConstructionJXG(X, p) {
         + '    var x = coords[0], y = coords[1];\n\n'
         + "    if (toolMode !== '') {\n"
         + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
-        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('" + I18N_D.t('opt.jxg_msg_rayon_2') + "'); }\n"
         + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
         + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
-        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
-        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_2') + "'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_3') + "'); }\n"
         + "        else if (toolMode === 'par3') {\n"
         + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
         + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
         + "        else if (toolMode === 'inter1') {\n"
         + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
-        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon.\"); }\n"
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"" + I18N_D.t('opt.jxg_msg_inter2_generic') + "\"); }\n"
         + '        }\n'
         + "        else if (toolMode === 'inter2') {\n"
         + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
@@ -2929,19 +2793,19 @@ function _lunetteConstructionJXG(X, p) {
         + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
         + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
         + '                        syncState();\n'
-        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
-        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                    } else { setInstructions("' + I18N_D.t('opt.jxg_msg_lines_cross_outside') + '"); }\n'
+        + '                } else { setInstructions("' + I18N_D.t('opt.jxg_msg_parallel_segments') + '"); }\n'
         + '                resetTool();\n            }\n        }\n        return;\n    }\n\n'
         + '    var clickedSeg = getClickedSegment(x, y, 0.3, null);\n'
         + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
         + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
         + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
-        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
-        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ.\");\n"
-        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
-        + "addToolButton('Intersection (2 clics) → point B1', 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon.');\n"
-        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
-        + "addToolButton('Tout effacer', null, function(){\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon') + "', 'pt1', '" + I18N_D.t('opt.jxg_msg_rayon_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_par_axe') + "\", 'axp1', \"" + I18N_D.t('opt.jxg_msg_par_axe_noex') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon_parallele') + "', 'par1', '" + I18N_D.t('opt.jxg_msg_par_1') + "');\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_intersection_b1') + "', 'inter1', '" + I18N_D.t('opt.jxg_msg_inter1_generic') + "');\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_effacer_selection') + "', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_tout_effacer') + "', null, function(){\n"
         + '    selectedSegment = null;\n'
         + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
         + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
@@ -2992,7 +2856,7 @@ function _lunetteConstructionJXG(X, p) {
         + '    if (ro) {\n'
         + "        board.containerObj.style.pointerEvents = 'none';\n"
         + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
-        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        setInstructions("' + I18N_D.t('opt.jxg_msg_construction_validee') + '");\n'
         + '        return true;\n    }\n    return false;\n}\n'
         + 'if (!freezeIfReadonly()) {\n'
         + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
@@ -3083,7 +2947,7 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
         f1: f1, f2: f2, d: _n(d), beamH: beamH, tanA: _n(tanT),
         X_MIN: X_MIN, X_MAX: X_MAX, Y_MIN: Y_MIN, Y_MAX: Y_MAX,
         lens1H: lens1H, lens2H: lens2H, dispW: dispW
-    });
+    }, I18N_D);
 
     /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
     var vars = 'f1: ' + _n(f1) + '$\n'
@@ -3105,7 +2969,7 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
         + _opticsConstructionMaximaHelpers()
         + '\nrequire_mc(mc) := block(\n'
         + '  if not is(safe_op(mc) = "lunette_construction") or not is(length(mc) = 2) then\n'
-        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction lunette_construction(rayons,points))."\n'
+        + '    "' + I18N_D.t('opt.err_require_mc', { fn: 'lunette_construction' }) + '"\n'
         + '  else\n'
         + '    true\n'
         + ')$\n\n'
@@ -3167,17 +3031,11 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
         + 'have2: is(nb_full_ok >= 2)$\n\n'
         + 'c_point: is(found_point(ptList, ' + _n(f1) + ', ' + _n(yB1) + ', 0.3))$';
 
-    var fbBilan = '<p><strong>Bilan des rayons particuliers :</strong></p>\n'
-        + '[[if test="any_attempt"]]<ul>\n'
-        + '[[if test="att1"]]<li>Rayon issu de l\'infini par le centre O&#8321; (non dévié) : [[if test="c1s"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att2"]]<li>Rayon incident parallèle (décalé de ' + _n(beamH) + ' cm), réfracté vers B&#8321; : [[if test="c2s"]]<span style="color:#1e7e34;">&#10003; correct (incident et émergent)</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais un tronçon n\'a pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att3"]]<li>Rayon issu de B&#8321; par le centre O&#8322; (non dévié) : [[if test="c3s"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct géométriquement</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att4"]]<li>Rayon issu de B&#8321;, parallèle à l\'axe, émergent par F\'&#8322; : [[if test="c4s"]]<span style="color:#1e7e34;">&#10003; correct (incident et émergent)</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais un tronçon n\'a pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n'
-        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+    var fbBilan = I18N_D.t('opt.lun_fb_bilan', { beamh: _n(beamH) });
 
     var canonicalNodes = [
         {
-            name: '0', description: 'Rayons particuliers — score proportionnel', answertest: 'AlgEquiv',
+            name: '0', description: I18N_D.t('opt.lun_desc_rayons'), answertest: 'AlgEquiv',
             sans: 'true', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: 'score_rayons*5/6', truepenalty: '', truenextnode: '1',
             trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
@@ -3185,18 +3043,14 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
             falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
         },
         {
-            name: '1', description: 'Point image intermédiaire B1', answertest: 'AlgEquiv',
+            name: '1', description: I18N_D.t('opt.lun_desc_point_b1'), answertest: 'AlgEquiv',
             sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '-1',
             trueanswernote: 'prt' + X + '-1-T',
-            truefeedback: "<p>Le point B1 est correctement placé à l'intersection des deux rayons issus de l'objectif L&#8321;, dans le plan focal commun F'&#8321;=F&#8322;.</p>",
+            truefeedback: I18N_D.t('opt.lun_fb_point_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'prt' + X + '-1-F',
-            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B1. [[if test=\"have2\"]]Vous avez bien"
-                + ' des rayons particuliers géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B1 est placé'
-                + " précisément à l'intersection des deux rayons issus de l'objectif L&#8321; (celui par le centre O&#8321; et celui décalé"
-                + " de " + _n(beamH) + ' cm), dans le plan focal commun (x&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm).[[else]]Le point B1 ne peut être placé'
-                + " correctement que si les deux rayons issus de l'objectif sont d'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>"
+            falsefeedback: I18N_D.t('opt.lun_fb_point_false', { beamh: _n(beamH), f1: _n(f1) })
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
@@ -3208,34 +3062,19 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
     });
     var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
-    var genFbDefault = "<p>La lunette astronomique est afocale : l'objectif L&#8321; (f'&#8321;) et l'oculaire L&#8322; (f'&#8322;) sont séparés de"
-        + ' d&nbsp;=&nbsp;f\'&#8321;&nbsp;+&nbsp;f\'&#8322;&nbsp;=&nbsp;' + _n(d) + '&nbsp;cm, de sorte que leurs foyers F\'&#8321; et F&#8322; sont confondus.</p>\n<ul>\n'
-        + "<li>Deux rayons incidents parallèles, inclinés de θ par rapport à l'axe (l'un passant par le centre O&#8321;, l'autre décalé), convergent"
-        + " après l'objectif au même point B1, dans le plan focal commun (x&nbsp;=&nbsp;f'&#8321;&nbsp;=&nbsp;" + _n(f1) + '&nbsp;cm).</li>\n'
-        + '<li>B1 devient alors l\'objet de l\'oculaire L&#8322; : deux rayons issus de B1 (l\'un par le centre O&#8322;, l\'autre parallèle à'
-        + " l'axe puis réfracté par F'&#8322;) ressortent parallèles entre eux : l'image finale est à l'infini (système afocal).</li></ul>";
+    var genFbDefault = I18N_D.t('opt.lun_genfb', { d: _n(d), f1: _n(f1) });
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm, '
-        + 'f\'&#8322;&nbsp;=&nbsp;' + _n(f2) + '&nbsp;cm, θ&nbsp;=&nbsp;' + _n(theta) + '°</p>\n';
+        + I18N_D.t('opt.data_label')
+        + I18N_D.t('opt.lun_data_content', { f1: _n(f1), f2: _n(f2), theta: _n(theta) }) + '</p>\n';
 
     var instructions = '<div class="stack-comment">'
-        + '<h2>Construction — Lunette astronomique afocale</h2>'
-        + '<p>L\'objectif L&#8321; a une distance focale f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm, l\'oculaire L&#8322; a une distance focale'
-        + ' f\'&#8322;&nbsp;=&nbsp;' + _n(f2) + '&nbsp;cm ; ils sont séparés de d&nbsp;=&nbsp;' + _n(d) + '&nbsp;cm (système afocal). L\'objet observé'
-        + ' (une étoile) est à l\'infini, sous un diamètre apparent θ&nbsp;=&nbsp;' + _n(theta) + '°.</p>'
-        + '<p>À l\'aide des outils ci-dessous, <strong>tracez les quatre rayons remarquables</strong> :</p><ul>'
-        + '<li>le rayon incident passant par le centre optique O&#8321; de l\'objectif, non dévié ;</li>'
-        + '<li>un second rayon incident, parallèle au premier, décalé de ' + _n(beamH) + ' cm : après l\'objectif, il doit converger vers le'
-        + ' même point B1 que le premier (dans le plan focal commun F\'&#8321;=F&#8322;) ;</li>'
-        + '<li>le rayon issu de B1 passant par le centre optique O&#8322; de l\'oculaire, non dévié ;</li>'
-        + '<li>le rayon issu de B1, parallèle à l\'axe optique jusqu\'à l\'oculaire, qui émerge en passant par le foyer F\'&#8322;.</li></ul>'
-        + '<p>Une fois les deux premiers rayons tracés, utilisez le bouton <strong>« Intersection (2 clics) &rarr; point B1 »</strong>'
-        + ' pour construire précisément le point B1, puis tracez les deux rayons issus de B1 vers l\'oculaire (le faisceau émergent'
-        + ' est parallèle : il n\'y a pas de second point à construire, l\'image finale étant à l\'infini).</p>'
-        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
-        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
-        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> — c\'est le cas attendu ici pour tous les tronçons.</p></div>';
+        + '<h2>' + I18N_D.t('opt.lun_instr_h2') + '</h2>'
+        + I18N_D.t('opt.lun_instr_intro', { f1: _n(f1), f2: _n(f2), d: _n(d), theta: _n(theta) })
+        + I18N_D.t('opt.lun_instr_rays_intro') + '<ul>'
+        + I18N_D.t('opt.lun_instr_rays_list', { beamh: _n(beamH) }) + '</ul>'
+        + I18N_D.t('opt.lun_instr_intersection')
+        + I18N_D.t('opt.lun_instr_click') + '</div>';
 
     var textFrag = '<div style="background:#0284c7;border-left:5px solid #0369a1;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -3270,7 +3109,7 @@ function _genOptiqueLunetteConstructionCore(X, p, deps) {
    Portage de _miroirConstructionJXG pour un miroir plan : pas de F/C, glyphe
    plat symétrique, uniquement le point S. Le côté réel/virtuel dépend
    uniquement de x=0 (le miroir), l'image étant toujours virtuelle. */
-function _miroirPlanConstructionJXG(X, p) {
+function _miroirPlanConstructionJXG(X, p, I18N_D) {
     var SA = p.SA, AB = p.AB;
     var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
     var mirrorHeight = p.mirrorHeight;
@@ -3305,7 +3144,7 @@ function _miroirPlanConstructionJXG(X, p) {
         + "board.create('point', [xObj, AB], { name: 'B', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });\n"
         + "board.create('arrow', [[xObj, 0], [xObj, AB]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n\n"
         + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
-        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + 'var DEFAULT_MSG = "' + I18N_D.t('opt.jxg_default_msg') + '";\n\n'
         + "var instructionsEl = document.createElement('p');\n"
         + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
         + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
@@ -3357,7 +3196,7 @@ function _miroirPlanConstructionJXG(X, p) {
         + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
         + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
         + 'function deleteSelectedSegment() {\n'
-        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    if (!selectedSegment) { setInstructions("' + I18N_D.t('opt.jxg_msg_select_first') + '"); return; }\n'
         + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
         + '    board.removeObject(seg);\n'
         + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
@@ -3467,18 +3306,18 @@ function _miroirPlanConstructionJXG(X, p) {
         + '    var x = coords[0], y = coords[1];\n\n'
         + "    if (toolMode !== '') {\n"
         + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
-        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('" + I18N_D.t('opt.jxg_msg_rayon_2') + "'); }\n"
         + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
         + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
-        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
-        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_2') + "'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_3') + "'); }\n"
         + "        else if (toolMode === 'par3') {\n"
         + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
         + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
         + "        else if (toolMode === 'sym') { addCustomRay(0, 0, x, -y); resetTool(); }\n"
         + "        else if (toolMode === 'inter1') {\n"
         + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
-        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon réfléchi.\"); }\n"
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"" + I18N_D.t('opt.jxg_msg_inter2_reflechi') + "\"); }\n"
         + '        }\n'
         + "        else if (toolMode === 'inter2') {\n"
         + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
@@ -3498,8 +3337,8 @@ function _miroirPlanConstructionJXG(X, p) {
         + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
         + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
         + '                        syncState();\n'
-        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
-        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                    } else { setInstructions("' + I18N_D.t('opt.jxg_msg_lines_cross_outside') + '"); }\n'
+        + '                } else { setInstructions("' + I18N_D.t('opt.jxg_msg_parallel_segments') + '"); }\n'
         + '                resetTool();\n            }\n        }\n'
         + "        else if (toolMode === 'perp') {\n"
         + '            addRayFromPieces(null, null, true, x, [[0, y, 1]]);\n'
@@ -3510,14 +3349,14 @@ function _miroirPlanConstructionJXG(X, p) {
         + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
         + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
         + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
-        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
-        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ (ex : B).\");\n"
-        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
-        + "addToolButton(\"Symétrique / axe (1 clic)\", 'sym', \"SYMÉTRIQUE PAR RAPPORT À L'AXE : cliquez un point du rayon incident (vers S) ; le rayon réfléchi symétrique sera tracé depuis S.\");\n"
-        + "addToolButton(\"Intersection (2 clics) → point B'\", 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon réfléchi.');\n"
-        + "addToolButton(\"Tracer A' (perpendiculaire)\", 'perp', \"PERPENDICULAIRE : cliquez sur B' pour tracer A' (le trait tracé pourra ensuite être marqué réel/virtuel).\");\n"
-        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
-        + "addToolButton('Tout effacer', null, function(){\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon') + "', 'pt1', '" + I18N_D.t('opt.jxg_msg_rayon_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_par_axe') + "\", 'axp1', \"" + I18N_D.t('opt.jxg_msg_par_axe_ex') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon_parallele') + "', 'par1', '" + I18N_D.t('opt.jxg_msg_par_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_symetrique') + "\", 'sym', \"" + I18N_D.t('opt.jxg_msg_symetrique') + "\");\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_intersection_bp') + "\", 'inter1', '" + I18N_D.t('opt.jxg_msg_inter1_reflechi') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_tracer_ap') + "\", 'perp', \"" + I18N_D.t('opt.jxg_msg_perp') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_effacer_selection') + "', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_tout_effacer') + "', null, function(){\n"
         + '    selectedSegment = null;\n'
         + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
         + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
@@ -3568,7 +3407,7 @@ function _miroirPlanConstructionJXG(X, p) {
         + '    if (ro) {\n'
         + "        board.containerObj.style.pointerEvents = 'none';\n"
         + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
-        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        setInstructions("' + I18N_D.t('opt.jxg_msg_construction_validee') + '");\n'
         + '        return true;\n    }\n    return false;\n}\n'
         + 'if (!freezeIfReadonly()) {\n'
         + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
@@ -3637,7 +3476,7 @@ function _genOptiqueMiroirPlanCore(X, p, deps) {
         SA: SA, AB: AB,
         X_MIN: _n(-halfX), X_MAX: _n(halfX), Y_MIN: _n(-halfY), Y_MAX: _n(halfY),
         mirrorHeight: _n(mirH), dispW: dispW
-    });
+    }, I18N_D);
 
     /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
     var vars = 'mirrorHeight: ' + _n(mirH) + '$\n'
@@ -3654,7 +3493,7 @@ function _genOptiqueMiroirPlanCore(X, p, deps) {
         + _opticsConstructionMaximaHelpers()
         + '\nrequire_mc(mc) := block(\n'
         + '  if not is(safe_op(mc) = "miroirplan_construction") or not is(length(mc) = 2) then\n'
-        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction miroirplan_construction(rayons,points))."\n'
+        + '    "' + I18N_D.t('opt.err_require_mc', { fn: 'miroirplan_construction' }) + '"\n'
         + '  else\n'
         + '    true\n'
         + ')$\n\n'
@@ -3700,15 +3539,11 @@ function _genOptiqueMiroirPlanCore(X, p, deps) {
         + 'c_point: is(found_point(ptList, xAp, ABp, 0.3))$\n'
         + 'abp_status: is(found_AB_status(rayList, xAp, 0, ABp, 0.3, 0.3, 2))$';
 
-    var fbBilan = '<p><strong>Bilan des rayons remarquables :</strong></p>\n'
-        + '[[if test="any_attempt"]]<ul>\n'
-        + '[[if test="att1"]]<li>Rayon en incidence normale (perpendiculaire au miroir) : [[if test="l1_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct (statut réel/virtuel ou tronçons)</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att2"]]<li>Rayon issu de B arrivant en S : [[if test="l2_ok"]]<span style="color:#1e7e34;">&#10003; correct (droite incidente et droite réfléchie)</span>[[else]]<span style="color:#c0392b;">tracé mais pas encore correct (statut réel/virtuel ou tronçons)</span>[[/if]]</li>[[/if]]\n'
-        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+    var fbBilan = I18N_D.t('opt.mp_fb_bilan');
 
     var canonicalNodes = [
         {
-            name: '0', description: 'Rayons remarquables — score proportionnel', answertest: 'AlgEquiv',
+            name: '0', description: I18N_D.t('opt.mcc_desc_rayons'), answertest: 'AlgEquiv',
             sans: 'true', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: 'score_rayons*4/6', truepenalty: '', truenextnode: '1',
             trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
@@ -3716,33 +3551,24 @@ function _genOptiqueMiroirPlanCore(X, p, deps) {
             falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
         },
         {
-            name: '1', description: "Point image B'", answertest: 'AlgEquiv',
+            name: '1', description: I18N_D.t('opt.rc_desc_point_bp'), answertest: 'AlgEquiv',
             sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '2',
             trueanswernote: 'prt' + X + '-1-T',
-            truefeedback: "<p>Le point B' est correctement placé à l'intersection des deux rayons réfléchis (prolongés derrière le miroir).</p>",
+            truefeedback: I18N_D.t('opt.mp_fb_point_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '2',
             falseanswernote: 'prt' + X + '-1-F',
-            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B'. [[if test=\"have2\"]]Vous avez bien"
-                + ' les deux rayons remarquables géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B\' est placé'
-                + ' précisément à l\'intersection de leurs <em>prolongements virtuels</em> (la partie en pointillés, derrière le miroir), et'
-                + ' non ailleurs sur l\'un des deux rayons.[[else]]Le point B\' ne peut être placé correctement que si les deux rayons'
-                + ' remarquables sont d\'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>'
+            falsefeedback: I18N_D.t('opt.mp_fb_point_false')
         },
         {
-            name: '2', description: "Nature réelle/virtuelle du segment A'B'", answertest: 'AlgEquiv',
+            name: '2', description: I18N_D.t('opt.rc_desc_statut_abp'), answertest: 'AlgEquiv',
             sans: 'abp_status', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '-1',
             trueanswernote: 'prt' + X + '-2-T',
-            truefeedback: "<p>Le segment A'B' est correctement marqué virtuel : un miroir plan ne fait jamais converger réellement"
-                + ' les rayons réfléchis devant lui, quelle que soit la position de l\'objet. L\'image ne se forme qu\'en prolongeant'
-                + ' ces rayons derrière le miroir : elle est donc toujours virtuelle (et de même taille que l\'objet).</p>',
+            truefeedback: I18N_D.t('opt.mp_fb_statut_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'prt' + X + '-2-F',
-            falsefeedback: "<p>Le segment A'B', représentant l'image, doit être marqué <strong>virtuel</strong> : avec un miroir plan,"
-                + ' les rayons réfléchis divergent toujours devant le miroir et l\'image ne se forme qu\'en les prolongeant (en'
-                + ' pointillés) derrière le miroir. Tracez (ou retracez) le tronçon entre A\' et B\' avec l\'outil « Tracer A\''
-                + ' (perpendiculaire) », puis cliquez dessus pour le marquer virtuel.</p>'
+            falsefeedback: I18N_D.t('opt.mp_fb_statut_false')
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
@@ -3754,35 +3580,21 @@ function _genOptiqueMiroirPlanCore(X, p, deps) {
     });
     var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
-    var raysListHtml = "<li>le rayon issu de B, perpendiculaire au miroir (incidence normale), qui se réfléchit sur lui-même ;</li>\n"
-        + "<li>le rayon issu de B arrivant au sommet S, qui repart symétriquement par rapport à l'axe optique.</li>";
+    var raysListHtml = I18N_D.t('opt.mp_rays_list');
 
-    var genFbDefault = "<p>Les deux rayons remarquables suivants permettent de construire B' :</p>\n<ul>\n"
-        + "<li>Le rayon issu de B, perpendiculaire au miroir, se réfléchit sur lui-même.</li>\n"
-        + "<li>Le rayon issu de B et arrivant au sommet S repart symétriquement par rapport à l'axe optique.</li>\n</ul>\n"
-        + '<p>Un miroir plan ne fait jamais converger réellement les rayons réfléchis : c\'est le prolongement de leurs tronçons'
-        + ' derrière le miroir (virtuel, en pointillés) qui se croise pour donner l\'image B\' = (' + _n(xAp) + '&nbsp;;&nbsp;' + _n(ABp)
-        + '), d\'où A\'B\' = ' + _n(ABp) + '&nbsp;cm (image virtuelle, de même taille que l\'objet).</p>';
+    var genFbDefault = I18N_D.t('opt.mp_genfb', { xap: _n(xAp), abp: _n(ABp) });
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> SA&nbsp;=&nbsp;' + _n(SA) + '&nbsp;cm, AB&nbsp;=&nbsp;' + _n(AB) + '&nbsp;cm</p>\n';
+        + I18N_D.t('opt.data_label')
+        + I18N_D.t('opt.mp_data_content', { sa: _n(SA), ab: _n(AB) }) + '</p>\n';
 
     var instructions = '<div class="stack-comment">'
-        + '<h2>Construction — Miroir plan</h2>'
-        + '<p>L\'objet AB, de taille ' + _n(AB) + ' cm, est placé perpendiculairement à l\'axe optique à SA&nbsp;=&nbsp;' + _n(SA)
-        + ' cm devant le miroir plan (sommet S).</p>'
-        + '<p>À l\'aide des outils ci-dessous, <strong>tracez les deux rayons remarquables issus de B</strong> et faites-les se'
-        + ' réfléchir sur le miroir pour construire l\'image B\' de B. Avec un miroir plan, les rayons réfléchis divergent'
-        + ' toujours devant le miroir : il faut prolonger leur trajet <em>derrière</em> le miroir (en pointillés, virtuel)'
-        + ' pour les faire se croiser et construire l\'image virtuelle B\' :</p>'
+        + '<h2>' + I18N_D.t('opt.mp_instr_h2') + '</h2>'
+        + I18N_D.t('opt.mp_instr_intro', { ab: _n(AB), sa: _n(SA) })
+        + I18N_D.t('opt.mp_instr_cross')
         + '<ul>' + raysListHtml + '</ul>'
-        + '<p>Une fois les deux rayons réfléchis tracés, utilisez le bouton <strong>« Intersection (2 clics) &rarr; point B\' »</strong>'
-        + ' et cliquez successivement sur les deux rayons réfléchis (la partie du tracé <em>après</em> le miroir, en pointillés)'
-        + ' pour construire précisément le point B\'.</p>'
-        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
-        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
-        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> : ne cliquez que pour marquer un tronçon'
-        + ' virtuel, ou pour l\'effacer s\'il ne doit pas apparaître.</p></div>';
+        + I18N_D.t('opt.mp_instr_p3')
+        + I18N_D.t('opt.rc_instr_p4') + '</div>';
 
     var textFrag = '<div style="background:#b45309;border-left:5px solid #92400e;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -3976,7 +3788,7 @@ function _genOptiqueMiroirSpheriqueCore(X, p, deps) {
         + tolH.toFixed(2) + ');\n';
     var prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
     var canonicalNodes = [{
-        name: '0', description: 'Image miroir sphérique', answertest: 'AlgEquiv',
+        name: '0', description: I18N_D.t('opt.ms_desc_image'), answertest: 'AlgEquiv',
         sans: 'opt_ok_' + X, tans: 'true', testoptions: '', quiet: '0',
         truescoremode: '=', truescore: '1', truepenalty: '0', truenextnode: '-1',
         trueanswernote: 'PRT' + X + '-1-T', truefeedback: fbOk,
@@ -3994,7 +3806,7 @@ function _genOptiqueMiroirSpheriqueCore(X, p, deps) {
     var typeLabel = (msType === 'concave') ? I18N_D.t('opt.ms_type_concave') : I18N_D.t('opt.ms_type_convexe');
     var SAp = -xAp;
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> '
+        + I18N_D.t('opt.data_label')
         + I18N_D.t('opt.ms_data_miroir_prefix') + typeLabel + ', |f\'| = ' + f + ' cm, '
         + 'SA = ' + SA + ' cm, AB = ' + AB + ' cm</p>\n';
 
@@ -4035,7 +3847,7 @@ function _genOptiqueMiroirSpheriqueCore(X, p, deps) {
    rayons incidents parallèles inclinés de θ (l'un par le sommet S, l'autre
    décalé de beamH) se réfléchissent et convergent en B1. Le miroir est
    toujours concave (miroir primaire convergent). */
-function _telescopeConstructionJXG(X, p) {
+function _telescopeConstructionJXG(X, p, I18N_D) {
     var f1 = p.f1, beamH = p.beamH, tanA = p.tanA;
     var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
     var mirrorHeight = p.mirrorHeight;
@@ -4076,9 +3888,9 @@ function _telescopeConstructionJXG(X, p) {
         + "board.create('arrow', [[segX1, -tanA*segX1], [segX2, -tanA*segX2]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
         + "board.create('segment', [[segX1, -tanA*segX1+beamH], [segX2, -tanA*segX2+beamH]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
         + "board.create('arrow', [[segX1, -tanA*segX1+beamH], [segX2, -tanA*segX2+beamH]], { strokeColor: '#c0392b', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n"
-        + "board.create('text', [segX1, -tanA*segX1+beamH+0.8, \"Objet \\u00e0 l'infini : rayons incidents parall\\u00e8les (angle \\u03b1)\"], { fixed: true, fontSize: 11, color: '#c0392b', highlight: false, tabindex: null });\n\n"
+        + "board.create('text', [segX1, -tanA*segX1+beamH+0.8, \"" + I18N_D.t('opt.jxg_label_objet_infini') + "\"], { fixed: true, fontSize: 11, color: '#c0392b', highlight: false, tabindex: null });\n\n"
         + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
-        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + 'var DEFAULT_MSG = "' + I18N_D.t('opt.jxg_default_msg') + '";\n\n'
         + "var instructionsEl = document.createElement('p');\n"
         + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
         + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
@@ -4130,7 +3942,7 @@ function _telescopeConstructionJXG(X, p) {
         + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
         + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
         + 'function deleteSelectedSegment() {\n'
-        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    if (!selectedSegment) { setInstructions("' + I18N_D.t('opt.jxg_msg_select_first') + '"); return; }\n'
         + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
         + '    board.removeObject(seg);\n'
         + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
@@ -4240,18 +4052,18 @@ function _telescopeConstructionJXG(X, p) {
         + '    var x = coords[0], y = coords[1];\n\n'
         + "    if (toolMode !== '') {\n"
         + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
-        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('" + I18N_D.t('opt.jxg_msg_rayon_2') + "'); }\n"
         + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
         + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
-        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
-        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_2') + "'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_3') + "'); }\n"
         + "        else if (toolMode === 'par3') {\n"
         + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
         + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
         + "        else if (toolMode === 'sym') { addCustomRay(0, 0, x, -y); resetTool(); }\n"
         + "        else if (toolMode === 'inter1') {\n"
         + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
-        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon réfléchi.\"); }\n"
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"" + I18N_D.t('opt.jxg_msg_inter2_reflechi') + "\"); }\n"
         + '        }\n'
         + "        else if (toolMode === 'inter2') {\n"
         + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
@@ -4271,20 +4083,20 @@ function _telescopeConstructionJXG(X, p) {
         + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
         + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
         + '                        syncState();\n'
-        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
-        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                    } else { setInstructions("' + I18N_D.t('opt.jxg_msg_lines_cross_outside') + '"); }\n'
+        + '                } else { setInstructions("' + I18N_D.t('opt.jxg_msg_parallel_segments') + '"); }\n'
         + '                resetTool();\n            }\n        }\n        return;\n    }\n\n'
         + '    var clickedSeg = getClickedSegment(x, y, 0.3, null);\n'
         + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
         + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
         + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
-        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
-        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ.\");\n"
-        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
-        + "addToolButton(\"Symétrique / axe (1 clic)\", 'sym', \"SYMÉTRIQUE PAR RAPPORT À L'AXE : cliquez un point du rayon incident (vers S) ; le rayon réfléchi symétrique sera tracé depuis S.\");\n"
-        + "addToolButton(\"Intersection (2 clics) → point B1\", 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon réfléchi.');\n"
-        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
-        + "addToolButton('Tout effacer', null, function(){\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon') + "', 'pt1', '" + I18N_D.t('opt.jxg_msg_rayon_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_par_axe') + "\", 'axp1', \"" + I18N_D.t('opt.jxg_msg_par_axe_noex') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon_parallele') + "', 'par1', '" + I18N_D.t('opt.jxg_msg_par_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_symetrique') + "\", 'sym', \"" + I18N_D.t('opt.jxg_msg_symetrique') + "\");\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_intersection_b1') + "\", 'inter1', '" + I18N_D.t('opt.jxg_msg_inter1_reflechi') + "');\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_effacer_selection') + "', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_tout_effacer') + "', null, function(){\n"
         + '    selectedSegment = null;\n'
         + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
         + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
@@ -4335,7 +4147,7 @@ function _telescopeConstructionJXG(X, p) {
         + '    if (ro) {\n'
         + "        board.containerObj.style.pointerEvents = 'none';\n"
         + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
-        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        setInstructions("' + I18N_D.t('opt.jxg_msg_construction_validee') + '");\n'
         + '        return true;\n    }\n    return false;\n}\n'
         + 'if (!freezeIfReadonly()) {\n'
         + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
@@ -4417,7 +4229,7 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
         f1: f1, beamH: beamH, tanA: _n(tanT),
         X_MIN: X_MIN, X_MAX: X_MAX, Y_MIN: Y_MIN, Y_MAX: Y_MAX,
         mirrorHeight: mirrorHeight, dispW: dispW
-    });
+    }, I18N_D);
 
     /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
     var vars = 'f1: ' + _n(f1) + '$\n'
@@ -4435,7 +4247,7 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
         + _opticsConstructionMaximaHelpers()
         + '\nrequire_mc(mc) := block(\n'
         + '  if not is(safe_op(mc) = "telescope_construction") or not is(length(mc) = 2) then\n'
-        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction telescope_construction(rayons,points))."\n'
+        + '    "' + I18N_D.t('opt.err_require_mc', { fn: 'telescope_construction' }) + '"\n'
         + '  else\n'
         + '    true\n'
         + ')$\n\n'
@@ -4482,17 +4294,11 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
         + 'have2: is(nb_full_ok >= 2)$\n\n'
         + 'c_point: is(found_point(ptList, ' + _n(-f1) + ', ' + _n(yB1) + ', 0.3))$';
 
-    var fbBilan = '<p><strong>Bilan des rayons particuliers :</strong></p>\n'
-        + '[[if test="any_attempt"]]<ul>\n'
-        + '[[if test="att1"]]<li>Rayon incident touchant le sommet S : [[if test="l1_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att2"]]<li>Rayon réfléchi symétrique (par S), vers B&#8321; : [[if test="l2_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att3"]]<li>Rayon incident décalé de ' + _n(beamH) + ' cm : [[if test="l3_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att4"]]<li>Rayon réfléchi correspondant, vers B&#8321; : [[if test="l4_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
-        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+    var fbBilan = I18N_D.t('opt.tel_fb_bilan', { beamh: _n(beamH) });
 
     var canonicalNodes = [
         {
-            name: '0', description: 'Rayons particuliers — score proportionnel', answertest: 'AlgEquiv',
+            name: '0', description: I18N_D.t('opt.tel_desc_rayons'), answertest: 'AlgEquiv',
             sans: 'true', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: 'score_rayons*5/6', truepenalty: '', truenextnode: '1',
             trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
@@ -4500,17 +4306,14 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
             falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
         },
         {
-            name: '1', description: 'Image B1 dans le plan focal', answertest: 'AlgEquiv',
+            name: '1', description: I18N_D.t('opt.tel_desc_point_b1'), answertest: 'AlgEquiv',
             sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '-1',
             trueanswernote: 'prt' + X + '-1-T',
-            truefeedback: "<p>Le point B1 est correctement placé à l'intersection des deux rayons réfléchis, dans le plan focal du miroir primaire (x&nbsp;=&nbsp;-f&#8321;).</p>",
+            truefeedback: I18N_D.t('opt.tel_fb_point_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'prt' + X + '-1-F',
-            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B1. [[if test=\"have2\"]]Vos rayons"
-                + ' réfléchis sont géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B1 est placé'
-                + " précisément à leur intersection.[[else]]Le point B1 ne peut être placé correctement que si les rayons réfléchis"
-                + ' sont d\'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>'
+            falsefeedback: I18N_D.t('opt.tel_fb_point_false')
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
@@ -4522,26 +4325,17 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
     });
     var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
-    var genFbDefault = "<p>Le miroir primaire concave du télescope, de distance focale f'&#8321;&nbsp;=&nbsp;" + _n(f1) + '&nbsp;cm, forme'
-        + " l'image d'une étoile à l'infini dans son plan focal (x&nbsp;=&nbsp;-f&#8321;).</p>\n<ul>\n"
-        + "<li>Le rayon incident touchant le sommet S se réfléchit symétriquement par rapport à l'axe optique.</li>\n"
-        + '<li>Un second rayon incident, parallèle au premier, décalé de ' + _n(beamH) + ' cm, se réfléchit également vers le même point.</li>\n'
-        + "<li>Les deux rayons réfléchis se coupent au point B&#8321;, image de l'étoile formée par le miroir primaire.</li></ul>";
+    var genFbDefault = I18N_D.t('opt.tel_genfb', { f1: _n(f1), beamh: _n(beamH) });
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> ' + I18N_D.t('opt.tel_data_miroir') + _n(f1) + '&nbsp;cm, θ&nbsp;=&nbsp;' + _n(theta) + '°</p>\n';
+        + I18N_D.t('opt.data_label')
+        + I18N_D.t('opt.tel_data_miroir') + _n(f1) + '&nbsp;cm, θ&nbsp;=&nbsp;' + _n(theta) + '°</p>\n';
 
     var instructions = '<div class="stack-comment">'
-        + '<h2>Construction — Télescope, miroir primaire</h2>'
-        + '<p>Le miroir primaire concave a une distance focale f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm. L\'étoile observée est à l\'infini,'
-        + ' sous un diamètre apparent θ&nbsp;=&nbsp;' + _n(theta) + '°.</p>'
-        + '<p>À l\'aide des outils ci-dessous, <strong>tracez les deux rayons incidents</strong> (l\'un touchant le sommet S du miroir, l\'autre'
-        + ' décalé de ' + _n(beamH) + ' cm) puis leurs <strong>rayons réfléchis</strong> correspondants (utilisez « Symétrique / axe » pour le rayon'
-        + ' réfléchi au sommet S). Une fois les deux rayons réfléchis tracés, utilisez <strong>« Intersection (2 clics) &rarr; point B1 »</strong>'
-        + ' pour construire le point image B1.</p>'
-        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
-        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
-        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> — c\'est le cas attendu ici pour tous les tronçons.</p></div>';
+        + '<h2>' + I18N_D.t('opt.tel_instr_h2') + '</h2>'
+        + I18N_D.t('opt.tel_instr_intro', { f1: _n(f1), theta: _n(theta) })
+        + I18N_D.t('opt.tel_instr_rays', { beamh: _n(beamH) })
+        + I18N_D.t('opt.tel_instr_click') + '</div>';
 
     var textFrag = '<div style="background:#065f46;border-left:5px solid #064e3b;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'
@@ -4581,7 +4375,7 @@ function _genOptiqueTelescopeConstructionCore(X, p, deps) {
    œil normal). L'élève trace jusqu'à 5 rayons sur le même schéma : 3 pour
    l'objectif (convergeant en B1, construit par « Intersection »), puis 2
    pour l'oculaire (issus de B1, ressortant parallèles). */
-function _microscopeConstructionJXG(X, p) {
+function _microscopeConstructionJXG(X, p, I18N_D) {
     var f1 = p.f1, f2 = p.f2, d = p.d, xA = p.xA, AB = p.AB;
     var X_MIN = p.X_MIN, X_MAX = p.X_MAX, Y_MIN = p.Y_MIN, Y_MAX = p.Y_MAX;
     var lens1H = p.lens1H, lens2H = p.lens2H;
@@ -4630,7 +4424,7 @@ function _microscopeConstructionJXG(X, p) {
         + "board.create('point', [xA, AB], { name: 'B', size: 4, color: 'red', fixed: true, highlight: false, tabindex: null });\n"
         + "board.create('arrow', [[xA, 0], [xA, AB]], { strokeColor: 'red', strokeWidth: 2, fixed: true, highlight: false, tabindex: null });\n\n"
         + "var handlePoint = board.create('point', [0, Y_MIN + 0.3], { visible: false, fixed: true, name: '', tabindex: null });\n\n"
-        + 'var DEFAULT_MSG = "Cliquez sur un tronçon de droite pour basculer son statut (réel/virtuel) ; il reste sélectionné pour le bouton Effacer. Cliquez sur un point pour le supprimer. Molette : zoom. Maj + glisser : déplacer la vue.";\n\n'
+        + 'var DEFAULT_MSG = "' + I18N_D.t('opt.jxg_default_msg') + '";\n\n'
         + "var instructionsEl = document.createElement('p');\n"
         + "instructionsEl.style.cssText = 'margin:.6em 0 0;font-size:.85em;color:#333;';\n"
         + 'instructionsEl.textContent = DEFAULT_MSG;\n\n'
@@ -4682,7 +4476,7 @@ function _microscopeConstructionJXG(X, p) {
         + '    if (prev && prev !== seg) { paintSegment(prev); }\n'
         + '    paintSegment(seg);\n    setInstructions(DEFAULT_MSG);\n    syncState();\n}\n\n'
         + 'function deleteSelectedSegment() {\n'
-        + '    if (!selectedSegment) { setInstructions("Cliquez d\'abord sur un tronçon de rayon pour le sélectionner."); return; }\n'
+        + '    if (!selectedSegment) { setInstructions("' + I18N_D.t('opt.jxg_msg_select_first') + '"); return; }\n'
         + '    var seg = selectedSegment;\n    selectedSegment = null;\n'
         + '    board.removeObject(seg);\n'
         + '    var idx = raySegments.indexOf(seg);\n    if (idx > -1) raySegments.splice(idx, 1);\n'
@@ -4789,17 +4583,17 @@ function _microscopeConstructionJXG(X, p) {
         + '    var x = coords[0], y = coords[1];\n\n'
         + "    if (toolMode !== '') {\n"
         + '        var snapped = snapToPoint(x, y); x = snapped.x; y = snapped.y;\n\n'
-        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('RAYON (2/2) : cliquez le 2e point.'); }\n"
+        + "        if (toolMode === 'pt1') { tempPoint = { x: x, y: y }; toolMode = 'pt2'; setInstructions('" + I18N_D.t('opt.jxg_msg_rayon_2') + "'); }\n"
         + "        else if (toolMode === 'pt2') { addCustomRay(tempPoint.x, tempPoint.y, x, y); resetTool(); }\n"
         + "        else if (toolMode === 'axp1') { addCustomRay(x, y, x + 1, y); resetTool(); }\n"
-        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('PARALLÈLE (2/3) : 2e point de direction.'); }\n"
-        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('PARALLÈLE (3/3) : point de passage.'); }\n"
+        + "        else if (toolMode === 'par1') { dirPoint1 = { x: x, y: y }; toolMode = 'par2'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_2') + "'); }\n"
+        + "        else if (toolMode === 'par2') { dirPoint2 = { x: x, y: y }; toolMode = 'par3'; setInstructions('" + I18N_D.t('opt.jxg_msg_par_3') + "'); }\n"
         + "        else if (toolMode === 'par3') {\n"
         + '            var dx = dirPoint2.x - dirPoint1.x, dy = dirPoint2.y - dirPoint1.y;\n'
         + '            addCustomRay(x, y, x + dx, y + dy);\n            resetTool();\n        }\n'
         + "        else if (toolMode === 'inter1') {\n"
         + '            interSeg1 = getClickedSegment(x, y, 0.4, null);\n'
-        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"INTERSECTION (2/2) : cliquez le 2e rayon.\"); }\n"
+        + "            if (interSeg1) { toolMode = 'inter2'; setInstructions(\"" + I18N_D.t('opt.jxg_msg_inter2_generic') + "\"); }\n"
         + '        }\n'
         + "        else if (toolMode === 'inter2') {\n"
         + '            var seg2 = getClickedSegment(x, y, 0.4, interSeg1);\n'
@@ -4819,19 +4613,19 @@ function _microscopeConstructionJXG(X, p) {
         + "                        var pInt = board.create('point', [xi, yi], { name: name, size: 4, color: 'black', fixed: true, highlight: false, tabindex: null });\n"
         + '                        allDrawnElements.push(pInt); standaloneElements.push(pInt);\n'
         + '                        syncState();\n'
-        + '                    } else { setInstructions("Les droites se croisent hors des segments."); }\n'
-        + '                } else { setInstructions("Segments parallèles."); }\n'
+        + '                    } else { setInstructions("' + I18N_D.t('opt.jxg_msg_lines_cross_outside') + '"); }\n'
+        + '                } else { setInstructions("' + I18N_D.t('opt.jxg_msg_parallel_segments') + '"); }\n'
         + '                resetTool();\n            }\n        }\n        return;\n    }\n\n'
         + '    var clickedSeg = getClickedSegment(x, y, 0.3, null);\n'
         + '    if (clickedSeg) { onSegmentClick(clickedSeg); return; }\n'
         + '    var clickedPt = getClickedPoint(x, y, 0.5);\n'
         + '    if (clickedPt) { onPointClick(clickedPt); return; }\n});\n\n'
-        + "addToolButton('Rayon (2 clics)', 'pt1', 'RAYON (1/2) : cliquez le point de départ.');\n"
-        + "addToolButton(\"Rayon // axe (1 clic)\", 'axp1', \"RAYON PARALLÈLE À L'AXE : cliquez le point de départ.\");\n"
-        + "addToolButton('Rayon parallèle (3 clics)', 'par1', 'PARALLÈLE (1/3) : 1er point de direction.');\n"
-        + "addToolButton('Intersection (2 clics) → point B1', 'inter1', 'INTERSECTION (1/2) : cliquez le 1er rayon.');\n"
-        + "addToolButton('Effacer le tronçon sélectionné', null, function(){ deleteSelectedSegment(); });\n"
-        + "addToolButton('Tout effacer', null, function(){\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon') + "', 'pt1', '" + I18N_D.t('opt.jxg_msg_rayon_1') + "');\n"
+        + "addToolButton(\"" + I18N_D.t('opt.jxg_btn_par_axe') + "\", 'axp1', \"" + I18N_D.t('opt.jxg_msg_par_axe_noex') + "\");\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_rayon_parallele') + "', 'par1', '" + I18N_D.t('opt.jxg_msg_par_1') + "');\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_intersection_b1') + "', 'inter1', '" + I18N_D.t('opt.jxg_msg_inter1_generic') + "');\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_effacer_selection') + "', null, function(){ deleteSelectedSegment(); });\n"
+        + "addToolButton('" + I18N_D.t('opt.jxg_btn_tout_effacer') + "', null, function(){\n"
         + '    selectedSegment = null;\n'
         + '    allDrawnElements.forEach(function(el){ board.removeObject(el); });\n'
         + '    allDrawnElements = []; raySegments = []; logicalRays = []; standaloneElements = []; intersectionCounter = 0;\n'
@@ -4882,7 +4676,7 @@ function _microscopeConstructionJXG(X, p) {
         + '    if (ro) {\n'
         + "        board.containerObj.style.pointerEvents = 'none';\n"
         + "        toolbarDiv.querySelectorAll('button').forEach(function(b){ b.disabled = true; });\n"
-        + '        setInstructions("Construction validée : la figure est figée.");\n'
+        + '        setInstructions("' + I18N_D.t('opt.jxg_msg_construction_validee') + '");\n'
         + '        return true;\n    }\n    return false;\n}\n'
         + 'if (!freezeIfReadonly()) {\n'
         + "    if (inputEl) new MutationObserver(freezeIfReadonly).observe(inputEl, { attributes: true, attributeFilter: ['readonly', 'disabled'] });\n"
@@ -4985,7 +4779,7 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
         f1: f1, f2: f2, d: _n1(d), xA: xA, AB: AB,
         X_MIN: X_MIN, X_MAX: X_MAX, Y_MIN: Y_MIN, Y_MAX: Y_MAX,
         lens1H: lens1H, lens2H: lens2H, dispW: dispW
-    });
+    }, I18N_D);
 
     /* ── Maxima : constantes + bibliothèque d'aide + validateur ── */
     var vars = 'f1: ' + _n(f1) + '$\n'
@@ -5010,7 +4804,7 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
         + _opticsConstructionMaximaHelpers()
         + '\nrequire_mc(mc) := block(\n'
         + '  if not is(safe_op(mc) = "microscope_construction") or not is(length(mc) = 2) then\n'
-        + '    "La réponse doit être générée par la construction graphique ci-dessus (fonction microscope_construction(rayons,points))."\n'
+        + '    "' + I18N_D.t('opt.err_require_mc', { fn: 'microscope_construction' }) + '"\n'
         + '  else\n'
         + '    true\n'
         + ')$\n\n'
@@ -5065,18 +4859,11 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
         + 'have2: is(nb_full_ok >= 2)$\n\n'
         + 'c_point: is(found_point(ptList, xA1, ABp, ' + xtol + '))$';
 
-    var fbBilan = '<p><strong>Bilan des rayons particuliers :</strong></p>\n'
-        + '[[if test="any_attempt"]]<ul>\n'
-        + "[[if test=\"att1\"]]<li>Rayon issu de B, parallèle à l'axe, émergent par F'&#8321; : [[if test=\"l1_ok\"]]<span style=\"color:#1e7e34;\">&#10003; correct</span>[[else]]<span style=\"color:#d68910;\">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n"
-        + '[[if test="att2"]]<li>Rayon issu de B par le centre O&#8321; (non dévié) : [[if test="l2_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
-        + "[[if test=\"att3\"]]<li>Rayon issu de B par le foyer F&#8321;, émergent parallèle à l'axe : [[if test=\"l3_ok\"]]<span style=\"color:#1e7e34;\">&#10003; correct (incident et émergent)</span>[[else]]<span style=\"color:#d68910;\">le tracé est bien positionné, mais un tronçon n'a pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n"
-        + '[[if test="att4"]]<li>Rayon issu de B&#8321; par le centre O&#8322; (non dévié) : [[if test="l4_ok"]]<span style="color:#1e7e34;">&#10003; correct</span>[[else]]<span style="color:#d68910;">tracé mais statut réel/virtuel incorrect</span>[[/if]]</li>[[/if]]\n'
-        + '[[if test="att5"]]<li>Rayon issu de B&#8321;, parallèle à l\'axe, émergent par F\'&#8322; : [[if test="l5_ok"]]<span style="color:#1e7e34;">&#10003; correct (incident et émergent)</span>[[else]]<span style="color:#d68910;">le tracé est bien positionné, mais un tronçon n\'a pas le bon statut réel/virtuel</span>[[/if]]</li>[[/if]]\n'
-        + '</ul>[[else]]<p><span style="color:#c0392b;">Aucun rayon n\'a encore été tracé.</span></p>[[/if]]';
+    var fbBilan = I18N_D.t('opt.mic_fb_bilan');
 
     var canonicalNodes = [
         {
-            name: '0', description: 'Rayons particuliers — score proportionnel', answertest: 'AlgEquiv',
+            name: '0', description: I18N_D.t('opt.mic_desc_rayons'), answertest: 'AlgEquiv',
             sans: 'true', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: 'score_rayons*5/6', truepenalty: '', truenextnode: '1',
             trueanswernote: 'prt' + X + '-0-T', truefeedback: fbBilan,
@@ -5084,17 +4871,14 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
             falseanswernote: 'prt' + X + '-0-F', falsefeedback: '<p></p>'
         },
         {
-            name: '1', description: 'Point image intermédiaire B1', answertest: 'AlgEquiv',
+            name: '1', description: I18N_D.t('opt.mic_desc_point_b1'), answertest: 'AlgEquiv',
             sans: 'c_point', tans: 'true', testoptions: '', quiet: '1',
             truescoremode: '+', truescore: '1/6', truepenalty: '', truenextnode: '-1',
             trueanswernote: 'prt' + X + '-1-T',
-            truefeedback: "<p>Le point B1 est correctement placé à l'intersection des rayons issus de l'objectif L&#8321;, dans le plan focal objet F&#8322; de l'oculaire.</p>",
+            truefeedback: I18N_D.t('opt.mic_fb_point_true'),
             falsescoremode: '+', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
             falseanswernote: 'prt' + X + '-1-F',
-            falsefeedback: "<p>Le point construit n'est pas exactement à l'endroit attendu pour B1. [[if test=\"have2\"]]Vous avez bien"
-                + ' des rayons particuliers géométriquement corrects (voir le bilan ci-dessus) : vérifiez que le point B1 est placé'
-                + " précisément à l'intersection de deux des trois rayons issus de l'objectif L&#8321;.[[else]]Le point B1 ne peut être placé"
-                + " correctement que si les rayons issus de l'objectif sont d'abord correctement tracés (voir le bilan ci-dessus).[[/if]]</p>"
+            falsefeedback: I18N_D.t('opt.mic_fb_point_false')
         }
     ];
     var prtMeta = { name: 'prt' + X, value: '1.0000000', autosimplify: '1', feedbackstyle: '1', feedbackvariables: fbVars };
@@ -5106,30 +4890,17 @@ function _genOptiqueMicroscopeConstructionCore(X, p, deps) {
     });
     var prtXML  = buildPrtXml_D(prtMeta, xmlNodes);
 
-    var genFbDefault = "<p>L'objectif L&#8321; (f'&#8321;&nbsp;=&nbsp;" + _n(f1) + '&nbsp;cm) forme, de l\'objet réel AB (au-delà de son foyer objet F&#8321;),'
-        + ' une image réelle intermédiaire A&#8321;B&#8321;, renversée et agrandie (grandissement γ&nbsp;=&nbsp;' + _n(gam) + ').</p>\n<ul>\n'
-        + "<li>Trois rayons remarquables issus de B convergent après l'objectif au point B&#8321;.</li>\n"
-        + "<li>L'oculaire L&#8322; (f'&#8322;&nbsp;=&nbsp;" + _n(f2) + '&nbsp;cm) est placé de sorte que A&#8321;B&#8321; soit exactement dans son plan focal'
-        + ' objet F&#8322; (réglage pour un œil normal) : les rayons issus de B&#8321; ressortent alors parallèles entre eux, l\'image finale'
-        + ' étant à l\'infini (système afocal).</li></ul>';
+    var genFbDefault = I18N_D.t('opt.mic_genfb', { f1: _n(f1), gam: _n(gam), f2: _n(f2) });
 
     var dataRow = '<p style="margin:6px 0 10px;font-size:.9em;color:#374151;">'
-        + '<strong>Données :</strong> f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm, '
-        + 'f\'&#8322;&nbsp;=&nbsp;' + _n(f2) + '&nbsp;cm, O&#8321;A&nbsp;=&nbsp;' + _n(xA) + '&nbsp;cm, AB&nbsp;=&nbsp;' + _n(AB) + '&nbsp;cm</p>\n';
+        + I18N_D.t('opt.data_label')
+        + I18N_D.t('opt.mic_data_content', { f1: _n(f1), f2: _n(f2), xa: _n(xA), ab: _n(AB) }) + '</p>\n';
 
     var instructions = '<div class="stack-comment">'
-        + '<h2>Construction — Microscope (réglage pour un œil normal)</h2>'
-        + '<p>L\'objectif L&#8321; a une distance focale f\'&#8321;&nbsp;=&nbsp;' + _n(f1) + '&nbsp;cm ; l\'objet AB, de hauteur ' + _n(AB) + '&nbsp;cm, est placé'
-        + ' en O&#8321;A&nbsp;=&nbsp;' + _n(xA) + '&nbsp;cm (au-delà du foyer objet F&#8321;). L\'oculaire L&#8322; a une distance focale f\'&#8322;&nbsp;=&nbsp;'
-        + _n(f2) + '&nbsp;cm.</p>'
-        + '<p>À l\'aide des outils ci-dessous, <strong>tracez d\'abord au moins deux des trois rayons remarquables issus de B</strong>'
-        + ' à travers l\'objectif L&#8321; (parallèle à l\'axe puis par F\'&#8321; ; par le centre O&#8321; ; par F&#8321; puis émergent parallèle'
-        + ' à l\'axe), utilisez <strong>« Intersection (2 clics) &rarr; point B1 »</strong> pour construire le point image intermédiaire B&#8321;,'
-        + ' puis <strong>tracez les deux rayons issus de B&#8321;</strong> à travers l\'oculaire L&#8322; (par le centre O&#8322; ; parallèle à'
-        + ' l\'axe jusqu\'à L&#8322; puis émergent par F\'&#8322;) : le faisceau émergent est parallèle (image finale à l\'infini).</p>'
-        + '<p>Cliquez sur un tronçon de rayon pour basculer son caractère réel/virtuel (il reste alors sélectionné pour le'
-        + ' bouton « Effacer le tronçon sélectionné ») ; cliquez sur un point construit pour le supprimer directement.'
-        + ' <strong>Par défaut, un tronçon non cliqué est considéré réel</strong> — c\'est le cas attendu ici pour tous les tronçons.</p></div>';
+        + '<h2>' + I18N_D.t('opt.mic_instr_h2') + '</h2>'
+        + I18N_D.t('opt.mic_instr_intro', { f1: _n(f1), ab: _n(AB), xa: _n(xA), f2: _n(f2) })
+        + I18N_D.t('opt.mic_instr_rays')
+        + I18N_D.t('opt.tel_instr_click') + '</div>';
 
     var textFrag = '<div style="background:#9333ea;border-left:5px solid #6b21a8;'
         + 'border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;'

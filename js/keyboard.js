@@ -338,8 +338,8 @@ if (typeof document !== 'undefined') {
 // ══════════════════════════════════════════════════════
 //  HELP
 // ══════════════════════════════════════════════════════
-function buildHelpHTML(selector,extra){const cbs=document.querySelectorAll(selector);let items=[];cbs.forEach(c=>{if(c.checked&&c.dataset.html)items.push(`<li>${c.dataset.html}</li>`);});if(extra)items.push(`<li>${extra}</li>`);if(!items.length)return '';return `<div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>Conseils pour la saisie :</strong><ul style="margin:8px 0 0 20px;line-height:1.7">${items.join('')}</ul></div>`;}
-function buildAlgHelp(){const sv=document.getElementById('alg-h-vars').checked;const vars=v('alg-vars');return buildHelpHTML('.alg-h',sv&&vars?`Variables à utiliser : <code>${vars}</code>`:null);}
+function buildHelpHTML(selector,extra){const cbs=document.querySelectorAll(selector);let items=[];cbs.forEach(c=>{if(c.checked&&c.dataset.html)items.push(`<li>${c.dataset.html}</li>`);});if(extra)items.push(`<li>${extra}</li>`);if(!items.length)return '';return `<div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>${I18N.t('help.conseils_saisie')}</strong><ul style="margin:8px 0 0 20px;line-height:1.7">${items.join('')}</ul></div>`;}
+function buildAlgHelp(){const sv=document.getElementById('alg-h-vars').checked;const vars=v('alg-vars');return buildHelpHTML('.alg-h',sv&&vars?I18N.t('alg.help_html_vars_utiliser',{vars:vars}):null);}
 function algRenderFbDetail() {
     var container = document.getElementById('alg-fb-detail');
     if (!container || container.dataset.built || typeof ALG_FB_DEFS === 'undefined') return;

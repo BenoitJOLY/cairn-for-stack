@@ -20,6 +20,13 @@ function cirEngineRun(cfg) {
   var LT = String.fromCharCode(60), GT = String.fromCharCode(62);
   function detag(str) { return str.split('#LT#').join(LT).split('#GT#').join(GT); }
 
+  // cfg.labels : libellés déjà résolus par I18N côté appelant (js/gen-circuit.js ou
+  // js/circuit-ui.js), car cette fonction est stringifiée telle quelle dans le XML
+  // Moodle exporté et s'exécute alors dans l'iframe élève, hors de l'appli StackForge
+  // (window.I18N n'y existe pas) — d'où le repli français ci-dessous si absent.
+  var L = cfg.labels || {};
+  function lb(key, def) { if (L[key]) return L[key]; return def; }
+
   var isValidated = false;
   var inputAns1 = null, inputAns2 = null, inputAns3 = null, inputAns4 = null;
 
@@ -36,7 +43,7 @@ function cirEngineRun(cfg) {
   }
 
   function initApp() {
-    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-1, 7.5, 14.5, -1.5], axis: false, grid: false, showNavigation: false, showCopyright: false, keepaspectratio: true, pan: { enabled: false }, zoom: { enabled: false }, title: 'Éditeur de circuit électrique', description: 'Grille interactive : cliquez sur un composant de la palette pour l\'ajouter, faites-le glisser pour le positionner, puis connectez ses bornes pour construire le circuit.' });
+    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-1, 7.5, 14.5, -1.5], axis: false, grid: false, showNavigation: false, showCopyright: false, keepaspectratio: true, pan: { enabled: false }, zoom: { enabled: false }, title: lb('boardTitle', 'Éditeur de circuit électrique'), description: lb('boardDescription', 'Grille interactive : cliquez sur un composant de la palette pour l\'ajouter, faites-le glisser pour le positionner, puis connectez ses bornes pour construire le circuit.') });
     function dataUri(svg) { return 'data:image/svg+xml,' + encodeURIComponent(svg); }
     function term(dx, dy, role, color) { return { dx: dx, dy: dy, role: role, color: color || '#6b7280' }; }
     function wrapSvg(innerBody, innerH, deg) { var canvas = Math.max(200, innerH); var dy = (canvas - innerH) / 2; var c = canvas / 2; return detag('#LT#svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + canvas + ' ' + canvas + '"#GT##LT#g transform="rotate(' + deg + ' ' + c + ' ' + c + ') translate(0 ' + dy + ')"#GT#') + innerBody + detag('#LT#/g#GT##LT#/svg#GT#'); }
@@ -59,15 +66,15 @@ function cirEngineRun(cfg) {
 
     var RECT = { w: 2.2, h: 1.1 }; var SQUARE = { w: 1.7, h: 1.7 }; var TH = 0.33;
     var CATALOG = [
-      { key: 'gen', label: 'Générateur (pile)', w: RECT.w, h: RECT.h, innerH: 100, svg: battInner, hasValue: true, unit: 'V', defaultValue: 9, conducts: [], terminals: [term(-RECT.w / 2, 0, 'moins', '#2563eb'), term(RECT.w / 2, 0, 'plus', '#dc2626')] },
-      { key: 'lamp', label: 'Lampe', w: SQUARE.w, h: SQUARE.h, innerH: 200, svgOff: lampOffInner, svgOn: lampOnInner, conducts: [[0, 1]], terminals: [term(-SQUARE.w / 2, 0, 'a'), term(SQUARE.w / 2, 0, 'b')] },
-      { key: 'led', label: 'LED', w: RECT.w, h: RECT.h, innerH: 100, svgOff: ledOffInner, svgOn: ledOnInner, polarise: true, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'anode', '#dc2626'), term(RECT.w / 2, 0, 'cathode', '#1f2937')] },
-      { key: 'res', label: 'Résistance', w: RECT.w, h: RECT.h, innerH: 100, svg: resInner, hasValue: true, unit: 'Ω', defaultValue: 220, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
-      { key: 'cap', label: 'Condensateur', w: RECT.w, h: RECT.h, innerH: 100, svg: capInner, hasValue: true, unit: 'µF', defaultValue: 100, conducts: [], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
-      { key: 'coil', label: 'Bobine', w: RECT.w, h: RECT.h, innerH: 100, svg: coilInner, hasValue: true, unit: 'mH', defaultValue: 10, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
-      { key: 'motor', label: 'Moteur', w: RECT.w, h: RECT.h, innerH: 100, svg: motorInner, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
-      { key: 'switch2', label: 'Interrupteur (2 pts)', w: RECT.w, h: RECT.h, innerH: 100, terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')], states: [{ svg: switchOpenInner, connections: [], label: 'ouvert' }, { svg: switchClosedInner, connections: [[0, 1]], label: 'fermé' }] },
-      { key: 'switch3', label: 'Interrupteur (3 pts)', w: RECT.w, h: 1.45, innerH: 100, terminals: [term(-RECT.w / 2, 0, 'c', '#7c3aed'), term(RECT.w / 2, TH, 't1'), term(RECT.w / 2, -TH, 't2')], states: [{ svg: sw3aInner, connections: [[0, 1]], label: 'position 1' }, { svg: sw3bInner, connections: [[0, 2]], label: 'position 2' }] }
+      { key: 'gen', label: lb('comp_gen', 'Générateur (pile)'), w: RECT.w, h: RECT.h, innerH: 100, svg: battInner, hasValue: true, unit: 'V', defaultValue: 9, conducts: [], terminals: [term(-RECT.w / 2, 0, 'moins', '#2563eb'), term(RECT.w / 2, 0, 'plus', '#dc2626')] },
+      { key: 'lamp', label: lb('comp_lamp', 'Lampe'), w: SQUARE.w, h: SQUARE.h, innerH: 200, svgOff: lampOffInner, svgOn: lampOnInner, conducts: [[0, 1]], terminals: [term(-SQUARE.w / 2, 0, 'a'), term(SQUARE.w / 2, 0, 'b')] },
+      { key: 'led', label: lb('comp_led', 'LED'), w: RECT.w, h: RECT.h, innerH: 100, svgOff: ledOffInner, svgOn: ledOnInner, polarise: true, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'anode', '#dc2626'), term(RECT.w / 2, 0, 'cathode', '#1f2937')] },
+      { key: 'res', label: lb('comp_res', 'Résistance'), w: RECT.w, h: RECT.h, innerH: 100, svg: resInner, hasValue: true, unit: 'Ω', defaultValue: 220, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
+      { key: 'cap', label: lb('comp_cap', 'Condensateur'), w: RECT.w, h: RECT.h, innerH: 100, svg: capInner, hasValue: true, unit: 'µF', defaultValue: 100, conducts: [], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
+      { key: 'coil', label: lb('comp_coil', 'Bobine'), w: RECT.w, h: RECT.h, innerH: 100, svg: coilInner, hasValue: true, unit: 'mH', defaultValue: 10, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
+      { key: 'motor', label: lb('comp_motor', 'Moteur'), w: RECT.w, h: RECT.h, innerH: 100, svg: motorInner, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
+      { key: 'switch2', label: lb('comp_switch2', 'Interrupteur (2 pts)'), w: RECT.w, h: RECT.h, innerH: 100, terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')], states: [{ svg: switchOpenInner, connections: [], label: 'ouvert' }, { svg: switchClosedInner, connections: [[0, 1]], label: 'fermé' }] },
+      { key: 'switch3', label: lb('comp_switch3', 'Interrupteur (3 pts)'), w: RECT.w, h: 1.45, innerH: 100, terminals: [term(-RECT.w / 2, 0, 'c', '#7c3aed'), term(RECT.w / 2, TH, 't1'), term(RECT.w / 2, -TH, 't2')], states: [{ svg: sw3aInner, connections: [[0, 1]], label: 'position 1' }, { svg: sw3bInner, connections: [[0, 2]], label: 'position 2' }] }
     ];
     CATALOG.forEach(function (c) { c.boxSize = Math.max(c.w, c.h); });
     var CATALOG_BY_KEY = {}; CATALOG.forEach(function (c) { CATALOG_BY_KEY[c.key] = c; });
@@ -118,22 +125,22 @@ function cirEngineRun(cfg) {
       var nameEl = document.getElementById('valName'), inp = document.getElementById('valInput');
       var unitEl = document.getElementById('valUnit'), hintEl = document.getElementById('valHint');
       if (!selectedInst) {
-        nameEl.textContent = 'Aucun composant sélectionné';
+        nameEl.textContent = lb('valNoneSelected', 'Aucun composant sélectionné');
         inp.value = ''; inp.disabled = true; unitEl.textContent = '';
-        hintEl.textContent = 'Clique sur un composant du schéma pour régler sa valeur.';
+        hintEl.textContent = lb('valhint', 'Clique sur un composant du schéma pour régler sa valeur.');
         return;
       }
       var cat = CATALOG_BY_KEY[selectedInst.key];
       nameEl.textContent = cat.label;
       if (!cat.hasValue) {
         inp.value = ''; inp.disabled = true; unitEl.textContent = '';
-        hintEl.textContent = 'Ce composant n\'a pas de valeur réglable.';
+        hintEl.textContent = lb('valNoAdjustable', 'Ce composant n\'a pas de valeur réglable.');
         return;
       }
       inp.disabled = isValidated;
       inp.value = selectedInst.value;
       unitEl.textContent = cat.unit;
-      hintEl.textContent = isValidated ? 'Circuit validé : réglage verrouillé.' : 'Valeur strictement positive.';
+      hintEl.textContent = isValidated ? lb('valLocked', 'Circuit validé : réglage verrouillé.') : lb('valPositive', 'Valeur strictement positive.');
     }
     function selectInstance(inst) { selectedInst = inst; refreshSelection(); }
 
@@ -160,7 +167,7 @@ function cirEngineRun(cfg) {
 
     document.getElementById('btnScissors').addEventListener('click', function () { if (isValidated) return; scissorsMode = !scissorsMode; document.getElementById('btnScissors').classList.toggle('active', scissorsMode); document.getElementById('board').classList.toggle('cutting', scissorsMode); if (scissorsMode) cancelPending(); });
     document.getElementById('btnUndo').addEventListener('click', function () { if (isValidated) return; if (pathPoints.length) { board.removeObject(pathSegs.pop()); board.removeObject(pathPoints.pop()); board.update(); } else if (pending) cancelPending(); });
-    document.getElementById('btnReset').addEventListener('click', function () { if (isValidated) return; scissorsMode = false; document.getElementById('btnScissors').classList.remove('active'); document.getElementById('board').classList.remove('cutting'); instances.slice().forEach(function (inst) { try { deleteInstance(inst); } catch (e) { } }); instances = []; cables = []; clearInProgressPath(); pending = null; selectedInst = null; fb.textContent = 'Choisis un composant à droite pour commencer.'; fb.style.background = '#f1f5f9'; fb.style.color = '#475569'; fb.style.borderColor = 'var(--line)'; board.update(); });
+    document.getElementById('btnReset').addEventListener('click', function () { if (isValidated) return; scissorsMode = false; document.getElementById('btnScissors').classList.remove('active'); document.getElementById('board').classList.remove('cutting'); instances.slice().forEach(function (inst) { try { deleteInstance(inst); } catch (e) { } }); instances = []; cables = []; clearInProgressPath(); pending = null; selectedInst = null; fb.textContent = lb('feedbackPlaceholder', 'Choisis un composant à droite pour commencer.'); fb.style.background = '#f1f5f9'; fb.style.color = '#475569'; fb.style.borderColor = 'var(--line)'; board.update(); });
 
     board.on('down', function (evt) {
       var c = board.getUsrCoordsOfMouse(evt);
@@ -562,9 +569,9 @@ function cirEngineRun(cfg) {
 
       if (cfg.mode === 'teacher') {
         if (instances.length) {
-          fb.textContent = instances.length + ' composant(s) placé(s), ' + g.count + ' nœud(s) électrique(s).';
+          fb.textContent = lb('statusComponents', '{n} composant(s) placé(s), {m} nœud(s) électrique(s).').split('{n}').join(String(instances.length)).split('{m}').join(String(g.count));
         } else {
-          fb.textContent = 'Aucun composant placé — cliquez sur un composant à droite pour commencer.';
+          fb.textContent = lb('statusEmpty', 'Aucun composant placé — cliquez sur un composant à droite pour commencer.');
         }
         fb.style.background = '#f1f5f9'; fb.style.color = '#475569'; fb.style.borderColor = '#e5e7eb';
       }
@@ -572,7 +579,7 @@ function cirEngineRun(cfg) {
 
     function syncToStack() {
       if (isValidated) return;
-      if (instances.length === 0) { fb.textContent = 'Place au moins un composant avant de valider.'; fb.style.background = '#fee2e2'; fb.style.color = '#991b1b'; fb.style.borderColor = '#dc2626'; return; }
+      if (instances.length === 0) { fb.textContent = lb('placeAtLeastOne', 'Place au moins un composant avant de valider.'); fb.style.background = '#fee2e2'; fb.style.color = '#991b1b'; fb.style.borderColor = '#dc2626'; return; }
       isValidated = true;
       inputAns1.value = canonicalSignature();
       inputAns2.value = componentsSignature();
@@ -582,7 +589,7 @@ function cirEngineRun(cfg) {
       inputAns4.dispatchEvent(new Event('change'));
       pushState();
       lockUI();
-      fb.textContent = 'Circuit validé ! Cliquez maintenant sur le bouton \'Vérifier\' de la page.';
+      fb.textContent = lb('validatedClickVerify', 'Circuit validé ! Cliquez maintenant sur le bouton \'Vérifier\' de la page.');
       fb.style.background = '#dcfce7';
       fb.style.color = '#15803d';
       fb.style.borderColor = '#16a34a';
@@ -612,7 +619,7 @@ function cirEngineRun(cfg) {
       if (inputAns3) { if (inputAns3.value) restoreState(inputAns3.value); }
       if (isValidated) {
         lockUI();
-        fb.textContent = 'Circuit déjà validé (verrouillé).';
+        fb.textContent = lb('alreadyValidated', 'Circuit déjà validé (verrouillé).');
         fb.style.background = '#dcfce7'; fb.style.color = '#15803d'; fb.style.borderColor = '#16a34a';
       }
     }
@@ -669,9 +676,41 @@ function cirEngineRun(cfg) {
   }
 }
 
+// Construit l'objet cfg.labels à partir d'un I18N.t() résolu côté appelant (js/gen-circuit.js
+// pour l'export réel, js/circuit-ui.js pour le canvas enseignant/aperçu élève) : source unique
+// des clés attendues par les appels lb(...) dans cirEngineRun ci-dessus, pour éviter toute
+// divergence entre les deux points d'appel.
+function cirBuildLabels(I18N_D) {
+  var t = I18N_D.t.bind(I18N_D);
+  return {
+    boardTitle: t('cir.board_title'),
+    boardDescription: t('cir.board_description'),
+    comp_gen: t('cir.comp_gen'),
+    comp_lamp: t('cir.comp_lamp'),
+    comp_led: t('cir.comp_led'),
+    comp_res: t('cir.comp_res'),
+    comp_cap: t('cir.comp_cap'),
+    comp_coil: t('cir.comp_coil'),
+    comp_motor: t('cir.comp_motor'),
+    comp_switch2: t('cir.comp_switch2'),
+    comp_switch3: t('cir.comp_switch3'),
+    valNoneSelected: t('cir.val_none_selected'),
+    valhint: t('cir.valhint'),
+    valNoAdjustable: t('cir.val_no_adjustable'),
+    valLocked: t('cir.val_locked'),
+    valPositive: t('cir.val_positive'),
+    feedbackPlaceholder: t('cir.feedback_placeholder'),
+    statusComponents: t('cir.status_components'),
+    statusEmpty: t('cir.status_empty'),
+    placeAtLeastOne: t('cir.place_at_least_one'),
+    validatedClickVerify: t('cir.validated_click_verify'),
+    alreadyValidated: t('cir.already_validated')
+  };
+}
+
 // Export CommonJS pour Node (tests + génération XML côté js/gen-circuit.js) : la même
 // fonction est utilisée par le navigateur (via <script src>) et stringifiée pour
 // être injectée telle quelle dans le [[script type="module"]] du XML Moodle exporté.
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { cirEngineRun: cirEngineRun, CIR_ENGINE_JS: cirEngineRun.toString() };
+  module.exports = { cirEngineRun: cirEngineRun, CIR_ENGINE_JS: cirEngineRun.toString(), cirBuildLabels: cirBuildLabels };
 }

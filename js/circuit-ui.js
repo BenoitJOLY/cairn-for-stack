@@ -17,16 +17,16 @@ function cirBuildAtelierHTML(opts) {
   var inputNames = opts.inputNames || { s: 'cir_prev_s', c: 'cir_prev_c', w: 'cir_prev_w', v: 'cir_prev_v' };
 
   var consigne = isTeacher
-    ? 'Construisez ici le circuit que les élèves devront reproduire à l\'identique. Cliquez sur un composant à droite pour le placer. Cliquez sur un composant du schéma pour le <strong>sélectionner</strong> : glissez son repère carré gris pour le déplacer, <strong>⟳</strong> pour le tourner, l\'étiquette (✎) pour changer sa valeur. Cliquez sur deux bornes pour tirer un câble.'
-    : 'Clique sur un composant à droite pour le placer. Clique sur un composant du schéma pour le <strong>sélectionner</strong> : un repère carré gris apparaît, glisse-le pour déplacer le composant. <strong>⟳</strong> pour tourner, l\'étiquette (✎) pour changer une valeur. Clique sur deux bornes pour tirer un câble. Un interrupteur déjà sélectionné bascule quand on reclique dessus.';
+    ? I18N.t('cir.teacher_atelier_instructions')
+    : I18N.t('cir.atelier_instructions');
 
   var feedbackDefault = isTeacher
-    ? 'Aucun composant placé — cliquez sur un composant à droite pour commencer.'
-    : 'Choisis un composant à droite pour commencer.';
+    ? I18N.t('cir.status_empty')
+    : I18N.t('cir.feedback_placeholder');
 
   var validationSection = isTeacher ? '' : (
-    '<h2 class="sc">Validation</h2>\n' +
-    '    <button id="btnExport" type="button">✅ Valider le circuit</button>\n'
+    '<h2 class="sc">' + I18N.t('cir.heading_validation') + '</h2>\n' +
+    '    <button id="btnExport" type="button">✅ ' + I18N.t('cir.btn_export') + '</button>\n'
   );
 
   var hiddenInputs = '';
@@ -43,7 +43,8 @@ function cirBuildAtelierHTML(opts) {
     inputNames: inputNames,
     initialStateB64: initialStateB64,
     jsxCssUrl: 'lib/jsxgraph/jsxgraph.css',
-    jsxJsUrl: 'lib/jsxgraph/jsxgraphcore.js'
+    jsxJsUrl: 'lib/jsxgraph/jsxgraphcore.js',
+    labels: cirBuildLabels(I18N)
   };
 
   return '<!doctype html>\n'
@@ -51,29 +52,29 @@ function cirBuildAtelierHTML(opts) {
     + '<style>' + CIR_ATELIER_CSS + '</style>\n'
     + '</head><body>\n'
     + hiddenInputs + '\n'
-    + '<h1 class="sc">🔌 Atelier circuits électriques</h1>\n'
+    + '<h1 class="sc">🔌 ' + I18N.t('cir.atelier_title') + '</h1>\n'
     + '<p class="sub">' + consigne + '</p>\n'
     + '<div class="layout">\n'
     + '  <div class="left">\n'
     + '    <div class="toolbar">\n'
-    + '      <button id="btnScissors" type="button">✂️ Ciseau</button>\n'
-    + '      <button id="btnUndo" type="button">← Annuler point</button>\n'
-    + '      <button id="btnReset" type="button">↺ Vider tout</button>\n'
+    + '      <button id="btnScissors" type="button">✂️ ' + I18N.t('cir.btn_scissors') + '</button>\n'
+    + '      <button id="btnUndo" type="button">← ' + I18N.t('cir.btn_undo') + '</button>\n'
+    + '      <button id="btnReset" type="button">↺ ' + I18N.t('cir.btn_reset') + '</button>\n'
     + '    </div>\n'
     + '    <div id="board" role="img"></div>\n'
     + '    <div id="feedback">' + feedbackDefault + '</div>\n'
     + '  </div>\n'
     + '  <div class="right">\n'
-    + '    <h2 class="sc">Composants</h2>\n'
+    + '    <h2 class="sc">' + I18N.t('cir.heading_components') + '</h2>\n'
     + '    <div class="palette" id="palette"></div>\n'
-    + '    <h2 class="sc">Valeur</h2>\n'
+    + '    <h2 class="sc">' + I18N.t('cir.heading_value') + '</h2>\n'
     + '    <div id="valBox">\n'
-    + '      <div id="valName">Sélectionne un composant</div>\n'
+    + '      <div id="valName">' + I18N.t('cir.valname_placeholder') + '</div>\n'
     + '      <div class="valrow">\n'
-    + '        <input id="valInput" type="number" step="any" min="0" disabled aria-label="Valeur du composant sélectionné">\n'
+    + '        <input id="valInput" type="number" step="any" min="0" disabled aria-label="' + I18N.t('cir.val_input_aria') + '">\n'
     + '        <span id="valUnit"></span>\n'
     + '      </div>\n'
-    + '      <div id="valHint">Clique sur un composant du schéma pour régler sa valeur.</div>\n'
+    + '      <div id="valHint">' + I18N.t('cir.valhint') + '</div>\n'
     + '    </div>\n'
     + '    ' + validationSection
     + '  </div>\n'

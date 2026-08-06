@@ -41,6 +41,14 @@ function buildCinJSX_Phase1(cfg) {
   var refVec2X = cfg.refVec2X || 'refVec2X', refVec2Y = cfg.refVec2Y || 'refVec2Y';
   var nameVec1X = cfg.nameVec1X || 'ans_vec1_x', nameVec1Y = cfg.nameVec1Y || 'ans_vec1_y';
   var nameVec2X = cfg.nameVec2X || 'ans_vec2_x', nameVec2Y = cfg.nameVec2Y || 'ans_vec2_y';
+  var lblVec1 = cfg.lblVec1 || 'Tracer le 1ᵉʳ vecteur déplacement';
+  var lblVec2 = cfg.lblVec2 || 'Tracer le 2ᵉ vecteur déplacement';
+  var lblErase = cfg.lblErase || '✖ Effacer';
+  var lblEchellePrefix = cfg.lblEchellePrefix || 'Échelle du document : 1 pixel ↔ ';
+  var lblEchelleSuffix = cfg.lblEchelleSuffix || ' m.';
+  var lblClickInstruction = cfg.lblClickInstruction || 'Cliquez sur les 2 points successifs concernés, dans l\'ordre, sur le graphique.';
+  var lblVec1Done = cfg.lblVec1Done || 'Vecteur 1 tracé ✓';
+  var lblVec2Done = cfg.lblVec2Done || 'Vecteur 2 tracé ✓';
   return '[[jsxgraph width="' + W + '" aspect-ratio="' + (Wnum / boardHnum).toFixed(3) + '"'
     + ' input-ref-' + nameVec1X + '="' + refVec1X + '" input-ref-' + nameVec1Y + '="' + refVec1Y + '"'
     + ' input-ref-' + nameVec2X + '="' + refVec2X + '" input-ref-' + nameVec2Y + '="' + refVec2Y + '"]]\n'
@@ -77,19 +85,19 @@ function buildCinJSX_Phase1(cfg) {
     + '  b.style.cssText = "padding:6px 10px;font-size:12.5px;border:1.5px solid "+color+";border-radius:4px;background:#fff;color:"+color+";cursor:pointer;font-weight:600;";\n'
     + '  return b;\n'
     + '}\n'
-    + 'var LBL_VEC1 = "Tracer le 1\\u1d49\\u02b3 vecteur d\\u00e9placement";\n'
-    + 'var LBL_VEC2 = "Tracer le 2\\u1d49 vecteur d\\u00e9placement";\n'
+    + 'var LBL_VEC1 = ' + JSON.stringify(lblVec1) + ';\n'
+    + 'var LBL_VEC2 = ' + JSON.stringify(lblVec2) + ';\n'
     + 'var btnVec1 = mkBtn(LBL_VEC1, "#f97316");\n'
     + 'var btnVec2 = mkBtn(LBL_VEC2, "#7c3aed");\n'
-    + 'var btnEraseVec1 = mkBtn("\\u2716 Effacer", "#f97316");\n'
-    + 'var btnEraseVec2 = mkBtn("\\u2716 Effacer", "#7c3aed");\n'
+    + 'var btnEraseVec1 = mkBtn(' + JSON.stringify(lblErase) + ', "#f97316");\n'
+    + 'var btnEraseVec2 = mkBtn(' + JSON.stringify(lblErase) + ', "#7c3aed");\n'
     + 'btnEraseVec1.style.cssText += "padding:6px 8px;display:none;";\n'
     + 'btnEraseVec2.style.cssText += "padding:6px 8px;display:none;";\n'
     + 'var statusTxt = document.createElement("div");\n'
     + 'statusTxt.style.cssText = "font-size:12px;color:#374151;flex-basis:100%;min-height:15px;";\n'
     + 'var noteEchelle = document.createElement("div");\n'
     + 'noteEchelle.style.cssText = "font-size:12px;color:#475569;flex-basis:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:6px 10px;margin-bottom:2px;";\n'
-    + 'noteEchelle.textContent = "\\u00c9chelle du document : 1 pixel \\u2194 " + echelle.toFixed(5) + " m.";\n'
+    + 'noteEchelle.textContent = ' + JSON.stringify(lblEchellePrefix) + ' + echelle.toFixed(5) + ' + JSON.stringify(lblEchelleSuffix) + ';\n'
     + 'var vec1Done = false, vec2Done = false, pendingSlot = 0, pendingFirst = -1;\n'
     + 'var arrowVec1 = null, arrowVec2 = null, labelVec1 = null, labelVec2 = null;\n'
     + 'function syncVec(slot, dx, dy){\n'
@@ -101,7 +109,7 @@ function buildCinJSX_Phase1(cfg) {
     + 'function armSlot(slot){\n'
     + '  if ((slot === 1 && vec1Done) || (slot === 2 && vec2Done)) return;\n'
     + '  pendingSlot = slot; pendingFirst = -1;\n'
-    + '  statusTxt.textContent = "Cliquez sur les 2 points successifs concern\\u00e9s, dans l\'ordre, sur le graphique.";\n'
+    + '  statusTxt.textContent = ' + JSON.stringify(lblClickInstruction) + ';\n'
     + '}\n'
     + 'function finishVec(slot, startIdx, endIdx){\n'
     + '  var dx = Mlist[endIdx][0] - Mlist[startIdx][0], dy = Mlist[endIdx][1] - Mlist[startIdx][1];\n'
@@ -113,8 +121,8 @@ function buildCinJSX_Phase1(cfg) {
     + '  var lenStr = pxLen.toFixed(1) + " px";\n'
     + '  var label = b1.create("text", [midX + 0.15, midY + 0.15, function(){ return lenStr; }], {fontSize:12, color:col, fixed:true, visible:true, cssStyle:"font-weight:700;background:rgba(255,255,255,.8);padding:1px 4px;border-radius:3px;"});\n'
     + '  syncVec(slot, dx, dy);\n'
-    + '  if (slot === 1) { arrowVec1 = arrow; labelVec1 = label; vec1Done = true; btnVec1.disabled = true; btnVec1.style.opacity = "0.5"; btnVec1.textContent = "Vecteur 1 trac\\u00e9 \\u2713"; btnEraseVec1.style.display = "inline-block"; }\n'
-    + '  else { arrowVec2 = arrow; labelVec2 = label; vec2Done = true; btnVec2.disabled = true; btnVec2.style.opacity = "0.5"; btnVec2.textContent = "Vecteur 2 trac\\u00e9 \\u2713"; btnEraseVec2.style.display = "inline-block"; }\n'
+    + '  if (slot === 1) { arrowVec1 = arrow; labelVec1 = label; vec1Done = true; btnVec1.disabled = true; btnVec1.style.opacity = "0.5"; btnVec1.textContent = ' + JSON.stringify(lblVec1Done) + '; btnEraseVec1.style.display = "inline-block"; }\n'
+    + '  else { arrowVec2 = arrow; labelVec2 = label; vec2Done = true; btnVec2.disabled = true; btnVec2.style.opacity = "0.5"; btnVec2.textContent = ' + JSON.stringify(lblVec2Done) + '; btnEraseVec2.style.display = "inline-block"; }\n'
     + '  b1.update();\n'
     + '}\n'
     + 'function eraseVec(slot){\n'
@@ -203,6 +211,13 @@ function buildCinJSX_Phase2(cfg) {
   var refDvX = cfg.refDvX || 'refDvX', refDvY = cfg.refDvY || 'refDvY';
   var refVi = cfg.refVi || 'refVi', refVip1 = cfg.refVip1 || 'refVip1';
   var nameVi = cfg.nameVi || 'ans_vi', nameVip1 = cfg.nameVip1 || 'ans_vip1';
+  var lblPlaceholderA = cfg.lblPlaceholderA || 'Renseignez v';
+  var lblPlaceholderB = cfg.lblPlaceholderB || ' et v';
+  var lblPlaceholderC = cfg.lblPlaceholderC || ' ci-dessus pour faire apparaître les vecteurs.';
+  var lblCloner = cfg.lblCloner || 'Cloner v';
+  var lblInverser = cfg.lblInverser || 'Inverser';
+  var lblTracerDv = cfg.lblTracerDv || 'Tracer Δv';
+  var lblRecommencer = cfg.lblRecommencer || '↻ Recommencer';
   return '[[jsxgraph width="' + W + '" aspect-ratio="' + (Wnum / boardHnum).toFixed(3) + '"'
     + ' input-ref-' + (cfg.nameDvX || 'ans_dv_x') + '="' + refDvX + '" input-ref-' + (cfg.nameDvY || 'ans_dv_y') + '="' + refDvY + '"'
     + ' input-ref-' + nameVi + '="' + refVi + '" input-ref-' + nameVip1 + '="' + refVip1 + '"]]\n'
@@ -228,7 +243,7 @@ function buildCinJSX_Phase2(cfg) {
     + '  if (elY0 && !elY0.value) { elY0.value = "0"; elY0.dispatchEvent(new Event("change")); }\n'
     + '})();\n'
     + 'var placeholder = b2.create("text", [function(){return wx0+(wx1-wx0)*0.04;}, function(){return wy0+(wy1-wy0)*0.5;}, function(){\n'
-    + '  return "Renseignez v" + iIdx + " et v" + (iIdx+1) + " ci-dessus pour faire appara\\u00eetre les vecteurs.";\n'
+    + '  return ' + JSON.stringify(lblPlaceholderA) + ' + iIdx + ' + JSON.stringify(lblPlaceholderB) + ' + (iIdx+1) + ' + JSON.stringify(lblPlaceholderC) + ';\n'
     + '}], {fontSize:12, color:"#94a3b8", fixed:true, visible:true});\n'
     + 'var Mi_pt = null, Mip1_pt = null, Avi = null, Avip1 = null;\n'
     + 'var built = false;\n'
@@ -289,11 +304,11 @@ function buildCinJSX_Phase2(cfg) {
     + '  b.disabled = true; b.style.opacity = "0.4";\n'
     + '  return b;\n'
     + '}\n'
-    + 'var btnCloneVi = mkBtn("Cloner v" + iIdx, "#f97316");\n'
-    + 'var btnCloneVip1 = mkBtn("Cloner v" + (iIdx+1), "#7c3aed");\n'
-    + 'var btnInvert = mkBtn("Inverser", "#374151");\n'
-    + 'var btnTrace = mkBtn("Tracer \\u0394v" + iIdx, "#dc2626");\n'
-    + 'var btnResetP2 = mkBtn("\\u21bb Recommencer", "#64748b");\n'
+    + 'var btnCloneVi = mkBtn(' + JSON.stringify(lblCloner) + ' + iIdx, "#f97316");\n'
+    + 'var btnCloneVip1 = mkBtn(' + JSON.stringify(lblCloner) + ' + (iIdx+1), "#7c3aed");\n'
+    + 'var btnInvert = mkBtn(' + JSON.stringify(lblInverser) + ', "#374151");\n'
+    + 'var btnTrace = mkBtn(' + JSON.stringify(lblTracerDv) + ' + iIdx, "#dc2626");\n'
+    + 'var btnResetP2 = mkBtn(' + JSON.stringify(lblRecommencer) + ', "#64748b");\n'
     + '\n'
     + 'btnCloneVi.addEventListener("click", function(){\n'
     + '  if (usedVi || !built) return;\n'

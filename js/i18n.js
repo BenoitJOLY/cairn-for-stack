@@ -80,6 +80,9 @@ window.I18N = (function () {
     root.querySelectorAll("[data-i18n-dataph]").forEach(function (el) {
       el.setAttribute("data-ph", t(el.getAttribute("data-i18n-dataph")));
     });
+    root.querySelectorAll("[data-i18n-datahtml]").forEach(function (el) {
+      el.setAttribute("data-html", t(el.getAttribute("data-i18n-datahtml")));
+    });
   }
 
   /* ── Changement de langue ── */

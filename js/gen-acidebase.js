@@ -201,13 +201,13 @@ function genAcideBaseCore(X, p, deps) {
     // ═══════════════════════════════════════════════════════════════
     if (abMethod === 'colorimetrie') {
         var ALL_INDICATORS = {
-            hel:  { label: 'Hélianthine',          pL: 3.1,  pH: 4.4,  cL: [255,0,0],     cH: [255,255,0] },
-            vbc:  { label: 'Vert de bromocrésol',  pL: 3.8,  pH: 5.4,  cL: [255,255,0],   cH: [0,120,90]  },
-            rm:   { label: 'Rouge de méthyle',     pL: 4.2,  pH: 6.3,  cL: [220,20,60],   cH: [255,255,0] },
-            bbt:  { label: 'Bleu de Bromothymol',  pL: 6.0,  pH: 7.6,  cL: [255,215,0],   cH: [0,0,255]   },
-            rc:   { label: 'Rouge de crésol',      pL: 7.2,  pH: 8.8,  cL: [255,255,0],   cH: [220,20,60] },
-            phph: { label: 'Phénolphtaléine',      pL: 8.2,  pH: 10.0, cL: [240,240,240], cH: [255,20,147] },
-            ja:   { label: "Jaune d'alizarine",    pL: 10.1, pH: 12.0, cL: [255,255,0],   cH: [255,140,0] }
+            hel:  { label: I18N_D.t('ab.ind_name_hel'),  pL: 3.1,  pH: 4.4,  cL: [255,0,0],     cH: [255,255,0] },
+            vbc:  { label: I18N_D.t('ab.ind_name_vbc'),  pL: 3.8,  pH: 5.4,  cL: [255,255,0],   cH: [0,120,90]  },
+            rm:   { label: I18N_D.t('ab.ind_name_rm'),   pL: 4.2,  pH: 6.3,  cL: [220,20,60],   cH: [255,255,0] },
+            bbt:  { label: I18N_D.t('ab.ind_name_bbt'),  pL: 6.0,  pH: 7.6,  cL: [255,215,0],   cH: [0,0,255]   },
+            rc:   { label: I18N_D.t('ab.ind_name_rc'),   pL: 7.2,  pH: 8.8,  cL: [255,255,0],   cH: [220,20,60] },
+            phph: { label: I18N_D.t('ab.ind_name_phph'), pL: 8.2,  pH: 10.0, cL: [240,240,240], cH: [255,20,147] },
+            ja:   { label: I18N_D.t('ab.ind_name_ja'),   pL: 10.1, pH: 12.0, cL: [255,255,0],   cH: [255,140,0] }
         };
         var indKeys = (p.indKeys || []).filter(function(k) { return ALL_INDICATORS[k]; });
         if (!indKeys.length) indKeys = ['hel', 'bbt', 'phph'];
@@ -295,7 +295,7 @@ function genAcideBaseCore(X, p, deps) {
             + '    var pH = calcPh(curVol);\n'
             + '    document.getElementById("color-square").style.backgroundColor = getColor(pH);\n'
             + '    document.getElementById("vol-display").textContent = "V = " + curVol.toFixed(1) + " mL";\n'
-            + '    document.getElementById("tries-display").textContent = "Essais : " + tries;\n'
+            + '    document.getElementById("tries-display").textContent = ' + JSON.stringify(I18N_D.t('ab.essais_lbl') + ' ') + ' + tries;\n'
             + '    document.querySelectorAll(".ind-btn").forEach(function(b) {\n'
             + '        if(dosageStarted) { b.classList.add("locked"); } else { b.classList.remove("locked"); }\n'
             + '        if(b.dataset.ind === curInd) { b.classList.add("active"); }\n'
@@ -363,17 +363,17 @@ function genAcideBaseCore(X, p, deps) {
             + '[[/style]]\n\n'
             + '<div class="container">\n'
             + '  <div class="beaker-section">\n'
-            + '    <div class="label">Bécher</div>\n'
+            + '    <div class="label">' + I18N_D.t('ab.becher_lbl') + '</div>\n'
             + '    <div id="color-square" class="square"></div>\n'
             + '    <div id="vol-display" class="vol-text">V = 0.0 mL</div>\n'
-            + '    <div id="tries-display" class="tries-text">Essais : 1</div>\n'
+            + '    <div id="tries-display" class="tries-text">' + I18N_D.t('ab.essais_lbl') + ' 1</div>\n'
             + '  </div>\n'
             + '  <div class="controls-section">\n'
-            + '    <div class="label">Choix de l\'indicateur :</div>\n'
+            + '    <div class="label">' + I18N_D.t('ab.choix_indicateur_lbl') + '</div>\n'
             + '    <div class="btn-group">\n'
             + indButtonsHtml + '\n'
             + '    </div>\n'
-            + '    <div class="label" style="margin-top: 15px;">Pas de versement :</div>\n'
+            + '    <div class="label" style="margin-top: 15px;">' + I18N_D.t('ab.pas_versement_lbl') + '</div>\n'
             + '    <div class="btn-group step-group">\n'
             + '      <button class="btn step-btn" type="button" data-step="0.1">0.1 mL</button>\n'
             + '      <button class="btn step-btn" type="button" data-step="0.2">0.2 mL</button>\n'
@@ -382,22 +382,22 @@ function genAcideBaseCore(X, p, deps) {
             + '      <button class="btn step-btn" type="button" data-step="2">2.0 mL</button>\n'
             + '    </div>\n'
             + '    <div class="btn-group" style="flex-direction: column;">\n'
-            + '      <button id="btn-add" class="btn btn-add" type="button">+ Verser la soude</button>\n'
-            + '      <button id="btn-reset" class="btn btn-reset" type="button">Recommencer le dosage</button>\n'
+            + '      <button id="btn-add" class="btn btn-add" type="button">' + I18N_D.t('ab.btn_verser') + '</button>\n'
+            + '      <button id="btn-reset" class="btn btn-reset" type="button">' + I18N_D.t('ab.btn_recommencer') + '</button>\n'
             + '    </div>\n'
             + '  </div>\n'
             + '</div>\n\n'
             + '[[script type="module"]]\n' + scriptModule + '[[/script]]\n'
             + '[[/iframe]]\n';
 
-        textFrag = banner('Simulation de dosage et indicateur coloré')
-            + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;">On dose ' + (typeMap[abType] || abType) + nStr + '.</p>\n'
+        textFrag = banner(I18N_D.t('ab.banner_colorimetrie'))
+            + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;">' + I18N_D.t('ab.method1_intro', { type: (typeMap[abType] || abType) + nStr }) + '</p>\n'
             + dataRow
-            + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;"><strong>Consigne :</strong> Sélectionnez un indicateur, choisissez un pas de versement, puis ajoutez le titrant. Le carré représente la couleur de votre bécher. Lorsque vous voyez le virage, saisissez le volume équivalent ci-dessous. <em>(Attention : "Recommencer" ajoute une pénalité).</em></p>\n'
+            + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;"><strong>' + I18N_D.t('ab.consigne_lbl') + '</strong> ' + I18N_D.t('ab.method1_consigne') + ' <em>' + I18N_D.t('ab.method1_consigne_warn') + '</em></p>\n'
             + '<div style="display:none">\n[[input:' + nameVol + ']][[validation:' + nameVol + ']]\n[[input:' + nameInd + ']][[validation:' + nameInd + ']]\n[[input:' + nameTries + ']][[validation:' + nameTries + ']]\n</div>\n\n'
             + iframeBlock
             + '<div style="margin-top:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">\n'
-            + '    <label for="' + nameVeq + '" style="font-weight:bold; font-size:0.95em; color:#1e3a5f;">Volume équivalent observé (en mL) :</label>\n'
+            + '    <label for="' + nameVeq + '" style="font-weight:bold; font-size:0.95em; color:#1e3a5f;">' + I18N_D.t('ab.veq_observe_lbl') + '</label>\n'
             + '    [[input:' + nameVeq + ']] [[validation:' + nameVeq + ']]\n'
             + '</div>';
 
@@ -432,39 +432,39 @@ function genAcideBaseCore(X, p, deps) {
 
         var b1 = bareme, b2 = +(bareme * 0.75).toFixed(4), b3 = +(bareme * 0.5).toFixed(4);
         canonicalNodes = [
-            { name: '0', description: 'Vérification indicateur', answertest: 'AlgEquiv', sans: 'is_ind_ok' + S, tans: 'true',
+            { name: '0', description: I18N_D.t('tpl.ab_desc_indicateur'), answertest: 'AlgEquiv', sans: 'is_ind_ok' + S, tans: 'true',
               testoptions: '', quiet: '0',
   truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '1', trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-0-F',
-              falsefeedback: '<strong>Indicateur incorrect.</strong> Le pH à l\'équivalence est d\'environ ' + pHeq.toFixed(2) + '. Le <strong>' + indLabel + '</strong> (zone ' + indZone + ') est le seul indicateur adapté ici.', falseFbKind: 'false' },
-            { name: '1', description: 'Vérification volume équivalent', answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
+              falsefeedback: I18N_D.t('ab.fb_ind_wrong', { ph: pHeq.toFixed(2), ind: indLabel, zone: indZone }), falseFbKind: 'false' },
+            { name: '1', description: I18N_D.t('tpl.ab_desc_volume_equivalent'), answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '2', trueanswernote: 'PRT' + X + '-1-T', truefeedback: '',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-1-F',
-              falsefeedback: '<strong>Bon indicateur, mais volume incorrect.</strong> Le virage doit apparaître pour un volume d\'environ ' + targetVol.toFixed(1) + ' mL.', falseFbKind: 'partial' },
-            { name: '2', description: 'Calcul pénalité essais (1 essai)', answertest: 'AlgEquiv', sans: 'tries_val' + S, tans: '1',
+              falsefeedback: I18N_D.t('ab.fb_vol_wrong', { vol: targetVol.toFixed(1) }), falseFbKind: 'partial' },
+            { name: '2', description: I18N_D.t('tpl.ab_desc_penalite_1'), answertest: 'AlgEquiv', sans: 'tries_val' + S, tans: '1',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(b1), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-2-T',
-              truefeedback: '<strong>Parfait !</strong> Indicateur correct et dosage réussi du premier coup.', fbKind: 'true',
+              truefeedback: I18N_D.t('ab.fb_perfect_1try'), fbKind: 'true',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '3', falseanswernote: 'PRT' + X + '-2-F', falsefeedback: '' },
-            { name: '3', description: 'Calcul pénalité essais (2 essais)', answertest: 'AlgEquiv', sans: 'tries_val' + S, tans: '2',
+            { name: '3', description: I18N_D.t('tpl.ab_desc_penalite_2'), answertest: 'AlgEquiv', sans: 'tries_val' + S, tans: '2',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(b2), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-3-T',
-              truefeedback: '<strong>Correct.</strong> Vous avez dû recommencer une fois, une pénalité est appliquée.', fbKind: 'true',
+              truefeedback: I18N_D.t('ab.fb_correct_2tries'), fbKind: 'true',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '4', falseanswernote: 'PRT' + X + '-3-F', falsefeedback: '' },
-            { name: '4', description: 'Calcul pénalité essais (3 essais ou +)', answertest: 'AlgEquiv', sans: 'true', tans: 'true',
+            { name: '4', description: I18N_D.t('tpl.ab_desc_penalite_3plus'), answertest: 'AlgEquiv', sans: 'true', tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(b3), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-4-T',
-              truefeedback: '<strong>Correct, mais trop d\'essais.</strong> Vous avez recommencé le dosage à plusieurs reprises. Le score est plafonné.', fbKind: 'partial',
+              truefeedback: I18N_D.t('ab.fb_correct_manytries'), fbKind: 'partial',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-4-F', falsefeedback: '' }
         ];
         prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedbackVarsText };
 
-        generalFeedbackAuto = '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;">Réponses attendues</div>'
+        generalFeedbackAuto = '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;">' + I18N_D.t('ab.genfb_title') + '</div>'
             + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
-            + '<span style="font-weight:bold;color:#1e3a5f;">Q' + X + ' Analyse :</span> Le pH à l\'équivalence est d\'environ ' + pHeq.toFixed(2)
-            + '. La <strong>' + indLabel + '</strong> est l\'indicateur dont la zone de virage encadre ce pH. Le volume équivalent théorique est '
-            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code>.</div>';
+            + '<span style="font-weight:bold;color:#1e3a5f;">Q' + X + ' ' + I18N_D.t('ab.genfb_analyse_lbl') + '</span> '
+            + I18N_D.t('ab.genfb_analyse_text', { ph: pHeq.toFixed(2), ind: indLabel, vol: '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code>' })
+            + '</div>';
 
     // ═══════════════════════════════════════════════════════════════
     //  MÉTHODE 2 — Méthode des tangentes (JSXGraph)
@@ -637,7 +637,7 @@ function genAcideBaseCore(X, p, deps) {
             + '});\n\n'
             + 'var cursor = board.create("glider", [' + (targetVol * 1.25).toFixed(1) + ', 7, guideLine], {\n'
             + '  size:8, face:"circle", fillColor:"#ef4444", strokeColor:"#b91c1c",\n'
-            + '  name:"Votre r\\u00e9ponse", label:{fontSize:12, color:"#b91c1c", offset:[10,-15]}\n'
+            + '  name:' + JSON.stringify(I18N_D.t('ab.votre_reponse_lbl')) + ', label:{fontSize:12, color:"#b91c1c", offset:[10,-15]}\n'
             + '});\n\n'
             + 'var cursorLine = board.create("line", [\n'
             + '    function(){ return [cursor.X(), -0.5]; },\n'
@@ -652,15 +652,15 @@ function genAcideBaseCore(X, p, deps) {
             + '   function(){return "V="+cursor.X().toFixed(1)+" mL";}],\n'
             + '  {fixed:false, fontSize:12, color:"#ef4444", highlight:false});\n';
 
-        textFrag = banner('pH-métrie')
-            + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;">On réalise le dosage ' + (typeMap[abType] || abType) + nStr + '. La courbe de dosage pH-métrique est tracée ci-dessous.</p>\n'
+        textFrag = banner(I18N_D.t('ab.banner_tangentes'))
+            + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;">' + I18N_D.t('ab.method2_intro', { type: (typeMap[abType] || abType) + nStr }) + '</p>\n'
             + dataRow
-            + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;"><strong>Consigne :</strong> Appliquez la <strong>méthode des tangentes</strong>. Déplacez les points <span style="color:#f97316;font-weight:bold;">T<sub>1</sub></span> et <span style="color:#a855f7;font-weight:bold;">T<sub>2</sub></span> à l\'endroit où la courbe est la plus incurvée. Le graphique tracera la droite équidistante (en vert). Déplacez le curseur rouge à l\'abscisse du point d\'intersection trouvé pour lire le volume équivalent.</p>\n'
+            + '<p style="margin:10px 0;font-size:.95em;line-height:1.5;"><strong>' + I18N_D.t('ab.consigne_lbl') + '</strong> ' + I18N_D.t('ab.method2_consigne') + '</p>\n'
             + '<div style="display:none">[[input:' + name1 + ']][[validation:' + name1 + ']]</div>\n\n'
             + '[[jsxgraph input-ref-' + name1 + '="' + refSlopes + '" width="' + dispW + 'px" height="' + dispH + 'px"]]\n'
             + jxg + '\n[[/jsxgraph]]\n'
             + '<div style="margin-top:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">\n'
-            + '    <label for="' + name2 + '" style="font-weight:bold; font-size:0.95em; color:#1e3a5f;">Volume équivalent lu sur le graphique (en mL) :</label>\n'
+            + '    <label for="' + name2 + '" style="font-weight:bold; font-size:0.95em; color:#1e3a5f;">' + I18N_D.t('ab.veq_lu_lbl') + '</label>\n'
             + '    [[input:' + name2 + ']] [[validation:' + name2 + ']]\n'
             + '</div>';
 
@@ -685,30 +685,31 @@ function genAcideBaseCore(X, p, deps) {
 
         var t1s = +(bareme * 0.5).toFixed(4), t2s = +(bareme * 0.5).toFixed(4), t3s = +(bareme * 0.25).toFixed(4);
         canonicalNodes = [
-            { name: '0', description: 'Vérification parallélisme des tangentes', answertest: 'AlgEquiv', sans: 'is_parallel' + S, tans: 'true',
+            { name: '0', description: I18N_D.t('tpl.ab_desc_parallelisme_tangentes'), answertest: 'AlgEquiv', sans: 'is_parallel' + S, tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(t1s), truepenalty: '0', truenextnode: '1', trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0.1', falsenextnode: '2', falseanswernote: 'PRT' + X + '-0-F',
-              falsefeedback: '<strong>Tangentes non parallèles.</strong> L\'écart entre les pentes est trop grand. Ajustez finement les points T1 et T2 pour qu\'elles aient la même pente.', falseFbKind: 'partial' },
-            { name: '1', description: 'Vérification volume équivalent', answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
+              falsefeedback: I18N_D.t('ab.fb_tangentes_not_parallel'), falseFbKind: 'partial' },
+            { name: '1', description: I18N_D.t('tpl.ab_desc_volume_equivalent'), answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(t2s), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-1-T',
-              truefeedback: '<strong>Excellent !</strong> La méthode des tangentes est parfaitement maîtrisée et le volume équivalent est correct.', fbKind: 'true',
+              truefeedback: I18N_D.t('ab.fb_tangentes_excellent'), fbKind: 'true',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0.1', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-1-F',
-              falsefeedback: '<strong>Parallélisme correct.</strong> Cependant, la valeur du volume équivalent lue est incorrecte.', falseFbKind: 'partial' },
-            { name: '2', description: 'Repli : volume équivalent sans tangentes rigoureuses', answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
+              falsefeedback: I18N_D.t('ab.fb_tangentes_parallel_ok_vol_wrong'), falseFbKind: 'partial' },
+            { name: '2', description: I18N_D.t('tpl.ab_desc_repli_veq_non_rigoureux'), answertest: 'AlgEquiv', sans: 'is_veq_ok' + S, tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(t3s), truepenalty: '', truenextnode: '-1', trueanswernote: 'PRT' + X + '-2-T',
-              truefeedback: 'Le volume équivalent est correct mais le travail n\'est pas rigoureux.', fbKind: 'true',
+              truefeedback: I18N_D.t('ab.fb_tangentes_vol_ok_not_rigorous'), fbKind: 'true',
               falsescoremode: '-', falsescore: '0', falsepenalty: '', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-2-F',
-              falsefeedback: '<strong>Parallélisme et valeur incorrects.</strong> La méthode des tangentes est à revoir.', falseFbKind: 'partial' }
+              falsefeedback: I18N_D.t('ab.fb_tangentes_both_wrong'), falseFbKind: 'partial' }
         ];
         prtMeta = { name: 'prt' + X, value: '1', autosimplify: '1', feedbackstyle: '1', feedbackvariables: feedbackVarsText };
 
-        generalFeedbackAuto = '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;">Réponses attendues</div>'
+        generalFeedbackAuto = '<div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;">' + I18N_D.t('ab.genfb_title') + '</div>'
             + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
-            + '<span style="font-weight:bold;color:#1e3a5f;">Q' + X + ' Méthode :</span> Tangentes aux points d\'inflexion de la pente et '
-            + '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code></div>';
+            + '<span style="font-weight:bold;color:#1e3a5f;">Q' + X + ' ' + I18N_D.t('ab.genfb_methode_lbl') + '</span> '
+            + I18N_D.t('ab.genfb_methode_text', { vol: '<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#a21caf;">V_eq = ' + targetVol.toFixed(1) + ' mL</code>' })
+            + '</div>';
     }
 
     // Encadrés colorés appliqués uniquement sur la copie xmlNodes servant à prtXML —

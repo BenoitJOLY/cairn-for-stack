@@ -454,27 +454,27 @@ is_proportional${X}: if length(full_ans_map${X})=0 then false else is(length(sub
   });
 
   const canonicalNodes=[
-    mkCanonNode(0,'Fleche','AlgEquiv',`is_arrow_ok${X}`,'true',w_prt1.toFixed(7),1,0,1,
-      `<p><span style="color: green; font-weight: bold;">✓ Bonne flèche de réaction !</span></p>`,
-      `<p><span style="color: red; font-weight: bold;">✗ Mauvaise flèche.</span> Détectée : {@ans_arrow_det${X}@}, attendue : {@${vSep}@}</p>`),
-    mkCanonNode(1,'Bilan atomes','AlgEquiv',`is_atoms_ok${X}`,'true',w_n0.toFixed(7),2,0,2,
-      `<p><span style="color: green; font-weight: bold;">✓ Votre réaction est équilibrée du point de vue des éléments chimiques !</span></p>`,
-      `<p><span style="color: #cc2222; font-weight: bold;">✗ Votre réaction n'est pas équilibrée du point des éléments chimiques !</span></p>`),
-    mkCanonNode(2,'Charges','AlgEquiv',`charges_conserved${X}`,'true',w_n1.toFixed(7),3,0,3,
-      `<p><span style="color: green;">✓ Votre équation est équilibrée électriquement.</span></p>`,
-      `<p><span style="color: red;">✗ Les charges ne sont pas conservées dans votre réaction.</span> Réactifs : {@charge_rea_s${X}@}, Produits : {@charge_pro_s${X}@}</p>`),
-    mkCanonNode(3,'Formules','AlgEquiv',`formulas_ok${X}`,'true',w_n2.toFixed(7),5,0,4,
-      `<p><span style="color: green;">✓ Vos formules sont correctes !</span></p>`,
-      `<p><span style="color: red;">✗ Vos formules sont incorrectes.</span> Réactifs : {@nb_rea_s${X}@}/${r.f.length}, Produits : {@nb_pro_s${X}@}/${p_.f.length}</p>`),
-    mkCanonNode(4,'Groupes','AlgEquiv',`fct_pro_ok${X}`,'true',w_n3.toFixed(7),5,0,5,
-      `<p><span style="color: orange;">⚠ Bonne compréhension du type de réaction.</span></p>`,
-      `<p><span style="color: red;">✗ Groupes fonctionnels non reconnus.</span></p>`),
-    mkCanonNode(5,'Coefficients','AlgEquiv',`coefs_ok${X}`,'true',w_n4.toFixed(7),-1,0,6,
-      `<p><span style="color: green;">✓ Vos coefficients stœchiométriques sont corrects !</span></p>`,
-      `<p><span style="color: #cc2222;">✗ Vos coefficients stœchiométriques sont incorrects !</span></p>`),
-    mkCanonNode(6,'Coefs prop','AlgEquiv',`is_proportional${X}`,'true',w_n5.toFixed(7),-1,0,-1,
-      `<p><span style="color: orange;">⚠ Coefficients proportionnels (k={@k_ratio${X}@}) mais non réduits.</span></p>`,
-      `<p><span style="color: red;">✗ Coefficients non proportionnels.</span></p>`)
+    mkCanonNode(0,I18N_D.t('tpl.topo_desc_fleche'),'AlgEquiv',`is_arrow_ok${X}`,'true',w_prt1.toFixed(7),1,0,1,
+      `<p><span style="color: green; font-weight: bold;">${I18N_D.t('tpl.topo_fb_fleche_ok')}</span></p>`,
+      `<p><span style="color: red; font-weight: bold;">${I18N_D.t('tpl.topo_fb_fleche_ko', { det: `{@ans_arrow_det${X}@}`, att: `{@${vSep}@}` })}</span></p>`),
+    mkCanonNode(1,I18N_D.t('tpl.topo_desc_atomes'),'AlgEquiv',`is_atoms_ok${X}`,'true',w_n0.toFixed(7),2,0,2,
+      `<p><span style="color: green; font-weight: bold;">${I18N_D.t('tpl.topo_fb_atomes_ok')}</span></p>`,
+      `<p><span style="color: #cc2222; font-weight: bold;">${I18N_D.t('tpl.topo_fb_atomes_ko')}</span></p>`),
+    mkCanonNode(2,I18N_D.t('tpl.topo_desc_charges'),'AlgEquiv',`charges_conserved${X}`,'true',w_n1.toFixed(7),3,0,3,
+      `<p><span style="color: green;">${I18N_D.t('tpl.topo_fb_charges_ok')}</span></p>`,
+      `<p><span style="color: red;">${I18N_D.t('tpl.topo_fb_charges_ko', { rea: `{@charge_rea_s${X}@}`, pro: `{@charge_pro_s${X}@}` })}</span></p>`),
+    mkCanonNode(3,I18N_D.t('tpl.topo_desc_formules'),'AlgEquiv',`formulas_ok${X}`,'true',w_n2.toFixed(7),5,0,4,
+      `<p><span style="color: green;">${I18N_D.t('tpl.topo_fb_formules_ok')}</span></p>`,
+      `<p><span style="color: red;">${I18N_D.t('tpl.topo_fb_formules_ko', { rea: `{@nb_rea_s${X}@}/${r.f.length}`, pro: `{@nb_pro_s${X}@}/${p_.f.length}` })}</span></p>`),
+    mkCanonNode(4,I18N_D.t('tpl.topo_desc_groupes'),'AlgEquiv',`fct_pro_ok${X}`,'true',w_n3.toFixed(7),5,0,5,
+      `<p><span style="color: orange;">${I18N_D.t('tpl.topo_fb_groupes_ok')}</span></p>`,
+      `<p><span style="color: red;">${I18N_D.t('tpl.topo_fb_groupes_ko')}</span></p>`),
+    mkCanonNode(5,I18N_D.t('tpl.topo_desc_coefficients'),'AlgEquiv',`coefs_ok${X}`,'true',w_n4.toFixed(7),-1,0,6,
+      `<p><span style="color: green;">${I18N_D.t('tpl.topo_fb_coefs_ok')}</span></p>`,
+      `<p><span style="color: #cc2222;">${I18N_D.t('tpl.topo_fb_coefs_ko')}</span></p>`),
+    mkCanonNode(6,I18N_D.t('tpl.topo_desc_coefsprop'),'AlgEquiv',`is_proportional${X}`,'true',w_n5.toFixed(7),-1,0,-1,
+      `<p><span style="color: orange;">${I18N_D.t('tpl.topo_fb_coefsprop_ok', { k: `{@k_ratio${X}@}` })}</span></p>`,
+      `<p><span style="color: red;">${I18N_D.t('tpl.topo_fb_coefsprop_ko')}</span></p>`)
   ];
   const prtMeta = { name:`prt${X}`, value:'1.0000000', autosimplify:'1', feedbackstyle:'2', feedbackvariables: fbVars };
   const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
@@ -843,18 +843,18 @@ function insertModeChar(tag, ch) {
   editor.dispatchEvent(new Event('input'));
 }
 var sep = document.createElement('span'); sep.style.cssText = 'border-left:1px solid #aaa;height:22px;display:inline-block;margin:0 3px;';
-btnSub = makeBtn('x<sub style="color:#e67e22;font-size:0.75em">2</sub> Indice', activateSub, '#34495e');
-btnSup = makeBtn('x<sup style="color:#2980b9;font-size:0.75em">n</sup> Exposant', activateSup, '#34495e');
+btnSub = makeBtn('x<sub style="color:#e67e22;font-size:0.75em">2</sub> ' + ${JSON.stringify(I18N_D.t('tpl.chem_btn_indice'))}, activateSub, '#34495e');
+btnSup = makeBtn('x<sup style="color:#2980b9;font-size:0.75em">n</sup> ' + ${JSON.stringify(I18N_D.t('tpl.chem_btn_exposant'))}, activateSup, '#34495e');
 toolbar.appendChild(btnSub); toolbar.appendChild(btnSup); toolbar.appendChild(sep);
-toolbar.appendChild(makeBtn('→ Total', function() { insertPlainText(' -> '); }, '#27ae60'));
-toolbar.appendChild(makeBtn('⇌ Équilibre', function() { insertPlainText(' <=> '); }, '#27ae60'));
-toolbar.appendChild(makeBtn('↔ Mésomérie', function() { insertPlainText(' <-> '); }, '#27ae60'));
+toolbar.appendChild(makeBtn(${JSON.stringify(I18N_D.t('tpl.topo_btn_total'))}, function() { insertPlainText(' -> '); }, '#27ae60'));
+toolbar.appendChild(makeBtn(${JSON.stringify(I18N_D.t('tpl.topo_btn_equilibrium'))}, function() { insertPlainText(' <=> '); }, '#27ae60'));
+toolbar.appendChild(makeBtn(${JSON.stringify(I18N_D.t('tpl.chem_btn_mesomerie'))}, function() { insertPlainText(' <-> '); }, '#27ae60'));
 editor.addEventListener('keydown', function(e) {
   var key = e.key; if (key.length !== 1) { return; }
   if (modeActive === 'sub') { if (/^\\d$/.test(key)) { e.preventDefault(); insertModeChar('sub', key); return; } endMode(); return; }
   if (modeActive === 'sup') { if (/^\\d$/.test(key) || key === '+' || key === '-') { e.preventDefault(); insertModeChar('sup', key); if (key === '+' || key === '-') { endMode(); } return; } endMode(); return; }
 });
-var latexBar = document.createElement('input'); latexBar.type = 'text'; latexBar.readOnly = true; latexBar.placeholder = 'LaTeX genere automatiquement...';
+var latexBar = document.createElement('input'); latexBar.type = 'text'; latexBar.readOnly = true; latexBar.placeholder = ${JSON.stringify(I18N_D.t('tpl.chem_latex_placeholder'))};
 latexBar.style.cssText = 'width:100%;font-family:Consolas,monospace;padding:7px;background:#eee;border:1px solid #ccc;color:#555;box-sizing:border-box;border-radius:4px;font-size:0.85rem;margin-bottom:8px;';
 var imgBox = document.createElement('div'); imgBox.style.cssText = 'padding:12px;background:#fff;border:1px solid #ddd;border-radius:6px;min-height:55px;text-align:center;';
 var img = document.createElement('img'); img.style.cssText = 'max-height:65px;'; img.src = 'https://latex.codecogs.com/svg.image?\\\\ce{...}'; imgBox.appendChild(img);
@@ -985,30 +985,30 @@ stpf${X}: sort(map(sort,tpf${X}));`;
   const fe=`<div style="padding:12px;background:#F9B3A9;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:10px;">`;
 
   const canonicalNodes=[
-    mkCanonNode(0,'Flèche','AlgEquiv',`vf${X}`,'1',0,1,0,1,
-  `${fb}<strong>✅ Flèche correcte</strong> — Le type de flèche correspond bien à la nature de la réaction.</div>`,
-  `${fe}<strong>✗ Flèche incorrecte</strong> — La flèche utilisée ({@fleche_el_disp${X}@}) ne correspond pas au type de réaction attendu ({@fleche_att_disp${X}@}).</div>`),
-    mkCanonNode(1,'Réactifs','EqualComAss',`srf${X}`,`strf${X}`,0.20,2,0,-1,
-  `${fb}<strong>✅ Réactifs corrects</strong> — Vous avez bien identifié les {@nb_rs${X}@} réactifs.</div>`,
-  `${fe}<strong>✗ Réactifs incorrects</strong> — Vous avez écrit {@nb_rs${X}@} réactif(s), {@nb_rt${X}@} sont attendus.</div>`),
-    mkCanonNode(2,'Produits','EqualComAss',`spf${X}`,`stpf${X}`,0.20,3,0,-1,
-  `${fb}<strong>✅ Produits corrects</strong> — Vous avez bien identifié les {@nb_ps${X}@} produits.</div>`,
-  `${fe}<strong>✗ Produits incorrects</strong> — Vous avez écrit {@nb_ps${X}@} produit(s), {@nb_pt${X}@} sont attendus.</div>`),
-    mkCanonNode(3,'Conservation charges','NumRelative',`sch_rs${X}`,`sch_ps${X}`,0.20,4,0,-1,
-  `${fb}<strong>✅ Conservation des charges</strong> — Les charges sont bien équilibrées ({@sch_rs${X}@}).</div>`,
-  `${fe}<strong>✗ Non-conservation des charges</strong> — Réactifs : {@sch_rs${X}@}, Produits : {@sch_ps${X}@}.</div>`),
-    mkCanonNode(4,'Valeur charge','NumRelative',`sch_rs${X}`,`sch_rt${X}`,0.20,5,0,5,
-  `${fb}<strong>✅ Valeur de charge correcte</strong> — La charge globale ({@sch_rs${X}@}) est celle attendue.</div>`,
-  `${fe}<strong>✗ Valeur de charge incorrecte</strong> — Obtenue : {@sch_rs${X}@}, attendue : {@sch_rt${X}@}.</div>`),
-    mkCanonNode(5,'Stœchio exacte','NumRelative',`vcs${X}`,'1',0.20,7,0,6,
-  `${fb}<strong>✅ Coefficients corrects</strong> — Les coefficients stœchiométriques sont parfaitement ajustés.</div>`,
+    mkCanonNode(0,I18N_D.t('tpl.chem_desc_fleche'),'AlgEquiv',`vf${X}`,'1',0,1,0,1,
+  `${fb}<strong>${I18N_D.t('tpl.chem_fb_fleche_ok')}</strong></div>`,
+  `${fe}<strong>${I18N_D.t('tpl.chem_fb_fleche_ko', { used: `{@fleche_el_disp${X}@}`, expected: `{@fleche_att_disp${X}@}` })}</strong></div>`),
+    mkCanonNode(1,I18N_D.t('tpl.chem_desc_reactifs'),'EqualComAss',`srf${X}`,`strf${X}`,0.20,2,0,-1,
+  `${fb}<strong>${I18N_D.t('tpl.chem_fb_reactifs_ok', { n: `{@nb_rs${X}@}` })}</strong></div>`,
+  `${fe}<strong>${I18N_D.t('tpl.chem_fb_reactifs_ko', { n: `{@nb_rs${X}@}`, expected: `{@nb_rt${X}@}` })}</strong></div>`),
+    mkCanonNode(2,I18N_D.t('tpl.chem_desc_produits'),'EqualComAss',`spf${X}`,`stpf${X}`,0.20,3,0,-1,
+  `${fb}<strong>${I18N_D.t('tpl.chem_fb_produits_ok', { n: `{@nb_ps${X}@}` })}</strong></div>`,
+  `${fe}<strong>${I18N_D.t('tpl.chem_fb_produits_ko', { n: `{@nb_ps${X}@}`, expected: `{@nb_pt${X}@}` })}</strong></div>`),
+    mkCanonNode(3,I18N_D.t('tpl.chem_desc_conservcharges'),'NumRelative',`sch_rs${X}`,`sch_ps${X}`,0.20,4,0,-1,
+  `${fb}<strong>${I18N_D.t('tpl.chem_fb_conservcharges_ok', { val: `{@sch_rs${X}@}` })}</strong></div>`,
+  `${fe}<strong>${I18N_D.t('tpl.chem_fb_conservcharges_ko', { rea: `{@sch_rs${X}@}`, pro: `{@sch_ps${X}@}` })}</strong></div>`),
+    mkCanonNode(4,I18N_D.t('tpl.chem_desc_valcharge'),'NumRelative',`sch_rs${X}`,`sch_rt${X}`,0.20,5,0,5,
+  `${fb}<strong>${I18N_D.t('tpl.chem_fb_valcharge_ok', { val: `{@sch_rs${X}@}` })}</strong></div>`,
+  `${fe}<strong>${I18N_D.t('tpl.chem_fb_valcharge_ko', { got: `{@sch_rs${X}@}`, exp: `{@sch_rt${X}@}` })}</strong></div>`),
+    mkCanonNode(5,I18N_D.t('tpl.chem_desc_stoechioexacte'),'NumRelative',`vcs${X}`,'1',0.20,7,0,6,
+  `${fb}<strong>${I18N_D.t('tpl.chem_fb_stoechioexacte_ok')}</strong></div>`,
   ``),
-    mkCanonNode(6,'Stœchio multiple','NumRelative',`vcp${X}`,'true',0,7,0,-1,
-  `${fb}<strong>✅ Coefficients proportionnels</strong> — Corrects mais multipliés par {@k${X}@}. Pensez à simplifier.</div>`,
-  `${fe}<strong>✗ Coefficients incorrects</strong> — L'équation n'est pas correctement équilibrée.</div>`),
-    mkCanonNode(7,'Groupes fonctionnels','AlgEquiv',`ok_g${X}`,'1',0,-1,0,-1,
-  `${fb}<strong>✅ Groupes caractéristiques corrects</strong> — Tous les groupes requis ont été trouvés.</div>`,
-  `${fe}<strong>✗ Groupes caractéristiques incorrects</strong> — [[if test="not ok_rg${X}"]]\u26a0\ufe0f Réactifs, il manque : <strong>{#mq_rg${X}#}</strong>[[/if]] [[if test="not ok_pg${X}"]]\u26a0\ufe0f Produits, il manque : <strong>{#mq_pg${X}#}</strong>[[/if]]</div>`)
+    mkCanonNode(6,I18N_D.t('tpl.chem_desc_stoechiomultiple'),'NumRelative',`vcp${X}`,'true',0,7,0,-1,
+  `${fb}<strong>${I18N_D.t('tpl.chem_fb_stoechiomultiple_ok', { k: `{@k${X}@}` })}</strong></div>`,
+  `${fe}<strong>${I18N_D.t('tpl.chem_fb_stoechiomultiple_ko')}</strong></div>`),
+    mkCanonNode(7,I18N_D.t('tpl.chem_desc_groupesfct'),'AlgEquiv',`ok_g${X}`,'1',0,-1,0,-1,
+  `${fb}<strong>${I18N_D.t('tpl.chem_fb_groupesfct_ok')}</strong></div>`,
+  `${fe}<strong>${I18N_D.t('tpl.chem_fb_groupesfct_ko_title')}</strong> — [[if test="not ok_rg${X}"]]${I18N_D.t('tpl.chem_fb_missing_reactifs')} <strong>{#mq_rg${X}#}</strong>[[/if]] [[if test="not ok_pg${X}"]]${I18N_D.t('tpl.chem_fb_missing_produits')} <strong>{#mq_pg${X}#}</strong>[[/if]]</div>`)
   ];
   const prtMeta = { name:`prt${X}`, value:'1.0000000', autosimplify:'1', feedbackstyle:'2', feedbackvariables: fbVars };
   const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
@@ -1023,8 +1023,8 @@ stpf${X}: sort(map(sort,tpf${X}));`;
   const diagNodes = [];
   canonicalNodes.forEach((n, i) => {
     const isFirst = i === 0, isLast = i === canonicalNodes.length - 1;
-    if (!isFirst && n.truefeedback) diagNodes.push({ desc: n.description + ' (succès)', fb: n.truefeedback });
-    if (!isLast && n.falsefeedback) diagNodes.push({ desc: n.description + ' (échec)', fb: n.falsefeedback });
+    if (!isFirst && n.truefeedback) diagNodes.push({ desc: n.description + I18N_D.t('common.diag_success_suffix'), fb: n.truefeedback });
+    if (!isLast && n.falsefeedback) diagNodes.push({ desc: n.description + I18N_D.t('common.diag_failure_suffix'), fb: n.falsefeedback });
   });
 
   // Encart "réponse attendue" injecté directement dans generalFeedback (pas seulement

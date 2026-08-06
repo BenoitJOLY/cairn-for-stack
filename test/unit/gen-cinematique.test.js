@@ -17,9 +17,26 @@ const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
 const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 const { _mkInput, _mkFbGen } = require(path.join('..', '..', 'js', 'gen-math-shared.js'));
 
+// Charge les vraies traductions FR (comportement identique à l'app : add()
+// puis t(key, vars) substitue {var}) — nécessaire ici car plusieurs tests
+// vérifient le texte français rendu (M<sub>i</sub>M<sub>i+1</sub>...), pas
+// seulement la présence de la clé (contrairement au stub passthrough utilisé
+// par test/unit/gen-redox.test.js pour un fichier qui ne teste pas le texte).
+global.I18N = {
+    _strings: {},
+    add(code, strings) { Object.assign(this._strings, strings); },
+    t(key, vars) {
+        let s = this._strings[key] != null ? this._strings[key] : key;
+        if (vars) for (const v in vars) s = s.split('{' + v + '}').join(vars[v]);
+        return s;
+    }
+};
+require(path.join('..', '..', 'lang', 'fr.js'));
+const I18N_STUB = global.I18N;
+
 const DEPS = {
     cinComputeAll, buildCinJSX_Phase1, buildCinJSX_Phase2,
-    _mkInput, _cinFinalize, buildPrtXml, _mkFbGen, applyFbBox
+    _mkInput, _cinFinalize, buildPrtXml, _mkFbGen, applyFbBox, I18N: I18N_STUB
 };
 
 function baseParams(overrides) {
