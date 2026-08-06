@@ -170,27 +170,27 @@ for i: 1 thru ${wordCount} do (
         fb_ok: endcons(lbl, fb_ok)
       ) else if d = 1 then (
         score_cw: score_cw + 1/2,
-        fb_approx: endcons(sconcat(lbl, " : ", supcase(ans_c), " au lieu de ", all_ta[i]), fb_approx)
+        fb_approx: endcons(sconcat(lbl, " : ", supcase(ans_c), " ", ${JSON.stringify(I18N_D.t('cw.label_instead_of'))}, " ", all_ta[i]), fb_approx)
       ) else
         fb_wrong: endcons(sconcat(lbl, " -> ", all_ta[i]), fb_wrong)
     ) else
-      fb_wrong: endcons(sconcat(lbl, " (sans reponse) -> ", all_ta[i]), fb_wrong)
+      fb_wrong: endcons(sconcat(lbl, " (", ${JSON.stringify(I18N_D.t('cw.label_no_answer'))}, ") -> ", all_ta[i]), fb_wrong)
   )
 );
 score: score_cw / ${wordCount};
 fb_html: "<div style='margin-top:8px;font-size:.9rem;'>";
 if length(fb_ok) > 0 then (
-  fb_html: sconcat(fb_html, "<p style='color:#166534;margin:4px 0;'><strong>&#9989; Corrects (", string(length(fb_ok)), ") :</strong>"),
+  fb_html: sconcat(fb_html, "<p style='color:#166534;margin:4px 0;'><strong>&#9989; ", ${JSON.stringify(I18N_D.t('cw.label_corrects'))}, " (", string(length(fb_ok)), ") :</strong>"),
   for j: 1 thru length(fb_ok) do fb_html: sconcat(fb_html, " N&#176;", fb_ok[j]),
   fb_html: sconcat(fb_html, "</p>")
 );
 if length(fb_approx) > 0 then (
-  fb_html: sconcat(fb_html, "<p style='color:#854d0e;margin:4px 0;'><strong>&#9888; Proches - 1 lettre d'ecart (", string(length(fb_approx)), ") :</strong><ul style='margin:2px 0;padding-left:18px;'>"),
+  fb_html: sconcat(fb_html, "<p style='color:#854d0e;margin:4px 0;'><strong>&#9888; ", ${JSON.stringify(I18N_D.t('cw.label_proches'))}, " (", string(length(fb_approx)), ") :</strong><ul style='margin:2px 0;padding-left:18px;'>"),
   for j: 1 thru length(fb_approx) do fb_html: sconcat(fb_html, "<li>N&#176;", fb_approx[j], "</li>"),
   fb_html: sconcat(fb_html, "</ul></p>")
 );
 if length(fb_wrong) > 0 then (
-  fb_html: sconcat(fb_html, "<p style='color:#991b1b;margin:4px 0;'><strong>&#10060; Incorrects (", string(length(fb_wrong)), ") :</strong><ul style='margin:2px 0;padding-left:18px;'>"),
+  fb_html: sconcat(fb_html, "<p style='color:#991b1b;margin:4px 0;'><strong>&#10060; ", ${JSON.stringify(I18N_D.t('cw.label_incorrects'))}, " (", string(length(fb_wrong)), ") :</strong><ul style='margin:2px 0;padding-left:18px;'>"),
   for j: 1 thru length(fb_wrong) do fb_html: sconcat(fb_html, "<li>N&#176;", fb_wrong[j], "</li>"),
   fb_html: sconcat(fb_html, "</ul></p>")
 );
@@ -198,7 +198,7 @@ fb_html: sconcat(fb_html, "</div>");`;
 
     let prtMeta = { name: 'prt'+X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: prtFeedbackVariables+' ' };
     let canonicalNodes = [{
-        name: '0', description: 'Test tous les mots', answertest: 'AlgEquiv', sans: 'score', tans: '1',
+        name: '0', description: I18N_D.t('cw.node_desc_test_mots'), answertest: 'AlgEquiv', sans: 'score', tans: '1',
         testoptions: '', quiet: '0',
         truescoremode: '=', truescore: '1', truepenalty: '0', truenextnode: '-1',
         trueanswernote: 'PRT-'+X+'-1-T', truefeedback: `<p><strong>${I18N_D.t('cw.fb_ok')}</strong></p>{#fb_html#} `,

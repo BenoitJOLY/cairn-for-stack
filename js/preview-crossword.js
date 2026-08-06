@@ -11,7 +11,7 @@ function renderPreviewHTML_cw(state) {
         : '') +
       '</div>';
   } else {
-    gridHTML = '<p style="color:#475569;font-style:italic;margin-bottom:12px;">G\xe9n\xe9rez la grille dans l\'onglet Config pour afficher l\'aper\xe7u.</p>';
+    gridHTML = '<p style="color:#475569;font-style:italic;margin-bottom:12px;">' + I18N.t('cw.preview_gen_grid_hint') + '</p>';
   }
 
   var defsHTML = '';
@@ -19,12 +19,12 @@ function renderPreviewHTML_cw(state) {
     var horizWords = placedWords.filter(function(w){ return w.direction === 'H'; }).sort(function(a,b){ return a.number - b.number; });
     var vertWords  = placedWords.filter(function(w){ return w.direction === 'V'; }).sort(function(a,b){ return a.number - b.number; });
     if (horizWords.length > 0) {
-      defsHTML += '<p style="font-weight:700;margin:8px 0 4px;">Horizontal</p><ul style="padding-left:1.2em;margin:0 0 10px;">';
+      defsHTML += '<p style="font-weight:700;margin:8px 0 4px;">' + I18N.t('cw.horizontal') + '</p><ul style="padding-left:1.2em;margin:0 0 10px;">';
       horizWords.forEach(function(w){ defsHTML += '<li style="margin-bottom:3px;"><strong>' + w.number + '.</strong> ' + (w.def || '') + '</li>'; });
       defsHTML += '</ul>';
     }
     if (vertWords.length > 0) {
-      defsHTML += '<p style="font-weight:700;margin:8px 0 4px;">Vertical</p><ul style="padding-left:1.2em;margin:0 0 10px;">';
+      defsHTML += '<p style="font-weight:700;margin:8px 0 4px;">' + I18N.t('cw.vertical') + '</p><ul style="padding-left:1.2em;margin:0 0 10px;">';
       vertWords.forEach(function(w){ defsHTML += '<li style="margin-bottom:3px;"><strong>' + w.number + '.</strong> ' + (w.def || '') + '</li>'; });
       defsHTML += '</ul>';
     }
@@ -33,7 +33,7 @@ function renderPreviewHTML_cw(state) {
       state.rows.map(function(r){ return '<li><strong>' + (r.w||'').replace(/</g,'&lt;') + '</strong> — ' + (r.d||'') + '</li>'; }).join('') +
       '</ul>';
   } else {
-    defsHTML = '<p style="color:#475569;font-style:italic;">Ajoutez des mots pour afficher l\'aper\xe7u.</p>';
+    defsHTML = '<p style="color:#475569;font-style:italic;">' + I18N.t('cw.preview_add_words_hint') + '</p>';
   }
 
   // Feedback général : grille complétée (styles inline pour l'iframe) + réponses
@@ -62,18 +62,18 @@ function renderPreviewHTML_cw(state) {
     var horizFb = placedWords.filter(function(w){ return w.direction === 'H'; }).sort(function(a,b){ return a.number - b.number; });
     var vertFb  = placedWords.filter(function(w){ return w.direction === 'V'; }).sort(function(a,b){ return a.number - b.number; });
     if (horizFb.length > 0) {
-      fbGenContent += '<p style="font-weight:700;margin:6px 0 3px;">Horizontal</p><ul style="padding-left:1.2em;margin:0 0 8px;">';
+      fbGenContent += '<p style="font-weight:700;margin:6px 0 3px;">' + I18N.t('cw.horizontal') + '</p><ul style="padding-left:1.2em;margin:0 0 8px;">';
       horizFb.forEach(function(w){ fbGenContent += '<li><strong>' + w.number + '.</strong> ' + (w.word||'') + (w.def ? ' — ' + w.def : '') + '</li>'; });
       fbGenContent += '</ul>';
     }
     if (vertFb.length > 0) {
-      fbGenContent += '<p style="font-weight:700;margin:6px 0 3px;">Vertical</p><ul style="padding-left:1.2em;margin:0 0 8px;">';
+      fbGenContent += '<p style="font-weight:700;margin:6px 0 3px;">' + I18N.t('cw.vertical') + '</p><ul style="padding-left:1.2em;margin:0 0 8px;">';
       vertFb.forEach(function(w){ fbGenContent += '<li><strong>' + w.number + '.</strong> ' + (w.word||'') + (w.def ? ' — ' + w.def : '') + '</li>'; });
       fbGenContent += '</ul>';
     }
   }
   if (!fbGenContent) {
-    fbGenContent = '<p style="color:#475569;font-style:italic;">G\xe9n\xe9rez la grille pour afficher la solution.</p>';
+    fbGenContent = '<p style="color:#475569;font-style:italic;">' + I18N.t('cw.preview_gen_solution_hint') + '</p>';
   }
 
   return _hsSimplePreviewHTML({
@@ -85,7 +85,7 @@ function renderPreviewHTML_cw(state) {
     fbOk: '', fbWrong: '', fbGen: state.fbGen
   });
   } catch(e) {
-    return '<html><body style="font-family:sans-serif;padding:12px;color:#dc2626;"><strong>Erreur aperçu mots croisés :</strong><pre style="font-size:.8rem;white-space:pre-wrap;">' + String(e) + '</pre></body></html>';
+    return '<html><body style="font-family:sans-serif;padding:12px;color:#dc2626;"><strong>' + I18N.t('cw.preview_render_error') + '</strong><pre style="font-size:.8rem;white-space:pre-wrap;">' + String(e) + '</pre></body></html>';
   }
 }
 window.cwRefreshPreview = _hsWireSimplePreview('crossword', 'cw', 'cw-preview-container', 'fp-crossword', renderPreviewHTML_cw);
