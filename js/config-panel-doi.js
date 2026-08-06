@@ -22,9 +22,9 @@ function restoreState_doi(s) {
 
 function resetForm_doi() {
       document.getElementById('doi-objects-list').innerHTML='';
-      if(typeof doiAddRow==='function')doiAddRow('Terre','gravitationnel');
+      if(typeof doiAddRow==='function')doiAddRow(I18N.t('doi.default_obj_terre'),'gravitationnel');
       setRichVal('doi-text','');
-      document.getElementById('doi-main-obj').value='Système';document.getElementById('doi-extra').value='1';
+      document.getElementById('doi-main-obj').value=I18N.t('doi.default_main_obj_generic');document.getElementById('doi-extra').value='1';
       var _doifbGen=document.getElementById('doi-fbgen');if(_doifbGen)_doifbGen.value='';
       if(typeof doiRefresh==='function')doiRefresh();
 }

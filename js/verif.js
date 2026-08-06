@@ -628,11 +628,11 @@ function verifBuildInterface(xmlDoc, tags, qName, qData, previewText) {
         window._doiInteractiveBlock = interactiveMatch ? interactiveMatch[1] : '';
         if (doiQ.rawConfig && doiQ.rawConfig.objects) {
             doiQ._previewAfter = `<div contenteditable="false" style="margin-top:10px;">` +
-                `<div style="margin-bottom:8px;text-align:center;padding:8px;background:#f8fafc;border:2px dashed #cbd5e1;border-radius:8px;"><div style="color:#64748b;font-weight:bold;margin-bottom:6px;">Étiquettes :</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">` +
+                `<div style="margin-bottom:8px;text-align:center;padding:8px;background:#f8fafc;border:2px dashed #cbd5e1;border-radius:8px;"><div style="color:#64748b;font-weight:bold;margin-bottom:6px;">${I18N.t('doi.etiquettes_lbl')}</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">` +
                 (doiQ.rawConfig.mainObj ? `<div style="background:#EC4899;color:white;padding:6px 12px;border-radius:4px;font-weight:bold;">${doiQ.rawConfig.mainObj}</div>` : '') +
                 doiQ.rawConfig.objects.map(o=>`<div style="background:${o.type==='intrus'?'#94a3b8':'#3B82F6'};color:white;padding:6px 12px;border-radius:4px;font-weight:bold;">${o.name}</div>`).join('') +
                 `</div></div>` +
-                `<div style="text-align:center;padding:10px;background:#f0f9ff;border:1px dashed #bae6fd;border-radius:8px;"><div style="font-size:.75rem;font-weight:700;color:#475569;margin-bottom:8px;">🕸️ Diagramme Objet-Interaction (Énoncé)</div>${window.genDOIEmptyPreviewImage?window.genDOIEmptyPreviewImage(doiQ.rawConfig):'<div style="color:#94a3b8;font-style:italic;">Aperçu non disponible</div>'}</div>` +
+                `<div style="text-align:center;padding:10px;background:#f0f9ff;border:1px dashed #bae6fd;border-radius:8px;"><div style="font-size:.75rem;font-weight:700;color:#475569;margin-bottom:8px;">🕸️ ${I18N.t('doi.apercu_enonce_titre')}</div>${window.genDOIEmptyPreviewImage?window.genDOIEmptyPreviewImage(doiQ.rawConfig):'<div style="color:#94a3b8;font-style:italic;">' + I18N.t('doi.apercu_non_disponible') + '</div>'}</div>` +
                 `</div>`;
         }
     }

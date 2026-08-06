@@ -1232,17 +1232,17 @@ window.nucRefreshPreview = _hsWireSimplePreview('nuclear', 'nuc', 'nuc-preview-c
 function renderPreviewHTML_doi(state) {
   var imgHTML = (typeof genDOIStudentPreviewHTML === 'function')
     ? genDOIStudentPreviewHTML()
-    : '<p style="color:#94a3b8;font-style:italic;">Ajoutez des objets dans l\'onglet Config pour afficher l\'aperçu.</p>';
+    : '<p style="color:#94a3b8;font-style:italic;">' + I18N.t('doi.preview_no_objects') + '</p>';
   var realParts = {};
   try { realParts = (typeof genDOICore === 'function' && typeof _doiBuildParams === 'function') ? genDOICore(1, _doiBuildParams()) : {}; } catch (e) { realParts = {}; }
   return _hsSimplePreviewHTML({
     badge: I18N.t('badge.doi'), badgeColor: '#78716c', noteBg: '#fafaf9', noteColor: '#57534e',
     prefix: 'doi', bareme: state.bareme || 2,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : placer les objets et interactions dans les zones bleues.</em></p>'),
+    text: _hsRenderMath(state.text || '<p><em>' + I18N.t('doi.preview_auto_statement') + '</em></p>'),
     exampleHTML: imgHTML,
     exampleLabel: '',
     fbOk: '', fbWrong: '',
-    fbGenAuto: realParts.correctionImg || '<p style="color:#94a3b8;font-style:italic;">Ajoutez des objets dans l\'onglet Config pour afficher le schéma de correction.</p>',
+    fbGenAuto: realParts.correctionImg || '<p style="color:#94a3b8;font-style:italic;">' + I18N.t('doi.preview_no_objects_correction') + '</p>',
     fbGen: state.fbGen,
     extraFeedbackNodes: (realParts.diagNodes || []).map(function(n) {
       return { desc: n.desc, fb: n.fb };

@@ -6,9 +6,9 @@ function doiInitUI(){
     const list = document.getElementById('doi-objects-list');
     list.innerHTML = '';
     // Ajout d'objets par défaut
-    doiAddRow('Terre', 'gravitationnel');
-    doiAddRow('Air', 'contact');
-    doiAddRow('Tremplin', 'intrus');
+    doiAddRow(I18N.t('doi.default_obj_terre'), 'gravitationnel');
+    doiAddRow(I18N.t('doi.default_obj_air'), 'contact');
+    doiAddRow(I18N.t('doi.default_obj_tremplin'), 'intrus');
     doiRefresh();
 }
 
@@ -45,9 +45,9 @@ function doiDrawPreview(){
     const canvas = document.getElementById('doi-canvas');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    const mainObj = document.getElementById('doi-main-obj').value || "Système";
+    const mainObj = document.getElementById('doi-main-obj').value || I18N.t('doi.default_main_obj_generic');
     const extraZones = parseInt(document.getElementById('doi-extra').value) || 0;
-    
+
     const rows = document.querySelectorAll('.doi-obj-row');
     const objects = [];
     rows.forEach(r => {
@@ -135,13 +135,13 @@ function genDOIEmptyPreviewImage(config = null) {
     let mainObj, extraZones, objects;
 
     if (config) {
-        mainObj = config.mainObj || "System";
+        mainObj = config.mainObj || I18N.t('doi.default_main_obj_generic');
         extraZones = config.extraZones || 0;
         objects = config.objects || [];
     } else {
         const mainObjInput = document.getElementById('doi-main-obj');
         const extraZonesInput = document.getElementById('doi-extra');
-        mainObj = mainObjInput ? mainObjInput.value : "Système";
+        mainObj = mainObjInput ? mainObjInput.value : I18N.t('doi.default_main_obj_generic');
         extraZones = extraZonesInput ? parseInt(extraZonesInput.value) : 0;
         const rows = document.querySelectorAll('.doi-obj-row');
         objects = [];
@@ -184,7 +184,7 @@ function genDOIEmptyPreviewImage(config = null) {
     c.fillStyle = '#EC4899'; c.globalAlpha = 0.1; c.fill(); c.globalAlpha = 1;
     c.strokeStyle = '#EC4899'; c.lineWidth = 2; c.stroke();
     c.fillStyle = '#1e293b'; c.font = 'bold 15px Arial'; c.textAlign = 'center';
-    c.fillText('Zone de dépôt', centerX, centerY + 5);
+    c.fillText(I18N.t('doi.zone_depot'), centerX, centerY + 5);
     const centerAnchors = [
         { x: centerX, y: centerY - cRy }, { x: centerX - cRx, y: centerY },
         { x: centerX + cRx, y: centerY }, { x: centerX, y: centerY + cRy }
@@ -201,7 +201,7 @@ function genDOIEmptyPreviewImage(config = null) {
         c.fillStyle = '#3B82F6'; c.globalAlpha = 0.1; c.fill(); c.globalAlpha = 1;
         c.strokeStyle = '#3B82F6'; c.lineWidth = 2; c.stroke();
         c.fillStyle = '#1e293b'; c.font = 'bold 15px Arial'; c.textAlign = 'center';
-        c.fillText('Zone de dépôt', bx, by + 5);
+        c.fillText(I18N.t('doi.zone_depot'), bx, by + 5);
 
         const pX = Math.round(bx - bRx * Math.cos(angle));
         const pY = Math.round(by - bRy * Math.sin(angle));
@@ -230,17 +230,17 @@ function genDOIStudentPreviewHTML(config = null) {
 
     return `
 <div style="background: #E0F2FE; border-left: 4px solid #0284C7; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
-<p style="margin: 0 0 10px 0; font-weight: bold;">Consigne :</p>
+<p style="margin: 0 0 10px 0; font-weight: bold;">${I18N.t('doi.consigne_titre')}</p>
 <ul style="margin: 0; padding-left: 20px;">
-<li>Glissez l'étiquette du <strong>système étudié</strong> dans la zone <strong>rouge</strong>.</li>
-<li>Glissez les étiquettes des <strong>objets en interaction</strong> dans les zones <strong>bleues</strong> (il n'est pas obligatoire de toutes les remplir).</li>
-<li>Les intrus doivent être placés dans la <strong>zone grise</strong> en bas.</li>
-<li>Reliez les points d'ancrage (●) selon le type d'interaction.</li>
+<li>${I18N.t('doi.consigne_systeme')}</li>
+<li>${I18N.t('doi.consigne_interagissants')}</li>
+<li>${I18N.t('doi.consigne_intrus')}</li>
+<li>${I18N.t('doi.consigne_ancrage')}</li>
 </ul>
 </div>
 <div style="margin-bottom: 15px; text-align: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
-<label style="margin-right: 20px; font-weight: bold;"><input style="margin-right: 5px;" checked disabled type="radio"> Interaction de contact (→)</label>
-<label style="font-weight: bold;"><input style="margin-right: 5px;" disabled type="radio"> Interaction à distance (⇢)</label>
+<label style="margin-right: 20px; font-weight: bold;"><input style="margin-right: 5px;" checked disabled type="radio"> ${I18N.t('doi.radio_contact')}</label>
+<label style="font-weight: bold;"><input style="margin-right: 5px;" disabled type="radio"> ${I18N.t('doi.radio_distance')}</label>
 </div>
 <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; padding: 15px; background: #fff; border: 2px dashed #cbd5e1; border-radius: 8px; flex-wrap: wrap;">${chipsHTML}</div>
 ${genDOIEmptyPreviewImage(config)}`;
@@ -260,7 +260,7 @@ function genDOIFullPreviewImage(config = null) {
         const mainObjInput = document.getElementById('doi-main-obj');
         const extraZonesInput = document.getElementById('doi-extra');
         
-        mainObj = mainObjInput ? mainObjInput.value : "Système";
+        mainObj = mainObjInput ? mainObjInput.value : I18N.t('doi.default_main_obj_generic');
         extraZones = extraZonesInput ? parseInt(extraZonesInput.value) : 0;
         
         const rows = document.querySelectorAll('.doi-obj-row');
@@ -358,7 +358,7 @@ function genDOIFullPreviewImage(config = null) {
 
             drawArrow(closestAnc, { x: pX, y: pY }, color, arrowType === 'dashed');
         } else {
-            c.fillStyle = '#1e293b'; c.fillText('Zone de dépôt', bx, by + 5);
+            c.fillStyle = '#1e293b'; c.fillText(I18N.t('doi.zone_depot'), bx, by + 5);
         }
     }
 
@@ -374,7 +374,7 @@ function genDOIFullPreviewImage(config = null) {
         c.fill();
     });
 
-    return `<img src="${cvs.toDataURL('image/png')}" alt="Correction DOI" style="display:block; margin:0 auto; border-radius:8px; border:1px solid #cbd5e1; max-width:100%; height:auto;">`;
+    return `<img src="${cvs.toDataURL('image/png')}" alt="${I18N.t('doi.correction_img_alt')}" style="display:block; margin:0 auto; border-radius:8px; border:1px solid #cbd5e1; max-width:100%; height:auto;">`;
 }
 
 // ════════════════════════════════════════════════════════════════════════════════════
@@ -388,7 +388,7 @@ function genDOIFullPreviewImage(config = null) {
 function _doiBuildParams(){
     const bareme = parseFloat(document.getElementById('doi-bareme').value) || 2;
     const text = richVal('doi-text');
-    const mainObj = document.getElementById('doi-main-obj').value || "Système";
+    const mainObj = document.getElementById('doi-main-obj').value || I18N.t('doi.default_main_obj_generic');
     const extraZones = parseInt(document.getElementById('doi-extra').value) || 0;
 
     const rows = document.querySelectorAll('.doi-obj-row');
@@ -434,6 +434,7 @@ async function genDOI(X){
 function genDOICore(X, p, deps){
     deps = deps || {};
     const mkFbGen_D = deps._mkFbGen || _mkFbGen;
+    const I18N_D = deps.I18N || I18N;
 
     const bareme = p.bareme, text = p.text, mainObj = p.mainObj, extraZones = p.extraZones;
     const objects = p.objects, rawConfig = p.rawConfig, correctionImg = p.correctionImg, fbGen = p.fbGen;
@@ -577,7 +578,7 @@ function genDOICore(X, p, deps){
     ctx.globalAlpha = 1; ctx.strokeStyle = binZone.color; ctx.setLineDash([5, 5]); ctx.strokeRect(binZone.x, binZone.y, binZone.w, binZone.h); ctx.setLineDash([]);
     ctx.fillStyle = '#475569'; ctx.textAlign = 'center'; ctx.font = '14px Arial';
     if(placements.poubelle) ctx.fillText(placements.poubelle.join(', '), 460, binZone.y + 30);
-    ctx.font = 'bold 14px Arial'; ctx.fillText("Objet(s) hors système étudié (intrus)", 460, binZone.y + binZone.h + 20);
+    ctx.font = 'bold 14px Arial'; ctx.fillText(${JSON.stringify(I18N_D.t('tpl.doi_hors_systeme'))}, 460, binZone.y + binZone.h + 20);
 
     arrows.forEach(a => drawArrow(a.fP, a.tP, a.type, a.type === 'solid' ? '#B59600' : '#007F7F'));
     if (currentDrag) drawArrow(dragStart.pos, currentDrag.to, document.querySelector('input[name="arrowType"]:checked').value, '#fbbf24');
@@ -586,7 +587,7 @@ function genDOICore(X, p, deps){
       ctx.beginPath(); ctx.ellipse(o.x, o.y, o.rx, o.ry, 0, 0, 2 * Math.PI);
       ctx.fillStyle = o.color; ctx.globalAlpha = 0.1; ctx.fill(); ctx.globalAlpha = 1;
       ctx.strokeStyle = o.color; ctx.lineWidth = 2; ctx.stroke();
-      ctx.fillStyle = '#1e293b'; ctx.font = 'bold 15px Arial'; ctx.fillText(placements[k] || 'Zone de dépôt', o.x, o.y + 5);
+      ctx.fillStyle = '#1e293b'; ctx.font = 'bold 15px Arial'; ctx.fillText(placements[k] || ${JSON.stringify(I18N_D.t('doi.zone_depot'))}, o.x, o.y + 5);
       const drawAnc = (p, owner) => {
         ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI);
         ctx.fillStyle = usedAnchors.has(owner+'_'+p.x+'_'+p.y) ? '#9ca3af' : '#000';
@@ -693,23 +694,23 @@ function genDOICore(X, p, deps){
 
     // --- 4. HTML CONTAINER ---
     // Les marqueurs délimitent la partie éditable (énoncé + consigne) de la partie interactive (canvas/script)
-    const textFrag = `<div style="background:#ADA762;border-left:5px solid #7a7540;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#1e293b;font-size:.95rem;">Q${X} — DOI</strong><span style="background:#7a7540;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span><span style="background:#fff;color:#7a7540;border:1px solid #7a7540;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🕸️ Diagramme</span></div><!-- ENONCE-START --><div style="margin-bottom:14px;">${text || ''}</div>
+    const textFrag = `<div style="background:#ADA762;border-left:5px solid #7a7540;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#1e293b;font-size:.95rem;">Q${X} — DOI</strong><span style="background:#7a7540;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ${bareme} pt</span><span style="background:#fff;color:#7a7540;border:1px solid #7a7540;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🕸️ ${I18N_D.t('doi.banniere_type')}</span></div><!-- ENONCE-START --><div style="margin-bottom:14px;">${text || ''}</div>
 <div style="background: #E0F2FE; border-left: 4px solid #0284C7; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
-<p style="margin: 0 0 10px 0; font-weight: bold;">Consigne :</p>
+<p style="margin: 0 0 10px 0; font-weight: bold;">${I18N_D.t('doi.consigne_titre')}</p>
 <ul style="margin: 0; padding-left: 20px;">
-<li>Glissez l'étiquette du <strong>système étudié</strong> dans la zone <strong>rouge</strong>.</li>
-<li>Glissez les étiquettes des <strong>objets en interaction</strong> dans les zones <strong>bleues</strong> (il n'est pas obligatoire de toutes les remplir).</li>
-<li>Les intrus doivent être placés dans la <strong>zone grise</strong> en bas.</li>
-<li>Reliez les points d'ancrage (●) selon le type d'interaction.</li>
+<li>${I18N_D.t('doi.consigne_systeme')}</li>
+<li>${I18N_D.t('doi.consigne_interagissants')}</li>
+<li>${I18N_D.t('doi.consigne_intrus')}</li>
+<li>${I18N_D.t('doi.consigne_ancrage')}</li>
 </ul>
 </div><!-- ENONCE-END -->
 <div id="doi-container" style="max-width: 920px; margin: 0 auto; font-family: Arial, sans-serif; background: #f8fafc; padding: 20px; border-radius: 10px;">
 <div style="margin-bottom: 20px; text-align: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
 <label style="margin-right: 20px; font-weight: bold; cursor: pointer;">
-  <input style="margin-right: 5px;" checked="checked" name="arrowType" type="radio" value="solid"> Interaction de contact (→) 
-</label> 
+  <input style="margin-right: 5px;" checked="checked" name="arrowType" type="radio" value="solid"> ${I18N_D.t('doi.radio_contact')}
+</label>
 <label style="font-weight: bold; cursor: pointer;">
-  <input style="margin-right: 5px;" name="arrowType" type="radio" value="dashed"> Interaction à distance (⇢) 
+  <input style="margin-right: 5px;" name="arrowType" type="radio" value="dashed"> ${I18N_D.t('doi.radio_distance')}
 </label>
 </div>
 <div id="draggables" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; padding: 15px; background: #fff; border: 2px dashed #cbd5e1; border-radius: 8px; flex-wrap: wrap;"></div>
@@ -751,7 +752,7 @@ test_distance: is(ssearch("dashed", ans${X}) # false);]]></text>
       </feedbackvariables>
       <node>
         <name>0</name>
-        <description>Système</description>
+        <description>${I18N_D.t('doi.node_systeme')}</description>
         <answertest>AlgEquiv</answertest>
         <sans>test_systeme</sans>
         <tans>true</tans>
@@ -762,17 +763,17 @@ test_distance: is(ssearch("dashed", ans${X}) # false);]]></text>
         <truepenalty></truepenalty>
         <truenextnode>1</truenextnode>
         <trueanswernote>PRT-${X}-0-T</trueanswernote>
-        <truefeedback format="html"><text><![CDATA[<p>L'objet d'étude est bien placé.</p>]]></text></truefeedback>
+        <truefeedback format="html"><text><![CDATA[${I18N_D.t('doi.fb_systeme_ok')}]]></text></truefeedback>
         <falsescoremode>-</falsescoremode>
         <falsescore>0</falsescore>
         <falsepenalty></falsepenalty>
         <falsenextnode>-1</falsenextnode>
         <falseanswernote>PRT-${X}-0-F</falseanswernote>
-        <falsefeedback format="html"><text><![CDATA[<p>L'objet d'étude est incorrect.</p>]]></text></falsefeedback>
+        <falsefeedback format="html"><text><![CDATA[${I18N_D.t('doi.fb_systeme_ko')}]]></text></falsefeedback>
       </node>
       <node>
         <name>1</name>
-        <description>Objets Interagissants</description>
+        <description>${I18N_D.t('doi.node_objets')}</description>
         <answertest>AlgEquiv</answertest>
         <sans>test_objs</sans>
         <tans>true</tans>
@@ -783,17 +784,17 @@ test_distance: is(ssearch("dashed", ans${X}) # false);]]></text>
         <truepenalty></truepenalty>
         <truenextnode>2</truenextnode>
         <trueanswernote>PRT-${X}-1-T</trueanswernote>
-        <truefeedback format="html"><text><![CDATA[<p>Les objets interagissants sont bien placés.</p>]]></text></truefeedback>
+        <truefeedback format="html"><text><![CDATA[${I18N_D.t('doi.fb_objets_ok')}]]></text></truefeedback>
         <falsescoremode>-</falsescoremode>
         <falsescore>0</falsescore>
         <falsepenalty></falsepenalty>
         <falsenextnode>-1</falsenextnode>
         <falseanswernote>PRT-${X}-1-F</falseanswernote>
-        <falsefeedback format="html"><text><![CDATA[<p>Erreur sur le placement des objets interagissants.</p>]]></text></falsefeedback>
+        <falsefeedback format="html"><text><![CDATA[${I18N_D.t('doi.fb_objets_ko')}]]></text></falsefeedback>
       </node>
       <node>
         <name>2</name>
-        <description>Flèches Contact</description>
+        <description>${I18N_D.t('doi.node_fleches_contact')}</description>
         <answertest>AlgEquiv</answertest>
         <sans>test_contact</sans>
         <tans>true</tans>
@@ -804,13 +805,13 @@ test_distance: is(ssearch("dashed", ans${X}) # false);]]></text>
         <truepenalty></truepenalty>
         <truenextnode>-1</truenextnode>
         <trueanswernote>PRT-${X}-2-T</trueanswernote>
-        <truefeedback format="html"><text><![CDATA[<p>Les flèches de contact sont correctes.</p>]]></text></truefeedback>
+        <truefeedback format="html"><text><![CDATA[${I18N_D.t('doi.fb_contact_ok')}]]></text></truefeedback>
         <falsescoremode>-</falsescoremode>
         <falsescore>0</falsescore>
         <falsepenalty></falsepenalty>
         <falsenextnode>-1</falsenextnode>
         <falseanswernote>PRT-${X}-2-F</falseanswernote>
-        <falsefeedback format="html"><text><![CDATA[<p>Vérifiez vos interactions de contact.</p>]]></text></falsefeedback>
+        <falsefeedback format="html"><text><![CDATA[${I18N_D.t('doi.fb_contact_ko')}]]></text></falsefeedback>
       </node>
     </prt>`;
 
@@ -830,7 +831,7 @@ test_distance: is(ssearch("dashed", ans${X}) # false);]]></text>
       </feedbackvariables>
       <node>
         <name>0</name>
-        <description>Intrus</description>
+        <description>${I18N_D.t('doi.node_intrus')}</description>
         <answertest>AlgEquiv</answertest>
         <sans>all_intrus_ok</sans>
         <tans>true</tans>
@@ -841,22 +842,22 @@ test_distance: is(ssearch("dashed", ans${X}) # false);]]></text>
         <truepenalty></truepenalty>
         <truenextnode>-1</truenextnode>
         <trueanswernote>PRT-${X}-2-T</trueanswernote>
-        <truefeedback format="html"><text><![CDATA[<p>Les intrus sont correctement identifiés.</p>]]></text></truefeedback>
+        <truefeedback format="html"><text><![CDATA[${I18N_D.t('doi.fb_intrus_ok')}]]></text></truefeedback>
         <falsescoremode>-</falsescoremode>
         <falsescore>0</falsescore>
         <falsepenalty></falsepenalty>
         <falsenextnode>-1</falsenextnode>
         <falseanswernote>PRT-${X}-2-F</falseanswernote>
-        <falsefeedback format="html"><text><![CDATA[<p>Erreur sur les intrus.</p>]]></text></falsefeedback>
+        <falsefeedback format="html"><text><![CDATA[${I18N_D.t('doi.fb_intrus_ko')}]]></text></falsefeedback>
       </node>
     </prt>`;
 
     // Feedbacks par nœud (description + feedback vrai/faux), pour l'aperçu enseignant
     const diagNodes = [
-        { desc: 'Système', fb: `<p>L'objet d'étude est bien placé.</p>`, falseFb: `<p>L'objet d'étude est incorrect.</p>` },
-        { desc: 'Objets Interagissants', fb: `<p>Les objets interagissants sont bien placés.</p>`, falseFb: `<p>Erreur sur le placement des objets interagissants.</p>` },
-        { desc: 'Flèches Contact', fb: `<p>Les flèches de contact sont correctes.</p>`, falseFb: `<p>Vérifiez vos interactions de contact.</p>` },
-        { desc: 'Intrus', fb: `<p>Les intrus sont correctement identifiés.</p>`, falseFb: `<p>Erreur sur les intrus.</p>` }
+        { desc: I18N_D.t('doi.node_systeme'), fb: I18N_D.t('doi.fb_systeme_ok'), falseFb: I18N_D.t('doi.fb_systeme_ko') },
+        { desc: I18N_D.t('doi.node_objets'), fb: I18N_D.t('doi.fb_objets_ok'), falseFb: I18N_D.t('doi.fb_objets_ko') },
+        { desc: I18N_D.t('doi.node_fleches_contact'), fb: I18N_D.t('doi.fb_contact_ok'), falseFb: I18N_D.t('doi.fb_contact_ko') },
+        { desc: I18N_D.t('doi.node_intrus'), fb: I18N_D.t('doi.fb_intrus_ok'), falseFb: I18N_D.t('doi.fb_intrus_ko') }
     ];
 
     return {
