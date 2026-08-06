@@ -3553,6 +3553,8 @@ I18N.add("nl", {
   "nuc.preview_example_label": "Wat de leerling ziet (leeg invoerveld, stelt zelf de reactie samen):",
   "nuc.preview_editor_placeholder": "(de leerling schrijft hier zijn reactie — er is geen reactie vooraf ingevuld)",
   "ab.preview_prt_feedback_title": "PRT-feedback (in evaluatievolgorde):",
+  "ab.preview_statement_placeholder": "Automatische opgave: pH-titratie.",
+  "ab.preview_sim_visual_only_warning": "⚠️ Voorbeeld — de simulatie hieronder is alleen visueel: interacties (klikken, slepen, invoer) tellen hier niet mee voor de score. De echte correctie gebeurt in Moodle.",
   "cir.preview_no_model_placeholder": "Bouw hiernaast een modelschakeling in de werkplaats om de leerlingvoorvertoning te zien.",
   "common.preview_jsxgraph_error_prefix": "JSXGraph-fout: ",
   "common.preview_if_correct": "Indien correct",

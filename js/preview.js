@@ -833,7 +833,7 @@ function renderPreviewHTML_acideBase(state) {
     .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled aria-hidden="true" style="' + fakeInputStyle + '">')
     .replace(/\[\[validation:[^\]]+\]\]/g, '');
   var scenarioParts = bodyFrag.split('<!--HS-AB-GRAPHIC-->');
-  var textBefore = scenarioParts[0] ? _hsRenderMath(scenarioParts[0]) : '<p><em>Énoncé automatique : titrage pH-métrique.</em></p>';
+  var textBefore = scenarioParts[0] ? _hsRenderMath(scenarioParts[0]) : '<p><em>' + I18N.t('ab.preview_statement_placeholder') + '</em></p>';
   var textAfter = scenarioParts[1] ? _hsRenderMath(scenarioParts[1]) : '';
 
   var abMethod = realParts.abMethod || 'colorimetrie';
@@ -870,7 +870,7 @@ function renderPreviewHTML_acideBase(state) {
       + '<script>(function(){ try { var divid = ' + JSON.stringify(boardId) + '; ' + jsBody + ' } catch(e){ var el=document.getElementById(' + JSON.stringify(boardId) + '); if(el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">" + ' + JSON.stringify(I18N.t('common.preview_jsxgraph_error_prefix')) + ' + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; console.error(e); } })();<\/script>';
   }
   if (textAfter) exampleHTML += '<div style="margin-top:10px;">' + textAfter + '</div>';
-  exampleHTML = '<div style="background:#fef9c3;border:1px solid #eab308;color:#713f12;font-size:.78rem;padding:6px 10px;border-radius:6px;margin-bottom:10px;">⚠️ Aperçu — la simulation ci-dessous est visuelle uniquement : les interactions (clics, glisser, saisie) ne sont pas prises en compte dans le calcul du score ici. La correction réelle se fait dans Moodle.</div>' + exampleHTML;
+  exampleHTML = '<div style="background:#fef9c3;border:1px solid #eab308;color:#713f12;font-size:.78rem;padding:6px 10px;border-radius:6px;margin-bottom:10px;">' + I18N.t('ab.preview_sim_visual_only_warning') + '</div>' + exampleHTML;
 
   return _hsSimplePreviewHTML({
     badge: I18N.t('type.acide-base'), badgeColor: '#15803d', noteBg: '#d1fae5', noteColor: '#065f46',

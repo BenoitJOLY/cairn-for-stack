@@ -3552,6 +3552,8 @@ I18N.add("fr", {
   "nuc.preview_example_label": "Ce que voit l'élève (zone de saisie vide, il compose sa propre réaction) :",
   "nuc.preview_editor_placeholder": "(l'élève écrit ici sa réaction — aucune réaction n'est pré-remplie)",
   "ab.preview_prt_feedback_title": "Feedbacks du PRT (dans l'ordre d'évaluation) :",
+  "ab.preview_statement_placeholder": "Énoncé automatique : titrage pH-métrique.",
+  "ab.preview_sim_visual_only_warning": "⚠️ Aperçu — la simulation ci-dessous est visuelle uniquement : les interactions (clics, glisser, saisie) ne sont pas prises en compte dans le calcul du score ici. La correction réelle se fait dans Moodle.",
   "cir.preview_no_model_placeholder": "Construisez un circuit modèle dans l'atelier ci-contre pour voir l'aperçu élève.",
   "common.preview_jsxgraph_error_prefix": "Erreur JSXGraph : ",
   "common.preview_if_correct": "Si correct",

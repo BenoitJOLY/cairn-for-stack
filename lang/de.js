@@ -3553,6 +3553,8 @@ I18N.add("de", {
   "nuc.preview_example_label": "Was der Schüler sieht (leeres Eingabefeld, er stellt seine eigene Reaktion zusammen):",
   "nuc.preview_editor_placeholder": "(der Schüler schreibt hier seine Reaktion — keine Reaktion ist vorausgefüllt)",
   "ab.preview_prt_feedback_title": "PRT-Rückmeldungen (in Auswertungsreihenfolge):",
+  "ab.preview_statement_placeholder": "Automatische Aufgabe: pH-Titration.",
+  "ab.preview_sim_visual_only_warning": "⚠️ Vorschau — die Simulation unten dient nur zur Veranschaulichung: Interaktionen (Klicks, Ziehen, Eingabe) werden hier bei der Bewertung nicht berücksichtigt. Die eigentliche Korrektur erfolgt in Moodle.",
   "cir.preview_no_model_placeholder": "Bauen Sie im Werkstatt-Panel nebenan eine Modellschaltung, um die Schülervorschau zu sehen.",
   "common.preview_jsxgraph_error_prefix": "JSXGraph-Fehler: ",
   "common.preview_if_correct": "Falls richtig",

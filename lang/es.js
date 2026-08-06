@@ -3553,6 +3553,8 @@ I18N.add("es", {
   "nuc.preview_example_label": "Lo que ve el alumno (zona de escritura vacía, compone su propia reacción):",
   "nuc.preview_editor_placeholder": "(el alumno escribe aquí su reacción — no hay ninguna reacción precargada)",
   "ab.preview_prt_feedback_title": "Comentarios del PRT (en orden de evaluación):",
+  "ab.preview_statement_placeholder": "Enunciado automático: valoración pH-métrica.",
+  "ab.preview_sim_visual_only_warning": "⚠️ Vista previa — la simulación de abajo es solo visual: las interacciones (clics, arrastrar, entrada) no se tienen en cuenta aquí para el cálculo de la puntuación. La corrección real se realiza en Moodle.",
   "cir.preview_no_model_placeholder": "Construye un circuito modelo en el taller de al lado para ver la vista previa del alumno.",
   "common.preview_jsxgraph_error_prefix": "Error de JSXGraph: ",
   "common.preview_if_correct": "Si es correcto",

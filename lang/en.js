@@ -3549,6 +3549,8 @@ I18N.add("en", {
   "nuc.preview_example_label": "What the student sees (empty input area, they compose their own reaction):",
   "nuc.preview_editor_placeholder": "(the student writes their reaction here — no reaction is pre-filled)",
   "ab.preview_prt_feedback_title": "PRT feedbacks (in evaluation order):",
+  "ab.preview_statement_placeholder": "Automatic statement: pH titration.",
+  "ab.preview_sim_visual_only_warning": "⚠️ Preview — the simulation below is visual only: interactions (clicks, dragging, input) are not taken into account for scoring here. Actual grading happens in Moodle.",
   "cir.preview_no_model_placeholder": "Build a model circuit in the workshop opposite to see the student preview.",
   "common.preview_jsxgraph_error_prefix": "JSXGraph error: ",
   "common.preview_if_correct": "If correct",
