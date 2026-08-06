@@ -82,8 +82,8 @@ function _strBuildParams(X){
   const ansPlain=ansRich.replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
   document.getElementById('str-ans').value=ansPlain;
   const size=v('str-size'),test=v('str-test');
-  const fbc=resolveFb('str-fbc',FB_JUSTE_DEFAULT);
-  const fbe=resolveFb('str-fbe',FB_FAUX_DEFAULT);
+  const fbc=resolveFb('str-fbc',FB_JUSTE_DEFAULT());
+  const fbe=resolveFb('str-fbe',FB_FAUX_DEFAULT());
   const fbGen=resolveFb('str-fbgen','');
   const sol=richVal('str-sol');
   const aideOn=document.getElementById('str-aide-on').checked;

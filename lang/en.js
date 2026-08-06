@@ -85,6 +85,8 @@ I18N.add("en", {
   "dlg.img_remove":      "Remove",
 
   /* ── Boilerplate shared across question panels ── */
+  "common.fb_default_juste":      "<p>✅ <strong>Correct answer!</strong></p>",
+  "common.fb_default_faux":       "<p>❌ <strong>Incorrect answer.</strong> Check your reasoning and try again.</p>",
   "common.tab_config":            "Config",
   "common.tab_fbgen":             "General feedback",
   "common.editor_btn":            "Editor",

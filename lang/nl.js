@@ -87,6 +87,8 @@ I18N.add("nl", {
   "dlg.img_remove":      "VERWIJDEREN",
 
   /* ── Boilerplate commun aux panneaux de question ── */
+  "common.fb_default_juste":      "<p>✅ <strong>Juist antwoord!</strong></p>",
+  "common.fb_default_faux":       "<p>❌ <strong>Onjuist antwoord.</strong> Controleer uw redenering en probeer opnieuw.</p>",
   "common.tab_config":            "Configuratie",
   "common.tab_fbgen":             "Algemene feedback",
   "common.editor_btn":            "Editor",

@@ -66,9 +66,9 @@ function renderPreviewHTML_algebraic(state) {
   // state.realFbWrongHTML : HTML du nœud PRT réellement déclenché par une réponse
   // fausse (sonde), déjà encadré côté serveur (applyFbBox_D appliqué dans
   // genAlgebraicCore avant export) — pas de wrapFb() local dans ce cas.
-  const fbWrongBody = state.realFbWrongHTML || wrapFb(_hsRenderMath(state.fbe || FB_FAUX_DEFAULT), false);
+  const fbWrongBody = state.realFbWrongHTML || wrapFb(_hsRenderMath(state.fbe || FB_FAUX_DEFAULT()), false);
   const fbGlobalHTML = `
-    <div data-alg-field="fbc">${wrapFb(_hsRenderMath(state.fbc || FB_JUSTE_DEFAULT), true)}</div>
+    <div data-alg-field="fbc">${wrapFb(_hsRenderMath(state.fbc || FB_JUSTE_DEFAULT()), true)}</div>
     <div data-alg-field="fbe">${fbWrongBody}</div>`;
   const fbDetailHTML = _algFbDetailHTML(state);
 
@@ -140,9 +140,9 @@ function renderPreviewHTML_algebraic(state) {
     var container = document.getElementById('alg-preview-container');
     if (!container) return;
     var state = captureState();
-    _algAugmentStateWithReal(state);
-    var __algHasRandom = true;
-    try { __algHasRandom = _hsHasRandomization(genAlgebraicCore(1, _algBuildParams()).vars); } catch (e) { __algHasRandom = true; }
+    _algAugmentStateWithReal(state);
+    var __algHasRandom = true;
+    try { __algHasRandom = _hsHasRandomization(genAlgebraicCore(1, _algBuildParams()).vars); } catch (e) { __algHasRandom = true; }
     _hsUpdateRerollVisibility('alg', __algHasRandom);
     var iframe = mountPreviewIframe('alg-preview-container', renderPreviewHTML_algebraic(state));
     if (iframe && !iframe.__hsClickWired) {

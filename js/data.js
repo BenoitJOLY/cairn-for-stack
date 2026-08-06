@@ -62,9 +62,10 @@ const LABELS={
     'avancement':'⚗️ Tableau d\'avancement',
     'cinematique':'🏃 Cinématique du point'
 };
-// default feedbacks when left empty
-const FB_JUSTE_DEFAULT='<p>✅ <strong>Bonne réponse !</strong></p>';
-const FB_FAUX_DEFAULT='<p>❌ <strong>Réponse incorrecte.</strong> Vérifiez votre démarche et réessayez.</p>';
+// default feedbacks when left empty (fonctions, pas des const, pour rester
+// a jour lors d'un changement de langue en direct — voir I18N.setLang())
+function FB_JUSTE_DEFAULT(){ return I18N.t('common.fb_default_juste'); }
+function FB_FAUX_DEFAULT(){ return I18N.t('common.fb_default_faux'); }
 
 // ══════════════════════════════════════════════════════
 //  HELPERS

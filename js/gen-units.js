@@ -5,8 +5,8 @@ async function genUnits(X){
   // bord de pré-remplir les textarea un-fbc/un-fbe si vides — comportement du code d'origine
   // à préserver même si ces valeurs ne servent pas au cœur pur.
   v('un-tol');
-  resolveFb('un-fbc',FB_JUSTE_DEFAULT);
-  resolveFb('un-fbe',FB_FAUX_DEFAULT);
+  resolveFb('un-fbc',FB_JUSTE_DEFAULT());
+  resolveFb('un-fbe',FB_FAUX_DEFAULT());
   const p={
     bareme: parseFloat(v('un-bareme'))||1,
     text: richVal('un-text'),

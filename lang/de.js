@@ -87,6 +87,8 @@ I18N.add("de", {
   "dlg.img_remove":      "Löschen",
 
   /* ── Boilerplate commun aux panneaux de question ── */
+  "common.fb_default_juste":      "<p>✅ <strong>Richtige Antwort!</strong></p>",
+  "common.fb_default_faux":       "<p>❌ <strong>Falsche Antwort.</strong> Überprüfen Sie Ihren Lösungsweg und versuchen Sie es erneut.</p>",
   "common.tab_config":            "Konfiguration",
   "common.tab_fbgen":             "Allgemeines Feedback",
   "common.editor_btn":            "Herausgeber",

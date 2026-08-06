@@ -289,8 +289,8 @@ function genImageMesureParams() {
   var unit    = (document.getElementById('imm-unit').value || '').replace(/'/g, "\\'");
   var tol     = parseFloat(document.getElementById('imm-tol').value) || 5;
   var mode    = (document.getElementById('imm-mode') || {}).value || 'guide';
-  var fbOk    = document.getElementById('imm-fb-ok').value   || FB_JUSTE_DEFAULT;
-  var fbWrong = document.getElementById('imm-fb-wrong').value || FB_FAUX_DEFAULT;
+  var fbOk    = document.getElementById('imm-fb-ok').value   || FB_JUSTE_DEFAULT();
+  var fbWrong = document.getElementById('imm-fb-wrong').value || FB_FAUX_DEFAULT();
   var fbGenEl = document.getElementById('imm-fbgen');
 
   // Read targets

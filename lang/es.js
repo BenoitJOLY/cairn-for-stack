@@ -87,6 +87,8 @@ I18N.add("es", {
   "dlg.img_remove":      "Eliminar",
 
   /* ── Boilerplate commun aux panneaux de question ── */
+  "common.fb_default_juste":      "<p>✅ <strong>¡Respuesta correcta!</strong></p>",
+  "common.fb_default_faux":       "<p>❌ <strong>Respuesta incorrecta.</strong> Revise su razonamiento e inténtelo de nuevo.</p>",
   "common.tab_config":            "Configuración",
   "common.tab_fbgen":             "Comentarios generales",
   "common.editor_btn":            "Editor",

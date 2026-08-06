@@ -28,9 +28,9 @@ function renderPreviewHTML_numerical(state) {
 
   // state.realFbWrongHTML : HTML du nœud PRT réellement déclenché par une réponse
   // fausse (sonde), déjà encadré côté serveur — voir _numRefreshRealPreview().
-  const fbWrongBody = state.realFbWrongHTML || wrapFb(_hsRenderMath(state.fbe || FB_FAUX_DEFAULT), false);
+  const fbWrongBody = state.realFbWrongHTML || wrapFb(_hsRenderMath(state.fbe || FB_FAUX_DEFAULT()), false);
   const fbGlobalHTML = `
-    <div data-num-field="fbc">${wrapFb(_hsRenderMath(state.fbc || FB_JUSTE_DEFAULT), true)}</div>
+    <div data-num-field="fbc">${wrapFb(_hsRenderMath(state.fbc || FB_JUSTE_DEFAULT()), true)}</div>
     <div data-num-field="fbe">${fbWrongBody}</div>`;
 
   const tolNumeric = _hsNumToleranceValue(state.val, state.tolType, tolVal);
@@ -96,9 +96,9 @@ function renderPreviewHTML_numerical(state) {
     var container = document.getElementById('num-preview-container');
     if (!container) return;
     var state = captureState();
-    _numAugmentStateWithReal(state);
-    var __numHasRandom = true;
-    try { __numHasRandom = _hsHasRandomization(genNumericalCore(1, _numBuildParams()).vars); } catch (e) { __numHasRandom = true; }
+    _numAugmentStateWithReal(state);
+    var __numHasRandom = true;
+    try { __numHasRandom = _hsHasRandomization(genNumericalCore(1, _numBuildParams()).vars); } catch (e) { __numHasRandom = true; }
     _hsUpdateRerollVisibility('num', __numHasRandom);
     var iframe = mountPreviewIframe('num-preview-container', renderPreviewHTML_numerical(state));
     if (iframe && !iframe.__hsClickWired) {
