@@ -1183,6 +1183,13 @@ I18N.add("fr", {
   "topo.draw_jsme_btn":    "Dessiner (JSME)",
   "topo.scoring_info_html":"<strong>Scoring PRT Avancé :</strong> Somme PRT1 + N0 + N1 + N2 + N4 = 100%. (Les nœuds 3 et 5 sont des fallbacks).",
   "topo.fbgen_auto_desc":  "La correction se base sur les pondérations PRT définies ci-dessus (flèche, bilan d'atomes, charges, formules, coefficients, groupes fonctionnels).",
+  "topo.arrow_absente":       "absente",
+  "topo.arrow_aucune":        "aucune",
+  "topo.arrow_label_equilibre": "la flèche d'équilibre (<=>)",
+  "topo.arrow_label_totale":  "la flèche totale (->)",
+  "topo.arrow_label_aucune":  "aucune flèche",
+  "topo.arrow_expl_totale":   "une réaction TOTALE (irréversible)",
+  "topo.arrow_expl_equilibre":"une réaction D'ÉQUILIBRE (réversible)",
 
   "comp.msg_default":      "Votre réponse sera lue et corrigée par votre professeur.",
   "comp.fbgen_auto_desc":  "Cette question n'est pas corrigée automatiquement : c'est le professeur qui attribue la note dans Moodle après lecture de la copie.",

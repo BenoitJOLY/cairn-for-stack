@@ -1183,6 +1183,13 @@ I18N.add("nl", {
   "topo.draw_jsme_btn":    "Gelijkspel (JSME)",
   "topo.scoring_info_html":"<strong>Geavanceerde PRT-scores:</strong> som PRT1 + N0 + N1 + N2 + N4 = 100%. (Knooppunten 3 en 5 zijn fallbacks).",
   "topo.fbgen_auto_desc":  "De correctie is gebaseerd op de hierboven gedefinieerde PRT-wegingen (pijl, atoombalans, ladingen, formules, coëfficiënten, functionele groepen).",
+  "topo.arrow_absente":       "ontbrekend",
+  "topo.arrow_aucune":        "geen",
+  "topo.arrow_label_equilibre": "de evenwichtspijl (<=>)",
+  "topo.arrow_label_totale":  "de totaalpijl (->)",
+  "topo.arrow_label_aucune":  "geen pijl",
+  "topo.arrow_expl_totale":   "een TOTALE (onomkeerbare) reactie",
+  "topo.arrow_expl_equilibre":"een EVENWICHTS- (omkeerbare) reactie",
 
   "comp.msg_default":      "Je antwoord wordt door je docent gelezen en gecorrigeerd.",
   "comp.fbgen_auto_desc":  "Deze vraag wordt niet automatisch gecorrigeerd: het is de docent die na het lezen van het werkstuk in Moodle het cijfer toekent.",

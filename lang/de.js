@@ -1183,6 +1183,13 @@ I18N.add("de", {
   "topo.draw_jsme_btn":    "Zeichnen (JSME)",
   "topo.scoring_info_html":"<strong>Erweiterte PRT-Bewertung:</strong> Summe aus PRT1 + N0 + N1 + N2 + N4 = 100 %. (Die Knoten 3 und 5 sind Fallbacks.)",
   "topo.fbgen_auto_desc":  "Die Korrektur basiert auf den oben definierten PRT-Gewichtungen (Pfeil, Atom bilanz, Ladungen, Formeln, Koeffizienten, funktionelle Gruppen).",
+  "topo.arrow_absente":       "fehlend",
+  "topo.arrow_aucune":        "keiner",
+  "topo.arrow_label_equilibre": "der Gleichgewichtspfeil (<=>)",
+  "topo.arrow_label_totale":  "der Gesamtpfeil (->)",
+  "topo.arrow_label_aucune":  "kein Pfeil",
+  "topo.arrow_expl_totale":   "eine VOLLSTÄNDIGE (irreversible) Reaktion",
+  "topo.arrow_expl_equilibre":"eine GLEICHGEWICHTS- (reversible) Reaktion",
 
   "comp.msg_default":      "Ihre Antwort wird von Ihrem Lehrer gelesen und korrigiert.",
   "comp.fbgen_auto_desc":  "Diese Aufgabe wird nicht automatisch benotet: Der Lehrer vergibt die Note in Moodle, nachdem er die Prüfungsarbeit gelesen hat.",

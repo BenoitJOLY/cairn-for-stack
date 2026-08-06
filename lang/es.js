@@ -1183,6 +1183,13 @@ I18N.add("es", {
   "topo.draw_jsme_btn":    "Dibujar (JSME)",
   "topo.scoring_info_html":"<strong>Puntuación PRT avanzada:</strong> Suma de PRT1 + N0 + N1 + N2 + N4 = 100 %. (Los nodos 3 y 5 son de reserva).",
   "topo.fbgen_auto_desc":  "La corrección se basa en las ponderaciones PRT definidas anteriormente (flecha, balance de átomos, cargas, fórmulas, coeficientes, grupos funcionales).",
+  "topo.arrow_absente":       "ausente",
+  "topo.arrow_aucune":        "ninguna",
+  "topo.arrow_label_equilibre": "la flecha de equilibrio (<=>)",
+  "topo.arrow_label_totale":  "la flecha total (->)",
+  "topo.arrow_label_aucune":  "ninguna flecha",
+  "topo.arrow_expl_totale":   "una reacción TOTAL (irreversible)",
+  "topo.arrow_expl_equilibre":"una reacción DE EQUILIBRIO (reversible)",
 
   "comp.msg_default":      "Tu profesor leerá y corregirá tu respuesta.",
   "comp.fbgen_auto_desc":  "Esta pregunta no se corrige automáticamente: es el profesor quien pone la nota en Moodle tras leer el examen.",

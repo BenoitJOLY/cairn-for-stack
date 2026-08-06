@@ -1181,6 +1181,13 @@ I18N.add("en", {
   "topo.draw_jsme_btn":    "Draw (JSME)",
   "topo.scoring_info_html":"<strong>Advanced PRT scoring:</strong> Sum PRT1 + N0 + N1 + N2 + N4 = 100%. (Nodes 3 and 5 are fallbacks).",
   "topo.fbgen_auto_desc":  "Grading is based on the PRT weights defined above (arrow, atom balance, charges, formulas, coefficients, functional groups).",
+  "topo.arrow_absente":       "missing",
+  "topo.arrow_aucune":        "none",
+  "topo.arrow_label_equilibre": "the equilibrium arrow (<=>)",
+  "topo.arrow_label_totale":  "the total arrow (->)",
+  "topo.arrow_label_aucune":  "no arrow",
+  "topo.arrow_expl_totale":   "a TOTAL (irreversible) reaction",
+  "topo.arrow_expl_equilibre":"an EQUILIBRIUM (reversible) reaction",
 
   "comp.msg_default":      "Your answer will be read and graded by your teacher.",
   "comp.fbgen_auto_desc":  "This question is not graded automatically: the teacher assigns the grade in Moodle after reading the submission.",

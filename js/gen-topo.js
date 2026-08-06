@@ -124,8 +124,8 @@ nom_fct_attendue${X}: "${fctDefault}";
 has_fct_pro${X}: is(${vFp} # "");
 charge_rea_teacher${X}: sum(${vRc}[i]*${vRch}[i],i,1,length(${vRc}));
 charge_pro_teacher${X}: sum(${vPc}[i]*${vPch}[i],i,1,length(${vPc}));
-arrow_expl_fwd${X}: "une reaction TOTALE (irreversible)";
-arrow_expl_eq${X}: "une reaction D EQUILIBRE (reversible)";
+arrow_expl_fwd${X}: ${JSON.stringify(I18N_D.t('topo.arrow_expl_totale'))};
+arrow_expl_eq${X}: ${JSON.stringify(I18N_D.t('topo.arrow_expl_equilibre'))};
 tans_arrow_expl${X}: if is(${vSep}="->") then arrow_expl_fwd${X} else arrow_expl_eq${X};
 tans_arrow_other_expl${X}: if is(${vSep}="->") then arrow_expl_eq${X} else arrow_expl_fwd${X};
 tans_arrow_symbol${X}: if is(${vSep}="->") then "->" else "<=>";
@@ -412,11 +412,11 @@ is_tot${X}: false;
 if (not is_equi${X}) then (
     if slength(local_raw${X}) > slength(sremove(">",local_raw${X})) then is_tot${X}: true
 );
-ans_arrow_det${X}: "absente";
+ans_arrow_det${X}: ${JSON.stringify(I18N_D.t('topo.arrow_absente'))};
 if is_equi${X} then ans_arrow_det${X}: "<=>" else if is_tot${X} then ans_arrow_det${X}: "->";
 is_arrow_ok${X}: is(ans_arrow_det${X} = ${vSep});
-arrow_s_label${X}: if is_equi${X} then "la fleche d equilibre (<=>)" else if is_tot${X} then "la fleche totale (->)" else "aucune fleche";
-arrow_t_label${X}: if is(${vSep}="->") then "la fleche totale (->)" else "la fleche d equilibre (<=)";
+arrow_s_label${X}: if is_equi${X} then ${JSON.stringify(I18N_D.t('topo.arrow_label_equilibre'))} else if is_tot${X} then ${JSON.stringify(I18N_D.t('topo.arrow_label_totale'))} else ${JSON.stringify(I18N_D.t('topo.arrow_label_aucune'))};
+arrow_t_label${X}: if is(${vSep}="->") then ${JSON.stringify(I18N_D.t('topo.arrow_label_totale'))} else ${JSON.stringify(I18N_D.t('topo.arrow_label_equilibre'))};
 L_reac${X}: if listp(${iRch}) then ${iRch} else [];
 L_reac_n${X}: if listp(${iRc}) then ${iRc} else [];
 L_prod${X}: if listp(${iPch}) then ${iPch} else [];
@@ -942,8 +942,8 @@ ${jsxOpen}
 fleche_att${X}: tarrn${X};
 fleche_el${X}: ${iArr};
 vf${X}: if (fleche_el${X} = fleche_att${X}) then 1 else 0;
-fleche_el_disp${X}: if fleche_el${X}=1 then "->" else if fleche_el${X}=2 then "<=>" else if fleche_el${X}=3 then "<->" else "aucune";
-fleche_att_disp${X}: if fleche_att${X}=1 then "->" else if fleche_att${X}=2 then "<=>" else if fleche_att${X}=3 then "<->" else "aucune";
+fleche_el_disp${X}: if fleche_el${X}=1 then "->" else if fleche_el${X}=2 then "<=>" else if fleche_el${X}=3 then "<->" else ${JSON.stringify(I18N_D.t('topo.arrow_aucune'))};
+fleche_att_disp${X}: if fleche_att${X}=1 then "->" else if fleche_att${X}=2 then "<=>" else if fleche_att${X}=3 then "<->" else ${JSON.stringify(I18N_D.t('topo.arrow_aucune'))};
 /* Comptages */
 nb_rt${X}: length(trf${X}); nb_rs${X}: length(${iRf});
 nb_pt${X}: length(tpf${X}); nb_ps${X}: length(${iPf});
