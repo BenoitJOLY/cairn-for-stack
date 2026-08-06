@@ -982,6 +982,9 @@ I18N.add("en", {
   "jd.largeur":             "Width",
   "jd.hauteur":             "Height",
   "jd.fbgen_auto_note":     "Marking is automatic: a percentage of correctly completed zones is calculated, with a reminder of the expected solution in case of error.",
+  "jd.or_connector":        "or",
+  "jd.preview_default_statement":   "Automatic statement: drag the proposals to the correct zones.",
+  "jd.preview_needs_content_hint":  "Load a background image, add at least one proposal and one drop zone to see the interactive preview.",
 
   /* ── geogebra — Embedded GeoGebra applet ── */
   "type.geogebra":          "GeoGebra",

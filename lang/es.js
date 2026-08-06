@@ -984,6 +984,9 @@ I18N.add("es", {
   "jd.largeur":             "Ancho",
   "jd.hauteur":             "Altura",
   "jd.fbgen_auto_note":     "La corrección es automática: se calcula el porcentaje de casillas rellenadas correctamente y, en caso de error, se muestra la solución correcta.",
+  "jd.or_connector":        "o",
+  "jd.preview_default_statement":   "Enunciado automático: arrastrar las propuestas a las zonas correctas.",
+  "jd.preview_needs_content_hint":  "Cargue una imagen de fondo, añada al menos una propuesta y una zona de destino para ver la vista previa interactiva.",
 
   /* ── geogebra — Applet GeoGebra intégrée ── */
   "type.geogebra":          "GeoGebra",

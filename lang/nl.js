@@ -984,6 +984,9 @@ I18N.add("nl", {
   "jd.largeur":             "Breedte",
   "jd.hauteur":             "Hoogte",
   "jd.fbgen_auto_note":     "De correctie gebeurt automatisch: er wordt een percentage correct voltooide gebieden berekend, met een herinnering aan de verwachte oplossing in geval van een fout.",
+  "jd.or_connector":        "of",
+  "jd.preview_default_statement":   "Automatische opgave: sleep de voorstellen naar de juiste zones.",
+  "jd.preview_needs_content_hint":  "Laad een achtergrondafbeelding, voeg minstens één voorstel en één afzetzone toe om de interactieve voorvertoning te zien.",
 
   /* ── geogebra — Applet GeoGebra intégrée ── */
   "type.geogebra":          "GeoGebra",

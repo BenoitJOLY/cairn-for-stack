@@ -984,6 +984,9 @@ I18N.add("de", {
   "jd.largeur":             "Breite",
   "jd.hauteur":             "Höhe",
   "jd.fbgen_auto_note":     "Die Korrektur erfolgt automatisch: Es wird der Prozentsatz der korrekt ausgefüllten Felder berechnet, und bei Fehlern wird die erwartete Lösung angezeigt.",
+  "jd.or_connector":        "oder",
+  "jd.preview_default_statement":   "Automatische Aufgabenstellung: die Vorschläge in die richtigen Zonen ziehen.",
+  "jd.preview_needs_content_hint":  "Laden Sie ein Hintergrundbild, fügen Sie mindestens einen Vorschlag und eine Ablagezone hinzu, um die interaktive Vorschau zu sehen.",
 
   /* ── geogebra — Applet GeoGebra intégrée ── */
   "type.geogebra":          "GeoGebra",

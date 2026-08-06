@@ -984,6 +984,9 @@ I18N.add("fr", {
   "jd.largeur":             "Largeur",
   "jd.hauteur":             "Hauteur",
   "jd.fbgen_auto_note":     "La correction est automatique : un pourcentage de zones correctement complétées est calculé, avec rappel de la solution attendue en cas d'erreur.",
+  "jd.or_connector":        "ou",
+  "jd.preview_default_statement":   "Énoncé automatique : glisser les propositions vers les bonnes zones.",
+  "jd.preview_needs_content_hint":  "Chargez une image de fond, ajoutez au moins une proposition et une zone de dépôt pour voir l'aperçu interactif.",
 
   /* ── geogebra — Applet GeoGebra intégrée ── */
   "type.geogebra":          "GeoGebra",

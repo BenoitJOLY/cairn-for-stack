@@ -352,7 +352,7 @@ function genJxgDropCore(X, p, deps) {
             var prop = st.proposals.find(function (p) { return p.id === id; });
             return prop ? htmlEsc_D(prop.text || I18N_D.t('tpl.vf_prop_fallback', {n: prop.id})) : '?';
         });
-        return '<li>' + I18N_D.t('jd.zone_label', {n: i + 1}) + ' → ' + (lbls.join(' <em>ou</em> ') || '?') + '</li>';
+        return '<li>' + I18N_D.t('jd.zone_label', {n: i + 1}) + ' → ' + (lbls.join(' <em>' + I18N_D.t('jd.or_connector') + '</em> ') || '?') + '</li>';
     }).join('');
     var trueFb  = '<p>✅ <strong>' + I18N_D.t('jd.fb_ok_title') + '</strong> ' + I18N_D.t('jd.fb_ok_detail') + '</p>';
     var falseFb = '<p>❌ ' + I18N_D.t('jd.fb_wrong', {pctvar: 'pct_' + X}) + '</p><ul>' + solutionLines + '</ul>';

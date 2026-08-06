@@ -34,15 +34,15 @@ function renderPreviewHTML_jxgdrop(state) {
       + realParts.kbdRaw
       + ' } catch(e){ var el=document.getElementById(' + JSON.stringify(boardId) + '); if(el) el.innerHTML = "<p style=\\"color:#dc2626;padding:10px;font-family:monospace;font-size:.8rem;white-space:pre-wrap;\\">Erreur JSXGraph : " + String(e && e.message || e).replace(/</g,"&lt;") + "<\\/p>"; console.error(e); } })();<\/script>';
   } else {
-    exampleHTML = '<p style="color:#475569;font-style:italic;">Chargez une image de fond, ajoutez au moins une proposition et une zone de dépôt pour voir l\'aperçu interactif.</p>';
+    exampleHTML = '<p style="color:#475569;font-style:italic;">' + I18N.t('jd.preview_needs_content_hint') + '</p>';
   }
 
   var node0 = realParts && realParts.prt && realParts.prt.nodes && realParts.prt.nodes[0];
 
   return _hsSimplePreviewHTML({
-    badge: I18N.t('type.jxgdrop') + ' JSXGraph', badgeColor: '#b45309', noteBg: '#fffbeb', noteColor: '#92400e',
+    badge: I18N.t('jd.banniere'), badgeColor: '#b45309', noteBg: '#fffbeb', noteColor: '#92400e',
     prefix: 'jd', bareme: state.bareme || 1,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : glisser les propositions vers les bonnes zones.</em></p>'),
+    text: _hsRenderMath(state.text || ('<p><em>' + I18N.t('jd.preview_default_statement') + '</em></p>')),
     exampleLabel: '',
     exampleHTML: exampleHTML,
     fbOk: node0 ? _jdTokenizeStack(node0.truefeedback) : '',
