@@ -765,7 +765,7 @@ function _diffBuildSvgPreview(type, mode, a_um, D_m, b_um, lambdaNm) {
     }
     svg += '<line x1="20" y1="' + (H - 18) + '" x2="' + (W - 8) + '" y2="' + (H - 18) + '" stroke="#444" stroke-width="1"/>';
     svg += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="' + col + '" stroke-width="2.2"/>';
-    svg += '<text x="' + (W / 2) + '" y="14" fill="#bbb" font-size="11" text-anchor="middle" font-family="sans-serif">Intensite I(y)</text>';
+    svg += '<text x="' + (W / 2) + '" y="14" fill="#bbb" font-size="11" text-anchor="middle" font-family="sans-serif">' + I18N.t('diff.svg_axis_intensite') + '</text>';
   } else if (type === "young") {
     /* Rendu raster (canvas, meme resolution logique que le board JSXGraph reel
        _diffTplYoung2D) plutot qu'une grille de <rect> SVG : a basse resolution
@@ -1127,12 +1127,12 @@ function genDiffractionCore(X, p, deps) {
     var LW = "diffLW" + X, UL = "diffUL" + X;
     vars += UL + ": 0.06E-3;\n";
     vars += LW + ": float(" + D + "*" + L + "/" + A + ");\n";
-    vars += t(1) + ": [[1,false,\"C'est de la refraction\"],[2,false,\"C'est de la diffusion\"],"
-      + "[3,false,\"C'est le phenomene d'interferences\"],[4,true,\"C'est le phenomene de diffraction\"]];\n";
-    vars += "difffb1" + X + ": [\"On observe ici un phenomene de diffraction, pas de refraction (deviation a la traversee d'un milieu different).\","
-      + "\"On observe ici un phenomene de diffraction, pas de diffusion (renvoi de lumiere dans toutes les directions).\","
-      + "\"On observe ici un phenomene de diffraction, et non des interferences (qui necessitent deux sources ou deux fentes).\","
-      + "\"C'est bien le phenomene de diffraction : etalement de la lumiere par une fente unique.\"];\n";
+    vars += t(1) + ": [[1,false," + JSON.stringify(I18N_D.t('diff.opt_refraction')) + "],[2,false," + JSON.stringify(I18N_D.t('diff.opt_diffusion')) + "],"
+      + "[3,false," + JSON.stringify(I18N_D.t('diff.opt_interferences')) + "],[4,true," + JSON.stringify(I18N_D.t('diff.opt_diffraction')) + "]];\n";
+    vars += "difffb1" + X + ": [" + JSON.stringify(I18N_D.t('diff.fb1_diffraction_refraction')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_diffusion')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_interf_fentes')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_ok_fente')) + "];\n";
     vars += t(2) + ": l/(2*D);\n";
     vars += t(3) + ": float(" + L + "/" + A + "*1E-3);\n";
     vars += t(4) + ": " + L + "*nm;\n";
@@ -1142,9 +1142,9 @@ function genDiffractionCore(X, p, deps) {
     vars += t(5) + ": float((round(difft5i" + X + "*difftkk" + X + ")/difftkk" + X + "))*nm;\n";
     vars += "diffira" + X + ": " + uA + "/" + A + "; diffirD" + X + ": " + uD + "/" + D + "; diffirl" + X + ": " + UL + "/" + LW + ";\n";
     vars += "diffmv" + X + ": max(diffira" + X + ",diffirD" + X + ",diffirl" + X + ");\n";
-    vars += t(6) + ": [[1,is(diffira" + X + "=diffmv" + X + "),\"une fente de meilleure precision (a)\"],"
-      + "[2,is(diffirD" + X + "=diffmv" + X + "),\"une distance D plus precise\"],"
-      + "[3,is(diffirl" + X + "=diffmv" + X + "),\"une mesure l plus precise\"]];\n";
+    vars += t(6) + ": [[1,is(diffira" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_fente')) + "],"
+      + "[2,is(diffirD" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_distance_d')) + "],"
+      + "[3,is(diffirl" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_mesure_l')) + "]];\n";
     vars += t(7) + ": float((" + L + "+" + t(5) + "/nm))*nm;\n";
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
@@ -1237,12 +1237,12 @@ function genDiffractionCore(X, p, deps) {
   } else if (type === "fente_double") {
     vars += UI_ + ": (rand(10)+3)/10*1E-3;\n";
     vars += "diffI" + X + ": float((round(100*" + L + "*1E-9*" + D + "/(" + B + "*1E-6)*1E3))/100);\n";
-    vars += t(1) + ": [[1,false,\"C'est de la refraction\"],[2,false,\"C'est de la diffusion\"],"
-      + "[3,true,\"C'est le phenomene d'interferences\"],[4,false,\"C'est le phenomene de diffraction\"]];\n";
-    vars += "difffb1" + X + ": [\"On observe ici des interferences, pas de refraction (deviation a la traversee d'un milieu different).\","
-      + "\"On observe ici des interferences, pas de diffusion (renvoi de lumiere dans toutes les directions).\","
-      + "\"C'est bien le phenomene d'interferences : superposition de deux ondes issues des deux fentes.\","
-      + "\"On observe ici des interferences, et non de la simple diffraction (qui necessite une seule fente).\"];\n";
+    vars += t(1) + ": [[1,false," + JSON.stringify(I18N_D.t('diff.opt_refraction')) + "],[2,false," + JSON.stringify(I18N_D.t('diff.opt_diffusion')) + "],"
+      + "[3,true," + JSON.stringify(I18N_D.t('diff.opt_interferences')) + "],[4,false," + JSON.stringify(I18N_D.t('diff.opt_diffraction')) + "]];\n";
+    vars += "difffb1" + X + ": [" + JSON.stringify(I18N_D.t('diff.fb1_interf_refraction')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_interf_diffusion')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_interf_ok_fentes')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_interf_diffraction_fente')) + "];\n";
     vars += t(2) + ": diffI" + X + "*mm;\n";
     vars += t(3) + ": (D*lambda)/(i);\n";
     vars += t(4) + ": " + B + "*1E-6*m;\n";
@@ -1317,12 +1317,12 @@ function genDiffractionCore(X, p, deps) {
     var RW = "diffRW" + X, UR = "diffUR" + X;
     vars += UR + ": 0.06E-3;\n";
     vars += RW + ": float(1.22*" + D + "*" + L + "/" + A + ");\n";
-    vars += t(1) + ": [[1,false,\"C'est de la refraction\"],[2,false,\"C'est de la diffusion\"],"
-      + "[3,false,\"C'est le phenomene d'interferences\"],[4,true,\"C'est le phenomene de diffraction\"]];\n";
-    vars += "difffb1" + X + ": [\"On observe ici un phenomene de diffraction, pas de refraction (deviation a la traversee d'un milieu different).\","
-      + "\"On observe ici un phenomene de diffraction, pas de diffusion (renvoi de lumiere dans toutes les directions).\","
-      + "\"On observe ici un phenomene de diffraction, et non des interferences (qui necessitent deux sources ou deux trous).\","
-      + "\"C'est bien le phenomene de diffraction : etalement de la lumiere par un trou circulaire (tache d'Airy).\"];\n";
+    vars += t(1) + ": [[1,false," + JSON.stringify(I18N_D.t('diff.opt_refraction')) + "],[2,false," + JSON.stringify(I18N_D.t('diff.opt_diffusion')) + "],"
+      + "[3,false," + JSON.stringify(I18N_D.t('diff.opt_interferences')) + "],[4,true," + JSON.stringify(I18N_D.t('diff.opt_diffraction')) + "]];\n";
+    vars += "difffb1" + X + ": [" + JSON.stringify(I18N_D.t('diff.fb1_diffraction_refraction')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_diffusion')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_interf_trous')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_ok_trou_circ')) + "];\n";
     vars += t(2) + ": r/D;\n";
     vars += t(3) + ": float(1.22*" + L + "/" + A + "*1E-3);\n";
     vars += t(4) + ": " + L + "*nm;\n";
@@ -1332,9 +1332,9 @@ function genDiffractionCore(X, p, deps) {
     vars += t(5) + ": float((round(difft5i" + X + "*difftkk" + X + ")/difftkk" + X + "))*nm;\n";
     vars += "diffira" + X + ": " + uA + "/" + A + "; diffirD" + X + ": " + uD + "/" + D + "; diffirl" + X + ": " + UR + "/" + RW + ";\n";
     vars += "diffmv" + X + ": max(diffira" + X + ",diffirD" + X + ",diffirl" + X + ");\n";
-    vars += t(6) + ": [[1,is(diffira" + X + "=diffmv" + X + "),\"un trou de meilleure precision (a)\"],"
-      + "[2,is(diffirD" + X + "=diffmv" + X + "),\"une distance D plus precise\"],"
-      + "[3,is(diffirl" + X + "=diffmv" + X + "),\"une mesure r plus precise\"]];\n";
+    vars += t(6) + ": [[1,is(diffira" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_trou')) + "],"
+      + "[2,is(diffirD" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_distance_d')) + "],"
+      + "[3,is(diffirl" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_mesure_r')) + "]];\n";
     vars += t(7) + ": float((" + L + "+" + t(5) + "/nm))*nm;\n";
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
@@ -1428,12 +1428,12 @@ function genDiffractionCore(X, p, deps) {
     var LW = "diffLW" + X, UL = "diffUL" + X;
     vars += UL + ": 0.06E-3;\n";
     vars += LW + ": float(" + D + "*" + L + "/" + A + ");\n";
-    vars += t(1) + ": [[1,false,\"C'est de la refraction\"],[2,false,\"C'est de la diffusion\"],"
-      + "[3,false,\"C'est le phenomene d'interferences\"],[4,true,\"C'est le phenomene de diffraction\"]];\n";
-    vars += "difffb1" + X + ": [\"On observe ici un phenomene de diffraction, pas de refraction (deviation a la traversee d'un milieu different).\","
-      + "\"On observe ici un phenomene de diffraction, pas de diffusion (renvoi de lumiere dans toutes les directions).\","
-      + "\"On observe ici un phenomene de diffraction, et non des interferences (qui necessitent deux sources ou deux trous).\","
-      + "\"C'est bien le phenomene de diffraction : etalement de la lumiere par un trou carre.\"];\n";
+    vars += t(1) + ": [[1,false," + JSON.stringify(I18N_D.t('diff.opt_refraction')) + "],[2,false," + JSON.stringify(I18N_D.t('diff.opt_diffusion')) + "],"
+      + "[3,false," + JSON.stringify(I18N_D.t('diff.opt_interferences')) + "],[4,true," + JSON.stringify(I18N_D.t('diff.opt_diffraction')) + "]];\n";
+    vars += "difffb1" + X + ": [" + JSON.stringify(I18N_D.t('diff.fb1_diffraction_refraction')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_diffusion')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_interf_trous')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_diffraction_ok_trou_carre')) + "];\n";
     vars += t(2) + ": l/(2*D);\n";
     vars += t(3) + ": float(" + L + "/" + A + "*1E-3);\n";
     vars += t(4) + ": " + L + "*nm;\n";
@@ -1443,9 +1443,9 @@ function genDiffractionCore(X, p, deps) {
     vars += t(5) + ": float((round(difft5i" + X + "*difftkk" + X + ")/difftkk" + X + "))*nm;\n";
     vars += "diffira" + X + ": " + uA + "/" + A + "; diffirD" + X + ": " + uD + "/" + D + "; diffirl" + X + ": " + UL + "/" + LW + ";\n";
     vars += "diffmv" + X + ": max(diffira" + X + ",diffirD" + X + ",diffirl" + X + ");\n";
-    vars += t(6) + ": [[1,is(diffira" + X + "=diffmv" + X + "),\"un trou de meilleure precision (a)\"],"
-      + "[2,is(diffirD" + X + "=diffmv" + X + "),\"une distance D plus precise\"],"
-      + "[3,is(diffirl" + X + "=diffmv" + X + "),\"une mesure l plus precise\"]];\n";
+    vars += t(6) + ": [[1,is(diffira" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_trou')) + "],"
+      + "[2,is(diffirD" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_distance_d')) + "],"
+      + "[3,is(diffirl" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_mesure_l')) + "]];\n";
     vars += t(7) + ": float((" + L + "+" + t(5) + "/nm))*nm;\n";
     vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";
 
@@ -1538,12 +1538,12 @@ function genDiffractionCore(X, p, deps) {
   } else {
     vars += UI_ + ": (rand(10)+3)/10*1E-3;\n";
     vars += "diffI" + X + ": " + L + "*1E-9*" + D + "/(" + B + "*1E-6)*1E3;\n";
-    vars += t(1) + ": [[1,false,\"C'est de la refraction\"],[2,false,\"C'est de la diffusion\"],"
-      + "[3,true,\"C'est le phenomene d'interferences\"],[4,false,\"C'est le phenomene de diffraction\"]];\n";
-    vars += "difffb1" + X + ": [\"On observe ici des interferences, pas de refraction (deviation a la traversee d'un milieu different).\","
-      + "\"On observe ici des interferences, pas de diffusion (renvoi de lumiere dans toutes les directions).\","
-      + "\"C'est bien le phenomene d'interferences : superposition de deux ondes issues des deux trous.\","
-      + "\"On observe ici des interferences, et non de la simple diffraction (qui necessite un seul trou).\"];\n";
+    vars += t(1) + ": [[1,false," + JSON.stringify(I18N_D.t('diff.opt_refraction')) + "],[2,false," + JSON.stringify(I18N_D.t('diff.opt_diffusion')) + "],"
+      + "[3,true," + JSON.stringify(I18N_D.t('diff.opt_interferences')) + "],[4,false," + JSON.stringify(I18N_D.t('diff.opt_diffraction')) + "]];\n";
+    vars += "difffb1" + X + ": [" + JSON.stringify(I18N_D.t('diff.fb1_interf_refraction')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_interf_diffusion')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_interf_ok_trous')) + ","
+      + JSON.stringify(I18N_D.t('diff.fb1_interf_diffraction_trou')) + "];\n";
     vars += t(2) + ": diffI" + X + "*mm;\n";
     vars += t(3) + ": " + L + "*1E-9*m;\n";
     vars += "difft4i" + X + ": " + L + "*((" + UI_ + "/diffI" + X + ")^2+(" + uD + "/" + D + ")^2+(" + uB + "/" + B + ")^2)^0.5;\n";
@@ -1552,9 +1552,9 @@ function genDiffractionCore(X, p, deps) {
     vars += t(4) + ": float((round(difft4i" + X + "*difftkk" + X + ")/difftkk" + X + "))*nm;\n";
     vars += "diffirb" + X + ": " + uB + "/" + B + "; diffirD" + X + ": " + uD + "/" + D + "; diffiri" + X + ": " + UI_ + "/diffI" + X + ";\n";
     vars += "diffmv" + X + ": max(diffirb" + X + ",diffirD" + X + ",diffiri" + X + ");\n";
-    vars += t(5) + ": [[1,is(diffirb" + X + "=diffmv" + X + "),\"un ecartement de trous de meilleure precision\"],"
-      + "[2,is(diffirD" + X + "=diffmv" + X + "),\"une distance D plus precise\"],"
-      + "[3,is(diffiri" + X + "=diffmv" + X + "),\"une mesure i plus precise\"]];\n";
+    vars += t(5) + ": [[1,is(diffirb" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_ecartement')) + "],"
+      + "[2,is(diffirD" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_distance_d')) + "],"
+      + "[3,is(diffiri" + X + "=diffmv" + X + ")," + JSON.stringify(I18N_D.t('diff.opt_ameliorer_mesure_i')) + "]];\n";
     vars += t(6) + ": float((" + L + "+" + t(4) + "/nm))*nm;\n";
     vars += t(7) + ": float((" + L + "-" + t(4) + "/nm))*nm;";
 
@@ -1643,7 +1643,7 @@ function genDiffractionCore(X, p, deps) {
     + 'padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
     + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — ' + I18N_D.t("diff.header_title") + '</strong>'
     + '<span style="background:#312e81;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
-    + '<span style="background:#fff;color:#312e81;border:1px solid #312e81;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">' + type + ' / ' + mode + '</span>'
+    + '<span style="background:#fff;color:#312e81;border:1px solid #312e81;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">' + I18N_D.t('diff.type_' + type) + ' / ' + I18N_D.t('diff.mode_' + mode) + '</span>'
     + "</div>";
 
   var textFrag = header
