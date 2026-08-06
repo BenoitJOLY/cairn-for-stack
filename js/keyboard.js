@@ -20,8 +20,8 @@ function buildKbdStackHTML(X){
   .stack-row-label:first-of-type{margin-top:0;}
 [[/style]]
 <div class="stack-keyboard-container">
-  <div class="stack-keyboard-title">\u2328\ufe0f Aide \u00e0 la saisie</div>
-  <div class="stack-row-label">Op\u00e9rateurs &amp; symboles</div>
+  <div class="stack-keyboard-title">\u2328\ufe0f ${I18N.t('tpl.kbd_aide_saisie')}</div>
+  <div class="stack-row-label">${I18N.t('kbd.grp_operators')}</div>
   <div class="stack-keyboard-row">
     <button class="btn-ins" type="button" data-val="+">+</button>
     <button class="btn-ins" type="button" data-val="-">&#8722;</button>
@@ -34,7 +34,7 @@ function buildKbdStackHTML(X){
     <button class="btn-ins" type="button" data-val="(">(</button>
     <button class="btn-ins" type="button" data-val=")">)</button>
   </div>
-  <div class="stack-row-label">Fonctions usuelles</div>
+  <div class="stack-row-label">${I18N.t('kbd.grp_functions')}</div>
   <div class="stack-keyboard-row">
     <button class="btn-ins" type="button" data-val="sqrt()">&#8730;</button>
     <button class="btn-ins" type="button" data-val="abs()">|x|</button>
@@ -419,7 +419,7 @@ function updateUnPreview(){
   const h=buildUnHelp();
   const kbdOn=document.getElementById('un-h-kbd').checked;
   let preview=h||'';
-  if(kbdOn)preview+='<div style="margin-top:8px;padding:9px 13px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;font-size:.82rem;color:#1d4ed8;"><strong><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-keyboard"></use></svg> Clavier virtuel Maxima</strong> — sera inclus dans la question.</div>';
+  if(kbdOn)preview+='<div style="margin-top:8px;padding:9px 13px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;font-size:.82rem;color:#1d4ed8;"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-keyboard"></use></svg> '+I18N.t('common.preview_kbd_note')+'</div>';
   p.innerHTML=preview||'<em style="color:#94a3b8">Cochez des options...</em>';
 }
 function updateNumPreview(){

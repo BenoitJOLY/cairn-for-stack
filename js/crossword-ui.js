@@ -551,10 +551,10 @@ function updateMatchPrompt() {
     const level = lvlInp ? lvlInp.value.trim() : "2nde";
     const sous = (document.getElementById('match-pb-sous')?.value || '').trim();
     const chap = (document.getElementById('match-pb-chap')?.value || '').trim();
-    let ctx = `${matter} de niveau ${level}`;
-    if(sous) ctx += `, sous-matière « ${sous} »`;
-    if(chap) ctx += `, chapitre « ${chap} »`;
-    
+    let ctx = I18N.t('match.prompt_ctx_base', {matter: matter, level: level});
+    if(sous) ctx += I18N.t('match.prompt_ctx_sous', {sous: sous});
+    if(chap) ctx += I18N.t('match.prompt_ctx_chap', {chap: chap});
+
     // Logique pour la langue
     let lang = "Français";
     if(langSel) {
@@ -566,38 +566,37 @@ function updateMatchPrompt() {
         }
     }
 
- const prompt = `### RÔLE
-Tu es un ingénieur pédagogique expert en conception d'évaluations interactives (Matching Questions). Ta mission est de générer un exercice de mise en relation de concepts structuré en JSON.
+ const prompt = `${I18N.t('match.prompt_role')}
 
-### CONSIGNE
-Génère un exercice de type "Appariement" sur le sujet suivant : ${subject} pour un exercice en ${ctx}.
-- La colonne de gauche (leftItems) contient des concepts, des exemples précis, des valeurs ou des cas concrets.
-- La colonne de droite (rightItems) contient des catégories générales, des définitions, des propriétés ou des seuils.
-- CONTRAINTE PÉDAGOGIQUE OBLIGATOIRE (NON 1-à-1) : L'exercice ne doit PAS être une simple correspondance linéaire. Conçois l'exercice pour qu'un élément de droite soit lié à plusieurs éléments de gauche (relation Plusieurs-à-Un), ou qu'un élément de gauche soit associé à plusieurs propriétés à droite (Plusieurs-à-Plusieurs).
-- La langue à utiliser est ${lang}.
+${I18N.t('match.prompt_consigne_title')}
+${I18N.t('match.prompt_consigne', {subject: subject, ctx: ctx})}
+- ${I18N.t('match.prompt_bullet_left')}
+- ${I18N.t('match.prompt_bullet_right')}
+- ${I18N.t('match.prompt_bullet_constraint')}
+- ${I18N.t('match.prompt_bullet_lang', {lang: lang})}
 
-### CONTRAINTES TECHNIQUES STRICTES
-1. FORMAT DE SORTIE : JSON pur uniquement (pas de blabla, pas de balises markdown de code block, juste l'objet JSON).
-2. STRUCTURE DES ITEMS : Chaque objet dans "leftItems" et "rightItems" doit obligatoirement avoir cette structure exacte :
+${I18N.t('match.prompt_tech_title')}
+${I18N.t('match.prompt_tech1')}
+${I18N.t('match.prompt_tech2')}
    {
      "id": <number>,
      "html": "<p>Texte avec balises HTML si nécessaire</p>",
      "text": "Texte brut sans balises"
    }
-3. STRUCTURE DES CONNECTIONS : Le tableau "connections" doit être un tableau de paires d'indices numériques (commençant à 0). Exemple : [[0, 0], [1, 2], [2, 2]]. Ne pas utiliser d'objets avec des clés leftId/rightId.
-4. ASYMÉTRIE : Le nombre d'éléments à gauche et à droite doit être différent. Un même index de droite DOIT apparaître plusieurs fois dans le tableau "connections" pour valider la structure non linéaire.
-5. ÉCHAPPEMENT JSON : à l'intérieur des chaînes, double tout antislash (\\\\) et échappe les guillemets internes (\\"). Échappe correctement les guillemets dans les attributs HTML. Le JSON doit être valide tel quel.
+${I18N.t('match.prompt_tech3')}
+${I18N.t('match.prompt_tech4')}
+${I18N.t('match.prompt_tech5')}
 
-### EXEMPLE DE STRUCTURE ATTENDUE (Modèle asymétrique Plusieurs-à-Un)
+${I18N.t('match.prompt_example_title')}
 {
   "leftItems": [
-    { "id": 0, "html": "<p>Chien</p>", "text": "Chien" },
-    { "id": 1, "html": "<p>Aigle</p>", "text": "Aigle" },
-    { "id": 2, "html": "<p>Chat</p>", "text": "Chat" }
+    { "id": 0, "html": "<p>${I18N.t('match.prompt_example_left1')}</p>", "text": "${I18N.t('match.prompt_example_left1')}" },
+    { "id": 1, "html": "<p>${I18N.t('match.prompt_example_left2')}</p>", "text": "${I18N.t('match.prompt_example_left2')}" },
+    { "id": 2, "html": "<p>${I18N.t('match.prompt_example_left3')}</p>", "text": "${I18N.t('match.prompt_example_left3')}" }
   ],
   "rightItems": [
-    { "id": 0, "html": "<p>Mammifères</p>", "text": "Mammifères" },
-    { "id": 1, "html": "<p>Oiseaux</p>", "text": "Oiseaux" }
+    { "id": 0, "html": "<p>${I18N.t('match.prompt_example_right1')}</p>", "text": "${I18N.t('match.prompt_example_right1')}" },
+    { "id": 1, "html": "<p>${I18N.t('match.prompt_example_right2')}</p>", "text": "${I18N.t('match.prompt_example_right2')}" }
   ],
   "connections": [
     [0, 0],
@@ -606,11 +605,11 @@ Génère un exercice de type "Appariement" sur le sujet suivant : ${subject} pou
   ]
 }
 
-### CONTRÔLE FINAL (avant de répondre)
-Vérifie que : (1) le JSON est syntaxiquement valide ; (2) tous les antislashes sont doublés et les guillemets internes échappés ; (3) la structure (id/html/text, connections en paires d'indices) est respectée ; (4) l'asymétrie est présente ; (5) aucun texte hors du bloc JSON. Si tu ne peux pas respecter ces contraintes, renvoie un objet JSON vide {}.
+${I18N.t('match.prompt_final_title')}
+${I18N.t('match.prompt_final_check')}
 
-### TÂCHE
-Génère maintenant le JSON final pour le sujet : ${subject}`;
+${I18N.t('match.prompt_task_title')}
+${I18N.t('match.prompt_task', {subject: subject})}`;
 
 resInp.value = prompt;
 }

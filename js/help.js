@@ -110,6 +110,15 @@ function closeHelp(){
     build();
   }
 
+  // Les boutons « Aide » sont créés une fois avec un texte figé (innerHTML/title,
+  // pas de data-i18n) : on les retraduit explicitement au changement de langue.
+  document.addEventListener('i18n:changed', ()=>{
+    document.querySelectorAll('.btn-help').forEach(btn=>{
+      btn.innerHTML = I18N.t('tpl.help_btn');
+      btn.title = I18N.t('tpl.help_btn_title');
+    });
+  });
+
   // Fermeture avec la touche Échap
   document.addEventListener('keydown', e=>{
     if(e.key === 'Escape'){
