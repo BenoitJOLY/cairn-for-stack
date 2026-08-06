@@ -532,7 +532,7 @@ function genOscilloscopeCore(X, p, deps){
 
     vars = '/* Q'+X+' : Oscilloscope — Période/Fréquence ('+bareme+'pt) */\n'
       + 'ta'+X+'_type_val: '+typeExpr+';\n'
-      + 'ta'+X+'_type_text: if ta'+X+'_type_val=1 then "sinusoïdale" else (if ta'+X+'_type_val=2 then "carrée" else (if ta'+X+'_type_val=3 then "triangulaire" else (if ta'+X+'_type_val=4 then "carrée (réaliste)" else (if ta'+X+'_type_val=5 then "triangulaire (réaliste)" else (if ta'+X+'_type_val=6 then "déformée (harmoniques)" else (if ta'+X+'_type_val=7 then "en dents de scie" else "complexe à paliers"))))));\n'
+      + 'ta'+X+'_type_text: if ta'+X+'_type_val=1 then '+JSON.stringify(I18N_D.t('osc.qnote_type_sinus'))+' else (if ta'+X+'_type_val=2 then '+JSON.stringify(I18N_D.t('osc.qnote_type_carre'))+' else (if ta'+X+'_type_val=3 then '+JSON.stringify(I18N_D.t('osc.qnote_type_triangle'))+' else (if ta'+X+'_type_val=4 then '+JSON.stringify(I18N_D.t('osc.qnote_type_carre_reel'))+' else (if ta'+X+'_type_val=5 then '+JSON.stringify(I18N_D.t('osc.qnote_type_triangle_reel'))+' else (if ta'+X+'_type_val=6 then '+JSON.stringify(I18N_D.t('osc.qnote_type_harmoniques'))+' else (if ta'+X+'_type_val=7 then '+JSON.stringify(I18N_D.t('osc.qnote_type_dents_scie'))+' else '+JSON.stringify(I18N_D.t('osc.qnote_type_paliers'))+'))))));\n'
       + (freqMode==='alea'
           ? 'ta'+X+'_liste_fq: [100, 200, 250, 500, 1000, 2000];\nta'+X+'_f: ta'+X+'_liste_fq[rand(length(ta'+X+'_liste_fq))+1];\n'
           : 'ta'+X+'_f: '+ffreq+';\n')
@@ -600,7 +600,7 @@ function genOscilloscopeCore(X, p, deps){
         pedMode==='expert');
     }
 
-    qnote = 'Type: {@ta'+X+'_type_text@} | f={@ta'+X+'_f@} Hz, T={@ta'+X+'_T@}, f={@ta'+X+'_fq@}';
+    qnote = I18N_D.t('osc.qnote_type_label')+': {@ta'+X+'_type_text@} | f={@ta'+X+'_f@} Hz, T={@ta'+X+'_T@}, f={@ta'+X+'_fq@}';
     genFb = '<div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
       + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
       + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N_D.t('osc.genfb_q1_periode') + '</span> <p>' + I18N_D.t('osc.genfb_periode_explanation', {X: X}) + '</p></div>'
