@@ -11,7 +11,7 @@ function renderPreviewHTML_match(state) {
   const left = state.left || [];
   const right = state.right || [];
   const connections = state.connections || [];
-  const nodeDesc = 'Liaisons correctes ?';
+  const nodeDesc = I18N.t('match.node_desc_liaisons');
 
   const colHTML = function (items, field) {
     return items.map(function (it, i) {
@@ -28,8 +28,8 @@ function renderPreviewHTML_match(state) {
   const fbGenTab = document.getElementById('match-fb-gen');
   const onlyFbGen = !!(fbGenTab && fbGenTab.classList.contains('on'));
 
-  const fbGenBody = `<p style="color:#166534;font-weight:bold;margin-top:0;">📋 Correction :</p>
-  <ul class="hs-match-conn-list">${connHTML || '<li style="color:#475569;">(aucune liaison définie)</li>'}</ul>
+  const fbGenBody = `<p style="color:#166534;font-weight:bold;margin-top:0;">${I18N.t('match.correction_title')}</p>
+  <ul class="hs-match-conn-list">${connHTML || '<li style="color:#475569;">' + I18N.t('match.preview_no_connections') + '</li>'}</ul>
   ${state.fbGen ? '<p>' + _hsRenderMath(state.fbGen) + '</p>' : ''}`;
 
   const bodyHTML = onlyFbGen ? `
@@ -44,9 +44,9 @@ function renderPreviewHTML_match(state) {
 
   <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
   <div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${nodeDesc}</div>
-  <div style="border-left:4px solid #16a34a;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:8px;color:#166534;"><strong>Excellent !</strong> Vous avez trouvé les <em>{@nb_bons@}</em> liaisons correctes.</div>
+  <div style="border-left:4px solid #16a34a;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:8px;color:#166534;"><strong>${I18N.t('match.fb_ok_title')}</strong> ${I18N.t('match.fb_ok_detail')}</div>
   <div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${nodeDesc}</div>
-  <div style="border-left:4px solid #f59e0b;padding:8px 12px;background:#fffbeb;border-radius:4px;color:#92400e;"><strong>Résultat :</strong> Vous avez trouvé <em>{@nb_bons@}</em> bonne(s) liaison(s) sur <em>{@total@}</em>.<br><span style="font-size:.85rem;">Vos erreurs (liaisons incorrectes) : <em>{@faux_feedback_str@}</em></span></div>`;
+  <div style="border-left:4px solid #f59e0b;padding:8px 12px;background:#fffbeb;border-radius:4px;color:#92400e;"><strong>${I18N.t('match.fb_wrong_title')}</strong> ${I18N.t('match.fb_wrong_detail')}<br><span style="font-size:.85rem;">${I18N.t('match.fb_wrong_errors_title')} <em>{@faux_feedback_str@}</em></span></div>`;
 
   return `<!DOCTYPE html>
 <html lang="fr">

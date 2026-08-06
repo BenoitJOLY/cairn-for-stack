@@ -591,6 +591,8 @@ I18N.add("de", {
   "match.banniere":          "Elemente miteinander verbinden",
   "match.badge":             "Paarungen",
   "match.correction_title":  "📋 Korrektur:",
+  "match.node_desc_liaisons": "Verbindungen korrekt?",
+  "match.preview_no_connections": "(keine Verbindung definiert)",
 
   /* ── Composition libre (COMP) ── */
   "comp.section_operations":          "Geschäftstätigkeit",

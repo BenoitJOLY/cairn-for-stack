@@ -335,7 +335,7 @@ setTimeout(sol_init, 100);
 
   const prtMeta = { name: 'prt'+X, value: String(bareme), autosimplify: '1', feedbackstyle: '2', feedbackvariables: fbVars };
   const canonicalNodes = [{
-    name: '0', description: 'Liaisons correctes ?', answertest: 'NumAbsolute', sans: 'note_calculee', tans: '1',
+    name: '0', description: I18N_D.t('match.node_desc_liaisons'), answertest: 'NumAbsolute', sans: 'note_calculee', tans: '1',
     testoptions: '0', quiet: '0',
     truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
     trueanswernote: 'PRT-'+X+'-0-T', truefeedback: `<div style="padding:10px; background-color:#d4edda; color:#155724; border-radius:5px;">

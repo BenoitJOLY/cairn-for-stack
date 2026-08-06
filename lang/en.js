@@ -589,6 +589,8 @@ I18N.add("en", {
   "match.banniere":          "Match the elements",
   "match.badge":             "Matching",
   "match.correction_title":  "📋 Correction:",
+  "match.node_desc_liaisons": "Correct links?",
+  "match.preview_no_connections": "(no link defined)",
 
   /* ── Free composition (COMP) ── */
   "comp.section_operations":          "Operations",

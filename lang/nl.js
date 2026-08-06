@@ -591,6 +591,8 @@ I18N.add("nl", {
   "match.banniere":          "Verbind de elementen",
   "match.badge":             "Koppelingen",
   "match.correction_title":  "📋 Oplossing:",
+  "match.node_desc_liaisons": "Correcte verbindingen?",
+  "match.preview_no_connections": "(geen verbinding gedefinieerd)",
 
   /* ── Composition libre (COMP) ── */
   "comp.section_operations":          "Operaties",

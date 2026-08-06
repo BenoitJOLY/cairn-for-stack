@@ -591,6 +591,8 @@ I18N.add("fr", {
   "match.banniere":          "Relier les éléments",
   "match.badge":             "Appariements",
   "match.correction_title":  "📋 Correction :",
+  "match.node_desc_liaisons": "Liaisons correctes ?",
+  "match.preview_no_connections": "(aucune liaison définie)",
 
   /* ── Composition libre (COMP) ── */
   "comp.section_operations":          "Opérations",
