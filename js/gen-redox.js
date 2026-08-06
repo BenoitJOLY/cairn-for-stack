@@ -361,12 +361,12 @@ cursorCode,
             + dirHint('rx_ecur', 'rx_etgt', I18Nd.t('rx.fb_xy_ewrong_low'), I18Nd.t('rx.fb_xy_ewrong_high'))
             + (meth.eWrong ? '<br>' + meth.eWrong : ''));
         canonicalNodes = [
-            { name: '0', description: 'Vérification volume', answertest: 'AlgEquiv', sans: 'rx_v_ok', tans: 'true',
+            { name: '0', description: I18Nd.t('rx.node_desc_volume'), answertest: 'AlgEquiv', sans: 'rx_v_ok', tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: '0', truepenalty: '0', truenextnode: '1', trueanswernote: 'PRT' + X + '-0-T', truefeedback: '',
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-0-F',
               falsefeedback: fbWrong || vWrongFbXY },
-            { name: '1', description: 'Vérification potentiel', answertest: 'AlgEquiv', sans: 'rx_e_ok', tans: 'true',
+            { name: '1', description: I18Nd.t('rx.node_desc_potentiel'), answertest: 'AlgEquiv', sans: 'rx_e_ok', tans: 'true',
               testoptions: '', quiet: '0',
               truescoremode: '+', truescore: String(bareme), truepenalty: '0', truenextnode: '-1', trueanswernote: 'PRT' + X + '-1-T', truefeedback: fbOk || okFb,
               falsescoremode: '=', falsescore: '0', falsepenalty: '0', falsenextnode: '-1', falseanswernote: 'PRT' + X + '-1-F',

@@ -2935,6 +2935,8 @@ I18N.add("nl", {
   "rx.fb_xy_ewrong_title":      "Goed volume, maar de potentiaal is fout.",
   "rx.fb_xy_ewrong_low":        "Je waarde is te laag.",
   "rx.fb_xy_ewrong_high":       "Je waarde is te hoog.",
+  "rx.node_desc_volume":        "Volumecontrole",
+  "rx.node_desc_potentiel":     "Potentiaalcontrole",
 
   /* ── Réactions nucléaires (NUC) ── */
   "nuc.title":          "Kernreacties (generator)",
@@ -4212,6 +4214,9 @@ I18N.add("nl", {
   "equiv.preview_etape_manque": "⚠ Vink aan en vul de verwachte tussenstap in.",
   "rx.preview_saisir_params": "Parameters invoeren…",
   "rx.preview_warn_spontane": "⚠ E°₁ moet &gt; E°₂ zijn voor een spontane reactie",
+  "rx.preview_read_on_graph": "afgelezen op de grafiek",
+  "rx.preview_then": "vervolgens",
+  "rx.preview_cursor_student": "cursor (leerling)",
   "sui.preview_formule_fn": "formule als functie van n",
   "sui.preview_random_note": "Waarden willekeurig gegenereerd door Maxima binnen de opgegeven grenzen — verschillend voor elke student.",
 

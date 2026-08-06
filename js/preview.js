@@ -385,7 +385,7 @@ function renderPreviewHTML_redox(state) {
   let targetLabel;
   if (rxFind === 'calc') {
     const c2Target = (g.n1 * g.c1 * g.Veq) / (g.n2 * g.v2);
-    targetLabel = `Veq (lu sur le graphe, ± ${tolVol} mL) puis C₂ = ${c2Target.toFixed(4)} mol/L (± ${tolC} mol/L)`;
+    targetLabel = `Veq (${I18N.t('rx.preview_read_on_graph')}, ± ${tolVol} mL) ${I18N.t('rx.preview_then')} C₂ = ${c2Target.toFixed(4)} mol/L (± ${tolC} mol/L)`;
   } else if (g.cursorMode === 'x') {
     targetLabel = `Veq = ${g.Veq.toFixed(2)} mL (± ${tolVol} mL)`;
   } else if (g.cursorMode === 'y') {
@@ -403,7 +403,7 @@ function renderPreviewHTML_redox(state) {
   const curColD = g.cursorMode === 'x' ? '#b91c1c' : g.cursorMode === 'y' ? '#5b21b6' : '#9a3412';
   const cursorSvg = g.cursorMode !== 'none' ? `
       <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="6" fill="${curCol}" stroke="${curColD}" stroke-width="1.5"/>
-      <text x="${curX.toFixed(1)}" y="${(curY - 10).toFixed(1)}" font-size="11" font-weight="bold" fill="${curCol}" text-anchor="middle">▶ curseur (élève)</text>` : '';
+      <text x="${curX.toFixed(1)}" y="${(curY - 10).toFixed(1)}" font-size="11" font-weight="bold" fill="${curCol}" text-anchor="middle">▶ ${I18N.t('rx.preview_cursor_student')}</text>` : '';
 
   const svg = `
     <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;background:#fff;border:1px solid #fecaca;border-radius:8px;">
@@ -418,8 +418,8 @@ function renderPreviewHTML_redox(state) {
     </svg>`;
 
   const fbHTML = `
-    <div data-rx-field="fbc">${wrapFb(_hsRenderMath(state.fbOk || '✅ <strong>Bonne réponse !</strong>'), true)}</div>
-    <div data-rx-field="fbe">${wrapFb(_hsRenderMath(state.fbWrong || '❌ <strong>Réponse incorrecte.</strong>'), false)}</div>`;
+    <div data-rx-field="fbc">${wrapFb(_hsRenderMath(state.fbOk || ('✅ <strong>' + I18N.t('rx.fb_ok_default') + '</strong>')), true)}</div>
+    <div data-rx-field="fbe">${wrapFb(_hsRenderMath(state.fbWrong || ('❌ <strong>' + I18N.t('rx.fb_wrong_default') + '</strong>')), false)}</div>`;
 
   const fbGenHTML = `<div class="hs-clickable" data-rx-field="fbgen" style="border-left:4px solid #b91c1c;padding:10px 14px;background:#fee2e2;border-radius:4px;margin:4px 0;">${state.fbGen ? _hsRenderMath(state.fbGen) : '<span style="color:#475569;">' + I18N.t('common.preview_no_general_fb') + '</span>'}</div>`;
 
@@ -579,8 +579,8 @@ function _hsSimplePreviewHTML(cfg) {
   // wrapFb() ré-encadrerait alors une seconde fois (boîte dans la boîte). Les autres
   // types (pas encore migrés vers applyFbBox) continuent de compter sur wrapFb() ici.
   const okWrongHTML = cfg.hideOkWrongBoxes ? '' : `
-    <div data-${cfg.prefix}-field="fbc">${fbOkDescHTML}${cfg.fbBoxesPreWrapped ? _hsRenderMath(cfg.fbOk || '✅ <strong>Bonne réponse !</strong>') : wrapFb(_hsRenderMath(cfg.fbOk || '✅ <strong>Bonne réponse !</strong>'), true)}</div>
-    <div data-${cfg.prefix}-field="fbe">${fbWrongDescHTML}${cfg.fbBoxesPreWrapped ? _hsRenderMath(cfg.fbWrong || '❌ <strong>Réponse incorrecte.</strong>') : wrapFb(_hsRenderMath(cfg.fbWrong || '❌ <strong>Réponse incorrecte.</strong>'), false)}</div>`;
+    <div data-${cfg.prefix}-field="fbc">${fbOkDescHTML}${cfg.fbBoxesPreWrapped ? _hsRenderMath(cfg.fbOk || FB_JUSTE_DEFAULT()) : wrapFb(_hsRenderMath(cfg.fbOk || FB_JUSTE_DEFAULT()), true)}</div>
+    <div data-${cfg.prefix}-field="fbe">${fbWrongDescHTML}${cfg.fbBoxesPreWrapped ? _hsRenderMath(cfg.fbWrong || FB_FAUX_DEFAULT()) : wrapFb(_hsRenderMath(cfg.fbWrong || FB_FAUX_DEFAULT()), false)}</div>`;
   const fbHTML = `
     ${okWrongHTML}
     ${extraNodesHTML}

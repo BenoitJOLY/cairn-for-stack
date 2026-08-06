@@ -2934,6 +2934,8 @@ I18N.add("fr", {
   "rx.fb_xy_ewrong_title":      "Bon volume, mais le potentiel n'est pas bon.",
   "rx.fb_xy_ewrong_low":        "Ta valeur est trop basse.",
   "rx.fb_xy_ewrong_high":       "Ta valeur est trop haute.",
+  "rx.node_desc_volume":        "Vérification volume",
+  "rx.node_desc_potentiel":     "Vérification potentiel",
 
   /* ── Réactions nucléaires (NUC) ── */
   "nuc.title":          "Réactions Nucléaires (Générateur)",
@@ -4212,6 +4214,9 @@ I18N.add("fr", {
   "equiv.preview_etape_manque": "⚠ Cochez et renseignez l'étape intermédiaire attendue.",
   "rx.preview_saisir_params": "Saisir les paramètres…",
   "rx.preview_warn_spontane": "⚠ E°₁ doit être &gt; E°₂ pour une réaction spontanée",
+  "rx.preview_read_on_graph": "lu sur le graphe",
+  "rx.preview_then": "puis",
+  "rx.preview_cursor_student": "curseur (élève)",
   "sui.preview_formule_fn": "formule en fonction de n",
   "sui.preview_random_note": "Valeurs générées aléatoirement par Maxima dans les bornes indiquées — différentes à chaque étudiant.",
 

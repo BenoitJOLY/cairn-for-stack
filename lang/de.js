@@ -2935,6 +2935,8 @@ I18N.add("de", {
   "rx.fb_xy_ewrong_title":      "Gutes Volumen, aber das Potenzial ist falsch.",
   "rx.fb_xy_ewrong_low":        "Dein Wert ist zu niedrig.",
   "rx.fb_xy_ewrong_high":       "Dein Wert ist zu hoch.",
+  "rx.node_desc_volume":        "Volumenprüfung",
+  "rx.node_desc_potentiel":     "Potentialprüfung",
 
   /* ── Réactions nucléaires (NUC) ── */
   "nuc.title":          "Kernreaktionen (Generator)",
@@ -4212,6 +4214,9 @@ I18N.add("de", {
   "equiv.preview_etape_manque": "⚠ Aktivieren und den erwarteten Zwischenschritt angeben.",
   "rx.preview_saisir_params": "Parameter eingeben…",
   "rx.preview_warn_spontane": "⚠ E°₁ muss &gt; E°₂ sein für eine spontane Reaktion",
+  "rx.preview_read_on_graph": "aus dem Diagramm abgelesen",
+  "rx.preview_then": "dann",
+  "rx.preview_cursor_student": "Cursor (Schüler)",
   "sui.preview_formule_fn": "Formel in Abhängigkeit von n",
   "sui.preview_random_note": "Von Maxima zufällig innerhalb der angegebenen Grenzen generierte Werte — für jeden Studierenden unterschiedlich.",
 
