@@ -31,7 +31,7 @@ async function genZscore(X) {
       body: JSON.stringify({type: 'zscore', X, params: p})
     });
     if (res.ok) { const data = await res.json(); if (data && data.ok) return data.parts; }
-    if (res.status === 429) { const data = await res.json().catch(() => ({})); throw new Error(data.error || 'Quota hebdomadaire atteint.'); }
+    if (res.status === 429) { const data = await res.json().catch(() => ({})); throw new Error(data.error || I18N.t('msg.err_quota_hebdo')); }
     console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "zscore", repli sur le calcul local.');
   } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "zscore", repli sur le calcul local.', e); }
   return genZscoreCore(X, p);

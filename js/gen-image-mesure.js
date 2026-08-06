@@ -351,7 +351,7 @@ async function genImageMesure(X) {
     }
     if (res.status === 429) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Quota hebdomadaire atteint.');
+        throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
     }
     console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "image-mesure", repli sur le calcul local (session expirée ?).');
   } catch (e) {

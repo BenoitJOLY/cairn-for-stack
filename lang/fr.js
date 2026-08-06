@@ -528,6 +528,7 @@ I18N.add("fr", {
   /* ── Erreurs de validation des générateurs (generators.js) ── */
   "msg.err_tirage_cb":    "Paramètres de tirage invalides pour les Cases à cocher. Corrigez les avertissements avant de continuer.",
   "msg.err_props_vide":   "Cases à cocher : ajoutez au moins une proposition.",
+  "msg.err_quota_hebdo":  "Quota hebdomadaire atteint.",
   "msg.err_tirage_pool":  "Paramètres de tirage invalides ({type}). Corrigez les avertissements.",
   "msg.err_formule_vide": "Algébrique Q{n} : réponse attendue obligatoire.",
   "msg.err_expr_display_vide": "Algébrique Q{n} : expression à afficher dans l'énoncé obligatoire.",

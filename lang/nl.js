@@ -528,6 +528,7 @@ I18N.add("nl", {
   /* ── Erreurs de validation des générateurs (generators.js) ── */
   "msg.err_tirage_cb":    "Ongeldige trekkingsinstellingen voor selectievakjes. Corrigeer de waarschuwingen voordat u doorgaat.",
   "msg.err_props_vide":   "Selectievakjes: voeg minimaal één voorstel toe.",
+  "msg.err_quota_hebdo":  "Wekelijks quotum bereikt.",
   "msg.err_tirage_pool":  "Ongeldige tekenparameters ({type}). Los de waarschuwingen op.",
   "msg.err_formule_vide": "Algebraïsche Q{n}: verplicht verwacht antwoord.",
   "msg.err_expr_display_vide": "Algebraïsche Q{n}: expressie die moet worden weergegeven in de verplichte instructie.",

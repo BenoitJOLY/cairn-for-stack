@@ -526,6 +526,7 @@ I18N.add("en", {
   /* ── Generator validation errors (generators.js) ── */
   "msg.err_tirage_cb":    "Invalid draw parameters for Checkboxes. Please fix the warnings before continuing.",
   "msg.err_props_vide":   "Checkboxes: add at least one proposition.",
+  "msg.err_quota_hebdo":  "Weekly quota reached.",
   "msg.err_tirage_pool":  "Invalid draw parameters ({type}). Please fix the warnings.",
   "msg.err_formule_vide": "Algebraic Q{n}: expected answer is required.",
   "msg.err_expr_display_vide": "Algebraic Q{n}: expression to display in the statement is required.",

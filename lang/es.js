@@ -528,6 +528,7 @@ I18N.add("es", {
   /* ── Erreurs de validation des générateurs (generators.js) ── */
   "msg.err_tirage_cb":    "Parámetros de extracción no válidos para las casillas de selección. Corrige las advertencias antes de continuar.",
   "msg.err_props_vide":   "Casillas de selección: añade al menos una propuesta.",
+  "msg.err_quota_hebdo":  "Cuota semanal alcanzada.",
   "msg.err_tirage_pool":  "Parámetros de impresión no válidos ({type}). Corrige las advertencias.",
   "msg.err_formule_vide": "Álgebra Q{n}: es obligatorio dar una respuesta.",
   "msg.err_expr_display_vide": "Álgebra Q{n}: expresión que debe aparecer en el enunciado obligatorio.",

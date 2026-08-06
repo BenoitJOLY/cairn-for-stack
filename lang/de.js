@@ -528,6 +528,7 @@ I18N.add("de", {
   /* ── Erreurs de validation des générateurs (generators.js) ── */
   "msg.err_tirage_cb":    "Ungültige Ausgabeparameter für die Kontrollkästchen. Beheben Sie die Warnungen, bevor Sie fortfahren.",
   "msg.err_props_vide":   "Kontrollkästchen: Fügen Sie mindestens einen Vorschlag hinzu.",
+  "msg.err_quota_hebdo":  "Wöchentliches Kontingent erreicht.",
   "msg.err_tirage_pool":  "Ungültige Druckparameter ({type}). Beheben Sie die Warnungen.",
   "msg.err_formule_vide": "Algebra Q{n}: Antwort erforderlich.",
   "msg.err_expr_display_vide": "Algebra Q{n}: Der Ausdruck muss in der Aufgabenstellung angegeben werden.",
