@@ -124,8 +124,9 @@ function _nomDonnesMaximaLiteral(esc) {
   }).join(',') + ']';
 }
 
-function _nomIframe(X) {
-  return '<iframe src="https://mon-domaine.com/viewer.html?smiles={@molecule_smiles_url' + X + '@}" width="300" height="300" style="border:0;" loading="lazy" title="Représentation de la molécule"></iframe>';
+function _nomIframe(X, I18N_D) {
+  I18N_D = I18N_D || I18N;
+  return '<iframe src="https://mon-domaine.com/viewer.html?smiles={@molecule_smiles_url' + X + '@}" width="300" height="300" style="border:0;" loading="lazy" title="' + I18N_D.t('nom.iframe_title') + '"></iframe>';
 }
 
 function _nomReadFormParams(){
@@ -245,7 +246,7 @@ ${urlChain()}`;
     return { bareme, vars, qnote:`{@nom${X}@}`,
       textFrag: `${banniere}
       <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
-      ${_nomIframe(X)}<br>
+      ${_nomIframe(X, I18N_D)}<br>
       <p>${I18N_D.t('nom.q_famille')} [[input:ans${X}f]] [[validation:ans${X}f]]</p>
       <p>${I18N_D.t('nom.q_nom')} [[input:ans${X}n]] [[validation:ans${X}n]]</p>`,
       inputXML: `    <input>
@@ -334,7 +335,7 @@ fb_manques${X} : if length(manques${X}) > 0 then sconcat("<div style='color:#924
     return { bareme, vars, qnote:`{@groupes_vrais${X}@}`,
       textFrag: `${banniere}
       <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
-      ${_nomIframe(X)}<br>
+      ${_nomIframe(X, I18N_D)}<br>
       <p>${I18N_D.t('nom.q_checkbox')} [[input:ans${X}]] [[validation:ans${X}]]</p>`,
       inputXML: `    <input>
       <name>ans${X}</name>
@@ -396,7 +397,7 @@ nom_pattern${X} : regexify_nom${X}(nom_attendu${X})$`;
   return { bareme, vars, qnote:`{@nom_attendu${X}@}`,
     textFrag: `${banniere}
     <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
-    ${_nomIframe(X)}<br>
+    ${_nomIframe(X, I18N_D)}<br>
     <p>${I18N_D.t('nom.q_nom_iupac')} [[input:ans${X}]] [[validation:ans${X}]]</p>`,
     inputXML: `    <input>
       <name>ans${X}</name>
@@ -417,7 +418,7 @@ nom_pattern${X} : regexify_nom${X}(nom_attendu${X})$`;
       <options></options>
     </input>`,
     prtXML,
-    generalFeedback: `<p>Molécule imposée : {@nom_attendu${X}@} (famille : {@famille_attendue${X}@}).</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
+    generalFeedback: `<p>${I18N_D.t('nom.genfb_fixe', {nom: '{@nom_attendu'+X+'@}', famille: '{@famille_attendue'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
     feedbackRef:`[[feedback:prt${X}]]`, prt:{meta:prtMeta,nodes:canonicalNodes} };
 }
 

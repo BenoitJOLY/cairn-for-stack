@@ -4573,6 +4573,8 @@ I18N.add("fr", {
   "nom.genfb_aleatoire": "Molécule : {nom} (famille : {famille}).",
   "nom.genfb_checkbox": "Groupes présents : {groupes}.",
   "nom.genfb_fixe": "Molécule imposée : {nom} (famille : {famille}).",
+  "nom.iframe_title": "Représentation de la molécule",
+  "nom.preview_smiles_note": "la représentation moléculaire réelle ne s'affiche que dans Moodle",
 
   /* ── Génération IA (institutionnelle/personnelle) ── */
   "ai.generer_avec_ia": "Générer avec l'IA",

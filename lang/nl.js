@@ -4570,6 +4570,8 @@ I18N.add("nl", {
   "nom.genfb_aleatoire": "Molecuul: {nom} (familie: {famille}).",
   "nom.genfb_checkbox": "Aanwezige groepen: {groupes}.",
   "nom.genfb_fixe": "Vast molecuul: {nom} (familie: {famille}).",
+  "nom.iframe_title": "Weergave van het molecuul",
+  "nom.preview_smiles_note": "de werkelijke moleculaire weergave wordt alleen in Moodle getoond",
 
   /* ── AI-generatie (institutioneel/persoonlijk) ── */
   "ai.generer_avec_ia": "Genereren met AI",

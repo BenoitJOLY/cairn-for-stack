@@ -4566,6 +4566,8 @@ I18N.add("en", {
   "nom.genfb_aleatoire": "Molecule: {nom} (family: {famille}).",
   "nom.genfb_checkbox": "Groups present: {groupes}.",
   "nom.genfb_fixe": "Fixed molecule: {nom} (family: {famille}).",
+  "nom.iframe_title": "Molecule representation",
+  "nom.preview_smiles_note": "the actual molecular representation is only shown in Moodle",
 
   /* ── AI generation (institutional/personal) ── */
   "ai.generer_avec_ia": "Generate with AI",

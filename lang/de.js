@@ -4570,6 +4570,8 @@ I18N.add("de", {
   "nom.genfb_aleatoire": "Molekül: {nom} (Familie: {famille}).",
   "nom.genfb_checkbox": "Vorhandene Gruppen: {groupes}.",
   "nom.genfb_fixe": "Festgelegtes Molekül: {nom} (Familie: {famille}).",
+  "nom.iframe_title": "Darstellung des Moleküls",
+  "nom.preview_smiles_note": "die tatsächliche Molekülstruktur wird nur in Moodle angezeigt",
 
   /* ── KI-Generierung (institutionell/persönlich) ── */
   "ai.generer_avec_ia": "Mit KI generieren",

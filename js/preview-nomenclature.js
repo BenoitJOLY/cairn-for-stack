@@ -47,7 +47,7 @@ function _nomSimulateDraw(paramFamille, paramCarbonesMax) {
 function _nomSmilesBox(smiles) {
   return '<div style="display:inline-block;padding:10px 14px;background:#ecfeff;border:1.5px dashed #67e8f9;border-radius:8px;font-family:monospace;font-size:.95rem;color:#0e7490;">'
     + '🧬 SMILES : <strong>' + _nomEscapeHtml(smiles) + '</strong>'
-    + '<div style="font-size:.74rem;color:#0e7490;font-weight:400;margin-top:4px;font-family:-apple-system,Segoe UI,Arial,sans-serif;">(la représentation moléculaire réelle ne s\'affiche que dans Moodle)</div>'
+    + '<div style="font-size:.74rem;color:#0e7490;font-weight:400;margin-top:4px;font-family:-apple-system,Segoe UI,Arial,sans-serif;">(' + I18N.t('nom.preview_smiles_note') + ')</div>'
     + '</div>';
 }
 
@@ -74,9 +74,9 @@ function _nomTokenize(html, known) {
 function _nomCbFbBox(kind, items) {
   if (!items || !items.length) return '';
   var styles = {
-    bons: { style: 'color:green;border-left:4px solid green;padding:7px;margin:3px 0', title: 'Groupes correctement identifiés :' },
-    faux: { style: 'color:red;border-left:4px solid red;padding:7px;margin:3px 0', title: 'Groupes cochés à tort (absents de la molécule) :' },
-    manques: { style: "color:#92400e;background:#fffbeb;border-left:4px solid #f59e0b;padding:7px;margin:3px 0", title: 'Groupes présents mais oubliés :' }
+    bons: { style: 'color:green;border-left:4px solid green;padding:7px;margin:3px 0', title: I18N.t('nom.fb_groupes_ok_title') },
+    faux: { style: 'color:red;border-left:4px solid red;padding:7px;margin:3px 0', title: I18N.t('nom.fb_groupes_faux_title') },
+    manques: { style: "color:#92400e;background:#fffbeb;border-left:4px solid #f59e0b;padding:7px;margin:3px 0", title: I18N.t('nom.fb_groupes_manques_title') }
   };
   var s = styles[kind];
   return '<div style="' + s.style + '"><b>' + s.title + '</b><ul>'
