@@ -609,6 +609,11 @@ I18N.add("en", {
   "comp.default_msg":         "Your answer will be read and marked by your teacher.",
   "comp.fb_enregistre":       "Answer saved. Your teacher will mark it and assign the grade.",
   "comp.paste_banner":        "⚠️ Copy-paste / drag-and-drop blocked — {n} attempt(s) detected (visible to the marker)",
+  "comp.header_title":        "Composition",
+  "comp.badge_correction_manuelle": "Manual grading",
+  "comp.node_desc_inerte":    "Inert — manually graded by the teacher (manualgraded)",
+  "comp.preview_placeholder": "Write the question statement here.",
+  "comp.preview_editor_note": "Student answer editor (visible in Moodle only)",
 
   /* ── json-import.js ── */
   "msg.json_import_titre":    "Import JSON — {type}",

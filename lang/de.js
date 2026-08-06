@@ -611,6 +611,11 @@ I18N.add("de", {
   "comp.default_msg":         "Ihre Antwort wird von Ihrem Lehrer gelesen und korrigiert.",
   "comp.fb_enregistre":       "Die Antwort wurde gespeichert. Ihr Lehrer wird sie korrigieren und die Note vergeben.",
   "comp.paste_banner":        "⚠️ Kopieren und Einfügen / Drag & Drop gesperrt — {n} Versuch(e) erkannt (für den Korrektor sichtbar)",
+  "comp.header_title":        "Aufsatz",
+  "comp.badge_correction_manuelle": "Manuelle Korrektur",
+  "comp.node_desc_inerte":    "Inaktiv — manuelle Korrektur durch die Lehrkraft (manualgraded)",
+  "comp.preview_placeholder": "Schreiben Sie hier die Fragestellung.",
+  "comp.preview_editor_note": "Antworteditor der Schüler (nur in Moodle sichtbar)",
 
   /* ── json-import.js ── */
   "msg.json_import_titre":    "JSON importieren — {type}",

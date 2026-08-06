@@ -436,9 +436,9 @@ function genCompositionCore(X, p, deps) {
   var jsxMarker = '<!--HS-KBD:' + X + '-->';
   var HDR =
     '<div style="background:#ede9fe;border-left:5px solid #6d28d9;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
-      '<strong style="font-weight:800;color:#4c1d95;font-size:.95rem;">Q' + X + ' — Rédaction</strong>' +
+      '<strong style="font-weight:800;color:#4c1d95;font-size:.95rem;">Q' + X + ' — ' + I18N_D.t('comp.header_title') + '</strong>' +
       '<span style="background:#6d28d9;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>' +
-      '<span style="background:#fef3c7;color:#92400e;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">👨‍🏫 Correction manuelle</span>' +
+      '<span style="background:#fef3c7;color:#92400e;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">👨‍🏫 ' + I18N_D.t('comp.badge_correction_manuelle') + '</span>' +
     '</div>';
   var textFrag =
     HDR +
@@ -454,7 +454,7 @@ function genCompositionCore(X, p, deps) {
     HDR +
     '<div style="margin-bottom:10px;">' + text + '</div>' +
     '<div style="padding:10px 14px;background:#f5f3ff;border:1.5px dashed #a78bfa;border-radius:8px;font-size:.82rem;color:#5b21b6;text-align:center;">' +
-      '📝 Éditeur de réponse élève (visible dans Moodle uniquement)' +
+      '📝 ' + I18N_D.t('comp.preview_editor_note') +
     '</div>';
 
   // Input XML — type "notes" en manualgraded:true (cf. STACK "Semi-automatic Marking").
@@ -492,7 +492,7 @@ function genCompositionCore(X, p, deps) {
 
   var prtMeta = { name: 'prt' + X, value: String(bareme), autosimplify: '1', feedbackstyle: '1', feedbackvariables: '' };
   var canonicalNodes = [{
-    name: '0', description: 'Inerte — correction manuelle par le professeur (manualgraded)',
+    name: '0', description: I18N_D.t('comp.node_desc_inerte'),
     answertest: 'AlgEquiv', sans: '1', tans: '1', testoptions: '', quiet: '0',
     truescoremode: '=', truescore: '1', truepenalty: '', truenextnode: '-1',
     trueanswernote: 'PRT-' + X + '-1-T',

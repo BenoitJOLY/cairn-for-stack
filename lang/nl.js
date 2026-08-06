@@ -611,6 +611,11 @@ I18N.add("nl", {
   "comp.default_msg":         "Je antwoord wordt door je docent gelezen en gecorrigeerd.",
   "comp.fb_enregistre":       "Reactie opgenomen. Je leraar zal het corrigeren en het cijfer toekennen.",
   "comp.paste_banner":        "⚠️ Kopiëren en plakken / slepen en neerzetten geblokkeerd — {n} poging(en) gedetecteerd (zichtbaar voor de proeflezer)",
+  "comp.header_title":        "Opstel",
+  "comp.badge_correction_manuelle": "Handmatige correctie",
+  "comp.node_desc_inerte":    "Inert — handmatig nagekeken door de docent (manualgraded)",
+  "comp.preview_placeholder": "Schrijf hier de vraagstelling.",
+  "comp.preview_editor_note": "Antwoordeditor van de leerling (alleen zichtbaar in Moodle)",
 
   /* ── json-import.js ── */
   "msg.json_import_titre":    "JSON importeren — {type}",
