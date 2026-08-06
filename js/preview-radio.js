@@ -26,9 +26,13 @@ function renderPreviewHTML_radio(state) {
       </label>`;
   }).join('');
 
+  // Bordure/fond conservés en vert/rouge, texte en couleur neutre — voir
+  // js/preview-checkbox.js (retour utilisateur 2026-07-28, même règle
+  // étendue ici : aucun texte de feedback ne doit être coloré).
   const fbItemsHTML = options.map(function (o) {
     const col = o.isV ? 'green' : 'red';
-    return `<div class="hs-clickable" data-ra-field="prop-fb" data-ra-array="${o.arr}" data-ra-index="${o.idx}" style="color:${col};border-left:4px solid ${col};padding:7px;margin:3px 0">
+    const bg = o.isV ? '#f0fdf4' : '#fef2f2';
+    return `<div class="hs-clickable" data-ra-field="prop-fb" data-ra-array="${o.arr}" data-ra-index="${o.idx}" style="background:${bg};border-left:4px solid ${col};padding:7px;margin:3px 0">
       <b>${_hsRenderMath(o.p.text || '')}</b><br/>${_hsRenderMath(o.p.fb || '')}
     </div>`;
   }).join('');

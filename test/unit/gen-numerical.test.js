@@ -11,7 +11,7 @@ const path = require('node:path');
 
 const { genNumericalCore } = require(path.join('..', '..', 'js', 'gen-numerical.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
-const { applyFbBox, inferFbKind } = require(path.join('..', '..', 'js', 'fb-box.js'));
+const { applyFbBox, inferFbKind, stripLeadingFbIcon } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -19,7 +19,7 @@ const I18N_STUB = {
 const wrapFb = (html, ok) => `<div class="${ok ? 'ok' : 'ko'}">${html || '&nbsp;'}</div>`;
 const buildKbdStackHTML = (X) => `<!--KBD-STUB-${X}-->`;
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, buildKbdStackHTML, applyFbBox, inferFbKind };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, buildKbdStackHTML, applyFbBox, inferFbKind, stripLeadingFbIcon };
 
 function baseParams(overrides) {
     return Object.assign({

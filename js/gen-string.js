@@ -128,6 +128,7 @@ function genStringCore(X,p,deps){
   const htmlEsc_D=deps.htmlEsc||htmlEsc;
   const applyFbBox_D=deps.applyFbBox||applyFbBox;
   const inferFbKind_D=deps.inferFbKind||inferFbKind;
+  const stripLeadingFbIcon_D=deps.stripLeadingFbIcon||stripLeadingFbIcon;
 
   const bareme=p.bareme, text=p.text, ansPlain=p.ansPlain, size=p.size, test=p.test;
   const fbc=p.fbc, fbe=p.fbe, fbGen=p.fbGen, solH=p.solH, paletteHtml=p.paletteHtml, altsArr=p.altsArr;
@@ -160,10 +161,13 @@ function genStringCore(X,p,deps){
   // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
   // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
   // presentation. Voir js/fb-box.js (applyFbBox).
+  // stripLeadingFbIcon : fbc/fbe retombent par défaut sur FB_JUSTE_DEFAULT()/
+  // FB_FAUX_DEFAULT() (js/data.js), déjà préfixés de leur propre icône —
+  // sans ce retrait, applyFbBox_D en ajoute une seconde (icône doublée).
   const toXmlNodes=function(nds){return nds.map(function(n){
     return Object.assign({}, n, {
-      truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
-      falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+      truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), stripLeadingFbIcon_D(n.truefeedback)),
+      falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), stripLeadingFbIcon_D(n.falsefeedback))
     });
   });};
   if(!altsArr.length){

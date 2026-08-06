@@ -24,7 +24,8 @@ function renderPreviewHTML_logique(state) {
     hideExampleBox: true,
     fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
     fbGenAuto: _hsRenderMath(_calcTokenizeForPreview(realGeneralFeedback, knownVars) + note),
-    fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen
+    fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen,
+    fbBoxesPreWrapped: true
   });
 }
 window.lgRefreshPreview = _hsWireSimplePreview('logique', 'lg', 'lg-preview-container', 'fp-logique', renderPreviewHTML_logique);

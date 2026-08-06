@@ -27,9 +27,12 @@ function renderPreviewHTML_dropdown(state) {
     return `<div class="hs-dd-option" data-dd-array="${o.arr}" data-dd-index="${o.idx}">${_hsRenderMath(o.p.text || '')}</div>`;
   }).join('');
 
+  // Bordure/fond conservés en vert/rouge, texte en couleur neutre — voir
+  // js/preview-checkbox.js (retour utilisateur 2026-07-28).
   const fbItemsHTML = options.map(function (o) {
     const col = o.isV ? 'green' : 'red';
-    return `<div class="hs-clickable" data-dd-field="prop-fb" data-dd-array="${o.arr}" data-dd-index="${o.idx}" style="color:${col};border-left:4px solid ${col};padding:7px;margin:3px 0">
+    const bg = o.isV ? '#f0fdf4' : '#fef2f2';
+    return `<div class="hs-clickable" data-dd-field="prop-fb" data-dd-array="${o.arr}" data-dd-index="${o.idx}" style="background:${bg};border-left:4px solid ${col};padding:7px;margin:3px 0">
       <b>${_hsRenderMath(o.p.text || '')}</b><br/>${_hsRenderMath(o.p.fb || '')}
     </div>`;
   }).join('');

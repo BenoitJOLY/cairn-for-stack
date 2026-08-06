@@ -172,23 +172,23 @@ function addVFRow(text, exp, fbIfVrai, fbIfFaux) {
   div.innerHTML =
     `<div class="vf-row-num"></div>
     <div class="vf-row-top">
-      <div class="vf-ptext-wrap"><div id="prev-vf-ptext-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Texte de la proposition" onclick="openRich('vf-ptext-${id}')"></div><textarea id="vf-ptext-${id}" class="vf-ptext" style="display:none"></textarea></div>
+      <div class="vf-ptext-wrap"><div id="prev-vf-ptext-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="${I18N.t('vf.row_ptext_ph')}" onclick="openRich('vf-ptext-${id}')"></div><textarea id="vf-ptext-${id}" class="vf-ptext" style="display:none"></textarea></div>
       <div class="vf-exp-group">
-        <span class="vf-exp-label">Réponse attendue :</span>
-        <label class="vf-radio-lbl"><input type="radio" class="vf-exp" name="vf-exp-${id}" value="v" ${chkV} onchange="validateVFDraw();"> Vrai</label>
-        <label class="vf-radio-lbl"><input type="radio" class="vf-exp" name="vf-exp-${id}" value="f" ${chkF} onchange="validateVFDraw();"> Faux</label>
+        <span class="vf-exp-label">${I18N.t('vf.row_reponse_attendue_lbl')}</span>
+        <label class="vf-radio-lbl"><input type="radio" class="vf-exp" name="vf-exp-${id}" value="v" ${chkV} onchange="validateVFDraw();"> ${I18N.t('vf.preview_vrai')}</label>
+        <label class="vf-radio-lbl"><input type="radio" class="vf-exp" name="vf-exp-${id}" value="f" ${chkF} onchange="validateVFDraw();"> ${I18N.t('vf.preview_faux')}</label>
       </div>
       <button class="btn-del" onclick="document.getElementById('vfr${id}').remove();validateVFDraw();renumberVFRows();" aria-label="${I18N.t('btn.supprimer')}">✕</button>
     </div>
     <div class="vf-row-fbs">
       <div class="vf-fb-block">
-        <label class="vf-fb-label">💡 Ce que voit l'élève s'il coche <b>Vrai</b></label>
-        <div id="prev-vf-fbv-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Message affiché si l'élève coche Vrai" onclick="openRich('vf-fbv-${id}')"></div>
+        <label class="vf-fb-label">${I18N.t('vf.row_si_vrai_lbl_html')}</label>
+        <div id="prev-vf-fbv-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="${I18N.t('vf.row_fbv_ph')}" onclick="openRich('vf-fbv-${id}')"></div>
         <textarea id="vf-fbv-${id}" class="vf-fb-ifvrai" style="display:none"></textarea>
       </div>
       <div class="vf-fb-block">
-        <label class="vf-fb-label">💡 Ce que voit l'élève s'il coche <b>Faux</b></label>
-        <div id="prev-vf-fbf-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="Message affiché si l'élève coche Faux" onclick="openRich('vf-fbf-${id}')"></div>
+        <label class="vf-fb-label">${I18N.t('vf.row_si_faux_lbl_html')}</label>
+        <div id="prev-vf-fbf-${id}" class="rich-preview rich-preview-sm" tabindex="0" role="button" data-ph="${I18N.t('vf.row_fbf_ph')}" onclick="openRich('vf-fbf-${id}')"></div>
         <textarea id="vf-fbf-${id}" class="vf-fb-iffaux" style="display:none"></textarea>
       </div>
     </div>`;
@@ -204,7 +204,7 @@ function addVFRow(text, exp, fbIfVrai, fbIfFaux) {
 function renumberVFRows() {
   document.querySelectorAll('#vf-props .vf-row').forEach(function(r, i) {
     var numEl = r.querySelector('.vf-row-num');
-    if (numEl) numEl.textContent = 'Proposition ' + (i + 1);
+    if (numEl) numEl.textContent = I18N.t('vf.row_prop_num', { n: i + 1 });
   });
 }
 
@@ -217,9 +217,9 @@ function addOrdRow(text) {
   div.className = 'ord-row';
   div.draggable = true;
   div.innerHTML =
-    `<span class="ord-handle" title="Glisser pour réordonner">⠿</span>
+    `<span class="ord-handle" title="${I18N.t('ord.drag_hint')}">⠿</span>
     <span class="ord-num"></span>
-    <input type="text" class="ord-item-text" value="${attrEsc(text)}" placeholder="Texte de l'élément">
+    <input type="text" class="ord-item-text" value="${attrEsc(text)}" placeholder="${I18N.t('ord.item_ph')}">
     <button class="btn-del" onclick="document.getElementById('ordr${id}').remove();renumberOrdRows();if(typeof ordRefreshPreview==='function')ordRefreshPreview();" aria-label="${I18N.t('btn.supprimer')}">✕</button>`;
 
   document.getElementById('ord-items').appendChild(div);

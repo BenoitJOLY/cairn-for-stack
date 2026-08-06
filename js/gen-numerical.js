@@ -51,6 +51,7 @@ function genNumericalCore(X, p, deps){
   var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   var applyFbBox_D = deps.applyFbBox || applyFbBox;
   var inferFbKind_D = deps.inferFbKind || inferFbKind;
+  var stripLeadingFbIcon_D = deps.stripLeadingFbIcon || stripLeadingFbIcon;
 
   const bareme=p.bareme, text=p.text, val=p.val, n=p.n, isR=p.isR;
   const fbc=p.fbc, fbe=p.fbe, tolType=p.tolType, tolVal=p.tolVal, forbid=p.forbid;
@@ -76,10 +77,13 @@ function genNumericalCore(X, p, deps){
   // canonicalNodes (expose via prt.nodes pour prt-manager.js) reste brut, sans
   // encadre, pour que l'edition manuelle du PRT ne montre jamais de HTML de
   // presentation. Voir js/fb-box.js (applyFbBox).
+  // stripLeadingFbIcon : fbc/fbe retombent par défaut sur FB_JUSTE_DEFAULT()/
+  // FB_FAUX_DEFAULT() (js/data.js), déjà préfixés de leur propre icône —
+  // sans ce retrait, applyFbBox_D en ajoute une seconde (icône doublée).
   var xmlNodes = canonicalNodes.map(function(n){
     return Object.assign({}, n, {
-      truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), n.truefeedback),
-      falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), n.falsefeedback)
+      truefeedback: applyFbBox_D(inferFbKind_D(n, 'true'), stripLeadingFbIcon_D(n.truefeedback)),
+      falsefeedback: applyFbBox_D(inferFbKind_D(n, 'false'), stripLeadingFbIcon_D(n.falsefeedback))
     });
   });
   var prtXML=buildPrtXml_D(prtMeta, xmlNodes);

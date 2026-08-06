@@ -35,6 +35,15 @@ function resetFbBoxStyles() {
     if (typeof localStorage !== 'undefined') localStorage.removeItem(FB_BOX_STORAGE_KEY);
 }
 
+// Repli pour les callers qui passent un texte déjà "auto-iconé" (ex.
+// FB_JUSTE_DEFAULT()/FB_FAUX_DEFAULT(), prévus pour wrapFb() qui n'ajoute pas
+// sa propre icône) à applyFbBox(), qui préfixe TOUJOURS l'icône du style —
+// évite l'icône doublée en tête de <p> (ex. "✅ ✅ Bonne réponse !").
+function stripLeadingFbIcon(html) {
+    if (!html) return html;
+    return html.replace(/^(<p>)?\s*(?:✅|❌|⚠️|⚠|🔶|🚨|🔄|🔑)\s*/, '$1');
+}
+
 function applyFbBox(kind, html) {
     if (!html) return html;
     var s = getFbBoxStyles()[kind] || FB_BOX_DEFAULTS[kind] || FB_BOX_DEFAULTS.false;
@@ -84,5 +93,5 @@ function inferFbKind(node, branch) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { FB_BOX_DEFAULTS: FB_BOX_DEFAULTS, FB_BOX_STORAGE_KEY: FB_BOX_STORAGE_KEY, getFbBoxStyles: getFbBoxStyles, saveFbBoxStyles: saveFbBoxStyles, resetFbBoxStyles: resetFbBoxStyles, applyFbBox: applyFbBox, unwrapFbBox: unwrapFbBox, inferFbKind: inferFbKind };
+    module.exports = { FB_BOX_DEFAULTS: FB_BOX_DEFAULTS, FB_BOX_STORAGE_KEY: FB_BOX_STORAGE_KEY, getFbBoxStyles: getFbBoxStyles, saveFbBoxStyles: saveFbBoxStyles, resetFbBoxStyles: resetFbBoxStyles, applyFbBox: applyFbBox, unwrapFbBox: unwrapFbBox, inferFbKind: inferFbKind, stripLeadingFbIcon: stripLeadingFbIcon };
 }

@@ -123,7 +123,7 @@ function renderPreviewHTML_checkbox(state) {
     ? drawnProps.filter(function (p) { return p.isV; }).map(function (p) {
         const idx = allProps.indexOf(p);
         return `<div class="hs-clickable" data-cb-field="prop-fb2" data-cb-index="${idx}" style="color:#92400e;background:#fffbeb;border-left:4px solid #f59e0b;padding:7px;margin:3px 0">
-          <b>&#9888;&#65039; Oubli : </b>${_hsRenderMath(p.text || '')}<br/>${_hsRenderMath(p.fb2 || '')}
+          <b>&#9888;&#65039; ${I18N.t('tpl.checkbox_oubli_label')} : </b>${_hsRenderMath(p.text || '')}<br/>${_hsRenderMath(p.fb2 || '')}
         </div>`;
       }).join('')
     : '';

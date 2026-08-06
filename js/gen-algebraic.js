@@ -67,6 +67,7 @@ function genAlgebraicCore(X, p, deps){
   var algPrtNodeCanonical_D = deps.algPrtNodeCanonical || algPrtNodeCanonical;
   var applyFbBox_D = deps.applyFbBox || applyFbBox;
   var inferFbKind_D = deps.inferFbKind || inferFbKind;
+  var stripLeadingFbIcon_D = deps.stripLeadingFbIcon || stripLeadingFbIcon;
 
   const bareme=p.bareme, text=p.text, formula=p.formula, mode=p.mode;
   const exprDisplay=p.exprDisplay, errorExpr=p.errorExpr;
@@ -130,10 +131,13 @@ function genAlgebraicCore(X, p, deps){
       'PRT-BUG-ERR-FOUND','PRT-WRONG-TOTAL',I18N_D.t('alg.node_err_signe')));
   }
   const prtMeta={name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:''};
+  // stripLeadingFbIcon : fbc/fbe retombent par défaut sur FB_JUSTE_DEFAULT()/
+  // FB_FAUX_DEFAULT() (js/data.js), déjà préfixés de leur propre icône —
+  // sans ce retrait, applyFbBox_D en ajoute une seconde (icône doublée).
   const xmlNodes=canonicalNodes.map(function(n){
     return Object.assign({}, n, {
-      truefeedback: applyFbBox_D(inferFbKind_D(n,'true'), n.truefeedback),
-      falsefeedback: applyFbBox_D(inferFbKind_D(n,'false'), n.falsefeedback)
+      truefeedback: applyFbBox_D(inferFbKind_D(n,'true'), stripLeadingFbIcon_D(n.truefeedback)),
+      falsefeedback: applyFbBox_D(inferFbKind_D(n,'false'), stripLeadingFbIcon_D(n.falsefeedback))
     });
   });
   const prtXML=buildPrtXml_D(prtMeta, xmlNodes);

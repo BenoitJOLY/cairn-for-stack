@@ -1889,10 +1889,16 @@ fill="currentColor" stroke="none">
       <!-- Image upload -->
       <div class="field">
         <label><span data-i18n="imm.image_lbl">Image</span> <span style="font-size:.8em;color:#6b7280;" data-i18n="imm.image_hint">(jpeg/png — max 300 Ko conseillé)</span></label>
-        <input type="file" id="imm-file" accept="image/*" onchange="immLoadImage(this)">
+        <input type="file" id="imm-file" accept="image/*" onchange="immLoadImage(this)" style="display:none">
         <input type="hidden" id="imm-image-data">
         <input type="hidden" id="imm-img-w">
         <input type="hidden" id="imm-img-h">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px;">
+          <button type="button" class="btn-dd-upload" onclick="document.getElementById('imm-file').click()">
+            <svg class="hs-ico" aria-hidden="true"><use href="#ico-file-open"></use></svg> <span data-i18n="imm.image_btn">Choisir une image…</span>
+          </button>
+          <span id="imm-filename" style="font-size:.82rem;color:#6b7280;font-style:italic;"></span>
+        </div>
       </div>
 
       <!-- Preview + overlay -->
@@ -2687,6 +2693,12 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane on" id="phy-cfg">
       <div class="field">
+        <label data-i18n="thy.consigne_lbl">Énoncé</label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-phy-text" onclick="openRich('phy-text')" style="min-height:60px;border-color:#7f1d1d;background:#fff1f2;"></div>
+        <textarea id="phy-text" style="display:none"></textarea>
+      </div>
+
+      <div class="field">
         <label data-i18n="thy.preset_lbl">Préréglage</label>
         <select id="phy-preset" onchange="phyApplyPreset()">
           <option value="-1" data-i18n="thy.preset_choisir">— Choisir un exemple —</option>
@@ -2727,11 +2739,6 @@ fill="currentColor" stroke="none">
 
       <div id="phy-preview" style="background:#fff1f2;border:1.5px solid #fca5a5;border-radius:8px;padding:8px 12px;font-size:.85rem;color:#7f1d1d;margin:8px 0;"></div>
 
-      <div class="field">
-        <label data-i18n="thy.consigne_lbl">Consigne (HTML/LaTeX)</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-phy-text" onclick="openRich('phy-text')" style="min-height:60px;border-color:#7f1d1d;background:#fff1f2;"></div>
-        <textarea id="phy-text" style="display:none"></textarea>
-      </div>
       <div class="g2">
         <div class="field"><label data-i18n="ineq.fb_ok_lbl">Message si bonne réponse</label><input type="text" id="phy-fb-ok" placeholder="✅ défaut" data-i18n-ph="common.fb_ok_default_ph"></div>
         <div class="field"><label data-i18n="ineq.fb_wrong_lbl">Message si mauvaise réponse</label><input type="text" id="phy-fb-wrong" placeholder="❌ défaut" data-i18n-ph="common.fb_wrong_default_ph"></div>
@@ -3888,6 +3895,15 @@ fill="currentColor" stroke="none">
       </div>
       <div class="mpane on" id="cir-cfg">
 
+      <!-- Consigne riche -->
+      <div class="field">
+        <label data-i18n="cir.text_lbl">Énoncé</label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-cir-text" aria-label="Énoncé"
+             onclick="openRich('cir-text')"
+             style="min-height:70px;border-color:#c2410c;background:#fff7ed;"></div>
+        <textarea id="cir-text" style="display:none"></textarea>
+      </div>
+
       <!-- Aide -->
       <p style="font-size:.85rem;color:#6b7280;" data-i18n="cir.teacher_help">Construisez ci-dessous le circuit que les élèves devront reproduire à l'identique : cliquez sur un composant à droite pour le placer, cliquez sur deux bornes pour tirer un câble. Cliquez sur un composant du schéma pour le sélectionner (déplacer, tourner, régler sa valeur).</p>
 
@@ -3900,15 +3916,6 @@ fill="currentColor" stroke="none">
           <input type="checkbox" id="cir-check-values">
           <span data-i18n="cir.check_values_lbl">Exiger aussi les bonnes valeurs des composants (pas seulement le câblage)</span>
         </label>
-      </div>
-
-      <!-- Consigne riche -->
-      <div class="field">
-        <label data-i18n="log.consigne_lbl">Consigne (HTML/LaTeX)</label>
-        <div class="rich-preview" tabindex="0" role="button" id="prev-cir-text" aria-label="Énoncé"
-             onclick="openRich('cir-text')"
-             style="min-height:70px;border-color:#c2410c;background:#fff7ed;"></div>
-        <textarea id="cir-text" style="display:none"></textarea>
       </div>
 
       </div>

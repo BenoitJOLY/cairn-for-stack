@@ -66,6 +66,7 @@ function resetForm_image_mesure() {
       document.getElementById('imm-img-w').value='';
       document.getElementById('imm-img-h').value='';
       document.getElementById('imm-preview-wrap').style.display='none';
+      var _immFnReset=document.getElementById('imm-filename');if(_immFnReset)_immFnReset.textContent='';
       document.getElementById('imm-r1x').value='';
       document.getElementById('imm-r1y').value='';
       document.getElementById('imm-r1v').value='';

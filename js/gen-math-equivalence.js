@@ -143,9 +143,9 @@ function genEquivalenceCore(X, p, deps) {
     </input>`;
 
     // ── Nœuds PRT : EquivFirst (chaîne) → [étape intermédiaire imposée] → EqualComAss (résultat final) ──
-    var okFb = fbOk || `<strong>${I18N_D.t('equiv.fb_ok_default')}</strong>`;
+    var okFb = fbOk || I18N_D.t('equiv.fb_ok_default');
     var wrongFb = fbWrong || I18N_D.t('equiv.fb_wrong_default');
-    var finalOkFb = `<strong>${I18N_D.t('equiv.fb_final_ok')}</strong>`;
+    var finalOkFb = I18N_D.t('equiv.fb_final_ok');
     var finalWrongFb = I18N_D.t('equiv.fb_final_wrong');
 
     var canonicalNodes;

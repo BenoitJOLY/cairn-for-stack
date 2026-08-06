@@ -57,11 +57,22 @@ function openPromptBuilder(type){
   const xb=document.getElementById('pb-xb');if(xb)xb.value='2';
   const xbr=document.getElementById('pb-xbr');if(xbr)xbr.value='2';
 
-  // Reset Language Field
+  // Reset Language Field — défaut = langue d'interface courante, mais le
+  // sélecteur reste modifiable par l'utilisateur (retour utilisateur 2026-08-06).
   const ls=document.getElementById('pb-lang-select');
-  if(ls) ls.value='Français';
   const ll=document.getElementById('pb-lang-libre');
-  if(ll) { ll.value=''; ll.style.display='none'; }
+  const _pbLangBySelectValue={fr:'Français',en:'Anglais',es:'Espagnol',de:'Allemand'};
+  const _curUiLang=(typeof I18N!=='undefined'&&I18N.getLang)?I18N.getLang():'fr';
+  const _mappedLang=_pbLangBySelectValue[_curUiLang];
+  if(ls){
+    if(_mappedLang){
+      ls.value=_mappedLang;
+      if(ll){ ll.value=''; ll.style.display='none'; }
+    } else {
+      ls.value='Autre';
+      if(ll){ ll.value=(typeof I18N!=='undefined'&&I18N.name)?I18N.name(_curUiLang):''; ll.style.display='block'; }
+    }
+  }
 
   // Rebuild cascade buttons and initial preview
   pbInitMat();

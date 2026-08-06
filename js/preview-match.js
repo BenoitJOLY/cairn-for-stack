@@ -44,9 +44,9 @@ function renderPreviewHTML_match(state) {
 
   <div class="hs-fb-section-title">${I18N.t('common.preview_fb_after_title')}</div>
   <div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${nodeDesc}</div>
-  <div style="border-left:4px solid #16a34a;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:8px;color:#166534;"><strong>${I18N.t('match.fb_ok_title')}</strong> ${I18N.t('match.fb_ok_detail')}</div>
+  <div style="border-left:4px solid #16a34a;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:8px;"><strong>${I18N.t('match.fb_ok_title')}</strong> ${I18N.t('match.fb_ok_detail')}</div>
   <div style="font-size:.78rem;color:#64748b;font-style:italic;margin-bottom:2px;">${nodeDesc}</div>
-  <div style="border-left:4px solid #f59e0b;padding:8px 12px;background:#fffbeb;border-radius:4px;color:#92400e;"><strong>${I18N.t('match.fb_wrong_title')}</strong> ${I18N.t('match.fb_wrong_detail')}<br><span style="font-size:.85rem;">${I18N.t('match.fb_wrong_errors_title')} <em>{@faux_feedback_str@}</em></span></div>`;
+  <div style="border-left:4px solid #f59e0b;padding:8px 12px;background:#fffbeb;border-radius:4px;"><strong>${I18N.t('match.fb_wrong_title')}</strong> ${I18N.t('match.fb_wrong_detail')}<br><span style="font-size:.85rem;">${I18N.t('match.fb_wrong_errors_title')} <em>{@faux_feedback_str@}</em></span></div>`;
 
   return `<!DOCTYPE html>
 <html lang="fr">

@@ -28,11 +28,11 @@ function _cinBuildLivePreviewJS(state) {
   if (!d.ok) {
     var reason;
     if (d.failReason === 'notEnoughPoints') {
-      reason = 'Il faut au moins 3 points M₀, M₁, M₂… digitalisés dans l\'atelier pour générer l\'aperçu. Pointez d\'autres positions sur le fond (libre ou image importée).';
+      reason = I18N.t('cin.preview_err_not_enough_points');
     } else if (d.failReason === 'badCalib') {
-      reason = 'La calibration de l\'échelle est incomplète ou dégénérée : posez 2 points de calibration distincts et renseignez une distance réelle strictement positive entre eux.';
+      reason = I18N.t('cin.preview_err_bad_calib');
     } else {
-      reason = 'L\'indice i choisi (' + d.iIdx + ') est hors limites pour le nombre de points digitalisés : il doit être compris entre ' + d.iMin + ' et ' + d.iMax + '.';
+      reason = I18N.t('cin.preview_err_bad_index', {iIdx: d.iIdx, iMin: d.iMin, iMax: d.iMax});
     }
     return { ok: false, reason: reason };
   }
@@ -97,15 +97,15 @@ function renderPreviewHTML_cinematique(state) {
   var exampleHTML;
   if (live.ok) {
     exampleHTML = '<div style="display:flex;gap:10px;flex-wrap:wrap;">'
-      + '<div style="flex:1 1 260px;"><div style="font-size:.72rem;color:#475569;margin-bottom:3px;">Étape 1 — mesure de la norme v<sub>i</sub></div>'
+      + '<div style="flex:1 1 260px;"><div style="font-size:.72rem;color:#475569;margin-bottom:3px;">' + I18N.t('cin.preview_step1_label') + '</div>'
       + '<div id="' + live.boardId1 + '" style="position:relative;width:100%;height:340px;border:1px solid #cbd5e1;border-radius:8px;overflow:visible;background:#fff;"></div></div>'
-      + '<div style="flex:1 1 260px;"><div style="font-size:.72rem;color:#475569;margin-bottom:3px;">Étape 2 — construction de Δv<sub>i</sub> (relation de Chasles)</div>'
+      + '<div style="flex:1 1 260px;"><div style="font-size:.72rem;color:#475569;margin-bottom:3px;">' + I18N.t('cin.preview_step2_label') + '</div>'
       + '<div id="' + live.boardId2 + '" style="position:relative;width:100%;height:340px;border:1px solid #cbd5e1;border-radius:8px;overflow:visible;background:#fff;"></div></div>'
       + '</div>'
       + '<script src="lib/jsxgraph/jsxgraphcore.js"><\/script>'
       + '<script>' + live.script + '<\/script>';
   } else {
-    exampleHTML = '<p style="color:#dc2626;font-style:italic;">' + (live.reason || 'Aperçu indisponible : digitalisez au moins 3 points dans l\'atelier et posez la calibration.') + '</p>';
+    exampleHTML = '<p style="color:#dc2626;font-style:italic;">' + (live.reason || I18N.t('cin.preview_unavailable_fallback')) + '</p>';
   }
 
   var realParts = null;
@@ -119,14 +119,14 @@ function renderPreviewHTML_cinematique(state) {
   var node2 = realParts && realParts.prts && realParts.prts[1] && realParts.prts[1].nodes[0];
   var extraFeedbackNodes = node2 ? [{
     desc: node2.description,
-    fb: (node2.truefeedback ? '<div><strong>Si correct :</strong> ' + _cinTokenizeStack(node2.truefeedback) + '</div>' : '')
-      + (node2.falsefeedback ? '<div><strong>Si incorrect :</strong> ' + _cinTokenizeStack(node2.falsefeedback) + '</div>' : '')
+    fb: (node2.truefeedback ? '<div><strong>' + I18N.t('common.preview_if_correct') + ':</strong> ' + _cinTokenizeStack(node2.truefeedback) + '</div>' : '')
+      + (node2.falsefeedback ? '<div><strong>' + I18N.t('common.preview_if_wrong') + ':</strong> ' + _cinTokenizeStack(node2.falsefeedback) + '</div>' : '')
   }] : [];
 
   return _hsSimplePreviewHTML({
-    badge: 'Cinématique du point', badgeColor: '#4f46e5', noteBg: '#eef2ff', noteColor: '#312e81',
+    badge: I18N.t('cin.title'), badgeColor: '#4f46e5', noteBg: '#eef2ff', noteColor: '#312e81',
     prefix: 'cin', bareme: state.bareme || 1,
-    text: _hsRenderMath(state.text || '<p><em>Énoncé automatique : mesure de la norme du vecteur vitesse puis construction de Δv<sub>i</sub> par la relation de Chasles.</em></p>'),
+    text: _hsRenderMath(state.text || ('<p><em>' + I18N.t('cin.preview_default_statement') + '</em></p>')),
     exampleLabel: '',
     exampleHTML: exampleHTML,
     fbOk: node1 ? _cinTokenizeStack(node1.truefeedback) : '',

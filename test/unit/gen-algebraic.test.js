@@ -11,7 +11,7 @@ const path = require('node:path');
 
 const { genAlgebraicCore } = require(path.join('..', '..', 'js', 'gen-algebraic.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
-const { applyFbBox, inferFbKind } = require(path.join('..', '..', 'js', 'fb-box.js'));
+const { applyFbBox, inferFbKind, stripLeadingFbIcon } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
@@ -29,7 +29,7 @@ function algPrtNodeCanonical(X,n,test,sans,tans,opts,trueNext,trueScore,falseNex
     };
 }
 
-const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, applyFbBox, inferFbKind };
+const DEPS = { I18N: I18N_STUB, buildPrtXml, wrapFb, algPrtNodeCanonical, buildKbdStackHTML, applyFbBox, inferFbKind, stripLeadingFbIcon };
 
 function baseParams(overrides) {
     return Object.assign({

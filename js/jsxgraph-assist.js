@@ -117,39 +117,32 @@ function jxgGeneratePrompt() {
 
   var varBlock = names.length
     ? names.map(function(n) {
-        return '  ' + n + '  →  var ' + n + ' = <valeur d\'exemple>; // POOLVAR: ' + n;
+        return I18N.t('jxg.prompt_var_line', {n: n});
       }).join('\n')
-    : '  (aucune variable définie dans le pool pour ce questionnaire)';
+    : I18N.t('jxg.prompt_no_vars');
 
   var varInit = names.slice(0, 6).map(function(n) {
     return 'var ' + n + ' = 1; // POOLVAR: ' + n;
   }).join('\n');
 
   var modeRule = isInteractive
-    ? '5. Ce graphique est INTERACTIF : les points que l\'élève doit pouvoir déplacer\n'
-    + '   sont des points JSXGraph normaux, déplaçables (PAS fixed:true). Juste après\n'
-    + '   la ligne board.create(\'point\', …) de CHAQUE point interactif, ajoute un\n'
-    + '   commentaire // BIND: nomVariable (ex: // BIND: ans1) indiquant à quelle\n'
-    + '   variable de réponse STACK il correspond — je ferai le branchement\n'
-    + '   stack_jxg.bind_point moi-même après conversion.'
-    : '5. Ce graphique est en AFFICHAGE SEUL (non interactif) : tous les objets\n'
-    + '   JSXGraph DOIVENT avoir {fixed:true, highlight:false, visible:true}\n'
-    + '   (les trois — STACK a besoin de visible:true en plus de fixed:true).';
+    ? I18N.t('jxg.prompt_rule5_interactive')
+    : I18N.t('jxg.prompt_rule5_display');
 
   var optSummary = [
-    optAxis  ? 'axes visibles' : 'pas d\'axes',
-    optGrid  ? 'quadrillage' : 'pas de quadrillage',
-    optOrtho ? 'ORTHONORMÉ (keepAspectRatio:true)' : '',
-    optNav   ? 'navigation activée' : 'navigation cachée',
-    optPan   ? 'pan souris activé' : 'pan désactivé',
-    stepX        ? 'pas X=' + stepX : '',
-    stepY        ? 'pas Y=' + stepY : '',
-    optReticule  ? 'RÉTICULE (crosshair + coordonnées)' : ''
+    optAxis  ? I18N.t('jxg.opt_axes_on') : I18N.t('jxg.opt_axes_off'),
+    optGrid  ? I18N.t('jxg.opt_grid_on') : I18N.t('jxg.opt_grid_off'),
+    optOrtho ? I18N.t('jxg.opt_ortho_on') : '',
+    optNav   ? I18N.t('jxg.opt_nav_on') : I18N.t('jxg.opt_nav_off'),
+    optPan   ? I18N.t('jxg.opt_pan_on') : I18N.t('jxg.opt_pan_off'),
+    stepX        ? I18N.t('jxg.opt_stepx', {v: stepX}) : '',
+    stepY        ? I18N.t('jxg.opt_stepy', {v: stepY}) : '',
+    optReticule  ? I18N.t('jxg.opt_reticule_on') : ''
   ].filter(Boolean).join(', ');
 
   // Snippet réticule à inclure tel quel dans le squelette
   var reticuleSnippet = optReticule
-    ? '/* --- réticule : lignes croisées + coordonnées au survol --- */\n'
+    ? I18N.t('jxg.prompt_reticule_comment') + '\n'
     + '(function() {\n'
     + '    var _rv = board.create(\'line\',\n'
     + '        [board.create(\'point\',[0,-1e4],{visible:false}),\n'
@@ -176,35 +169,23 @@ function jxgGeneratePrompt() {
     : '';
 
   var prompt =
-'Tu génères un graphique JSXGraph CLASSIQUE et AUTONOME (testable seul dans un\n'
-+ 'navigateur). Ne te préoccupe PAS de STACK/Moodle : je convertis moi-même ton\n'
-+ 'code ensuite (syntaxe [[jsxgraph]], divid, {#…#}) — inutile de la connaître.\n'
+I18N.t('jxg.prompt_intro') + '\n'
 + '\n'
-+ '━━ RÈGLES ━━\n'
-+ '1. Structure complète et autonome :\n'
-+ '   <div id="box" style="width:' + w + ';height:' + h + ';"></div>\n'
-+ '   <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>\n'
-+ '   <script>\n'
-+ '   var board = JXG.JSXGraph.initBoard(\'box\', {…});\n'
-+ '   … ton code …\n'
-+ '   </script>\n'
-+ '2. Nomme la variable du board EXACTEMENT "board" et le conteneur EXACTEMENT\n'
-+ '   "box" (comme dans le squelette ci-dessous).\n'
-+ '3. Si tu utilises une des variables listées plus bas, déclare-la avec une\n'
-+ '   valeur d\'exemple ET le commentaire // POOLVAR: nom sur la MÊME ligne\n'
-+ '   (ex: var a = 3; // POOLVAR: a) — c\'est ce qui me permet de la relier\n'
-+ '   automatiquement après conversion.\n'
-+ '4. Encadre le tracé de board.suspendUpdate() / board.unsuspendUpdate().\n'
++ I18N.t('jxg.prompt_rules_header') + '\n'
++ I18N.t('jxg.prompt_rule1', {w: w, h: h}) + '\n'
++ I18N.t('jxg.prompt_rule2') + '\n'
++ I18N.t('jxg.prompt_rule3') + '\n'
++ I18N.t('jxg.prompt_rule4') + '\n'
 + modeRule + '\n'
 + '\n'
-+ '━━ CONFIGURATION DU REPÈRE (à respecter exactement) ━━\n'
-+ 'Fenêtre : x de ' + xmin + ' à ' + xmax + ', y de ' + ymin + ' à ' + ymax + '\n'
-+ 'Options : ' + optSummary + '\n'
++ I18N.t('jxg.prompt_config_header') + '\n'
++ I18N.t('jxg.prompt_window', {xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax}) + '\n'
++ I18N.t('jxg.prompt_options', {opts: optSummary}) + '\n'
 + '\n'
-+ '━━ VARIABLES DISPONIBLES ━━\n'
++ I18N.t('jxg.prompt_vars_header') + '\n'
 + varBlock + '\n'
 + '\n'
-+ '━━ SQUELETTE DE RÉFÉRENCE (utiliser cette config exacte pour initBoard) ━━\n'
++ I18N.t('jxg.prompt_skeleton_header') + '\n'
 + '<div id="box" style="width:' + w + ';height:' + h + ';"></div>\n'
 + '<script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>\n'
 + '<script>\n'
@@ -213,18 +194,15 @@ function jxgGeneratePrompt() {
 + '});\n'
 + 'board.suspendUpdate();\n'
 + (varInit ? varInit + '\n' : '')
-+ '/* --- tracé ici --- */\n'
++ I18N.t('jxg.prompt_draw_here') + '\n'
 + (reticuleSnippet ? reticuleSnippet : '')
 + 'board.unsuspendUpdate();\n'
 + '</script>\n'
 + '\n'
-+ '━━ DEMANDE ━━\n'
-+ (desc || '(aucune description fournie)') + '\n'
++ I18N.t('jxg.prompt_request_header') + '\n'
++ (desc || I18N.t('jxg.prompt_no_desc')) + '\n'
 + '\n'
-+ 'Réponds UNIQUEMENT avec le code (div + script), prêt à coller et tester dans\n'
-+ 'un navigateur, entouré d\'un bloc de code markdown (```html au début, ```\n'
-+ 'à la fin) — sans quoi certaines interfaces de chat exécutent le HTML/JS\n'
-+ 'au lieu de l\'afficher comme du texte. Pas d\'explication avant ou après.';
++ I18N.t('jxg.prompt_footer');
 
   var out = document.getElementById('jxg-prompt-out');
   out.value = prompt;

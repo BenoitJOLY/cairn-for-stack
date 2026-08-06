@@ -75,8 +75,26 @@ stack_js.request_access_to_input("${ansRef}", true).then(function(input_id) {
 [[/iframe]]`;
 }
 
+// Extrait la partie HTML statique (style + boutons) du clavier STACK-JS pour
+// l'aperçu local : le reste de buildKbdStackHTML() ([[iframe]], [[script]]...)
+// est du pseudo-XML STACK interprété côté Moodle, pas du HTML valide dans
+// notre propre iframe de prévisualisation. Les boutons restent inertes ici
+// (pas de script rejoué), ce qui suffit pour un aperçu visuel fidèle.
+function buildKbdPreviewHTML(){
+  try {
+    var full = buildKbdStackHTML('1');
+    var styleMatch = full.match(/\[\[style\]\]([\s\S]*?)\[\[\/style\]\]/);
+    var startIdx = full.indexOf('<div class="stack-keyboard-container">');
+    var endIdx = full.indexOf('[[script');
+    if (startIdx === -1 || endIdx === -1) return '';
+    var containerHTML = full.slice(startIdx, endIdx).trim();
+    var styleHTML = styleMatch ? '<style>' + styleMatch[1] + '</style>' : '';
+    return styleHTML + containerHTML;
+  } catch (e) { return ''; }
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { buildKbdStackHTML: buildKbdStackHTML };
+  module.exports = { buildKbdStackHTML: buildKbdStackHTML, buildKbdPreviewHTML: buildKbdPreviewHTML };
 }
 
 function openKbdModal(type,fieldId){

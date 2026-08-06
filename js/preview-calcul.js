@@ -13,8 +13,8 @@ function renderPreviewHTML_calcul(state) {
   // directement le texte saisi par l'enseignant (état déjà utilisé avant l'aperçu réel),
   // simplement encadré via applyFbBox pour pouvoir accueillir realFbWrongHTML sans double
   // encadré (cf. commentaire fbBoxesPreWrapped dans js/preview.js).
-  var fbOkHTML = applyFbBox('true', state.fbOk || FB_JUSTE_DEFAULT());
-  var wrongFbHTML = applyFbBox('false', state.fbWrong || FB_FAUX_DEFAULT());
+  var fbOkHTML = applyFbBox('true', stripLeadingFbIcon(state.fbOk || FB_JUSTE_DEFAULT()));
+  var wrongFbHTML = applyFbBox('false', stripLeadingFbIcon(state.fbWrong || FB_FAUX_DEFAULT()));
   var scenarioHTML, fbGenBody;
   if (state.realBodyHTML) {
     // Tirage réellement calculé par Maxima (voir _calcRefreshRealPreview plus bas) :

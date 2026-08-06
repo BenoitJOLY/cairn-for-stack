@@ -74,7 +74,7 @@ function renderPreviewHTML_numerical(state) {
   </div>
   <div class="hs-main-block">
     <div class="hs-preview-text" data-num-field="text">${text}</div>
-    <div data-num-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? `<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ ${I18N.t('common.preview_kbd_note')}</div>` : ''}</div>
+    <div data-num-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? (typeof buildKbdPreviewHTML === 'function' ? buildKbdPreviewHTML() : `<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ ${I18N.t('common.preview_kbd_note')}</div>`) : ''}</div>
     <input class="hs-num-input" type="text" disabled placeholder="${I18N.t('common.preview_student_placeholder')}">
     <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 

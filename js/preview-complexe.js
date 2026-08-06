@@ -102,12 +102,18 @@ function renderPreviewHTML_complexe(state) {
   // ce catalogue liste plusieurs textes édités par l'enseignant selon le type
   // d'erreur, alors que la sonde n'en déclenche qu'un seul à la fois — les cacher
   // ferait disparaître des feedbacks bien réels aux yeux de l'enseignant).
+  // Chaque entrée du catalogue est encadrée (js/fb-box.js) comme partout ailleurs
+  // dans l'app : "ok"/"perfect" = encadré vert (réponse exacte), les autres motifs
+  // (erreurs partielles ou totales, trop nombreux et hétérogènes selon le scénario
+  // pour être fiablement classés vrai/faux) = encadré neutre (retour utilisateur
+  // 2026-08-06 : il manquait tout entourage ici).
   let fbGlobalHTML = '';
   if (typeof CPX_FB_DEFS !== 'undefined' && CPX_FB_DEFS[scenario]) {
     fbGlobalHTML = CPX_FB_DEFS[scenario].map(function (item) {
       const id = _cpxFbId(scenario, item.key);
       const raw = (state.fbDetail && state.fbDetail[id]) ? state.fbDetail[id] : I18N.t(item.defKey);
-      return `<div class="hs-clickable" data-cpx-field="detail:${id}" style="margin-bottom:8px;">${_hsRenderMath(_cpxSubst(raw, pmap))}</div>`;
+      const kind = (item.key === 'ok' || item.key === 'perfect') ? 'true' : 'general';
+      return `<div class="hs-clickable" data-cpx-field="detail:${id}" style="margin-bottom:8px;">${applyFbBox(kind, _hsRenderMath(_cpxSubst(raw, pmap)))}</div>`;
     }).join('');
   }
   if (useReal && state.realFbWrongHTML) {

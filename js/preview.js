@@ -197,9 +197,16 @@ function renderPreviewHTML_units(state) {
     ${state.fbGen ? `<div style="margin-top:8px;">${_hsRenderMath(state.fbGen)}</div>` : ''}
   </div>`;
 
+  // Le PRT réellement exporté (js/gen-units.js) ignore les champs fbc/fbe de
+  // l'éditeur — 2 nœuds au feedback fixe (vérif. unité, puis vérif. valeur).
+  // On affiche donc ici les 3 issues réelles plutôt que ces champs morts
+  // (retour utilisateur 2026-08-06 : l'aperçu ne montrait aucun feedback).
+  const unitLabel = state.unit || '—';
+  const fbUniteKo = I18N.t('un.fb_unite_incorrecte', { unitvar: unitLabel }).replace(/\{@|@\}/g, '');
   const fbGlobalHTML = `
-    <div data-un-field="fbc">${wrapFb(_hsRenderMath(state.fbc || ''), true)}</div>
-    <div data-un-field="fbe">${wrapFb(_hsRenderMath(state.fbe || ''), false)}</div>`;
+    <div>${applyFbBox('false', _hsRenderMath('<p>' + fbUniteKo + '</p>'))}</div>
+    <div>${applyFbBox('true', _hsRenderMath('<p>' + I18N.t('un.fb_ok_complete') + '</p>'))}</div>
+    <div>${applyFbBox('false', _hsRenderMath('<p>' + I18N.t('un.fb_wrong_valeur') + '</p>'))}</div>`;
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -232,7 +239,7 @@ function renderPreviewHTML_units(state) {
   <div class="hs-main-block">
     <div class="hs-preview-text" data-un-field="text">${text}</div>
     ${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}
-    ${kbdOn ? '<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ Clavier virtuel Maxima inclus dans la question.</div>' : ''}
+    ${kbdOn ? (typeof buildKbdPreviewHTML === 'function' ? buildKbdPreviewHTML() : `<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ ${I18N.t('common.preview_kbd_note')}</div>`) : ''}
     <input class="hs-un-input" type="text" disabled placeholder="ex : 9.81*m/s^2">
     <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 
@@ -1107,29 +1114,32 @@ window.chemRefreshPreview = _hsWireSimplePreview('chemical', 'chem', 'chem-previ
 // (capture des canvases SmilesDrawer) et ne peut pas être appelé de façon synchrone
 // ici comme genChemical()/genNuclear() le sont pour leur propre aperçu.
 function _topoDiagNodes() {
+  // Texte en couleur neutre — la bordure/fond de l'encadré (wrapFb/applyFbBox,
+  // vert=vrai/rouge=faux) suffit déjà à indiquer le sens du feedback (retour
+  // utilisateur 2026-08-06, même règle que js/preview-checkbox.js).
   var X = '';
   return [
     { description: I18N.t('tpl.topo_desc_fleche'),
-      truefeedback: '<p><span style="color: green; font-weight: bold;">' + I18N.t('tpl.topo_fb_fleche_ok') + '</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">' + I18N.t('tpl.topo_fb_fleche_ko', { det: '{@ans_arrow_det' + X + '@}', att: '{@tans_arrow' + X + '@}' }) + '</span></p>' },
+      truefeedback: '<p><strong>' + I18N.t('tpl.topo_fb_fleche_ok') + '</strong></p>',
+      falsefeedback: '<p><strong>' + I18N.t('tpl.topo_fb_fleche_ko', { det: '{@ans_arrow_det' + X + '@}', att: '{@tans_arrow' + X + '@}' }) + '</strong></p>' },
     { description: I18N.t('tpl.topo_desc_atomes'),
-      truefeedback: '<p><span style="color: green; font-weight: bold;">' + I18N.t('tpl.topo_fb_atomes_ok') + '</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222; font-weight: bold;">' + I18N.t('tpl.topo_fb_atomes_ko') + '</span></p>' },
+      truefeedback: '<p><strong>' + I18N.t('tpl.topo_fb_atomes_ok') + '</strong></p>',
+      falsefeedback: '<p><strong>' + I18N.t('tpl.topo_fb_atomes_ko') + '</strong></p>' },
     { description: I18N.t('tpl.topo_desc_charges'),
-      truefeedback: '<p><span style="color: green;">' + I18N.t('tpl.topo_fb_charges_ok') + '</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_charges_ko', { rea: '{@charge_rea_s' + X + '@}', pro: '{@charge_pro_s' + X + '@}' }) + '</span></p>' },
+      truefeedback: '<p>' + I18N.t('tpl.topo_fb_charges_ok') + '</p>',
+      falsefeedback: '<p>' + I18N.t('tpl.topo_fb_charges_ko', { rea: '{@charge_rea_s' + X + '@}', pro: '{@charge_pro_s' + X + '@}' }) + '</p>' },
     { description: I18N.t('tpl.topo_desc_formules'),
-      truefeedback: '<p><span style="color: green;">' + I18N.t('tpl.topo_fb_formules_ok') + '</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_formules_ko', { rea: '{@nb_rea_s' + X + '@}', pro: '{@nb_pro_s' + X + '@}' }) + '</span></p>' },
+      truefeedback: '<p>' + I18N.t('tpl.topo_fb_formules_ok') + '</p>',
+      falsefeedback: '<p>' + I18N.t('tpl.topo_fb_formules_ko', { rea: '{@nb_rea_s' + X + '@}', pro: '{@nb_pro_s' + X + '@}' }) + '</p>' },
     { description: I18N.t('tpl.topo_desc_groupes'),
-      truefeedback: '<p><span style="color: #b45309;">' + I18N.t('tpl.topo_fb_groupes_ok') + '</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_groupes_ko') + '</span></p>' },
+      truefeedback: '<p>' + I18N.t('tpl.topo_fb_groupes_ok') + '</p>',
+      falsefeedback: '<p>' + I18N.t('tpl.topo_fb_groupes_ko') + '</p>' },
     { description: I18N.t('tpl.topo_desc_coefficients'),
-      truefeedback: '<p><span style="color: green;">' + I18N.t('tpl.topo_fb_coefs_ok') + '</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_coefs_ko') + '</span></p>' },
+      truefeedback: '<p>' + I18N.t('tpl.topo_fb_coefs_ok') + '</p>',
+      falsefeedback: '<p>' + I18N.t('tpl.topo_fb_coefs_ko') + '</p>' },
     { description: I18N.t('tpl.topo_desc_coefsprop'), sans: 'is_proportional' + X, tans: 'true',
-      truefeedback: '<p><span style="color: #b45309;">' + I18N.t('tpl.topo_fb_coefsprop_ok', { k: '{@k_ratio' + X + '@}' }) + '</span></p>',
-      falsefeedback: '<p><span style="color: #cc2222;">' + I18N.t('tpl.topo_fb_coefsprop_ko') + '</span></p>' }
+      truefeedback: '<p>' + I18N.t('tpl.topo_fb_coefsprop_ok', { k: '{@k_ratio' + X + '@}' }) + '</p>',
+      falsefeedback: '<p>' + I18N.t('tpl.topo_fb_coefsprop_ko') + '</p>' }
   ];
 }
 
@@ -1277,6 +1287,7 @@ function renderPreviewHTML_apn(state) {
     fbOkDesc: prtBoxes.okDesc, fbWrongDesc: prtBoxes.wrongDesc,
     fbGenAuto: _hsRenderMath(_calcTokenizeForPreview(realGeneralFeedback, knownVars) + note),
     fbOk: _calcTokenizeForPreview(prtBoxes.okFb, knownVars), fbWrong: _calcTokenizeForPreview(prtBoxes.wrongFb, knownVars), fbGen: state.fbGen,
+    fbBoxesPreWrapped: true,
     extraFeedbackNodes: (realParts.diagNodes || []).map(function(n) {
       return { desc: n.desc, fb: applyFbBox(n.kind, _calcTokenizeForPreview(n.fb, knownVars)) };
     })

@@ -425,9 +425,9 @@ function buildCWPrompt() {
   const level = document.getElementById('cw-pb-level').value.trim() || "[INSÉREZ VOTRE classe ICI]";
   const sous = (document.getElementById('cw-pb-sous')?.value || '').trim();
   const chap = (document.getElementById('cw-pb-chap')?.value || '').trim();
-  let ctx = `${matter} en classe de ${level}`;
-  if(sous) ctx += `, sous-matière « ${sous} »`;
-  if(chap) ctx += `, chapitre « ${chap} »`;
+  let ctx = I18N.t('cw.prompt_ctx_base', {matter: matter, level: level});
+  if(sous) ctx += I18N.t('cw.prompt_ctx_sous', {sous: sous});
+  if(chap) ctx += I18N.t('cw.prompt_ctx_chap', {chap: chap});
   const count = document.getElementById('cw-pb-count').value || "[INSÉREZ VOTRE nombre ICI]";
   const lang = document.getElementById('cw-pb-lang').value || "Français";
 
@@ -447,35 +447,35 @@ function buildCWPrompt() {
   // ══════════════════════════════════════════════════
   // GÉNÉRATION DU PROMPT
   // ══════════════════════════════════════════════════
-  const prompt = `Tu es un créateur de mots croisés expert et un enseignant pédagogue de ${ctx} . Génère une liste de mots et leurs définitions pour créer une grille de mots croisés.
+  const prompt = `${I18N.t('cw.prompt_role', {ctx: ctx})}
 
-Thème demandé : ${theme}
-Nombre de mots à générer : ${count}
-Langue : ${lang}
+${I18N.t('cw.prompt_theme_lbl', {theme: theme})}
+${I18N.t('cw.prompt_count_lbl', {count: count})}
+${I18N.t('cw.prompt_lang_lbl', {lang: lang})}
 
-Règles strictes d'interconnexion :
+${I18N.t('cw.prompt_rules_lbl')}
  ${rule1}
-2. VÉRIFICATION CROISÉE : Avant de lister un mot, assure-toi qu'il partage AU MOINS une lettre avec au moins 2 autres mots de ta liste.
-3. Les mots doivent contenir entre 4 et 10 lettres. Évite les mots de 2 ou 3 lettres qui bloquent la grille.
-4. Les définitions doivent être courtes, claires et au style typique des mots croisés.
-5. Écris les mots en MAJUSCULES sans accents pour le champ "word" (ex: "ECOLE" et non "École"). Tu peux mettre des accents dans les définitions.
-6. INTERDICTION ABSOLUE : la définition ne doit JAMAIS contenir le mot à trouver, ni un mot de la même famille (même racine). Par exemple, pour le mot "RÉACTION", la définition ne doit contenir ni "réaction", ni "réagir", ni "réactif".
-7. NATURE DES MOTS : chaque mot doit être un NOM COMMUN au SINGULIER. Pas de noms propres, pas de pluriels, pas de verbes conjugués, pas de mots composés (ni espace ni trait d'union).
+${I18N.t('cw.prompt_rule2')}
+${I18N.t('cw.prompt_rule3')}
+${I18N.t('cw.prompt_rule4')}
+${I18N.t('cw.prompt_rule5')}
+${I18N.t('cw.prompt_rule6')}
+${I18N.t('cw.prompt_rule7')}
 
-Génère UNIQUEMENT un tableau JSON valide, sans aucun texte supplémentaire avant ou après, en utilisant exactement cette structure :
+${I18N.t('cw.prompt_json_instr')}
 [
   {
-    "word": "MOT",
-    "def": "Définition du mot ici"
+    "word": "${I18N.t('cw.prompt_json_word_ph')}",
+    "def": "${I18N.t('cw.prompt_json_def_ph')}"
   }
 ]
 
-CONTRÔLE FINAL (à vérifier avant de répondre) :
-- Le tableau JSON est syntaxiquement valide (virgules, guillemets, crochets corrects).
-- Tout antislash éventuel est doublé (\\\\) et tout guillemet interne est échappé (\\") pour rester un JSON valide.
-- Aucune définition ne contient son propre mot (règle 6) ; tous les mots sont des noms communs au singulier (règle 7).
-- Aucun texte, commentaire ou balise markdown en dehors du tableau.
-Si tu ne peux pas respecter ces contraintes, renvoie un tableau vide [].`;
+${I18N.t('cw.prompt_final_check')}
+${I18N.t('cw.prompt_check1')}
+${I18N.t('cw.prompt_check2')}
+${I18N.t('cw.prompt_check3')}
+${I18N.t('cw.prompt_check4')}
+${I18N.t('cw.prompt_fallback')}`;
 
   document.getElementById('cw-pb-result').value = prompt;
 }

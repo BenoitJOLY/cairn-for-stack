@@ -32,6 +32,8 @@ function immLoadImage(input) {
       document.getElementById('imm-img-h').value = finalH;
       document.getElementById('imm-img').src = finalDataUrl;
       document.getElementById('imm-preview-wrap').style.display = '';
+      var immFn = document.getElementById('imm-filename');
+      if (immFn) immFn.textContent = file.name + ' — ' + finalW + '×' + finalH + ' px';
       // Size warning (base64 is ~4/3 of raw)
       var kb = Math.round(finalDataUrl.length / 1024);
       var warn = document.getElementById('imm-size-warn');
