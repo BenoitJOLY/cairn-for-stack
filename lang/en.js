@@ -3016,6 +3016,8 @@ I18N.add("en", {
   "ord.banniere":       "Sequencing",
   "ord.parsons_headers":            "Drop your items here:",
   "ord.parsons_available_header":   "Drag from here:",
+  "ord.preview_add_items_hint":     "Add items in the Config tab to display the preview.",
+  "ord.preview_default_statement":  "Automatic statement: put the items back in the correct order.",
   "cw.horizontal":       "Horizontal",
   "cw.vertical":         "Vertical",
   "cw.fb_ok":            "Well done, all your words are correct!",

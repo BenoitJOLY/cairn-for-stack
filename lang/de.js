@@ -3019,6 +3019,8 @@ I18N.add("de", {
   "ord.banniere":       "Terminplanung",
   "ord.parsons_headers":            "Laden Sie Ihre Dateien hier hoch:",
   "ord.parsons_available_header":   "Von hier aus ziehen:",
+  "ord.preview_add_items_hint":     "Fügen Sie Elemente im Tab „Konfiguration“ hinzu, um die Vorschau anzuzeigen.",
+  "ord.preview_default_statement":  "Automatische Aufgabenstellung: die Elemente in die richtige Reihenfolge bringen.",
   "cw.horizontal":       "Horizontal",
   "cw.vertical":         "Vertikal",
   "cw.fb_ok":            "Bravo, alle deine Wörter sind richtig!",

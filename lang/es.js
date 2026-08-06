@@ -3019,6 +3019,8 @@ I18N.add("es", {
   "ord.banniere":       "Planificación",
   "ord.parsons_headers":            "Sube tus archivos aquí:",
   "ord.parsons_available_header":   "Desliza el dedo desde aquí:",
+  "ord.preview_add_items_hint":     "Añada elementos en la pestaña Config para mostrar la vista previa.",
+  "ord.preview_default_statement":  "Enunciado automático: reordenar los elementos correctamente.",
   "cw.horizontal":       "Horizontal",
   "cw.vertical":         "Vertical",
   "cw.fb_ok":            "¡Enhorabuena, todas tus respuestas son correctas!",

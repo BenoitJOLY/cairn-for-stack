@@ -3018,6 +3018,8 @@ I18N.add("fr", {
   "ord.banniere":       "Ordonnancement",
   "ord.parsons_headers":            "Déposez vos éléments ici :",
   "ord.parsons_available_header":   "Glissez à partir d'ici :",
+  "ord.preview_add_items_hint":     "Ajoutez des éléments dans l'onglet Config pour afficher l'aperçu.",
+  "ord.preview_default_statement":  "Énoncé automatique : remettre les éléments dans le bon ordre.",
   "cw.horizontal":       "Horizontal",
   "cw.vertical":         "Vertical",
   "cw.fb_ok":            "Bravo, tous vos mots sont corrects !",

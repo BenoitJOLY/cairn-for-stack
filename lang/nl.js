@@ -3019,6 +3019,8 @@ I18N.add("nl", {
   "ord.banniere":       "Planning",
   "ord.parsons_headers":            "Plaats uw artikelen hier:",
   "ord.parsons_available_header":   "Veeg vanaf hier:",
+  "ord.preview_add_items_hint":     "Voeg elementen toe in het tabblad Config om de voorvertoning te tonen.",
+  "ord.preview_default_statement":  "Automatische opgave: zet de elementen in de juiste volgorde.",
   "cw.horizontal":       "Horizontaal",
   "cw.vertical":         "Verticaal",
   "cw.fb_ok":            "Goed gedaan, al je woorden zijn correct!",
