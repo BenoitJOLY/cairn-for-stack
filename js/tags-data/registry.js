@@ -9,7 +9,12 @@ function registerCountryTags(code, label, tree) {
   TAGS_COUNTRIES[code] = { label: label, tree: tree };
 }
 
+// Le référentiel de tags suit la langue d'interface (I18N) : pas de choix
+// manuel indépendant. currentPays() reflète simplement la langue active.
 function currentPays() {
+  if (window.I18N && typeof I18N.getLang === 'function' && TAGS_COUNTRIES[I18N.getLang()]) {
+    return I18N.getLang();
+  }
   try { return localStorage.getItem(STACKFORGE_PAYS_KEY) || 'fr'; } catch (e) { return 'fr'; }
 }
 
@@ -35,3 +40,8 @@ if (document.readyState === 'loading') {
 } else {
   applyPays(currentPays());
 }
+
+// Changement de langue d'interface → le référentiel de tags suit.
+document.addEventListener('i18n:changed', function (e) {
+  applyPays((e.detail && e.detail.lang) || currentPays());
+});
