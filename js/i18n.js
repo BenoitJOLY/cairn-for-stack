@@ -110,6 +110,12 @@ window.I18N = (function () {
       b.classList.toggle("on", b.getAttribute("data-lang") === active);
     });
   }
+  /* Reconstruit le sélecteur (ex. après l'arrivée de langues chargées en différé). */
+  function rebuildSwitcher() {
+    var sw = document.getElementById("hs-lang-switch");
+    if (sw) sw.remove();
+    injectSwitcher();
+  }
   function injectSwitcher() {
     var header = document.querySelector(".app-header");
     if (!header || document.getElementById("hs-lang-switch")) return;
@@ -164,6 +170,6 @@ window.I18N = (function () {
   return {
     add: add, register: register, t: t, apply: apply,
     setLang: setLang, use: setLang, getLang: getLang,
-    langs: langs, name: name
+    langs: langs, name: name, rebuildSwitcher: rebuildSwitcher
   };
 })();

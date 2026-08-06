@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/assistant.css">
   <link rel="stylesheet" href="css/darkmode.css">
-  <script src="lib/smiles-drawer/smiles-drawer.min.js"></script>
-  <script src="lib/katex/katex.min.js"></script>
 </head>
 <body><!-- STACKFORGE — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
 <!-- STACKFORGE — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
@@ -734,7 +732,7 @@ fill="currentColor" stroke="none">
 
 <header class="v4-header app-header" role="banner">
   <div class="v4-header-left">
-    <img src="assets/icone_48x48.png" class="v4-logo-img" alt="StackForge">
+    <img src="assets/icone_48x48.png" class="v4-logo-img" alt="StackForge" width="48" height="48">
     <div class="v4-brand">
       <h1 class="v4-app-name">StackForge</h1>
       <span class="v4-app-sub" data-i18n="app.subtitle">Générez le savoir, certifiez la réponse.</span>
@@ -8599,16 +8597,32 @@ fill="currentColor" stroke="none">
 </div>
 
 <!-- ═══ SCRIPTS V4 ════════════════════════════════════════════════════ -->
+<script src="lib/smiles-drawer/smiles-drawer.min.js"></script>
+<script src="lib/katex/katex.min.js"></script>
 <script>function jsmeOnLoad() {}</script>
 <script type="text/javascript" src="lib/jsme/dist/jsme/jsme.nocache.js"></script>
 
-<!-- i18n -->
+<!-- i18n : charge la langue active (+ repli fr) tout de suite ; diffère les 3 autres
+     langues en arrière-plan après le chargement de la page (elles pèsent ~2 Mo
+     au total pour un seul lecteur actif à la fois). -->
 <script src="js/i18n.js"></script>
-<script src="lang/fr.js"></script>
-<script src="lang/en.js"></script>
-<script src="lang/de.js"></script>
-<script src="lang/es.js"></script>
-<script src="lang/nl.js"></script>
+<script>
+window.__hsKnownLangs = ["fr","en","de","es","nl"];
+window.__hsActiveLang = (function(){
+  var saved = "fr";
+  try { var s = localStorage.getItem("stackforge_lang"); if (s && window.__hsKnownLangs.indexOf(s) !== -1) saved = s; } catch(e){}
+  return saved;
+})();
+window.__hsDeferredLangs = [];
+window.__hsLoadLangSet = function(prefix, isCore){
+  var active = window.__hsActiveLang, need = (active === "fr") ? ["fr"] : [active, "fr"];
+  need.forEach(function(code){ document.write('<script src="' + prefix + code + '.js"><\/script>'); });
+  window.__hsKnownLangs.forEach(function(code){
+    if (need.indexOf(code) === -1) window.__hsDeferredLangs.push({ url: prefix + code + ".js", core: !!isCore });
+  });
+};
+window.__hsLoadLangSet("lang/", true);
+</script>
 <script src="js/i18n-walk.js"></script>
 <script src="js/i18n-content.js"></script>
 
@@ -8773,22 +8787,14 @@ fill="currentColor" stroke="none">
 <script src="js/verif.js"></script>
 <script src="js/maxima-client.js"></script>
 <script src="js/doi.js"></script>
-<script src="lang/help.fr.js"></script>
-<script src="lang/help.en.js"></script>
-<script src="lang/help.de.js"></script>
-<script src="lang/help.es.js"></script>
-<script src="lang/help.nl.js"></script>
+<script>__hsLoadLangSet("lang/help.")</script>
 <script src="js/help.js"></script>
 <script src="lib/pdfjs/pdf.min.js"></script>
 <script src="lib/fflate/fflate.min.js"></script>
 <script src="js/ai-docs.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/relance.js"></script>
-<script src="lang/assistant.fr.js"></script>
-<script src="lang/assistant.en.js"></script>
-<script src="lang/assistant.de.js"></script>
-<script src="lang/assistant.es.js"></script>
-<script src="lang/assistant.nl.js"></script>
+<script>__hsLoadLangSet("lang/assistant.")</script>
 <script src="js/assistant.js"></script>
 <script src="js/version.js"></script>
 <script src="js/options.js"></script>
@@ -8914,6 +8920,28 @@ fill="currentColor" stroke="none">
 <script src="js/preview-zscore.js"></script>
 <script src="js/preview-avancement.js"></script>
 <script src="js/preview-cinematique.js"></script>
+<script>
+window.addEventListener("load", function(){
+  var run = function(){
+    var items = window.__hsDeferredLangs || [];
+    window.__hsDeferredLangs = [];
+    var coreLeft = items.filter(function(i){ return i.core; }).length;
+    items.forEach(function(item){
+      var el = document.createElement("script");
+      el.src = item.url;
+      if (item.core) el.onload = function(){
+        if (--coreLeft === 0) {
+          if (window.I18N && I18N.rebuildSwitcher) I18N.rebuildSwitcher();
+          if (window.__hsRefreshOptionsLangs) window.__hsRefreshOptionsLangs();
+        }
+      };
+      document.body.appendChild(el);
+    });
+  };
+  if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 3000 });
+  else setTimeout(run, 800);
+});
+</script>
 </body>
 </html>
 

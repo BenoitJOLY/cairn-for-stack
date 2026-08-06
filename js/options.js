@@ -89,14 +89,7 @@
     box.querySelector(".hs-opt-x").addEventListener("click", closeModal);
 
     // langues
-    var langs = box.querySelector("#hs-opt-langs");
-    (window.I18N ? I18N.langs() : ["fr"]).forEach(function (code) {
-      var b = document.createElement("button");
-      b.setAttribute("data-lang", code);
-      b.textContent = (I18N.name ? I18N.name(code) : code);
-      b.addEventListener("click", function () { I18N.setLang(code); syncLangButtons(); });
-      langs.appendChild(b);
-    });
+    buildLangButtons();
     // thème
     box.querySelectorAll("#hs-opt-themes button").forEach(function (b) {
       b.addEventListener("click", function () { applyTheme(b.getAttribute("data-theme")); });
@@ -123,6 +116,25 @@
     syncThemeButtons(currentTheme());
     syncModeButtons(currentMode());
   }
+
+  /* Construit (ou reconstruit) la liste des boutons de langue à partir de
+     I18N.langs() : certaines langues sont chargées en différé après le
+     premier affichage, donc cette fonction est ré-appelable (ex. depuis
+     window.__hsRefreshOptionsLangs une fois le chargement différé terminé). */
+  function buildLangButtons() {
+    var langs = document.getElementById("hs-opt-langs");
+    if (!langs) return;
+    langs.innerHTML = "";
+    (window.I18N ? I18N.langs() : ["fr"]).forEach(function (code) {
+      var b = document.createElement("button");
+      b.setAttribute("data-lang", code);
+      b.textContent = (I18N.name ? I18N.name(code) : code);
+      b.addEventListener("click", function () { I18N.setLang(code); syncLangButtons(); });
+      langs.appendChild(b);
+    });
+    syncLangButtons();
+  }
+  window.__hsRefreshOptionsLangs = buildLangButtons;
 
   function syncLangButtons() {
     var box = document.getElementById("hs-opt-langs");
