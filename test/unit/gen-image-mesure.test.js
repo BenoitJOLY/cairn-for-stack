@@ -92,7 +92,7 @@ test('genImageMesureCore : mode autonome — input échelle + 1 input par cible,
     assert.match(q.inputXML, /<name>imm1ec<\/name>/);
     assert.match(q.inputXML, /<name>imm1a1<\/name>/);
     assert.match(q.prtXML, /<name>prtimm11<\/name>/);
-    assert.match(q.prtXML, /<name>1<\/name>[\s\S]*Diagnostic/);
+    assert.match(q.prtXML, /<name>1<\/name>[\s\S]*imm\.node_diagnostic_echelle/);
 });
 
 test('genImageMesureCore : mode expert — aucun input d\'échelle, PRT neutre 1 nœud par cible', () => {

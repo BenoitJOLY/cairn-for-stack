@@ -553,11 +553,11 @@ function genImageMesureCore(X, p, deps) {
   function immPrtEchelleGuideXML(prtName, value, sans, tans) {
     var pieges = String(Math.round(-echelleRounded * 1e6) / 1e6);
     var nodes = [
-      _immNode('0', 'Vérification de l\'échelle de conversion (pixels → ' + unit + ')',
+      _immNode('0', I18N_D.t('imm.node_verif_echelle', {unit: unit}),
         'NumRelative', sans, tans, tol,
         '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N_D.t('imm.echelle_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
-      _immNode('1', 'Piège : repères 1 et 2 inversés (signe de l\'échelle)',
+      _immNode('1', I18N_D.t('imm.node_piege_inversion'),
         'NumRelative', sans, pieges, tol,
         '=', 0, -1, prtName + '-1-T', _immTrap(I18N_D.t('imm.piege_signe_desc')),
         '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N_D.t('imm.echelle_incorrecte_lbl') + '</strong> ' + fbWrong + '<p>' + I18N_D.t('imm.echelle_rappel_desc') + '</p>')
@@ -571,11 +571,11 @@ function genImageMesureCore(X, p, deps) {
   function immPrtRawGuideXML(prtName, value, sans, tans, pxDistLit) {
     var piege = String(pxDistLit);
     var nodes = [
-      _immNode('0', 'Vérification de la distance convertie (avant ajout de l\'origine)',
+      _immNode('0', I18N_D.t('imm.node_verif_distance_brute'),
         'NumRelative', sans, tans, tol,
         '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N_D.t('imm.distance_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
-      _immNode('1', 'Piège : distance laissée en pixels (oubli de la conversion par l\'échelle)',
+      _immNode('1', I18N_D.t('imm.node_piege_oubli_conversion'),
         'NumRelative', sans, piege, tol,
         '=', 0, -1, prtName + '-1-T', _immTrap(I18N_D.t('imm.piege_pixels_desc', {unit: unit})),
         '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N_D.t('imm.distance_incorrecte_lbl') + '</strong> ' + fbWrong + '<p>' + I18N_D.t('imm.distance_rappel_desc') + '</p>')
@@ -595,11 +595,11 @@ function genImageMesureCore(X, p, deps) {
       ? '<p>' + I18N_D.t('imm.kohint_ecart') + '</p>'
       : '<p>' + I18N_D.t('imm.kohint_position') + '</p>';
     var nodes = [
-      _immNode('0', 'Vérification de la valeur finale',
+      _immNode('0', I18N_D.t('imm.node_verif_valeur_finale'),
         'NumRelative', sans, tans, tol,
         '+', 1, -1, prtName + '-0-T', _immOk('<strong>' + I18N_D.t('imm.valeur_finale_correcte_lbl') + '</strong> ' + fbOk),
         '=', 0, 1, prtName + '-0-F', ''),
-      _immNode('1', targetType === 'ecart' ? 'Piège : origine ajoutée à tort à un écart' : 'Piège : origine (repère 1) non ajoutée',
+      _immNode('1', targetType === 'ecart' ? I18N_D.t('imm.node_piege_origine_ecart') : I18N_D.t('imm.node_piege_origine_manquante'),
         'NumRelative', sans, piege, tol,
         '=', 0, -1, prtName + '-1-T', _immTrap(trapTxt),
         '=', 0, -1, prtName + '-1-F', _immKo('<strong>' + I18N_D.t('imm.valeur_finale_incorrecte_lbl') + '</strong> ' + fbWrong + koHint)
@@ -617,11 +617,11 @@ function genImageMesureCore(X, p, deps) {
       : _immTrap(I18N_D.t('imm.hint_autonome_position'));
     var failFb = _immKo(I18N_D.t('imm.fail_autonome_desc'));
     var nodes = [
-      _immNode('0', 'Vérification de la valeur finale attendue',
+      _immNode('0', I18N_D.t('imm.node_verif_valeur_finale_attendue'),
         'NumRelative', sansFinal, tansFinal, tol,
         '+', 1, -1, prtName + '-0-T', _immOk(fbOk),
         '+', 0, 1, prtName + '-0-F', ''),
-      _immNode('1', 'Diagnostic (crédit partiel) : l\'échelle de conversion est-elle correcte ?',
+      _immNode('1', I18N_D.t('imm.node_diagnostic_echelle'),
         'NumRelative', P + 'ec', P + 'ec', tol,
         '+', 0.5, -1, prtName + '-1-T', hintFb,
         '=', 0, -1, prtName + '-1-F', failFb)
@@ -634,7 +634,7 @@ function genImageMesureCore(X, p, deps) {
   function immPrtExpertXML(prtName, value, sansFinal, tansFinal) {
     var neutralFail = _immKo(I18N_D.t('imm.neutral_fail_expert_desc'));
     var nodes = [
-      _immNode('0', 'Vérification de la valeur finale (sans indication de la nature de l\'erreur)',
+      _immNode('0', I18N_D.t('imm.node_verif_valeur_finale_neutre'),
         'NumRelative', sansFinal, tansFinal, tol,
         '+', 1, -1, prtName + '-0-T', _immOk(fbOk),
         '=', 0, -1, prtName + '-0-F', neutralFail)
