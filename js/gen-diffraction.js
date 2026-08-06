@@ -154,7 +154,7 @@ ${reticuleBlock}
 [[/jsxgraph]]`;
 }
 
-function _diffTplCourbeSimple() {
+function _diffTplCourbeSimple(I18N_D) {
   return `[[jsxgraph width="700px" height="360px"]]
 (function() {
     var a = {#a1#} * 1e-6;
@@ -176,8 +176,8 @@ function _diffTplCourbeSimple() {
     var board = JXG.JSXGraph.initBoard(divid, {
         boundingbox: [-xMax, 1.2, xMax, -0.2], axis: true, showNavigation: true, showCopyright: false
     });
-    board.defaultAxes.x.setAttribute({ name: 'Position y (m)', withLabel: true, label: { offset: [0, -20] } });
-    board.defaultAxes.y.setAttribute({ name: 'Intensite normalisee', withLabel: true, label: { offset: [-20, 0] } });
+    board.defaultAxes.x.setAttribute({ name: ${JSON.stringify(I18N_D.t('diff.axis_position_y'))}, withLabel: true, label: { offset: [0, -20] } });
+    board.defaultAxes.y.setAttribute({ name: ${JSON.stringify(I18N_D.t('diff.axis_intensite_normalisee'))}, withLabel: true, label: { offset: [-20, 0] } });
 
     board.create('functiongraph', [calculateIntensity, -xMax, xMax], { strokeColor: couleur, strokeWidth: 3, name: 'I(y)' });
 
@@ -190,11 +190,11 @@ function _diffTplCourbeSimple() {
 
     board.create('text', [
         function() { return xMax * 0.4; }, 1.1,
-        function() { return 'Position : y = ' + (cursor.X() * 1000).toFixed(2) + ' mm'; }
+        function() { return ${JSON.stringify(I18N_D.t('diff.readout_position_y'))} + (cursor.X() * 1000).toFixed(2) + ' mm'; }
     ], { fontSize: 13, strokeColor: '#006600', highlight: false });
     board.create('text', [
         function() { return xMax * 0.4; }, 1.0,
-        function() { return 'Intensite : I = ' + (calculateIntensity(cursor.X()) * 100).toFixed(1) + ' %'; }
+        function() { return ${JSON.stringify(I18N_D.t('diff.readout_intensity'))} + (calculateIntensity(cursor.X()) * 100).toFixed(1) + ' %'; }
     ], { fontSize: 13, strokeColor: '#CC0000', highlight: false });
 })();
 [[/jsxgraph]]`;
@@ -264,7 +264,7 @@ ${reticuleBlock}
 [[/jsxgraph]]`;
 }
 
-function _diffTplCourbeDouble() {
+function _diffTplCourbeDouble(I18N_D) {
   return `[[jsxgraph width="700px" height="400px"]]
 (function() {
     var a = {#a1#} * 1e-6;
@@ -277,8 +277,8 @@ function _diffTplCourbeDouble() {
     var board = JXG.JSXGraph.initBoard(divid, {
         boundingbox: [-0.05, 1.2, 0.05, -0.2], axis: true, showNavigation: true, showCopyright: false
     });
-    board.defaultAxes.x.setAttribute({ name: 'Position y (m)', withLabel: true, label: { offset: [0, -20] } });
-    board.defaultAxes.y.setAttribute({ name: 'Intensite normalisee', withLabel: true, label: { offset: [-20, 0] } });
+    board.defaultAxes.x.setAttribute({ name: ${JSON.stringify(I18N_D.t('diff.axis_position_y'))}, withLabel: true, label: { offset: [0, -20] } });
+    board.defaultAxes.y.setAttribute({ name: ${JSON.stringify(I18N_D.t('diff.axis_intensite_normalisee'))}, withLabel: true, label: { offset: [-20, 0] } });
 
     function calculateIntensity(y) {
         var theta = Math.atan(y / D);
@@ -307,17 +307,17 @@ function _diffTplCourbeDouble() {
 
     board.create('text', [
         function() { return xMax * 0.4; }, 1.1,
-        function() { return 'Position : y = ' + (cursor.X() * 1000).toFixed(2) + ' mm'; }
+        function() { return ${JSON.stringify(I18N_D.t('diff.readout_position_y'))} + (cursor.X() * 1000).toFixed(2) + ' mm'; }
     ], { fontSize: 13, strokeColor: '#006600', highlight: false });
     board.create('text', [
         function() { return xMax * 0.4; }, 1.0,
-        function() { return 'Intensite : I = ' + (calculateIntensity(cursor.X()) * 100).toFixed(1) + ' %'; }
+        function() { return ${JSON.stringify(I18N_D.t('diff.readout_intensity'))} + (calculateIntensity(cursor.X()) * 100).toFixed(1) + ' %'; }
     ], { fontSize: 13, strokeColor: '#CC0000', highlight: false });
 })();
 [[/jsxgraph]]`;
 }
 
-function _diffTplYoung2D(withGlider) {
+function _diffTplYoung2D(withGlider, I18N_D) {
   return `[[jsxgraph width="700px" height="500px"]]
 (function() {
     var a1 = {#a1#};
@@ -400,7 +400,7 @@ function _diffTplYoung2D(withGlider) {
     board.on('boundingbox', function() { redrawCanvas(); });
 
     board.create('point', [0, 0], { name: '', size: 4, fillColor: '#ffffff', strokeColor: '#ffffff', fixed: true });
-    board.create('text', [0, -1.5, 'Centre'], { fontSize: 11, color: '#ffffff', anchorX: 'middle', anchorY: 'top', fixed: true });
+    board.create('text', [0, -1.5, ${JSON.stringify(I18N_D.t('diff.label_centre'))}], { fontSize: 11, color: '#ffffff', anchorX: 'middle', anchorY: 'top', fixed: true });
 ${withGlider ? `
     var centre = board.create('point', [0, 0], { visible: false, fixed: true });
     var reticule = board.create('point', [5, 5], { name: '', size: 5, fillColor: '#00ff00', strokeColor: '#ffffff', strokeWidth: 2 });
@@ -413,7 +413,7 @@ ${withGlider ? `
 [[/jsxgraph]]`;
 }
 
-function _diffTplCoupeYoung() {
+function _diffTplCoupeYoung(I18N_D) {
   return `[[jsxgraph width="700px" height="360px"]]
 (function() {
     var a1 = {#a1#};
@@ -455,8 +455,8 @@ function _diffTplCoupeYoung() {
     var board = JXG.JSXGraph.initBoard(divid, {
         boundingbox: [-xMax, 1.2, xMax, -0.2], axis: true, showNavigation: true, showCopyright: false
     });
-    board.defaultAxes.x.setAttribute({ name: 'Position x (mm)', withLabel: true, label: { offset: [0, -20] } });
-    board.defaultAxes.y.setAttribute({ name: 'Intensite normalisee', withLabel: true, label: { offset: [-20, 0] } });
+    board.defaultAxes.x.setAttribute({ name: ${JSON.stringify(I18N_D.t('diff.axis_position_x'))}, withLabel: true, label: { offset: [0, -20] } });
+    board.defaultAxes.y.setAttribute({ name: ${JSON.stringify(I18N_D.t('diff.axis_intensite_normalisee'))}, withLabel: true, label: { offset: [-20, 0] } });
 
     board.create('functiongraph', [intensiteCoupe, -xMax, xMax], { strokeColor: couleur, strokeWidth: 3, name: 'I(x,0)' });
 
@@ -470,13 +470,13 @@ function _diffTplCoupeYoung() {
 
     board.create('text', [
         function() { return xMax * 0.4; }, 1.1,
-        function() { return 'Position : x = ' + cursor.X().toFixed(2) + ' mm'; }
+        function() { return ${JSON.stringify(I18N_D.t('diff.readout_position_x'))} + cursor.X().toFixed(2) + ' mm'; }
     ], { fontSize: 13, strokeColor: '#006600', highlight: false });
 })();
 [[/jsxgraph]]`;
 }
 
-function _diffTplCirc2D(withGlider) {
+function _diffTplCirc2D(withGlider, I18N_D) {
   return `[[jsxgraph width="700px" height="500px"]]
 (function() {
     var a1 = {#a1#};
@@ -544,7 +544,7 @@ ${_diffBesselJ1JsSrc}
     board.on('boundingbox', function() { redrawCanvas(); });
 
     board.create('point', [0, 0], { name: '', size: 4, fillColor: '#ffffff', strokeColor: '#ffffff', fixed: true });
-    board.create('text', [0, -1.5, 'Centre'], { fontSize: 11, color: '#ffffff', anchorX: 'middle', anchorY: 'top', fixed: true });
+    board.create('text', [0, -1.5, ${JSON.stringify(I18N_D.t('diff.label_centre'))}], { fontSize: 11, color: '#ffffff', anchorX: 'middle', anchorY: 'top', fixed: true });
 ${withGlider ? `
     var centre = board.create('point', [0, 0], { visible: false, fixed: true });
     var reticule = board.create('point', [half * 0.2, half * 0.2], { name: '', size: 5, fillColor: '#00ff00', strokeColor: '#ffffff', strokeWidth: 2 });
@@ -557,7 +557,7 @@ ${withGlider ? `
 [[/jsxgraph]]`;
 }
 
-function _diffTplCoupeCirc() {
+function _diffTplCoupeCirc(I18N_D) {
   return `[[jsxgraph width="700px" height="360px"]]
 (function() {
     var a1 = {#a1#};
@@ -579,8 +579,8 @@ ${_diffBesselJ1JsSrc}
     var board = JXG.JSXGraph.initBoard(divid, {
         boundingbox: [-xMax, 1.2, xMax, -0.2], axis: true, showNavigation: true, showCopyright: false
     });
-    board.defaultAxes.x.setAttribute({ name: 'Position r (mm)', withLabel: true, label: { offset: [0, -20] } });
-    board.defaultAxes.y.setAttribute({ name: 'Intensite normalisee', withLabel: true, label: { offset: [-20, 0] } });
+    board.defaultAxes.x.setAttribute({ name: ${JSON.stringify(I18N_D.t('diff.axis_position_r'))}, withLabel: true, label: { offset: [0, -20] } });
+    board.defaultAxes.y.setAttribute({ name: ${JSON.stringify(I18N_D.t('diff.axis_intensite_normalisee'))}, withLabel: true, label: { offset: [-20, 0] } });
 
     board.create('functiongraph', [intensiteCoupe, -xMax, xMax], { strokeColor: couleur, strokeWidth: 3, name: 'I(r)' });
 
@@ -594,7 +594,7 @@ ${_diffBesselJ1JsSrc}
 
     board.create('text', [
         function() { return xMax * 0.4; }, 1.1,
-        function() { return 'Position : r = ' + cursor.X().toFixed(2) + ' mm'; }
+        function() { return ${JSON.stringify(I18N_D.t('diff.readout_position_r'))} + cursor.X().toFixed(2) + ' mm'; }
     ], { fontSize: 13, strokeColor: '#006600', highlight: false });
 })();
 [[/jsxgraph]]`;
@@ -683,20 +683,20 @@ ${withGlider ? `
 [[/jsxgraph]]`;
 }
 
-function _diffBuildJsx(type, mode) {
+function _diffBuildJsx(type, mode, I18N_D) {
   if (type === "fente_simple") {
-    return mode === "ecran" ? _diffTplBarres(true) : (_diffTplBarres(false) + "\n" + _diffTplCourbeSimple());
+    return mode === "ecran" ? _diffTplBarres(true) : (_diffTplBarres(false) + "\n" + _diffTplCourbeSimple(I18N_D));
   }
   if (type === "fente_double") {
-    return mode === "ecran" ? _diffTplFranges(true) : (_diffTplFranges(false) + "\n" + _diffTplCourbeDouble());
+    return mode === "ecran" ? _diffTplFranges(true) : (_diffTplFranges(false) + "\n" + _diffTplCourbeDouble(I18N_D));
   }
   if (type === "trou_circulaire") {
-    return mode === "ecran" ? _diffTplCirc2D(true) : (_diffTplCirc2D(true) + "\n" + _diffTplCoupeCirc());
+    return mode === "ecran" ? _diffTplCirc2D(true, I18N_D) : (_diffTplCirc2D(true, I18N_D) + "\n" + _diffTplCoupeCirc(I18N_D));
   }
   if (type === "trou_carre") {
-    return mode === "ecran" ? _diffTplCarre2D(true) : (_diffTplCarre2D(false) + "\n" + _diffTplCourbeSimple());
+    return mode === "ecran" ? _diffTplCarre2D(true) : (_diffTplCarre2D(false) + "\n" + _diffTplCourbeSimple(I18N_D));
   }
-  return mode === "ecran" ? _diffTplYoung2D(true) : (_diffTplYoung2D(true) + "\n" + _diffTplCoupeYoung());
+  return mode === "ecran" ? _diffTplYoung2D(true, I18N_D) : (_diffTplYoung2D(true, I18N_D) + "\n" + _diffTplCoupeYoung(I18N_D));
 }
 
 /* ── UI : selection type / mode ── */
@@ -1633,7 +1633,7 @@ function genDiffractionCore(X, p, deps) {
     feedbackRef = [1, 2, 3, 4, 5, 6].map(function (n) { return "[[feedback:prt" + n + X + "]]"; }).join("");
   }
 
-  var jsx = _diffBuildJsx(type, mode)
+  var jsx = _diffBuildJsx(type, mode, I18N_D)
     .replace(/\{#a1#\}/g, "{#" + A + "#}")
     .replace(/\{#D1#\}/g, "{#" + D + "#}")
     .replace(/\{#b1#\}/g, "{#" + B + "#}")
