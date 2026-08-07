@@ -1,3 +1,21 @@
+/*
+ * StackForge — générateur de questions STACK pour Moodle
+ * Copyright (C) 2026  Benoit Joly
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 // ── Table de Student (bilatérale) — coefficients t critiques classiques ──
 // ν (degrés de liberté = n-1) de 1 à 30, colonnes 90% / 95% / 99%. Au-delà de
 // ν=30 on réutilise la ligne ν=30 (convergence rapide vers la loi normale —

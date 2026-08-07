@@ -1,3 +1,21 @@
+/*
+ * StackForge — générateur de questions STACK pour Moodle
+ * Copyright (C) 2026  Benoit Joly
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 /* STACKFORGE - Generateur Interferences-Diffraction (JSXGraph)
    3 types de mesure : fente_simple, fente_double, young
    2 modes par type : ecran (mesure directe sur la figure), capteur (figure + courbe I(distance))
