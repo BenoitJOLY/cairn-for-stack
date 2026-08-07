@@ -12,13 +12,14 @@ const path = require('node:path');
 
 const { genNomenclatureCore, NOM_DONNES, _nomFamilies } = require(path.join('..', '..', 'js', 'gen-nomenclature.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
+const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
 const escapeMaximaString = (s) => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 // Stub I18N minimal : suffisant pour genNomenclatureCore, qui n'utilise que t().
 const I18N_STUB = {
     t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key
 };
-const DEPS = { buildPrtXml, escapeMaximaString, I18N: I18N_STUB };
+const DEPS = { buildPrtXml, escapeMaximaString, I18N: I18N_STUB, applyFbBox };
 
 function assertBalancedTags(xml, label) {
     const stripped = xml.replace(/<!\[CDATA\[[\s\S]*?\]\]>/g, '');
@@ -114,7 +115,8 @@ test('mode fixe : nom décomposable (cas par défaut) -> 5 nœuds PRT critères 
     assert.equal(q.prt.nodes[4].truenextnode, '-1');
     assert.equal(q.prt.nodes[4].falsenextnode, '-1');
     assert.match(q.vars, /longueur_ref3 : 5\$/);
-    assert.match(q.vars, /crit_famille3 : is\(famille_s3 = famille_attendue3\)\$/);
+    assert.doesNotMatch(q.vars, /crit_famille3 :/);
+    assert.match(q.prt.meta.feedbackvariables, /crit_famille3 : is\(famille_s3 = famille_attendue3\)\$/);
 });
 
 test('mode fixe : famille Esters -> 6 nœuds PRT (ajoute le critère alkyle), poids bareme/6', () => {
@@ -210,13 +212,20 @@ test('mode aléatoire : PRT à 6 nœuds critères (longueur/subs/numero/ordre/al
     assert.equal(q.prt.nodes[5].tans, 'famille2');
 });
 
-test('mode aléatoire : donnes_decomp précalculé + refs indexées par choix2', () => {
+test('mode aléatoire : refs de décomposition lues directement sur la ligne tirée (molecule2), pas via un second tableau indexé par choix2', () => {
     const q = genNomenclatureCore(2, aleaParams(), DEPS);
-    assert.match(q.vars, /donnes_decomp2 : \[/);
-    assert.match(q.vars, /decomp_ref2 : donnes_decomp2\[choix2\]\$/);
-    assert.match(q.vars, /longueur_ref2 : decomp_ref2\[1\]\$/);
-    assert.match(q.vars, /alkyle_ref2 : decomp_ref2\[5\]\$/);
-    assert.match(q.vars, /crit_alkyle2 : is\(alkyle_ref2 = false or alkyle_s2 = alkyle_ref2\)\$/);
+    // Régression : donnes_decomp/decomp_ref étaient un second tableau non filtré,
+    // désynchronisé de donnes_pool dès qu'un filtre famille/carbones était actif
+    // (bug réel trouvé en live sur Moodle). Un seul tableau, un seul index désormais.
+    assert.doesNotMatch(q.vars, /donnes_decomp2/);
+    assert.doesNotMatch(q.vars, /decomp_ref2/);
+    assert.match(q.vars, /longueur_ref2 : molecule2\[4\]\$/);
+    assert.match(q.vars, /iscyclo_ref2 : molecule2\[5\]\$/);
+    assert.match(q.vars, /subs_ref2 : molecule2\[6\]\$/);
+    assert.match(q.vars, /locprinc_ref2 : molecule2\[7\]\$/);
+    assert.match(q.vars, /alkyle_ref2 : molecule2\[8\]\$/);
+    assert.doesNotMatch(q.vars, /crit_alkyle2 :/);
+    assert.match(q.prt.meta.feedbackvariables, /crit_alkyle2 : is\(alkyle_ref2 = false or alkyle_s2 = alkyle_ref2\)\$/);
 });
 
 test('mode aléatoire : XML bien formé (prtXML, inputXML)', () => {

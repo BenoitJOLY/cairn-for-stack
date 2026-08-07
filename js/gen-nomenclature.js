@@ -244,19 +244,7 @@ function _nomDecompose(rawName) {
   return fail;
 }
 
-// Chaîne Maxima littérale ["Famille","Nom","SMILES"] pour toutes les entrées de NOM_DONNES.
-// esc : fonction d'échappement Maxima injectée par l'appelant (deps.escapeMaximaString
-// côté tests Node, global escapeMaximaString côté navigateur — cf. genNomenclatureCore).
-function _nomDonnesMaximaLiteral(esc) {
-  return '[' + NOM_DONNES.map(function(m){
-    return '["' + esc(m[0]) + '","' + esc(m[1]) + '","' + esc(m[2]) + '"]';
-  }).join(',') + ']';
-}
-
-// Décomposition (_nomDecompose) précalculée pour les 98 entrées de NOM_DONNES,
-// dans le même ordre — sert à bâtir donnes_decomp${X} (mode Aléatoire), indexé
-// par le même choix${X} que donnes${X}, sans jamais faire analyser par Maxima
-// le nom de RÉFÉRENCE (seul le nom soumis par l'étudiant l'est, cf. nom_analyse${X}).
+// Décomposition (_nomDecompose) précalculée pour les 98 entrées de NOM_DONNES, dans le même ordre.
 let _nomDonnesDecompCache = null;
 function _nomDonnesDecomp() {
   if (!_nomDonnesDecompCache) {
@@ -265,14 +253,29 @@ function _nomDonnesDecomp() {
   return _nomDonnesDecompCache;
 }
 
-function _nomDonnesDecompMaximaLiteral() {
-  return '[' + _nomDonnesDecomp().map(function(d) {
+// Chaîne Maxima littérale d'une seule table ["Famille","Nom","SMILES",longueur,
+// iscyclo,subs,locprinc,alkyle] par entrée de NOM_DONNES — famille/nom/smiles ET
+// décomposition précalculée fusionnées dans la MÊME ligne. Indispensable : le
+// mode Aléatoire filtre le pool par famille/carbones AVANT de tirer choix${X},
+// donc si la décomposition vivait dans un tableau séparé indexé par le même
+// choix${X}, un filtre actif désynchroniserait les deux tableaux (longueur
+// différente/ordre différent) et decomp_ref${X} pointerait sur une autre
+// molécule que celle réellement tirée (bug réel trouvé en live sur Moodle :
+// crit_longueur/subs/numero/ordre faux même sur la réponse de référence, dès
+// qu'un filtre famille était actif). Un seul tableau, un seul index : plus de
+// désynchronisation possible.
+// esc : fonction d'échappement Maxima injectée par l'appelant (deps.escapeMaximaString
+// côté tests Node, global escapeMaximaString côté navigateur — cf. genNomenclatureCore).
+function _nomDonnesMaximaLiteral(esc) {
+  const decomps = _nomDonnesDecomp();
+  return '[' + NOM_DONNES.map(function(m, i){
+    const d = decomps[i];
     const longueur = d.ok ? d.longueur : 0;
     const iscyclo = d.ok ? String(!!d.iscyclo) : 'false';
     const subs = d.ok ? _nomSubsLiteral(d.subs) : '[]';
     const locprinc = d.ok && d.locprinc !== false ? String(d.locprinc) : 'false';
     const alkyle = d.ok && d.alkyle != null ? String(d.alkyle) : 'false';
-    return `[${longueur},${iscyclo},${subs},${locprinc},${alkyle}]`;
+    return '["' + esc(m[0]) + '","' + esc(m[1]) + '","' + esc(m[2]) + '",' + longueur + ',' + iscyclo + ',' + subs + ',' + locprinc + ',' + alkyle + ']';
   }).join(',') + ']';
 }
 
@@ -545,11 +548,24 @@ function _nomBuildCriteriaNodes(X, I18N_D, weight, includeFamille, includeAlkyle
       testoptions: '', quiet: '0',
       truescoremode: '+', truescore: String(weight), truepenalty: '', truenextnode: next,
       trueanswernote: `prt${X}-${nodeIdx + 1}-T`,
-      truefeedback: `<p>${I18N_D.t(c.fbOk)}</p>`,
+      truefeedback: `<p>${I18N_D.t(c.fbOk)}</p>`, fbKind: 'true',
       falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: next,
       falseanswernote: `prt${X}-${nodeIdx + 1}-F`,
-      falsefeedback: `<p>${I18N_D.t(c.fbKo)}</p>`
+      falsefeedback: `<p>${I18N_D.t(c.fbKo)}</p>`, falseFbKind: 'false'
     };
+  });
+}
+
+// xmlNodes : copie des nœuds canoniques avec l'encadré coloré (bordure/fond/icône)
+// appliqué, réservée à buildPrtXml_D/prtXML (export final) — prt.nodes (canonicalNodes)
+// reste brut pour l'édition via prt-manager.js. Cf. js/fb-box.js et le même pattern
+// dans js/gen-vf.js.
+function _nomApplyFbBox(nodes, applyFbBox_D) {
+  return nodes.map(function(n) {
+    return Object.assign({}, n, {
+      truefeedback: n.truefeedback ? applyFbBox_D(n.fbKind || 'true', n.truefeedback) : n.truefeedback,
+      falsefeedback: n.falsefeedback ? applyFbBox_D(n.falseFbKind || 'false', n.falsefeedback) : n.falsefeedback
+    });
   });
 }
 
@@ -564,6 +580,7 @@ function genNomenclatureCore(X, p, deps){
   deps = deps || {};
   const buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   const escapeMaximaString_D = deps.escapeMaximaString || escapeMaximaString;
+  const applyFbBox_D = deps.applyFbBox || applyFbBox;
   const I18N_D = deps.I18N || I18N;
   const jsmolUrl_D = deps.jsmolUrl || (typeof window !== 'undefined' && window._instanceJsmolUrl) || '';
 
@@ -606,6 +623,11 @@ molecule${X} : donnes_pool${X}[choix${X}]$
 famille${X} : molecule${X}[1]$
 nom${X} : molecule${X}[2]$
 molecule_smiles${X} : molecule${X}[3]$
+longueur_ref${X} : molecule${X}[4]$
+iscyclo_ref${X} : molecule${X}[5]$
+subs_ref${X} : molecule${X}[6]$
+locprinc_ref${X} : molecule${X}[7]$
+alkyle_ref${X} : molecule${X}[8]$
 strip_accents${X}(s) := block([s2],
   s2 : s,
   s2 : ssubst("e","é",s2), s2 : ssubst("e","è",s2), s2 : ssubst("e","ê",s2), s2 : ssubst("e","ë",s2),
@@ -616,15 +638,7 @@ strip_accents${X}(s) := block([s2],
   s2)$
 liste_familles${X} : sort(listify(setify(map(lambda([m], m[1]), donnes${X}))), lambda([a,b], orderlessp(strip_accents${X}(a), strip_accents${X}(b))))$
 options_famille${X} : map(lambda([f], [f, is(f=famille${X}), f]), liste_familles${X})$
-donnes_decomp${X} : ${_nomDonnesDecompMaximaLiteral()}$
-decomp_ref${X} : donnes_decomp${X}[choix${X}]$
-longueur_ref${X} : decomp_ref${X}[1]$
-iscyclo_ref${X} : decomp_ref${X}[2]$
-subs_ref${X} : decomp_ref${X}[3]$
-locprinc_ref${X} : decomp_ref${X}[4]$
-alkyle_ref${X} : decomp_ref${X}[5]$
 ${_nomMaximaHelpers(X)}
-${_nomCriteriaVars(X, `ans${X}n`, 'false')}
 ${urlChain()}`;
 
     // 6 nœuds à part égale (bareme/6) : 5 critères analysés depuis le nom
@@ -638,14 +652,14 @@ ${urlChain()}`;
       testoptions: '', quiet: '0',
       truescoremode: '+', truescore: String(nomWeight), truepenalty: '', truenextnode: '-1',
       trueanswernote: `prt${X}-6-T`,
-      truefeedback: `<p>${I18N_D.t('nom.fb_famille_ok', {famille: '{@famille'+X+'@}'})}</p>`,
+      truefeedback: `<p>${I18N_D.t('nom.fb_famille_ok', {famille: '{@famille'+X+'@}'})}</p>`, fbKind: 'true',
       falsescoremode: '=', falsescore: '0', falsepenalty: '', falsenextnode: '-1',
       falseanswernote: `prt${X}-6-F`,
-      falsefeedback: `<p>${I18N_D.t('nom.fb_famille_ko', {famille: '{@famille'+X+'@}'})}</p>`
+      falsefeedback: `<p>${I18N_D.t('nom.fb_famille_ko', {famille: '{@famille'+X+'@}'})}</p>`, falseFbKind: 'false'
     };
-    const prtMeta = { name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:'' };
+    const prtMeta = { name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables: _nomCriteriaVars(X, `ans${X}n`, 'false') };
     const canonicalNodes = critNodes.concat([familleNode]);
-    const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+    const prtXML = buildPrtXml_D(prtMeta, _nomApplyFbBox(canonicalNodes, applyFbBox_D));
 
     return { bareme, vars, qnote:`{@nom${X}@}`,
       textFrag: `${banniere}
@@ -690,7 +704,7 @@ ${urlChain()}`;
       <options></options>
     </input>`,
       prtXML,
-      generalFeedback: `<p>${I18N_D.t('nom.genfb_aleatoire', {nom: '{@nom'+X+'@}', famille: '{@famille'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
+      generalFeedback: applyFbBox_D('general', `<p>${I18N_D.t('nom.genfb_aleatoire', {nom: '{@nom'+X+'@}', famille: '{@famille'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`),
       feedbackRef:`[[feedback:prt${X}]]`, prt:{meta:prtMeta,nodes:canonicalNodes} };
   }
 
@@ -760,7 +774,7 @@ fb_manques${X} : if length(manques${X}) > 0 then sconcat("<div style='color:#924
       <options></options>
     </input>`,
       prtXML,
-      generalFeedback: `<p>${I18N_D.t('nom.genfb_checkbox', {groupes: '{@groupes_vrais'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
+      generalFeedback: applyFbBox_D('general', `<p>${I18N_D.t('nom.genfb_checkbox', {groupes: '{@groupes_vrais'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`),
       feedbackRef:`[[feedback:prt${X}]]`, prt:{meta:prtMeta,nodes:canonicalNodes} };
   }
 
@@ -800,9 +814,8 @@ subs_ref${X} : ${_nomSubsLiteral(fixeDecomp.subs)}$
 locprinc_ref${X} : ${fixeDecomp.locprinc === false ? 'false' : fixeDecomp.locprinc}$
 alkyle_ref${X} : ${fixeDecomp.alkyle == null ? 'false' : fixeDecomp.alkyle}$
 ${_nomMaximaHelpers(X)}
-${_nomCriteriaVars(X, `ans${X}`, `famille_attendue${X}`)}
 ${urlChain()}`;
-    prtMeta = { name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:'' };
+    prtMeta = { name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables: _nomCriteriaVars(X, `ans${X}`, `famille_attendue${X}`) };
     canonicalNodes = _nomBuildCriteriaNodes(X, I18N_D, weight, true, includeAlkyle, '-1', 0);
   } else {
     vars = `/* Q${X} : Nomenclature - mode Fixe (${bareme}pt) */
@@ -818,13 +831,13 @@ ${regexifyBlock}`;
         testoptions:'', quiet:'0',
         truescoremode:'=', truescore:'1', truepenalty:'', truenextnode:'-1',
         trueanswernote:`prt${X}-1-T`,
-        truefeedback:`<p>${I18N_D.t('nom.fb_fixe_ok', {famille: '{@famille_attendue'+X+'@}'})}</p>`,
+        truefeedback:`<p>${I18N_D.t('nom.fb_fixe_ok', {famille: '{@famille_attendue'+X+'@}'})}</p>`, fbKind: 'true',
         falsescoremode:'=', falsescore:'0', falsepenalty:'', falsenextnode:'-1',
         falseanswernote:`prt${X}-1-F`,
-        falsefeedback:`<p>${I18N_D.t('nom.fb_fixe_ko', {nom: '{@nom_attendu'+X+'@}', famille: '{@famille_attendue'+X+'@}'})}</p>` }
+        falsefeedback:`<p>${I18N_D.t('nom.fb_fixe_ko', {nom: '{@nom_attendu'+X+'@}', famille: '{@famille_attendue'+X+'@}'})}</p>`, falseFbKind: 'false' }
     ];
   }
-  const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
+  const prtXML = buildPrtXml_D(prtMeta, _nomApplyFbBox(canonicalNodes, applyFbBox_D));
 
   return { bareme, vars, qnote:`{@nom_attendu${X}@}`,
     textFrag: `${banniere}
@@ -850,7 +863,7 @@ ${regexifyBlock}`;
       <options></options>
     </input>`,
     prtXML,
-    generalFeedback: `<p>${I18N_D.t('nom.genfb_fixe', {nom: '{@nom_attendu'+X+'@}', famille: '{@famille_attendue'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`,
+    generalFeedback: applyFbBox_D('general', `<p>${I18N_D.t('nom.genfb_fixe', {nom: '{@nom_attendu'+X+'@}', famille: '{@famille_attendue'+X+'@}'})}</p>${fbGen ? `<p>${fbGen}</p>` : ''}`),
     feedbackRef:`[[feedback:prt${X}]]`, prt:{meta:prtMeta,nodes:canonicalNodes} };
 }
 
