@@ -490,8 +490,9 @@ function copyCWPrompt() {
     if(btn) {
       const orig = btn.innerHTML;
       btn.innerHTML = I18N.t('tpl.copie');
-      btn.style.background = "#059669";
-      setTimeout(() => { btn.innerHTML = orig; btn.style.background = "#ea580c"; }, 2000);
+      btn.style.background = "#047857";
+      btn.style.color = "#fff";
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = "#ea580c"; btn.style.color = "#0f172a"; }, 2000);
     }
   }).catch(e => { alert(I18N.t('tpl.copie_erreur')); });
 }
@@ -624,8 +625,9 @@ function copyMatchPrompt() {
     if(btn) {
       const orig = btn.innerHTML;
       btn.innerHTML = I18N.t('tpl.copie');
-      btn.style.background = "#059669";
-      setTimeout(() => { btn.innerHTML = orig; btn.style.background = ""; }, 2000);
+      btn.style.background = "#047857";
+      btn.style.color = "#fff";
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = ""; btn.style.color = ""; }, 2000);
     }
   }).catch(e => { alert(I18N.t('tpl.copie_erreur')); });
 }

@@ -250,7 +250,7 @@ async function _testXMLWithMaxima(xml, resultElId) {
     // temporaire (seed 1) juste pour vérifier que la question se rend bien.
     var testSeed = 1;
     var res = await maximaRenderXML(insertDeployedSeeds(xml, [testSeed]), testSeed);
-    if (resultEl) { resultEl.textContent = '✅ ' + I18N.t('maxima.msg_rendu_ok'); resultEl.style.color = '#059669'; }
+    if (resultEl) { resultEl.textContent = '✅ ' + I18N.t('maxima.msg_rendu_ok'); resultEl.style.color = '#047857'; }
     console.log('[maxima] render result', res);
   } catch(e) {
     if (resultEl) { resultEl.textContent = '❌ ' + e.message; resultEl.style.color = '#b91c1c'; }

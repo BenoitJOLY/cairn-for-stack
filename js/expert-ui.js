@@ -872,7 +872,7 @@ function expertExpandInlinePrt(qid, prtIdx){
   bar.className='exp-prt-inline-bar';
   bar.innerHTML=
     '<span style="font-size:.8rem;font-weight:700;color:#a78bfa;">'+_ee(I18N.t('exp.prt_tree_title',{name:prt.name}))+'</span>'
-   +'<button class="prt-hdr-btn prt-hdr-tidy"  onclick="prtTidy()">⟳ Tidy</button>'
+   +'<button class="prt-hdr-btn prt-hdr-tidy"  onclick="prtTidy()">⟳ '+_ee(I18N.t('prt.tidy_label'))+'</button>'
    +'<button class="prt-hdr-btn prt-hdr-reset" onclick="prtResetLayout()">⊞ Reset</button>'
    +'<button class="prt-hdr-btn prt-hdr-add"   onclick="prtAddNode()">'+I18N.t('exp.prt_add_node_btn')+'</button>'
    +'<button class="prt-hdr-btn prt-hdr-save"  onclick="savePrtManager()" style="margin-left:auto;">'+I18N.t('exp.prt_apply_btn')+'</button>';

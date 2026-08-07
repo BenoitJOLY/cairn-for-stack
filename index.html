@@ -801,6 +801,11 @@ fill="currentColor" stroke="none">
       <button class="rtb" onmousedown="event.preventDefault();v4ExecR('insertUnorderedList')" title="Liste à puces" data-i18n-title="rtb.list_bullet" data-i18n="tpl.rtb_liste_puce">&#x2022; Liste</button>
       <button class="rtb" onmousedown="event.preventDefault();v4ExecR('insertOrderedList')" title="Liste numérotée" data-i18n-title="rtb.list_numbered" data-i18n="tpl.rtb_liste_num">1. Liste</button>
       <div class="rtb-sep"></div>
+      <button class="rtb" onmousedown="event.preventDefault();v4ExecR('formatBlock','<h3>')" title="Titre H3" data-i18n-title="rtb.h3">H3</button>
+      <button class="rtb" onmousedown="event.preventDefault();v4ExecR('formatBlock','<h4>')" title="Titre H4" data-i18n-title="rtb.h4">H4</button>
+      <button class="rtb" onmousedown="event.preventDefault();v4ExecR('formatBlock','<h5>')" title="Titre H5" data-i18n-title="rtb.h5">H5</button>
+      <button class="rtb" onmousedown="event.preventDefault();v4ExecR('formatBlock','<p>')" title="Texte normal" data-i18n-title="rtb.normal_text" data-i18n="rtb.normal_text_label">Normal</button>
+      <div class="rtb-sep"></div>
       <button class="rtb" onmousedown="event.preventDefault();v4ExecR('justifyLeft')" title="Aligner à gauche" data-i18n-title="rtb.align_left">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="15" y1="12" x2="3" y2="12"></line><line x1="19" y1="18" x2="3" y2="18"></line></svg>
       </button>
@@ -829,7 +834,7 @@ fill="currentColor" stroke="none">
       <label style="font-size:.78rem;font-weight:700;color:var(--slate);"><span data-i18n="dlg.table_rows">Lignes</span>&#x202F;: <input type="number" id="v4-tbl-rows" value="3" min="1" max="20" style="width:55px;padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;"></label>
       <label style="font-size:.78rem;font-weight:700;color:var(--slate);"><span data-i18n="dlg.table_cols">Colonnes</span>&#x202F;: <input type="number" id="v4-tbl-cols" value="3" min="1" max="10" style="width:55px;padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;"></label>
       <label style="font-size:.78rem;font-weight:700;color:var(--slate);display:flex;align-items:center;gap:5px;"><input type="checkbox" id="v4-tbl-header" checked style="width:14px;height:14px;"> <span data-i18n="dlg.table_header">En-tête</span></label>
-      <button onclick="v4InsertTable()" style="background:#0891b2;color:#fff;padding:6px 12px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.82rem;" data-i18n="dlg.table_insert">Insérer</button>
+      <button onclick="v4InsertTable()" style="background:#0e7490;color:#fff;padding:6px 12px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.82rem;" data-i18n="dlg.table_insert">Insérer</button>
       <button onclick="document.getElementById('v4-table-dialog').style.display='none'" style="background:#f1f5f9;color:#334155;padding:6px 12px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.82rem;" data-i18n-aria="btn.fermer">&#x2715;</button>
     </div>
     <!-- Propri&#xe9;t&#xe9;s image s&#xe9;lectionn&#xe9;e dans l'&#xe9;diteur V4 -->
@@ -838,8 +843,20 @@ fill="currentColor" stroke="none">
       <span data-i18n="dlg.img_width">Largeur (max 800 px)</span>&#x202F;: <input type="number" id="v4-img-w" style="width:70px;padding:4px 6px;border:1.5px solid #bae6fd;border-radius:5px;" placeholder="800">
       <span data-i18n="dlg.img_height">Hauteur (px ou vide=auto)</span>&#x202F;: <input type="number" id="v4-img-h" style="width:70px;padding:4px 6px;border:1.5px solid #bae6fd;border-radius:5px;">
       <span data-i18n="dlg.img_alt">Alt</span>&#x202F;: <input type="text" id="v4-img-alt" style="width:160px;padding:4px 6px;border:1.5px solid #bae6fd;border-radius:5px;" placeholder="Description..." data-i18n-ph="dlg.img_alt_ph">
-      <button onclick="v4ApplyImgProps()" style="background:#059669;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.img_apply">Appliquer</button>
+      <button onclick="v4ApplyImgProps()" style="background:#047857;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.img_apply">Appliquer</button>
       <button onclick="v4RemoveSelectedImg()" style="background:#dc2626;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.img_remove">Supprimer</button>
+    </div>
+    <!-- Propriétés tableau sélectionné dans l'éditeur V4 -->
+    <div id="v4-tbl-props" style="display:none;background:#f0fdf4;border-bottom:1px solid #bbf7d0;padding:8px 14px;align-items:center;gap:10px;flex-wrap:wrap;">
+      <strong>&#x229E; <span data-i18n="dlg.tbl_selected">Tableau sélectionné</span></strong>
+      <span data-i18n="dlg.tbl_width">Largeur (%)</span>&#x202F;: <input type="number" id="v4-tbl-w" min="10" max="100" style="width:70px;padding:4px 6px;border:1.5px solid #bbf7d0;border-radius:5px;" placeholder="100">
+      <button onclick="v4ApplyTableProps()" style="background:#047857;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.tbl_apply">Appliquer</button>
+      <button onclick="v4TableAddRow()" style="background:#0e7490;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.tbl_add_row">+ Ligne</button>
+      <button onclick="v4TableRemoveRow()" style="background:#b45309;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.tbl_remove_row">− Ligne</button>
+      <button onclick="v4TableAddCol()" style="background:#0e7490;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.tbl_add_col">+ Colonne</button>
+      <button onclick="v4TableRemoveCol()" style="background:#b45309;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.tbl_remove_col">− Colonne</button>
+      <label style="display:flex;align-items:center;gap:5px;font-weight:400;" title="Ctrl+clic pour ajouter une case, Maj+clic pour sélectionner une plage" data-i18n-title="dlg.tbl_cell_bg_hint"><span data-i18n="dlg.tbl_cell_bg">Couleur de la case</span> <input type="color" id="v4-tbl-cellbg" value="#ffffff" onchange="v4ApplyCellBg(this.value)" style="width:32px;height:28px;padding:1px;border:1.5px solid #bbf7d0;border-radius:5px;cursor:pointer;"></label>
+      <button onclick="v4RemoveSelectedTable()" style="background:#dc2626;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.tbl_remove">Supprimer</button>
     </div>
     <div class="v4-editor-hint" data-i18n="editor.hint_empty">
       R&#xe9;digez l'&#xe9;nonc&#xe9; ici. Glissez un type depuis la palette ← pour ins&#xe9;rer une question.
@@ -1906,13 +1923,13 @@ fill="currentColor" stroke="none">
           <svg id="imm-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></svg>
         </div>
         <div id="imm-size-warn" style="display:none;color:#b45309;font-size:.8rem;margin-top:4px;"></div>
-        <div id="imm-capture-hint" style="display:none;font-size:.82rem;color:#0891b2;margin-top:4px;font-weight:600;"></div>
+        <div id="imm-capture-hint" style="display:none;font-size:.82rem;color:#0e7490;margin-top:4px;font-weight:600;"></div>
         <div style="font-size:.78rem;color:#6b7280;margin-top:4px;"><span data-i18n-html="imm.legende_reperes_html">🔵 Repères = étalonnage &nbsp;|&nbsp; 🟠 Repères = mesures cibles — aperçu enseignant uniquement, <strong>ni l'un ni l'autre n'est visible par l'élève</strong></span></div>
       </div>
 
       <!-- Étalonnage -->
       <fieldset style="border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;margin:10px 0;">
-        <legend style="font-size:.85rem;font-weight:600;color:#0891b2;" data-i18n="imm.etalonnage_legend">Étalonnage — 2 repères connus</legend>
+        <legend style="font-size:.85rem;font-weight:600;color:#0e7490;" data-i18n="imm.etalonnage_legend">Étalonnage — 2 repères connus</legend>
         <div class="info-box" style="font-size:.82rem;margin-bottom:8px;" data-i18n-html="imm.etalonnage_info_html">Cliquez <strong>Capturer</strong> puis cliquez sur l'image pour repérer (position + valeur réelle) chaque point d'étalonnage — ceci sert uniquement à calculer les bonnes réponses. <strong>Rien n'est montré à l'élève automatiquement</strong> : la description et la valeur ci-dessous sont un aide-mémoire enseignant, à reprendre vous-même (avec vos mots) dans le champ Énoncé si vous voulez que l'élève en dispose.</div>
         <div class="g2">
           <div class="field">
@@ -1956,7 +1973,7 @@ fill="currentColor" stroke="none">
 
       <!-- Mesures -->
       <fieldset style="border:1.5px solid #d1fae5;border-radius:8px;padding:10px 14px;margin:10px 0;">
-        <legend style="font-size:.85rem;font-weight:600;color:#059669;" data-i18n="imm.mesures_legend">Mesures demandées à l'élève</legend>
+        <legend style="font-size:.85rem;font-weight:600;color:#047857;" data-i18n="imm.mesures_legend">Mesures demandées à l'élève</legend>
         <div class="info-box" style="font-size:.82rem;margin-bottom:8px;" data-i18n="imm.mesures_info">Pour chaque mesure : entrez la valeur attendue directement, ou cliquez 📍 puis sur l'image pour la calculer automatiquement depuis l'étalonnage.</div>
         <div id="imm-targets"></div>
         <button type="button" onclick="immAddTarget()" class="btn-sm" style="margin-top:8px;" data-i18n="imm.ajouter_mesure_btn">+ Ajouter une mesure</button>
@@ -5865,7 +5882,7 @@ fill="currentColor" stroke="none">
 
       <div class="g2">
         <div class="field"><label data-i18n="cin.calib_dist_lbl" title="Distance réelle, en mètres, entre les 2 repères de calibration posés en mode Calibration.">Distance réelle entre les 2 repères (m)</label><input type="number" id="cin-calib-dist" value="1" step="0.01" min="0.01" onchange="cinAtelierSetCalibDist(this.value)"></div>
-        <div class="field" style="justify-content:center;"><span id="cin-atelier-echelle-info" style="font-size:.78rem;color:#0891b2;font-weight:600;"></span></div>
+        <div class="field" style="justify-content:center;"><span id="cin-atelier-echelle-info" style="font-size:.78rem;color:#0e7490;font-weight:600;"></span></div>
       </div>
 
       <div class="field">
@@ -6130,7 +6147,7 @@ fill="currentColor" stroke="none">
     <div class="prt-mngr-header">
       <span id="prt-mngr-title" class="prt-mngr-title">Arbre PRT</span>
       <div class="prt-mngr-header-btns">
-        <button class="prt-hdr-btn prt-hdr-tidy"  onclick="prtTidy()" title="Renuméroter les nœuds séquentiellement (Tidy)" data-i18n-title="prt.tidy_title">⟳ Tidy</button>
+        <button class="prt-hdr-btn prt-hdr-tidy"  onclick="prtTidy()" title="Renuméroter les nœuds séquentiellement" data-i18n-title="prt.tidy_title">⟳ <span data-i18n="prt.tidy_label">Renuméroter</span></button>
         <button class="prt-hdr-btn prt-hdr-reset" onclick="prtResetLayout()" title="Réinitialiser la disposition automatique" data-i18n-title="prt.reset_title">⊞ Reset</button>
         <button class="prt-hdr-btn prt-hdr-add"   onclick="prtAddNode()">＋ <span data-i18n="prt.add_node_label">Nœud</span></button>
         <button class="prt-hdr-btn prt-hdr-del"   onclick="prtDeleteSelectedNode()" title="Supprimer le nœud sélectionné" data-i18n-title="prt.delete_node_title">🗑 <span data-i18n="btn.supprimer">Supprimer</span></button>
@@ -6330,7 +6347,7 @@ fill="currentColor" stroke="none">
       <label style="font-size:.78rem;font-weight:700;color:var(--slate);"><span data-i18n="dlg.table_rows">Lignes</span> : <input type="number" id="tbl-rows" value="3" min="1" max="20" style="width:55px;padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;"></label>
       <label style="font-size:.78rem;font-weight:700;color:var(--slate);"><span data-i18n="dlg.table_cols">Colonnes</span> : <input type="number" id="tbl-cols" value="3" min="1" max="10" style="width:55px;padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;"></label>
       <label style="font-size:.78rem;font-weight:700;color:var(--slate);display:flex;align-items:center;gap:5px;"><input type="checkbox" id="tbl-header" checked style="width:14px;height:14px;"> <span data-i18n="dlg.table_header">En-tête</span></label>
-      <button onclick="insertTable()" style="background:#0891b2;color:#fff;padding:6px 12px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.82rem;" data-i18n="dlg.table_insert">Insérer</button>
+      <button onclick="insertTable()" style="background:#0e7490;color:#fff;padding:6px 12px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.82rem;" data-i18n="dlg.table_insert">Insérer</button>
       <button onclick="document.getElementById('table-dialog').style.display='none'" style="background:#f1f5f9;color:#334155;padding:6px 12px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.82rem;" data-i18n-aria="btn.fermer">✕</button>
     </div>
     <!-- image props -->
@@ -6339,7 +6356,7 @@ fill="currentColor" stroke="none">
       <span data-i18n="dlg.img_width">Largeur (max 800px)</span> : <input type="number" id="img-w" class="inp-w" placeholder="800" aria-label="Largeur de l'image en px (max 800)" data-i18n-aria="dlg.img_width_aria">
       <span data-i18n="dlg.img_height">Hauteur (px ou vide=auto)</span> : <input type="number" id="img-h" class="inp-h" aria-label="Hauteur de l'image en px" data-i18n-aria="dlg.img_height_aria">
       <span data-i18n="dlg.img_alt">Alt</span> : <input type="text" id="img-alt" class="inp-alt" placeholder="Description..." aria-label="Texte alternatif de l'image" data-i18n-ph="dlg.img_alt_ph" data-i18n-aria="dlg.img_alt_aria">
-      <button onclick="applyImgProps()" style="background:#059669;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.img_apply">Appliquer</button>
+      <button onclick="applyImgProps()" style="background:#047857;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.img_apply">Appliquer</button>
       <button onclick="removeSelectedImg()" style="background:#dc2626;color:#fff;padding:5px 10px;border:none;border-radius:5px;font-weight:700;cursor:pointer;" data-i18n="dlg.img_remove">Supprimer</button>
     </div>
     <div id="rich-editor" contenteditable="true" spellcheck="true"></div>
@@ -6766,7 +6783,7 @@ fill="currentColor" stroke="none">
               <label class="geo2d-ck"><input type="checkbox" id="g2tri-pBCA" onchange="_geo2dPreview()"> <span data-i18n="geo2d.par_bca">(BC) par A</span></label>
               <label class="geo2d-ck"><input type="checkbox" id="g2tri-pACB" onchange="_geo2dPreview()"> <span data-i18n="geo2d.par_acb">(AC) par B</span></label>
             </div>
-            <p class="geo2d-hint" style="font-weight:600;color:#0891b2;margin:5px 0 2px;" data-i18n="geo2d.perpendiculars">Perpendiculaires</p>
+            <p class="geo2d-hint" style="font-weight:600;color:#0e7490;margin:5px 0 2px;" data-i18n="geo2d.perpendiculars">Perpendiculaires</p>
             <div style="display:flex;flex-direction:column;gap:3px;">
               <label class="geo2d-ck"><input type="checkbox" id="g2tri-perpABC" onchange="_geo2dPreview()"> <span data-i18n="geo2d.perp_abc">⊥(AB) par C</span></label>
               <label class="geo2d-ck"><input type="checkbox" id="g2tri-perpBCA" onchange="_geo2dPreview()"> <span data-i18n="geo2d.perp_bca">⊥(BC) par A</span></label>
@@ -8022,6 +8039,20 @@ fill="currentColor" stroke="none">
     <h2 style="font-size:1.1rem;margin-bottom:6px;"><svg class="hs-ico"><use href="#ico-action-tags"></use></svg> <span data-i18n="modal.etape_2_tags_moodle">Étape 2 — Tags Moodle &amp; Téléchargement</span></h2>
     <p style="font-size:.82rem;color:var(--slate);margin-bottom:10px;" data-i18n-html="modal.tag_categories_hint">Catégories <span style="color:#dc2626;font-weight:700">*</span> = obligatoires.</p>
     <hr class="tm-divider">
+    <!-- Pénalité & style de feedback (paramètres question) -->
+    <div class="tm-section">
+      <div class="tm-title" data-i18n="modal.tag_penalty_title">Pénalité en cas de nouvel essai</div>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:400;">
+        <input type="number" id="tm-penalty-input" min="0" max="1" step="0.01" value="0.1" style="width:70px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+        <span data-i18n="modal.tag_penalty_hint">Si plusieurs essais sont autorisés sur la question, cette fraction du barème est retirée à chaque nouvelle tentative (0 = aucune pénalité).</span>
+      </label>
+    </div>
+    <div class="tm-section">
+      <div class="tm-title" data-i18n="modal.tag_feedbackstyle_title">Notation de la question</div>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="radio" name="tm-feedbackstyle-radio" value="compact" checked> <span data-i18n="modal.tag_feedbackstyle_compact">Notée — mode normal, la question compte pour la note</span></label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="radio" name="tm-feedbackstyle-radio" value="formative"> <span data-i18n="modal.tag_feedbackstyle_formative">Non notée — mode formatif (entraînement), la question ne compte pas pour la note</span></label>
+    </div>
+    <hr class="tm-divider">
     <!-- Bouton "Aucun tag" -->
     <div class="tm-notag-row">
       <button id="tm-notag-btn" class="tm-notag-btn" onclick="tmToggleNoTag()">🚫 <span data-i18n="modal.tag_no_tag_btn">Ne mettre aucun tag</span></button>
@@ -8311,7 +8342,7 @@ fill="currentColor" stroke="none">
     </div>
     <div class="pb-footer">
       <button onclick="closePB()" style="background:#f1f5f9;color:var(--navy);flex:.6;" data-i18n="btn.annuler">Annuler</button>
-      <button id="pb-ai-btn" onclick="pbGenerateWithAI()" style="background:#059669;color:#fff;display:none;"><svg class="hs-ico"><use href="#ico-tool-ai"></use></svg> <span data-i18n="ai.generer_avec_ia">Générer avec l'IA</span></button>
+      <button id="pb-ai-btn" onclick="pbGenerateWithAI()" style="background:#047857;color:#fff;display:none;"><svg class="hs-ico"><use href="#ico-tool-ai"></use></svg> <span data-i18n="ai.generer_avec_ia">Générer avec l'IA</span></button>
       <button id="pb-copy-btn" onclick="pbCopy()" style="background:#4338ca;color:#fff;" disabled><svg class="hs-ico"><use href="#ico-file-document"></use></svg> <span data-i18n="modal.pb_copier_prompt">Copier le prompt</span></button>
     </div>
   </div>
@@ -8373,7 +8404,7 @@ fill="currentColor" stroke="none">
     <div class="verif-footer">
       <button onclick="closeVerifModal()" style="padding:10px 20px;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:6px;font-weight:600;cursor:pointer;" data-i18n-html="modal.verif_close_btn">&larr; Fermer</button>
       <div class="hs-flex1"></div>
-      <button onclick="doDownload()" style="padding:10px 24px;background:#059669;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><svg class="hs-ico"><use href="#ico-action-save"></use></svg> <span data-i18n="btn.exporter_xml">Exporter le XML</span></button>
+      <button onclick="doDownload()" style="padding:10px 24px;background:#047857;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><svg class="hs-ico"><use href="#ico-action-save"></use></svg> <span data-i18n="btn.exporter_xml">Exporter le XML</span></button>
     </div>
 
   </div>

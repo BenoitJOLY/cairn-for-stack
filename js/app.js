@@ -192,6 +192,13 @@ function buildXML() {
   });
   var allInputs = orderedQ.map(function(q){ return q.inputXML||''; }).join('\n');
   var allPRTs = orderedQ.map(function(q){ return q.prtXML||''; }).join('\n\n');
+  var _penaltyEl = document.getElementById('tm-penalty-input');
+  var penaltyValue = _penaltyEl && _penaltyEl.value !== '' ? parseFloat(_penaltyEl.value) : 0.1;
+  if (isNaN(penaltyValue)) penaltyValue = 0.1;
+  var _fbStyleEl = document.querySelector('input[name="tm-feedbackstyle-radio"]:checked');
+  if (_fbStyleEl && _fbStyleEl.value === 'formative') {
+    allPRTs = allPRTs.replace(/<feedbackstyle>\d+<\/feedbackstyle>/g, '<feedbackstyle>0</feedbackstyle>');
+  }
   var allFB = '<ol>\n' + orderedQ.map(function(q){ return '  <li>' + (q.feedbackRef||'') + '</li>'; }).join('\n') + '\n</ol>';
   var allQnote = orderedQ.map(function(q){ return q.qnote||''; }).join(' | ');
   var hsTypes = orderedQ.map(function(q){ return q.type||''; }).filter(Boolean).join(',');
@@ -294,7 +301,7 @@ function buildXML() {
     + '      <text><![CDATA[' + generalFeedbackContent + ']]></text>\n'
     + '    </generalfeedback>\n'
     + '    <defaultgrade>' + totalB + '</defaultgrade>\n'
-    + '    <penalty>0.1</penalty>\n'
+    + '    <penalty>' + penaltyValue + '</penalty>\n'
     + '    <hidden>0</hidden>\n'
     + '    <idnumber></idnumber>\n'
     + '    <stackversion><text></text></stackversion>\n'

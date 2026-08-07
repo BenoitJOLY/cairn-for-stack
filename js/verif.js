@@ -970,7 +970,7 @@ function verifBuildInterface(xmlDoc, tags, qName, qData, previewText) {
             nodeDiv.style.borderTop = '1px solid #e2e8f0';
             nodeDiv.style.marginTop = '10px';
             nodeDiv.style.paddingTop = '10px';
-            nodeDiv.innerHTML = `<div style="font-size:.78rem;font-weight:700;color:#0891b2;margin-bottom:8px;">${nodeLabel}</div><span class="vf-label">${I18N.t('tpl.vf_si_vrai')}</span>${verifCreateToolbar(tId)}<div id="${tId}" class="vf-zone vf-vrai" contenteditable="true">${verifHideStackTags(node.querySelector('truefeedback text')?.textContent||'')}</div><span class="vf-label" style="margin-top:10px;">${I18N.t('tpl.vf_si_faux')}</span>${verifCreateToolbar(fId)}<div id="${fId}" class="vf-zone vf-faux" contenteditable="true">${verifHideStackTags(node.querySelector('falsefeedback text')?.textContent||'')}</div>`;
+            nodeDiv.innerHTML = `<div style="font-size:.78rem;font-weight:700;color:#0e7490;margin-bottom:8px;">${nodeLabel}</div><span class="vf-label">${I18N.t('tpl.vf_si_vrai')}</span>${verifCreateToolbar(tId)}<div id="${tId}" class="vf-zone vf-vrai" contenteditable="true">${verifHideStackTags(node.querySelector('truefeedback text')?.textContent||'')}</div><span class="vf-label" style="margin-top:10px;">${I18N.t('tpl.vf_si_faux')}</span>${verifCreateToolbar(fId)}<div id="${fId}" class="vf-zone vf-faux" contenteditable="true">${verifHideStackTags(node.querySelector('falsefeedback text')?.textContent||'')}</div>`;
             wrapper.appendChild(nodeDiv);
             _verifPrtStorage.push({tNode: node.querySelector('truefeedback text'), fNode: node.querySelector('falsefeedback text'), tId, fId, isPool: false});
         });
@@ -1112,7 +1112,7 @@ function verifBuildInterface(xmlDoc, tags, qName, qData, previewText) {
         if (realType === 'complexe') {
             solutionsHtml += `<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
                 <span style="font-weight:bold;color:var(--navy2);">Q${num} Nombres complexes</span>
-                <span style="color:#0891b2;font-size:.82rem;margin-left:6px;">✓ Correction auto-générée — visible dans la zone ci-dessus</span>
+                <span style="color:#0e7490;font-size:.82rem;margin-left:6px;">✓ Correction auto-générée — visible dans la zone ci-dessus</span>
             </div>`;
             return;
         }

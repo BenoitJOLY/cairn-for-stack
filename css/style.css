@@ -177,7 +177,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .btn-add{flex:1;padding:14px;background:var(--navy2);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;}
 .btn-add:hover{background:var(--navy);}
 .btn-add.update-mode{background:#d97706;}
-.btn-gen{flex:2;padding:14px;background:#059669;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-gen{flex:2;padding:14px;background:#047857;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;}
 .btn-gen:hover:not(:disabled){background:#047857;}
 .btn-gen:disabled{background:#cbd5e1;cursor:not-allowed;}
 .toast{display:none;position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 22px;border-radius:10px;font-size:.88rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:9000;white-space:nowrap;}
@@ -307,7 +307,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .rich-footer{display:flex;gap:10px;padding:12px 18px;background:#f8fafc;border-top:1px solid var(--border);}
 .rich-footer button{flex:1;padding:11px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.9rem;border:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 .rich-cancel{background:#f1f5f9;color:var(--navy);}
-.rich-confirm{background:#059669;color:#fff;}
+.rich-confirm{background:#047857;color:#fff;}
 
 /* ═══ LINK MODAL ═══ */
 #linkModal{z-index:9600;}
@@ -685,7 +685,7 @@ html[data-theme="dark"] .chem-editor-sm { background:#0f172a; border-color:#3341
 
 .match-connection-zone { background: #ecfdf5; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-top: 15px; }
 .match-connection-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.match-connection-tag { background: #059669; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+.match-connection-tag { background: #047857; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
 .match-connection-tag button { background: none; border: none; color: rgba(255,255,255,0.8); cursor: pointer; font-weight: bold; }
 .match-connection-tag button:hover { color: white; }
 .match-actions { display: flex; gap: 10px; margin-top: 10px; }
@@ -1322,7 +1322,7 @@ html[data-theme="dark"] .btn-shared-pool:hover{background:#1f1500;}
 .sv-del{background:#fee2e2;border:none;border-radius:7px;padding:7px 9px;cursor:pointer;color:#dc2626;font-size:.85rem;margin-left:auto;flex-shrink:0;align-self:flex-end;}
 .sv-del:hover{background:#dc2626;color:#fff;}
 .sv-code-row{margin-top:7px;padding-top:7px;border-top:1px dashed var(--border);font-size:.77rem;color:#64748b;}
-.sv-code-row code{font-family:"Courier New",Courier,monospace;color:#0891b2;font-size:.79rem;}
+.sv-code-row code{font-family:"Courier New",Courier,monospace;color:#0e7490;font-size:.79rem;}
 
 /* Dark mode modale */
 html[data-theme="dark"] .sv-box{background:#1e293b;}
@@ -1955,6 +1955,22 @@ body { padding: 0; }
   font-style: italic;
   pointer-events: none;
 }
+.v4-editor img.selected,
+.v4-editor table.selected { outline: 3px solid #6366f1; border-radius: 4px; }
+.v4-editor table td.v4-cell-multisel,
+.v4-editor table th.v4-cell-multisel { box-shadow: inset 0 0 0 2px #6366f1; }
+/* Ces barres gardent un fond pastel clair fixe (thème clair ou sombre) : le texte
+   doit donc rester foncé quel que soit le thème, sinon il hérite du texte clair
+   du mode sombre et le contraste échoue au WCAG AA. */
+#v4-img-props strong, #v4-img-props span,
+#v4-tbl-props strong, #v4-tbl-props span,
+#img-props strong, #img-props span {
+  color: #1e293b;
+}
+html[data-theme="dark"] .v4-editor table th,
+html[data-theme="dark"] #rich-editor table th {
+  color: #1e293b;
+}
 .v4-editor.drag-over {
   background: #eff6ff;
   outline: 2.5px dashed #3b82f6;
@@ -2413,7 +2429,7 @@ html[data-theme="dark"] .vf-full-statement-body .vf-stack-ph { background: #1e3a
 .sv-input-mono { font-family:"Courier New",Courier,monospace !important; }
 .sv-flex1 { flex:1; min-width:0; }
 .sv-units-sep { font-size:.85rem; color:#94a3b8; padding:0 3px; flex-shrink:0; align-self:center; }
-.sv-pr { font-family:"Courier New",Courier,monospace; font-size:.72rem; color:#0891b2; background:#f0f9ff; padding:2px 7px; border-radius:4px; margin-left:auto; max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; align-self:center; }
+.sv-pr { font-family:"Courier New",Courier,monospace; font-size:.72rem; color:#0e7490; background:#f0f9ff; padding:2px 7px; border-radius:4px; margin-left:auto; max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; align-self:center; }
 .sv-json-summary { font-size:.77rem; color:#64748b; white-space:nowrap; flex-shrink:0; align-self:center; }
 .sv-json-toggle { padding:3px 10px; border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc; color:var(--navy2); font-size:.75rem; font-weight:700; cursor:pointer; flex-shrink:0; }
 .sv-json-toggle:hover { background:var(--navy); color:#fff; border-color:var(--navy); }
