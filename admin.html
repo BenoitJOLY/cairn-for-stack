@@ -85,6 +85,10 @@
       <div class="field"><label for="a-maxima-url">URL du serveur Stack-API</label><input type="url" id="a-maxima-url" placeholder="https://…"></div>
       <button class="btn-save" onclick="saveMaximaUrl()">Enregistrer</button>
       <div class="status-line" id="status-maxima"></div>
+      <div class="field"><label for="a-jsmol-url">URL du serveur JSmol (visualisation 3D)</label><input type="url" id="a-jsmol-url" placeholder="https://…/jsmol-viewer"></div>
+      <p class="hint">Racine du dépôt JSmol hébergé (ex. GitHub Pages), sans slash final — utilisée pour construire l'URL de <code>viewer.html?smiles=…</code> embarquée dans les questions de nomenclature exportées.</p>
+      <button class="btn-save" onclick="saveJsmolUrl()">Enregistrer</button>
+      <div class="status-line" id="status-jsmol"></div>
     </section>
 
     <section class="admin-section">
@@ -164,6 +168,7 @@ async function loadConfig() {
     document.getElementById('a-gh-banque-branch').value = cfg.mutualisation.ghBanqueBranch || '';
     document.getElementById('a-gh-banque-folder').value = cfg.mutualisation.ghBanqueFolder || '';
     document.getElementById('a-maxima-url').value = cfg.maximaUrl || '';
+    document.getElementById('a-jsmol-url').value = cfg.jsmolUrl || '';
     document.getElementById('a-ai-baseurl').value = cfg.ai.baseUrl || '';
     document.getElementById('a-ai-model').value = cfg.ai.model || '';
     const legal = cfg.legal || {};
@@ -201,6 +206,10 @@ async function saveMutualisation() {
 
 async function saveMaximaUrl() {
   await postConfig({ maximaUrl: document.getElementById('a-maxima-url').value.trim() }, 'status-maxima');
+}
+
+async function saveJsmolUrl() {
+  await postConfig({ jsmolUrl: document.getElementById('a-jsmol-url').value.trim().replace(/\/+$/, '') }, 'status-jsmol');
 }
 
 async function saveAiProvider() {

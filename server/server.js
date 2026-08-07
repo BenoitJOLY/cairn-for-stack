@@ -130,7 +130,7 @@ const instanceConfig = require('./instance-config');
 // par défaut (js/maxima-client.js) — voir plan §6/§7.
 app.get('/api/config/public', (req, res) => {
   const cfg = instanceConfig.getPublicConfig();
-  res.json({ mutualisation: cfg.mutualisation, maximaUrl: cfg.maximaUrl, legal: cfg.legal });
+  res.json({ mutualisation: cfg.mutualisation, maximaUrl: cfg.maximaUrl, jsmolUrl: cfg.jsmolUrl, legal: cfg.legal });
 });
 
 app.get('/api/admin/config', requireRole('admin'), (req, res) => {
@@ -138,12 +138,15 @@ app.get('/api/admin/config', requireRole('admin'), (req, res) => {
 });
 
 app.post('/api/admin/config', requireRole('admin'), (req, res) => {
-  const { mutualisation, maximaUrl, ai, legal } = req.body || {};
+  const { mutualisation, maximaUrl, jsmolUrl, ai, legal } = req.body || {};
   if (mutualisation && typeof mutualisation === 'object') {
     instanceConfig.setMutualisationConfig(mutualisation);
   }
   if (typeof maximaUrl === 'string') {
     instanceConfig.setMaximaUrl(maximaUrl);
+  }
+  if (typeof jsmolUrl === 'string') {
+    instanceConfig.setJsmolUrl(jsmolUrl);
   }
   if (ai && typeof ai === 'object') {
     instanceConfig.setAiProviderConfig(ai);

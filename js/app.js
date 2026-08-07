@@ -70,8 +70,14 @@ function buildXML() {
   // Tags obligatoires : "stack" + un tag par type de question (toujours ajoutés)
   var mandatoryClean = new Set(['stack']);
   var typeSet = new Set(orderedQ.map(function(q){ return q.type; }).filter(Boolean));
+  // Types dont le XML exporté embarque systématiquement un viewer JSmol
+  // (iframe viewer.html?smiles=..., cf. js/gen-nomenclature.js:_nomIframe) —
+  // tag dédié pour retrouver/auditer côté Moodle les questions qui dépendent
+  // du serveur JSmol configuré en admin, indépendamment du tag de type.
+  var JSMOL_TYPES = new Set(['nomenclature']);
   typeSet.forEach(function(t){
     mandatoryClean.add(typeof tagClean==='function' ? tagClean(t) : t);
+    if (JSMOL_TYPES.has(t)) mandatoryClean.add('jsmol');
   });
   var mandatoryTags = [...mandatoryClean]
     .filter(function(c){ return c && !tags.some(function(u){ return u.clean===c; }); })
@@ -679,6 +685,7 @@ async function fetchInstanceConfig() {
     GH_REVIEW_BRANCH = m.ghReviewBranch || '';
     GH_REVIEW_FOLDER = m.ghReviewFolder || '';
     window._instanceMaximaUrl = cfg.maximaUrl || '';
+    window._instanceJsmolUrl = cfg.jsmolUrl || '';
     window._instanceLegal = cfg.legal || {};
     renderRgpdLegalInfo();
   } catch (e) {

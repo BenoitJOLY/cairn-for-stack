@@ -142,9 +142,16 @@ function _nomDonnesMaximaLiteral(esc) {
   }).join(',') + ']';
 }
 
-function _nomIframe(X, I18N_D) {
+function _nomIframe(X, I18N_D, jsmolUrl) {
   I18N_D = I18N_D || I18N;
-  return '<iframe src="https://mon-domaine.com/viewer.html?smiles={@molecule_smiles_url' + X + '@}" width="300" height="300" style="border:0;" loading="lazy" title="' + I18N_D.t('nom.iframe_title') + '"></iframe>';
+  // jsmolUrl : racine du viewer JSmol configurée par l'admin de l'instance
+  // (admin.html → GET /api/config/public → window._instanceJsmolUrl, cf.
+  // js/app.js:fetchInstanceConfig). Résolue une fois par genNomenclatureCore
+  // et propagée ici plutôt que lue directement (fonction testable côté Node,
+  // où `window` n'existe pas). Tant qu'aucune URL n'est configurée, l'iframe
+  // pointe vers un placeholder volontairement non résolu (voir historique).
+  const base = (jsmolUrl || 'https://mon-domaine.com').replace(/\/+$/, '');
+  return '<iframe src="' + base + '/viewer.html?smiles={@molecule_smiles_url' + X + '@}" width="300" height="300" style="border:0;" loading="lazy" title="' + I18N_D.t('nom.iframe_title') + '"></iframe>';
 }
 
 function _nomReadFormParams(){
@@ -196,6 +203,7 @@ function genNomenclatureCore(X, p, deps){
   const buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
   const escapeMaximaString_D = deps.escapeMaximaString || escapeMaximaString;
   const I18N_D = deps.I18N || I18N;
+  const jsmolUrl_D = deps.jsmolUrl || (typeof window !== 'undefined' && window._instanceJsmolUrl) || '';
 
   const bareme = p.bareme, text = p.text||'';
   const fbGen = p.fbGen||'';
@@ -264,7 +272,7 @@ ${urlChain()}`;
     return { bareme, vars, qnote:`{@nom${X}@}`,
       textFrag: `${banniere}
       <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
-      ${_nomIframe(X, I18N_D)}<br>
+      ${_nomIframe(X, I18N_D, jsmolUrl_D)}<br>
       <p>${I18N_D.t('nom.q_famille')} [[input:ans${X}f]] [[validation:ans${X}f]]</p>
       <p>${I18N_D.t('nom.q_nom')} [[input:ans${X}n]] [[validation:ans${X}n]]</p>`,
       inputXML: `    <input>
@@ -353,7 +361,7 @@ fb_manques${X} : if length(manques${X}) > 0 then sconcat("<div style='color:#924
     return { bareme, vars, qnote:`{@groupes_vrais${X}@}`,
       textFrag: `${banniere}
       <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
-      ${_nomIframe(X, I18N_D)}<br>
+      ${_nomIframe(X, I18N_D, jsmolUrl_D)}<br>
       <p>${I18N_D.t('nom.q_checkbox')} [[input:ans${X}]] [[validation:ans${X}]]</p>`,
       inputXML: `    <input>
       <name>ans${X}</name>
@@ -415,7 +423,7 @@ nom_pattern${X} : regexify_nom${X}(nom_attendu${X})$`;
   return { bareme, vars, qnote:`{@nom_attendu${X}@}`,
     textFrag: `${banniere}
     <!-- ENONCE-START -->${text}<!-- ENONCE-END -->
-    ${_nomIframe(X, I18N_D)}<br>
+    ${_nomIframe(X, I18N_D, jsmolUrl_D)}<br>
     <p>${I18N_D.t('nom.q_nom_iupac')} [[input:ans${X}]] [[validation:ans${X}]]</p>`,
     inputXML: `    <input>
       <name>ans${X}</name>

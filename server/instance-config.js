@@ -29,6 +29,7 @@ const DEFAULTS = {
     ghBanqueFolder: '', ghBanqueBranch: '',
   },
   maximaUrl: '',
+  jsmolUrl: '',
   ai: { baseUrl: '', model: '' },
   // Affiché dans la modale "Mentions légales" (RGPD) côté client. Le responsable
   // de traitement est qui héberge/administre CETTE instance, jamais l'auteur du
@@ -48,6 +49,7 @@ function load() {
   return {
     mutualisation: Object.assign({}, DEFAULTS.mutualisation, raw.mutualisation),
     maximaUrl: raw.maximaUrl || '',
+    jsmolUrl: raw.jsmolUrl || '',
     ai: Object.assign({}, DEFAULTS.ai, raw.ai),
     legal: Object.assign({}, DEFAULTS.legal, raw.legal),
     secrets: Object.assign({}, DEFAULTS.secrets, raw.secrets),
@@ -66,6 +68,7 @@ function getPublicConfig() {
   return {
     mutualisation: cfg.mutualisation,
     maximaUrl: cfg.maximaUrl,
+    jsmolUrl: cfg.jsmolUrl,
     ai: cfg.ai,
     legal: cfg.legal,
     ghTokenConfigured: !!cfg.secrets.ghInstitutionalToken,
@@ -88,6 +91,12 @@ function setLegalConfig(fields) {
 function setMaximaUrl(url) {
   const cfg = load();
   cfg.maximaUrl = String(url || '').trim();
+  save(cfg);
+}
+
+function setJsmolUrl(url) {
+  const cfg = load();
+  cfg.jsmolUrl = String(url || '').trim();
   save(cfg);
 }
 
@@ -119,6 +128,6 @@ function getSecret(name) {
 }
 
 module.exports = {
-  getPublicConfig, setMutualisationConfig, setMaximaUrl, setAiProviderConfig, setLegalConfig,
+  getPublicConfig, setMutualisationConfig, setMaximaUrl, setJsmolUrl, setAiProviderConfig, setLegalConfig,
   setSecret, clearSecret, getSecret,
 };
