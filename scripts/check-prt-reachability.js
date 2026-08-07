@@ -389,7 +389,7 @@ const TARGETS = [
         label: 'Nomenclature chimique', module: '../js/gen-nomenclature.js', coreFn: 'genNomenclatureCore', deps: RICH_DEPS,
         scenarios: [
             { label: 'fixe', params: { bareme: 1, text: '<p>Nommez cette molécule.</p>', mode: 'fixe', fixeSmiles: 'CC(C)CC(C)(C)C', fixeNom: '2,2,4-triméthylpentane', fixeFamille: 'Alcanes', fbGen: '' } },
-            { label: 'aleatoire', params: { bareme: 2, text: '<p>Identifiez cette molécule.</p>', mode: 'aleatoire', paramFamille: 'Alcanes', paramCarbonesMax: '4', fbGen: '' } },
+            { label: 'aleatoire', params: { bareme: 2, text: '<p>Identifiez cette molécule.</p>', mode: 'aleatoire', paramFamilles: ['Alcanes'], paramCarbonesMax: '4', fbGen: '' } },
             { label: 'checkbox', params: { bareme: 1, text: '<p>Cochez les groupes présents.</p>', mode: 'checkbox', cbSmiles: 'NC(CC(=O)O)C', cbVrais: 'Amine, Acide carboxylique', cbFaux: 'Alcool, Aldéhyde, Ester', fbGen: '' } }
         ]
     },

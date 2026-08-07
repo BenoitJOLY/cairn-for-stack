@@ -673,6 +673,62 @@ const HELP_CONTENT = {
         'La conclusión de compatibilidad es una lista desplegable (Compatible / Incompatible), no un campo numérico.',
         'No hay generación aleatoria disponible en esta versión (MVP solo con valores fijos).'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── CÁMARA FOTOGRÁFICA (EXPOSICIÓN)
+  apn: {
+    title: '<svg class="hs-ico"><use href="#ico-type-apn"></use></svg> Cámara fotográfica (exposición) — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>El estudiante encuentra, mediante un <b>cuestionario de opción múltiple</b>, el valor del ajuste desconocido (diafragma, velocidad de obturación o ISO) que mantiene la <b>misma exposición</b> cuando uno o dos de los otros dos ajustes cambian, a partir de una configuración inicial dada en el enunciado.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Parámetro a encontrar</b>: cuál de los tres ajustes (Velocidad / Diafragma / ISO) debe encontrar el estudiante — se convierte en la pregunta de opción múltiple.',
+        '<b>Parámetro(s) modificado(s)</b>: entre los dos ajustes restantes, marque el o los que cambian entre la configuración inicial y la configuración objetivo (al menos uno marcado).',
+        'La configuración inicial (valores de partida de los 3 ajustes) y el valor objetivo del/de los parámetro(s) modificado(s) se describen en el <b>enunciado</b> — el módulo no genera esos valores, solo corrige la respuesta de opción múltiple.',
+        '<b>Mensajes si respuesta correcta/incorrecta</b>: opcionales, sustituyen el texto por defecto.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'El triángulo de exposición sigue la regla de los «pasos EV»: un cambio de 1 paso en un ajuste debe compensarse con 1 paso (en el sentido correcto) de otro para mantener la misma exposición — esta es la lógica que corrige la pregunta de opción múltiple, no un cálculo mostrado al estudiante.',
+        'Sin generación aleatoria en esta versión: los valores numéricos (aperturas, velocidades, ISO) se escriben a mano en el enunciado.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── NOMENCLATURA QUÍMICA
+  nomenclature: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nomenclature"></use></svg> Nomenclatura química — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>El estudiante identifica el <b>nombre IUPAC</b> y/o la <b>familia</b> de una molécula descrita por su fórmula <b>SMILES</b>, o marca los <b>grupos funcionales</b> que contiene. Tres modos independientes según el objetivo pedagógico.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Molécula fija</b>: introduzca el SMILES, el nombre IUPAC esperado y la familia esperada. La comparación del nombre acepta guiones/espacios/mayúsculas indistintamente (comparación tolerante, sin sintaxis exacta requerida).',
+        '<b>Generador aleatorio</b>: se extrae una molécula al azar de una base de datos integrada, filtrada por <b>familia(s)</b> (casillas, varias posibles; ninguna marcada = todas) y opcionalmente un <b>número máximo de carbonos</b>. Si ninguna molécula cumple los filtros, la extracción recurre automáticamente al conjunto completo en lugar de fallar.',
+        '<b>Análisis funcional (casillas)</b>: introduzca un SMILES y dos listas separadas por comas — los grupos funcionales realmente presentes, y grupos señuelo ausentes. El estudiante marca los que identifica; se mezclan aleatoriamente en la lista que se le muestra.',
+        'El botón <b>🧬 Ver en 3D</b> en la vista previa del estudiante carga una representación 3D interactiva de la molécula (requiere un servidor JSmol configurado en Admin) — se carga solo al hacer clic, nunca automáticamente.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'En modo Casillas, la puntuación es proporcional al número de aciertos menos los errores (no es una calificación todo o nada).',
+        'La vista 3D en la pregunta exportada depende de un servidor JSmol externo (autoalojado) configurado por el administrador; sin él, el iframe 3D no se muestra en Moodle pero el resto de la pregunta funciona con normalidad.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── CINEMÁTICA DEL PUNTO
+  cinematique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-cinematique"></use></svg> Cinemática del punto — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>A partir de una <b>cronofotografía</b> de un punto M en movimiento, el estudiante mide las normas de los vectores velocidad v_i y v_{i+1} (mediante diferencias de posiciones sucesivas), y luego construye el vector variación de velocidad Δv_i = v_{i+1} − v_i mediante la <b>relación de Chasles</b> (clonación, selección, inversión, adhesión magnética en la vista previa).</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Taller de digitalización</b>: marque cada posición M0, M1, M2… en orden cronológico, sobre fondo libre o una imagen importada como guía (la imagen nunca se guarda ni se exporta — solo se guardan los puntos marcados y la calibración).',
+        '<b>Calibración</b>: coloque 2 marcadores en modo Calibración e indique la distancia real (en metros) entre ellos, para convertir los píxeles del taller en metros.',
+        '<b>Intervalo entre 2 fotos (Δt)</b>: duración entre dos puntos M consecutivos.',
+        '<b>Método de cálculo de la velocidad</b>: «Punto siguiente» (programa 2019, M_iM_{i+1}/Δt) o «Derivada simétrica» (M_{i-1}M_{i+1}/2Δt) — esta última se recomienda para movimientos circulares o parabólicos, donde da una dirección tangente correcta.',
+        '<b>Índice i de partida</b>: determina qué puntos se usan para calcular v_i (segmento M_iM_{i+1}) y luego v_{i+1} (segmento M_{i+1}M_{i+2}) — aparece un mensaje de error en la vista previa si i está fuera de rango para el número de puntos digitalizados.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Con el método «Derivada simétrica», el índice i debe dejar espacio a ambos lados (necesita M_{i-1} y M_{i+2}) — revise la vista previa si aparece un mensaje de error.',
+        'La imagen importada como guía es solo una ayuda visual para usted durante la digitalización: no forma parte ni de la pregunta guardada ni de la exportación a Moodle.',
+        'Sin generación aleatoria en esta versión: las posiciones digitalizadas y Δt son valores fijos.'
+      ])) + _HELP_COMMON
   }
 };
 

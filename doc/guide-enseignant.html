@@ -298,7 +298,7 @@ kbd{
   <p>Créer, personnaliser et exporter des questions STACK pour Moodle — sans écrire de code</p>
   <div class="header-badges">
     <span class="badge badge-navy">Version 4.1 · 2026</span>
-    <span class="badge badge-blue">40+ types de questions</span>
+    <span class="badge badge-blue">49 types de questions</span>
   </div>
 </div>
 
@@ -404,7 +404,7 @@ kbd{
 <div class="section" id="types">
   <h2 class="sec-title">5. Les types de questions disponibles</h2>
 
-  <p>StackForge propose <strong>40+ types</strong> organisés en catégories. Choisissez celui qui correspond le mieux à la compétence évaluée.</p>
+  <p>StackForge propose <strong>49 types</strong> organisés en catégories. Choisissez celui qui correspond le mieux à la compétence évaluée.</p>
 
   <!-- QCM -->
   <div class="type-group-title">Questionnaire à choix</div>
@@ -507,6 +507,14 @@ kbd{
       <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">DOI (Domaine de définition)</span></div>
       <div class="type-desc">Déterminer le domaine d'une fonction (intervalle, union…).</div>
     </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">Raisonnement par équivalence</span></div>
+      <div class="type-desc">Vérifie un raisonnement mené étape par étape (développement, équation, factorisation, système), avec contrôle de chaque étape intermédiaire.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">GeoGebra</span></div>
+      <div class="type-desc">Intègre une applet GeoGebra existante (identifiant de matériel) avec entrées/sorties et coefficients paramétrables aléatoirement.</div>
+    </div>
   </div>
 
   <!-- Sciences -->
@@ -551,6 +559,34 @@ kbd{
     <div class="type-card">
       <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">RVB / CMJN</span></div>
       <div class="type-desc">Synthèse additive et soustractive des couleurs (optique).</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Cinématique du point</span></div>
+      <div class="type-desc">Vecteur vitesse, relation de Chasles, méthode de la tangente ou de la dérivée symétrique sur une trajectoire pointée.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Circuits électriques</span></div>
+      <div class="type-desc">Atelier de construction de circuit sur canevas : l'élève place composants et connexions, StackForge vérifie le modèle obtenu.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Appareil photo (exposition)</span></div>
+      <div class="type-desc">Diaphragme, vitesse, ISO : l'élève retrouve le paramètre manquant du triangle d'exposition photographique.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Nomenclature chimique</span></div>
+      <div class="type-desc">Nommer ou identifier une molécule organique selon les règles IUPAC, en mode valeur fixe, aléatoire ou QCM.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Tableau d'avancement</span></div>
+      <div class="type-desc">Tableau d'avancement d'une réaction chimique : quantités initiales, coefficients, réactif limitant, avancement final.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Incertitude de mesure</span></div>
+      <div class="type-desc">Calcul d'incertitude-type (méthode GUM), propagation de type A/B, arrondi et écriture correcte du résultat final.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-card-head"><span class="type-cat cat-sci">Sciences</span><span class="type-name">Z-score (compatibilité métrologique)</span></div>
+      <div class="type-desc">Compare une valeur mesurée à une référence via le z-score, avec seuil de compatibilité configurable.</div>
     </div>
   </div>
 
@@ -953,11 +989,53 @@ kbd{
 <div class="section" id="export">
   <h2 class="sec-title">12. Exporter vers Moodle</h2>
 
+  <p>Cliquer sur <strong>Exporter XML</strong> dans la barre d'en-tête ne télécharge pas directement un fichier : cela ouvre la <strong>modale de tags Moodle</strong> (« Étape 2 »), qui sert à la fois à classer la question et à choisir comment la diffuser.</p>
+
+  <h3>12.1 Préparer l'export</h3>
   <div class="steps">
     <div class="step"><div class="step-body">Assurez-vous que toutes les questions ont leur chip <strong>verte</strong> (Enregistrer appliqué).</div></div>
-    <div class="step"><div class="step-body">Cliquez sur <strong>Exporter XML</strong> dans la barre d'en-tête. Un fichier <code>stackforge-export.xml</code> est téléchargé.</div></div>
+    <div class="step"><div class="step-body">Cliquez sur <strong>Exporter XML</strong> dans la barre d'en-tête. La modale de tags s'ouvre.</div></div>
+    <div class="step"><div class="step-body">En haut de la modale, réglez la <strong>pénalité</strong> par nouvel essai (0 à 1, par défaut 0,1) et le mode de <strong>notation</strong> : « Notée » (compte pour la note) ou « Non notée » (mode formatif / entraînement).</div></div>
+  </div>
+
+  <h3>12.2 Renseigner les tags</h3>
+  <p>Sept catégories structurent la question ; les six premières sont <strong>obligatoires</strong> (marquées d'un <span style="color:#dc2626;font-weight:700">*</span>) :</p>
+  <ul>
+    <li><strong>1. Matière</strong>, <strong>2. Niveau</strong>, <strong>3. Sous-matière</strong>, <strong>4. Chapitre</strong> — listes proposées par l'établissement, ou saisie libre.</li>
+    <li><strong>5. Bloom</strong> — un ou plusieurs niveaux de la taxonomie (Mémoriser, Comprendre, Appliquer, Analyser, Évaluer).</li>
+    <li><strong>6. Difficulté</strong> — un seul choix parmi Simple / Modéré / Dur.</li>
+    <li><strong>7. Outils &amp; Divers</strong> (facultatif) — GeoGebra, JSXGraph, ou un tag personnalisé.</li>
+  </ul>
+  <p>Un aperçu des tags s'affiche en bas de la modale (les accents et caractères spéciaux sont automatiquement supprimés).</p>
+
+  <div class="warn-box">
+    <div class="box-title">Bouton « Ne mettre aucun tag »</div>
+    <p>Il permet de sauter cette étape en quelques secondes, mais la question ne pourra alors ni être mutualisée avec d'autres enseignants, ni être retrouvée ou classée facilement par la suite. À réserver aux exports strictement personnels.</p>
+  </div>
+
+  <h3>12.3 Variantes et vérification Maxima</h3>
+  <div class="steps">
+    <div class="step"><div class="step-body">Réglez le <strong>nombre de variantes STACK</strong> (<code>deployedseed</code>) à générer : minimum 5, maximum 100, valeur par défaut 10. Chaque variante correspond à un jeu de valeurs aléatoires différent.</div></div>
+    <div class="step"><div class="step-body">Cliquez sur <strong>🧪 Tester avec Maxima</strong> : StackForge compile chaque variante auprès du serveur Maxima et affiche une barre de progression, puis un résultat (variantes valides / en erreur).</div></div>
+  </div>
+  <div class="tip-box">
+    Ce test préalable évite de découvrir une variante cassée (division par zéro, racine négative…) une fois la question déjà importée dans Moodle.
+  </div>
+
+  <h3>12.4 Finaliser : télécharger ou déposer pour validation</h3>
+  <p>Une fois les catégories obligatoires remplies, deux boutons deviennent actifs — au choix :</p>
+  <ul>
+    <li><strong>Confirmer et prévisualiser</strong> — télécharge immédiatement le fichier XML sur votre poste, pour un import manuel dans Moodle (voir 12.5).</li>
+    <li><strong>📥 Déposer pour validation</strong> — envoie directement le XML dans le dossier <code>a_verifier/</code> du dépôt GitHub institutionnel, pour relecture par un validateur avant publication dans la banque de questions mutualisée. Ce bouton n'est disponible que si l'administrateur a configuré la zone de mutualisation ; sinon un message l'indique.</li>
+  </ul>
+  <div class="info-box">
+    Les questions validées et publiées par l'équipe pédagogique sont consultables et téléchargeables (par lot, filtrées par tags) depuis la page <strong>Dépôt</strong> de StackForge, accessible sans avoir besoin de repasser par Moodle.
+  </div>
+
+  <h3>12.5 Importer le XML dans Moodle</h3>
+  <div class="steps">
     <div class="step"><div class="step-body">Dans Moodle : <strong>Banque de questions → Importer → Moodle XML</strong>.</div></div>
-    <div class="step"><div class="step-body">Sélectionnez la catégorie cible, importez le fichier.</div></div>
+    <div class="step"><div class="step-body">Sélectionnez la catégorie cible, importez le fichier téléchargé à l'étape 12.4.</div></div>
     <div class="step"><div class="step-body">Testez avec <strong>Aperçu</strong> dans Moodle avant d'ajouter la question à un quiz.</div></div>
   </div>
 

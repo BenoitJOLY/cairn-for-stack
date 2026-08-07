@@ -96,6 +96,9 @@
 [data-theme="dark"] .form-panel input:focus,
 [data-theme="dark"] .form-panel select:focus,
 [data-theme="dark"] .form-panel textarea:focus { border-color: #3b82f6; }
+/* Boîte cases à cocher (familles nomenclature) : fond clair codé en dur sinon,
+   ce qui casse le contraste WCAG AA du texte clair de ".form-panel label". */
+[data-theme="dark"] .nom-fam-list { background: #0f172a; border-color: #334155; }
 
 /* ── V4 éditeur ──────────────────────────────────────────────── */
 [data-theme="dark"] .v4-editor        { background: var(--v4-editor-bg); }

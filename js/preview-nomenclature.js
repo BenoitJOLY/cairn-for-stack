@@ -26,10 +26,12 @@
 // place un tokenizer maison _nomTokenize() + une reconstitution JS pure du tirage aléatoire
 // (_nomSimulateDraw, via NOM_DONNES déjà disponible côté client) pour l'aperçu "🎲 simulé".
 //
-// Le viewer SMILES (iframe vers le placeholder https://mon-domaine.com/viewer.html, cf.
-// _nomIframe() dans gen-nomenclature.js) n'est délibérément jamais embarqué dans l'aperçu :
-// ni domaine réel, ni appel réseau externe non sollicité par l'enseignant. On affiche à la
-// place la chaîne SMILES brute dans un encart (_nomSmilesBox).
+// Le viewer SMILES (iframe vers _instanceJsmolUrl/viewer.html, cf. _nomIframe() dans
+// gen-nomenclature.js) n'est jamais chargé automatiquement dans l'aperçu — on affiche
+// d'abord la chaîne SMILES brute dans un encart (_nomSmilesBox). Un bouton "Voir en 3D"
+// permet à l'enseignant de déclencher lui-même l'appel réseau vers le serveur JSmol
+// configuré en admin : jamais d'appel externe non sollicité au fil de la frappe,
+// seulement sur clic explicite.
 
 function _nomEscapeHtml(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -44,11 +46,13 @@ function _nomCarbonCount(smiles) {
 
 // Reproduit côté JS le filtre Maxima donnes_filtres${X}/donnes_pool${X} (repli sur le
 // pool complet si le filtre famille+carbones ne matche rien) — cf. gen-nomenclature.js.
-function _nomFilteredPool(paramFamille, paramCarbonesMax) {
-  var fam = paramFamille || 'Toutes';
+// paramFamilles : tableau de familles cochées ([] = aucun filtre = "toutes").
+function _nomFilteredPool(paramFamilles, paramCarbonesMax) {
+  var fams = Array.isArray(paramFamilles) ? paramFamilles
+    : (paramFamilles && paramFamilles !== 'Toutes' ? [paramFamilles] : []);
   var cmax = (paramCarbonesMax === '' || paramCarbonesMax === null || paramCarbonesMax === undefined) ? null : parseInt(paramCarbonesMax, 10);
   var filtered = NOM_DONNES.filter(function (m) {
-    return (fam === 'Toutes' || m[0] === fam) && (cmax === null || isNaN(cmax) || _nomCarbonCount(m[2]) <= cmax);
+    return (fams.length === 0 || fams.indexOf(m[0]) !== -1) && (cmax === null || isNaN(cmax) || _nomCarbonCount(m[2]) <= cmax);
   });
   return filtered.length ? filtered : NOM_DONNES;
 }
@@ -56,28 +60,37 @@ function _nomFilteredPool(paramFamille, paramCarbonesMax) {
 // Simulation JS pure du tirage rand(...) de Maxima (mode Aléatoire) : ne peut jamais
 // être identique au tirage réel (seed Maxima), sert uniquement d'illustration avant
 // que l'enseignant ne déclenche "👁️ Aperçu réel".
-function _nomSimulateDraw(paramFamille, paramCarbonesMax) {
-  var pool = _nomFilteredPool(paramFamille, paramCarbonesMax);
+function _nomSimulateDraw(paramFamilles, paramCarbonesMax) {
+  var pool = _nomFilteredPool(paramFamilles, paramCarbonesMax);
   var pick = pool[Math.floor(Math.random() * pool.length)];
   return { famille: pick[0], nom: pick[1], smiles: pick[2] };
 }
 
 function _nomSmilesBox(smiles) {
+  var jsmolBase = (typeof window !== 'undefined' && window._instanceJsmolUrl) || '';
+  var viewerUrl = jsmolBase ? (jsmolBase.replace(/\/+$/, '') + '/viewer.html?smiles=' + encodeURIComponent(smiles)) : '';
+  var btnHTML = viewerUrl
+    ? '<button type="button" class="hs-nom-3d-btn" data-url="' + _nomEscapeHtml(viewerUrl) + '" style="display:block;margin-top:8px;padding:5px 10px;border:1px solid #67e8f9;border-radius:6px;background:#fff;color:#0e7490;font-size:.8rem;cursor:pointer;">🧬 ' + I18N.t('nom.preview_show_3d') + '</button>'
+    : '';
+  // Chargement de l'iframe JSmol différé au clic (data-url + listener), jamais au
+  // rendu de l'aperçu : voir la note en tête de fichier.
+  var script = viewerUrl
+    ? '<script>document.querySelectorAll(".hs-nom-3d-btn").forEach(function(b){b.addEventListener("click",function(){var f=document.createElement("iframe");f.src=b.getAttribute("data-url");f.width=260;f.height=260;f.style.border="0";f.style.display="block";f.style.marginTop="8px";f.loading="lazy";b.replaceWith(f);});});<\/script>'
+    : '';
   return '<div style="display:inline-block;padding:10px 14px;background:#ecfeff;border:1.5px dashed #67e8f9;border-radius:8px;font-family:monospace;font-size:.95rem;color:#0e7490;">'
     + '🧬 SMILES : <strong>' + _nomEscapeHtml(smiles) + '</strong>'
     + '<div style="font-size:.74rem;color:#0e7490;font-weight:400;margin-top:4px;font-family:-apple-system,Segoe UI,Arial,sans-serif;">(' + I18N.t('nom.preview_smiles_note') + ')</div>'
-    + '</div>';
+    + btnHTML
+    + '</div>'
+    + script;
 }
 
-// Reverse la chaîne de ssubst de urlChain() (gen-nomenclature.js) — pas un décodage
-// URI complet : seuls ces 5 motifs sont substitués côté Maxima.
+// Décode la chaîne percent-encodée produite par urlChain() (gen-nomenclature.js,
+// table NOM_URL_ESCAPES_D) : c'est un encodage percent standard, decodeURIComponent
+// le lit donc sans avoir besoin de connaître la table exacte des 28 caractères.
 function _nomDecodeSmilesUrl(encoded) {
-  return String(encoded || '')
-    .replace(/%5C/g, '\\')
-    .replace(/%2F/g, '/')
-    .replace(/%28/g, '(')
-    .replace(/%29/g, ')')
-    .replace(/%3D/g, '=');
+  var s = String(encoded || '');
+  try { return decodeURIComponent(s); } catch (e) { return s; }
 }
 
 function _nomTokenize(html, known) {
@@ -106,8 +119,8 @@ function _nomStripBannerAndInputs(html, smilesReplacement) {
   var fakeInputStyle = 'padding:6px 10px;border:1px solid #94a3b8;border-radius:5px;font-size:.95rem;background:#f8fafc;color:#94a3b8;width:160px;';
   return String(html || '')
     .replace(/^<div style="[^"]*border-left[^"]*"[^>]*>[\s\S]*?<\/div>/, '')
-    .replace(/<iframe src="https:\/\/mon-domaine\.com\/viewer\.html\?smiles=\{@molecule_smiles_url\d+@\}"[^>]*><\/iframe>/, smilesReplacement)
-    .replace(/<iframe src="https:\/\/mon-domaine\.com\/viewer\.html\?smiles=([^"]*)"[^>]*><\/iframe>/, function (m, enc) { return _nomSmilesBox(_nomDecodeSmilesUrl(enc)); })
+    .replace(/<iframe src="[^"]*\/viewer\.html\?smiles=\{@molecule_smiles_url\d+@\}"[^>]*><\/iframe>/, smilesReplacement)
+    .replace(/<iframe src="[^"]*\/viewer\.html\?smiles=([^"]*)"[^>]*><\/iframe>/, function (m, enc) { return _nomSmilesBox(_nomDecodeSmilesUrl(enc)); })
     .replace(/\[\[input:[^\]]+\]\]/g, '<input type="text" disabled aria-label="Aperçu du champ de réponse" style="' + fakeInputStyle + '">')
     .replace(/\[\[validation:[^\]]+\]\]/g, '');
 }
@@ -129,7 +142,7 @@ function renderPreviewHTML_nomenclature(state) {
   var knownOk, knownWrong;
 
   if (mode === 'aleatoire') {
-    var draw = _nomSimulateDraw(state.paramFamille, state.paramCarbonesMax);
+    var draw = _nomSimulateDraw(state.paramFamilles, state.paramCarbonesMax);
     smiles = draw.smiles;
     known.nom1 = _nomEscapeHtml(draw.nom);
     known.famille1 = _nomEscapeHtml(draw.famille);
@@ -300,7 +313,10 @@ function renderPreviewHTML_nomenclature(state) {
     }
   }
 
-  window.nomRefreshPreview = _hsWireSimplePreview('nomenclature', 'nom', 'nom-preview-container', 'fp-nomenclature', renderPreviewHTML_nomenclature, false, _nomAugmentStateWithReal);
+  // scripted=true : nécessaire pour que le bouton "Voir en 3D" (_nomSmilesBox) puisse
+  // remplacer lui-même son data-url par une iframe JSmol au clic, à l'intérieur de
+  // l'iframe d'aperçu sandboxée.
+  window.nomRefreshPreview = _hsWireSimplePreview('nomenclature', 'nom', 'nom-preview-container', 'fp-nomenclature', renderPreviewHTML_nomenclature, true, _nomAugmentStateWithReal);
 
   // Nouvelle session d'édition (panneau réouvert) → seed réinitialisé, aperçu réel
   // effacé, boutons affichés/masqués selon que Maxima est configuré et que le mode

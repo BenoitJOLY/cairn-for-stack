@@ -128,6 +128,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .field input[type="radio"],.field input[type="checkbox"]{width:auto;padding:0;border:none;background:transparent;flex-shrink:0;}
 .field input:focus,.field select:focus{outline:none;border-color:var(--navy3);}
 .field input.err{border-color:#dc2626;background:#fff5f5;}
+.nom-fam-list{border:1px solid #cbd5e1;border-radius:6px;padding:8px 10px;background:#fff;}
 .field-err{font-size:.72rem;color:#dc2626;font-weight:600;margin-top:2px;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .hint{font-size:.72rem;color:var(--hint-color);margin-top:3px;font-style:italic;line-height:1.4;}

@@ -19,20 +19,38 @@
 // config-panel-nomenclature.js — capture/restore/reset + mode selector pour le type "nomenclature"
 // (chip unique, 3 modes internes Fixe/Aléatoire/Checkbox — cf. js/gen-nomenclature.js)
 
+// Cases à cocher famille (mode Aléatoire) : aucune coche = pas de filtre (= "Toutes").
+function _nomGetCheckedFamilies() {
+  var boxes = document.querySelectorAll('#nom-param-familles .nom-fam-chk:checked');
+  return Array.prototype.map.call(boxes, function(b) { return b.value; });
+}
+
+function _nomSetCheckedFamilies(list) {
+  var set = {};
+  (list || []).forEach(function(f) { set[f] = true; });
+  document.querySelectorAll('#nom-param-familles .nom-fam-chk').forEach(function(b) {
+    b.checked = !!set[b.value];
+  });
+}
+
 function _nomPopulateFamilies() {
-  var sel = document.getElementById('nom-param-famille');
+  var wrap = document.getElementById('nom-param-familles');
   var dl = document.getElementById('nom-familles-datalist');
-  if (!sel && !dl) return;
+  if (!wrap && !dl) return;
   var fams = (typeof _nomFamilies === 'function') ? _nomFamilies() : [];
-  if (sel) {
-    var current = sel.value;
-    sel.innerHTML = '<option value="Toutes">Toutes</option>';
+  if (wrap) {
+    var current = _nomGetCheckedFamilies();
+    wrap.innerHTML = '';
     fams.forEach(function(f) {
-      var opt = document.createElement('option');
-      opt.value = f; opt.textContent = f;
-      sel.appendChild(opt);
+      var label = document.createElement('label');
+      label.style.cssText = 'font-weight:normal;display:flex;align-items:center;gap:5px;white-space:nowrap;cursor:pointer;';
+      var chk = document.createElement('input');
+      chk.type = 'checkbox'; chk.className = 'nom-fam-chk'; chk.value = f;
+      chk.checked = current.indexOf(f) !== -1;
+      label.appendChild(chk);
+      label.appendChild(document.createTextNode(' ' + f));
+      wrap.appendChild(label);
     });
-    if (current && fams.indexOf(current) !== -1) sel.value = current;
   }
   if (dl) {
     dl.innerHTML = '';
@@ -41,6 +59,24 @@ function _nomPopulateFamilies() {
       opt.value = f;
       dl.appendChild(opt);
     });
+  }
+}
+
+// Mode Fixe : SMILES/nom/famille sont 3 champs libres non reliés entre eux (l'enseignant
+// peut dupliquer une question puis ne changer que le SMILES et oublier la famille). Si le
+// SMILES saisi correspond à une molécule connue de NOM_DONNES, on avertit en cas d'écart.
+function _nomCheckFixeFamille() {
+  var warnEl = document.getElementById('nom-fixe-warn');
+  var msgEl = document.getElementById('nom-fixe-warn-msg');
+  if (!warnEl || !msgEl) return;
+  var smiles = (v('nom-fixe-smiles') || '').trim();
+  var famille = (v('nom-fixe-famille') || '').trim();
+  var match = (typeof NOM_DONNES !== 'undefined') ? NOM_DONNES.find(function(m) { return m[2] === smiles; }) : null;
+  if (match && famille && match[0] !== famille) {
+    msgEl.textContent = I18N.t('nom.fixe_famille_warn', { nom: match[1], famille: match[0] });
+    warnEl.style.display = 'block';
+  } else {
+    warnEl.style.display = 'none';
   }
 }
 
@@ -61,7 +97,7 @@ function captureState_nomenclature() {
   s.fixeSmiles = v('nom-fixe-smiles');
   s.fixeNom = v('nom-fixe-nom');
   s.fixeFamille = v('nom-fixe-famille');
-  s.paramFamille = v('nom-param-famille') || 'Toutes';
+  s.paramFamilles = _nomGetCheckedFamilies();
   s.paramCarbonesMax = v('nom-param-carbones-max');
   s.cbSmiles = v('nom-cb-smiles');
   s.cbVrais = v('nom-cb-vrais');
@@ -79,7 +115,11 @@ function restoreState_nomenclature(s) {
   document.getElementById('nom-fixe-smiles').value = s.fixeSmiles || 'CC(C)CC(C)(C)C';
   document.getElementById('nom-fixe-nom').value = s.fixeNom || '2,2,4-triméthylpentane';
   document.getElementById('nom-fixe-famille').value = s.fixeFamille || 'Alcanes';
-  document.getElementById('nom-param-famille').value = s.paramFamille || 'Toutes';
+  _nomCheckFixeFamille();
+  // Compat rétro : anciennes sauvegardes avec un unique s.paramFamille (hors "Toutes").
+  var fams = Array.isArray(s.paramFamilles) ? s.paramFamilles
+    : (s.paramFamille && s.paramFamille !== 'Toutes' ? [s.paramFamille] : []);
+  _nomSetCheckedFamilies(fams);
   document.getElementById('nom-param-carbones-max').value = s.paramCarbonesMax || '';
   document.getElementById('nom-cb-smiles').value = s.cbSmiles || 'NC(CC(=O)O)C';
   document.getElementById('nom-cb-vrais').value = s.cbVrais || 'Amine, Acide carboxylique';
@@ -97,7 +137,8 @@ function resetForm_nomenclature() {
   document.getElementById('nom-fixe-smiles').value = 'CC(C)CC(C)(C)C';
   document.getElementById('nom-fixe-nom').value = '2,2,4-triméthylpentane';
   document.getElementById('nom-fixe-famille').value = 'Alcanes';
-  document.getElementById('nom-param-famille').value = 'Toutes';
+  _nomCheckFixeFamille();
+  _nomSetCheckedFamilies([]);
   document.getElementById('nom-param-carbones-max').value = '';
   document.getElementById('nom-cb-smiles').value = 'NC(CC(=O)O)C';
   document.getElementById('nom-cb-vrais').value = 'Amine, Acide carboxylique';

@@ -673,6 +673,62 @@ const HELP_CONTENT = {
         'Der Kompatibilitätsschluss ist ein Dropdown (Kompatibel / Inkompatibel), kein numerisches Feld.',
         'In dieser Version ist keine Zufallsgenerierung verfügbar (MVP nur mit festen Werten).'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── FOTOKAMERA (BELICHTUNG)
+  apn: {
+    title: '<svg class="hs-ico"><use href="#ico-type-apn"></use></svg> Fotokamera (Belichtung) — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Der Schüler findet per <b>Multiple-Choice</b> den Wert der unbekannten Einstellung (Blende, Verschlusszeit oder ISO), der die <b>gleiche Belichtung</b> beibehält, wenn sich eine oder zwei der anderen beiden Einstellungen ändern, ausgehend von einer im Aufgabentext angegebenen Ausgangskonfiguration.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Zu findende Einstellung</b>: welche der drei Einstellungen (Zeit / Blende / ISO) der Schüler finden muss — sie wird zur Multiple-Choice-Frage.',
+        '<b>Geänderte Einstellung(en)</b>: von den beiden verbleibenden Einstellungen ankreuzen, welche sich zwischen Ausgangs- und Zielkonfiguration ändern (mindestens eine angekreuzt).',
+        'Die Ausgangskonfiguration (Startwerte der 3 Einstellungen) und der Zielwert der geänderten Einstellung(en) werden im <b>Aufgabentext</b> beschrieben — das Modul erzeugt diese Werte nicht, es bewertet nur die Multiple-Choice-Antwort.',
+        '<b>Meldungen bei richtiger/falscher Antwort</b>: optional, ersetzen den Standardtext.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Das Belichtungsdreieck folgt der „LW-Stufen"-Regel: eine Änderung um 1 Stufe bei einer Einstellung muss durch 1 Stufe (in die richtige Richtung) einer anderen ausgeglichen werden, um die Belichtung zu erhalten — das ist die Logik, die die Multiple-Choice-Frage bewertet, keine dem Schüler angezeigte Berechnung.',
+        'In dieser Version keine Zufallsgenerierung: die Zahlenwerte (Blenden, Zeiten, ISO) werden von Hand im Aufgabentext geschrieben.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── CHEMISCHE NOMENKLATUR
+  nomenclature: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nomenclature"></use></svg> Chemische Nomenklatur — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Der Schüler bestimmt den <b>IUPAC-Namen</b> und/oder die <b>Stoffgruppe</b> eines durch seine <b>SMILES</b>-Formel beschriebenen Moleküls, oder kreuzt die enthaltenen <b>funktionellen Gruppen</b> an. Drei unabhängige Modi je nach Lernziel.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Vorgegebenes Molekül</b>: SMILES, erwarteter IUPAC-Name und erwartete Stoffgruppe eingeben. Der Namensabgleich akzeptiert Bindestriche/Leerzeichen/Groß-Kleinschreibung beliebig (tolerante Vergleichslogik, keine exakte Syntax nötig).',
+        '<b>Zufallsgenerator</b>: ein Molekül wird zufällig aus einer eingebauten Datenbank gezogen, gefiltert nach <b>Stoffgruppe(n)</b> (Kontrollkästchen, mehrere möglich; keine Auswahl = alle) und optional einer <b>maximalen Kohlenstoffzahl</b>. Passt kein Molekül zu den Filtern, greift die Ziehung automatisch auf die Gesamtmenge zurück, statt zu scheitern.',
+        '<b>Funktionsgruppenanalyse (Checkboxen)</b>: SMILES und zwei durch Kommas getrennte Listen eingeben — die tatsächlich vorhandenen funktionellen Gruppen und abwesende Ablenker-Gruppen. Der Schüler kreuzt die von ihm erkannten an; sie werden in der ihm angezeigten Liste zufällig gemischt.',
+        'Der Button <b>🧬 In 3D ansehen</b> in der Schülervorschau lädt eine interaktive 3D-Darstellung des Moleküls (benötigt einen in Admin konfigurierten JSmol-Server) — wird nur bei Klick geladen, nie automatisch.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Im Checkbox-Modus ist die Punktzahl proportional zur Anzahl richtiger Kreuze minus falscher (keine Alles-oder-nichts-Bewertung).',
+        'Die 3D-Ansicht in der exportierten Frage hängt von einem externen (selbst gehosteten) JSmol-Server ab, der vom Administrator konfiguriert wird; ohne ihn wird das 3D-iframe in Moodle nicht angezeigt, der Rest der Frage funktioniert aber normal.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── KINEMATIK DES PUNKTES
+  cinematique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-cinematique"></use></svg> Kinematik des Punktes — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Anhand einer <b>Chronofotografie</b> eines bewegten Punktes M misst der Schüler die Beträge der Geschwindigkeitsvektoren v_i und v_{i+1} (aus aufeinanderfolgenden Positionsdifferenzen) und konstruiert dann den Geschwindigkeitsänderungsvektor Δv_i = v_{i+1} − v_i mittels der <b>Chasles-Beziehung</b> (Klonen, Auswahl, Umkehrung, magnetisches Einrasten in der Vorschau).</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Digitalisierungswerkstatt</b>: klicken Sie jede Position M0, M1, M2… in chronologischer Reihenfolge, auf freiem Hintergrund oder einem importierten Führungsbild (das Bild wird nie gespeichert noch exportiert — nur die geklickten Punkte und die Kalibrierung).',
+        '<b>Kalibrierung</b>: setzen Sie 2 Markierungen im Kalibrierungsmodus und geben Sie den realen Abstand (in Metern) zwischen ihnen ein, um Pixel der Werkstatt in Meter umzurechnen.',
+        '<b>Intervall zwischen 2 Fotos (Δt)</b>: Zeitspanne zwischen zwei aufeinanderfolgenden M-Punkten.',
+        '<b>Methode zur Geschwindigkeitsberechnung</b>: „Nachfolgepunkt" (Lehrplan 2019, M_iM_{i+1}/Δt) oder „Symmetrische Ableitung" (M_{i-1}M_{i+1}/2Δt) — letztere wird für kreisförmige oder parabolische Bewegungen empfohlen, da sie eine korrekte Tangentenrichtung liefert.',
+        '<b>Startindex i</b>: bestimmt, welche Punkte zur Berechnung von v_i (Strecke M_iM_{i+1}) und dann v_{i+1} (Strecke M_{i+1}M_{i+2}) verwendet werden — eine Fehlermeldung erscheint in der Vorschau, wenn i für die Anzahl der digitalisierten Punkte außerhalb des gültigen Bereichs liegt.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Bei der Methode „Symmetrische Ableitung" muss der Index i auf beiden Seiten Platz lassen (benötigt M_{i-1} und M_{i+2}) — prüfen Sie die Vorschau, falls eine Fehlermeldung erscheint.',
+        'Das importierte Führungsbild ist nur eine visuelle Hilfe für Sie beim Digitalisieren: es gehört weder zur gespeicherten Frage noch zum Moodle-Export.',
+        'In dieser Version keine Zufallsgenerierung: digitalisierte Positionen und Δt sind feste Werte.'
+      ])) + _HELP_COMMON
   }
 };
 

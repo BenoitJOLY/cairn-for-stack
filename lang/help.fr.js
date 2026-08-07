@@ -694,6 +694,62 @@ const HELP_CONTENT = {
         'En mode « prolongement », si l\'élève n\'a pas du tout répondu à la question précédente (ou a soumis des coefficients invalides), la correction retombe automatiquement sur les coefficients du professeur — le tableau reste toujours corrigeable.',
         'Aucune génération aléatoire dans cette version : les quantités initiales et coefficients sont des valeurs fixes saisies par le professeur.'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── APPAREIL PHOTO (EXPOSITION)
+  apn: {
+    title: '<svg class="hs-ico"><use href="#ico-type-apn"></use></svg> Appareil photo (exposition) — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>L\'élève retrouve, par <b>QCM</b>, la valeur du réglage inconnu (diaphragme, vitesse d\'obturation ou ISO) qui permet de <b>conserver la même exposition</b> quand un ou deux des deux autres réglages changent, à partir d\'une configuration initiale donnée dans l\'énoncé.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Paramètre à trouver</b> : celui des trois réglages (Vitesse / Diaphragme / ISO) que l\'élève doit retrouver — c\'est lui qui devient le QCM.',
+        '<b>Paramètre(s) modifié(s)</b> : parmi les deux réglages restants, cochez celui ou ceux qui changent entre la configuration initiale et la configuration cible (au moins un coché).',
+        'La configuration initiale (valeurs de départ des 3 réglages) et la valeur cible du/des paramètre(s) modifié(s) se décrivent dans l\'<b>énoncé</b> — le module ne génère pas ces valeurs, il ne fait que corriger le QCM.',
+        '<b>Messages si bonne/mauvaise réponse</b> : facultatifs, remplacent le texte par défaut.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Le triangle d\'exposition suit la règle des « valeurs IL » : une variation d\'1 cran d\'un réglage doit être compensée par 1 cran (dans le bon sens) d\'un autre pour garder la même exposition — c\'est cette logique que corrige le QCM, pas un calcul affiché à l\'élève.',
+        'Aucune génération aléatoire dans cette version : les valeurs numériques (ouvertures, vitesses, ISO) sont rédigées à la main dans l\'énoncé.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── NOMENCLATURE CHIMIQUE
+  nomenclature: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nomenclature"></use></svg> Nomenclature chimique — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>L\'élève identifie le <b>nom IUPAC</b> et/ou la <b>famille</b> d\'une molécule décrite par sa formule <b>SMILES</b>, ou coche les <b>groupes fonctionnels</b> qu\'elle contient. Trois modes indépendants selon l\'objectif pédagogique.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Molécule imposée</b> : vous saisissez le SMILES, le nom IUPAC attendu et la famille attendue. La correspondance du nom accepte tirets/espaces/casse indifféremment (comparaison tolérante, pas de syntaxe exacte à respecter).',
+        '<b>Générateur aléatoire</b> : une molécule est tirée au hasard dans une base intégrée, filtrée par <b>famille(s)</b> (cases à cocher, plusieurs possibles ; aucune coche = toutes) et éventuellement un <b>nombre de carbones max</b>. Si aucune molécule ne correspond aux filtres, le tirage se replie automatiquement sur l\'ensemble complet plutôt que d\'échouer.',
+        '<b>Analyse fonctionnelle (cases à cocher)</b> : vous saisissez un SMILES et deux listes séparées par des virgules — les groupes fonctionnels réellement présents, et des groupes leurres absents. L\'élève coche ceux qu\'il identifie ; ils sont mélangés aléatoirement dans la liste qui lui est proposée.',
+        'Le bouton <b>🧬 Voir en 3D</b> dans l\'aperçu élève charge une représentation 3D interactive de la molécule (nécessite qu\'un serveur JSmol soit configuré dans Admin) — chargée uniquement sur clic, jamais automatiquement.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'En mode Checkbox, le score est proportionnel au nombre de bonnes coches moins les mauvaises (pas de correction en tout-ou-rien).',
+        'La visualisation 3D dans la question exportée dépend d\'un serveur JSmol externe (auto-hébergé) configuré par l\'administrateur ; sans lui, l\'iframe 3D ne s\'affiche pas dans Moodle mais le reste de la question fonctionne normalement.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── CINÉMATIQUE DU POINT
+  cinematique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-cinematique"></use></svg> Cinématique du point — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>À partir d\'une <b>chronophotographie</b> d\'un point M en mouvement, l\'élève mesure les normes des vecteurs vitesse v_i et v_{i+1} (par différences de positions successives), puis construit le vecteur variation de vitesse Δv_i = v_{i+1} − v_i par la <b>relation de Chasles</b> (clonage, sélection, inversion, accroche magnétique dans l\'aperçu).</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Atelier de digitalisation</b> : pointez chaque position M0, M1, M2… dans l\'ordre chronologique, sur fond libre ou sur une image importée comme guide (l\'image n\'est jamais enregistrée ni exportée — seuls les points cliqués et la calibration le sont).',
+        '<b>Calibration</b> : posez 2 repères en mode Calibration puis indiquez la distance réelle (en mètres) entre eux, pour convertir les pixels de l\'atelier en mètres.',
+        '<b>Intervalle entre 2 photos (Δt)</b> : durée entre deux points M consécutifs.',
+        '<b>Méthode de calcul de la vitesse</b> : « Point d\'après » (programme 2019, M_iM_{i+1}/Δt) ou « Dérivée symétrique » (M_{i-1}M_{i+1}/2Δt) — cette dernière est recommandée pour les mouvements circulaires ou paraboliques, où elle donne une direction tangente correcte.',
+        '<b>Indice i du point de départ</b> : détermine quels points servent à calculer v_i (tracé M_iM_{i+1}) puis v_{i+1} (tracé M_{i+1}M_{i+2}) — un message d\'erreur apparaît dans l\'aperçu si i est hors limites pour le nombre de points digitalisés.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Avec la méthode « Dérivée symétrique », l\'indice i doit laisser de la place des deux côtés (besoin de M_{i-1} et M_{i+2}) — vérifiez l\'aperçu si un message d\'erreur apparaît.',
+        'L\'image importée comme guide n\'est qu\'un support visuel pour vous pendant le pointage : elle ne fait partie ni de la question enregistrée, ni de l\'export Moodle.',
+        'Aucune génération aléatoire dans cette version : les positions digitalisées et Δt sont des valeurs fixes.'
+      ])) + _HELP_COMMON
   }
 };
 

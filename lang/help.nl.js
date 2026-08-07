@@ -673,6 +673,62 @@ const HELP_CONTENT = {
         'De compatibiliteitsconclusie is een keuzelijst (Compatibel / Incompatibel), geen numeriek veld.',
         'In deze versie is geen willekeurige generatie beschikbaar (alleen MVP met vaste waarden).'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── FOTOCAMERA (BELICHTING)
+  apn: {
+    title: '<svg class="hs-ico"><use href="#ico-type-apn"></use></svg> Fotocamera (belichting) — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>De leerling zoekt via een <b>meerkeuzevraag</b> de waarde van de onbekende instelling (diafragma, sluitertijd of ISO) die dezelfde <b>belichting</b> behoudt wanneer een of twee van de andere twee instellingen veranderen, uitgaande van een in de vraagtekst gegeven beginconfiguratie.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Te vinden instelling</b>: welke van de drie instellingen (Sluitertijd / Diafragma / ISO) de leerling moet vinden — deze wordt de meerkeuzevraag.',
+        '<b>Gewijzigde instelling(en)</b>: vink van de twee resterende instellingen aan welke verandert/veranderen tussen de begin- en doelconfiguratie (minstens één aangevinkt).',
+        'De beginconfiguratie (startwaarden van de 3 instellingen) en de doelwaarde van de gewijzigde instelling(en) worden beschreven in de <b>vraagtekst</b> — de module genereert deze waarden niet, ze beoordeelt alleen het meerkeuzeantwoord.',
+        '<b>Berichten bij goed/fout antwoord</b>: optioneel, vervangen de standaardtekst.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'De belichtingsdriehoek volgt de "EV-stops"-regel: een verandering van 1 stop bij één instelling moet gecompenseerd worden door 1 stop (in de juiste richting) bij een andere om dezelfde belichting te behouden — dit is de logica die de meerkeuzevraag beoordeelt, geen berekening die aan de leerling wordt getoond.',
+        'Geen willekeurige generatie in deze versie: de numerieke waarden (diafragma\'s, sluitertijden, ISO) worden handmatig in de vraagtekst geschreven.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── SCHEIKUNDIGE NOMENCLATUUR
+  nomenclature: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nomenclature"></use></svg> Scheikundige nomenclatuur — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>De leerling identificeert de <b>IUPAC-naam</b> en/of <b>familie</b> van een molecuul beschreven door zijn <b>SMILES</b>-formule, of vinkt de <b>functionele groepen</b> aan die het bevat. Drie onafhankelijke modi afhankelijk van het lesdoel.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Vast molecuul</b>: voer de SMILES, de verwachte IUPAC-naam en de verwachte familie in. De naamvergelijking accepteert streepjes/spaties/hoofdlettergebruik door elkaar (tolerante vergelijking, geen exacte syntax vereist).',
+        '<b>Willekeurige generator</b>: er wordt willekeurig een molecuul getrokken uit een ingebouwde database, gefilterd op <b>familie(s)</b> (aanvinkvakjes, meerdere mogelijk; niets aangevinkt = alle) en optioneel een <b>maximaal aantal koolstofatomen</b>. Als geen enkel molecuul aan de filters voldoet, valt de trekking automatisch terug op de volledige set in plaats van te mislukken.',
+        '<b>Functionele-groepenanalyse (aanvinkvakjes)</b>: voer een SMILES en twee door komma\'s gescheiden lijsten in — de daadwerkelijk aanwezige functionele groepen, en afwezige lokgroepen. De leerling vinkt de groepen aan die hij herkent; ze worden willekeurig gemengd in de lijst die hem getoond wordt.',
+        'De knop <b>🧬 In 3D bekijken</b> in het leerlingvoorbeeld laadt een interactieve 3D-weergave van het molecuul (vereist een in Admin geconfigureerde JSmol-server) — wordt alleen geladen bij een klik, nooit automatisch.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'In de modus Aanvinkvakjes is de score evenredig met het aantal juiste aanvinkingen minus de foute (geen alles-of-niets-beoordeling).',
+        'De 3D-weergave in de geëxporteerde vraag hangt af van een externe (zelf gehoste) JSmol-server die door de beheerder is geconfigureerd; zonder deze wordt de 3D-iframe niet getoond in Moodle, maar de rest van de vraag werkt gewoon normaal.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── KINEMATICA VAN HET PUNT
+  cinematique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-cinematique"></use></svg> Kinematica van het punt — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Op basis van een <b>chronofotografie</b> van een bewegend punt M meet de leerling de groottes van de snelheidsvectoren v_i en v_{i+1} (via opeenvolgende positieverschillen), en construeert vervolgens de snelheidsveranderingsvector Δv_i = v_{i+1} − v_i via de <b>relatie van Chasles</b> (klonen, selecteren, omkeren, magnetisch vastklikken in het voorbeeld).</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Digitaliseerwerkplaats</b>: klik elke positie M0, M1, M2… aan in chronologische volgorde, op een vrije achtergrond of een geïmporteerde hulpafbeelding (de afbeelding wordt nooit opgeslagen of geëxporteerd — alleen de aangeklikte punten en de kalibratie).',
+        '<b>Kalibratie</b>: plaats 2 markeringen in de kalibratiemodus en geef de werkelijke afstand (in meter) ertussen op, om pixels van de werkplaats om te rekenen naar meters.',
+        '<b>Interval tussen 2 foto\'s (Δt)</b>: tijdsduur tussen twee opeenvolgende M-punten.',
+        '<b>Methode voor snelheidsberekening</b>: "Volgend punt" (curriculum 2019, M_iM_{i+1}/Δt) of "Symmetrische afgeleide" (M_{i-1}M_{i+1}/2Δt) — de laatste wordt aanbevolen voor cirkelvormige of parabolische bewegingen, waar ze een correcte raaklijnrichting geeft.',
+        '<b>Startindex i</b>: bepaalt welke punten worden gebruikt om v_i (segment M_iM_{i+1}) en vervolgens v_{i+1} (segment M_{i+1}M_{i+2}) te berekenen — er verschijnt een foutmelding in het voorbeeld als i buiten bereik ligt voor het aantal gedigitaliseerde punten.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Bij de methode "Symmetrische afgeleide" moet index i aan beide kanten ruimte laten (heeft M_{i-1} en M_{i+2} nodig) — controleer het voorbeeld als er een foutmelding verschijnt.',
+        'De geïmporteerde hulpafbeelding is alleen een visueel hulpmiddel voor u tijdens het digitaliseren: ze maakt geen deel uit van de opgeslagen vraag, noch van de Moodle-export.',
+        'Geen willekeurige generatie in deze versie: gedigitaliseerde posities en Δt zijn vaste waarden.'
+      ])) + _HELP_COMMON
   }
 };
 

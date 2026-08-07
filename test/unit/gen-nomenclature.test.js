@@ -72,8 +72,14 @@ test('mode fixe : vars contient smiles_dessin/nom_attendu/famille_attendue suffi
     assert.match(q.vars, /famille_attendue3 : "Alcanes"\$/);
 });
 
-test('mode fixe : regexify_nom construit un pattern tolérant tirets/espaces/casse', () => {
-    const q = genNomenclatureCore(3, fixeParams(), DEPS);
+// Famille hors périmètre du décomposeur (7 familles supportées, cf. _nomDecompose) :
+// sert à couvrir le repli sur l'ancien nœud RegExp tolérant unique.
+function fixeParamsFallback(overrides) {
+    return fixeParams(Object.assign({ fixeFamille: 'Amines', fixeNom: 'Butan-1-amine', fixeSmiles: 'CCCCN' }, overrides || {}));
+}
+
+test('mode fixe : nom non décomposable -> repli, regexify_nom construit un pattern tolérant tirets/espaces/casse', () => {
+    const q = genNomenclatureCore(3, fixeParamsFallback(), DEPS);
     assert.match(q.vars, /regexify_nom3\(s\) := block/);
     assert.match(q.vars, /nom_pattern3 : regexify_nom3\(nom_attendu3\)\$/);
     // Le bug historique (ssubst séquentiels qui se recapturent) produisait "[-[- ]?]?" :
@@ -81,8 +87,8 @@ test('mode fixe : regexify_nom construit un pattern tolérant tirets/espaces/cas
     assert.ok(!q.vars.includes('[-[- ]?]?'));
 });
 
-test('mode fixe : un seul PRT, answertest RegExp, truescore 1 falsescore 0', () => {
-    const q = genNomenclatureCore(3, fixeParams(), DEPS);
+test('mode fixe : nom non décomposable -> repli sur un seul PRT, answertest RegExp, truescore 1 falsescore 0', () => {
+    const q = genNomenclatureCore(3, fixeParamsFallback(), DEPS);
     assert.equal(q.prt.nodes.length, 1);
     assert.equal(q.prt.nodes[0].answertest, 'RegExp');
     assert.equal(q.prt.nodes[0].sans, 'ans3');
@@ -91,29 +97,61 @@ test('mode fixe : un seul PRT, answertest RegExp, truescore 1 falsescore 0', () 
     assert.equal(q.prt.nodes[0].falsescore, '0');
 });
 
+test('mode fixe : nom décomposable (cas par défaut) -> 5 nœuds PRT critères (famille/longueur/subs/numero/ordre), poids bareme/5', () => {
+    const q = genNomenclatureCore(3, fixeParams(), DEPS);
+    assert.equal(q.prt.nodes.length, 5);
+    assert.deepEqual(q.prt.nodes.map((n) => n.description), ['famille', 'longueur', 'subs', 'numero', 'ordre']);
+    q.prt.nodes.forEach((n) => {
+        assert.equal(n.answertest, 'AlgEquiv');
+        assert.equal(n.truescore, '0.2');
+        assert.equal(n.falsescore, '0');
+    });
+    assert.equal(q.prt.nodes[0].sans, 'crit_famille3');
+    for (let i = 0; i < 4; i++) {
+        assert.equal(q.prt.nodes[i].truenextnode, String(i + 1));
+        assert.equal(q.prt.nodes[i].falsenextnode, String(i + 1));
+    }
+    assert.equal(q.prt.nodes[4].truenextnode, '-1');
+    assert.equal(q.prt.nodes[4].falsenextnode, '-1');
+    assert.match(q.vars, /longueur_ref3 : 5\$/);
+    assert.match(q.vars, /crit_famille3 : is\(famille_s3 = famille_attendue3\)\$/);
+});
+
+test('mode fixe : famille Esters -> 6 nœuds PRT (ajoute le critère alkyle), poids bareme/6', () => {
+    const q = genNomenclatureCore(3, fixeParams({ fixeFamille: 'Esters', fixeNom: "Éthanoate d'éthyle", fixeSmiles: 'CC(=O)OCC' }), DEPS);
+    assert.equal(q.prt.nodes.length, 6);
+    assert.deepEqual(q.prt.nodes.map((n) => n.description), ['famille', 'longueur', 'subs', 'numero', 'ordre', 'alkyle']);
+    q.prt.nodes.forEach((n) => assert.equal(n.truescore, '0.16666666666666666'));
+    assert.equal(q.prt.nodes[5].truenextnode, '-1');
+    assert.match(q.vars, /alkyle_ref3 : 2\$/);
+});
+
 test('mode fixe : les guillemets dans les champs teachers sont échappés', () => {
-    const q = genNomenclatureCore(1, fixeParams({ fixeNom: 'Nom avec "guillemets"' }), DEPS);
+    const q = genNomenclatureCore(1, fixeParamsFallback({ fixeNom: 'Nom avec "guillemets"' }), DEPS);
     assert.match(q.vars, /Nom avec \\"guillemets\\"/);
 });
 
-test('mode fixe : XML bien formé (prtXML, inputXML)', () => {
+test('mode fixe : XML bien formé (prtXML, inputXML) - cas décomposable et cas repli', () => {
     const q = genNomenclatureCore(3, fixeParams(), DEPS);
     assertBalancedTags(q.prtXML, 'prtXML');
     assertBalancedTags(q.inputXML, 'inputXML');
+    const qFallback = genNomenclatureCore(3, fixeParamsFallback(), DEPS);
+    assertBalancedTags(qFallback.prtXML, 'prtXML (repli)');
+    assertBalancedTags(qFallback.inputXML, 'inputXML (repli)');
 });
 
 // ── Mode Aléatoire (générateur filtré famille + carbones) ──────────────────
 function aleaParams(overrides) {
     return Object.assign({
         bareme: 2, text: '<p>Identifiez cette molécule.</p>', mode: 'aleatoire',
-        paramFamille: 'Alcanes', paramCarbonesMax: '4', fbGen: ''
+        paramFamilles: ['Alcanes'], paramCarbonesMax: '4', fbGen: ''
     }, overrides || {});
 }
 
 test('mode aléatoire : pool donnes + filtre famille/carbones + repli si vide', () => {
     const q = genNomenclatureCore(2, aleaParams(), DEPS);
     assert.match(q.vars, /donnes2 : \[/);
-    assert.match(q.vars, /param_famille2 : "Alcanes"\$/);
+    assert.match(q.vars, /param_familles2 : \["Alcanes"\]\$/);
     assert.match(q.vars, /param_carbones_max2 : 4\$/);
     assert.match(q.vars, /donnes_filtres2 : sublist\(donnes2,/);
     assert.match(q.vars, /donnes_pool2 : if filtre_vide2 then donnes2 else donnes_filtres2\$/);
@@ -124,6 +162,28 @@ test('mode aléatoire : param_carbones_max vide -> false (pas de limite)', () =>
     assert.match(q.vars, /param_carbones_max2 : false\$/);
 });
 
+test('mode aléatoire : plusieurs familles cochées -> liste Maxima à plusieurs entrées, filtre par elementp', () => {
+    const q = genNomenclatureCore(2, aleaParams({ paramFamilles: ['Alcanes', 'Esters'] }), DEPS);
+    assert.match(q.vars, /param_familles2 : \["Alcanes","Esters"\]\$/);
+    assert.match(q.vars, /elementp\(m\[1\], setify\(param_familles2\)\)/);
+});
+
+test('mode aléatoire : aucune famille cochée -> param_familles vide = aucun filtre (repli sur donnes complet)', () => {
+    const q = genNomenclatureCore(2, aleaParams({ paramFamilles: [] }), DEPS);
+    assert.match(q.vars, /param_familles2 : \[\]\$/);
+    assert.match(q.vars, /param_familles2 = \[\] or elementp/);
+});
+
+test('mode aléatoire : compat rétro paramFamille (singulier, ancien format) converti en tableau', () => {
+    const q = genNomenclatureCore(2, { bareme: 2, text: '', mode: 'aleatoire', paramFamille: 'Esters', paramCarbonesMax: '', fbGen: '' }, DEPS);
+    assert.match(q.vars, /param_familles2 : \["Esters"\]\$/);
+});
+
+test('mode aléatoire : compat rétro paramFamille="Toutes" converti en liste vide (aucun filtre)', () => {
+    const q = genNomenclatureCore(2, { bareme: 2, text: '', mode: 'aleatoire', paramFamille: 'Toutes', paramCarbonesMax: '', fbGen: '' }, DEPS);
+    assert.match(q.vars, /param_familles2 : \[\]\$/);
+});
+
 test('mode aléatoire : deux entrées (nom + famille) et deux inputs ans2n/ans2f', () => {
     const q = genNomenclatureCore(2, aleaParams(), DEPS);
     assert.match(q.inputXML, /<name>ans2n<\/name>/);
@@ -131,15 +191,32 @@ test('mode aléatoire : deux entrées (nom + famille) et deux inputs ans2n/ans2f
     assert.match(q.inputXML, /<type>dropdown<\/type>/);
 });
 
-test('mode aléatoire : PRT à 2 nœuds cumulant 0.5 + 0.5, node0 enchaîne toujours vers node1', () => {
+test('mode aléatoire : PRT à 6 nœuds critères (longueur/subs/numero/ordre/alkyle/famille) cumulant bareme/6 chacun, chaînage jusqu\'au dernier', () => {
     const q = genNomenclatureCore(2, aleaParams(), DEPS);
-    assert.equal(q.prt.nodes.length, 2);
-    assert.equal(q.prt.nodes[0].truescore, '0.5');
-    assert.equal(q.prt.nodes[0].truenextnode, '1');
-    assert.equal(q.prt.nodes[0].falsenextnode, '1');
-    assert.equal(q.prt.nodes[1].truescore, '0.5');
-    assert.equal(q.prt.nodes[1].truenextnode, '-1');
-    assert.equal(q.prt.nodes[1].falsenextnode, '-1');
+    assert.equal(q.prt.nodes.length, 6);
+    assert.deepEqual(q.prt.nodes.map((n) => n.description), ['longueur', 'subs', 'numero', 'ordre', 'alkyle', 'famille']);
+    q.prt.nodes.forEach((n) => {
+        assert.equal(n.truescore, '0.3333333333333333');
+        assert.equal(n.falsescore, '0');
+    });
+    for (let i = 0; i < 5; i++) {
+        assert.equal(q.prt.nodes[i].truenextnode, String(i + 1));
+        assert.equal(q.prt.nodes[i].falsenextnode, String(i + 1));
+    }
+    assert.equal(q.prt.nodes[5].truenextnode, '-1');
+    assert.equal(q.prt.nodes[5].falsenextnode, '-1');
+    assert.equal(q.prt.nodes[5].answertest, 'String');
+    assert.equal(q.prt.nodes[5].sans, 'ans2f');
+    assert.equal(q.prt.nodes[5].tans, 'famille2');
+});
+
+test('mode aléatoire : donnes_decomp précalculé + refs indexées par choix2', () => {
+    const q = genNomenclatureCore(2, aleaParams(), DEPS);
+    assert.match(q.vars, /donnes_decomp2 : \[/);
+    assert.match(q.vars, /decomp_ref2 : donnes_decomp2\[choix2\]\$/);
+    assert.match(q.vars, /longueur_ref2 : decomp_ref2\[1\]\$/);
+    assert.match(q.vars, /alkyle_ref2 : decomp_ref2\[5\]\$/);
+    assert.match(q.vars, /crit_alkyle2 : is\(alkyle_ref2 = false or alkyle_s2 = alkyle_ref2\)\$/);
 });
 
 test('mode aléatoire : XML bien formé (prtXML, inputXML)', () => {

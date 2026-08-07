@@ -5343,7 +5343,7 @@ fill="currentColor" stroke="none">
       <div id="nom-section-fixe">
         <div class="field">
           <label data-i18n="nom.fixe_smiles_lbl">SMILES de la molécule</label>
-          <input type="text" id="nom-fixe-smiles" value="CC(C)CC(C)(C)C" style="font-family:monospace;">
+          <input type="text" id="nom-fixe-smiles" value="CC(C)CC(C)(C)C" style="font-family:monospace;" oninput="_nomCheckFixeFamille()">
         </div>
         <div class="g2">
           <div class="field">
@@ -5352,23 +5352,22 @@ fill="currentColor" stroke="none">
           </div>
           <div class="field">
             <label data-i18n="nom.fixe_famille_lbl">Famille attendue</label>
-            <input type="text" id="nom-fixe-famille" value="Alcanes" list="nom-familles-datalist">
+            <input type="text" id="nom-fixe-famille" value="Alcanes" list="nom-familles-datalist" oninput="_nomCheckFixeFamille()">
           </div>
         </div>
         <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="nom.fixe_hint">La correspondance du nom accepte tirets/espaces/casse indifféremment (regex tolérant).</div>
+        <div class="warn-box" id="nom-fixe-warn">⚠️ <span id="nom-fixe-warn-msg"></span></div>
       </div>
 
       <!-- Mode Aléatoire : tirage filtré par famille + nombre de carbones max -->
       <div id="nom-section-aleatoire" style="display:none">
-        <div class="g2">
-          <div class="field">
-            <label data-i18n="nom.param_famille_lbl">Famille</label>
-            <select id="nom-param-famille"><option value="Toutes">Toutes</option></select>
-          </div>
-          <div class="field">
-            <label data-i18n="nom.param_carbones_max_lbl">Nombre de carbones max (optionnel)</label>
-            <input type="number" id="nom-param-carbones-max" min="1" step="1" placeholder="Illimité">
-          </div>
+        <div class="field">
+          <label><span data-i18n="nom.param_famille_lbl">Famille(s)</span> <span class="fb-note-hint" data-i18n="nom.param_famille_note">(aucune coche = toutes)</span></label>
+          <div id="nom-param-familles" class="nom-fam-list" style="display:flex;flex-wrap:wrap;gap:5px 14px;max-height:130px;overflow-y:auto;"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="nom.param_carbones_max_lbl">Nombre de carbones max (optionnel)</label>
+          <input type="number" id="nom-param-carbones-max" min="1" step="1" placeholder="Illimité">
         </div>
         <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="nom.aleatoire_hint">Une molécule est tirée au hasard parmi celles qui correspondent aux filtres (repli sur l'ensemble complet si aucune ne correspond). L'élève identifie le nom et la famille.</div>
       </div>

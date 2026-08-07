@@ -665,6 +665,62 @@ const HELP_CONTENT = {
         'The compatibility conclusion is a dropdown (Compatible / Incompatible), not a numeric field.',
         'No random generation is available in this version (fixed-value MVP only).'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── CAMERA (EXPOSURE)
+  apn: {
+    title: '<svg class="hs-ico"><use href="#ico-type-apn"></use></svg> Camera (exposure) — Help',
+    body:
+      _hSection('What it is for',
+        '<p>The student finds, via a <b>multiple-choice question</b>, the value of the unknown setting (aperture, shutter speed or ISO) that keeps the <b>same exposure</b> when one or two of the other two settings change, starting from an initial configuration given in the question text.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Setting to find</b>: which of the three settings (Speed / Aperture / ISO) the student must find — it becomes the multiple-choice question.',
+        '<b>Changed setting(s)</b>: among the two remaining settings, check the one(s) that change between the initial configuration and the target configuration (at least one checked).',
+        'The initial configuration (starting values of the 3 settings) and the target value of the changed setting(s) are described in the <b>question text</b> — the module does not generate these values, it only grades the multiple-choice answer.',
+        '<b>Correct/incorrect answer messages</b>: optional, replace the default text.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'The exposure triangle follows the "EV stops" rule: a 1-stop change in one setting must be compensated by 1 stop (in the right direction) of another to keep the same exposure — this is the logic graded by the multiple-choice question, not a calculation shown to the student.',
+        'No random generation in this version: the numeric values (apertures, speeds, ISO) are written by hand in the question text.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── CHEMICAL NOMENCLATURE
+  nomenclature: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nomenclature"></use></svg> Chemical nomenclature — Help',
+    body:
+      _hSection('What it is for',
+        '<p>The student identifies the <b>IUPAC name</b> and/or <b>family</b> of a molecule described by its <b>SMILES</b> formula, or checks the <b>functional groups</b> it contains. Three independent modes depending on the teaching goal.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Fixed molecule</b>: enter the SMILES, the expected IUPAC name and the expected family. Name matching accepts hyphens/spaces/case interchangeably (tolerant comparison, no exact syntax required).',
+        '<b>Random generator</b>: a molecule is randomly drawn from a built-in database, filtered by <b>family/families</b> (checkboxes, several allowed; none checked = all) and optionally a <b>max carbon count</b>. If no molecule matches the filters, the draw automatically falls back to the full set instead of failing.',
+        '<b>Functional group analysis (checkboxes)</b>: enter a SMILES and two comma-separated lists — the functional groups actually present, and decoy groups that are absent. The student checks the ones they identify; they are shuffled randomly in the list shown to them.',
+        'The <b>🧬 View in 3D</b> button in the student preview loads an interactive 3D representation of the molecule (requires a JSmol server configured in Admin) — loaded only on click, never automatically.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'In Checkbox mode, the score is proportional to the number of correct checks minus incorrect ones (not all-or-nothing grading).',
+        'The 3D view in the exported question depends on an external (self-hosted) JSmol server configured by the administrator; without it, the 3D iframe does not show in Moodle but the rest of the question still works normally.'
+      ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── POINT KINEMATICS
+  cinematique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-cinematique"></use></svg> Point kinematics — Help',
+    body:
+      _hSection('What it is for',
+        '<p>From a <b>chronophotograph</b> of a point M in motion, the student measures the norms of the velocity vectors v_i and v_{i+1} (from successive position differences), then constructs the velocity variation vector Δv_i = v_{i+1} − v_i using the <b>Chasles relation</b> (cloning, selection, flipping, magnetic snapping in the preview).</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Digitization workshop</b>: click each position M0, M1, M2… in chronological order, on a blank background or an imported guide image (the image is never saved nor exported — only the clicked points and the calibration are).',
+        '<b>Calibration</b>: place 2 markers in Calibration mode, then enter the real distance (in meters) between them, to convert workshop pixels into meters.',
+        '<b>Interval between 2 photos (Δt)</b>: duration between two consecutive M points.',
+        '<b>Velocity calculation method</b>: "Next point" (2019 curriculum, M_iM_{i+1}/Δt) or "Symmetric derivative" (M_{i-1}M_{i+1}/2Δt) — the latter is recommended for circular or parabolic motion, where it gives a correct tangent direction.',
+        '<b>Starting index i</b>: determines which points are used to compute v_i (segment M_iM_{i+1}) then v_{i+1} (segment M_{i+1}M_{i+2}) — an error message appears in the preview if i is out of range for the number of digitized points.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'With the "Symmetric derivative" method, index i must leave room on both sides (needs M_{i-1} and M_{i+2}) — check the preview if an error message appears.',
+        'The imported guide image is only a visual aid for you while digitizing: it is part neither of the saved question nor of the Moodle export.',
+        'No random generation in this version: the digitized positions and Δt are fixed values.'
+      ])) + _HELP_COMMON
   }
 };
 
