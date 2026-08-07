@@ -30,6 +30,12 @@ document.addEventListener('keydown',e=>{
   }
 });
 function confirmRich(){setRichVal(currentRichField,spansToLatex(richEditor()));
+  // Lien bidirectionnel énoncé ↔ générateur de prompt IA (js/prompt.js) : si le champ
+  // édité correspond à l'énoncé du type de prompt en cours, on répercute vers pb-question.
+  if(typeof _pbTextIdForType==='function' && currentRichField===_pbTextIdForType(_pbType)){
+    const pbq=document.getElementById('pb-question');
+    if(pbq){ pbq.value=_pbHtmlToText(richVal(currentRichField)); if(typeof pbBuild==='function') pbBuild(); }
+  }
   if(currentRichField==='chem-text' && typeof chemUpdateLock==='function') chemUpdateLock();
   if(currentRichField==='nuc-text' && typeof nucUpdateLock==='function') nucUpdateLock();
   if(currentRichField && currentRichField.indexOf('calc-')===0) {

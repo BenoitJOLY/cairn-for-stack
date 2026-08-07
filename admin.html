@@ -101,6 +101,22 @@
     </section>
 
     <section class="admin-section">
+      <h2>Mentions légales &amp; RGPD (instance hébergée)</h2>
+      <p class="hint">Affiché dans la modale « Mentions légales » de l'application. Le responsable de traitement est la personne ou l'organisme qui héberge et administre <strong>cette instance</strong> — jamais l'auteur du logiciel StackForge. Une instance peut proposer plusieurs langues, mais le responsable et l'autorité de contrôle ne changent pas selon la langue affichée : ils doivent être nommés explicitement ci-dessous (champs marqués <strong>*</strong> obligatoires) plutôt que de laisser un texte générique.</p>
+      <div class="admin-row">
+        <div class="field"><label for="a-legal-responsable-nom">Responsable de traitement (nom / organisme) *</label><input type="text" id="a-legal-responsable-nom" required placeholder="Ex : Lycée X, Rectorat de Y, association Z…"></div>
+        <div class="field"><label for="a-legal-responsable-email">E-mail de contact *</label><input type="text" id="a-legal-responsable-email" required placeholder="contact@exemple.org"></div>
+      </div>
+      <div class="admin-row">
+        <div class="field"><label for="a-legal-pays">Pays d'hébergement principal</label><input type="text" id="a-legal-pays" placeholder="Ex : France"></div>
+        <div class="field"><label for="a-legal-autorite-nom">Autorité de contrôle compétente *</label><input type="text" id="a-legal-autorite-nom" required placeholder="Ex : CNIL"></div>
+        <div class="field"><label for="a-legal-autorite-url">URL de l'autorité de contrôle</label><input type="url" id="a-legal-autorite-url" placeholder="https://www.cnil.fr"></div>
+      </div>
+      <button class="btn-save" onclick="saveLegal()">Enregistrer</button>
+      <div class="status-line" id="status-legal"></div>
+    </section>
+
+    <section class="admin-section">
       <h2>Comptes &amp; rôles</h2>
       <table class="accounts-table">
         <thead><tr><th>Identifiant</th><th>Rôle</th><th>Auto-inscrit</th></tr></thead>
@@ -133,6 +149,12 @@ async function loadConfig() {
     document.getElementById('a-maxima-url').value = cfg.maximaUrl || '';
     document.getElementById('a-ai-baseurl').value = cfg.ai.baseUrl || '';
     document.getElementById('a-ai-model').value = cfg.ai.model || '';
+    const legal = cfg.legal || {};
+    document.getElementById('a-legal-responsable-nom').value = legal.responsableNom || '';
+    document.getElementById('a-legal-responsable-email').value = legal.responsableEmail || '';
+    document.getElementById('a-legal-pays').value = legal.pays || '';
+    document.getElementById('a-legal-autorite-nom').value = legal.autoriteNom || '';
+    document.getElementById('a-legal-autorite-url').value = legal.autoriteUrl || '';
     updateBadge('ghToken', cfg.ghTokenConfigured);
     updateBadge('aiKey', cfg.aiKeyConfigured);
   } catch (err) {
@@ -172,6 +194,25 @@ async function saveAiProvider() {
     },
   };
   await postConfig(body, 'status-ai-provider');
+}
+
+async function saveLegal() {
+  const legal = {
+    responsableNom: document.getElementById('a-legal-responsable-nom').value.trim(),
+    responsableEmail: document.getElementById('a-legal-responsable-email').value.trim(),
+    pays: document.getElementById('a-legal-pays').value.trim(),
+    autoriteNom: document.getElementById('a-legal-autorite-nom').value.trim(),
+    autoriteUrl: document.getElementById('a-legal-autorite-url').value.trim(),
+  };
+  // Le responsable de traitement et l'autorité de contrôle sont fixes pour une
+  // instance donnée (indépendants des langues proposées aux utilisateurs) : on
+  // exige qu'ils soient nommés explicitement plutôt que de laisser un texte
+  // générique s'afficher côté client (voir js/app.js renderRgpdLegalInfo).
+  if (!legal.responsableNom || !legal.responsableEmail || !legal.autoriteNom) {
+    setStatus('status-legal', 'Champs obligatoires (*) manquants.', false);
+    return;
+  }
+  await postConfig({ legal: legal }, 'status-legal');
 }
 
 async function postConfig(body, statusId) {

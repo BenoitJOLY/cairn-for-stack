@@ -112,7 +112,7 @@ const instanceConfig = require('./instance-config');
 // par défaut (js/maxima-client.js) — voir plan §6/§7.
 app.get('/api/config/public', (req, res) => {
   const cfg = instanceConfig.getPublicConfig();
-  res.json({ mutualisation: cfg.mutualisation, maximaUrl: cfg.maximaUrl });
+  res.json({ mutualisation: cfg.mutualisation, maximaUrl: cfg.maximaUrl, legal: cfg.legal });
 });
 
 app.get('/api/admin/config', requireRole('admin'), (req, res) => {
@@ -120,7 +120,7 @@ app.get('/api/admin/config', requireRole('admin'), (req, res) => {
 });
 
 app.post('/api/admin/config', requireRole('admin'), (req, res) => {
-  const { mutualisation, maximaUrl, ai } = req.body || {};
+  const { mutualisation, maximaUrl, ai, legal } = req.body || {};
   if (mutualisation && typeof mutualisation === 'object') {
     instanceConfig.setMutualisationConfig(mutualisation);
   }
@@ -129,6 +129,18 @@ app.post('/api/admin/config', requireRole('admin'), (req, res) => {
   }
   if (ai && typeof ai === 'object') {
     instanceConfig.setAiProviderConfig(ai);
+  }
+  if (legal && typeof legal === 'object') {
+    // Défense en profondeur : la validation côté client (admin.html) peut être
+    // contournée par un appel direct à l'API — le responsable de traitement et
+    // l'autorité de contrôle sont fixes par instance et doivent être nommés
+    // explicitement, jamais laissés vides pour retomber sur un texte générique.
+    const missing = ['responsableNom', 'responsableEmail', 'autoriteNom']
+      .filter((k) => !String(legal[k] || '').trim());
+    if (missing.length) {
+      return res.status(400).json({ error: `Champs obligatoires manquants : ${missing.join(', ')}` });
+    }
+    instanceConfig.setLegalConfig(legal);
   }
   res.json(instanceConfig.getPublicConfig());
 });

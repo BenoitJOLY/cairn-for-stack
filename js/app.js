@@ -661,11 +661,51 @@ async function fetchInstanceConfig() {
     GH_REVIEW_BRANCH = m.ghReviewBranch || '';
     GH_REVIEW_FOLDER = m.ghReviewFolder || '';
     window._instanceMaximaUrl = cfg.maximaUrl || '';
+    window._instanceLegal = cfg.legal || {};
+    renderRgpdLegalInfo();
   } catch (e) {
     console.error('fetchInstanceConfig:', e);
   }
 }
 fetchInstanceConfig();
+
+function _escHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Modale "Mentions légales" (index.html, #copy-rgpd-body) : le responsable de
+// traitement et l'autorité de contrôle dépendent de QUI héberge cette instance
+// (admin.html, section RGPD), jamais de l'auteur du logiciel StackForge — voir
+// PLAN.md. Sans configuration admin (mode local/hors-serveur, ou instance pas
+// encore paramétrée), on retombe sur un texte générique plutôt que d'inventer
+// un responsable ou une autorité de contrôle par défaut.
+function renderRgpdLegalInfo() {
+  var body = document.getElementById('copy-rgpd-body');
+  if (!body || typeof I18N === 'undefined') return;
+  var L = window._instanceLegal || {};
+  var nom = (L.responsableNom || '').trim();
+  var email = (L.responsableEmail || '').trim();
+  var autoriteNom = (L.autoriteNom || '').trim();
+  var autoriteUrl = (L.autoriteUrl || '').trim();
+
+  var responsable = nom
+    ? (email ? _escHtml(nom) + ' — <a href="mailto:' + _escHtml(email) + '">' + _escHtml(email) + '</a>' : _escHtml(nom))
+    : I18N.t('copy.rgpd_responsable_fallback');
+  var autorite = autoriteNom
+    ? (autoriteUrl ? '<a href="' + _escHtml(autoriteUrl) + '" target="_blank" rel="noopener">' + _escHtml(autoriteNom) + '</a>' : _escHtml(autoriteNom))
+    : I18N.t('copy.rgpd_autorite_fallback');
+
+  body.innerHTML = I18N.t('copy.rgpd_body', { responsable: responsable, autorite: autorite });
+}
+document.addEventListener('i18n:changed', renderRgpdLegalInfo);
+// I18N.init() ne résout la langue active (préférence localStorage) que sur
+// DOMContentLoaded (js/i18n.js) ; s'appeler avant rendrait ce paragraphe en
+// français par défaut le temps que la vraie langue soit posée.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', renderRgpdLegalInfo);
+} else {
+  renderRgpdLegalInfo();
+}
 
 function ghGetToken() {
   var t = localStorage.getItem('stackforge_gh_token');

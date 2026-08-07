@@ -8145,38 +8145,40 @@ fill="currentColor" stroke="none">
 <!-- MODALE — MENTIONS LÉGALES & COPYRIGHT             -->
 <!-- ══════════════════════════════════════════════════ -->
 <div id="copyModal" class="modal-backdrop" onclick="closeCopyModal(event)" style="z-index:2000;">
-  <div class="calc-box" style="width:520px;max-width:95vw;" onclick="event.stopPropagation()">
-  <img src="assets\stackforge.png" alt="Stackforge" style="display:block;margin:0 auto 16px;height:60px;width:auto;border-radius:10px;">
-    <h2 style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);font-size:1rem;"><svg class="hs-ico"><use href="#ico-footer-legal"></use></svg> <span data-i18n="modal.mentions_legales_amp_droits">Mentions légales &amp; Droits d'utilisation</span></h2>
-    <div style="font-size:.85rem;color:var(--navy2);line-height:1.7;">
+  <div class="calc-box" style="width:1040px;max-width:97vw;" onclick="event.stopPropagation()">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid var(--border);">
+    <img src="assets\stackforge.png" alt="Stackforge" style="height:34px;width:auto;border-radius:8px;flex-shrink:0;">
+    <h2 style="display:flex;align-items:center;gap:8px;font-size:.98rem;margin:0;"><svg class="hs-ico"><use href="#ico-footer-legal"></use></svg> <span data-i18n="modal.mentions_legales_amp_droits">Mentions légales &amp; Droits d'utilisation</span></h2>
+  </div>
+    <div style="font-size:.82rem;color:var(--navy2);line-height:1.42;">
       <p data-i18n-html="copy.intro"><strong>Stackforge</strong> est un outil open-source conçu pour faciliter la création de questions STACK pour la plateforme Moodle.</p>
-      <p style="margin-top:10px;" data-i18n-html="copy.auteur"><strong>Auteur :</strong> Benoit Joly — 2026</p>
-      <div class="modal-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin:12px 0;">
-        <p style="font-weight:700;color:#15803d;margin-bottom:6px;" data-i18n="copy.licence_titre">📄 Licence d'utilisation</p>
-        <p data-i18n-html="copy.licence_body">Distribué sous licence <strong>GNU AGPLv3</strong>. Utilisation, modification et redistribution libres, y compris à titre commercial.<br>
-        Si vous exploitez une version modifiée sur un serveur accessible à des utilisateurs, l'AGPL vous oblige à leur fournir le code source correspondant.<br>
-        Code source et texte complet de la licence : <a href="https://github.com/BenoitJOLY/stackforge" target="_blank" rel="noopener noreferrer">github.com/BenoitJOLY/stackforge</a>.</p>
-      </div>
-      <div class="modal-section" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin:12px 0;">
-        <p style="font-weight:700;color:#1d4ed8;margin-bottom:6px;" data-i18n="copy.rgpd_titre">🔒 RGPD &amp; Données personnelles</p>
-        <p data-i18n-html="copy.rgpd_body">Utilisé <strong>en local dans votre navigateur</strong>, cet outil n'envoie aucune donnée à un serveur.<br>
-        Sur la <strong>version hébergée</strong> (accès par compte), sont traités : votre identifiant et un hachage non réversible de votre mot de passe, un cookie de session strictement nécessaire à la connexion (aucun cookie de suivi ni publicitaire), et l'horodatage de vos générations pour appliquer le quota hebdomadaire.<br>
-        <strong>Finalité :</strong> gérer l'accès au service et prévenir les abus. <strong>Durée de conservation :</strong> tant que le compte existe.<br>
-        <strong>Responsable de traitement :</strong> Benoit Joly — <a href="mailto:b_joly@orange.fr">b_joly@orange.fr</a>.<br>
-        <strong>Vos droits</strong> (accès, rectification, effacement) : par e-mail, ou directement ci-dessous si vous êtes connecté·e. Vous pouvez aussi déposer une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>.</p>
-      </div>
-      <div class="modal-section" style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:12px;margin:12px 0;">
-        <p style="font-weight:700;color:#be123c;margin-bottom:6px;" data-i18n="copy.compte_titre">👤 Vos droits sur votre compte</p>
-        <p style="margin-bottom:10px;" data-i18n="copy.compte_body">Si vous êtes connecté·e sur la version hébergée, vous pouvez vous déconnecter ou supprimer définitivement votre compte et toutes les données associées (identifiant, mot de passe, historique d'usage).</p>
-        <div style="display:flex;gap:8px;">
-          <button style="flex:1;background:#fff;color:var(--navy);border:1px solid var(--border);padding:9px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem;" onclick="logoutFromApp()" data-i18n="btn.deconnexion">Se déconnecter</button>
-          <button style="flex:1;background:#be123c;color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem;" onclick="deleteAccountFromApp()" data-i18n="btn.supprimer_compte">Supprimer mon compte et mes données</button>
+      <p style="margin-top:4px;" data-i18n-html="copy.auteur"><strong>Auteur :</strong> Benoit Joly — 2026</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;">
+        <div class="modal-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:9px 10px;">
+          <p style="font-weight:700;color:#15803d;margin-bottom:4px;" data-i18n="copy.licence_titre">📄 Licence d'utilisation</p>
+          <p data-i18n-html="copy.licence_body">Distribué sous licence <strong>GNU AGPLv3</strong>. Utilisation, modification et redistribution libres, y compris à titre commercial.<br>
+          Si vous exploitez une version modifiée sur un serveur accessible à des utilisateurs, l'AGPL vous oblige à leur fournir le code source correspondant.<br>
+          Code source et texte complet de la licence : <a href="https://github.com/BenoitJOLY/stackforge" target="_blank" rel="noopener noreferrer">github.com/BenoitJOLY/stackforge</a>.</p>
+        </div>
+        <div class="modal-section" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:9px 10px;">
+          <p style="font-weight:700;color:#1d4ed8;margin-bottom:4px;" data-i18n="copy.rgpd_titre">🔒 RGPD &amp; Données personnelles</p>
+          <p id="copy-rgpd-body"></p>
         </div>
       </div>
-      <p style="font-size:.78rem;color:var(--slate);margin-top:8px;" data-i18n="copy.footer_note">Les questions générées appartiennent à leurs auteurs. Stackforge n'est qu'un outil de mise en forme.</p>
+      <div class="modal-section" style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:9px 10px;margin:8px 0;">
+        <p style="font-weight:700;color:#be123c;margin-bottom:4px;" data-i18n="copy.compte_titre">👤 Vos droits sur votre compte</p>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <p style="margin:0;flex:1;min-width:260px;" data-i18n="copy.compte_body">Si vous êtes connecté·e sur la version hébergée, vous pouvez vous déconnecter ou supprimer définitivement votre compte et toutes les données associées (identifiant, mot de passe, historique d'usage).</p>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
+            <button style="background:#fff;color:var(--navy);border:1px solid var(--border);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.78rem;white-space:nowrap;" onclick="logoutFromApp()" data-i18n="btn.deconnexion">Se déconnecter</button>
+            <button style="background:#be123c;color:#fff;border:none;padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.78rem;white-space:nowrap;" onclick="deleteAccountFromApp()" data-i18n="btn.supprimer_compte">Supprimer mon compte et mes données</button>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:.75rem;color:var(--slate);margin-top:4px;" data-i18n="copy.footer_note">Les questions générées appartiennent à leurs auteurs. Stackforge n'est qu'un outil de mise en forme.</p>
     </div>
-    <div style="margin-top:18px;">
-      <button style="background:var(--navy);color:white;width:100%;padding:11px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.9rem;" onclick="document.getElementById('copyModal').style.display='none'" data-i18n="btn.fermer">Fermer</button>
+    <div style="margin-top:10px;">
+      <button style="background:var(--navy);color:white;width:100%;padding:9px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.88rem;" onclick="document.getElementById('copyModal').style.display='none'" data-i18n="btn.fermer">Fermer</button>
     </div>
   </div>
 </div>
@@ -8250,7 +8252,7 @@ fill="currentColor" stroke="none">
       <div class="pb-section-divider"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-required"></use></svg> <span data-i18n="modal.pb_infos_obligatoires">Informations obligatoires</span></div>
       <div class="pb-field">
         <label class="pb-label"><span data-i18n="modal.pb_question_theme">Question / Thème</span> <span class="req">*</span></label>
-        <textarea id="pb-question" class="pb-input" rows="2" placeholder="Ex : Parmi les propositions suivantes, laquelle est vraie concernant les lois de Newton ?" data-i18n-ph="modal.pb_question_ex_ph" oninput="pbBuild()" style="resize:vertical;"></textarea>
+        <textarea id="pb-question" class="pb-input" rows="2" placeholder="Ex : Parmi les propositions suivantes, laquelle est vraie concernant les lois de Newton ?" data-i18n-ph="modal.pb_question_ex_ph" oninput="pbBuild();pbSyncQuestionToText()" style="resize:vertical;"></textarea>
       </div>
       <div class="pb-input-row">
         <div class="pb-field">

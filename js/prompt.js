@@ -4,6 +4,29 @@ let _pbType = null;  // 'CB' | 'RA' | 'DD'
 // State for the cascade inside the prompt builder
 const _pb = {mat:null, niv:null, sous:null, chap:null};
 
+// Lien bidirectionnel énoncé ↔ champ "Question / Thème" du générateur de prompt IA.
+// Les deux ne sont pas fusionnés (append) mais miroir l'un de l'autre : la case
+// pb-question EST l'énoncé (en texte brut), donc modifier l'un modifie l'autre.
+const _pbTextIdMap = {CB:'cb-text', RA:'ra-text', DD:'dd-text', VF:'vf-text'};
+function _pbTextIdForType(type){ return _pbTextIdMap[type] || null; }
+function _pbHtmlToText(html){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || '';
+  return (tmp.textContent || tmp.innerText || '').trim();
+}
+function _pbTextToHtml(text){
+  const esc = (text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return esc ? '<p>' + esc.replace(/\n/g,'<br>') + '</p>' : '';
+}
+// Appelé uniquement par l'événement input du champ pb-question (jamais lors d'un
+// pré-remplissage programmatique) pour ne jamais écraser silencieusement un
+// énoncé existant tant que l'utilisateur n'a pas lui-même retapé dedans.
+function pbSyncQuestionToText(){
+  const textId = _pbTextIdForType(_pbType);
+  if(!textId) return;
+  setRichVal(textId, _pbTextToHtml(document.getElementById('pb-question')?.value||''));
+}
+
 // Cascade IA (institutionnelle → personnelle → aucune) — voir plan §8.
 // Récupéré une fois au chargement pour savoir si le bouton "Générer avec l'IA"
 // doit être proposé à côté du copier/coller manuel (v1 scopée à RA/DD).
@@ -52,7 +75,13 @@ function openPromptBuilder(type){
   ['pb-opt-bloom','pb-opt-erreur','pb-opt-piege','pb-opt-latex','pb-opt-syntaxe'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.checked=false;
   });
-  const q=document.getElementById('pb-question');if(q)q.value='';
+  // Pré-remplissage depuis l'énoncé déjà saisi (lien bidirectionnel) plutôt qu'un
+  // champ vide — voir pbSyncQuestionToText() pour le sens inverse.
+  const q=document.getElementById('pb-question');
+  if(q){
+    const textId=_pbTextIdForType(type);
+    q.value = textId ? _pbHtmlToText(richVal(textId)) : '';
+  }
   const xe=document.getElementById('pb-xe');if(xe)xe.value='4';
   const xb=document.getElementById('pb-xb');if(xb)xb.value='2';
   const xbr=document.getElementById('pb-xbr');if(xbr)xbr.value='2';
@@ -367,13 +396,13 @@ function pbBuild(){
     const fauxCount = Math.max(1, parseInt(xe)-1);
     p += `{\n  "xe": ${xe},\n  "vrais": [\n${Array.from({length:xbr},(_,i)=>`    {\n      "t": "${bonneReponseLabel}${xbr>1?' '+(i+1):''}",\n      "f": "${explicationPedago}"\n    }`).join(',\n')}\n  ],\n  "faux": [\n${Array.from({length:Math.min(fauxCount,2)},(_,i)=>`    {\n      "t": "${distracteurLabel} ${i+1}",\n      "f": "${explicationPedago}"\n    }`).join(',\n')}\n  ]\n}`;
   } else {
-    const showOubliCB = _pbType==='CB' && document.getElementById('cb-show-oubli')?.checked;
-    if(showOubliCB){
-      p += `• ${I18N.t('pb.cb_feedback_oubli_instr')}\n`;
-      p += `{\n  "xe": ${xe},\n  "xb": ${xb},\n  "propositions": [\n    {\n      "valeur": true,\n      "texte": "${I18N.t('pb.ex_enonce_prop_vraie')}",\n      "feedback": "${I18N.t('pb.ex_analyse_si_cochee')}",\n      "feedback_oubli": "${I18N.t('pb.ex_explication_oubli')}"\n    },\n    {\n      "valeur": false,\n      "texte": "${I18N.t('pb.ex_enonce_prop_fausse')}",\n      "feedback": "${I18N.t('pb.ex_analyse_pedago')}"\n    }\n  ]\n}`;
-    } else {
-      p += `{\n  "xe": ${xe},\n  "xb": ${xb},\n  "propositions": [\n    {\n      "valeur": true,\n      "texte": "${I18N.t('pb.ex_enonce_proposition')}",\n      "feedback": "${I18N.t('pb.ex_analyse_pedago')}"\n    }\n  ]\n}`;
-    }
+    // Le feedback "vraie non cochée" est toujours demandé à l'IA, même si la case
+    // "cb-show-oubli" n'est pas cochée : l'enseignant a pu simplement oublier de
+    // l'activer. La donnée reste dans le JSON importé (addCBRow/.p-fb2) et n'est
+    // que masquée dans l'UI tant que la case n'est pas cochée — elle réapparaît
+    // intacte si l'enseignant change d'avis (voir toggleCBOubli() dans prop-rows.js).
+    p += `• ${I18N.t('pb.cb_feedback_oubli_instr')}\n`;
+    p += `{\n  "xe": ${xe},\n  "xb": ${xb},\n  "propositions": [\n    {\n      "valeur": true,\n      "texte": "${I18N.t('pb.ex_enonce_prop_vraie')}",\n      "feedback": "${I18N.t('pb.ex_analyse_si_cochee')}",\n      "feedback_oubli": "${I18N.t('pb.ex_explication_oubli')}"\n    },\n    {\n      "valeur": false,\n      "texte": "${I18N.t('pb.ex_enonce_prop_fausse')}",\n      "feedback": "${I18N.t('pb.ex_analyse_pedago')}"\n    }\n  ]\n}`;
   }
 
   const prev = document.getElementById('pb-preview');
@@ -391,16 +420,8 @@ function pbCopy(){
   const text = window._pbPromptText||'';
   if(!text){ toast(I18N.t('msg.aucun_prompt_a_copier')); return; }
 
-  // Injecter la question dans l'énoncé du type en cours
-  const question = (document.getElementById('pb-question')?.value||'').trim();
-  if(question){
-    const textIdMap = {CB:'cb-text', RA:'ra-text', DD:'dd-text', VF:'vf-text'};
-    const textId = textIdMap[_pbType];
-    if(textId){
-      const current = richVal(textId);
-      setRichVal(textId, (current||'') + `<p>${question}</p>`);
-    }
-  }
+  // L'énoncé est déjà synchronisé en direct avec pb-question (pbSyncQuestionToText) :
+  // plus besoin d'y injecter la question ici.
 
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(text)
@@ -421,18 +442,6 @@ function pbFallbackCopy(text){
 }
 
 // ── GÉNÉRATION IA (RA/DD uniquement, cascade institutionnelle/perso — plan §8) ──
-
-// Même injection de la question dans le champ énoncé que pbCopy(), pour que le
-// résultat soit identique que l'utilisateur passe par l'IA ou le copier/coller.
-function _pbInjectQuestionText(){
-  const question=(document.getElementById('pb-question')?.value||'').trim();
-  if(!question) return;
-  const textIdMap={CB:'cb-text',RA:'ra-text',DD:'dd-text',VF:'vf-text'};
-  const textId=textIdMap[_pbType];
-  if(!textId) return;
-  const current=richVal(textId);
-  setRichVal(textId,(current||'')+`<p>${question}</p>`);
-}
 
 function pbGenerateWithAI(){
   const applyFn=_pbType==='RA'?applyRAJSON:(_pbType==='DD'?applyDDJSON:null);
@@ -462,7 +471,6 @@ async function aiGenerateAndImport(targetType,applyFn){
       if(targetType==='RA') importRAJSON(); else importDDJSON();
       return;
     }
-    _pbInjectQuestionText();
     applyFn(data.data);
     toast(I18N.t('msg.json_importe'));
     closePB();

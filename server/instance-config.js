@@ -12,6 +12,15 @@ const DEFAULTS = {
   },
   maximaUrl: '',
   ai: { baseUrl: '', model: '' },
+  // Affiché dans la modale "Mentions légales" (RGPD) côté client. Le responsable
+  // de traitement est qui héberge/administre CETTE instance, jamais l'auteur du
+  // logiciel StackForge — chaque exploitant renseigne ses propres coordonnées et
+  // son autorité de contrôle nationale (CNIL en France, mais StackForge est
+  // destiné à des déploiements internationaux).
+  legal: {
+    responsableNom: '', responsableEmail: '', pays: '',
+    autoriteNom: '', autoriteUrl: '',
+  },
   secrets: { ghInstitutionalToken: null, aiApiKey: null },
 };
 
@@ -22,6 +31,7 @@ function load() {
     mutualisation: Object.assign({}, DEFAULTS.mutualisation, raw.mutualisation),
     maximaUrl: raw.maximaUrl || '',
     ai: Object.assign({}, DEFAULTS.ai, raw.ai),
+    legal: Object.assign({}, DEFAULTS.legal, raw.legal),
     secrets: Object.assign({}, DEFAULTS.secrets, raw.secrets),
   };
 }
@@ -39,6 +49,7 @@ function getPublicConfig() {
     mutualisation: cfg.mutualisation,
     maximaUrl: cfg.maximaUrl,
     ai: cfg.ai,
+    legal: cfg.legal,
     ghTokenConfigured: !!cfg.secrets.ghInstitutionalToken,
     aiKeyConfigured: !!cfg.secrets.aiApiKey,
   };
@@ -47,6 +58,12 @@ function getPublicConfig() {
 function setMutualisationConfig(fields) {
   const cfg = load();
   cfg.mutualisation = Object.assign({}, cfg.mutualisation, fields);
+  save(cfg);
+}
+
+function setLegalConfig(fields) {
+  const cfg = load();
+  cfg.legal = Object.assign({}, cfg.legal, fields);
   save(cfg);
 }
 
@@ -84,6 +101,6 @@ function getSecret(name) {
 }
 
 module.exports = {
-  getPublicConfig, setMutualisationConfig, setMaximaUrl, setAiProviderConfig,
+  getPublicConfig, setMutualisationConfig, setMaximaUrl, setAiProviderConfig, setLegalConfig,
   setSecret, clearSecret, getSecret,
 };
