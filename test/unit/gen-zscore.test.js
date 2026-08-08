@@ -179,3 +179,9 @@ test("qnote expose z={@q1_z@}", () => {
     const q = genZscoreCore(1, baseParams(), DEPS);
     assert.equal(q.qnote, 'z={@q1_z@}');
 });
+
+test("feedback général : pas d'icône 🔑 doublée quand trig.correction_title la porte déjà", () => {
+    const I18N_REAL_TITLE = { t: (key, vars) => key === 'trig.correction_title' ? '🔑 Correction' : (vars ? key + ':' + JSON.stringify(vars) : key) };
+    const q = genZscoreCore(1, baseParams(), Object.assign({}, DEPS, { I18N: I18N_REAL_TITLE }));
+    assert.equal((q.generalFeedback.match(/🔑/g) || []).length, 1);
+});

@@ -65,6 +65,10 @@ function genZscoreCore(X, p, deps) {
   var mkFbGen_D = deps._mkFbGen || _mkFbGen;
   var applyFbBox_D = deps.applyFbBox || applyFbBox;
   var zsVars_D = deps._zsVars || _zsVars;
+  // trig.correction_title porte un 🔑 intégré au texte ; applyFbBox_D('general', ...)
+  // plus bas fournit déjà l'icône de l'encadré, d'où le retrait pour éviter le doublon
+  // (même pattern que gen-math-inequation.js/gen-math-matrices.js).
+  var correctionTitle = I18N_D.t('trig.correction_title').replace(/^\S+\s*/, '');
 
   var ctx = p.context || {};
   var g = p.grandeurs || {};
@@ -135,7 +139,7 @@ function genZscoreCore(X, p, deps) {
   });
 
   var textFrag = HDR + introHtml + givensHtml + textParts.join('\n');
-  var generalFeedback = applyFbBox_D('general', mkFbGen_D(`<strong>${I18N_D.t('trig.correction_title') || 'Correction'}</strong><br>${I18N_D.t('zs.fbgen', {zvar: 'q'+X+'_z', seuil: seuil, ccl: (isCompatible ? (I18N_D.t('zs.compatible_choice') || 'Compatible') : (I18N_D.t('zs.incompatible_choice') || 'Incompatible'))}) || ''}`, p.fbGen));
+  var generalFeedback = applyFbBox_D('general', mkFbGen_D(`<strong>${correctionTitle || 'Correction'}</strong><br>${I18N_D.t('zs.fbgen', {zvar: 'q'+X+'_z', seuil: seuil, ccl: (isCompatible ? (I18N_D.t('zs.compatible_choice') || 'Compatible') : (I18N_D.t('zs.incompatible_choice') || 'Incompatible'))}) || ''}`, p.fbGen));
 
   return {
     type: 'zscore', bareme, vars, qnote: `z={@q${X}_z@}`,

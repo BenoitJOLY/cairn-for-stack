@@ -117,19 +117,20 @@ if (typeof module !== 'undefined' && module.exports) {
 
 function openKbdModal(type,fieldId){
   kbdCurrentType = type;
-  const colors = {alg:'var(--algebraic)',num:'var(--numerical)',un:'var(--units)'};
-  const labels = {alg:'➗ '+I18N.t('tpl.vf_type_algebraic'),num:'🔢 '+I18N.t('tpl.vf_type_numerical'),un:'📐 '+I18N.t('tpl.vf_type_units')};
+  const colors = {alg:'var(--algebraic-contrast)',num:'var(--numerical-contrast)',un:'var(--units-contrast)',incprop:'#9333ea'};
+  const labels = {alg:'➗ '+I18N.t('tpl.vf_type_algebraic'),num:'🔢 '+I18N.t('tpl.vf_type_numerical'),un:'📐 '+I18N.t('tpl.vf_type_units'),incprop:'🧮 '+I18N.t('inc.prop_formula_lbl')};
   document.getElementById('kbd-head-bar').style.background = colors[type]||'var(--navy)';
   document.querySelector('#kbd-head-bar h3').innerHTML = '<svg class="hs-ico"><use href="#ico-tool-keyboard"></use></svg> '+I18N.t('tpl.kbd_aide_saisie')+' — '+(labels[type]||'');
   document.getElementById('kbd-btn-confirm').style.background = colors[type]||'var(--navy)';
 
-  // Sync "aide" checkbox with per-type state
+  // Sync "aide" checkbox with per-type state (hidden when the type has no student-facing field)
   const aideMap = {alg:'alg-h-kbd', num:'num-h-kbd', un:'un-h-kbd'};
   const srcCb = document.getElementById(aideMap[type]);
   document.getElementById('kbd-aide-check').checked = srcCb ? srcCb.checked : false;
+  document.getElementById('kbd-aide-label').style.display = srcCb ? '' : 'none';
 
   // Target field (answer/value input, or an explicit fieldId override)
-  const fieldMap = {alg:'alg-formula', num:'num-val', un:'un-val'};
+  const fieldMap = {alg:'alg-formula', num:'num-val', un:'un-val', incprop:'inc-prop-formula'};
   kbdTargetField = document.getElementById(fieldId||fieldMap[type])||null;
 
   // Pre-fill test zone
@@ -327,10 +328,10 @@ function updateKbdPreview(){
   if(validIcon&&validMsg){
     if(a.errors.length){
       validIcon.textContent='🔴';
-      validMsg.innerHTML=a.errors.map(e=>`<span style="color:#dc2626;font-weight:600;">${e}</span>`).join(' &nbsp;·&nbsp; ');
+      validMsg.innerHTML=a.errors.map(e=>`<span class="kbd-msg-err">${e}</span>`).join(' &nbsp;·&nbsp; ');
     }else{
       validIcon.textContent='🟢';
-      validMsg.innerHTML='<span style="color:#15803d;font-weight:600;">'+I18N.t('tpl.kbd_structure_valide')+'</span>';
+      validMsg.innerHTML='<span class="kbd-msg-ok">'+I18N.t('tpl.kbd_structure_valide')+'</span>';
     }
   }
   if(rawEl)rawEl.textContent='Maxima : '+raw;

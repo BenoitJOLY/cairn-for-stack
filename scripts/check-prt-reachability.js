@@ -405,6 +405,29 @@ const TARGETS = [
                 steps: { moyenne: true, s: false, uA: false, uB: false, uc: false, U: true, ecriture: true },
                 fbGen: ''
             }
+        }, {
+            // result.prt == result.prts[0] : seule l'étape 'ecriture' cochée pour que
+            // ce soit BIEN son PRT (combiné, units) qui soit audité ci-dessous (sinon
+            // le script n'inspecte que le 1er PRT généré, ici 'moyenne').
+            label: 'ecriture seule (pm + unité)', params: {
+                bareme: 7,
+                context: { grandeur: 'Longueur', symbole: 'L', unite: 'cm', intro: '' },
+                typeA: { mode: 'manuel', data: [12.3, 12.5, 12.2, 12.4, 12.6], moyenneVraie: '', ecartTypePop: '', n: 0, decimales: 2 },
+                typeB: { source: 'resolution', q: '0.1', delta: '', ucert: '', kcert: '', valeur: '' },
+                rounding: { sigfig: 1, roundup: false, k: 1 },
+                steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true },
+                fbGen: ''
+            }
+        }, {
+            label: 'ecriture seule (pm sans unité)', params: {
+                bareme: 7,
+                context: { grandeur: 'Longueur', symbole: 'L', unite: '', intro: '' },
+                typeA: { mode: 'manuel', data: [12.3, 12.5, 12.2, 12.4, 12.6], moyenneVraie: '', ecartTypePop: '', n: 0, decimales: 2 },
+                typeB: { source: 'resolution', q: '0.1', delta: '', ucert: '', kcert: '', valeur: '' },
+                rounding: { sigfig: 1, roundup: false, k: 1 },
+                steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true },
+                fbGen: ''
+            }
         }]
     },
     {

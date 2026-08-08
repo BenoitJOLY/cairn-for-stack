@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 
 const { genIncertitudeCore, INC_STEP_ORDER } = require(path.join('..', '..', 'js', 'gen-incertitude.js'));
-const { _incTypeAVars, _incTypeBVars, _incRoundingVars, _incFinalRegex } = require(path.join('..', '..', 'js', 'gen-incertitude-calc.js'));
+const { _incTypeAVars, _incTypeBVars, _incPropagationVars, _incRoundingVars, _incFinalRegex } = require(path.join('..', '..', 'js', 'gen-incertitude-calc.js'));
 const { _incStepDefs } = require(path.join('..', '..', 'js', 'gen-incertitude-steps.js'));
 const { _incStudentFactor, _incStudentConfidence, _incStudentDf } = require(path.join('..', '..', 'js', 'gen-incertitude-student.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
@@ -26,8 +26,10 @@ const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 const { htmlEsc, escapeMaximaString } = require(path.join('..', '..', 'js', 'data.js'));
 
 global.htmlEsc = htmlEsc;
+global.escapeMaximaString = escapeMaximaString;
 global._incTypeAVars = _incTypeAVars;
 global._incTypeBVars = _incTypeBVars;
+global._incPropagationVars = _incPropagationVars;
 global._incRoundingVars = _incRoundingVars;
 global._incFinalRegex = _incFinalRegex;
 global._incStepDefs = _incStepDefs;
@@ -145,21 +147,116 @@ test("Type B 'impose' : valeur manquante lève une erreur", () => {
     assert.throws(() => genIncertitudeCore(1, baseParams({ typeB: { source: 'impose', valeur: '' } }), DEPS), /uB est obligatoire/);
 });
 
-test("Type B 'propagation' : Y = produit des termes (dénominateur -> exposant -1), uB = Y*sqrt(Σ(u/x)²)", () => {
-    const q = genIncertitudeCore(1, baseParams({
-        typeB: { source: 'propagation', propTerms: [
-            { value: '20', incert: '0.1', denom: false },
-            { value: '10', incert: '0.05', denom: false },
-            { value: '50', incert: '0.2', denom: true }
-        ] }
-    }), DEPS);
-    assert.match(q.vars, /q1_propY:float\(\(20\)\^1\*\(10\)\^1\*\(50\)\^-1\);/);
-    assert.match(q.vars, /q1_uB:float\(q1_propY\*sqrt\(\(\(0\.1\)\/\(20\)\)\^2\+\(\(0\.05\)\/\(10\)\)\^2\+\(\(0\.2\)\/\(50\)\)\^2\)\);/);
+// ── Grandeur composée (propagation par dérivation partielle) ────────────
+function propParams(overrides) {
+    return baseParams(Object.assign({
+        typeB: {
+            source: 'propagation', formula: '2*%pi*sqrt(L/g)',
+            propTerms: [
+                { symbole: 'L', valeur: '1', incertitude: '0.01' },
+                { symbole: 'g', valeur: '9.8', incertitude: '0.05' }
+            ]
+        },
+        steps: { moyenne: true, s: false, uA: false, uB: false, uc: true, U: true, ecriture: true }
+    }, overrides || {}));
+}
+
+test("Grandeur composée : pendule T=2π√(L/g) — Y0/u(Y) générés par diff() + ev(), uA forcé à 0", () => {
+    const q = genIncertitudeCore(1, propParams(), DEPS);
+    assert.match(q.vars, /q1_Yexpr:\(2\*%pi\*sqrt\(L\/g\)\);/);
+    assert.match(q.vars, /q1_moy:float\(ev\(q1_Yexpr,L=1,g=9\.8\)\);/);
+    assert.match(q.vars, /q1_uA:0;/);
+    assert.match(q.vars, /q1_uB:float\(sqrt\(ev\(diff\(q1_Yexpr,L\),L=1,g=9\.8\)\^2\*\(0\.01\)\^2\+ev\(diff\(q1_Yexpr,g\),L=1,g=9\.8\)\^2\*\(0\.05\)\^2\)\);/);
+    assert.match(q.vars, /q1_uc:float\(sqrt\(q1_uA\^2\+q1_uB\^2\)\);/);
+    assertBalancedTags(q.textFrag, 'textFrag');
 });
 
-test("Type B 'propagation' : aucun terme valide lève une erreur", () => {
-    assert.throws(() => genIncertitudeCore(1, baseParams({ typeB: { source: 'propagation', propTerms: [] } }), DEPS), /au moins un terme/);
-    assert.throws(() => genIncertitudeCore(1, baseParams({ typeB: { source: 'propagation', propTerms: [{ value: '20', incert: '' }] } }), DEPS), /au moins un terme/);
+test("Grandeur composée : étapes s/uA/uB absentes de _incStepDefs, moyenne sans barre", () => {
+    const defs = _incStepDefs(1, 'T', 's', propParams(), I18N_STUB);
+    const keys = defs.map(d => d.key);
+    assert.deepEqual(keys, ['moyenne', 'uc', 'U', 'ecriture']);
+    const moy = defs.find(d => d.key === 'moyenne');
+    assert.match(moy.textFrag, /\\\(T=\\\)/);
+    assert.doesNotMatch(moy.textFrag, /\\bar/);
+});
+
+test("Grandeur composée : formule vide lève une erreur", () => {
+    assert.throws(() => genIncertitudeCore(1, propParams({ typeB: { source: 'propagation', formula: '', propTerms: propParams().typeB.propTerms } }), DEPS), /formule de Y est obligatoire/);
+});
+
+test("Grandeur composée : aucune grandeur valide (terme sans symbole) lève une erreur", () => {
+    assert.throws(() => genIncertitudeCore(1, propParams({ typeB: { source: 'propagation', formula: '2*%pi*sqrt(L/g)', propTerms: [] } }), DEPS), /au moins une grandeur/);
+    assert.throws(() => genIncertitudeCore(1, propParams({ typeB: { source: 'propagation', formula: '2*%pi*sqrt(L/g)', propTerms: [{ symbole: '', valeur: '1', incertitude: '0.01' }] } }), DEPS), /au moins une grandeur/);
+});
+
+test("Grandeur composée : symboles dupliqués lèvent une erreur", () => {
+    assert.throws(() => genIncertitudeCore(1, propParams({ typeB: { source: 'propagation', formula: '2*%pi*sqrt(L/g)', propTerms: [
+        { symbole: 'L', valeur: '1', incertitude: '0.01' },
+        { symbole: 'L', valeur: '2', incertitude: '0.02' }
+    ] } }), DEPS), /utilisé plusieurs fois/);
+});
+
+test("Grandeur composée : symbole invalide (ne commence pas par une lettre) lève une erreur", () => {
+    assert.throws(() => genIncertitudeCore(1, propParams({ typeB: { source: 'propagation', formula: '2*%pi*sqrt(L/g)', propTerms: [
+        { symbole: '2L', valeur: '1', incertitude: '0.01' }
+    ] } }), DEPS), /pas un symbole valide/);
+});
+
+// ── Grandeur composée : formule "prête à l'emploi" (dérivées déjà calculées) ────
+test("Grandeur composée : formulaMode absent (ou 'none') ne génère aucune variable q_pd_ (non-régression)", () => {
+    const q = genIncertitudeCore(1, propParams(), DEPS);
+    assert.doesNotMatch(q.vars, /q1_pd_/);
+});
+
+test("Grandeur composée : formulaMode='pret' génère les coefficients q_pd_<symbole> (élasticité, dérivée relative)", () => {
+    const q = genIncertitudeCore(1, propParams({ typeB: {
+        source: 'propagation', formula: '2*%pi*sqrt(L/g)', formulaMode: 'pret',
+        propTerms: [
+            { symbole: 'L', valeur: '1', incertitude: '0.01' },
+            { symbole: 'g', valeur: '9.8', incertitude: '0.05' }
+        ]
+    } }), DEPS);
+    assert.match(q.vars, /q1_pd_L:float\(ev\(diff\(q1_Yexpr,L\),L=1,g=9\.8\)\*\(1\)\/q1_moy\);/);
+    assert.match(q.vars, /q1_pd_g:float\(ev\(diff\(q1_Yexpr,g\),L=1,g=9\.8\)\*\(9\.8\)\/q1_moy\);/);
+});
+
+test("Grandeur composée : formulaMode='structuree' affiche la formule absolue (dérivées symboliques non calculées)", () => {
+    const q = genIncertitudeCore(1, propParams({
+        context: { grandeur: 'Période', symbole: 'T', unite: 's', intro: '' },
+        typeB: {
+            source: 'propagation', formula: '2*%pi*sqrt(L/g)', formulaMode: 'structuree',
+            propTerms: [
+                { symbole: 'L', valeur: '1', incertitude: '0.01' },
+                { symbole: 'g', valeur: '9.8', incertitude: '0.05' }
+            ]
+        }
+    }), DEPS);
+    assert.ok(q.textFrag.includes('<p>\\(u(T)=\\sqrt{\\left(\\frac{\\partial T}{\\partial L}\\cdot u(L)\\right)^2+\\left(\\frac{\\partial T}{\\partial g}\\cdot u(g)\\right)^2}\\)</p>'), 'formule structurée absente ou mal formée');
+    assert.doesNotMatch(q.vars, /q1_pd_/);
+    assertBalancedTags(q.textFrag, 'textFrag');
+});
+
+test("Grandeur composée : formulaMode='pret' affiche la formule relative avec coefficients déjà calculés + rappel multiplicatif", () => {
+    const q = genIncertitudeCore(1, propParams({
+        context: { grandeur: 'Période', symbole: 'T', unite: 's', intro: '' },
+        typeB: {
+            source: 'propagation', formula: '2*%pi*sqrt(L/g)', formulaMode: 'pret',
+            propTerms: [
+                { symbole: 'L', valeur: '1', incertitude: '0.01' },
+                { symbole: 'g', valeur: '9.8', incertitude: '0.05' }
+            ]
+        }
+    }), DEPS);
+    assert.ok(q.textFrag.includes('\\(\\dfrac{u(T)}{T}=\\sqrt{\\left({@q1_pd_L@}\\cdot\\dfrac{u(L)}{L}\\right)^2+\\left({@q1_pd_g@}\\cdot\\dfrac{u(g)}{g}\\right)^2}\\)'), 'formule relative absente ou mal formée');
+    assert.ok(q.textFrag.includes('u(T)=T\\times\\dfrac{u(T)}{T}'), 'rappel multiplicatif absent');
+    assert.match(q.vars, /q1_pd_L:float\(/);
+    assertBalancedTags(q.textFrag, 'textFrag');
+});
+
+test("Grandeur composée : formulaMode absent => aucune formule affichée (non-régression, ancien défaut 'décoché')", () => {
+    const q = genIncertitudeCore(1, propParams(), DEPS);
+    assert.doesNotMatch(q.textFrag, /\\sqrt\{/);
+    assert.doesNotMatch(q.textFrag, /q1_pd_/);
 });
 
 // ── Arrondi GUM : sigfig / arrondi par excès / k ────────────────────────
@@ -226,7 +323,10 @@ test("Student activé : n dérivé du champ 'n' en mode aléatoire, 90% → tabl
 });
 
 // ── Étapes cochables : isolation + comptage ─────────────────────────────
-test("chaque étape cochée isolément produit exactement 1 <prt> et hérite du barème complet", () => {
+// Chaque étape cochée seule produit exactement 1 <prt> (y compris 'ecriture' :
+// même en format pm avec unité, les 3 champs valeur/incertitude/unité sont
+// regroupés dans un seul PRT combiné à 3 nœuds — cf. tests dédiés plus bas).
+test("chaque étape cochée isolément hérite du barème complet (1 <prt> par étape)", () => {
     INC_STEP_ORDER.forEach((key) => {
         const steps = {};
         INC_STEP_ORDER.forEach((k) => { steps[k] = (k === key); });
@@ -234,7 +334,8 @@ test("chaque étape cochée isolément produit exactement 1 <prt> et hérite du 
         const prtCount = (q.prtXML.match(/<prt>/g) || []).length;
         assert.equal(prtCount, 1, `étape '${key}' : attendu 1 <prt>, obtenu ${prtCount}`);
         assert.equal(q.prts.length, 1);
-        assert.equal(q.prts[0].meta.value, (7).toFixed(7), `étape '${key}' seule doit recevoir tout le barème`);
+        const totalValue = q.prts.reduce((sum, prt) => sum + parseFloat(prt.meta.value), 0);
+        assert.ok(Math.abs(totalValue - 7) < 1e-6, `étape '${key}' seule doit recevoir tout le barème au total (obtenu ${totalValue})`);
         assertBalancedTags(q.prtXML, `prtXML (${key})`);
         assertBalancedTags(q.inputXML, `inputXML (${key})`);
     });
@@ -298,13 +399,222 @@ test("tolérance Moyenne : surcharge personnalisée (2%) reflétée dans le PRT"
     assert.match(q.prtXML, /<testoptions>0\.02<\/testoptions>/);
 });
 
-// ── Écriture finale (regex) ──────────────────────────────────────────────
-test("étape 'ecriture' : regex tolérante ± / +/- / +- et unité optionnelle", () => {
+// ── Unitisation des étapes intermédiaires (moyenne/s/uA/uB/uc/U) ────────
+// Si context.unite est définie, TOUTES les étapes numériques (pas seulement
+// l'écriture finale) doivent être saisies en champ natif STACK `units`
+// (nombre*unité), avec un PRT à 2 nœuds (dimension puis magnitude), comme
+// js/gen-units.js — jamais en nombre seul (demande explicite de l'utilisateur,
+// répétée après un premier design incomplet qui ne l'appliquait qu'à
+// l'écriture finale).
+test("étape 'moyenne' avec unité : input ans_moy1 en type units, PRT à 2 nœuds (UnitsAbsolute dimension puis UnitsRelative magnitude)", () => {
+    const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: true, s: false, uA: false, uB: false, uc: false, U: false, ecriture: false } }), DEPS);
+    assert.match(q.inputXML, /<name>ans_moy1<\/name><type>units<\/type><tans>q1_moy\*\(cm\)<\/tans>/);
+    assert.equal(q.prts.length, 1);
+    assert.equal(q.prts[0].nodes.length, 2);
+    const testtypes = [...q.prtXML.matchAll(/<answertest>([^<]+)<\/answertest>/g)].map(m => m[1]);
+    assert.deepEqual(testtypes, ['UnitsAbsolute', 'UnitsRelative']);
+    assert.match(q.prtXML, /eleve_unit_ans_moy1/);
+    assert.match(q.prtXML, /teacher_unit_ans_moy1/);
+    assert.match(q.prtXML, /inc\.fb_wrong_moyenne/);
+    assertBalancedTags(q.prtXML, 'prtXML (moyenne unité)');
+    assertBalancedTags(q.inputXML, 'inputXML (moyenne unité)');
+});
+
+test("étape 'moyenne' sans unité (context.unite vide) : input reste numerical, PRT simple 1 nœud (non-régression)", () => {
+    const q = genIncertitudeCore(1, baseParams({
+        context: { grandeur: 'Longueur', symbole: 'L', unite: '', intro: '' },
+        steps: { moyenne: true, s: false, uA: false, uB: false, uc: false, U: false, ecriture: false }
+    }), DEPS);
+    assert.doesNotMatch(q.inputXML, /type>units/);
+    assert.equal(q.prts[0].nodes.length, 1);
+    assert.match(q.prtXML, /<answertest>NumRelative<\/answertest>/);
+});
+
+test("étape 'U' avec unité : magnitude testée en UnitsAbsolute (car test source NumAbsolute), pas UnitsRelative", () => {
+    const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: true, ecriture: false } }), DEPS);
+    assert.match(q.inputXML, /<name>ans_U1<\/name><type>units<\/type><tans>q1_U\*\(cm\)<\/tans>/);
+    const testtypes = [...q.prtXML.matchAll(/<answertest>([^<]+)<\/answertest>/g)].map(m => m[1]);
+    assert.deepEqual(testtypes, ['UnitsAbsolute', 'UnitsAbsolute']);
+    assert.match(q.prtXML, /inc\.fb_wrong_U/);
+});
+
+test("étapes s/uA/uB/uc avec unité : chacune produit un input units + feedback pédagogique dédié", () => {
+    const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: false, s: true, uA: true, uB: true, uc: true, U: false, ecriture: false } }), DEPS);
+    assert.match(q.inputXML, /<name>ans_s1<\/name><type>units<\/type><tans>q1_s\*\(cm\)<\/tans>/);
+    assert.match(q.inputXML, /<name>ans_ua1<\/name><type>units<\/type><tans>q1_uA\*\(cm\)<\/tans>/);
+    assert.match(q.inputXML, /<name>ans_ub1<\/name><type>units<\/type><tans>q1_uB\*\(cm\)<\/tans>/);
+    assert.match(q.inputXML, /<name>ans_uc1<\/name><type>units<\/type><tans>q1_uc\*\(cm\)<\/tans>/);
+    assert.match(q.prtXML, /inc\.fb_wrong_s/);
+    assert.match(q.prtXML, /inc\.fb_wrong_uA/);
+    assert.match(q.prtXML, /inc\.fb_wrong_uB_resolution/);
+    assert.match(q.prtXML, /inc\.fb_wrong_uc/);
+    assertBalancedTags(q.prtXML, 'prtXML (s/uA/uB/uc unité)');
+    assertBalancedTags(q.inputXML, 'inputXML (s/uA/uB/uc unité)');
+});
+
+test("étape 'uB' avec unité : la clé de feedback pédagogique dépend de la source Type B (calibration)", () => {
+    const q = genIncertitudeCore(1, baseParams({
+        typeB: { source: 'calibration', ucert: '0.05', kcert: '2' },
+        steps: { moyenne: false, s: false, uA: false, uB: true, uc: false, U: false, ecriture: false }
+    }), DEPS);
+    assert.match(q.prtXML, /inc\.fb_wrong_uB_calibration/);
+});
+
+test("étapes moyenne/U (avec unité) : le feedback 'correct' est labellisé par étape, jamais un \"Correct !\" générique dupliqué (plusieurs boîtes vertes identiques = illisible dès qu'il y a plusieurs champs)", () => {
+    const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: true, s: false, uA: false, uB: false, uc: false, U: true, ecriture: false } }), DEPS);
+    assert.match(q.prtXML, /inc\.fb_ok_moyenne/);
+    assert.match(q.prtXML, /inc\.fb_ok_U/);
+    assert.doesNotMatch(q.prtXML, /mat\.fb_ok_correct/);
+});
+
+test("chaque étape unitisée : somme des truescore des 2 nœuds = barème total de l'étape", () => {
+    const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: true, s: false, uA: false, uB: false, uc: false, U: false, ecriture: false } }), DEPS);
+    const scores = q.prts[0].nodes.map(n => eval(n.truescore));
+    assert.ok(Math.abs(scores.reduce((a, b) => a + b, 0) - 1) < 1e-6);
+    assert.equal(parseFloat(q.prts[0].meta.value), 7);
+});
+
+// ── Écriture finale, format "pm" : 3 champs (valeur, incertitude, unité) ──
+// Le format pm n'utilise plus de regex custom (bug confirmé 2x en prod) : le "±"
+// est du texte fixe. La valeur et l'incertitude sont 2 champs numériques simples.
+// Si une unité est définie sur la grandeur, un 3e champ natif STACK "units" est
+// ajouté, PARTAGÉ entre les 2 (l'élève ne l'écrit qu'une fois) — design confirmé
+// par l'utilisateur (AskUserQuestion), qui a rejeté le design intermédiaire où
+// chaque champ (valeur, incertitude) portait sa propre unité. La dimension du
+// champ unité est vérifiée par 1 seul nœud UnitsAbsolute (astuce ×2, comme
+// js/gen-units.js), les 3 champs regroupés dans UN SEUL PRT combiné, notés
+// indépendamment les uns des autres.
+test("étape 'ecriture' pm avec unité : 2 inputs numerical + 1 input units partagé, 1 seul PRT à 3 nœuds, pas de q1_ecr_regex", () => {
     const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true } }), DEPS);
-    assert.match(q.vars, /q1_ecr_regex:sconcat\(/);
-    assert.match(q.vars, /\\\\\+\/-\|\\\\\+-\|±/);
-    assert.match(q.inputXML, /ans_ecr1/);
-    assert.match(q.textFrag, /ans_ecr1/);
+    assert.doesNotMatch(q.vars, /q1_ecr_regex/);
+    assert.doesNotMatch(q.vars, /q1_ecrval_ta/);
+    assert.doesNotMatch(q.vars, /q1_ecrunc_ta/);
+    assert.match(q.vars, /q1_ecrunit_ta:1\*\(cm\);/);
+    assert.match(q.inputXML, /<name>ans_ecrval1<\/name>\s*<type>numerical<\/type>\s*<tans>q1_moy_r<\/tans>/);
+    assert.match(q.inputXML, /<name>ans_ecrunc1<\/name>\s*<type>numerical<\/type>\s*<tans>q1_U<\/tans>/);
+    assert.match(q.inputXML, /<name>ans_ecrunit1<\/name><type>units<\/type><tans>q1_ecrunit_ta<\/tans>/);
+    assert.match(q.textFrag, /ans_ecrval1/);
+    assert.match(q.textFrag, /ans_ecrunc1/);
+    assert.match(q.textFrag, /ans_ecrunit1/);
+    assert.doesNotMatch(q.textFrag, /\[\[validation:/);
+    assert.equal(q.prts.length, 1);
+    assert.equal(q.prts[0].nodes.length, 3);
+    const testtypes = [...q.prtXML.matchAll(/<answertest>([^<]+)<\/answertest>/g)].map(m => m[1]);
+    assert.deepEqual(testtypes, ['NumAbsolute', 'NumAbsolute', 'UnitsAbsolute']);
+    assert.match(q.prtXML, /eleve_unit1/);
+    assert.match(q.prtXML, /teacher_unit1/);
+    // Feedback spécifique par champ (valeur, incertitude, unité), pas un
+    // "Correct !" générique, et pédagogique (explique le pourquoi) sur les branches fausses.
+    assert.match(q.prtXML, /inc\.fb_ecr_valeur_ok/);
+    assert.match(q.prtXML, /inc\.fb_ecr_incertitude_ok/);
+    assert.match(q.prtXML, /inc\.fb_ecr_unite_ok/);
+    assert.match(q.prtXML, /inc\.fb_ecr_valeur_wrong/);
+    assert.match(q.prtXML, /inc\.fb_ecr_incertitude_wrong/);
+    assert.match(q.prtXML, /inc\.fb_ecr_unite_wrong/);
+    assertBalancedTags(q.prtXML, 'prtXML (ecriture pm+unité)');
+    assertBalancedTags(q.inputXML, 'inputXML (ecriture pm+unité)');
+});
+
+test("étape 'ecriture' pm : somme des truescore des 3 nœuds = barème total de l'étape", () => {
+    const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true } }), DEPS);
+    const scores = q.prts[0].nodes.map(n => eval(n.truescore));
+    assert.ok(Math.abs(scores.reduce((a, b) => a + b, 0) - 1) < 1e-6);
+    assert.equal(parseFloat(q.prts[0].meta.value), 7);
+});
+
+test("étape 'ecriture' pm : sans unité (context.unite vide), 1 PRT à 2 nœuds NumAbsolute", () => {
+    const q = genIncertitudeCore(1, baseParams({
+        context: { grandeur: 'Longueur', symbole: 'L', unite: '', intro: '' },
+        steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true }
+    }), DEPS);
+    assert.match(q.inputXML, /<name>ans_ecrval1<\/name>/);
+    assert.match(q.inputXML, /<name>ans_ecrunc1<\/name>/);
+    assert.doesNotMatch(q.inputXML, /type>units/);
+    assert.doesNotMatch(q.textFrag, /\[\[validation:/);
+    assert.equal(q.prts.length, 1);
+    assert.equal(q.prts[0].nodes.length, 2);
+    const testtypes = [...q.prtXML.matchAll(/<answertest>([^<]+)<\/answertest>/g)].map(m => m[1]);
+    assert.deepEqual(testtypes, ['NumAbsolute', 'NumAbsolute']);
+    assert.doesNotMatch(q.vars, /q1_ecrunit_ta/);
+});
+
+test("étape 'ecriture' : ecritureFormat absent = comportement pm par défaut (non-régression)", () => {
+    const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true } }), DEPS);
+    assert.doesNotMatch(q.vars, /q1_ecr_regex/);
+    assert.match(q.inputXML, /ans_ecrval1/);
+    assert.doesNotMatch(q.vars, /q1_inf_r:/);
+});
+
+test("étape 'ecriture' pm : le feedback général (corrigé) affiche la réponse finale attendue", () => {
+    const qUnit = genIncertitudeCore(1, baseParams({ steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true } }), DEPS);
+    assert.match(qUnit.generalFeedback, /q1_moy_r/);
+    assert.match(qUnit.generalFeedback, /q1_U/);
+
+    const qNoUnit = genIncertitudeCore(1, baseParams({
+        context: { grandeur: 'Longueur', symbole: 'L', unite: '', intro: '' },
+        steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true }
+    }), DEPS);
+    assert.match(qNoUnit.generalFeedback, /q1_moy_r/);
+    assert.match(qNoUnit.generalFeedback, /q1_U/);
+
+    const qNoEcriture = genIncertitudeCore(1, baseParams({ steps: { moyenne: true, s: false, uA: false, uB: false, uc: false, U: false, ecriture: false } }), DEPS);
+    assert.doesNotMatch(qNoEcriture.generalFeedback, /q1_moy_r \\\\pm/);
+});
+
+test("feedback général : pas d'icône 🔑 doublée quand trig.correction_title la porte déjà", () => {
+    const I18N_REAL_TITLE = { t: (key, vars) => key === 'trig.correction_title' ? '🔑 Correction' : (vars ? key + ':' + JSON.stringify(vars) : key) };
+    const q = genIncertitudeCore(1, baseParams({ steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true } }), Object.assign({}, DEPS, { I18N: I18N_REAL_TITLE }));
+    assert.equal((q.generalFeedback.match(/🔑/g) || []).length, 1);
+});
+
+test("étape 'ecriture' : format encadrement génère bornes inf/sup et regex tolérante avec symbole optionnel", () => {
+    const q = genIncertitudeCore(1, baseParams({
+        ecritureFormat: 'encadrement',
+        steps: { moyenne: false, s: false, uA: false, uB: false, uc: false, U: false, ecriture: true }
+    }), DEPS);
+    assert.match(q.vars, /q1_inf_r:q1_moy_r-q1_U;/);
+    assert.match(q.vars, /q1_sup_r:q1_moy_r\+q1_U;/);
+    assert.ok(q.vars.includes('q1_ecr_regex:sconcat('), 'regex sconcat manquant');
+    assert.ok(q.vars.includes('inc_esc1(q1_inf_r_s)'), 'borne inf absente de la regex');
+    assert.ok(q.vars.includes('inc_esc1(q1_sup_r_s)'), 'borne sup absente de la regex');
+    assert.ok(q.vars.includes('inc_esc1("L")'), 'symbole absent de la regex (doit être toléré, optionnel)');
+    assert.ok(q.vars.includes('q1_ecr_attendue:sconcat(q1_inf_r_s," < ","L"," < ",q1_sup_r_s'), 'q1_ecr_attendue mal formé');
+});
+
+test("_incStepDefs : format pm avec unité produit 1 seul def 'ecriture' porteur de 3 customNodes (valeur, incertitude, unité partagée)", () => {
+    const defsPm = _incStepDefs(1, 'L', 'cm', baseParams({ ecritureFormat: 'pm' }), I18N_STUB);
+    const ecrDefs = defsPm.filter(d => d.key === 'ecriture');
+    assert.equal(ecrDefs.length, 1);
+    assert.equal(ecrDefs[0].customNodes.length, 3);
+    assert.match(ecrDefs[0].feedbackvariables, /stack_unit_si_to_si_base\(ans_ecrunit1\)/);
+    assert.doesNotMatch(ecrDefs[0].feedbackvariables, /ans_ecrval1|ans_ecrunc1/);
+    assert.match(ecrDefs[0].rawInputXML, /<name>ans_ecrval1<\/name>\s*<type>numerical<\/type>/);
+    assert.match(ecrDefs[0].rawInputXML, /<name>ans_ecrunc1<\/name>\s*<type>numerical<\/type>/);
+    assert.match(ecrDefs[0].rawInputXML, /<name>ans_ecrunit1<\/name><type>units<\/type>/);
+    assert.match(ecrDefs[0].textFrag, /inc\.ecriture_pm_help_unit/);
+    assert.doesNotMatch(ecrDefs[0].textFrag, /\[\[validation:/);
+
+    const defsEnc = _incStepDefs(1, 'L', 'cm', baseParams({ ecritureFormat: 'encadrement' }), I18N_STUB);
+    const ecrEnc = defsEnc.find(d => d.key === 'ecriture');
+    assert.match(ecrEnc.textFrag, /inc\.ecriture_label_encadrement/);
+});
+
+test("_incStepDefs : format pm sans unité => 1 def 'ecriture' avec 2 customNodes NumAbsolute", () => {
+    const p = baseParams({ ecritureFormat: 'pm', context: { grandeur: 'Longueur', symbole: 'L', unite: '', intro: '' } });
+    const ecrDefs = _incStepDefs(1, 'L', '', p, I18N_STUB).filter(d => d.key === 'ecriture');
+    assert.equal(ecrDefs.length, 1);
+    assert.equal(ecrDefs[0].customNodes.length, 2);
+    assert.equal(ecrDefs[0].feedbackvariables, '');
+    assert.doesNotMatch(ecrDefs[0].rawInputXML, /type>units/);
+    assert.doesNotMatch(ecrDefs[0].textFrag, /\[\[validation:/);
+});
+
+test("_incStepDefs : ecritureFormat absent => comportement pm par défaut (non-régression)", () => {
+    const defs = _incStepDefs(1, 'L', 'cm', baseParams(), I18N_STUB);
+    const ecrDefs = defs.filter(d => d.key === 'ecriture');
+    assert.equal(ecrDefs.length, 1);
+    assert.equal(ecrDefs[0].customNodes.length, 3);
+    assert.doesNotMatch(ecrDefs[0].textFrag, /inc\.ecriture_label_encadrement/);
 });
 
 test("XML complet (toutes étapes cochées) reste bien formé", () => {

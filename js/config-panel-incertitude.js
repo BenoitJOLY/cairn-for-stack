@@ -23,9 +23,10 @@ var INC_DEFAULTS = {
   bareme: 7, grandeur: '', symbole: 'L', unite: 'cm', intro: '',
   typeAMode: 'manuel', typeAData: '12.3,12.5,12.2,12.4,12.6',
   typeAMoyenne: '12.4', typeAEcartType: '0.15', typeAN: '5', typeADecimales: '2',
-  typeBSource: 'resolution', typeBQ: '0.1', typeBDelta: '', typeBUcert: '', typeBKcert: '2', typeBValeur: '', propTerms: [],
+  typeBSource: 'resolution', typeBQ: '0.1', typeBDelta: '', typeBUcert: '', typeBKcert: '2', typeBValeur: '',
+  propFormula: '', propFormulaMode: 'none', propShowData: true, propTerms: [],
   sigfig: '1', roundup: false, k: '1', studentEnabled: false, studentConfidence: '95',
-  moyenneTolerancePct: '1', display: 'liste', fbGen: ''
+  moyenneTolerancePct: '1', ecritureFormat: 'pm', display: 'liste', fbGen: ''
 };
 var INC_STEP_KEYS = ['moyenne', 's', 'uA', 'uB', 'uc', 'U', 'ecriture'];
 
@@ -38,10 +39,14 @@ function captureState_incertitude() {
   s.typeAN = v('inc-typea-n'); s.typeADecimales = v('inc-typea-decimales');
   s.typeBSource = v('inc-typeb-source'); s.typeBQ = v('inc-typeb-q'); s.typeBDelta = v('inc-typeb-delta');
   s.typeBUcert = v('inc-typeb-ucert'); s.typeBKcert = v('inc-typeb-kcert'); s.typeBValeur = v('inc-typeb-valeur');
+  s.propFormula = v('inc-prop-formula');
+  s.propFormulaMode = (function(){ var r = document.querySelector('input[name="inc-prop-formula-mode"]:checked'); return r ? r.value : INC_DEFAULTS.propFormulaMode; })();
+  s.propShowData = !!document.getElementById('inc-prop-showdata').checked;
   s.propTerms = (typeof incGetPropTerms === 'function') ? incGetPropTerms() : [];
   s.sigfig = v('inc-sigfig'); s.roundup = !!document.getElementById('inc-roundup').checked; s.k = v('inc-k');
   s.studentEnabled = !!document.getElementById('inc-student-enabled').checked; s.studentConfidence = v('inc-student-confidence');
   s.moyenneTolerancePct = v('inc-moyenne-tolerance');
+  s.ecritureFormat = (function(){ var r = document.querySelector('input[name="inc-ecriture-format"]:checked'); return r ? r.value : INC_DEFAULTS.ecritureFormat; })();
   s.display = v('inc-display') || INC_DEFAULTS.display;
   s.steps = {};
   INC_STEP_KEYS.forEach(function(key){ s.steps[key] = !!document.getElementById('inc-step-' + key).checked; });
@@ -67,15 +72,19 @@ function restoreState_incertitude(s) {
   document.getElementById('inc-typeb-ucert').value = s.typeBUcert || INC_DEFAULTS.typeBUcert;
   document.getElementById('inc-typeb-kcert').value = s.typeBKcert || INC_DEFAULTS.typeBKcert;
   document.getElementById('inc-typeb-valeur').value = s.typeBValeur || INC_DEFAULTS.typeBValeur;
+  document.getElementById('inc-prop-formula').value = s.propFormula || INC_DEFAULTS.propFormula;
+  document.querySelectorAll('input[name="inc-prop-formula-mode"]').forEach(function(r){ r.checked = (r.value === (s.propFormulaMode || INC_DEFAULTS.propFormulaMode)); });
+  document.getElementById('inc-prop-showdata').checked = (s.propShowData != null) ? !!s.propShowData : INC_DEFAULTS.propShowData;
   var propBody = document.getElementById('inc-prop-body');
   if (propBody) propBody.innerHTML = '';
-  (s.propTerms || []).forEach(function(t){ if (typeof incAddPropTerm === 'function') incAddPropTerm(t.value, t.incert, t.denom); });
+  (s.propTerms || []).forEach(function(t){ if (typeof incAddPropTerm === 'function') incAddPropTerm(t.symbole, t.valeur, t.incertitude, t.unite); });
   document.getElementById('inc-sigfig').value = s.sigfig || INC_DEFAULTS.sigfig;
   document.getElementById('inc-roundup').checked = !!s.roundup;
   document.getElementById('inc-k').value = s.k || INC_DEFAULTS.k;
   document.getElementById('inc-student-enabled').checked = !!s.studentEnabled;
   document.getElementById('inc-student-confidence').value = s.studentConfidence || INC_DEFAULTS.studentConfidence;
   document.getElementById('inc-moyenne-tolerance').value = s.moyenneTolerancePct || INC_DEFAULTS.moyenneTolerancePct;
+  document.querySelectorAll('input[name="inc-ecriture-format"]').forEach(function(r){ r.checked = (r.value === (s.ecritureFormat || INC_DEFAULTS.ecritureFormat)); });
   document.getElementById('inc-display').value = s.display || INC_DEFAULTS.display;
   document.querySelectorAll('input[name="inc-display-radio"]').forEach(function(r){ r.checked = (r.value === (s.display || INC_DEFAULTS.display)); });
   var steps = s.steps || {};
@@ -102,6 +111,9 @@ function resetForm_incertitude() {
   document.getElementById('inc-typeb-ucert').value = INC_DEFAULTS.typeBUcert;
   document.getElementById('inc-typeb-kcert').value = INC_DEFAULTS.typeBKcert;
   document.getElementById('inc-typeb-valeur').value = INC_DEFAULTS.typeBValeur;
+  document.getElementById('inc-prop-formula').value = INC_DEFAULTS.propFormula;
+  document.querySelectorAll('input[name="inc-prop-formula-mode"]').forEach(function(r){ r.checked = (r.value === INC_DEFAULTS.propFormulaMode); });
+  document.getElementById('inc-prop-showdata').checked = INC_DEFAULTS.propShowData;
   var propBodyR = document.getElementById('inc-prop-body');
   if (propBodyR) propBodyR.innerHTML = '';
   document.getElementById('inc-sigfig').value = INC_DEFAULTS.sigfig;
@@ -110,6 +122,7 @@ function resetForm_incertitude() {
   document.getElementById('inc-student-enabled').checked = INC_DEFAULTS.studentEnabled;
   document.getElementById('inc-student-confidence').value = INC_DEFAULTS.studentConfidence;
   document.getElementById('inc-moyenne-tolerance').value = INC_DEFAULTS.moyenneTolerancePct;
+  document.querySelectorAll('input[name="inc-ecriture-format"]').forEach(function(r){ r.checked = (r.value === INC_DEFAULTS.ecritureFormat); });
   document.getElementById('inc-display').value = INC_DEFAULTS.display;
   document.querySelectorAll('input[name="inc-display-radio"]').forEach(function(r){ r.checked = (r.value === INC_DEFAULTS.display); });
   INC_STEP_KEYS.forEach(function(key){ document.getElementById('inc-step-' + key).checked = (key === 'moyenne' || key === 'U' || key === 'ecriture'); });

@@ -5454,6 +5454,7 @@ fill="currentColor" stroke="none">
       </div>
 
       <!-- Type A -->
+      <div id="inc-typea-section">
       <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
         <label style="font-weight:800;color:#9333ea;" data-i18n="inc.typea_title">Incertitude de type A (statistique)</label>
       </div>
@@ -5506,6 +5507,8 @@ fill="currentColor" stroke="none">
         </div>
         <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="inc.typea_alea_hint">Bruit uniforme calibré pour cibler exactement l'écart-type demandé (pas une vraie loi normale).</div>
       </div>
+      </div>
+      <!-- /inc-typea-section -->
 
       <!-- Type B -->
       <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
@@ -5556,11 +5559,34 @@ fill="currentColor" stroke="none">
       </div>
       <div id="inc-typeb-propagation-wrap" style="display:none">
         <div class="field">
-          <label data-i18n="inc.prop_terms_lbl">Termes de la formule (produit/quotient de grandeurs connues)</label>
-          <div id="inc-prop-body"></div>
-          <button type="button" onclick="incAddPropTerm()" style="margin-top:6px;background:#9333ea;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer;font-size:.82rem;" data-i18n="inc.prop_add_btn">+ Ajouter un terme</button>
+          <label><span data-i18n="inc.prop_formula_lbl">Formule de la grandeur composée (expression Maxima)</span> <button class="btn-kbd-open" onclick="openKbdModal('incprop')"><svg class="hs-ico"><use href="#ico-tool-keyboard"></use></svg> <span data-i18n="common.aide_saisie_btn">Aide à la saisie</span></button></label>
+          <input type="text" id="inc-prop-formula" style="font-family:monospace;" placeholder="2*%pi*sqrt(L/g)" data-i18n-ph="inc.prop_formula_ph">
         </div>
-        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="inc.prop_hint">u_B = Y × √(Σ(u(Xi)/Xi)²), avec Y = produit des valeurs (÷ pour les termes au dénominateur)</div>
+        <div class="field">
+          <label data-i18n="inc.prop_terms_lbl">Grandeurs intervenant dans la formule</label>
+          <div id="inc-prop-body"></div>
+          <button type="button" onclick="incAddPropTerm()" style="margin-top:6px;background:#9333ea;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer;font-size:.82rem;" data-i18n="inc.prop_add_btn">+ Ajouter une grandeur</button>
+        </div>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="inc.prop_hint">u(Y) calculé automatiquement par dérivation partielle de la formule (loi de propagation GUM).</div>
+        <div class="field" style="margin-top:8px;">
+          <label data-i18n="inc.prop_formulamode_lbl">Formule de propagation donnée à l'élève (énoncé + corrigé)</label>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+              <input type="radio" name="inc-prop-formula-mode" value="none" checked> <span data-i18n="inc.prop_formulamode_none">Aucune (l'élève dérive seul)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+              <input type="radio" name="inc-prop-formula-mode" value="structuree"> <span data-i18n="inc.prop_formulamode_structuree">Formule structurée (dérivées à calculer par l'élève)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+              <input type="radio" name="inc-prop-formula-mode" value="pret"> <span data-i18n="inc.prop_formulamode_pret">Formule prête à l'emploi (dérivées déjà calculées)</span>
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+            <input type="checkbox" id="inc-prop-showdata" checked> <span data-i18n="inc.prop_showdata_lbl">Afficher le rappel des données dans l'énoncé</span>
+          </label>
+        </div>
       </div>
 
       <!-- Arrondi / présentation -->
@@ -5612,13 +5638,13 @@ fill="currentColor" stroke="none">
           <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
             <input type="checkbox" id="inc-step-moyenne" checked onchange="incMoyenneToleranceToggle()"> <span data-i18n="inc.step_moyenne">Moyenne</span>
           </label>
-          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+          <label id="inc-step-s-wrap" style="display:flex;align-items:center;gap:5px;cursor:pointer;">
             <input type="checkbox" id="inc-step-s"> <span data-i18n="inc.step_s">Écart-type s</span>
           </label>
-          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+          <label id="inc-step-uA-wrap" style="display:flex;align-items:center;gap:5px;cursor:pointer;">
             <input type="checkbox" id="inc-step-uA"> <span data-i18n="inc.step_uA">Incertitude-type A</span>
           </label>
-          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+          <label id="inc-step-uB-wrap" style="display:flex;align-items:center;gap:5px;cursor:pointer;">
             <input type="checkbox" id="inc-step-uB"> <span data-i18n="inc.step_uB">Incertitude-type B</span>
           </label>
           <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
@@ -5628,12 +5654,23 @@ fill="currentColor" stroke="none">
             <input type="checkbox" id="inc-step-U" checked> <span data-i18n="inc.step_U">Incertitude élargie U</span>
           </label>
           <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
-            <input type="checkbox" id="inc-step-ecriture" checked> <span data-i18n="inc.step_ecriture">Écriture finale</span>
+            <input type="checkbox" id="inc-step-ecriture" checked onchange="incEcritureFormatToggle()"> <span data-i18n="inc.step_ecriture">Écriture finale</span>
           </label>
         </div>
         <div id="inc-moyenne-tolerance-wrap" style="margin-top:8px;max-width:180px;">
-          <label data-i18n="inc.moyenne_tolerance_lbl">Tolérance sur la moyenne (%)</label>
+          <label for="inc-moyenne-tolerance" data-i18n="inc.moyenne_tolerance_lbl">Tolérance sur la moyenne (%)</label>
           <input type="number" id="inc-moyenne-tolerance" value="1" min="0" step="0.1">
+        </div>
+        <div id="inc-ecriture-format-wrap" style="margin-top:8px;">
+          <label data-i18n="inc.ecriture_format_lbl">Format de la réponse attendue</label>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+              <input type="radio" name="inc-ecriture-format" value="pm" checked onchange="incEcritureFormatToggle()"> <span data-i18n="inc.ecriture_format_pm">x = valeur ± incertitude</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+              <input type="radio" name="inc-ecriture-format" value="encadrement" onchange="incEcritureFormatToggle()"> <span data-i18n="inc.ecriture_format_encadrement">Encadrement : borne inf &lt; x &lt; borne sup</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -6207,7 +6244,7 @@ fill="currentColor" stroke="none">
 <!-- KEYBOARD / SAISIE MAXIMA MODAL -->
 <div id="kbdModal" class="modal-backdrop" onclick="if(event.target===this)closeKbdModal()">
   <div class="kbd-box" onclick="event.stopPropagation()">
-    <div class="kbd-head" id="kbd-head-bar" style="background:var(--algebraic);">
+    <div class="kbd-head" id="kbd-head-bar" style="background:var(--algebraic-contrast);">
       <h3><svg class="hs-ico"><use href="#ico-tool-keyboard"></use></svg> <span data-i18n="modal.aide_a_la_saisie">Aide à la saisie Maxima</span></h3>
       <button class="kbd-head-close" onclick="closeKbdModal()" data-i18n-aria="btn.fermer">×</button>
     </div>
@@ -6295,7 +6332,7 @@ fill="currentColor" stroke="none">
     <h3><svg class="hs-ico"><use href="#ico-tool-keyboard"></use></svg> <span data-i18n="modal.formule_maxima">Formule Maxima</span></h3><p><span data-i18n="tpl.kbd_variables">Variables :</span> <code>%pi, sqrt(x), ta1, 9.81...</code></p>
     <input type="text" id="modal-formula" placeholder="ex: ta1 * 9.81" data-i18n-ph="calc.formula_ph" aria-label="Formule Maxima" data-i18n-aria="modal.formule_maxima">
     <div class="calc-btns">
-      <button onclick="applyFormula()" style="background:var(--numerical);color:#fff;" data-i18n="btn.appliquer">Appliquer</button>
+      <button onclick="applyFormula()" style="background:var(--numerical-contrast);color:#fff;" data-i18n="btn.appliquer">Appliquer</button>
       <button class="hs-bg-slate" onclick="this.closest('.modal-backdrop').style.display='none'" data-i18n="btn.annuler">Annuler</button>
     </div>
   </div>

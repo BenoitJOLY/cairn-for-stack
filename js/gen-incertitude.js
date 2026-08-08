@@ -41,6 +41,9 @@ function _incBuildParams() {
     },
     typeB: {
       source: typeBSource, q: gs('inc-typeb-q'), delta: gs('inc-typeb-delta'), ucert: gs('inc-typeb-ucert'), kcert: gs('inc-typeb-kcert'), valeur: gs('inc-typeb-valeur'),
+      formula: gs('inc-prop-formula'),
+      formulaMode: (document.querySelector('input[name="inc-prop-formula-mode"]:checked')||{}).value || 'none',
+      showData: gc('inc-prop-showdata'),
       propTerms: (typeof incGetPropTerms === 'function') ? incGetPropTerms() : []
     },
     display: gs('inc-display') || 'liste',
@@ -53,6 +56,7 @@ function _incBuildParams() {
       uc: gc('inc-step-uc'), U: gc('inc-step-U'), ecriture: gc('inc-step-ecriture')
     },
     moyenneTolerance: (parseFloat(gs('inc-moyenne-tolerance')) || 1) / 100,
+    ecritureFormat: (document.querySelector('input[name="inc-ecriture-format"]:checked')||{}).value || 'pm',
     fbGen: gs('inc-fbgen')
   };
 }
@@ -81,15 +85,26 @@ function genIncertitudeCore(X, p, deps) {
   var mkFbGen_D = deps._mkFbGen || _mkFbGen;
   var applyFbBox_D = deps.applyFbBox || applyFbBox;
   var escapeMaximaString_D = deps.escapeMaximaString || escapeMaximaString;
+  // trig.correction_title porte un 🔑 intégré au texte ; applyFbBox_D('general', ...)
+  // plus bas fournit déjà l'icône de l'encadré, d'où le retrait pour éviter le doublon
+  // (même pattern que gen-math-inequation.js/gen-math-matrices.js).
+  var correctionTitle = I18N_D.t('trig.correction_title').replace(/^\S+\s*/, '');
 
   var ctx = p.context || {};
   var bareme = p.bareme || 1;
   var steps = p.steps || {};
+  var isPropagation = ((p.typeB || {}).source === 'propagation');
   var checked = INC_STEP_ORDER.filter(function(k){ return !!steps[k]; });
   if (!checked.length) throw new Error(I18N_D.t('inc.err_no_step') || 'Incertitude : cochez au moins une étape à évaluer.');
 
-  var vars = [_incTypeAVars(X, p), _incTypeBVars(X, p), _incRoundingVars(X, p)];
-  if (steps.ecriture) vars.push(_incFinalRegex(X, p, {escapeMaximaString: escapeMaximaString_D}));
+  var vars = isPropagation
+    ? [_incPropagationVars(X, p), _incRoundingVars(X, p)]
+    : [_incTypeAVars(X, p), _incTypeBVars(X, p), _incRoundingVars(X, p)];
+  if (steps.ecriture && p.ecritureFormat === 'encadrement') vars.push(_incFinalRegex(X, p, {escapeMaximaString: escapeMaximaString_D}));
+  var ecrUnitRaw = ((p.context || {}).unite || '').trim();
+  if (steps.ecriture && p.ecritureFormat !== 'encadrement' && ecrUnitRaw) {
+    vars.push(`/* Q${X} Incertitude - Écriture finale : unité attendue (champ partagé valeur/incertitude) */\nq${X}_ecrunit_ta:1*(${ecrUnitRaw});`);
+  }
   vars = vars.join('\n');
 
   var stepBareme = +(bareme / checked.length).toFixed(7);
@@ -100,7 +115,31 @@ function genIncertitudeCore(X, p, deps) {
   var HDR = `<div style="background:#9333ea;border-left:5px solid #7e22ce;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><strong style="font-weight:800;color:#fff;font-size:.95rem;">Q${X} — ${I18N_D.t('inc.title')}${ctx.grandeur ? ' &middot; ' + htmlEsc(ctx.grandeur) : ''}</strong> <span style="background:#7e22ce;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:bold;">/ ${bareme} pt</span></div>`;
   var introHtml = ctx.intro ? `<p>${ctx.intro}</p>` : '';
   var serieHtml;
-  if (p.display === 'tableau') {
+  var propDataHtml = '', propFormulaHtml = '';
+  if (isPropagation) {
+    var propTerms = (p.typeB.propTerms || []).filter(function (t) { return t && t.symbole; });
+    if (p.typeB.showData) {
+      var rows = propTerms.map(function (t) {
+        var u = htmlEsc(t.unite || '');
+        return `\\(${htmlEsc(t.symbole)} = ${htmlEsc(t.valeur)} \\pm ${htmlEsc(t.incertitude)}${u ? ' \\; \\text{' + u + '}' : ''}\\)`;
+      }).join('<br>');
+      propDataHtml = `<p><strong>${I18N_D.t('inc.prop_data_title') || 'Données :'}</strong><br>${rows}</p>`;
+    }
+    if (p.typeB.formulaMode === 'structuree') {
+      var terms = propTerms.map(function (t) {
+        var s = htmlEsc(t.symbole);
+        return `\\left(\\frac{\\partial ${symb}}{\\partial ${s}}\\cdot u(${s})\\right)^2`;
+      }).join('+');
+      propFormulaHtml = `<p>\\(u(${symb})=\\sqrt{${terms}}\\)</p>`;
+    } else if (p.typeB.formulaMode === 'pret') {
+      var termsPret = propTerms.map(function (t) {
+        var s = htmlEsc(t.symbole);
+        return `\\left({@q${X}_pd_${t.symbole}@}\\cdot\\dfrac{u(${s})}{${s}}\\right)^2`;
+      }).join('+');
+      propFormulaHtml = `<p>\\(\\dfrac{u(${symb})}{${symb}}=\\sqrt{${termsPret}}\\)</p><p>${I18N_D.t('inc.prop_pret_reminder') || 'puis :'} \\(u(${symb})=${symb}\\times\\dfrac{u(${symb})}{${symb}}\\)</p>`;
+    }
+    serieHtml = '';
+  } else if (p.display === 'tableau') {
     var n = (p.typeA && p.typeA.mode === 'aleatoire') ? parseInt(p.typeA.n) : (p.typeA && p.typeA.data ? p.typeA.data.length : 0);
     var cells = '';
     for (var iCell = 1; iCell <= n; iCell++) {
@@ -116,6 +155,18 @@ function genIncertitudeCore(X, p, deps) {
 
   defs.forEach(function(def) {
     if (!steps[def.key]) return;
+    if (def.customNodes) {
+      var prtMetaC = { name: def.prtName, value: stepBareme.toFixed(7), autosimplify: '1', feedbackstyle: '2', feedbackvariables: def.feedbackvariables || '' };
+      var xmlNodesC = def.customNodes.map(function(n) {
+        return Object.assign({}, n, { truefeedback: applyFbBox_D('true', n.truefeedback), falsefeedback: applyFbBox_D('false', n.falsefeedback) });
+      });
+      inputBlocks.push(def.rawInputXML);
+      prtBlocks.push(buildPrtXml_D(prtMetaC, xmlNodesC));
+      feedbackRefs.push(`[[feedback:${def.prtName}]]`);
+      allPrts.push({ meta: prtMetaC, nodes: def.customNodes });
+      textParts.push(def.textFrag);
+      return;
+    }
     var node = {
       name: '0', description: def.desc, answertest: def.test, sans: def.inputName, tans: def.tans,
       testoptions: def.opts || '', quiet: '0',
@@ -133,8 +184,18 @@ function genIncertitudeCore(X, p, deps) {
     textParts.push(def.textFrag);
   });
 
-  var textFrag = HDR + introHtml + serieHtml + textParts.join('\n');
-  var generalFeedback = applyFbBox_D('general', mkFbGen_D(`<strong>${I18N_D.t('trig.correction_title') || 'Correction'}</strong><br>${I18N_D.t('inc.fbgen', {lvar:'q'+X+'_L', moyvar:'q'+X+'_moy', svar:'q'+X+'_s', uavar:'q'+X+'_uA', ubvar:'q'+X+'_uB', ucvar:'q'+X+'_uc', uvar:'q'+X+'_U'}) || ''}`, p.fbGen));
+  var textFrag = HDR + introHtml + propDataHtml + propFormulaHtml + serieHtml + textParts.join('\n');
+  var ecrAnswerHtml = '';
+  if (steps.ecriture) {
+    var ecrLbl = I18N_D.t(p.ecritureFormat === 'encadrement' ? 'inc.ecriture_label_encadrement' : 'inc.ecriture_label') || 'Écriture du résultat :';
+    ecrAnswerHtml = (p.ecritureFormat === 'encadrement')
+      ? `<p><strong>${ecrLbl}</strong> {@q${X}_ecr_attendue@}</p>`
+      : `<p><strong>${ecrLbl}</strong> \\(${symb} = {@q${X}_moy_r@} \\pm {@q${X}_U@}${unitSuffix}\\)</p>`;
+  }
+  var fbGenBody = isPropagation
+    ? `${propFormulaHtml}${I18N_D.t('inc.fbgen_propagation', {moyvar:'q'+X+'_moy', ubvar:'q'+X+'_uB', ucvar:'q'+X+'_uc', uvar:'q'+X+'_U'}) || ''}${ecrAnswerHtml}`
+    : (I18N_D.t('inc.fbgen', {lvar:'q'+X+'_L', moyvar:'q'+X+'_moy', svar:'q'+X+'_s', uavar:'q'+X+'_uA', ubvar:'q'+X+'_uB', ucvar:'q'+X+'_uc', uvar:'q'+X+'_U'}) || '') + ecrAnswerHtml;
+  var generalFeedback = applyFbBox_D('general', mkFbGen_D(`<strong>${correctionTitle || 'Correction'}</strong><br>${fbGenBody}`, p.fbGen));
 
   return {
     type: 'incertitude', bareme, vars, qnote: `${symb}\u0304={@q${X}_moy@}, U={@q${X}_U@}`,

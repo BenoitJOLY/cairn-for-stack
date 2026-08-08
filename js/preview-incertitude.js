@@ -117,10 +117,11 @@ function renderPreviewHTML_incertitude(state) {
   }
 
   // Sonde volontairement fausse mais toujours syntaxiquement valide pour le type
-  // d'input de chaque étape : numérique pour moyenne/s/uA/uB/uc/U (NumRelative/
-  // NumAbsolute), chaîne quelconque pour l'écriture finale (RegExp).
+  // d'input de chaque étape : numérique pour moyenne/s/uA/uB/uc/U/écriture-pm-valeur/
+  // écriture-pm-incertitude (NumRelative/NumAbsolute), chaîne quelconque pour
+  // l'écriture finale encadrement (RegExp) ou l'unité en format pm (StringSloppy).
   function _incBuildWrongProbe(node) {
-    return node.answertest === 'RegExp' ? '__reponse_fausse__' : '-999999';
+    return node.answertest === 'RegExp' || node.answertest === 'StringSloppy' ? '__reponse_fausse__' : '-999999';
   }
 
   async function _incFetchRealFbWrong(xml, seed, realParts) {

@@ -77,20 +77,61 @@ function _incTypeBVars(X, p) {
     if (b.valeur === undefined || b.valeur === '') throw new Error('Type B (valeur imposée) : uB est obligatoire.');
     code = `q${X}_uB:float(${b.valeur});`;
   } else if (source === 'propagation') {
-    // Grandeur calculée (produit/quotient de plusieurs grandeurs déjà connues, ex.
-    // C2=C1*V1/V2) : Y et les Xi sont des littéraux fournis par le prof (jamais
-    // randomisés), donc le calcul reste en Maxima mais avec des nombres en dur,
-    // même logique que la source 'impose'. Exposants toujours ±1 (produit/quotient
-    // simple) : "au dénominateur" coché -> exposant -1.
-    var terms = (b.propTerms || []).filter(function (t) { return t && t.value !== '' && t.value !== undefined && t.incert !== '' && t.incert !== undefined; });
-    if (terms.length < 1) throw new Error('Type B (propagation) : ajoutez au moins un terme (valeur + incertitude).');
-    var yExpr = terms.map(function (t) { return `(${t.value})^${t.denom ? -1 : 1}`; }).join('*');
-    var relExpr = terms.map(function (t) { return `((${t.incert})/(${t.value}))^2`; }).join('+');
-    code = `q${X}_propY:float(${yExpr});\nq${X}_uB:float(q${X}_propY*sqrt(${relExpr}));`;
+    // La source 'propagation' ne passe plus par ce chemin : c'est
+    // _incPropagationVars() qui la génère intégralement (voir plus bas), appelée par
+    // genIncertitudeCore() à la place de _incTypeAVars+_incTypeBVars.
+    throw new Error('Type B : la source "propagation" est gérée par _incPropagationVars, pas par _incTypeBVars.');
   } else {
     throw new Error('Type B : source d’erreur inconnue (' + source + ').');
   }
   return `/* Q${X} Incertitude - Type B (${source}) */\n${code}`;
+}
+
+// ── GRANDEUR COMPOSÉE (propagation par dérivation partielle) ──
+// L'enseignant fournit la formule symbolique de Y (ex. T=2*%pi*sqrt(L/g)) et, pour
+// chaque grandeur intervenant dedans, un symbole + une valeur + une incertitude
+// (littéraux profs, jamais randomisés). u(Y) est obtenue par la loi de propagation
+// des incertitudes générale (GUM) : u(Y)=sqrt(Σ (∂Y/∂Xi)²·u(Xi)²), calculée en Maxima
+// via diff() — précédent déjà établi dans gen-math-calcul.js/gen-acidebase.js, donc
+// pas d'improvisation CAS (Règle 0 DSTU). Les symboles ne sont JAMAIS assignés
+// directement (pas de "L:12") : seulement substitués via ev(...) au moment de
+// l'évaluation, pour que diff() reste valide sur l'expression symbolique.
+// q${X}_moy réutilise le slot "moyenne" du pipeline Type A (= Y0) et q${X}_uA est
+// forcé à 0 pour que q${X}_uc=sqrt(uA²+uB²)=uB=u(Y) sans toucher _incRoundingVars/
+// _incFinalRegex/l'étape "uc" en aval.
+function _incPropagationVars(X, p) {
+  var b = p.typeB || {};
+  var formula = (b.formula || '').trim();
+  if (!formula) throw new Error('Grandeur composée : la formule de Y est obligatoire.');
+  var terms = (b.propTerms || []).filter(function (t) {
+    return t && t.symbole !== '' && t.symbole !== undefined && t.valeur !== '' && t.valeur !== undefined && t.incertitude !== '' && t.incertitude !== undefined;
+  });
+  if (terms.length < 1) throw new Error('Grandeur composée : ajoutez au moins une grandeur (symbole + valeur + incertitude).');
+  var idRe = /^[A-Za-z][A-Za-z0-9_]*$/;
+  var seen = {};
+  terms.forEach(function (t) {
+    if (!idRe.test(t.symbole)) throw new Error('Grandeur composée : "' + t.symbole + '" n’est pas un symbole valide (lettres/chiffres/_, doit commencer par une lettre).');
+    if (seen[t.symbole]) throw new Error('Grandeur composée : le symbole "' + t.symbole + '" est utilisé plusieurs fois.');
+    seen[t.symbole] = true;
+  });
+  var subst = terms.map(function (t) { return `${t.symbole}=${t.valeur}`; }).join(',');
+  var sumSq = terms.map(function (t) {
+    return `ev(diff(q${X}_Yexpr,${t.symbole}),${subst})^2*(${t.incertitude})^2`;
+  }).join('+');
+  // Coefficient d'élasticité (Xi/Y0)·∂Y/∂Xi de chaque grandeur, réutilisé par
+  // gen-incertitude.js pour afficher la formule relative "prête à l'emploi"
+  // (u(Y)/Y=√(Σ(ci·u(Xi)/Xi)²)) sans que l'élève ait à dériver — même
+  // dérivée partielle que sumSq ci-dessus, juste réexprimée en relatif.
+  var pdVars = (b.formulaMode === 'pret')
+    ? '\n' + terms.map(function (t) {
+        return `q${X}_pd_${t.symbole}:float(ev(diff(q${X}_Yexpr,${t.symbole}),${subst})*(${t.valeur})/q${X}_moy);`;
+      }).join('\n')
+    : '';
+  return `/* Q${X} Incertitude - Grandeur composée (propagation par dérivation partielle) */
+q${X}_Yexpr:(${formula});
+q${X}_moy:float(ev(q${X}_Yexpr,${subst}));
+q${X}_uA:0;
+q${X}_uB:float(sqrt(${sumSq}));${pdVars}`;
 }
 
 // ── ARRONDI GUM : composition, élargissement, chiffres significatifs ──
@@ -122,33 +163,41 @@ q${X}_U:float(${roundFn}(q${X}_U_brut/q${X}_scale)*q${X}_scale);
 q${X}_moy_r:float(round(q${X}_moy/q${X}_scale)*q${X}_scale);`;
 }
 
-// ── ÉCRITURE FINALE : formatage décimal exact (sans string() natif, peu fiable
-// sur les zéros terminaux) + regex tolérante construite caractère par caractère
-// (même parade qu'au bug de double-substitution de regexify_nom() dans
-// js/gen-nomenclature.js : jamais de ssubst séquentiel sur les mêmes caractères).
+// ── ÉCRITURE FINALE (format "encadrement" uniquement) : formatage décimal exact
+// (sans string() natif, peu fiable sur les zéros terminaux) + regex tolérante
+// construite caractère par caractère (même parade qu'au bug de double-substitution
+// de regexify_nom() dans js/gen-nomenclature.js : jamais de ssubst séquentiel sur
+// les mêmes caractères). Le format "pm" n'utilise plus cette fonction : suite à un
+// bug regex confirmé 2x en prod, il repose désormais sur 2 champs natifs STACK
+// (units si une unité est définie, sinon NumAbsolute — cf. _ecrPmDefs() dans
+// js/gen-incertitude-steps.js).
 function _incFinalRegex(X, p, deps) {
   deps = deps || {};
   var escFn = deps.escapeMaximaString || (typeof escapeMaximaString === 'function' ? escapeMaximaString : function(s){ return String(s); });
   var unit = ((p.context || {}).unite || '').trim();
+  var symb = ((p.context || {}).symbole || '').trim() || 'x';
   var unitClause = unit ? `sconcat("\\\\s*",inc_esc${X}("${escFn(unit)}"))` : `""`;
   var unitLiteral = unit ? `," ","${escFn(unit)}"` : '';
-  return `/* Q${X} Incertitude - Formatage GUM (d\xe9cimales fixes) + regex "\xe9criture finale" */
-inc_pad${X}(n,width):=block([s],s:sconcat(n),while slength(s)<width do s:sconcat("0",s),s)$
+  var helpers = `inc_pad${X}(n,width):=block([s],s:sconcat(n),while slength(s)<width do s:sconcat("0",s),s)$
 inc_fmt${X}(val,nd):=block([sc,sg,ip,fp],
   sc:round(val*10^nd),sg:if sc<0 then "-" else "",sc:abs(sc),
   ip:floor(sc/10^nd),fp:sc-ip*10^nd,
   if nd=0 then sconcat(sg,ip) else sconcat(sg,ip,".",inc_pad${X}(fp,nd)))$
 inc_esc${X}(s):=block([chars,out,c,sp],chars:charlist(s),out:"",
-  sp:["\\\\",".","^","$","*","+","?","(",")","[","]","{","}","|"],
+  sp:["\\\\",".","^","$","*","+","?","(",")","[","]","{","}","|","/"],
   for c in chars do out:if member(c,sp) then sconcat(out,"\\\\",c) else sconcat(out,c),
   out)$
-q${X}_nd:max(0,-q${X}_exp);
-q${X}_moy_r_s:inc_fmt${X}(q${X}_moy_r,q${X}_nd);
-q${X}_U_s:inc_fmt${X}(q${X}_U,q${X}_nd);
-q${X}_ecr_regex:sconcat("(?i)^\\\\s*",inc_esc${X}(q${X}_moy_r_s),"\\\\s*(\\\\+/-|\\\\+-|\xb1)\\\\s*",inc_esc${X}(q${X}_U_s),${unitClause},"\\\\s*$");
-q${X}_ecr_attendue:sconcat(q${X}_moy_r_s," \xb1 ",q${X}_U_s${unitLiteral});`;
+q${X}_nd:max(0,-q${X}_exp);`;
+  return `/* Q${X} Incertitude - Formatage GUM (d\xe9cimales fixes) + regex "\xe9criture finale" (encadrement) */
+${helpers}
+q${X}_inf_r:q${X}_moy_r-q${X}_U;
+q${X}_sup_r:q${X}_moy_r+q${X}_U;
+q${X}_inf_r_s:inc_fmt${X}(q${X}_inf_r,q${X}_nd);
+q${X}_sup_r_s:inc_fmt${X}(q${X}_sup_r,q${X}_nd);
+q${X}_ecr_regex:sconcat("(?i)^\\\\s*",inc_esc${X}(q${X}_inf_r_s),"\\\\s*<\\\\s*(",inc_esc${X}("${escFn(symb)}"),"\\\\s*<\\\\s*)?",inc_esc${X}(q${X}_sup_r_s),${unitClause},"\\\\s*$");
+q${X}_ecr_attendue:sconcat(q${X}_inf_r_s," < ","${escFn(symb)}"," < ",q${X}_sup_r_s${unitLiteral});`;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { _incTypeAVars: _incTypeAVars, _incTypeBVars: _incTypeBVars, _incRoundingVars: _incRoundingVars, _incFinalRegex: _incFinalRegex };
+  module.exports = { _incTypeAVars: _incTypeAVars, _incTypeBVars: _incTypeBVars, _incPropagationVars: _incPropagationVars, _incRoundingVars: _incRoundingVars, _incFinalRegex: _incFinalRegex };
 }

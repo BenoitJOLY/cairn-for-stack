@@ -1,7 +1,7 @@
-Audit PRT — 2026-08-07T15:38:28.655Z
+Audit PRT — 2026-08-08T15:07:57.183Z
 0 référence(s) de nœud orpheline(s) détectée(s) (import Moodle cassé)
 1 branche(s) morte(s)/inatteignable(s) détectée(s)
-38 branche(s) non terminale(s) avec feedback mort détectée(s), 14 scénario(s) en erreur
+60 branche(s) non terminale(s) avec feedback mort détectée(s), 14 scénario(s) en erreur
 
 === Références de nœud orphelines (truenextnode/falsenextnode sans nœud <name> correspondant) ===
 
@@ -137,8 +137,74 @@ Audit PRT — 2026-08-07T15:38:28.655Z
 [Tableau d'avancement / follow_from] nœud 2, branche false non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
   feedback mort : av.fb_fin_false<p style="font-size:.85em;color:#6b7280;margin-top:.4em;">ℹ️ av.follow_note</p>
 
+[Nomenclature chimique / fixe] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_famille_ok</p>
+
+[Nomenclature chimique / fixe] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_famille_ko</p>
+
+[Nomenclature chimique / fixe] nœud 1, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_longueur_ok</p>
+
+[Nomenclature chimique / fixe] nœud 1, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_longueur_ko</p>
+
+[Nomenclature chimique / fixe] nœud 2, branche true non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_subs_ok</p>
+
+[Nomenclature chimique / fixe] nœud 2, branche false non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_subs_ko</p>
+
+[Nomenclature chimique / fixe] nœud 3, branche true non terminale (→ nœud 4) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_numero_ok</p>
+
+[Nomenclature chimique / fixe] nœud 3, branche false non terminale (→ nœud 4) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_numero_ko</p>
+
 [Nomenclature chimique / aleatoire] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
-  feedback mort : <p>nom.fb_nom_ok</p>
+  feedback mort : <p>nom.crit_longueur_ok</p>
 
 [Nomenclature chimique / aleatoire] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
-  feedback mort : <p>nom.fb_nom_ko:{"nom":"{@nomX@}"}</p>
+  feedback mort : <p>nom.crit_longueur_ko</p>
+
+[Nomenclature chimique / aleatoire] nœud 1, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_subs_ok</p>
+
+[Nomenclature chimique / aleatoire] nœud 1, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_subs_ko</p>
+
+[Nomenclature chimique / aleatoire] nœud 2, branche true non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_numero_ok</p>
+
+[Nomenclature chimique / aleatoire] nœud 2, branche false non terminale (→ nœud 3) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_numero_ko</p>
+
+[Nomenclature chimique / aleatoire] nœud 3, branche true non terminale (→ nœud 4) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_ordre_ok</p>
+
+[Nomenclature chimique / aleatoire] nœud 3, branche false non terminale (→ nœud 4) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_ordre_ko</p>
+
+[Nomenclature chimique / aleatoire] nœud 4, branche true non terminale (→ nœud 5) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_alkyle_ok</p>
+
+[Nomenclature chimique / aleatoire] nœud 4, branche false non terminale (→ nœud 5) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <p>nom.crit_alkyle_ko</p>
+
+[Incertitude (mesure GUM) / ecriture seule (pm + unité)] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <strong>inc.fb_ecr_valeur_ok</strong>
+
+[Incertitude (mesure GUM) / ecriture seule (pm + unité)] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : inc.fb_ecr_valeur_wrong:{"tavar":"qX_moy_r"}
+
+[Incertitude (mesure GUM) / ecriture seule (pm + unité)] nœud 1, branche true non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <strong>inc.fb_ecr_incertitude_ok</strong>
+
+[Incertitude (mesure GUM) / ecriture seule (pm + unité)] nœud 1, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : inc.fb_ecr_incertitude_wrong:{"tavar":"qX_U"}
+
+[Incertitude (mesure GUM) / ecriture seule (pm sans unité)] nœud 0, branche true non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : <strong>inc.fb_ecr_valeur_ok</strong>
+
+[Incertitude (mesure GUM) / ecriture seule (pm sans unité)] nœud 0, branche false non terminale (→ nœud 1) mais porte un feedback (jamais affiché à l'élève)
+  feedback mort : inc.fb_ecr_valeur_wrong:{"tavar":"qX_moy_r"}
