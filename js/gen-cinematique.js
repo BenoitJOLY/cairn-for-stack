@@ -221,12 +221,12 @@ function genCinematiqueCore(X, p, deps){
   });
 
   var kbdRaw = phase1JSX
-    + '\n<div style="display: none;" aria-hidden="true" tabindex="-1">[[input:ans_vec1_x'+X+']] [[input:ans_vec1_y'+X+']] [[input:ans_vec2_x'+X+']] [[input:ans_vec2_y'+X+']]</div>\n'
+    + '\n<div style="display: none;" aria-hidden="true" tabindex="-1">[[input:ans_vec1_x'+X+']] [[validation:ans_vec1_x'+X+']] [[input:ans_vec1_y'+X+']] [[validation:ans_vec1_y'+X+']] [[input:ans_vec2_x'+X+']] [[validation:ans_vec2_x'+X+']] [[input:ans_vec2_y'+X+']] [[validation:ans_vec2_y'+X+']]</div>\n'
     + '<p><strong>v<sub>' + iIdx + '</sub> = </strong> [[input:ans_vi'+X+']] m/s [[validation:ans_vi'+X+']] '
     + '&nbsp;&nbsp;<strong>v<sub>' + (iIdx+1) + '</sub> = </strong> [[input:ans_vip1'+X+']] m/s [[validation:ans_vip1'+X+']]</p>\n'
     + '<p><strong>' + I18N_D.t('cin.step2_title', {i: iIdx}) + '</strong></p>'
     + '<p>' + I18N_D.t('cin.step2_instruction', {i: iIdx, ip1: (iIdx+1)}) + '</p>\n'
-    + '<div style="display: none;" aria-hidden="true" tabindex="-1">[[input:ans_dv_x'+X+']] [[input:ans_dv_y'+X+']]</div>\n'
+    + '<div style="display: none;" aria-hidden="true" tabindex="-1">[[input:ans_dv_x'+X+']] [[validation:ans_dv_x'+X+']] [[input:ans_dv_y'+X+']] [[validation:ans_dv_y'+X+']]</div>\n'
     + phase2JSX;
 
   var textFrag = header

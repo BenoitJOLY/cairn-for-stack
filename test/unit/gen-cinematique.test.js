@@ -163,10 +163,10 @@ test('cas nominal : textFrag contient le marqueur kbdRaw, kbdRaw contient les 2 
     assert.match(parts.kbdRaw, /input-ref-ans_dv_y4="refDvY4"/);
     assert.match(parts.kbdRaw, /input-ref-ans_vi4="refVi4"/);
     assert.match(parts.kbdRaw, /input-ref-ans_vip14="refVip14"/);
-    // Inputs cachés vec1/vec2 (Phase 1) wrappés display:none + aria-hidden (DSTU 5.5)
-    assert.match(parts.kbdRaw, /<div style="display: none;" aria-hidden="true" tabindex="-1">\[\[input:ans_vec1_x4\]\] \[\[input:ans_vec1_y4\]\] \[\[input:ans_vec2_x4\]\] \[\[input:ans_vec2_y4\]\]<\/div>/);
-    // Inputs cachés (Phase 2, ans_dv_x/y) wrappés display:none + aria-hidden (DSTU 5.5)
-    assert.match(parts.kbdRaw, /<div style="display: none;" aria-hidden="true" tabindex="-1">\[\[input:ans_dv_x4\]\] \[\[input:ans_dv_y4\]\]<\/div>/);
+    // Inputs cachés vec1/vec2 (Phase 1) wrappés display:none + aria-hidden (DSTU 5.5), avec token [[validation:]] requis par STACK
+    assert.match(parts.kbdRaw, /<div style="display: none;" aria-hidden="true" tabindex="-1">\[\[input:ans_vec1_x4\]\] \[\[validation:ans_vec1_x4\]\] \[\[input:ans_vec1_y4\]\] \[\[validation:ans_vec1_y4\]\] \[\[input:ans_vec2_x4\]\] \[\[validation:ans_vec2_x4\]\] \[\[input:ans_vec2_y4\]\] \[\[validation:ans_vec2_y4\]\]<\/div>/);
+    // Inputs cachés (Phase 2, ans_dv_x/y) wrappés display:none + aria-hidden (DSTU 5.5), avec token [[validation:]] requis par STACK
+    assert.match(parts.kbdRaw, /<div style="display: none;" aria-hidden="true" tabindex="-1">\[\[input:ans_dv_x4\]\] \[\[validation:ans_dv_x4\]\] \[\[input:ans_dv_y4\]\] \[\[validation:ans_dv_y4\]\]<\/div>/);
 });
 
 test('cas nominal : vars Maxima contiennent iIdx, Mlist, vec1/vec2, vi, vip1, dv, tolérances et kv, toutes terminées par $', () => {
