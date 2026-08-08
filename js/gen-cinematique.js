@@ -175,7 +175,7 @@ function genCinematiqueCore(X, p, deps){
     + 'tol_dv_'+X+': 0.20$\n'
     + 'kv_'+X+': ' + _cinFmt(d.kv) + '$\n';
 
-  var header = _cinHeader(X, bareme, I18N_D.t('cin.header_title'), {bg:'#1e1b4b', accent:'#4f46e5'}, '🏹', I18N_D.t('palette.cat.physchim'));
+  var header = _cinHeader(X, bareme, I18N_D.t('cin.header_title'), {bg:'#1e1b4b', accent:'#4f46e5'}, '🏹', I18N_D.t('palette.cat.physique'));
 
   var phase1JSX = buildCinJSX_Phase1_D({
     width: '620px', height: '460px',

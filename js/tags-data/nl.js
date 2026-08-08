@@ -606,15 +606,8 @@ registerCountryTags('nl', 'Nederland', {
       ]
     }
   },
-  "Natuurkunde_Scheikunde": {
+  "Natuurkunde": {
     "Onderbouw": {
-      "Scheikunde": [
-        "Atomen_Ionen",
-        "Moleculen",
-        "Stofhoeveelheid",
-        "Dichtheid",
-        "Concentraties"
-      ],
       "Natuurkunde": [
         "Snelheid_Krachten",
         "Tragheid_Zwaartekracht",
@@ -626,12 +619,6 @@ registerCountryTags('nl', 'Nederland', {
       ]
     },
     "Bovenbouw_1": {
-      "Scheikunde": [
-        "Organische_Chemie_Synthese",
-        "Naamgeving_Functionele_Groepen",
-        "Redoxreacties",
-        "Titratie_Spectroscopie"
-      ],
       "Natuurkunde": [
         "Elektrisch_Veld",
         "Mechanische_Energie",
@@ -642,12 +629,6 @@ registerCountryTags('nl', 'Nederland', {
       ]
     },
     "Examenjaar": {
-      "Scheikunde": [
-        "Reactiesnelheid",
-        "Chemisch_Evenwicht",
-        "Zuren_Basen_pH",
-        "Beer_Lambert_Wet"
-      ],
       "Natuurkunde": [
         "Wetten_van_Newton",
         "Kepler_Planetenbeweging",
@@ -662,6 +643,42 @@ registerCountryTags('nl', 'Nederland', {
         "Interferentie_Diffractie",
         "Doppler_Effect",
         "Optica_Lenzen"
+      ],
+      "Nog_Te_Bepalen": [
+        "Nog_Te_Bepalen"
+      ]
+    }
+  },
+  "Scheikunde": {
+    "Onderbouw": {
+      "Scheikunde": [
+        "Atomen_Ionen",
+        "Moleculen",
+        "Stofhoeveelheid",
+        "Dichtheid",
+        "Concentraties"
+      ],
+      "Nog_Te_Bepalen": [
+        "Nog_Te_Bepalen"
+      ]
+    },
+    "Bovenbouw_1": {
+      "Scheikunde": [
+        "Organische_Chemie_Synthese",
+        "Naamgeving_Functionele_Groepen",
+        "Redoxreacties",
+        "Titratie_Spectroscopie"
+      ],
+      "Nog_Te_Bepalen": [
+        "Nog_Te_Bepalen"
+      ]
+    },
+    "Examenjaar": {
+      "Scheikunde": [
+        "Reactiesnelheid",
+        "Chemisch_Evenwicht",
+        "Zuren_Basen_pH",
+        "Beer_Lambert_Wet"
       ],
       "Nog_Te_Bepalen": [
         "Nog_Te_Bepalen"

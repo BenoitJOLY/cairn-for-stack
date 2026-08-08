@@ -99,20 +99,23 @@ NSI	Term	A_Definir	A_Definir
 Philosophie	Term	Notions	Le_Sujet, La_Conscience, Le_Temps, La_Nature, La_Culture, Le_Langage, La_Technique, La_Raison_Le_Reel, La_Verite, La_Liberte, Le_Devoir, Le_Bonheur, La_Justice, Letat, La_Religion, Lart
 Philosophie	Term	Methodes	Explication_Texte, Dissertation
 Philosophie	Term	A_Definir	A_Definir
-Physique-Chimie	2nde	Chimie	Atomes, Ions, Molecules, Quantite_Matiere, Masse_Volumique, Concentrations
-Physique-Chimie	2nde	Mecanique	Vitesse, Forces, Inertie, Gravitation
-Physique-Chimie	2nde	Ondes_Signaux	Son, Lumiere, Refraction, Lentilles, Spectres
-Physique-Chimie	2nde	Electricite	Tension, Intensite, Resistances
-Physique-Chimie	2nde	A_Definir	A_Definir
-Physique-Chimie	1ère	Chimie_Orga	Synthese, Nomenclature, Groupes_Caracteristiques
-Physique-Chimie	1ère	Chimie_Physique	Oxydoreduction, Titrage, Spectroscopie
-Physique-Chimie	1ère	Physique	Champ_Electrique, Energie_Mecanique, Photons
-Physique-Chimie	1ère	A_Definir	A_Definir
-Physique-Chimie	Term	Chimie	Cinetique_Chimique, Equilibre_Chimique, Acido_Basicite, Force_Des_Acides, Loi_De_Beer_Lambert
-Physique-Chimie	Term	Mecanique	Lois_De_Newton, Kepler, Fluides, Systemes_Oscillants
-Physique-Chimie	Term	Thermodynamique	Transferts_Thermiques, Energie_Interne
-Physique-Chimie	Term	Ondes_Physique	Interferences, Diffraction, Effet_Doppler, Lunette_Astronomique
-Physique-Chimie	Term	A_Definir	A_Definir
+Physique	2nde	Mecanique	Vitesse, Forces, Inertie, Gravitation
+Physique	2nde	Ondes_Signaux	Son, Lumiere, Refraction, Lentilles, Spectres
+Physique	2nde	Electricite	Tension, Intensite, Resistances
+Physique	2nde	A_Definir	A_Definir
+Physique	1ère	Physique	Champ_Electrique, Energie_Mecanique, Photons
+Physique	1ère	A_Definir	A_Definir
+Physique	Term	Mecanique	Lois_De_Newton, Kepler, Fluides, Systemes_Oscillants
+Physique	Term	Thermodynamique	Transferts_Thermiques, Energie_Interne
+Physique	Term	Ondes_Physique	Interferences, Diffraction, Effet_Doppler, Lunette_Astronomique
+Physique	Term	A_Definir	A_Definir
+Chimie	2nde	Chimie	Atomes, Ions, Molecules, Quantite_Matiere, Masse_Volumique, Concentrations
+Chimie	2nde	A_Definir	A_Definir
+Chimie	1ère	Chimie_Orga	Synthese, Nomenclature, Groupes_Caracteristiques
+Chimie	1ère	Chimie_Physique	Oxydoreduction, Titrage, Spectroscopie
+Chimie	1ère	A_Definir	A_Definir
+Chimie	Term	Chimie	Cinetique_Chimique, Equilibre_Chimique, Acido_Basicite, Force_Des_Acides, Loi_De_Beer_Lambert
+Chimie	Term	A_Definir	A_Definir
 S2TMD	1ère	Themes	Culture_Musicale_Choregraphique, Techniques_Pratiques, Economie_Droit
 S2TMD	1ère	A_Definir	A_Definir
 S2TMD	Term	Themes	Culture_Musicale_Choregraphique, Techniques_Pratiques, Economie_Droit

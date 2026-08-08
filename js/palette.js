@@ -73,7 +73,9 @@ var PALETTE_TYPES = [
 var PALETTE_CATEGORIES = [
   {id:'choix',       label:'Choix multiples',       types:['checkbox','radio','dropdown','vf']},
   {id:'numerique',   label:'Mathématiques',   types:['numerical','algebraic','complexe','calcul','statistiques','matrices','geometrie','suites','probabilites','trigonometrie','polynomes','limites','inequation','equivalence','geogebra']},
-  {id:'physchim',    label:'Physique-Chimie',        types:['units','doi','chemical','chemical_topo','nuclear','optique','acide-base','redox','circuit','physique','oscilloscope','diffraction','rvbcmj','apn','nomenclature','incertitude','zscore','avancement','cinematique']},
+  {id:'physique',    label:'Physique',               types:['doi','nuclear','optique','circuit','physique','oscilloscope','diffraction','rvbcmj','apn','cinematique']},
+  {id:'chimie',      label:'Chimie',                 types:['chemical','chemical_topo','acide-base','redox','nomenclature','avancement']},
+  {id:'sciences',    label:'Sciences (Général)',     types:['units','incertitude','zscore']},
   {id:'info',        label:'Informatique',           types:['basen','logique']},
   {id:'textuelle',   label:'Réponse textuelle',      types:['string','composition']},
   {id:'organisation',label:'Organisation',           types:['match','crossword','ord']},

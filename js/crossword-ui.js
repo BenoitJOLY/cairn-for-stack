@@ -266,7 +266,7 @@ function openCWPromptModal() {
   // Réinitialiser les valeurs par défaut
   document.getElementById('cw-pb-theme').value = '';
   document.getElementById('cw-pb-count').value = 15;
-  document.getElementById('cw-pb-matter').value = 'Physique-Chimie';
+  document.getElementById('cw-pb-matter').value = 'Physique';
   document.getElementById('cw-pb-level').value = '2nde';
   { const e=document.getElementById('cw-pb-sous'); if(e) e.value=''; }
   { const e=document.getElementById('cw-pb-chap'); if(e) e.value=''; }
@@ -309,8 +309,8 @@ function initCWSubjectUI() {
         matterContainer.appendChild(btn);
     });
 
-    // 2. Générer les boutons NIVEAU (initialisés avec Physique-Chimie par défaut)
-    updateCWLevelButtons('Physique-Chimie');
+    // 2. Générer les boutons NIVEAU (initialisés avec Physique par défaut)
+    updateCWLevelButtons('Physique');
     // 3. Générer les boutons SOUS-MATIÈRE pour le couple matière/niveau par défaut
     updateCWSousButtons();
 }
@@ -527,7 +527,7 @@ function openMatchPrompt() {
   const langCust = document.getElementById('match-pb-lang-custom');
 
   if(subInp) subInp.value = '';
-  if(matInp) matInp.value = 'Physique-Chimie';
+  if(matInp) matInp.value = 'Physique';
   if(lvlInp) lvlInp.value = '2nde';
   { const e=document.getElementById('match-pb-sous'); if(e) e.value=''; }
   { const e=document.getElementById('match-pb-chap'); if(e) e.value=''; }
@@ -566,7 +566,7 @@ function updateMatchPrompt() {
     if(!subInp || !resInp) return;
 
     const subject = subInp.value.trim() || "[INSÉRER LE SUJET ICI]";
-    const matter = matInp ? matInp.value.trim() : "Physique-Chimie";
+    const matter = matInp ? matInp.value.trim() : "Physique";
     const level = lvlInp ? lvlInp.value.trim() : "2nde";
     const sous = (document.getElementById('match-pb-sous')?.value || '').trim();
     const chap = (document.getElementById('match-pb-chap')?.value || '').trim();

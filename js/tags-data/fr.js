@@ -604,16 +604,8 @@ registerCountryTags('fr', 'France', {
       ]
     }
   },
-  "Physique-Chimie": {
+  "Physique": {
     "2nde": {
-      "Chimie": [
-        "Atomes",
-        "Ions",
-        "Molecules",
-        "Quantite_Matiere",
-        "Masse_Volumique",
-        "Concentrations"
-      ],
       "Mecanique": [
         "Vitesse",
         "Forces",
@@ -637,16 +629,6 @@ registerCountryTags('fr', 'France', {
       ]
     },
     "1ere": {
-      "Chimie_Orga": [
-        "Synthese",
-        "Nomenclature",
-        "Groupes_Caracteristiques"
-      ],
-      "Chimie_Physique": [
-        "Oxydoreduction",
-        "Titrage",
-        "Spectroscopie"
-      ],
       "Physique": [
         "Champ_Electrique",
         "Energie_Mecanique",
@@ -657,13 +639,6 @@ registerCountryTags('fr', 'France', {
       ]
     },
     "Term": {
-      "Chimie": [
-        "Cinetique_Chimique",
-        "Equilibre_Chimique",
-        "Acido_Basicite",
-        "Force_Des_Acides",
-        "Loi_De_Beer_Lambert"
-      ],
       "Mecanique": [
         "Lois_De_Newton",
         "Kepler",
@@ -679,6 +654,48 @@ registerCountryTags('fr', 'France', {
         "Diffraction",
         "Effet_Doppler",
         "Lunette_Astronomique"
+      ],
+      "A_Definir": [
+        "A_Definir"
+      ]
+    }
+  },
+  "Chimie": {
+    "2nde": {
+      "Chimie": [
+        "Atomes",
+        "Ions",
+        "Molecules",
+        "Quantite_Matiere",
+        "Masse_Volumique",
+        "Concentrations"
+      ],
+      "A_Definir": [
+        "A_Definir"
+      ]
+    },
+    "1ere": {
+      "Chimie_Orga": [
+        "Synthese",
+        "Nomenclature",
+        "Groupes_Caracteristiques"
+      ],
+      "Chimie_Physique": [
+        "Oxydoreduction",
+        "Titrage",
+        "Spectroscopie"
+      ],
+      "A_Definir": [
+        "A_Definir"
+      ]
+    },
+    "Term": {
+      "Chimie": [
+        "Cinetique_Chimique",
+        "Equilibre_Chimique",
+        "Acido_Basicite",
+        "Force_Des_Acides",
+        "Loi_De_Beer_Lambert"
       ],
       "A_Definir": [
         "A_Definir"

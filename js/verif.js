@@ -436,7 +436,7 @@ function initMatchPromptUI() {
         btn.onclick = () => selectMatchMatter(mat, btn);
         matterContainer.appendChild(btn);
     });
-    updateMatchLevelButtons('Physique-Chimie');
+    updateMatchLevelButtons('Physique');
     updateMatchSousButtons();
 }
 
