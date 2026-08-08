@@ -220,8 +220,11 @@ function expRenderPreview(){
   expertCaptureToState(_activeQid);
   var s=q._expertState;
   var env=expSimulateMaxima(s.vars||'');
+  var real = (typeof window!=='undefined') ? window._expLastRealPreview : null;
 
-  /* Afficher les variables simulées */
+  /* Afficher les variables simulées (indicatif — approximation JS locale,
+     même en aperçu réel : STACK ne renvoie pas de dictionnaire de variables
+     via /render, seul le texte déjà substitué est disponible) */
   var varsEl=document.getElementById('exp-preview-vars');
   if(varsEl){
     varsEl.innerHTML=Object.keys(env).map(function(k){
@@ -229,14 +232,30 @@ function expRenderPreview(){
     }).join('');
   }
 
-  /* Énoncé */
+  var badgeEl=document.getElementById('exp-preview-badge');
+  if(badgeEl){
+    if(real && real.bodyHTML){
+      badgeEl.textContent='🟢 '+I18N.t('common.preview_real_badge');
+      badgeEl.style.background='#ecfdf5'; badgeEl.style.color='#047857';
+    } else {
+      badgeEl.textContent='🎲 '+I18N.t('common.preview_sim_badge');
+      badgeEl.style.background='#f1f5f9'; badgeEl.style.color='#475569';
+    }
+  }
+
+  /* Énoncé — rendu réel (Maxima) si disponible, sinon simulation JS locale */
   var contentEl=document.getElementById('exp-preview-content');
   if(contentEl){
-    contentEl.innerHTML=_expReplaceStackTags(expGetQtextValue()||'<em>(vide)</em>', env);
+    contentEl.innerHTML = (real && real.bodyHTML)
+      ? real.bodyHTML
+      : _expReplaceStackTags(expGetQtextValue()||'<em>(vide)</em>', env);
     _expKatexRender(contentEl);
   }
 
-  /* Feedback général */
+  /* Feedback général — toujours simulé localement : contenu librement rédigé
+     par l'enseignant, non réductible à "la solution attendue" (contrairement
+     aux autres types, STACK ne renvoie aucun <generalfeedback> rendu via
+     /render ou /grade pour ce cas). */
   var gfbEl=document.getElementById('exp-preview-gfb');
   if(gfbEl){
     var gfbHtml=applyFbBox('general', expGetGfbValue()||'')||'<em>(vide)</em>';
@@ -244,94 +263,44 @@ function expRenderPreview(){
     _expKatexRender(gfbEl);
   }
 
-  /* Feedbacks vrai/faux de chaque nœud PRT */
+  /* Feedbacks de chaque PRT — feedback réel du chemin "réponse correcte"
+     (via /grade) quand disponible, sinon repli sur les feedbacks vrai/faux
+     simulés de chaque nœud */
   var prtEl=document.getElementById('exp-preview-prt');
   if(prtEl){
     var rows=[];
     (s.prts||[]).forEach(function(prt){
-      (prt.nodes||[]).forEach(function(n){
-        if(n.truefeedback)  rows.push(applyFbBox(inferFbKind(n,'true'),  n.truefeedback));
-        if(n.falsefeedback) rows.push(applyFbBox(inferFbKind(n,'false'), n.falsefeedback));
-      });
+      if(real && real.prtByName && real.prtByName[prt.name]){
+        rows.push({html:real.prtByName[prt.name], real:true});
+      } else {
+        (prt.nodes||[]).forEach(function(n){
+          if(n.truefeedback)  rows.push({html:applyFbBox(inferFbKind(n,'true'),  n.truefeedback), real:false});
+          if(n.falsefeedback) rows.push({html:applyFbBox(inferFbKind(n,'false'), n.falsefeedback), real:false});
+        });
+      }
     });
-    prtEl.innerHTML=rows.length ? rows.map(function(h){ return _expReplaceStackTags(h, env); }).join('') : '<em>(vide)</em>';
+    prtEl.innerHTML = rows.length
+      ? rows.map(function(r){ return r.real ? r.html : _expReplaceStackTags(r.html, env); }).join('')
+      : '<em>(vide)</em>';
     _expKatexRender(prtEl);
   }
 }
 
-/* ════════════════════════════════════════════════════════════════════
-   ATTRIBUTS — get/set
-   ════════════════════════════════════════════════════════════════════ */
-
-function expertInitAttrs(attrs){
-  attrs=attrs||{};
-  var _sa=function(id,v){ var el=document.getElementById(id); if(el) el.value=v||''; };
-  _sa('exp-attr-niveau',  attrs.niveau||'');
-  _sa('exp-attr-theme',   attrs.theme||'');
-  _sa('exp-attr-diff',    attrs.difficulte||'');
-  _sa('exp-attr-objectif',attrs.objectif||'');
-  _sa('exp-attr-tags',    attrs.tags||'');
-  _sa('exp-attr-author',  attrs.author||'');
-  setTimeout(expAutoGrowAll,20);
-}
-
-function expertCaptureAttrs(){
-  var _ga=function(id){ var el=document.getElementById(id); return el?el.value:''; };
-  return {
-    niveau:     _ga('exp-attr-niveau'),
-    theme:      _ga('exp-attr-theme'),
-    difficulte: _ga('exp-attr-diff'),
-    objectif:   _ga('exp-attr-objectif'),
-    tags:       _ga('exp-attr-tags'),
-    author:     _ga('exp-attr-author')
-  };
-}
-
-/* ════════════════════════════════════════════════════════════════════
-   EXPORT / IMPORT JSON
-   ════════════════════════════════════════════════════════════════════ */
-
-function expExportJson(){
-  var q=questions[_activeQid]; if(!q||!q._expertState) return;
-  expertCaptureToState(_activeQid);
-  var s=q._expertState;
-  s.attributes=expertCaptureAttrs();
-  var json=JSON.stringify(s,null,2);
-  var blob=new Blob([json],{type:'application/json'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=(s.name||'question-expert').replace(/[^a-zA-Z0-9_-]/g,'_')+'.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast(I18N.t('exp.toast_json_exported',{name:a.download}));
-}
-
-function expImportJson(input){
-  var file=input.files[0]; if(!file) return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var state=JSON.parse(e.target.result);
-      if(!state.inputs||!state.prts) throw new Error(I18N.t('exp.err_import_invalid_format'));
-      var q=questions[_activeQid];
-      if(!q) questions[_activeQid]=q={id:_activeQid,type:'expert'};
-      q._expertState=state;
-      expertInit(_activeQid);
-      expertInitAttrs(state.attributes||{});
-      toast(I18N.t('exp.toast_json_imported',{name:file.name}));
-    }catch(err){
-      toast(I18N.t('exp.toast_json_error',{msg:err.message}));
-    }
-    input.value='';
-  };
-  reader.readAsText(file);
-}
-
-/* ── JSXGraph dans les zones riches expert ──────────────────────── */
+/* ── JSXGraph / Géo2D / Géo3D dans les zones riches expert ───────── */
 function expOpenJsx(zoneId){
   /* Pointer _verifZoneActive sur la zone contenteditable ciblée */
   _verifZoneActive = document.getElementById(zoneId);
   if(typeof openJsxGraphModal==='function') openJsxGraphModal();
+}
+
+function expOpenGeo2d(zoneId){
+  _verifZoneActive = document.getElementById(zoneId);
+  if(typeof openGeo2dModal==='function') openGeo2dModal();
+}
+
+function expOpenGeo3d(zoneId){
+  _verifZoneActive = document.getElementById(zoneId);
+  if(typeof openGeo3dModal==='function') openGeo3dModal();
 }
 
 /* ── Auto-grow textarea ─────────────────────────────────────────── */
@@ -408,7 +377,13 @@ function expertInitQtextRich(html){
     /* Insérer le bouton JSXGraph + Code juste avant le dernier </div> de la toolbar */
     tbHtml = tbHtml.replace(/<\/div>\s*$/, function(m){
       return '<div class="rtb-sep"></div>'
+        + '<button class="rtb" onclick="verifExecR(\'exp-qtext-rich\',\'formatBlock\',\'<h3>\')" title="'+_ee(I18N.t('rtb.h3'))+'">H3</button>'
+        + '<button class="rtb" onclick="verifExecR(\'exp-qtext-rich\',\'formatBlock\',\'<h4>\')" title="'+_ee(I18N.t('rtb.h4'))+'">H4</button>'
+        + '<button class="rtb" onclick="verifExecR(\'exp-qtext-rich\',\'formatBlock\',\'<h5>\')" title="'+_ee(I18N.t('rtb.h5'))+'">H5</button>'
+        + '<div class="rtb-sep"></div>'
         + '<button class="rtb rtb-jxg" onclick="expOpenJsx(\'exp-qtext-rich\')" title="'+_ee(I18N.t('exp.jsx_insert_title'))+'">📊 JSXGraph</button>'
+        + '<button class="rtb rtb-geo2d" onclick="expOpenGeo2d(\'exp-qtext-rich\')" title="'+_ee(I18N.t('rtb.geo2d'))+'">'+I18N.t('rtb.geo2d_label')+'</button>'
+        + '<button class="rtb rtb-geo3d" onclick="expOpenGeo3d(\'exp-qtext-rich\')" title="'+_ee(I18N.t('rtb.geo3d'))+'">'+I18N.t('rtb.geo3d_label')+'</button>'
         + '<div class="rtb-sep"></div>'
         + '<button class="rtb" id="exp-code-btn" onclick="expToggleQtextCode()" title="'+_ee(I18N.t('exp.toggle_code_title'))+'">'
         + '&#x3C;/&#x3E; '+I18N.t('exp.code_btn')+'</button>' + m;
@@ -473,7 +448,13 @@ function expertInitGfbRich(html){
       : '<div class="rich-toolbar"></div>';
     tbHtml = tbHtml.replace(/<\/div>\s*$/, function(m){
       return '<div class="rtb-sep"></div>'
+        + '<button class="rtb" onclick="verifExecR(\'exp-gfb-rich\',\'formatBlock\',\'<h3>\')" title="'+_ee(I18N.t('rtb.h3'))+'">H3</button>'
+        + '<button class="rtb" onclick="verifExecR(\'exp-gfb-rich\',\'formatBlock\',\'<h4>\')" title="'+_ee(I18N.t('rtb.h4'))+'">H4</button>'
+        + '<button class="rtb" onclick="verifExecR(\'exp-gfb-rich\',\'formatBlock\',\'<h5>\')" title="'+_ee(I18N.t('rtb.h5'))+'">H5</button>'
+        + '<div class="rtb-sep"></div>'
         + '<button class="rtb rtb-jxg" onclick="expOpenJsx(\'exp-gfb-rich\')" title="'+_ee(I18N.t('exp.jsx_insert_title'))+'">📊 JSXGraph</button>'
+        + '<button class="rtb rtb-geo2d" onclick="expOpenGeo2d(\'exp-gfb-rich\')" title="'+_ee(I18N.t('rtb.geo2d'))+'">'+I18N.t('rtb.geo2d_label')+'</button>'
+        + '<button class="rtb rtb-geo3d" onclick="expOpenGeo3d(\'exp-gfb-rich\')" title="'+_ee(I18N.t('rtb.geo3d'))+'">'+I18N.t('rtb.geo3d_label')+'</button>'
         + '<div class="rtb-sep"></div>'
         + '<button class="rtb" id="exp-gfb-code-btn" onclick="expToggleGfbCode()" title="'+_ee(I18N.t('exp.toggle_code_title'))+'">'
         + '&#x3C;/&#x3E; '+I18N.t('exp.code_btn')+'</button>' + m;
@@ -540,9 +521,7 @@ function expertInit(qid){
   }
   var s=q._expertState;
 
-  _sv('exp-name',   s.name||'');
   _sv('exp-bareme', s.bareme||1);
-  _sv('exp-penalty',s.penalty||0);
   _sv('exp-qnote',  s.questionnote||'');
   _sv('exp-vars',   s.vars||'');
 
@@ -550,7 +529,6 @@ function expertInit(qid){
   expertInitGfbRich(s.generalfeedback||'');
   expertRenderInputs(s.inputs||[]);
   expertRenderPrts(qid, s.prts||[]);
-  expertInitAttrs(s.attributes||{});
   expertShowTab('meta');
   /* Auto-size les textareas déjà remplies */
   setTimeout(expAutoGrowAll, 20);
@@ -560,14 +538,11 @@ function expertInit(qid){
 function expertCaptureToState(qid){
   var q=questions[qid||_activeQid]; if(!q||!q._expertState) return;
   var s=q._expertState;
-  s.name          = _gv('exp-name');
   s.bareme        = parseFloat(_gv('exp-bareme'))||1;
-  s.penalty       = parseFloat(_gv('exp-penalty'))||0;
   s.questionnote  = _gv('exp-qnote');
   s.vars          = _gv('exp-vars');
   s.questiontext    = expGetQtextValue();
   s.generalfeedback = expGetGfbValue();
-  s.attributes      = expertCaptureAttrs();
 }
 
 /* ── captureState hook (called by config-panel.js) ──────────────── */
@@ -610,25 +585,25 @@ function expertInputCard(inp,i){
 
       /* ── Ligne 1 : identité */
       +'<div class="exp-row3">'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_name_lbl')+'</label>'
-          +'<input class="hs-input exp-mono" value="'+_ee(inp.name)+'" '
+        +'<div><label class="cfg-lbl" for="exp-inp-name-'+i+'">'+I18N.t('exp.input_name_lbl')+'</label>'
+          +'<input id="exp-inp-name-'+i+'" class="hs-input exp-mono" value="'+_ee(inp.name)+'" '
           +'onchange="expertUpdateInput('+i+',\'name\',this.value);document.querySelector(\'#exp-inp-'+i+' code\').textContent=this.value"></div>'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_type_lbl')+'</label>'
-          +'<select class="hs-input" onchange="expertUpdateInput('+i+',\'type\',this.value)">'+typeOpts+'</select></div>'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_tans_lbl')+'</label>'
-          +'<input class="hs-input exp-mono" value="'+_ee(inp.tans)+'" onchange="expertUpdateInput('+i+',\'tans\',this.value)"></div>'
+        +'<div><label class="cfg-lbl" for="exp-inp-type-'+i+'">'+I18N.t('exp.input_type_lbl')+'</label>'
+          +'<select id="exp-inp-type-'+i+'" class="hs-input" onchange="expertUpdateInput('+i+',\'type\',this.value)">'+typeOpts+'</select></div>'
+        +'<div><label class="cfg-lbl" for="exp-inp-tans-'+i+'">'+I18N.t('exp.input_tans_lbl')+'</label>'
+          +'<input id="exp-inp-tans-'+i+'" class="hs-input exp-mono" value="'+_ee(inp.tans)+'" onchange="expertUpdateInput('+i+',\'tans\',this.value)"></div>'
       +'</div>'
 
       /* ── Ligne 2 : champ et syntaxe */
       +'<div class="exp-row4">'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_boxsize_lbl')+'</label>'
-          +'<input type="number" class="hs-input" min="1" max="80" value="'+(inp.boxsize||15)+'" onchange="expertUpdateInput('+i+',\'boxsize\',+this.value)"></div>'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_syntaxhint_lbl')+'</label>'
-          +'<input class="hs-input exp-mono" value="'+_ee(inp.syntaxhint||'')+'" placeholder="'+_ee(I18N.t('exp.input_syntaxhint_ph'))+'" onchange="expertUpdateInput('+i+',\'syntaxhint\',this.value)"></div>'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_forbidwords_lbl')+'</label>'
-          +'<input class="hs-input exp-mono" value="'+_ee(inp.forbidwords||'')+'" placeholder="cos,sin,[[BASIC-TRIG]]" onchange="expertUpdateInput('+i+',\'forbidwords\',this.value)"></div>'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.input_allowwords_lbl')+'</label>'
-          +'<input class="hs-input exp-mono" value="'+_ee(inp.allowwords||'')+'" placeholder="Sin,myFunc" onchange="expertUpdateInput('+i+',\'allowwords\',this.value)"></div>'
+        +'<div><label class="cfg-lbl" for="exp-inp-boxsize-'+i+'">'+I18N.t('exp.input_boxsize_lbl')+'</label>'
+          +'<input id="exp-inp-boxsize-'+i+'" type="number" class="hs-input" min="1" max="80" value="'+(inp.boxsize||15)+'" onchange="expertUpdateInput('+i+',\'boxsize\',+this.value)"></div>'
+        +'<div><label class="cfg-lbl" for="exp-inp-syntaxhint-'+i+'">'+I18N.t('exp.input_syntaxhint_lbl')+'</label>'
+          +'<input id="exp-inp-syntaxhint-'+i+'" class="hs-input exp-mono" value="'+_ee(inp.syntaxhint||'')+'" placeholder="'+_ee(I18N.t('exp.input_syntaxhint_ph'))+'" onchange="expertUpdateInput('+i+',\'syntaxhint\',this.value)"></div>'
+        +'<div><label class="cfg-lbl" for="exp-inp-forbidwords-'+i+'">'+I18N.t('exp.input_forbidwords_lbl')+'</label>'
+          +'<input id="exp-inp-forbidwords-'+i+'" class="hs-input exp-mono" value="'+_ee(inp.forbidwords||'')+'" placeholder="cos,sin,[[BASIC-TRIG]]" onchange="expertUpdateInput('+i+',\'forbidwords\',this.value)"></div>'
+        +'<div><label class="cfg-lbl" for="exp-inp-allowwords-'+i+'">'+I18N.t('exp.input_allowwords_lbl')+'</label>'
+          +'<input id="exp-inp-allowwords-'+i+'" class="hs-input exp-mono" value="'+_ee(inp.allowwords||'')+'" placeholder="Sin,myFunc" onchange="expertUpdateInput('+i+',\'allowwords\',this.value)"></div>'
       +'</div>'
 
       /* ── Options complètes par sections */
@@ -690,7 +665,7 @@ function expertInputOptsHtml(inp, i){
 
   /* Communs à tous les types (hors MCQ pur) */
   if(!isMCQ){
-    s += '<select class="hs-input exp-sel-inline" title="'+_ee(I18N.t('exp.stars_select_title'))+'" onchange="expertUpdateInput('+i+',\'insertstars\',+this.value)">'+starsOpts+'</select>';
+    s += '<select class="hs-input exp-sel-inline" title="'+_ee(I18N.t('exp.stars_select_title'))+'" aria-label="'+_ee(I18N.t('exp.stars_select_title'))+'" onchange="expertUpdateInput('+i+',\'insertstars\',+this.value)">'+starsOpts+'</select>';
     s += chk('strictsyntax',I18N.t('exp.opt_strictsyntax_lbl'),I18N.t('exp.opt_strictsyntax_tip'));
     s += chk('forbidfloat',I18N.t('exp.opt_forbidfloat_lbl'),I18N.t('exp.opt_forbidfloat_tip'));
     s += chk('requirelowestterms',I18N.t('exp.opt_requirelowestterms_lbl'),I18N.t('exp.opt_requirelowestterms_tip'));
@@ -698,7 +673,7 @@ function expertInputOptsHtml(inp, i){
     s += chk('allowempty',I18N.t('exp.opt_allowempty_lbl'),I18N.t('exp.opt_allowempty_tip'),true);
   }
 
-  s += '<select class="hs-input exp-sel-inline" title="'+_ee(I18N.t('exp.showval_select_title'))+'" onchange="expertUpdateInput('+i+',\'showvalidation\',+this.value)">'+showOpts+'</select>';
+  s += '<select class="hs-input exp-sel-inline" title="'+_ee(I18N.t('exp.showval_select_title'))+'" aria-label="'+_ee(I18N.t('exp.showval_select_title'))+'" onchange="expertUpdateInput('+i+',\'showvalidation\',+this.value)">'+showOpts+'</select>';
   s += chk('mustverify',I18N.t('exp.opt_mustverify_lbl'),I18N.t('exp.opt_mustverify_tip'));
 
   /* Numérique */
@@ -799,19 +774,19 @@ function expertPrtCard(qid, prt, i){
     /* ── Paramètres PRT ── */
     +'<div class="exp-card-body">'
       +'<div class="exp-row3">'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.prt_name_lbl')+'</label>'
-          +'<input class="hs-input exp-mono" value="'+_ee(prt.name)+'" '
+        +'<div><label class="cfg-lbl" for="exp-prt-name-'+i+'">'+I18N.t('exp.prt_name_lbl')+'</label>'
+          +'<input id="exp-prt-name-'+i+'" class="hs-input exp-mono" value="'+_ee(prt.name)+'" '
           +'onchange="expertUpdatePrt('+i+',\'name\',this.value);document.querySelector(\'#exp-prt-'+i+' code\').textContent=this.value"></div>'
-        +'<div><label class="cfg-lbl">'+I18N.t('exp.prt_value_lbl')+'</label>'
-          +'<input type="number" class="hs-input" min="0" step="0.1" value="'+(prt.value||1)+'" onchange="expertUpdatePrt('+i+',\'value\',+this.value)"></div>'
-        +'<div><label class="cfg-lbl" title="'+_ee(I18N.t('exp.prt_feedbackstyle_title'))+'">'+I18N.t('exp.prt_feedbackstyle_lbl')+'</label>'
-          +'<select class="hs-input" onchange="expertUpdatePrt('+i+',\'feedbackstyle\',+this.value)">'+fsOpts+'</select></div>'
+        +'<div><label class="cfg-lbl" for="exp-prt-value-'+i+'">'+I18N.t('exp.prt_value_lbl')+'</label>'
+          +'<input id="exp-prt-value-'+i+'" type="number" class="hs-input" min="0" step="0.1" value="'+(prt.value||1)+'" onchange="expertUpdatePrt('+i+',\'value\',+this.value)"></div>'
+        +'<div><label class="cfg-lbl" for="exp-prt-fs-'+i+'" title="'+_ee(I18N.t('exp.prt_feedbackstyle_title'))+'">'+I18N.t('exp.prt_feedbackstyle_lbl')+'</label>'
+          +'<select id="exp-prt-fs-'+i+'" class="hs-input" onchange="expertUpdatePrt('+i+',\'feedbackstyle\',+this.value)">'+fsOpts+'</select></div>'
       +'</div>'
       +'<label class="exp-chk" style="margin-bottom:8px;">'
         +'<input type="checkbox" '+(prt.autosimplify?'checked':'')+' onchange="expertUpdatePrt('+i+',\'autosimplify\',this.checked?1:0)">'
         +'<span>Auto-simplify</span></label>'
-      +'<div style="display:flex;flex-direction:column;gap:4px;"><label class="cfg-lbl">'+I18N.t('exp.prt_feedbackvars_lbl')+'</label>'
-        +'<textarea class="hs-input exp-mono exp-autogrow" rows="2" style="resize:none;overflow:hidden;min-height:52px;"'
+      +'<div style="display:flex;flex-direction:column;gap:4px;"><label class="cfg-lbl" for="exp-prt-fbvars-'+i+'">'+I18N.t('exp.prt_feedbackvars_lbl')+'</label>'
+        +'<textarea id="exp-prt-fbvars-'+i+'" class="hs-input exp-mono exp-autogrow" rows="2" style="resize:none;overflow:hidden;min-height:52px;"'
         +' oninput="expAutoGrow(this);expertUpdatePrt('+i+',\'feedbackvariables\',this.value)"'
         +' onchange="expertUpdatePrt('+i+',\'feedbackvariables\',this.value)">'+_ee(prt.feedbackvariables||'')+'</textarea></div>'
       +'<div class="exp-prt-info">📍 <span id="exp-prt-nodecount-'+i+'">'+nodeCount+'</span> '+I18N.t('exp.prt_node_count_suffix')+'</div>'

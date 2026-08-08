@@ -6004,24 +6004,22 @@ fill="currentColor" stroke="none">
         <button class="exp-tab"        data-tab="feedback" role="tab" onclick="expertShowTab('feedback')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tab-feedback"></use></svg> <span data-i18n="exp.tab_feedback">Feedback</span></button>
         <button class="exp-tab"        data-tab="inputs"   role="tab" onclick="expertShowTab('inputs')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tab-inputs"></use></svg> <span data-i18n="exp.tab_inputs">Inputs</span></button>
         <button class="exp-tab"        data-tab="prts"     role="tab" onclick="expertShowTab('prts')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tab-prt"></use></svg> <span data-i18n="exp.tab_prts">PRTs</span></button>
-        <button class="exp-tab"        data-tab="attrs"    role="tab" onclick="expertShowTab('attrs')"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-tags"></use></svg> <span data-i18n="exp.tab_attrs">Attributs</span></button>
         <button class="exp-tab"        data-tab="preview"  role="tab" onclick="expertShowTab('preview');expRenderPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-action-preview"></use></svg> <span data-i18n="exp.tab_preview">Aperçu</span></button>
       </div>
 
       <!-- ── Tab : Variables & Métadonnées ─────────────────── -->
       <div class="exp-panel" id="exp-panel-meta" role="tabpanel">
         <div class="exp-panel-inner">
-          <div class="exp-row3" style="margin-bottom:10px;">
-            <div><label class="cfg-lbl" data-i18n="exp.nom_question_lbl">Nom de la question</label>
-              <input id="exp-name" class="hs-input" placeholder="ex: Dérivée affine Q1" data-i18n-ph="exp.nom_question_ph"></div>
-            <div><label class="cfg-lbl" data-i18n="exp.bareme_pts_lbl">Barème (pts)</label>
-              <input id="exp-bareme" type="number" class="hs-input" min="0" step="0.25" value="1"></div>
-            <div><label class="cfg-lbl" data-i18n="exp.penalite_lbl">Pénalité / tentative</label>
-              <input id="exp-penalty" type="number" class="hs-input" min="0" max="1" step="0.05" value="0"></div>
+          <div style="margin-bottom:10px;max-width:220px;">
+            <label class="cfg-lbl" for="exp-bareme" data-i18n="exp.bareme_pts_lbl">Barème (pts)</label>
+            <input id="exp-bareme" type="number" class="hs-input" min="0" step="0.25" value="1">
           </div>
-          <div style="margin-bottom:10px;">
+          <div style="margin-bottom:10px;display:flex;flex-direction:column;gap:4px;">
             <label class="cfg-lbl" data-i18n="exp.qnote_lbl">Question note (Maxima — identification des variantes)</label>
-            <input id="exp-qnote" class="hs-input exp-mono" placeholder="ex: {@ta1@}" data-i18n-ph="exp.qnote_ph">
+            <textarea id="exp-qnote" class="hs-input exp-mono exp-autogrow" rows="2"
+              style="resize:none;overflow:hidden;min-height:52px;"
+              oninput="expAutoGrow(this)"
+              placeholder="ex: {@ta1@}" data-i18n-ph="exp.qnote_ph"></textarea>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;">
             <label class="cfg-lbl" for="exp-vars" data-i18n="exp.vars_lbl">Variables de question (code Maxima)</label>
@@ -6043,7 +6041,7 @@ fill="currentColor" stroke="none">
           <!-- Toolbar injectée par expertInitQtextRich() -->
           <div id="exp-qtext-tb"></div>
           <!-- Éditeur riche inline -->
-          <div id="exp-qtext-rich" class="vf-zone exp-rich-zone" contenteditable="true"
+          <div id="exp-qtext-rich" class="vf-zone exp-rich-zone" contenteditable="true" role="textbox"
             aria-label="Énoncé de la question" data-i18n-aria="exp.qtext_rich_aria" aria-multiline="true"
             style="flex:1;min-height:180px;overflow-y:auto;border-radius:0 0 6px 6px;"></div>
           <!-- Vue code HTML (masquée par défaut) -->
@@ -6061,7 +6059,7 @@ fill="currentColor" stroke="none">
           <!-- Toolbar injectée par expertInitGfbRich() -->
           <div id="exp-gfb-tb"></div>
           <!-- Éditeur riche inline -->
-          <div id="exp-gfb-rich" class="vf-zone exp-rich-zone" contenteditable="true"
+          <div id="exp-gfb-rich" class="vf-zone exp-rich-zone" contenteditable="true" role="textbox"
             aria-label="Feedback général" data-i18n-aria="exp.gfb_aria" aria-multiline="true"
             style="flex:1;min-height:180px;overflow-y:auto;border-radius:0 0 6px 6px;"></div>
           <!-- Vue code HTML (masquée par défaut) -->
@@ -6091,51 +6089,6 @@ fill="currentColor" stroke="none">
         </div>
       </div>
 
-      <!-- ── Tab : Attributs ───────────────────────────────── -->
-      <div class="exp-panel" id="exp-panel-attrs" role="tabpanel" hidden>
-        <div class="exp-panel-inner">
-          <div class="exp-row3">
-            <div><label class="cfg-lbl" for="exp-attr-niveau" data-i18n="exp.niveau_lbl">Niveau</label>
-              <select id="exp-attr-niveau" class="hs-input">
-                <option value="" data-i18n="exp.choisir_opt">— choisir —</option>
-                <option data-i18n="exp.niveau_lycee">Lycée — Terminale</option>
-                <option data-i18n="exp.niveau_l1">Licence 1</option><option data-i18n="exp.niveau_l2">Licence 2</option><option data-i18n="exp.niveau_l3">Licence 3</option>
-                <option data-i18n="exp.niveau_m1">Master 1</option><option data-i18n="exp.niveau_m2">Master 2</option><option data-i18n="exp.niveau_bts">BTS / IUT</option>
-                <option data-i18n="exp.niveau_cpge">CPGE</option><option data-i18n="exp.niveau_autre">Autre</option>
-              </select></div>
-            <div><label class="cfg-lbl" for="exp-attr-theme" data-i18n="exp.theme_lbl">Thème</label>
-              <input id="exp-attr-theme" class="hs-input" placeholder="ex: Algèbre linéaire, Calcul intégral…" data-i18n-ph="exp.theme_ph"></div>
-            <div><label class="cfg-lbl" for="exp-attr-diff" data-i18n="exp.difficulte_lbl">Difficulté</label>
-              <select id="exp-attr-diff" class="hs-input">
-                <option value="" data-i18n="exp.choisir_opt">— choisir —</option>
-                <option value="1" data-i18n="exp.diff_facile">★☆☆ Facile</option>
-                <option value="2" data-i18n="exp.diff_intermediaire">★★☆ Intermédiaire</option>
-                <option value="3" data-i18n="exp.diff_difficile">★★★ Difficile</option>
-              </select></div>
-          </div>
-          <div><label class="cfg-lbl" for="exp-attr-objectif" data-i18n="exp.objectif_lbl">Objectif pédagogique / compétence visée</label>
-            <textarea id="exp-attr-objectif" class="hs-input exp-autogrow" rows="2"
-              style="resize:none;overflow:hidden;min-height:52px;" oninput="expAutoGrow(this)"
-              placeholder="ex: Calculer une dérivée par la définition, Résoudre un système linéaire…" data-i18n-ph="exp.objectif_ph"></textarea></div>
-          <div><label class="cfg-lbl" for="exp-attr-tags" data-i18n="exp.tags_lbl">Tags libres (séparés par des virgules)</label>
-            <input id="exp-attr-tags" class="hs-input" placeholder="ex: dérivée, polynôme, rand, STACK" data-i18n-ph="exp.tags_ph"></div>
-          <div><label class="cfg-lbl" for="exp-attr-author" data-i18n="exp.auteur_lbl">Auteur</label>
-            <input id="exp-attr-author" class="hs-input" placeholder="ex: Prof. Dupont — Université X" data-i18n-ph="exp.auteur_ph"></div>
-          <!-- Export / Import JSON -->
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0;">
-            <div class="cfg-lbl" style="margin-bottom:8px;" data-i18n="exp.sauvegarde_json_lbl">Sauvegarde de la question (JSON)</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button type="button" class="exp-add-btn" onclick="expExportJson()" data-i18n="exp.exporter_json_btn">💾 Exporter en JSON</button>
-              <label class="exp-add-btn" style="cursor:pointer;">
-                <span data-i18n="exp.importer_json_btn">📂 Importer un JSON</span>
-                <input type="file" accept=".json" style="display:none" onchange="expImportJson(this)">
-              </label>
-            </div>
-            <div class="exp-hint" style="margin-top:6px;" data-i18n="exp.sauvegarde_json_hint">Sauvegarde complète de la question (variables, énoncé, inputs, PRTs) indépendante du quiz StackForge.</div>
-          </div>
-        </div>
-      </div>
-
       <!-- ── Tab : Aperçu live ──────────────────────────────── -->
       <div class="exp-panel" id="exp-panel-preview" role="tabpanel" hidden>
         <div class="exp-panel-inner">
@@ -6144,9 +6097,12 @@ fill="currentColor" stroke="none">
             <span class="cfg-lbl" style="margin-right:6px;" data-i18n="exp.valeurs_simulees_lbl">Valeurs simulées :</span>
             <div id="exp-preview-vars" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
             <button type="button" class="exp-pv-refresh" onclick="expRenderPreview()" title="Regénérer des valeurs aléatoires" data-i18n-title="exp.nouvelles_valeurs_title" data-i18n="exp.nouvelles_valeurs_btn">🔀 Nouvelles valeurs</button>
+            <button type="button" id="exp-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="expRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+            <button type="button" id="exp-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="expShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+            <span id="exp-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
           </div>
           <!-- Rendu de l'énoncé -->
-          <div class="exp-pv-section-title"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tab-statement"></use></svg> <span data-i18n="ineq.text_lbl">Énoncé</span></div>
+          <div class="exp-pv-section-title"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tab-statement"></use></svg> <span data-i18n="ineq.text_lbl">Énoncé</span> <span id="exp-preview-badge" style="margin-left:8px;font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:20px;"></span></div>
           <div id="exp-preview-content" class="exp-pv-content"></div>
           <!-- Rendu du feedback -->
           <div class="exp-pv-section-title" style="margin-top:16px;" data-i18n="exp.feedback_general_lbl">💬 Feedback général</div>
@@ -8982,6 +8938,7 @@ window.__hsLoadLangSet("lang/", true);
 <script src="js/preview-crossword.js"></script>
 <script src="js/preview-dropdown.js"></script>
 <script src="js/preview-equivalence.js"></script>
+<script src="js/preview-expert.js"></script>
 <script src="js/preview-geometrie.js"></script>
 <script src="js/preview-image-mesure.js"></script>
 <script src="js/preview-imgclick.js"></script>

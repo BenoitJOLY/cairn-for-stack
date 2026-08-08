@@ -2587,7 +2587,7 @@ html[data-theme="dark"] .exp-rich-zone {
   border:1px solid #e2e8f0;border-bottom:none;
   border-radius:6px 6px 0 0;
 }
-.exp-hint { font-size:.78rem;color:#64748b; }
+.exp-hint { font-size:.78rem;color:var(--slate); }
 .exp-opt-hint { font-size:.7rem;color:#94a3b8;font-weight:400;cursor:help; }
 
 /* 3-column / 4-column row grids */
@@ -2705,7 +2705,6 @@ html[data-theme="dark"] .exp-prt-card .exp-card-hd { background:#1a1040; }
 html[data-theme="dark"] .exp-prt-info { background:#1e293b;color:#94a3b8; }
 html[data-theme="dark"] .exp-qtext-help { background:#0c2a3a;border-color:#0369a1;color:#7dd3fc; }
 html[data-theme="dark"] .cfg-lbl { color:#94a3b8; }
-html[data-theme="dark"] .exp-hint { color:#64748b; }
 html[data-theme="dark"] .form-panel-head { border-color:#334155; }
 
 /* ── Onglet Aperçu live ───────────────────────────────────────── */
@@ -2723,12 +2722,12 @@ html[data-theme="dark"] .form-panel-head { border-color:#334155; }
 }
 .exp-pv-refresh {
   margin-left:auto; padding:3px 10px;
-  background:#0ea5e9; color:#fff; border:none; border-radius:4px;
+  background:#0369a1; color:#fff; border:none; border-radius:4px;
   cursor:pointer; font-size:.78rem;
 }
-.exp-pv-refresh:hover { background:#0284c7; }
+.exp-pv-refresh:hover { background:#075985; }
 .exp-pv-section-title {
-  font-size:.78rem; font-weight:700; color:#64748b;
+  font-size:.78rem; font-weight:700; color:var(--slate);
   text-transform:uppercase; letter-spacing:.05em;
   margin-bottom:8px;
 }

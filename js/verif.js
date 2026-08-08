@@ -73,7 +73,7 @@ function verifCreateToolbar(targetId){
     <div class="rtb-sep"></div>
     <span style="font-size:.75rem;font-weight:600;color:var(--slate);padding:0 2px;">A</span>
     <input type="color" class="rtb-color" value="#000000" onchange="verifExecR('${targetId}','foreColor',this.value)" title="${I18N.t('tpl.vf_couleur_texte')}" aria-label="${I18N.t('tpl.vf_couleur_texte')}">
-    <span style="font-size:.75rem;font-weight:600;color:var(--slate);padding:0 2px;background:#ffff00;border-radius:3px;">HL</span>
+    <span style="font-size:.75rem;font-weight:600;color:#1e293b;padding:0 2px;background:#ffff00;border-radius:3px;">HL</span>
     <input type="color" class="rtb-color" value="#ffff00" onchange="verifExecR('${targetId}','hiliteColor',this.value)" title="${I18N.t('tpl.vf_surlignage')}" aria-label="${I18N.t('tpl.vf_surlignage')}">
     <div class="rtb-sep"></div>
     <button class="rtb" onclick="verifExecR('${targetId}','insertUnorderedList')">${I18N.t('tpl.vf_tb_liste_ul')}</button>
@@ -99,7 +99,7 @@ function verifCreateToolbar(targetId){
     <label class="rtb" title="${I18N.t('tpl.vf_audio')}"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-insert-audio"></use></svg> Audio<input type="file" id="vf-audio-${uid}" accept="audio/*" style="display:none" onchange="verifHandleAudio(this,'${targetId}')"></label>
     <div class="rtb-sep"></div>
     <button class="rtb" onclick="verifOpenLatexModal('${targetId}')" style="background:#4338ca;color:#fff;border-color:#4338ca;">&#x2211; LaTeX</button>
-    <button class="rtb" onclick="verifExecR('${targetId}','removeFormat')" style="margin-left:auto;"><svg class="hs-ico"><use href="#ico-content-clean"></use></svg></button>
+    <button class="rtb" onclick="verifExecR('${targetId}','removeFormat')" style="margin-left:auto;" title="${I18N.t('rtb.clear_format')}"><svg class="hs-ico" aria-hidden="true"><use href="#ico-content-clean"></use></svg></button>
   </div>`;
 }
 
