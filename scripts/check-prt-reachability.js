@@ -37,6 +37,7 @@ const { _incTypeAVars, _incTypeBVars, _incRoundingVars, _incFinalRegex } = requi
 const { _incStepDefs } = require(path.join('..', 'js', 'gen-incertitude-steps.js'));
 const { _incStudentFactor, _incStudentConfidence, _incStudentDf } = require(path.join('..', 'js', 'gen-incertitude-student.js'));
 const { _zsVars } = require(path.join('..', 'js', 'gen-zscore-calc.js'));
+const { _hwVars } = require(path.join('..', 'js', 'gen-hardyweinberg-calc.js'));
 
 const I18N_STUB = { t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key };
 
@@ -67,6 +68,7 @@ global._incStudentFactor = _incStudentFactor;
 global._incStudentConfidence = _incStudentConfidence;
 global._incStudentDf = _incStudentDf;
 global._zsVars = _zsVars;
+global._hwVars = _hwVars;
 
 const BASE_DEPS = { I18N: I18N_STUB, buildPrtXml: buildPrtXml, applyFbBox: applyFbBox, _mkFbGen: _mkFbGen, _mkInput: _mkInput };
 
@@ -439,6 +441,17 @@ const TARGETS = [
                 grandeurs: { xMes: '10.5', xRef: '10', uc: '0.3' },
                 seuil: '2',
                 steps: { z: true, conclusion: true },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Hardy-Weinberg (équilibre génétique)', module: '../js/gen-hardyweinberg.js', coreFn: 'genHardyWeinbergCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 3,
+                context: { espece: 'souris', phenoDom: 'pelage gris', phenoRec: 'pelage blanc', intro: '' },
+                grandeurs: { qList: '1/10,2/10,3/10,4/10,6/10,7/10,8/10,9/10' },
                 fbGen: ''
             }
         }]

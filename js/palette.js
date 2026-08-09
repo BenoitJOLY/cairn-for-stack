@@ -67,6 +67,7 @@ var PALETTE_TYPES = [
   {type:'zscore',       label:'Z-score (compatibilité métrologique, valeur mesurée vs référence)'},
   {type:'avancement',   label:"Tableau d'avancement (réaction chimique)"},
   {type:'cinematique',  label:'Cinématique du point (vecteur vitesse, relation de Chasles)'},
+  {type:'hardyweinberg', label:'Hardy-Weinberg (équilibre génétique)'},
   {type:'expert',       label:'Question Expert STACK'}
 ];
 
@@ -76,6 +77,7 @@ var PALETTE_CATEGORIES = [
   {id:'physique',    label:'Physique',               types:['doi','nuclear','optique','circuit','physique','oscilloscope','diffraction','rvbcmj','apn','cinematique']},
   {id:'chimie',      label:'Chimie',                 types:['chemical','chemical_topo','acide-base','redox','nomenclature','avancement']},
   {id:'sciences',    label:'Sciences (Général)',     types:['units','incertitude','zscore']},
+  {id:'svt',         label:'SVT',                    types:['hardyweinberg']},
   {id:'info',        label:'Informatique',           types:['basen','logique']},
   {id:'textuelle',   label:'Réponse textuelle',      types:['string','composition']},
   {id:'organisation',label:'Organisation',           types:['match','crossword','ord']},

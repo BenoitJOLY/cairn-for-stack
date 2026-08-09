@@ -729,6 +729,24 @@ const HELP_CONTENT = {
         'Das importierte Führungsbild ist nur eine visuelle Hilfe für Sie beim Digitalisieren: es gehört weder zur gespeicherten Frage noch zum Moodle-Export.',
         'In dieser Version keine Zufallsgenerierung: digitalisierte Positionen und Δt sind feste Werte.'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── HARDY-WEINBERG (BIOLOGIE)
+  hardyweinberg: {
+    title: '<svg class="hs-ico"><use href="#ico-type-hardyweinberg"></use></svg> Hardy-Weinberg — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Für eine Population im <b>Hardy-Weinberg-Gleichgewicht</b> bestimmt der Schüler aus dem beobachteten Anteil an Individuen mit rezessivem Phänotyp die <b>Häufigkeit des rezessiven Allels q</b>, die des dominanten Allels <b>p</b> sowie die <b>Häufigkeit der Heterozygoten</b> (2pq).</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Art / Dominanter Phänotyp / Rezessiver Phänotyp</b>: gestalten die Aufgabenstellung (z. B. „Mäuse", „graues Fell", „weißes Fell").',
+        '<b>Mögliche Häufigkeiten von q</b>: Liste von Brüchen oder Zahlen, durch Kommas getrennt (Maxima-Syntax, z. B. <code>1/10,2/10,3/10</code>) — ein Wert wird bei jedem Versuch des Schülers <b>serverseitig, über Maxima, zufällig</b> gezogen: eine einzige STACK-Frage deckt so alle Varianten ab, ohne dass auf Lehrerseite ein Zufallszug stattfindet.',
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Der Zufallszug erfolgt nativ in Maxima (kein JS-Zug vor dem Export): anders als bei „Z-score" oder „Messunsicherheit" kann die simulierte Vorschau keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Alle drei Teilfragen (q, p, Heterozygote) sind immer vorhanden, kein Schritt ist abschaltbar: das Szenario ergibt pädagogisch nur mit allen drei Antworten Sinn.',
+        'Ein klassischer Fehler wird bei der Heterozygoten-Teilfrage automatisch erkannt: Antwortet der Schüler mit der Häufigkeit der Individuen mit <b>dominantem</b> Phänotyp (1−q²) statt mit der Häufigkeit der <b>Heterozygoten</b> allein (2pq), weist ein gezieltes Feedback darauf hin.'
+      ])) + _HELP_COMMON
   }
 };
 

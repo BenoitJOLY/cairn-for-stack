@@ -3618,6 +3618,7 @@ I18N.add("de", {
   "palette.cat.physique":      "Physik",
   "palette.cat.chimie":        "Chemie",
   "palette.cat.sciences":      "Naturwissenschaften (Allgemein)",
+  "palette.cat.svt":           "Biologie",
   "palette.cat.info":          "Informatik",
   "palette.cat.textuelle":     "Wörtliche Antwort",
   "palette.cat.organisation":  "Organisation",
@@ -4770,6 +4771,21 @@ I18N.add("de", {
   "cin.jsx_lbl_inverser": "Umkehren",
   "cin.jsx_lbl_tracer_dv": "Zeichne Δv",
   "cin.jsx_lbl_recommencer": "↻ Neu starten",
+
+  /* ── Hardy-Weinberg (Biologie, Populationsgenetik) ── */
+  "type.hardyweinberg":        "Hardy-Weinberg (genetisches Gleichgewicht)",
+  "data.label.hardyweinberg":  "🧬 Hardy-Weinberg",
+  "hw.title": "Hardy-Weinberg (genetisches Gleichgewicht)",
+  "hw.info_box": "Population im Hardy-Weinberg-Gleichgewicht: Die Häufigkeit q des rezessiven Allels wird bei jedem Versuch zufällig (serverseitig, über Maxima) aus der unten angegebenen Liste gezogen — eine einzige STACK-Frage deckt so alle Varianten ab.",
+  "hw.espece_lbl": "Art",
+  "hw.pheno_dom_lbl": "Dominanter Phänotyp",
+  "hw.pheno_rec_lbl": "Rezessiver Phänotyp",
+  "hw.intro_lbl": "Aufgabenstellung / Anweisung (optional, vor der Frage eingefügt)",
+  "hw.qlist_title": "Mögliche Häufigkeiten des rezessiven Allels q",
+  "hw.qlist_hint": "Liste von Brüchen oder Zahlen, durch Kommas getrennt (Maxima-Syntax); mindestens zwei Werte, einer wird bei jedem Versuch zufällig gezogen.",
+  "hw.fbgen_auto_desc": "Die Korrektur (q, p, Heterozygote) wird automatisch erzeugt.",
+  "hw.preview_empty": "Automatisch generierte Frage — siehe die echte Vorschau für ein Beispiel.",
+  "hw.preview_steps_title": "Teilfragen",
 
   /* ── Nomenclature (Physique-Chimie) ── */
   "type.nomenclature":       "Nomenklatur (organische Chemie)",

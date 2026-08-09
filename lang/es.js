@@ -3618,6 +3618,7 @@ I18N.add("es", {
   "palette.cat.physique":      "Física",
   "palette.cat.chimie":        "Química",
   "palette.cat.sciences":      "Ciencias (General)",
+  "palette.cat.svt":           "Biología",
   "palette.cat.info":          "Informática",
   "palette.cat.textuelle":     "Respuesta literal",
   "palette.cat.organisation":  "Organización",
@@ -4770,6 +4771,21 @@ I18N.add("es", {
   "cin.jsx_lbl_inverser": "Invertir",
   "cin.jsx_lbl_tracer_dv": "Trazar Δv",
   "cin.jsx_lbl_recommencer": "↻ Reiniciar",
+
+  /* ── Hardy-Weinberg (Biología, genética de poblaciones) ── */
+  "type.hardyweinberg":        "Hardy-Weinberg (equilibrio genético)",
+  "data.label.hardyweinberg":  "🧬 Hardy-Weinberg",
+  "hw.title": "Hardy-Weinberg (equilibrio genético)",
+  "hw.info_box": "Población en equilibrio de Hardy-Weinberg: la frecuencia q del alelo recesivo se sortea aleatoriamente (del lado de Maxima, en cada intento) dentro de la lista indicada abajo — una sola pregunta STACK cubre así todas las variantes.",
+  "hw.espece_lbl": "Especie",
+  "hw.pheno_dom_lbl": "Fenotipo dominante",
+  "hw.pheno_rec_lbl": "Fenotipo recesivo",
+  "hw.intro_lbl": "Enunciado / consigna (opcional, añadido antes de la pregunta)",
+  "hw.qlist_title": "Frecuencias posibles del alelo recesivo q",
+  "hw.qlist_hint": "Lista de fracciones o números separados por comas (sintaxis Maxima); al menos dos valores, uno se sortea aleatoriamente en cada intento.",
+  "hw.fbgen_auto_desc": "La corrección (q, p, heterocigotos) se genera automáticamente.",
+  "hw.preview_empty": "Pregunta generada automáticamente — vea la vista previa real para un ejemplo.",
+  "hw.preview_steps_title": "Subpreguntas",
 
   /* ── Nomenclature (Physique-Chimie) ── */
   "type.nomenclature":       "Nomenclatura (química orgánica)",

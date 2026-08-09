@@ -3617,6 +3617,7 @@ I18N.add("fr", {
   "palette.cat.physique":      "Physique",
   "palette.cat.chimie":        "Chimie",
   "palette.cat.sciences":      "Sciences (Général)",
+  "palette.cat.svt":           "SVT",
   "palette.cat.info":          "Informatique",
   "palette.cat.textuelle":     "Réponse textuelle",
   "palette.cat.organisation":  "Organisation",
@@ -4773,6 +4774,21 @@ I18N.add("fr", {
   "cin.jsx_lbl_inverser": "Inverser",
   "cin.jsx_lbl_tracer_dv": "Tracer Δv",
   "cin.jsx_lbl_recommencer": "↻ Recommencer",
+
+  /* ── Hardy-Weinberg (SVT, génétique des populations) ── */
+  "type.hardyweinberg":        "Hardy-Weinberg (équilibre génétique)",
+  "data.label.hardyweinberg":  "🧬 Hardy-Weinberg",
+  "hw.title": "Hardy-Weinberg (équilibre génétique)",
+  "hw.info_box": "Population en équilibre de Hardy-Weinberg : la fréquence q de l'allèle récessif est tirée aléatoirement (côté Maxima, à chaque tentative) dans la liste indiquée ci-dessous — une seule question STACK couvre ainsi toutes les variantes.",
+  "hw.espece_lbl": "Espèce",
+  "hw.pheno_dom_lbl": "Phénotype dominant",
+  "hw.pheno_rec_lbl": "Phénotype récessif",
+  "hw.intro_lbl": "Énoncé / consigne (optionnel, ajouté avant la question)",
+  "hw.qlist_title": "Fréquences possibles de l'allèle récessif q",
+  "hw.qlist_hint": "Liste de fractions ou nombres séparés par des virgules (syntaxe Maxima) ; au moins deux valeurs, une est tirée au hasard à chaque tentative.",
+  "hw.fbgen_auto_desc": "La correction (q, p, hétérozygotes) est générée automatiquement.",
+  "hw.preview_empty": "Question générée automatiquement — voir l'aperçu réel pour un exemple.",
+  "hw.preview_steps_title": "Sous-questions",
 
   /* ── Nomenclature (Physique-Chimie) ── */
   "type.nomenclature":       "Nomenclature (chimie organique)",

@@ -3618,6 +3618,7 @@ I18N.add("nl", {
   "palette.cat.physique":      "Natuurkunde",
   "palette.cat.chimie":        "Scheikunde",
   "palette.cat.sciences":      "Wetenschappen (Algemeen)",
+  "palette.cat.svt":           "Biologie",
   "palette.cat.info":          "Computerwetenschappen",
   "palette.cat.textuelle":     "Tekst antwoord",
   "palette.cat.organisation":  "Organisatie",
@@ -4770,6 +4771,21 @@ I18N.add("nl", {
   "cin.jsx_lbl_inverser": "Omkeren",
   "cin.jsx_lbl_tracer_dv": "Teken Δv",
   "cin.jsx_lbl_recommencer": "↻ Opnieuw beginnen",
+
+  /* ── Hardy-Weinberg (Biologie, populatiegenetica) ── */
+  "type.hardyweinberg":        "Hardy-Weinberg (genetisch evenwicht)",
+  "data.label.hardyweinberg":  "🧬 Hardy-Weinberg",
+  "hw.title": "Hardy-Weinberg (genetisch evenwicht)",
+  "hw.info_box": "Populatie in Hardy-Weinberg-evenwicht: de frequentie q van het recessieve allel wordt bij elke poging willekeurig (serverzijdig, via Maxima) getrokken uit de lijst hieronder — één STACK-vraag dekt zo alle varianten.",
+  "hw.espece_lbl": "Soort",
+  "hw.pheno_dom_lbl": "Dominant fenotype",
+  "hw.pheno_rec_lbl": "Recessief fenotype",
+  "hw.intro_lbl": "Opgave / instructie (optioneel, toegevoegd vóór de vraag)",
+  "hw.qlist_title": "Mogelijke frequenties van het recessieve allel q",
+  "hw.qlist_hint": "Lijst van breuken of getallen gescheiden door komma's (Maxima-syntax); minstens twee waarden, er wordt er bij elke poging willekeurig één getrokken.",
+  "hw.fbgen_auto_desc": "De correctie (q, p, heterozygoten) wordt automatisch gegenereerd.",
+  "hw.preview_empty": "Automatisch gegenereerde vraag — zie de echte voorvertoning voor een voorbeeld.",
+  "hw.preview_steps_title": "Subvragen",
 
   /* ── Nomenclature (Physique-Chimie) ── */
   "type.nomenclature":       "Nomenclatuur (organische chemie)",

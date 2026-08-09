@@ -1,0 +1,241 @@
+🧬 THÈME 1 : GÉNÉTIQUE ET ÉVOLUTION
+1. Le modèle de Hardy-Weinberg (Équilibre génétique)
+
+     Concept mathématique : Équations du second degré, racines carrées, probabilités (p+q=1
+    , 
+    p2+2pq+q2=1
+    ).
+     Scénario : On donne la fréquence d'un phénotype récessif (ex: 9% de souris blanches). On demande la fréquence de l'allèle dominant, la fréquence des hétérozygotes, etc.
+     L'apport de STACK : 
+         Accepte toutes les écritures équivalentes : 0.3, 3/10, 30%, ou même sqrt(0.09) pour la fréquence de l'allèle.
+         Feedback intelligent : Si un élève répond 0.91 à la question "fréquence des hétérozygotes", STACK comprend qu'il a calculé 1−q2
+         (les phénotypes dominants) au lieu de 
+        2pq
+         (les génotypes hétérozygotes). Le feedback peut dire : 
+        "Attention, tu as donné la fréquence des individus dominants, mais on te demande la fréquence des hétérozygotes uniquement."
+
+2. Les probabilités de croisement (Mono et Dihybridisme)
+
+     Concept mathématique : Arbres de probabilités, fractions, multiplications.
+     Scénario : Croisement de drosophiles hétérozygotes. Quelle est la probabilité d'obtenir un mâle stérile et aux yeux blancs ?
+     L'apport de STACK : 
+         L'élève peut taper le raisonnement brut : 1/2 * 1/4 ou 0.125. 
+         Si le gène est lié au chromosome X, la probabilité diffère selon le sexe. STACK peut évaluer des formules conditionnelles complexes que Moodle classique ne sait pas gérer.
+
+3. Distance génétique et carte de liaison
+
+     Concept mathématique : Pourcentages, proportionnalité.
+     Scénario : À partir d'un tableau de test-cross, calculer la distance entre deux gènes.
+     L'apport de STACK : 
+         Gère la confusion classique entre "taux de recombinaison" (ex: 0.15) et "distance en centiMorgans" (15 cM). Si l'élève tape 0.15, STACK valide le calcul mais signale l'oubli de l'unité demandée.
+
+4. L'horloge moléculaire (Phylogénie)
+
+     Concept mathématique : Puissances de 10, équations à une inconnue, division par un facteur 2.
+     Scénario : On donne le % de différences dans l'ADN entre deux espèces et le taux de mutation par an. Calculer la date de divergence.
+     L'apport de STACK : 
+         Question en deux temps : 1) Demander l'expression littérale (ex: {diff}/(2*{taux}*{taille_seq}). 2) Demander le calcul final.
+         Le facteur 2 (parce que la mutation s'accumule dans les deux lignées) est l'erreur numéro 1. STACK attrape cette erreur mathématiquement et génère un feedback ciblé.
+
+🌍 THÈME 2 : GÉOLOGIE
+5. La datation absolue (Radiochronologie)
+
+     Concept mathématique : Logarithmes népériens (ln
+    ), fonction exponentielle, notation scientifique.
+     Scénario : Datation au Carbone 14 ou Potassium-Argon. Calcul de l'âge d'une roche à partir de la proportion d'isotopes radioactifs restants.
+     L'apport de STACK : 
+         Les élèves ont souvent des calculatrices différentes et se perdent dans les touches ln
+         ou 
+        ex
+        .
+         Avec STACK, l'élève peut taper la formule brute : -ln(0.25) / 1.25*10^-4. Maxima l'évalue.
+         Tolérance sur les puissances de 10 : accepte 45 000 000 ans ou 4.5 * 10^7 ans.
+
+6. Temps de trajet des ondes sismiques
+
+     Concept mathématique : Vitesse = Distance / Temps (v=d/t
+    ), soustraction de durées.
+     Scénario : Calculer le délai entre l'arrivée de l'onde P et de l'onde S à une station sismique.
+     L'apport de STACK : 
+         L'élève peut entrer la relation complète : 150/6 - 150/8.
+         STACK randomise la distance à l'épicentre et les vitesses des ondes pour chaque élève, générant automatiquement 30 versions différentes du même exercice sans que le prof n'ait à recalculer les corrigés.
+
+🦠 THÈME 3 : ÉCOLOGIE ET DYNAMIQUE DES POPULATIONS
+7. Modèle de Malthus (Croissance exponentielle)
+
+     Concept mathématique : Puissances, suites géométriques (Nt​=N0​×qt
+    ).
+     Scénario : Une population de levures double toutes les heures. Quelle population après 15 heures à partir de 500 individus ?
+     L'apport de STACK : 
+         Accepte 16384000 ou 500 * 2^15. 
+         Si l'élève se trompe d'une heure et tape 500 * 2^14, STACK peut répondre : "Ton calcul est cohérent avec une durée de 14h, mais l'énoncé indique 15h."
+
+8. La règle du 10% (Pyramides de biomasse)
+
+     Concept mathématique : Pourcentages empilés, puissances de 0.1, logarithmes (pour le niveau trophique max).
+     Scénario : On a 10 000 kg de phytoplancton. Quelle biomasse atteint le prédateur de 3ème niveau ?
+     L'apport de STACK : 
+         L'élève tape 10000 * 0.1^3. Maxima évalue que ça fait 10.
+         Variante poussée : "Une population a besoin de 50 kg de viande par an. Combien de niveaux trophiques cette chaîne peut-elle supporter ?" L'élève doit utiliser un logarithme : floor(log(50/10000) / log(0.1)). (STACK gère les fonctions mathématiques de terminale).
+
+9. Le test du χ2
+ (Khi-carré) en écologie
+
+     Concept mathématique : Statistiques, sommes de carrés, divisions.
+     Scénario : Vérifier si la répartition des espèces dans un milieu correspond au modèle théorique.
+     L'apport de STACK : 
+         Le calcul est fastidieux : ∑T(O−T)2​
+        .
+         STACK permet à l'élève de ne taper que l'expression avec les valeurs de l'énoncé. S'il a construit la bonne formule statistique, on valide la compétence "modéliser", même si l'élève se trompe de 1 dans l'addition finale.
+
+🫀 THÈME 4 : PHYSIOLOGIE ET IMMUNOLOGIE
+10. Le débit cardiaque
+
+     Concept mathématique : Multiplication, conversion d'unités (mL vers L).
+     Scénario : Fréquence cardiaque (FC) x Volume d'éjection systolique (VES).
+     L'apport de STACK : 
+         L'erreur classique : le VES est en mL, le résultat doit être en L/min. 
+         STACK peut séparer le champs de la "Valeur numérique" et le champ "Unité" (via un menu déroulant). Si la valeur est juste mais l'unité fausse, la note n'est pas de 0, le feedback est : "Ton calcul est parfait, mais tu as oublié de convertir tes mL en Litres."
+
+11. Potentiel de repos (Équation de Nernst)
+
+     Concept mathématique : Logarithme décimal (log10​
+    ), division de concentrations.
+     Scénario : Calculer le potentiel de membrane d'un neurone en fonction des concentrations ioniques (Potassium K+
+    ).
+     L'apport de STACK : 
+         Le prof n'a pas à vérifier que l'élève a bien appuyé sur la touche "log" et non "ln" de sa calculatrice.
+         L'élève tape 60 * log10(5/140). Si l'élève inverse le numérateur et le dénominateur, le résultat devient positif. STACK capte l'erreur de signe et alerte : "Un potentiel de repos est normalement négatif. As-tu bien placé la concentration intra et extra-cellulaire ?"
+
+12. Titrage et dilutions en série (Immunologie)
+
+     Concept mathématique : Fractions, puissances de 10.
+     Scénario : Déterminer le titre d'anticorps après des dilutions successives au 1/10.
+     L'apport de STACK : 
+         Au lieu de demander le résultat final (devinable), on demande à l'élève d'écrire la formule de la dilution au tube n°4. Il doit taper 1 / (10^4). S'il tape 1/40, STACK identifie l'erreur classique (addition au lieu de multiplication des facteurs de dilution).
+
+💡 Conclusion stratégique pour ton outil
+
+Si tu implémentes ces modèles, ta grille de fonctionnalités ne parle plus de "Mathématiques", mais de "Évaluation par analyse d'expressions". 
+Tu peuxpitcher ton outil aux profs de SVT en disant : "C'est le seul générateur Moodle qui permet de noter l'expression littérale de l'élève en SVT. L'élève écrit la formule du χ2
+ ou de Nernst, l'outil vérifie s'il a compris la biologie, et se charge du calcul à sa place." C'est un argument de vente massif pour les profs de sciences expérimentales.
+ 
+ ⚙️ SI (Sciences de l'Ingénieur)
+
+En SI, les élèves manipulent des formules complexes, souvent issues de la physique, mais appliquées à des systèmes réels (moteurs, réducteurs, capteurs). Le blocage calculatoire est fréquent.
+1. Bilan de puissance et rendement global
+
+     Concept mathématique : Multiplications, divisions, équation du premier degré.
+     Scénario : Un ascenseur a une masse m
+    , une vitesse 
+    v
+    , un rendement de réducteur 
+    ηred​
+     et un rendement de moteur 
+    ηmot​
+    . Calculer la puissance électrique absorbée.
+     L'apport de STACK : L'élève n'a pas à faire 3 calculs intermédiaires. Il peut taper directement l'expression complète : m*g*v / (eta_red * eta_mot). S'il inverse les rendements ou oublie la gravité g
+    , STACK identifie précisément le terme manquant ou l'erreur d'organisation de la formule.
+
+2. Les lois de Kirchhoff et Thévenin (Électricité)
+
+     Concept mathématique : Systèmes d'équations linéaires, fractions.
+     Scénario : Déterminer la résistance équivalente ou le courant dans une branche d'un circuit à 3 mailles (avec la méthode de Millman ou Thévenin).
+     L'apport de STACK : Il y a "mille façons" d'écrire un résultat après avoir mis au même dénominateur. Un élève peut taper (R1*R2 + R1*R3)/(R1+R2+R3) ou R1 - (R1^2)/(R1+R2+R3). STACK dit : "Ces deux expressions sont algébriquement identiques, c'est juste." Sans CAS, le prof doit prévoir toutes les formes simplifiées, ce qui est un cauchemar.
+
+3. Modélisation par un système du premier ordre (Asservissement)
+
+     Concept mathématique : Fonctions de transfert complexes (variable p
+    ), limites.
+     Scénario : On donne H(p)=1+τpK​
+    . On demande l'erreur statique en réponse à un échelon d'amplitude 
+    E0​
+    .
+     L'apport de STACK : STACK comprend la variable symbolique p
+    . L'élève peut taper la formule de l'erreur statique : 
+    lim(E0 * (1 - K/(1+0*p)), p, 0) ou plus simplement E0 * (1 - K). Si l'élève tape E0 * K, STACK répond : "Ton résultat correspond à la valeur finale de la sortie, pas à l'erreur (qui est la différence entre l'entrée et la sortie)."
+
+💻 NSI (Numérique et Sciences Informatiques)
+
+En NSI, on est en plein dans l'abstraction et le discret. Le moteur CAS est surprenant ici, car il excelle dans la manipulation de suites, de puissances et de logiques non continues.
+4. La norme IEEE 754 (Représentation des flottants)
+
+     Concept mathématique : Addition de fractions en base 2, puissances négatives.
+     Scénario : "Représentez le nombre 0.1
+     en binaire. Quelle est la somme des puissances de 2 qui compose sa mantisse ?"
+     L'apport de STACK : La réponse est une somme infinie ou tronquée : 1/8 + 1/16 + 1/32 + 1/256 + ... ou en binaire 0.0001100110011.... Si l'élève tape 1/8 + 1/16 + 1/64 (en ayant oublié un terme), STACK évalue la somme, voit qu'elle ne vaut pas 0.1, et peut dire : "La somme de tes puissances donne 0.21875, et non 0.1. Il te manque des termes pour approcher la valeur réelle."
+
+5. Calculs de complexité algorithmique
+
+     Concept mathématique : Fonctions logarithmiques, puissances, comparaison de fonctions.
+     Scénario : "Un algorithme de dichotomie traite un tableau de taille n
+    . Exprimez le nombre d'opérations dans le pire des cas."
+     L'apport de STACK : La bonne réponse est ⌈log2​(n)⌉
+     ou simplement 
+    log(n)/log(2).
+         Si l'élève tape n/2, STACK répond : "Ceci est la complexité d'une recherche séquentielle (en parcourant la moitié de la liste), pas d'un algorithme qui divise la taille par 2 à chaque étape (dichotomie)."
+         Si l'élève tape 2^n, STACK identifie l'inverse de la fonction logarithmique.
+
+6. Dénombrement sur les structures de données (Arbres)
+
+     Concept mathématique : Suites géométriques, sommes.
+     Scénario : "Un arbre binaire complet de hauteur h
+     (racine à la profondeur 0). Exprimez le nombre total de nœuds en fonction de 
+    h
+    ."
+     L'apport de STACK : L'élève peut taper 2^(h+1) - 1 ou 1 + 2 + 2^2 + ... + 2^h ou 2*2^h - 1. Maxima valide tout. Si l'élève tape 2^h - 1 (erreur classique liée à la définition de la hauteur), STACK le corrige : "Tu as calculé le nombre de nœuds pour un arbre de hauteur h−1
+    ."
+
+📈 SES / Économie
+
+En SES, les élèves utilisent énormément les mathématiques, mais souvent de manière "mécanique" (appliquer une formule vue en cours). STACK permet de vérifier qu'ils comprennent la mécanique économique derrière la formule.
+7. Taux de variation, Coefficient multiplicateur et Indice
+
+     Concept mathématique : Fractions, pourcentages, équivalence (1+t)=CM=100Indice​
+    .
+     Scénario : "Le prix d'un bien passe de 50€ à 60€. Donnez le taux de variation, puis le coefficient multiplicateur."
+     L'apport de STACK : 
+         L'élève peut répondre au taux par 10/50, 0.2, ou 20%.
+         L'apport majeur est le feedback sur les erreurs de signe ou de base : S'il tape -0.2, STACK dit "Tu as calculé la baisse, mais ici le prix augmente". S'il tape 50/60, STACK dit "Tu as divisé l'ancien par le nouveau, c'est l'inverse".
+
+8. L'élasticité-prix de la demande
+
+     Concept mathématique : Quotient de variations relatives (ΔP/PΔQ/Q​
+    ).
+     Scénario : Calculer l'élasticité quand le prix passe de 10 à 12 et la demande de 100 à 80.
+     L'apport de STACK : La valeur exacte est (20/100) / (2/10) ce qui fait -1.
+         Si l'élève tape 1 (en oubliant le signe), STACK peut déclencher un feedback économique fort : "Ton calcul numérique est bon, mais en économie, le signe de l'élasticité a un sens. Que signifie un signe négatif pour un bien normal ?" (Loi de la demande).
+
+9. Le multiplicateur keynésien
+
+     Concept mathématique : Somme d'une série géométrique 1−c1​
+     (où 
+    c
+     est la propension marginale à consommer).
+     Scénario : "L'État augmente ses dépenses de 100 millions. La propension marginale à consommer (PMC) est de 0,8. Quelle est l'augmentation totale du revenu national ?"
+     L'apport de STACK : 
+         L'élève peut taper 100 * (1 / (1 - 0.8)) ou 100 / 0.2 ou 500.
+         Question poussée : "Exprimez le multiplicateur k
+         en fonction de la PMS (Propension Marginale à Épargner, notée 
+        s
+        )." L'élève doit taper 
+        1/s. S'il tape 1/(1-c), STACK dit : "C'est correct par rapport à la PMC, mais on te l'a demandé par rapport à la PMS (s
+        ). Que vaut 
+        s
+         par rapport à 
+        c
+         ?"
+
+10. Croissance nominale vs Croissance réelle (Équation Fisher)
+
+     Concept mathématique : Équation non-linéaire des taux : (1+rreˊel​)=1+inflation1+rnominal​​
+    .
+     Scénario : Le salaire nominal augmente de 5%, l'inflation est de 2%. Quel est le taux de croissance réel ?
+     L'apport de STACK : 
+         C'est le piège classique de SES : les élèves font 5%−2%=3%
+         (approximation) au lieu de 
+        1.021.05​−1≈2,94%
+        .
+         Si l'élève tape 0.03, STACK peut répondre : "Ton résultat utilise l'approximation (rnom​−inflation)
+        . C'est accepté pour des ordres de grandeur, mais ici on te demande la formule exacte de Fisher."
+         Si l'élève tape (1.05/1.02) - 1, STACK valide l'usage de la formule exacte, même s'il n'a pas fini le calcul à la main.

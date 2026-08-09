@@ -750,6 +750,24 @@ const HELP_CONTENT = {
         'L\'image importée comme guide n\'est qu\'un support visuel pour vous pendant le pointage : elle ne fait partie ni de la question enregistrée, ni de l\'export Moodle.',
         'Aucune génération aléatoire dans cette version : les positions digitalisées et Δt sont des valeurs fixes.'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── HARDY-WEINBERG (SVT)
+  hardyweinberg: {
+    title: '<svg class="hs-ico"><use href="#ico-type-hardyweinberg"></use></svg> Hardy-Weinberg — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>Pour une population en <b>équilibre de Hardy-Weinberg</b>, l\'élève retrouve, à partir du pourcentage d\'individus au phénotype récessif observé, la <b>fréquence de l\'allèle récessif q</b>, celle de l\'allèle dominant <b>p</b>, puis la fréquence des <b>hétérozygotes</b> (2pq).</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Espèce / Phénotype dominant / Phénotype récessif</b> : habillent l\'énoncé (ex. « souris », « pelage gris », « pelage blanc »).',
+        '<b>Fréquences possibles de q</b> : liste de fractions ou nombres séparés par des virgules (syntaxe Maxima, ex. <code>1/10,2/10,3/10</code>) — une valeur est tirée au hasard <b>côté Maxima, à chaque tentative de l\'élève</b> : une seule question STACK couvre ainsi toutes les variantes, sans qu\'aucun tirage ne se fasse côté professeur.',
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Le tirage aléatoire est natif Maxima (pas un tirage JS avant export) : contrairement à « Z-score » ou « Incertitude », l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Les trois sous-questions (q, p, hétérozygotes) sont toujours présentes, sans étape désactivable : le scénario n\'a de sens pédagogique qu\'avec les trois réponses.',
+        'Un piège classique est diagnostiqué automatiquement sur la sous-question des hétérozygotes : si l\'élève répond avec la fréquence des individus au phénotype <b>dominant</b> (1−q²) au lieu de la fréquence des <b>hétérozygotes</b> seuls (2pq), un feedback ciblé le lui signale.'
+      ])) + _HELP_COMMON
   }
 };
 

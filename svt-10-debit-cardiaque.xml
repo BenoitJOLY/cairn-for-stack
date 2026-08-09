@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Débit cardiaque (conversion mL vers L)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>Un individu a une fréquence cardiaque <b>FC = {@fc@} battements/min</b> et un volume d'éjection systolique <b>VES = {@ves_ml@} mL</b>.</p>
+<p>Calcule le débit cardiaque <i>Q</i> = FC &times; VES, exprimé en <b>L/min</b>.<br/>[[input:ans1]] [[validation:ans1]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>\( Q = FC \times VES \). Le VES est donné en mL, il faut le convertir en L (diviser par 1000) avant de multiplier, puisque le résultat est demandé en L/min.</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+fc_list: [60,65,70,72,75,80]$
+fc: fc_list[1+random(length(fc_list))]$
+ves_list: [60,65,70,75,80,90]$
+ves_ml: ves_list[1+random(length(ves_list))]$
+q_correct: fc*ves_ml/1000$
+err_forgot_convert: fc*ves_ml$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>q_correct</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>débit correct en L/min</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>q_correct</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct : \( Q = FC \times VES \) avec VES converti en L.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt1-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>conversion mL vers L oubliée</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>err_forgot_convert</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0.5</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Ton calcul est parfait, mais tu as oublié de convertir tes mL en litres : ta valeur est 1000 fois trop grande pour être exprimée en L/min. Divise le VES par 1000 avant de multiplier par FC.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt1-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. \( Q = FC \times VES \), en convertissant le VES de mL en L (division par 1000).</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+  </question>
+</quiz>

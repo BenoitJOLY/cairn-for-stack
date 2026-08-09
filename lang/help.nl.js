@@ -729,6 +729,24 @@ const HELP_CONTENT = {
         'De geïmporteerde hulpafbeelding is alleen een visueel hulpmiddel voor u tijdens het digitaliseren: ze maakt geen deel uit van de opgeslagen vraag, noch van de Moodle-export.',
         'Geen willekeurige generatie in deze versie: gedigitaliseerde posities en Δt zijn vaste waarden.'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── HARDY-WEINBERG (BIOLOGIE)
+  hardyweinberg: {
+    title: '<svg class="hs-ico"><use href="#ico-type-hardyweinberg"></use></svg> Hardy-Weinberg — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Voor een populatie in <b>Hardy-Weinberg-evenwicht</b> leidt de leerling, uitgaande van het waargenomen percentage individuen met het recessieve fenotype, de <b>frequentie van het recessieve allel q</b> af, die van het dominante allel <b>p</b>, en de frequentie van <b>heterozygoten</b> (2pq).</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Soort / Dominant fenotype / Recessief fenotype</b>: kleden de opgave aan (bv. "muizen", "grijze vacht", "witte vacht").',
+        '<b>Mogelijke frequenties van q</b>: lijst van breuken of getallen gescheiden door komma\'s (Maxima-syntax, bv. <code>1/10,2/10,3/10</code>) — bij elke poging van de leerling wordt <b>serverzijdig, via Maxima, willekeurig</b> een waarde getrokken: één STACK-vraag dekt zo alle varianten, zonder dat er aan de kant van de docent iets wordt getrokken.',
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'De willekeurige trekking is native Maxima (geen JS-trekking vóór export): anders dan bij "Z-score" of "Onzekerheid" kan het gesimuleerde voorbeeld geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'De drie subvragen (q, p, heterozygoten) zijn altijd aanwezig, geen enkele stap is uitschakelbaar: het scenario heeft pedagogisch alleen zin met alle drie de antwoorden.',
+        'Een klassieke fout wordt automatisch gediagnosticeerd bij de subvraag over heterozygoten: als de leerling antwoordt met de frequentie van individuen met <b>dominant</b> fenotype (1−q²) in plaats van de frequentie van <b>heterozygoten</b> alleen (2pq), wijst een gerichte feedback hierop.'
+      ])) + _HELP_COMMON
   }
 };
 

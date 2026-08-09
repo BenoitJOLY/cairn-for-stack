@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Modèle de Malthus (croissance exponentielle)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>Une population de levures {@croiss_desc@} toutes les heures. On part d'une population initiale de <b>{@n0@} individus</b>.</p>
+<p>Quelle est la taille de la population après <b>{@t@} heures</b> ?<br/>[[input:ans1]] [[validation:ans1]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>Modèle de croissance exponentielle (suite géométrique) : \( N_t = N_0 \times q^t \), où <i>q</i> est le facteur multiplicatif par période et <i>t</i> le nombre de périodes écoulées.</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+n0_list: [200,500,1000,2000]$
+n0: n0_list[1+random(length(n0_list))]$
+q_list: [2,3]$
+q: q_list[1+random(length(q_list))]$
+croiss_desc_list: ["double", "triple"]$
+croiss_desc: if q=2 then croiss_desc_list[1] else croiss_desc_list[2]$
+t_list: [10,12,15,18,20]$
+t: t_list[1+random(length(t_list))]$
+t_minus1: t-1$
+n_final: n0*q^t$
+err_offbyone: n0*q^t_minus1$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>n_final</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>population correcte</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>n_final</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct : \( N_t = N_0 \times q^t \).</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt1-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>erreur d'une période (t-1 au lieu de t)</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>err_offbyone</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Ton calcul est cohérent avec une durée de {@t_minus1@}h, mais l'énoncé indique {@t@}h — as-tu bien compté le bon nombre de périodes écoulées ?</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt1-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Utilise \( N_t = N_0 \times q^t \) avec le nombre de périodes écoulées indiqué dans l'énoncé.</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+  </question>
+</quiz>

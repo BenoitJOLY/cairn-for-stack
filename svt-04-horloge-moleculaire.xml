@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Horloge moléculaire (phylogénie)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>On compare une séquence homologue de <b>{@seq_val@} paires de bases</b> chez deux espèces. On dénombre <b>{@diff_val@}</b> nucléotides différents entre les deux séquences. Le taux de mutation neutre de ce gène est estimé à <b>{@taux_a@} &times; 10<sup>-9</sup></b> substitutions par site et par an (noté <i>mu</i>).</p>
+<p>On note <i>nbdiff</i> le nombre de nucléotides différents, <i>long_seq</i> la longueur de la séquence comparée, et <i>mu</i> le taux de mutation par site et par an. Les mutations s'accumulent indépendamment dans les deux lignées depuis leur divergence.</p>
+<p>a) Écris l'expression littérale de la date de divergence <i>T</i> (en années) en fonction de <i>nbdiff</i>, <i>long_seq</i> et <i>mu</i>.<br/>[[input:ans1]] [[validation:ans1]]</p>
+<p>b) Calcule la valeur numérique de cette date de divergence <i>T</i>, en années.<br/>[[input:ans2]] [[validation:ans2]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>La proportion de différences observée \( D = nbdiff/long\_seq \) résulte de mutations accumulées <b>indépendamment dans chacune des deux lignées</b> depuis la divergence, d'où le facteur 2 : \( D = 2 \times mu \times T \), soit \( T = nbdiff/(2 \times mu \times long\_seq) \).</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>2</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+seq_list: [1000, 2000, 5000]$
+seq_val: seq_list[1+random(length(seq_list))]$
+taux_list: [1,2,4,5,8]$
+taux_a: taux_list[1+random(length(taux_list))]$
+taux_val: taux_a*10^(-9)$
+dpct_list: [1,2,3,4,5,6,8,10]$
+d_pct: dpct_list[1+random(length(dpct_list))]$
+diff_val: seq_val*d_pct/100$
+ta_formula: nbdiff/(2*mu*long_seq)$
+err_no2_formula: nbdiff/(mu*long_seq)$
+t_val: diff_val/(2*taux_val*seq_val)$
+err_no2_val: diff_val/(taux_val*seq_val)$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]] [[feedback:prt2]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>ta_formula</tans>
+      <boxsize>20</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords>nbdiff,mu,long_seq</allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>numerical</type>
+      <tans>t_val</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>formule correcte</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>ta_formula</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt1-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>facteur 2 oublié (formule)</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>err_no2_formula</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Il te manque le facteur 2 au dénominateur : les mutations s'accumulent indépendamment dans <b>chacune</b> des deux lignées depuis la divergence, pas dans une seule.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt1-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. La date de divergence s'obtient en isolant <i>T</i> dans \( nbdiff/long\_seq = 2 \times mu \times T \).</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+
+    <prt>
+      <name>prt2</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>valeur numérique correcte</description>
+          <answertest>NumRelative</answertest>
+          <sans>ans2</sans>
+          <tans>t_val</tans>
+          <testoptions>0.01</testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt2-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt2-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>facteur 2 oublié (numérique)</description>
+          <answertest>NumRelative</answertest>
+          <sans>ans2</sans>
+          <tans>err_no2_val</tans>
+          <testoptions>0.01</testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt2-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Ta valeur est exactement le double de la bonne réponse : tu as oublié de diviser par 2 (accumulation des mutations dans les deux lignées). Toutes les écritures sont acceptées (ex : 4.5*10^7 ou 45000000).</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt2-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Reprends la formule de a) et substitue les valeurs numériques de l'énoncé.</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+  </question>
+</quiz>

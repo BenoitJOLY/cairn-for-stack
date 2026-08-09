@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Test du χ² (Khi-carré) en écologie</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>On souhaite vérifier si la répartition observée de 4 espèces dans un milieu correspond au modèle théorique attendu (40% / 30% / 20% / 10%), sur un échantillon total de <b>{@n_total@} individus</b> :</p>
+<table border="1" cellpadding="4">
+<tr><th>Espèce</th><th>Effectif observé O</th><th>Effectif théorique T</th></tr>
+<tr><td>A</td><td>{@o1@}</td><td>{@t1@}</td></tr>
+<tr><td>B</td><td>{@o2@}</td><td>{@t2@}</td></tr>
+<tr><td>C</td><td>{@o3@}</td><td>{@t3@}</td></tr>
+<tr><td>D</td><td>{@o4@}</td><td>{@t4@}</td></tr>
+</table>
+<p>Calcule la valeur du χ² pour cette répartition.<br/>[[input:ans1]] [[validation:ans1]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>\( \chi^2 = \sum \dfrac{(O-T)^2}{T} \) — on divise toujours par l'effectif <b>théorique</b> T (jamais par l'effectif observé O).</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+n_list: [100,200]$
+n_total: n_list[1+random(length(n_list))]$
+t1: n_total*2/5$
+t2: n_total*3/10$
+t3: n_total*1/5$
+t4: n_total*1/10$
+d_list: [2,4,6,8]$
+d_dev: d_list[1+random(length(d_list))]$
+e_list: [1,2,3]$
+e_dev: e_list[1+random(length(e_list))]$
+o1: t1+d_dev$
+o2: t2-d_dev$
+o3: t3+e_dev$
+o4: t4-e_dev$
+chi2: (o1-t1)^2/t1 + (o2-t2)^2/t2 + (o3-t3)^2/t3 + (o4-t4)^2/t4$
+err_wrong_denom: (o1-t1)^2/o1 + (o2-t2)^2/o2 + (o3-t3)^2/o3 + (o4-t4)^2/o4$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>chi2</tans>
+      <boxsize>25</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>χ² correct</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>chi2</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct : tu as construit et évalué la bonne formule statistique.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt1-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>division par O au lieu de T</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>err_wrong_denom</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Attention, tu as divisé par l'effectif <b>observé</b> (O) dans chaque terme, alors qu'il faut diviser par l'effectif <b>théorique</b> (T) : \( \chi^2 = \sum (O-T)^2/T \).</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt1-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Pour chaque espèce, calcule \( (O-T)^2/T \), puis fais la somme des 4 termes.</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+  </question>
+</quiz>

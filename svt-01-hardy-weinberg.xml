@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Hardy-Weinberg (équilibre génétique)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>Dans une population de souris en équilibre de Hardy-Weinberg, le caractère « pelage blanc » est récessif (allèle <i>q</i>) face au caractère « pelage gris » (allèle <i>p</i>). On observe que <b>{@q2_pct@} %</b> des souris de la population ont le pelage blanc.</p>
+<p>a) Quelle est la fréquence de l'allèle récessif (<i>q</i>) ?<br/>[[input:ans1]] [[validation:ans1]]</p>
+<p>b) Quelle est la fréquence de l'allèle dominant (<i>p</i>) ?<br/>[[input:ans2]] [[validation:ans2]]</p>
+<p>c) Quelle est la fréquence des individus hétérozygotes dans la population ?<br/>[[input:ans3]] [[validation:ans3]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>Rappel : sous les conditions de Hardy-Weinberg, \( p+q=1 \) et \( p^2+2pq+q^2=1 \).<br/>
+La fréquence du phénotype récessif observé donne directement \( q^2 \), d'où \( q=\sqrt{q^2} \), puis \( p=1-q \), puis la fréquence des hétérozygotes \( 2pq \).</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>3</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+list_q: [1/10,2/10,3/10,4/10,6/10,7/10,8/10,9/10]$
+q: list_q[1+random(length(list_q))]$
+q2: q^2$
+q2_pct: q2*100$
+p: 1-q$
+het: 2*p*q$
+err_dominant: 1-q2$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]] [[feedback:prt2]] [[feedback:prt3]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>q</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>algebraic</type>
+      <tans>p</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans3</name>
+      <type>algebraic</type>
+      <tans>het</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>q correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>q</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<p>Correct : \( q=\sqrt{q^2} \).</p> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[<p>Incorrect. La fréquence de l'allèle récessif est la racine carrée de la fréquence du phénotype récessif observé : \( q=\sqrt{q^2} \).</p> ]]></text></falsefeedback>
+      </node>
+    </prt>
+
+    <prt>
+      <name>prt2</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>p correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans2</sans>
+        <tans>p</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt2-0-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<p>Correct : \( p=1-q \).</p> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt2-0-F</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Utilise la relation \( p+q=1 \), donc \( p=1-q \).</p> ]]></text></falsefeedback>
+      </node>
+    </prt>
+
+    <prt>
+      <name>prt3</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>2pq correct</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans3</sans>
+          <tans>het</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt3-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct : la fréquence des hétérozygotes est \( 2pq \).</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt3-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>confusion phénotype dominant vs hétérozygotes</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans3</sans>
+          <tans>err_dominant</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt3-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Attention, tu as donné la fréquence des individus <b>dominants</b> ( \( 1-q^2 \), c'est-à-dire \( p^2+2pq \) ), mais on te demande la fréquence des <b>hétérozygotes</b> uniquement ( \( 2pq \) ).</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt3-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. La fréquence des hétérozygotes se calcule par \( 2pq \), avec \( p=1-q \) et \( q=\sqrt{q^2} \).</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+  </question>
+</quiz>

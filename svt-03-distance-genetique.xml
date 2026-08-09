@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Distance génétique et carte de liaison (test-cross)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>Un test-cross entre deux gènes liés donne la répartition phénotypique suivante sur la descendance :</p>
+<table border="1" cellpadding="4">
+<tr><th>Phénotype</th><th>Effectif</th></tr>
+<tr><td>Parental type 1</td><td>{@parental_half@}</td></tr>
+<tr><td>Parental type 2</td><td>{@parental_half@}</td></tr>
+<tr><td>Recombinant type 1</td><td>{@recomb_half@}</td></tr>
+<tr><td>Recombinant type 2</td><td>{@recomb_half@}</td></tr>
+<tr><td><b>Total</b></td><td><b>{@N@}</b></td></tr>
+</table>
+<p>a) Quel est le taux de recombinaison observé entre ces deux gènes ?<br/>[[input:ans1]] [[validation:ans1]]</p>
+<p>b) Quelle est la distance génétique entre ces deux gènes, exprimée en centiMorgans (cM) ?<br/>[[input:ans2]] [[validation:ans2]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>Le taux de recombinaison est le rapport (effectifs recombinants)/(effectif total). La distance génétique en centiMorgans se lit en multipliant ce taux par 100 : 1% de recombinaison correspond conventionnellement à 1 cM.</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>2</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+n_list: [1000, 2000]$
+n_total: n_list[1+random(length(n_list))]$
+rpct_list: [4,6,8,10,12,14,16,18,20,22,24]$
+r_pct: rpct_list[1+random(length(rpct_list))]$
+recomb: n_total*r_pct/100$
+recomb_half: recomb/2$
+parental: n_total-recomb$
+parental_half: parental/2$
+taux_recomb: recomb/n_total$
+distance_cM: taux_recomb*100$
+err_forgot_convert: taux_recomb$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]] [[feedback:prt2]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>taux_recomb</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>algebraic</type>
+      <tans>distance_cM</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>taux correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>taux_recomb</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<p>Correct.</p> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Le taux de recombinaison est le rapport (effectifs recombinants)/(effectif total).</p> ]]></text></falsefeedback>
+      </node>
+    </prt>
+
+    <prt>
+      <name>prt2</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>distance cM correcte</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans2</sans>
+          <tans>distance_cM</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt2-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct : 1% de recombinaison = 1 cM.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt2-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>oubli de conversion en cM</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans2</sans>
+          <tans>err_forgot_convert</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt2-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Ton calcul est juste, mais tu as redonné le taux de recombinaison (sans unité), pas la distance génétique. Multiplie ce taux par 100 pour l'exprimer en centiMorgans.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt2-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. La distance en cM s'obtient en multipliant le taux de recombinaison par 100.</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+  </question>
+</quiz>

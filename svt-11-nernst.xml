@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Potentiel de repos (équation de Nernst)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>Un neurone présente les concentrations en ions potassium K<sup>+</sup> suivantes : <b>[K<sup>+</sup>]<sub>extracellulaire</sub> = {@k_ext@} mM</b> et <b>[K<sup>+</sup>]<sub>intracellulaire</sub> = {@k_int@} mM</b>.</p>
+<p>À l'aide de l'équation de Nernst simplifiée \( E_K = 60 \times \log_{10}\!\left(\dfrac{[K^+]_{ext}}{[K^+]_{int}}\right) \) (en mV), calcule le potentiel d'équilibre du potassium.<br/>[[input:ans1]] [[validation:ans1]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>\( E_K = 60 \times \log_{10}(C_{ext}/C_{int}) \). Comme le potassium est bien plus concentré à l'intérieur de la cellule, le rapport \( C_{ext}/C_{int} \) est inférieur à 1, donc son logarithme est négatif : un potentiel de repos est physiologiquement négatif.</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+kext_list: [3,4,5,6]$
+k_ext: kext_list[1+random(length(kext_list))]$
+kint_list: [120,130,140,150,155]$
+k_int: kint_list[1+random(length(kint_list))]$
+e_correct: 60*log(k_ext/k_int)/log(10)$
+err_inverted: 60*log(k_int/k_ext)/log(10)$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>e_correct</tans>
+      <boxsize>20</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>potentiel correct (négatif)</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>e_correct</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct : \( E_K = 60 \times \log_{10}(C_{ext}/C_{int}) \), un potentiel de repos négatif.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt1-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>concentrations intra/extra inversées (signe positif)</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>err_inverted</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Un potentiel de repos est normalement négatif. As-tu bien placé la concentration intra et extracellulaire ? Le rapport doit être \( C_{ext}/C_{int} \), pas l'inverse.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt1-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Utilise \( E_K = 60 \times \log_{10}(C_{ext}/C_{int}) \) avec les concentrations extra- et intracellulaires données.</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+  </question>
+</quiz>

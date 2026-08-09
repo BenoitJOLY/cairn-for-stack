@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Temps de trajet des ondes sismiques (délai P/S)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>Une station sismique enregistre un séisme situé à une distance épicentrale de <b>{@d@} km</b>. L'onde P se propage à <b>{@vp@} km/s</b>, l'onde S se propage à <b>{@vs@} km/s</b> (l'onde P est toujours plus rapide que l'onde S).</p>
+<p>Quel est le délai, en secondes, entre l'arrivée de l'onde P et l'arrivée de l'onde S à cette station ?<br/>[[input:ans1]] [[validation:ans1]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>Chaque onde met un temps \( t = d/v \) pour parcourir la distance \( d \). L'onde P arrive en premier (plus rapide), l'onde S arrive ensuite : le délai observé est donc \( \Delta t = d/v_S - d/v_P \).</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+d_list: [80,120,150,200,240,300]$
+d: d_list[1+random(length(d_list))]$
+vp_list: [6,7,8]$
+vp: vp_list[1+random(length(vp_list))]$
+vs_list: [3,7/2,4,9/2]$
+vs: vs_list[1+random(length(vs_list))]$
+delta_t: d/vs - d/vp$
+err_reversed: d/vp - d/vs$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>delta_t</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>délai correct</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>delta_t</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct : \( \Delta t = d/v_S - d/v_P \).</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt1-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>ordre de soustraction inversé</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans1</sans>
+          <tans>err_reversed</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt1-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Ton résultat est négatif : tu as inversé l'ordre de la soustraction. L'onde P arrive en premier (elle est plus rapide), donc le délai observé est (temps d'arrivée de S) − (temps d'arrivée de P), soit \( d/v_S - d/v_P \).</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt1-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Calcule séparément le temps de trajet de chaque onde ( \( t=d/v \) ), puis soustrais.</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+  </question>
+</quiz>

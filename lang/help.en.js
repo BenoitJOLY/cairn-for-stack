@@ -721,6 +721,24 @@ const HELP_CONTENT = {
         'The imported guide image is only a visual aid for you while digitizing: it is part neither of the saved question nor of the Moodle export.',
         'No random generation in this version: the digitized positions and Δt are fixed values.'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── HARDY-WEINBERG (BIOLOGY)
+  hardyweinberg: {
+    title: '<svg class="hs-ico"><use href="#ico-type-hardyweinberg"></use></svg> Hardy-Weinberg — Help',
+    body:
+      _hSection('What it is for',
+        '<p>For a population at <b>Hardy-Weinberg equilibrium</b>, the student derives, from the observed percentage of individuals with the recessive phenotype, the <b>recessive allele frequency q</b>, the dominant allele frequency <b>p</b>, and the <b>heterozygote frequency</b> (2pq).</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Species / Dominant phenotype / Recessive phenotype</b>: dress up the statement (e.g. "mice", "grey coat", "white coat").',
+        '<b>Possible frequencies for q</b>: list of fractions or numbers separated by commas (Maxima syntax, e.g. <code>1/10,2/10,3/10</code>) — a value is drawn at random <b>server-side, via Maxima, on every attempt by the student</b>: a single STACK question therefore covers every variant, with no draw happening on the teacher side.',
+        '<b>Statement / instructions</b>: optional text added before the generated question.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'The random draw is native Maxima (not a JS draw before export): unlike "Z-score" or "Uncertainty", the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'All three sub-questions (q, p, heterozygotes) are always present, with no toggleable step: the scenario only makes pedagogical sense with all three answers.',
+        'A classic mistake is automatically diagnosed on the heterozygote sub-question: if the student answers with the frequency of <b>dominant</b>-phenotype individuals (1−q²) instead of the <b>heterozygotes</b> alone (2pq), a targeted feedback points it out.'
+      ])) + _HELP_COMMON
   }
 };
 

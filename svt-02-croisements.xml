@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Croisements mono/dihybridisme (gène lié à l'X)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>On réalise un croisement chez <i>Drosophila melanogaster</i> portant sur deux caractères indépendants :</p>
+<ul>
+<li>Un gène <b>autosomal</b> contrôlant la forme des ailes (ailes normales dominant, ailes <i>vestigiales</i> récessif) : croisement {@auto_desc@}.</li>
+<li>Un gène <b>lié au chromosome X</b> contrôlant la couleur des yeux (yeux normaux dominant, yeux <i>blancs</i> récessif) : croisement entre {@sex_desc@}.</li>
+</ul>
+<p>a) Quelle est la probabilité qu'un descendant ait les ailes vestigiales (phénotype récessif) ?<br/>[[input:ans1]] [[validation:ans1]]</p>
+<p>b) Quelle est la probabilité qu'un descendant soit un <b>mâle aux yeux blancs</b> ?<br/>[[input:ans2]] [[validation:ans2]]</p>
+<p>c) En supposant les deux gènes indépendants, quelle est la probabilité qu'un descendant soit à la fois <b>mâle</b>, aux <b>yeux blancs</b>, ET aux <b>ailes vestigiales</b> ?<br/>[[input:ans3]] [[validation:ans3]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>Le gène des ailes est autosomal : le ratio phénotypique se lit directement sur l'échiquier de croisement classique. Le gène des yeux est lié à l'X : le sexe et le phénotype ne sont PAS indépendants (les mâles sont hémizygotes, ils n'ont qu'un seul allèle X). La probabilité « mâle ET yeux blancs » se lit directement sur l'échiquier de croisement du gène lié à l'X, elle ne se calcule PAS en multipliant naïvement P(mâle)=1/2 par un ratio autosomal 1/4. La probabilité finale combine les deux gènes indépendants par multiplication : \( p_{total} = p_{ailes} \times p_{yeuxmâle} \).</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>3</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+auto_types: ["<i>Vv</i> (hétérozygote) &times; <i>Vv</i> (hétérozygote)", "<i>Vv</i> (hétérozygote) &times; <i>vv</i> (homozygote récessif, test-cross)"]$
+auto_probs: [1/4, 1/2]$
+idx_auto: 1+random(2)$
+auto_desc: auto_types[idx_auto]$
+p_auto: auto_probs[idx_auto]$
+sexlinked_types: ["une mère porteuse (X<sup>W</sup>X<sup>w</sup>) et un père aux yeux normaux (X<sup>W</sup>Y)", "une mère aux yeux blancs (X<sup>w</sup>X<sup>w</sup>) et un père aux yeux normaux (X<sup>W</sup>Y)"]$
+sexlinked_probs: [1/4, 1/2]$
+idx_sex: 1+random(2)$
+sex_desc: sexlinked_types[idx_sex]$
+p_sexlinked: sexlinked_probs[idx_sex]$
+err_naive_sex: (1/2)*(1/4)$
+p_total: p_auto*p_sexlinked$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]] [[feedback:prt2]] [[feedback:prt3]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>p_auto</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>algebraic</type>
+      <tans>p_sexlinked</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans3</name>
+      <type>algebraic</type>
+      <tans>p_total</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>p_auto correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>p_auto</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<p>Correct.</p> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Relis l'échiquier de croisement du gène autosomal : compte la proportion de descendants homozygotes récessifs sur l'ensemble des combinaisons possibles.</p> ]]></text></falsefeedback>
+      </node>
+    </prt>
+
+    <prt>
+      <name>prt2</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <nodes>
+        <node>
+          <name>0</name>
+          <description>p_sexlinked correct</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans2</sans>
+          <tans>p_sexlinked</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>1</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt2-0-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Correct : le sexe et le phénotype ne sont pas indépendants pour un gène lié à l'X.</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>1</falsenextnode>
+          <falseanswernote>prt2-0-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[ ]]></text></falsefeedback>
+        </node>
+        <node>
+          <name>1</name>
+          <description>confusion multiplication naïve P(mâle)*ratio autosomal</description>
+          <answertest>AlgEquiv</answertest>
+          <sans>ans2</sans>
+          <tans>err_naive_sex</tans>
+          <testoptions></testoptions>
+          <quiet>0</quiet>
+          <truescoremode>=</truescoremode>
+          <truescore>0</truescore>
+          <truepenalty></truepenalty>
+          <truenextnode>-1</truenextnode>
+          <trueanswernote>prt2-1-T</trueanswernote>
+          <truefeedback format="html"><text><![CDATA[<p>Attention, tu as multiplié P(mâle)=1/2 par un ratio autosomal 1/4, mais un gène lié à l'X n'est pas indépendant du sexe : le mâle est hémizygote (un seul X). Reconstruis directement l'échiquier de croisement du gène lié à l'X pour lire la proportion « mâle ET yeux blancs ».</p> ]]></text></truefeedback>
+          <falsescoremode>=</falsescoremode>
+          <falsescore>0</falsescore>
+          <falsepenalty></falsepenalty>
+          <falsenextnode>-1</falsenextnode>
+          <falseanswernote>prt2-1-F</falseanswernote>
+          <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Construis l'échiquier de croisement du gène lié à l'X et compte la proportion de descendants qui sont à la fois mâles et aux yeux blancs.</p> ]]></text></falsefeedback>
+        </node>
+      </nodes>
+    </prt>
+
+    <prt>
+      <name>prt3</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>p_total correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans3</sans>
+        <tans>p_total</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt3-0-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<p>Correct : les deux gènes étant indépendants, les probabilités se multiplient.</p> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt3-0-F</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Deux gènes indépendants : multiplie la probabilité obtenue en a) par celle obtenue en b).</p> ]]></text></falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>

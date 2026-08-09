@@ -3614,6 +3614,7 @@ I18N.add("en", {
   "palette.cat.physique":      "Physics",
   "palette.cat.chimie":        "Chemistry",
   "palette.cat.sciences":      "Science (General)",
+  "palette.cat.svt":           "Biology",
   "palette.cat.info":          "Computer science",
   "palette.cat.textuelle":     "Text answer",
   "palette.cat.organisation":  "Organisation",
@@ -4766,6 +4767,21 @@ I18N.add("en", {
   "cin.jsx_lbl_inverser": "Invert",
   "cin.jsx_lbl_tracer_dv": "Draw Δv",
   "cin.jsx_lbl_recommencer": "↻ Restart",
+
+  /* ── Hardy-Weinberg (Biology, population genetics) ── */
+  "type.hardyweinberg":        "Hardy-Weinberg (genetic equilibrium)",
+  "data.label.hardyweinberg":  "🧬 Hardy-Weinberg",
+  "hw.title": "Hardy-Weinberg (genetic equilibrium)",
+  "hw.info_box": "Population at Hardy-Weinberg equilibrium: the recessive allele frequency q is drawn at random (server-side, via Maxima, on every attempt) from the list given below — a single STACK question therefore covers every variant.",
+  "hw.espece_lbl": "Species",
+  "hw.pheno_dom_lbl": "Dominant phenotype",
+  "hw.pheno_rec_lbl": "Recessive phenotype",
+  "hw.intro_lbl": "Statement / instructions (optional, added before the question)",
+  "hw.qlist_title": "Possible frequencies for the recessive allele q",
+  "hw.qlist_hint": "List of fractions or numbers separated by commas (Maxima syntax); at least two values, one is drawn at random on every attempt.",
+  "hw.fbgen_auto_desc": "The correction (q, p, heterozygotes) is generated automatically.",
+  "hw.preview_empty": "Question generated automatically — see the real preview for an example.",
+  "hw.preview_steps_title": "Sub-questions",
 
   /* ── Nomenclature (Physique-Chimie) ── */
   "type.nomenclature":       "Nomenclature (organic chemistry)",

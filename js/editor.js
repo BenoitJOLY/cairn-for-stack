@@ -255,7 +255,8 @@ const TYPE_ICON_MAP = {
   'incertitude':'incertitude',
   'zscore':'zscore',
   'avancement':'avancement',
-  'cinematique':'cinematique'
+  'cinematique':'cinematique',
+  'hardyweinberg':'hardyweinberg'
 };
 
 function initEditor() {

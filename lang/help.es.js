@@ -729,6 +729,24 @@ const HELP_CONTENT = {
         'La imagen importada como guía es solo una ayuda visual para usted durante la digitalización: no forma parte ni de la pregunta guardada ni de la exportación a Moodle.',
         'Sin generación aleatoria en esta versión: las posiciones digitalizadas y Δt son valores fijos.'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── HARDY-WEINBERG (BIOLOGÍA)
+  hardyweinberg: {
+    title: '<svg class="hs-ico"><use href="#ico-type-hardyweinberg"></use></svg> Hardy-Weinberg — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>Para una población en <b>equilibrio de Hardy-Weinberg</b>, el estudiante determina, a partir del porcentaje observado de individuos con fenotipo recesivo, la <b>frecuencia del alelo recesivo q</b>, la del alelo dominante <b>p</b>, y la frecuencia de <b>heterocigotos</b> (2pq).</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Especie / Fenotipo dominante / Fenotipo recesivo</b>: visten el enunciado (ej. «ratones», «pelaje gris», «pelaje blanco»).',
+        '<b>Frecuencias posibles de q</b>: lista de fracciones o números separados por comas (sintaxis Maxima, ej. <code>1/10,2/10,3/10</code>) — un valor se sortea aleatoriamente <b>del lado de Maxima, en cada intento del estudiante</b>: una sola pregunta STACK cubre así todas las variantes, sin ningún sorteo del lado del profesor.',
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'El sorteo aleatorio es nativo de Maxima (no un sorteo JS antes de exportar): a diferencia de «Z-score» o «Incertidumbre», la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Las tres subpreguntas (q, p, heterocigotos) siempre están presentes, sin ningún paso desactivable: el escenario solo tiene sentido pedagógico con las tres respuestas.',
+        'Un error clásico se diagnostica automáticamente en la subpregunta de heterocigotos: si el estudiante responde con la frecuencia de individuos de fenotipo <b>dominante</b> (1−q²) en lugar de la frecuencia de <b>heterocigotos</b> solos (2pq), un feedback específico se lo señala.'
+      ])) + _HELP_COMMON
   }
 };
 

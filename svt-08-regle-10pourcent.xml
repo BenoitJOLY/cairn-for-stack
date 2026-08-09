@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="stack">
+    <name><text>SVT - Règle du 10% (pyramides de biomasse)</text></name>
+    <questiontext format="html">
+      <text><![CDATA[
+<p>Un écosystème produit <b>{@b0@} kg</b> de biomasse de phytoplancton (niveau trophique 1). On admet la règle du 10% : seuls 10% de la biomasse d'un niveau trophique sont transférés au niveau trophique supérieur.</p>
+<p>a) Quelle biomasse atteint le prédateur situé au <b>{@n_partA@}<sup>e</sup> niveau trophique</b> (le phytoplancton étant le niveau 1) ?<br/>[[input:ans1]] [[validation:ans1]]</p>
+<p>b) Une population de prédateurs a besoin de <b>{@b_need@} kg</b> de nourriture par an pour subsister. Combien de niveaux trophiques supplémentaires cette chaîne alimentaire peut-elle supporter au maximum à partir du phytoplancton ?<br/>[[input:ans2]] [[validation:ans2]]</p>
+]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[
+<p>Biomasse au niveau <i>n</i> : \( B_n = B_0 \times 0.1^n \) (avec \( n \) le nombre de transferts depuis le niveau 1). Nombre maximal de niveaux supportables sachant le besoin \( B_{besoin} \) : \( n_{max} = \lfloor \log(B_{besoin}/B_0)/\log(0.1) \rfloor \).</p>
+]]> </text>
+    </generalfeedback>
+    <defaultgrade>2</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion><text>2024092500</text></stackversion>
+    <questionvariables>
+      <text><![CDATA[
+b0_list: [5000,10000,20000,50000]$
+b0: b0_list[1+random(length(b0_list))]$
+npartA_list: [2,3,4]$
+n_partA: npartA_list[1+random(length(npartA_list))]$
+biomasse_a: b0*(1/10)^(n_partA-1)$
+k_list: [1,2,3]$
+k_target: k_list[1+random(length(k_list))]$
+m_list: [1/5,3/10,2/5,1/2,3/5,7/10,4/5,9/10,1]$
+m_val: m_list[1+random(length(m_list))]$
+b_need: b0*m_val/10^k_target$
+x_val: b_need/b0$
+n_max: floor(float(log(x_val)/log(0.1)))$
+      ]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]] [[feedback:prt2]]</div> ]]></text>
+    </specificfeedback>
+
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>biomasse_a</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>algebraic</type>
+      <tans>n_max</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+
+    <prt>
+      <name>prt1</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>biomasse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>biomasse_a</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<p>Correct : \( B_0 \times 0.1^n \).</p> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Applique la règle du 10% une fois par transfert de niveau trophique : \( B_0 \times 0.1^n \), où <i>n</i> est le nombre de transferts depuis le phytoplancton.</p> ]]></text></falsefeedback>
+      </node>
+    </prt>
+
+    <prt>
+      <name>prt2</name>
+      <value>1</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables><text></text></feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>nombre de niveaux correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans2</sans>
+        <tans>n_max</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt2-0-T</trueanswernote>
+        <truefeedback format="html"><text><![CDATA[<p>Correct.</p> ]]></text></truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt2-0-F</falseanswernote>
+        <falsefeedback format="html"><text><![CDATA[<p>Incorrect. Pose l'inégalité \( B_0 \times 0.1^n \geq B_{besoin} \) et résous en <i>n</i> à l'aide d'un logarithme : \( n_{max} = \lfloor \log(B_{besoin}/B_0)/\log(0.1) \rfloor \).</p> ]]></text></falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>
