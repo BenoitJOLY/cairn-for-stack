@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.stack-assessment.org)",
+      "Bash(awk -F: '$1 > 4455 && $1 < 4500')",
+      "PowerShell(if \\($?\\) { \"OK\" } else { \"ERREUR\" })",
+      "Bash(python3)",
+      "Bash(sed -n '1,39p;257,298p' js/generators.js)",
+      "Read(//tmp/**)",
+      "PowerShell(node --check \"js\\\\gen-numerical.js\")",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(python drive4.py)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  }
+}

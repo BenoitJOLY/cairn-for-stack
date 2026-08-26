@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396948  -->
+  <question type="stack">
+    <name>
+      <text>Q1 — Mots Croisés (Levenshtein graduel)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#ea580c;border-left:5px solid #c2410c;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Mots Croisés</strong>
+        <span style="background:#c2410c;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 10 pt</span>
+        <span style="background:#ffffff;color:#c2410c;border:1px solid #c2410c;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🧩 Grille interactive</span>
+      </div>
+      <!-- ENONCE-START --><div style="background:#eff6ff;border-left:4px solid #3b82f6;padding:8px 14px;border-radius:0 6px 6px 0;margin-bottom:16px;font-size:.85rem;color:#1e40af;">
+        💡 <strong>Barème :</strong> Mot exact = 1 pt. 1 faute d'orthographe (même longueur) = 0.5 pt. 2 fautes = 0.25 pt. 3 fautes ou plus (ou longueur incorrecte) = 0 pt.
+      </div><!-- ENONCE-END -->
+      <div id="cw-grid" style="display:inline-grid; gap:0; border:2px solid #4095AD; background:#4095AD; grid-template-columns:repeat(17, 30px); grid-template-rows:repeat(14, 30px); margin-bottom: 20px;"><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-0"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">1</span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-5-1"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">2</span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-9-1"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">3</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-1"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-11-1"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-1"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-13-1"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-14-1"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-15-1"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-0-2"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">4</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-1-2"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-2-2"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">5</span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-5-2"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-2"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">6</span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-2"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-2-3"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-5-3"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-3"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-3"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">7</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-11-3"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-3"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">8</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-13-3"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-14-3"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-15-3"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-16-3"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-2-4"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-5-4"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-4"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-4"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-4"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-2-5"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-5-5"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-5"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-5"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-5"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-1-6"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">9</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-2-6"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-3-6"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-4-6"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-5-6"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-6-6"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-6"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-6"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-2-7"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-7"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">10</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-8-7"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-9-7"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-7"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-11-7"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-7"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">11</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-13-7"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-14-7"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-15-7"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-16-7"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-8"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-10-8"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-8"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-9"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-9-9"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">12</span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-9"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-4-10"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">13</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-5-10"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-6-10"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-10"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-8-10"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-9-10"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-11-10"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">14</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-10"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-13-10"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-14-10"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-15-10"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-16-10"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-11"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-9-11"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-11"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-6-12"></span><span style="position:absolute;top:1px;left:2px;font-size:10px;color:black;font-weight:normal;">15</span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-7-12"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-8-12"></span></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-9-12"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-12"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-9-13"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:white;border:1px solid #999;"><span id="cw-12-13"></span></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div><div style="width:30px;height:30px;background:#4095AD;"></div></div>
+      <div style="margin-top: 20px;">
+        <h4>Horizontal</h4>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li style="margin-bottom: 10px;"><strong>3.</strong> Grandeur électrique souvent associée à l'amplitude du signal.<br>[[input:cw1_3]] [[validation:cw1_3]]</li>
+          <li style="margin-bottom: 10px;"><strong>4.</strong> Sensation auditive produite par une vibration mécanique.<br>[[input:cw1_4]] [[validation:cw1_4]]</li>
+          <li style="margin-bottom: 10px;"><strong>7.</strong> Connexion permettant le passage de la perturbation.<br>[[input:cw1_7]] [[validation:cw1_7]]</li>
+          <li style="margin-bottom: 10px;"><strong>9.</strong> Caractéristique liée à la fréquence perçue par l'oreille.<br>[[input:cw1_9]] [[validation:cw1_9]]</li>
+          <li style="margin-bottom: 10px;"><strong>10.</strong> Processus de diminution de l'énergie lors d'une traversée.<br>[[input:cw1_10]] [[validation:cw1_10]]</li>
+          <li style="margin-bottom: 10px;"><strong>13.</strong> Espace matériel traversé par la propagation.<br>[[input:cw1_13]] [[validation:cw1_13]]</li>
+          <li style="margin-bottom: 10px;"><strong>14.</strong> Variation d'une grandeur physique porteuse d'une information.<br>[[input:cw1_14]] [[validation:cw1_14]]</li>
+          <li style="margin-bottom: 10px;"><strong>15.</strong> Phénomène de propagation d'une perturbation dans un milieu.<br>[[input:cw1_15]] [[validation:cw1_15]]</li>
+        </ul>
+        <h4>Vertical</h4>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li style="margin-bottom: 10px;"><strong>1.</strong> Rebondissement contre une paroi rigide.<br>[[input:cw1_1]] [[validation:cw1_1]]</li>
+          <li style="margin-bottom: 10px;"><strong>2.</strong> Qualité qui permet de distinguer deux instruments jouant la même note.<br>[[input:cw1_2]] [[validation:cw1_2]]</li>
+          <li style="margin-bottom: 10px;"><strong>5.</strong> Mesure logarithmique de l'amplitude acoustique.<br>[[input:cw1_5]] [[validation:cw1_5]]</li>
+          <li style="margin-bottom: 10px;"><strong>6.</strong> Déviation de la trajectoire lors du passage par une ouverture.<br>[[input:cw1_6]] [[validation:cw1_6]]</li>
+          <li style="margin-bottom: 10px;"><strong>8.</strong> Mélange gazeux assurant le transport habituel de la vibration.<br>[[input:cw1_8]] [[validation:cw1_8]]</li>
+          <li style="margin-bottom: 10px;"><strong>11.</strong> Durée nécessaire pour effectuer un cycle complet.<br>[[input:cw1_11]] [[validation:cw1_11]]</li>
+          <li style="margin-bottom: 10px;"><strong>12.</strong> Intervalle temporel entre deux instants.<br>[[input:cw1_12]] [[validation:cw1_12]]</li>
+        </ul>
+      </div>
+      <script>
+          (function() {
+              const cellMap = {"10,0":[{"input":"cw1_1","index":0}],"10,1":[{"input":"cw1_1","index":1},{"input":"cw1_3","index":1}],"10,2":[{"input":"cw1_1","index":2}],"10,3":[{"input":"cw1_1","index":3},{"input":"cw1_7","index":0}],"10,4":[{"input":"cw1_1","index":4}],"10,5":[{"input":"cw1_1","index":5}],"10,6":[{"input":"cw1_1","index":6}],"10,7":[{"input":"cw1_1","index":7},{"input":"cw1_10","index":3}],"10,8":[{"input":"cw1_1","index":8}],"5,1":[{"input":"cw1_2","index":0}],"5,2":[{"input":"cw1_2","index":1}],"5,3":[{"input":"cw1_2","index":2}],"5,4":[{"input":"cw1_2","index":3}],"5,5":[{"input":"cw1_2","index":4}],"5,6":[{"input":"cw1_2","index":5},{"input":"cw1_9","index":4}],"9,1":[{"input":"cw1_3","index":0}],"11,1":[{"input":"cw1_3","index":2}],"12,1":[{"input":"cw1_3","index":3}],"13,1":[{"input":"cw1_3","index":4}],"14,1":[{"input":"cw1_3","index":5}],"15,1":[{"input":"cw1_3","index":6}],"0,2":[{"input":"cw1_4","index":0}],"1,2":[{"input":"cw1_4","index":1}],"2,2":[{"input":"cw1_4","index":2},{"input":"cw1_5","index":0}],"2,3":[{"input":"cw1_5","index":1}],"2,4":[{"input":"cw1_5","index":2}],"2,5":[{"input":"cw1_5","index":3}],"2,6":[{"input":"cw1_5","index":4},{"input":"cw1_9","index":1}],"2,7":[{"input":"cw1_5","index":5}],"7,2":[{"input":"cw1_6","index":0}],"7,3":[{"input":"cw1_6","index":1}],"7,4":[{"input":"cw1_6","index":2}],"7,5":[{"input":"cw1_6","index":3}],"7,6":[{"input":"cw1_6","index":4},{"input":"cw1_9","index":6}],"7,7":[{"input":"cw1_6","index":5},{"input":"cw1_10","index":0}],"7,8":[{"input":"cw1_6","index":6}],"7,9":[{"input":"cw1_6","index":7}],"7,10":[{"input":"cw1_6","index":8},{"input":"cw1_13","index":3}],"7,11":[{"input":"cw1_6","index":9}],"7,12":[{"input":"cw1_6","index":10},{"input":"cw1_15","index":1}],"11,3":[{"input":"cw1_7","index":1}],"12,3":[{"input":"cw1_7","index":2},{"input":"cw1_8","index":0}],"13,3":[{"input":"cw1_7","index":3}],"14,3":[{"input":"cw1_7","index":4}],"15,3":[{"input":"cw1_7","index":5}],"16,3":[{"input":"cw1_7","index":6}],"12,4":[{"input":"cw1_8","index":1}],"12,5":[{"input":"cw1_8","index":2}],"1,6":[{"input":"cw1_9","index":0}],"3,6":[{"input":"cw1_9","index":2}],"4,6":[{"input":"cw1_9","index":3}],"6,6":[{"input":"cw1_9","index":5}],"8,7":[{"input":"cw1_10","index":1}],"9,7":[{"input":"cw1_10","index":2}],"11,7":[{"input":"cw1_10","index":4}],"12,7":[{"input":"cw1_10","index":5},{"input":"cw1_11","index":0}],"13,7":[{"input":"cw1_10","index":6}],"14,7":[{"input":"cw1_10","index":7}],"15,7":[{"input":"cw1_10","index":8}],"16,7":[{"input":"cw1_10","index":9}],"12,8":[{"input":"cw1_11","index":1}],"12,9":[{"input":"cw1_11","index":2}],"12,10":[{"input":"cw1_11","index":3},{"input":"cw1_14","index":1}],"12,11":[{"input":"cw1_11","index":4}],"12,12":[{"input":"cw1_11","index":5}],"12,13":[{"input":"cw1_11","index":6}],"9,9":[{"input":"cw1_12","index":0}],"9,10":[{"input":"cw1_12","index":1},{"input":"cw1_13","index":5}],"9,11":[{"input":"cw1_12","index":2}],"9,12":[{"input":"cw1_12","index":3},{"input":"cw1_15","index":3}],"9,13":[{"input":"cw1_12","index":4}],"4,10":[{"input":"cw1_13","index":0}],"5,10":[{"input":"cw1_13","index":1}],"6,10":[{"input":"cw1_13","index":2}],"8,10":[{"input":"cw1_13","index":4}],"11,10":[{"input":"cw1_14","index":0}],"13,10":[{"input":"cw1_14","index":2}],"14,10":[{"input":"cw1_14","index":3}],"15,10":[{"input":"cw1_14","index":4}],"16,10":[{"input":"cw1_14","index":5}],"6,12":[{"input":"cw1_15","index":0}],"8,12":[{"input":"cw1_15","index":2}]};
+              function updateGrid() {
+                  Object.keys(cellMap).forEach(coord => {
+                      const parts = coord.split(','); const x = parts[0]; const y = parts[1];
+                      const cellSpan = document.getElementById('cw-' + x + '-' + y);
+                      if(cellSpan) {
+                          let letterFound = '';
+                          for (let i = 0; i < cellMap[coord].length; i++) {
+                              const mapping = cellMap[coord][i];
+                              const inputEl = document.querySelector('input[name$="' + mapping.input + '"]');
+                              if(inputEl) { const val = inputEl.value || ''; if(val.charAt(mapping.index)) { letterFound = val.charAt(mapping.index).toUpperCase(); break; } }
+                          }
+                          cellSpan.textContent = letterFound;
+                      }
+                  });
+              }
+              document.addEventListener('input', function(e) { if (e.target.tagName === 'INPUT' && e.target.name) updateGrid(); });
+              setTimeout(updateGrid, 500);
+          })();
+      </script>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<style>
+        .cw-fb-grid{display:inline-grid;gap:0;border:2px solid #4095AD;background:#4095AD;}
+        .cw-fb-cell{width:30px;height:30px;display:flex;justify-content:center;align-items:center;font-weight:bold;text-transform:uppercase;position:relative;background:#fff;border:1px solid #999;color:#1e293b;font-size:.85rem;}
+        .cw-fb-cell.empty{background:#4095AD;border:none;}
+        .cw-fb-num{position:absolute;top:1px;left:2px;font-size:9px;color:#000;font-weight:normal;}
+      </style>
+      <div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold;color:#1e3a5f;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponses attendues
+        </div>
+        <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
+          <span style="font-weight:bold;color:#1e3a5f;">Q1 — Mots Croisés</span>
+          <span style="color:#64748b;font-size:.85rem;margin-left:6px;">Grille complétée</span>
+        </div>
+        <div style="margin-top:8px;overflow-x:auto;">
+          <div class="cw-fb-grid" style="grid-template-columns:repeat(17,30px);grid-template-rows:repeat(14,30px);">
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">1</span>R</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">2</span>T</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">3</span>T</div><div class="cw-fb-cell">E</div><div class="cw-fb-cell">N</div><div class="cw-fb-cell">S</div><div class="cw-fb-cell">I</div><div class="cw-fb-cell">O</div><div class="cw-fb-cell">N</div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell"><span class="cw-fb-num">4</span>S</div><div class="cw-fb-cell">O</div><div class="cw-fb-cell"><span class="cw-fb-num">5</span>N</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">I</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">6</span>D</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">F</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">I</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">M</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">I</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">7</span>L</div><div class="cw-fb-cell">I</div><div class="cw-fb-cell"><span class="cw-fb-num">8</span>A</div><div class="cw-fb-cell">I</div><div class="cw-fb-cell">S</div><div class="cw-fb-cell">O</div><div class="cw-fb-cell">N</div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">V</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">E</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">F</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">X</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">I</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">E</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">R</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">F</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">I</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">R</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">9</span>H</div><div class="cw-fb-cell">A</div><div class="cw-fb-cell">U</div><div class="cw-fb-cell">T</div><div class="cw-fb-cell">E</div><div class="cw-fb-cell">U</div><div class="cw-fb-cell">R</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">I</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">U</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">10</span>A</div><div class="cw-fb-cell">B</div><div class="cw-fb-cell">S</div><div class="cw-fb-cell">O</div><div class="cw-fb-cell">R</div><div class="cw-fb-cell"><span class="cw-fb-num">11</span>P</div><div class="cw-fb-cell">T</div><div class="cw-fb-cell">I</div><div class="cw-fb-cell">O</div><div class="cw-fb-cell">N</div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">C</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">I</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">T</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">T</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">12</span>D</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">I</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">13</span>M</div><div class="cw-fb-cell">I</div><div class="cw-fb-cell">L</div><div class="cw-fb-cell">I</div><div class="cw-fb-cell">E</div><div class="cw-fb-cell">U</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">14</span>S</div><div class="cw-fb-cell">I</div><div class="cw-fb-cell">G</div><div class="cw-fb-cell">N</div><div class="cw-fb-cell">A</div><div class="cw-fb-cell">L</div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">O</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">R</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">O</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell"><span class="cw-fb-num">15</span>O</div><div class="cw-fb-cell">N</div><div class="cw-fb-cell">D</div><div class="cw-fb-cell">E</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">D</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+            <div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">E</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell">E</div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div><div class="cw-fb-cell empty"></div>
+          </div>
+        </div>
+        <div style="margin-top:14px;font-size:.9rem;color:#334155;line-height:1.6;">
+          <strong>Horizontale :</strong> 3. Tension &bull; 4. Son &bull; 7. Liaison &bull; 9. Hauteur &bull; 10. Absorption &bull; 13. Milieu &bull; 14. Signal &bull; 15. Onde<br>
+          <strong>Verticale :</strong> 1. Réflexion &bull; 2. Timbre &bull; 5. Niveau &bull; 6. Diffraction &bull; 8. Air &bull; 11. Période &bull; 12. Durée
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>10</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[levenshtein(s,t) := block(
+  [m,n,prev,curr,i,j,c],
+  if stringp(s)=false then s:string(s),
+  if stringp(t)=false then t:string(t),
+  m:slength(s),
+  n:slength(t),
+  if m=0 then return(n),
+  if n=0 then return(m),
+  if m>30 or n>30 then return(100),
+  prev:makelist(i,i,0,n),
+  for i:1 thru m do (
+    curr:[i],
+    for j:1 thru n do (
+      if charat(s,i)=charat(t,j) then c:0 else c:1,
+      curr:endcons(min(prev[j+1]+1,curr[j]+1,prev[j]+c),curr)
+    ),
+    prev:curr
+  ),
+  last(prev)
+)$ 
+lev_score(s, ta) := block(
+  [rep, lev, a_plu, rep_ss, d_ss, plu_seul, plu_f1],
+  if stringp(s)=false then s:string(s),
+  rep: strim(" ", s),
+  if slength(rep) # slength(ta) then return(0),
+  lev: levenshtein(rep, ta),
+  if lev = 0 then return(1),
+  a_plu: slength(rep)>1 and charat(rep,slength(rep))="S",
+  if a_plu then (
+    rep_ss: substring(rep,1,slength(rep)-1),
+    d_ss: levenshtein(rep_ss, ta),
+    plu_seul: d_ss=0,
+    plu_f1: d_ss=1,
+    if plu_seul then return(1/2),
+    if plu_f1 then return(1/4)
+  ),
+  if lev = 1 then return(1/2),
+  if lev = 2 then return(1/4),
+  return(0)
+)$ 
+cw1_1_ta: "REFLEXION"$ cw1_2_ta: "TIMBRE"$ cw1_3_ta: "TENSION"$ cw1_4_ta: "SON"$ cw1_5_ta: "NIVEAU"$ cw1_6_ta: "DIFFRACTION"$ cw1_7_ta: "LIAISON"$ cw1_8_ta: "AIR"$ cw1_9_ta: "HAUTEUR"$ cw1_10_ta: "ABSORPTION"$ cw1_11_ta: "PERIODE"$ cw1_12_ta: "DUREE"$ cw1_13_ta: "MILIEU"$ cw1_14_ta: "SIGNAL"$ cw1_15_ta: "ONDE"$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@note_finale@} / 10</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>HéStack V2 | string-levenshtein-crossword</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>E</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>cw1_1</name>
+      <type>string</type>
+      <tans>cw1_1_ta</tans>
+      <boxsize>9</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_10</name>
+      <type>string</type>
+      <tans>cw1_10_ta</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_11</name>
+      <type>string</type>
+      <tans>cw1_11_ta</tans>
+      <boxsize>7</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_12</name>
+      <type>string</type>
+      <tans>cw1_12_ta</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_13</name>
+      <type>string</type>
+      <tans>cw1_13_ta</tans>
+      <boxsize>6</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_14</name>
+      <type>string</type>
+      <tans>cw1_14_ta</tans>
+      <boxsize>6</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_15</name>
+      <type>string</type>
+      <tans>cw1_15_ta</tans>
+      <boxsize>4</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_2</name>
+      <type>string</type>
+      <tans>cw1_2_ta</tans>
+      <boxsize>6</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_3</name>
+      <type>string</type>
+      <tans>cw1_3_ta</tans>
+      <boxsize>7</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_4</name>
+      <type>string</type>
+      <tans>cw1_4_ta</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_5</name>
+      <type>string</type>
+      <tans>cw1_5_ta</tans>
+      <boxsize>6</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_6</name>
+      <type>string</type>
+      <tans>cw1_6_ta</tans>
+      <boxsize>11</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_7</name>
+      <type>string</type>
+      <tans>cw1_7_ta</tans>
+      <boxsize>7</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_8</name>
+      <type>string</type>
+      <tans>cw1_8_ta</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>cw1_9</name>
+      <type>string</type>
+      <tans>cw1_9_ta</tans>
+      <boxsize>7</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>10.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[r1: strim(" ",supcase(cw1_1))$ r2: strim(" ",supcase(cw1_2))$ r3: strim(" ",supcase(cw1_3))$ r4: strim(" ",supcase(cw1_4))$ r5: strim(" ",supcase(cw1_5))$ r6: strim(" ",supcase(cw1_6))$ r7: strim(" ",supcase(cw1_7))$ r8: strim(" ",supcase(cw1_8))$ r9: strim(" ",supcase(cw1_9))$ r10: strim(" ",supcase(cw1_10))$ r11: strim(" ",supcase(cw1_11))$ r12: strim(" ",supcase(cw1_12))$ r13: strim(" ",supcase(cw1_13))$ r14: strim(" ",supcase(cw1_14))$ r15: strim(" ",supcase(cw1_15))$ 
+s1: lev_score(r1, cw1_1_ta)$ s2: lev_score(r2, cw1_2_ta)$ s3: lev_score(r3, cw1_3_ta)$ s4: lev_score(r4, cw1_4_ta)$ s5: lev_score(r5, cw1_5_ta)$ s6: lev_score(r6, cw1_6_ta)$ s7: lev_score(r7, cw1_7_ta)$ s8: lev_score(r8, cw1_8_ta)$ s9: lev_score(r9, cw1_9_ta)$ s10: lev_score(r10, cw1_10_ta)$ s11: lev_score(r11, cw1_11_ta)$ s12: lev_score(r12, cw1_12_ta)$ s13: lev_score(r13, cw1_13_ta)$ s14: lev_score(r14, cw1_14_ta)$ s15: lev_score(r15, cw1_15_ta)$ 
+total: s1+s2+s3+s4+s5+s6+s7+s8+s9+s10+s11+s12+s13+s14+s15$ note_finale: total / 15 * 10$ 
+mots: [cw1_1_ta, cw1_2_ta, cw1_3_ta, cw1_4_ta, cw1_5_ta, cw1_6_ta, cw1_7_ta, cw1_8_ta, cw1_9_ta, cw1_10_ta, cw1_11_ta, cw1_12_ta, cw1_13_ta, cw1_14_ta, cw1_15_ta]$ reps: [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15]$ scores: [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15]$ nums: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]$ 
+fb_details: ""$ for i:1 thru 15 do (
+  rep_disp: if reps[i] = "" then "<i style='color:#94a3b8'>vide</i>" else reps[i],
+  if scores[i] = 1 then (
+    fb_details: sconcat(fb_details, "<tr><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;color:#64748b;'>", nums[i], ".</td><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#15803d;'>", rep_disp, "</td><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;color:#15803d;'>✅ 1 pt</td></tr>")
+  ) else if scores[i] = 1/2 then (
+    fb_details: sconcat(fb_details, "<tr><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;color:#64748b;'>", nums[i], ".</td><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#ca8a04;'>", rep_disp, "</td><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;color:#ca8a04;'>🔶 0.5 pt (1 faute/pluriel)</td></tr>")
+  ) else if scores[i] = 1/4 then (
+    fb_details: sconcat(fb_details, "<tr><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;color:#64748b;'>", nums[i], ".</td><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#ea580c;'>", rep_disp, "</td><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;color:#ea580c;'>🟠 0.25 pt (2 fautes/pluriel+1)</td></tr>")
+  ) else (
+    fb_details: sconcat(fb_details, "<tr><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;color:#64748b;'>", nums[i], ".</td><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#dc2626;'>", rep_disp, "</td><td style='padding:4px 8px;border-bottom:1px solid #e2e8f0;color:#dc2626;'>❌ 0 pt (Attendu : ", mots[i], ")</td></tr>")
+  )
+)$ fb_html: sconcat("<div style='margin-top:15px;padding:12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;'><div style='font-weight:bold;color:#0f766e;margin-bottom:10px;'> Détail par mot :</div><table style='width:100%;border-collapse:collapse;font-size:.85rem;font-family:sans-serif;'>", fb_details, "</table></div>")$]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Calcul global et feedback détaillé</description>
+        <answertest>String</answertest>
+        <sans><![CDATA["ok"]]></sans>
+        <tans><![CDATA["ok"]]></tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>note_finale</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text>{@fb_html@}</text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

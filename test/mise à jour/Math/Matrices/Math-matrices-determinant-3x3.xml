@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396246  -->
+  <question type="stack">
+    <name>
+      <text>Matrices : Déterminant d'une matrice (3×3)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Matrices — Déterminant 3×3</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit la matrice :</p>
+<div style="text-align: center; margin: 15px 0;">\(M = {@M@}\)</div>
+<p><strong>Calculer</strong> le déterminant de \(M\) (par la règle de Sarrus ou par développement).</p>
+<div style="margin: 10px 0;">\(\det(M) = \) [[input:ans_det]] [[validation:ans_det]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée — Règle de Sarrus</div>
+<div style="font-size: .9rem;">
+<strong style="color: #15803d;">Diagonales descendantes (signe +) :</strong><br>
+• {@a11@} × {@a22@} × {@a33@} = {@p1@}<br>
+• {@a12@} × {@a23@} × {@a31@} = {@p2@}<br>
+• {@a13@} × {@a21@} × {@a32@} = {@p3@}<br>
+\(S_1 = {@p1@} + {@p2@} + {@p3@} = {@S1@}\)<br><br>
+<strong style="color: #dc2626;">Diagonales montantes (signe −) :</strong><br>
+• {@a13@} × {@a22@} × {@a31@} = {@n1@}<br>
+• {@a11@} × {@a23@} × {@a32@} = {@n2@}<br>
+• {@a12@} × {@a21@} × {@a33@} = {@n3@}<br>
+\(S_2 = {@n1@} + {@n2@} + {@n3@} = {@S2@}\)<br><br>
+\[
+\det(M) = S_1 - S_2 = {@S1@} - {@S2@} = {@det_correct@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Fonction utilitaire : entier aléatoire entre a et b */
+ri(a,b) := a + rand(b - a + 1)$ 
+
+/* Génération des 9 coefficients */
+a11: ri(-3,3); a12: ri(-3,3); a13: ri(-3,3);
+a21: ri(-3,3); a22: ri(-3,3); a23: ri(-3,3);
+a31: ri(-3,3); a32: ri(-3,3); a33: ri(-3,3);
+
+/* Construction de la matrice */
+M: matrix([a11,a12,a13],[a21,a22,a23],[a31,a32,a33]);
+
+/* Produits de Sarrus — diagonales descendantes (+) */
+p1: a11*a22*a33;
+p2: a12*a23*a31;
+p3: a13*a21*a32;
+
+/* Produits de Sarrus — diagonales montantes (−) */
+n1: a13*a22*a31;
+n2: a11*a23*a32;
+n3: a12*a21*a33;
+
+/* Sommes intermédiaires */
+S1: p1 + p2 + p3;
+S2: n1 + n2 + n3;
+
+/* Déterminant correct */
+det_correct: S1 - S2;
+
+/* Erreurs classiques */
+err_trace: a11 + a22 + a33;
+err_sarrus_plus: S1 + S2;
+err_sarrus_inv: S2 - S1;
+err_diag_seule: p1;]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>M={@M@}, det(M)={@det_correct@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:matrix-determinant-3x3</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_det</name>
+      <type>numerical</type>
+      <tans>det_correct</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_det</sans>
+        <tans>det_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Le déterminant est correct.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A calculé la trace</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_det</sans>
+        <tans>err_trace</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-TRACE</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion trace / déterminant !</strong> Vous avez calculé la <strong>trace</strong> (\(a_{11} + a_{22} + a_{33}\)). Le déterminant d'une matrice \(3 \times 3\) nécessite la <strong>règle de Sarrus</strong> ou un <strong>développement par cofacteurs</strong>, pas une simple somme.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-TRACE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Sarrus tout en + (pas de soustraction)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_det</sans>
+        <tans>err_sarrus_plus</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SARRUS-PLUS</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe dans Sarrus !</strong> Vous avez additionné les deux sommes (\(S_1 + S_2\)). Il faut obligatoirement <strong>soustraire</strong> les diagonales montantes : \(S_1 - S_2\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SARRUS-PLUS</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Sarrus inversé (S2 - S1)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_det</sans>
+        <tans>err_sarrus_inv</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SARRUS-INV</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Sens de Sarrus inversé !</strong> Vous avez calculé \(S_2 - S_1\) au lieu de \(S_1 - S_2\). N'oubliez pas : ce sont les diagonales descendantes moins les montantes.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SARRUS-INV</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur : A donné la première diagonale seule</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_det</sans>
+        <tans>err_diag_seule</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-DIAG-SEULE</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Calcul incomplet !</strong> Vous n'avez calculé que le produit de la première diagonale principale ({@a11@}×{@a22@}×{@a33@}). Un déterminant 3×3 nécessite de calculer les 3 diagonales descendantes, puis de soustraire les 3 montantes.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>5</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-DIAG</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>5</name>
+        <description>Erreur générique (Fallback)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_det</sans>
+        <tans>det_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-GENERIC</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez rigoureusement la règle de Sarrus :<br>\(\det(M) = (a_{11}a_{22}a_{33} + a_{12}a_{23}a_{31} + a_{13}a_{21}a_{32}) - (a_{13}a_{22}a_{31} + a_{11}a_{23}a_{32} + a_{12}a_{21}a_{33})\)</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-FALLBACK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>

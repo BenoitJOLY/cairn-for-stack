@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Cairn for Stack — schéma XSD de validation structurelle pour l'export
+  "question STACK" au format XML Moodle (élément <quiz><question type="stack">).
+
+  ATTENTION — Moodle ne publie AUCUN XSD officiel pour ce format : le
+  parseur d'import (question/format/xml/format.php + lib/xmlize.php) est un
+  parseur permissif "array-based", pas un validateur de schéma. Ce fichier
+  est donc un schéma NON OFFICIEL, reconstruit par rétro-ingénierie à partir
+  d'exports Cairn for Stack confirmés acceptés par un Moodle réel (voir
+  test/mise à jour/**/*.xml — notamment le pilote "Choix multiples-cases-
+  cocher-1.xml", validé live sur Moodle, utilisé comme référence pour ce
+  schéma). Il sert à détecter des régressions STRUCTURELLES (élément
+  manquant, mal ordonné, attribut de PRT oublié) dans buildXML() /
+  prt-manager.js — pas à garantir une conformité Moodle à 100%, qui reste
+  in fine confirmée par un import réel (voir PLAN.md).
+
+  Les contenus texte (Maxima, HTML) sont typés en xs:string sans contrainte
+  de valeur : leur charge est libre par nature (code Maxima, fragments HTML,
+  micro-langage [[input:...]]/{@var@}), seule la STRUCTURE XML est vérifiée.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="quiz">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="question" type="stackQuestionType" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ── Wrappers texte communs (<text> nu, ou <text> + attribut format="html">) ── -->
+  <xs:complexType name="textWrapType" mixed="true">
+    <xs:sequence>
+      <xs:element name="text" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="formattedTextType">
+    <xs:complexContent>
+      <xs:extension base="textWrapType">
+        <xs:attribute name="format" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- ── <question type="stack"> : ordre et champs produits par js/app.js::buildXML() ── -->
+  <xs:complexType name="stackQuestionType">
+    <xs:sequence>
+      <xs:element name="name" type="textWrapType"/>
+      <xs:element name="questiontext" type="formattedTextType"/>
+      <xs:element name="generalfeedback" type="formattedTextType"/>
+      <xs:element name="defaultgrade" type="xs:string"/>
+      <xs:element name="penalty" type="xs:string"/>
+      <xs:element name="hidden" type="xs:string"/>
+      <xs:element name="idnumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="stackversion" type="textWrapType"/>
+      <xs:element name="questionvariables" type="textWrapType"/>
+      <xs:element name="specificfeedback" type="formattedTextType"/>
+      <xs:element name="questionnote" type="formattedTextType" minOccurs="0"/>
+      <xs:element name="questiondescription" type="formattedTextType" minOccurs="0"/>
+      <xs:element name="questionsimplify" type="xs:string"/>
+      <xs:element name="assumepositive" type="xs:string"/>
+      <xs:element name="assumereal" type="xs:string"/>
+      <xs:element name="prtcorrect" type="formattedTextType"/>
+      <xs:element name="prtpartiallycorrect" type="formattedTextType"/>
+      <xs:element name="prtincorrect" type="formattedTextType"/>
+      <xs:element name="decimals" type="xs:string"/>
+      <xs:element name="scientificnotation" type="xs:string"/>
+      <xs:element name="multiplicationsign" type="xs:string"/>
+      <xs:element name="sqrtsign" type="xs:string"/>
+      <xs:element name="complexno" type="xs:string"/>
+      <xs:element name="inversetrig" type="xs:string"/>
+      <xs:element name="logicsymbol" type="xs:string"/>
+      <xs:element name="matrixparens" type="xs:string"/>
+      <xs:element name="isbroken" type="xs:string"/>
+      <xs:element name="variantsselectionseed" type="xs:string" minOccurs="0"/>
+      <xs:element name="input" type="stackInputType" maxOccurs="unbounded"/>
+      <xs:element name="prt" type="stackPrtType" maxOccurs="unbounded"/>
+      <!-- Ajoutés par un aller-retour réel via Moodle (variantes déployées, tests
+           enregistrés) — jamais émis par buildXML() lui-même, donc facultatifs et
+           non détaillés ici (contenu propre à Moodle, hors périmètre Cairn for Stack). -->
+      <xs:element name="deployedseed" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="tags" type="stackTagsType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="xs:string" use="required" fixed="stack"/>
+  </xs:complexType>
+
+  <!-- ── <input> : name + type obligatoires (universels quel que soit le type STACK :
+       algebraic/numerical/checkbox/string/matrix/...) ; le reste des sous-éléments
+       varie selon le type et n'est volontairement pas contraint ici (xs:any). ── -->
+  <xs:complexType name="stackInputType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ── <prt> : structure produite par js/prt-manager.js::buildPrtXml() ── -->
+  <xs:complexType name="stackPrtType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="value" type="xs:string"/>
+      <xs:element name="autosimplify" type="xs:string"/>
+      <xs:element name="feedbackstyle" type="xs:string"/>
+      <xs:element name="feedbackvariables" type="textWrapType"/>
+      <xs:element name="node" type="stackPrtNodeType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ── <node> : TOUS les attributs obligatoires du schéma STACK doivent être
+       présents (c'est le point précis vérifié par l'audit "sécurité PRT") ── -->
+  <xs:complexType name="stackPrtNodeType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="answertest" type="xs:string"/>
+      <xs:element name="sans" type="xs:string"/>
+      <xs:element name="tans" type="xs:string"/>
+      <xs:element name="testoptions" type="xs:string" minOccurs="0"/>
+      <xs:element name="quiet" type="xs:string"/>
+      <xs:element name="truescoremode" type="xs:string"/>
+      <xs:element name="truescore" type="xs:string"/>
+      <xs:element name="truepenalty" type="xs:string" minOccurs="0"/>
+      <xs:element name="truenextnode" type="xs:string"/>
+      <xs:element name="trueanswernote" type="xs:string" minOccurs="0"/>
+      <xs:element name="truefeedback" type="formattedTextType"/>
+      <xs:element name="falsescoremode" type="xs:string"/>
+      <xs:element name="falsescore" type="xs:string"/>
+      <xs:element name="falsepenalty" type="xs:string" minOccurs="0"/>
+      <xs:element name="falsenextnode" type="xs:string"/>
+      <xs:element name="falseanswernote" type="xs:string" minOccurs="0"/>
+      <xs:element name="falsefeedback" type="formattedTextType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="stackTagsType">
+    <xs:sequence>
+      <xs:element name="tag" type="textWrapType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,20 @@
+{
+  "name": "cairn-for-stack-server",
+  "private": true,
+  "version": "1.1.0",
+  "description": "Serveur de service pour Cairn for Stack (authentification par session + app statique protégée derrière un login).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "create-account": "node create-account.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "jsonrepair": "^3.15.0"
+  }
+}

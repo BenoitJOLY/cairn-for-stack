@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- Type 3 : Analyse fonctionnelle - Checkbox groupes caracteristiques vrais/faux melanges -->
+  <question type="stack">
+    <name>
+      <text>Nomenclature - Type 3 (Analyse fonctionnelle)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<h4><br></h4><br>
+
+<iframe src="https://mon-domaine.com/viewer.html?smiles={@molecule_smiles_url@}" width="300" height="300" style="border:0;" loading="lazy" title="Représentation de la molécule"></iframe><br>
+<p></p><p>Cochez le ou les groupe(s) caractéristique(s) réellement présent(s) dans cette molécule :</p>[[input:ans1]] [[validation:ans1]]<p></p>
+<p><br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024072400</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* ==================================================================
+   ZONE DE CONFIGURATION ENSEIGNANT (a editer uniquement ici)
+   STACK n'offre pas de panneau JSON dedie : ces trois lignes sont
+   l'equivalent editable sans toucher au reste du code Maxima.
+   smiles_dessin  : chaine SMILES de la molecule imposee
+   groupes_vrais  : liste des groupes fonctionnels reellement presents
+   groupes_faux   : liste des groupes fonctionnels leurres (absents)
+   ================================================================== */
+smiles_dessin : "NC(CC(=O)O)C"$
+groupes_vrais : ["Amine", "Acide carboxylique"]$
+groupes_faux : ["Alcool", "Aldéhyde", "Ester"]$
+/* ================================================================== */
+
+molecule_smiles : smiles_dessin$
+
+molecule_smiles_url : molecule_smiles$
+molecule_smiles_url : ssubst("%5C", "\\", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%2F", "/", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%28", "(", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%29", ")", molecule_smiles_url)$
+molecule_smiles_url : ssubst("%3D", "=", molecule_smiles_url)$
+
+tous_groupes : random_permutation(append(groupes_vrais, groupes_faux))$
+tans_checkbox : map(lambda([g], [g, elementp(g, setify(groupes_vrais)), g]), tous_groupes)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>{@groupes_vrais@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V4 | hestack-types:checkbox</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:green;"><i class="fa fa-check"></i></span> Réponse correcte, bravo&nbsp;!]]></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:orange;"><i class="fa fa-adjust"></i></span> Réponse partiellement correcte.]]></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text><![CDATA[<span style="font-size: 1.5em; color:red;"><i class="fa fa-times"></i></span> Réponse incorrecte.]]></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>checkbox</type>
+      <tans>tans_checkbox</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[idx1 : flatten([ans1])$
+bons1 : groupes_vrais$
+nv1 : cardinality(intersection(setify(idx1), setify(bons1)))$
+nf1 : cardinality(intersection(setify(idx1), setify(groupes_faux)))$
+den1 : length(bons1)$
+sc1 : if den1 > 0 then max(0, float((nv1-nf1)/den1)) else 0$
+pct1 : floor(sc1*100)$
+manques1 : listify(setdifference(setify(bons1), setify(idx1)))$
+coches_faux1 : listify(intersection(setify(idx1), setify(groupes_faux)))$
+coches_bons1 : listify(intersection(setify(idx1), setify(bons1)))$
+
+fb_bons1 : if length(coches_bons1) > 0 then sconcat("<div style='color:green;border-left:4px solid green;padding:7px;margin:3px 0'><b>Groupes correctement identifiés :</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), coches_bons1)), "</ul></div>") else ""$
+fb_faux1 : if length(coches_faux1) > 0 then sconcat("<div style='color:red;border-left:4px solid red;padding:7px;margin:3px 0'><b>Groupes cochés à tort (absents de la molécule) :</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), coches_faux1)), "</ul></div>") else ""$
+fb_manques1 : if length(manques1) > 0 then sconcat("<div style='color:#92400e;background:#fffbeb;border-left:4px solid #f59e0b;padding:7px;margin:3px 0'><b>⚠️ Groupes présents mais oubliés :</b><ul>", simplode(map(lambda([g], sconcat("<li>", g, "</li>")), manques1)), "</ul></div>") else ""$]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>score checkbox groupes</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>tans_checkbox</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #86efac;"><strong>✅ Score : 100%</strong>{@fb_bons1@}</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>sc1</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="padding:12px;background:#fafafa;border-radius:8px;border:1px solid #e2e8f0">
+<p><strong>Score : {@pct1@}%</strong></p>
+{@fb_bons1@}
+{@fb_faux1@}
+{@fb_manques1@}
+</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

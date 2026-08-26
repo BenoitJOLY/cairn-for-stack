@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 397022  -->
+  <question type="stack">
+    <name>
+      <text>chimie_simulation_dosage_stackjs</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#14532d;border-left:5px solid #166534;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Simulation de dosage et indicateur coloré</strong>
+<span style="background:#166534;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+</div>
+
+<p style="margin:10px 0;font-size:.95em;line-height:1.5;">On dose un acide faible AH (<strong>C<sub>1</sub> = 0.1 mol/L</strong>, <strong>V<sub>1</sub> = 20 mL</strong>) par la soude (<strong>C<sub>2</sub> = 0.1 mol/L</strong>).</p>
+<p style="margin:10px 0;font-size:.95em;line-height:1.5;"><strong>Consigne :</strong> Sélectionnez un indicateur, choisissez un pas de versement, puis ajoutez la soude. Le carré représente la couleur de votre bécher. Lorsque vous voyez le virage, saisissez le volume équivalent ci-dessous. <em>(Attention : "Recommencer" ajoute une pénalité).</em></p>
+
+<div style="display:none">
+[[input:ans_vol]][[validation:ans_vol]]
+[[input:ans_ind]][[validation:ans_ind]]
+[[input:ans_tries]][[validation:ans_tries]]
+</div>
+
+[[iframe width="100%" height="400px" scrolling="false"]]
+
+[[style]]
+  body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; }
+  .container { display: flex; gap: 30px; padding: 20px; align-items: flex-start; flex-wrap: wrap; }
+  .beaker-section { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .square { width: 120px; height: 120px; border: 4px solid #1e293b; border-radius: 8px; box-shadow: inset 0 4px 8px rgba(0,0,0,0.2); background-color: #F0F0F0; transition: background-color 0.1s; }
+  .vol-text { font-size: 1.2em; font-weight: bold; color: #b91c1c; }
+  .tries-text { font-size: 0.9em; color: #666; }
+  .controls-section { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 250px; }
+  .label { font-weight: bold; color: #1e3a5f; margin-bottom: 5px; font-size: 0.95em; }
+  .btn { padding: 8px 12px; border: 2px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.2s; }
+  .btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+  .btn.active { background: #1e3a5f; color: white; border-color: #1e3a5f; }
+  .btn.locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .step-group .btn { width: 60px; text-align: center; font-size: 0.85em; }
+  .btn-add { background: #166534; color: white; border-color: #166534; width: 100%; margin-top: 10px; }
+  .btn-add:hover { background: #15803d; }
+  .btn-reset { background: white; color: #dc2626; border-color: #dc2626; width: 100%; }
+  .btn-reset:hover { background: #fef2f2; }
+[[/style]]
+
+<div class="container">
+  <div class="beaker-section">
+    <div class="label">Bécher</div>
+    <div id="color-square" class="square"></div>
+    <div id="vol-display" class="vol-text">V = 0.0 mL</div>
+    <div id="tries-display" class="tries-text">Essais : 1</div>
+  </div>
+
+  <div class="controls-section">
+    <div class="label">Choix de l'indicateur :</div>
+    <div class="btn-group">
+      <button class="btn ind-btn" type="button" data-ind="hel">Hélianthine (3.1-4.4)</button>
+      <button class="btn ind-btn" type="button" data-ind="bbt">Bleu de Bromothymol (6.0-7.6)</button>
+      <button class="btn ind-btn" type="button" data-ind="phph">Phénolphtaléine (8.2-10.0)</button>
+    </div>
+    
+    <div class="label" style="margin-top: 15px;">Pas de versement :</div>
+    <div class="btn-group step-group">
+      <button class="btn step-btn" type="button" data-step="0.1">0.1 mL</button>
+      <button class="btn step-btn" type="button" data-step="0.2">0.2 mL</button>
+      <button class="btn step-btn active" type="button" data-step="0.5">0.5 mL</button>
+      <button class="btn step-btn" type="button" data-step="1">1.0 mL</button>
+      <button class="btn step-btn" type="button" data-step="2">2.0 mL</button>
+    </div>
+
+    <div class="btn-group" style="flex-direction: column;">
+      <button id="btn-add" class="btn btn-add" type="button">+ Verser la soude</button>
+      <button id="btn-reset" class="btn btn-reset" type="button">Recommencer le dosage</button>
+    </div>
+  </div>
+</div>
+
+[[script type="module"]]
+import {stack_js} from '[[cors src="stackjsiframe.js"/]]';
+
+const Ka = parseFloat("{#Ka#}");
+const C1 = parseFloat("{#C1#}");
+const V1 = parseFloat("{#V1#}");
+const C2 = parseFloat("{#C2#}");
+const Kw = 1e-14;
+
+function calcPh(V) {
+    if(V===0) return -Math.log10(Math.sqrt(Ka*C1));
+    var nA=C1*V1, nB=C2*V, nAH=nA-nB, Vt=V1+V;
+    if(nB < nA-1e-9) {
+        var AH=nAH/Vt, A_=nB/Vt;
+        if(A_<1e-12) return -Math.log10(Math.sqrt(Ka*AH));
+        return Math.log10(A_/AH)-Math.log10(Ka);
+    } else if(Math.abs(nB-nA)<=1e-9) {
+        var Ceq=nA/Vt, Kb=Kw/Ka;
+        return 14+0.5*Math.log10(Kb)+0.5*Math.log10(Ceq);
+    } else {
+        var nO=nB-nA, OH=nO/Vt;
+        return 14+Math.log10(OH);
+    }
+}
+
+var ind = {
+    hel: {pL:3.1, pH:4.4, cL:[255,0,0], cH:[255,255,0]},
+    bbt: {pL:6.0, pH:7.6, cL:[255,215,0], cH:[0,0,255]},
+    phph: {pL:8.2, pH:10.0, cL:[240,240,240], cH:[255,20,147]}
+};
+
+function getColor(pH) {
+    if(!curInd) return "#F0F0F0";
+    var i = ind[curInd];
+    if(pH <= i.pL) return "rgb("+i.cL.join(",")+")";
+    if(pH >= i.pH) return "rgb("+i.cH.join(",")+")";
+    var t = (pH - i.pL) / (i.pH - i.pL);
+    return "rgb("+Math.round(i.cL[0]+(i.cH[0]-i.cL[0])*t)+","+Math.round(i.cL[1]+(i.cH[1]-i.cL[1])*t)+","+Math.round(i.cL[2]+(i.cH[2]-i.cL[2])*t)+")";
+}
+
+var curVol = 0, curInd = "", tries = 1, dosageStarted = false, volStep = 0.5;
+var inputVol, inputInd, inputTries;
+var initialized = false;
+
+function init() {
+    if (!inputVol || !inputInd || !inputTries || initialized) return;
+    initialized = true;
+    
+    // Restauration de l'état sauvegardé par STACK
+    curVol = parseFloat(inputVol.value) || 0;
+    curInd = inputInd.value || "";
+    tries = parseInt(inputTries.value) || 1;
+    if (curVol > 0) dosageStarted = true;
+
+    updateUI();
+    attachEvents();
+}
+
+function syncInputs() {
+    inputVol.value = curVol.toFixed(1);
+    inputInd.value = curInd;
+    inputTries.value = tries;
+    inputVol.dispatchEvent(new Event('change'));
+    inputInd.dispatchEvent(new Event('change'));
+    inputTries.dispatchEvent(new Event('change'));
+}
+
+function updateUI() {
+    var pH = calcPh(curVol);
+    document.getElementById('color-square').style.backgroundColor = getColor(pH);
+    document.getElementById('vol-display').textContent = "V = " + curVol.toFixed(1) + " mL";
+    document.getElementById('tries-display').textContent = "Essais : " + tries;
+    
+    // Verrouillage visuel des indicateurs
+    document.querySelectorAll('.ind-btn').forEach(function(b) {
+        if(dosageStarted) { b.classList.add('locked'); }
+        else { b.classList.remove('locked'); }
+        
+        if(b.dataset.ind === curInd) { b.classList.add('active'); }
+        else if(!dosageStarted) { b.classList.remove('active'); }
+    });
+}
+
+function setInd(key) {
+    if (dosageStarted) return;
+    curInd = key;
+    updateUI();
+    syncInputs();
+}
+
+function setStep(val) {
+    volStep = val;
+    document.querySelectorAll('.step-btn').forEach(function(b) {
+        if(parseFloat(b.dataset.step) === val) b.classList.add('active');
+        else b.classList.remove('active');
+    });
+}
+
+function addVol() {
+    if(curVol >= 30) return;
+    curVol = Math.round((curVol + volStep) * 100) / 100;
+    if (!dosageStarted) {
+        dosageStarted = true;
+        document.querySelectorAll('.ind-btn').forEach(function(b) { b.classList.add('locked'); });
+    }
+    updateUI();
+    syncInputs();
+}
+
+function reset() {
+    curVol = 0;
+    dosageStarted = false;
+    tries++;
+    document.querySelectorAll('.ind-btn').forEach(function(b) { b.classList.remove('locked'); });
+    updateUI();
+    syncInputs();
+}
+
+function attachEvents() {
+    document.querySelectorAll('.ind-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) { e.preventDefault(); setInd(btn.dataset.ind); });
+    });
+    document.querySelectorAll('.step-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) { e.preventDefault(); setStep(parseFloat(btn.dataset.step)); });
+    });
+    document.getElementById('btn-add').addEventListener('click', function(e) { e.preventDefault(); addVol(); });
+    document.getElementById('btn-reset').addEventListener('click', function(e) { e.preventDefault(); reset(); });
+}
+
+// Connexions asynchrones sécurisées avec la page Moodle principale
+stack_js.request_access_to_input("ans_vol", true).then(function(id) { inputVol = document.getElementById(id); init(); });
+stack_js.request_access_to_input("ans_ind", true).then(function(id) { inputInd = document.getElementById(id); init(); });
+stack_js.request_access_to_input("ans_tries", true).then(function(id) { inputTries = document.getElementById(id); init(); });
+[[/script]]
+[[/iframe]]
+
+<div style="margin-top:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+    <label for="ans_veq" style="font-weight:bold; font-size:0.95em; color:#1e3a5f;">Volume équivalent observé (en mL) :</label>
+    [[input:ans_veq]] [[validation:ans_veq]]
+</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);"><div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div><div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;"><span style="font-weight:bold;color:#1e3a5f;">Q1 Analyse :</span> Le pH à l'équivalence est d'environ 8,75. La <strong>phénolphtaléine</strong> est le seul indicateur dont la zone de virage encadre ce pH. Le volume équivalent théorique est <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">V_eq = 20.0 mL</code>.</div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[Ka: 1.5849e-5$ V1: 20$ C1: 0.1$ C2: 0.1$ ta_veq: 20.0$ ta_ind: "phph"$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>AcideBase Q1 n=1 af-bf simulation indicateur</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:acide-base</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_ind</name>
+      <type>string</type>
+      <tans><![CDATA["phph"]]></tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_tries</name>
+      <type>numerical</type>
+      <tans>1.0</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_veq</name>
+      <type>numerical</type>
+      <tans>1.0*ta_veq</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_vol</name>
+      <type>string</type>
+      <tans><![CDATA["0.0"]]></tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[is_veq_ok: is(abs(float(ans_veq) - ta_veq) <= 0.5)$ is_ind_ok: is(ans_ind = ta_ind)$ tries_val: if numberp(float(ans_tries)) then floor(float(ans_tries)) else 0$]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification indicateur</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>is_ind_ok</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty>0</truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty>0</falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;margin:4px 0;">❌ <strong>Indicateur incorrect.</strong> Le pH à l'équivalence d'un dosage acide faible / base forte est basique (ici ≈ 8,75). L'hélianthine et le BBT ne sont pas adaptés.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Vérification volume équivalent</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>is_veq_ok</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty>0</truepenalty>
+        <truenextnode>2</truenextnode>
+        <trueanswernote>PRT1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty>0</falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Bon indicateur, mais volume incorrect.</strong> Avec la phénolphtaléine, le virage rose franc doit apparaître pour un volume de 20,0 mL.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Calcul pénalité essais (1 essai)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>tries_val</sans>
+        <tans>1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1.0</truescore>
+        <truepenalty>0</truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">✅ <strong>Parfait !</strong> Indicateur correct et dosage réussi du premier coup.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty>0</falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Calcul pénalité essais (2 essais)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>tries_val</sans>
+        <tans>2</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.75</truescore>
+        <truepenalty>0</truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">✅ <strong>Correct.</strong> Vous avez dû recommencer une fois, une pénalité de 0.25 pt est appliquée.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty>0</falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Calcul pénalité essais (3 essais ou +)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty>0</truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT1-4-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Correct, mais trop d'essais.</strong> Vous avez recommencé le dosage à plusieurs reprises. Le score est plafonné à 0.5 pt.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty>0</falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT1-4-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

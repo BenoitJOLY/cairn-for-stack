@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396096  -->
+  <question type="stack">
+    <name>
+      <text>Q4 - Systèmes : Équations à 2 inconnues</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#2563eb;border-left:5px solid #1d4ed8;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q4 — Systèmes</strong>
+        <span style="background:#1d4ed8;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#1d4ed8;border:1px solid #1d4ed8;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">#️⃣ Équations (inputs séparés)</span>
+      </div>
+      
+      Résoudre le système d'équations suivant : <br/><br/>
+      \[ \begin{array}{l} {@eq1@} \\ {@eq2@} \end{array} \]
+      <br/>
+      <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
+        <div><strong>x</strong> = [[input:ans_x]] [[validation:ans_x]]</div>
+        <div><strong>y</strong> = [[input:ans_y]] [[validation:ans_y]]</div>
+      </div>
+
+[[iframe width="100%" height="200px" scrolling="false"]]
+[[style]]
+  body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+  .stack-keyboard-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; max-width: 600px; box-sizing: border-box; margin-top: 10px; }
+  .stack-keyboard-title { font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stack-keyboard-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+  .stack-keyboard-row:last-child { margin-bottom: 0; }
+  .btn-ins { background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; color: #334155 !important; padding: 6px 12px !important; font-size: 0.9rem !important; font-weight: 600 !important; cursor: pointer !important; transition: all 0.15s ease !important; min-width: 38px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; user-select: none; }
+  .btn-ins:hover { background: #eff6ff !important; border-color: #93c5fd !important; color: #2563eb !important; }
+  .btn-ins:active { background: #dbeafe !important; }
+  .btn-var { background: #f1f5f9 !important; border-color: #94a3b8 !important; color: #0f172a !important; font-style: italic; }
+  .target-btn { background: #fff !important; border: 2px solid #cbd5e1 !important; border-radius: 6px !important; padding: 4px 10px !important; font-size: 0.8rem !important; font-weight: 700 !important; color: #64748b !important; cursor: pointer !important; transition: all 0.2s ease !important; }
+  .active-target { background: #2563eb !important; color: #ffffff !important; border-color: #2563eb !important; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3) !important; }
+  .sep { width: 1px; height: 28px; background: #e2e8f0; margin: 0 4px; }
+[[/style]]
+
+<div class="stack-keyboard-container">
+  <div class="stack-keyboard-title">🧮 Clavier cible</div>
+  
+  <div class="stack-keyboard-row">
+    <button id="target_x" class="target-btn active-target" type="button">Saisir pour <i>x</i></button>
+    <button id="target_y" class="target-btn" type="button">Saisir pour <i>y</i></button>
+  </div>
+
+  <div class="stack-keyboard-row">
+    <button class="btn-ins btn-var" type="button" data-val="x">x</button>
+    <button class="btn-ins btn-var" type="button" data-val="y">y</button>
+    <div class="sep"></div>
+    <button class="btn-ins" type="button" data-val="+">+</button>
+    <button class="btn-ins" type="button" data-val="-">-</button>
+    <button class="btn-ins" type="button" data-val="*">×</button>
+    <button class="btn-ins" type="button" data-val="/">/</button>
+    <div class="sep"></div>
+    <button class="btn-ins" type="button" data-val="(">(</button>
+    <button class="btn-ins" type="button" data-val=")">)</button>
+  </div>
+</div>
+
+[[script type="module"]]
+import {stack_js} from '[[cors src="stackjsiframe.js"/]]';
+
+let currentTarget = null;
+
+function setupInput(name, btnId) {
+    stack_js.request_access_to_input(name, true).then(function(input_id) {
+        var input = document.getElementById(input_id);
+        document.getElementById(btnId).addEventListener('click', function(e) {
+            e.preventDefault();
+            currentTarget = input;
+            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active-target'));
+            this.classList.add('active-target');
+        });
+        if(!currentTarget) {
+            currentTarget = input;
+        }
+    });
+}
+
+setupInput("ans_x", "target_x");
+setupInput("ans_y", "target_y");
+
+document.querySelectorAll('.btn-ins').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+        e.preventDefault();
+        if(!currentTarget) return;
+        var val = this.getAttribute('data-val');
+        var actuel = currentTarget.value || '';
+        var texteAvant = actuel.trimEnd();
+        var charPrecedent = texteAvant.length > 0 ? texteAvant.slice(-1) : null;
+        var excl = [null, '=', '+', '-', '*', '/', '^', '('];
+        var estOp = /^[+\-*\/^)]/.test(val);
+        var pref = '';
+        if (!excl.includes(charPrecedent) && !estOp && actuel.length > 0) { pref = '*'; }
+        currentTarget.value = actuel + pref + val;
+        currentTarget.dispatchEvent(new Event('change'));
+    });
+});
+[[/script]]
+[[/iframe]]]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;"><div style="font-weight:bold; margin-bottom:10px;">🔑 Correction détaillée</div><div style="font-size:.9rem;">Méthode par combinaison linéaire (ou addition) :<br/>En additionnant les deux équations terme à terme, les <strong>y</strong> s'annulent :<br/>\( (2x + y) + (x - y) = 5 + 4 \)<br/>\( 3x = 9 \)<br/>\( x = 3 \)<br/><br/>En remplaçant <strong>x</strong> par 3 dans la deuxième équation :<br/>\( 3 - y = 4 \)<br/>\( -y = 1 \)<br/>\( y = -1 \)<br/><br/>Le couple solution est donc \( (3 ; -1) \).</div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text>eq1: 2*x + y = 5;
+eq2: x - y = 4;
+ta_x: 3;
+ta_y: -1;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol><li>[[feedback:prt1]]</li></ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Solution du système : x={@ta_x@}, y={@ta_y@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:system</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_x</name>
+      <type>algebraic</type>
+      <tans>ta_x</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_y</name>
+      <type>algebraic</type>
+      <tans>ta_y</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_x</sans>
+        <tans>ta_x</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT-X-CORRECT</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-X-WRONG</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;">❌ <strong>Incorrect.</strong> La valeur de <em>x</em> est fausse.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_y</sans>
+        <tans>ta_y</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-Y-CORRECT</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Parfait !</strong> Le couple solution est correct.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-Y-WRONG</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #eab308;padding:10px 14px;background:#fefce8;border-radius:4px;">⚠ <strong>Presque.</strong> La valeur de <em>x</em> est bonne, mais la valeur de <em>y</em> est fausse.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

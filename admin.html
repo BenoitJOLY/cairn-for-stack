@@ -1,0 +1,336 @@
+<!--
+  Cairn for Stack — générateur de questions STACK pour Moodle
+  Copyright (C) 2026  Benoit Joly
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="assets/icone_18x18.png">
+<title>CAIRN FOR STACK — Administration</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/darkmode.css">
+<style>
+  .admin-wrap{max-width:820px;margin:0 auto;}
+  .admin-section{margin-bottom:20px;}
+  .admin-section h2{font-size:1rem;margin:0 0 14px;color:var(--navy);}
+  .admin-section p.hint{font-size:.8rem;color:var(--slate);margin:-8px 0 14px;}
+  .admin-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .admin-row .field{flex:1;min-width:180px;}
+  .field input[type=text],.field input[type=password],.field input[type=url]{padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;}
+  .btn-save{padding:9px 18px;border:none;border-radius:8px;background:var(--navy2);color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;}
+  .btn-save:hover{background:var(--navy);}
+  .btn-clear-secret{padding:8px 14px;border:1.5px solid #dc2626;border-radius:8px;background:#fff;color:#dc2626;font-weight:700;font-size:.8rem;cursor:pointer;margin-left:8px;}
+  .badge-configured{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:12px;}
+  .badge-configured.yes{background:#eafaf1;color:#198754;}
+  .badge-configured.no{background:#fef2f2;color:#b91c1c;}
+  .secret-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;}
+  table.accounts-table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  table.accounts-table th,table.accounts-table td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);}
+  table.accounts-table select{padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.82rem;}
+  .status-line{font-size:.8rem;margin-top:8px;min-height:1.1em;}
+  .status-line.ok{color:#198754;}
+  .status-line.err{color:#b91c1c;}
+  .admin-nav{display:flex;gap:14px;align-items:center;}
+  .admin-nav a{color:#fff;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+  <header class="app-header" role="banner" style="border-radius:14px 14px 0 0;">
+    <div><h1 style="font-size:1.1rem;margin:0;">⚙ Administration Cairn for Stack</h1></div>
+    <nav class="admin-nav">
+      <a href="validation.html">Validation</a>
+      <a href="index.html">← Retour au générateur</a>
+    </nav>
+  </header>
+  <main class="card" style="border-radius:0 0 14px 14px;">
+
+    <section class="admin-section">
+      <h2>Zone de mutualisation</h2>
+      <p class="hint">Dépôt GitHub utilisé par « Déposer pour validation » et par la banque de questions validées.</p>
+      <div class="admin-row">
+        <div class="field"><label for="a-gh-owner">Propriétaire (owner)</label><input type="text" id="a-gh-owner"></div>
+        <div class="field"><label for="a-gh-repo">Dépôt (repo)</label><input type="text" id="a-gh-repo"></div>
+      </div>
+      <div class="admin-row">
+        <div class="field"><label for="a-gh-review-branch">Branche de dépôt</label><input type="text" id="a-gh-review-branch" placeholder="depot-a-verifier"></div>
+        <div class="field"><label for="a-gh-review-folder">Dossier « à valider »</label><input type="text" id="a-gh-review-folder" placeholder="a_verifier"></div>
+      </div>
+      <div class="admin-row">
+        <div class="field"><label for="a-gh-banque-branch">Branche banque</label><input type="text" id="a-gh-banque-branch"></div>
+        <div class="field"><label for="a-gh-banque-folder">Dossier banque</label><input type="text" id="a-gh-banque-folder"></div>
+      </div>
+      <button class="btn-save" onclick="saveMutualisation()">Enregistrer</button>
+      <div class="status-line" id="status-mutualisation"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Serveur Maxima / JSmol (défaut d'instance)</h2>
+      <p class="hint">Utilisé comme valeur par défaut quand un enseignant n'a pas configuré son propre serveur.</p>
+      <div class="field"><label for="a-maxima-url">URL du serveur Stack-API</label><input type="url" id="a-maxima-url" placeholder="https://…"></div>
+      <button class="btn-save" onclick="saveMaximaUrl()">Enregistrer</button>
+      <div class="status-line" id="status-maxima"></div>
+      <div class="field"><label for="a-jsmol-url">URL du serveur JSmol (visualisation 3D)</label><input type="url" id="a-jsmol-url" placeholder="https://…/jsmol-viewer"></div>
+      <p class="hint">Racine du dépôt JSmol hébergé (ex. GitHub Pages), sans slash final — utilisée pour construire l'URL de <code>viewer.html?smiles=…</code> embarquée dans les questions de nomenclature exportées.</p>
+      <button class="btn-save" onclick="saveJsmolUrl()">Enregistrer</button>
+      <div class="status-line" id="status-jsmol"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Fournisseur IA institutionnel</h2>
+      <p class="hint">Compatible API OpenAI (chat completions). Utilisé en priorité par la génération IA, avant la clé personnelle de chaque enseignant.</p>
+      <div class="admin-row">
+        <div class="field"><label for="a-ai-baseurl">URL de base de l'API</label><input type="text" id="a-ai-baseurl" placeholder="https://api.exemple.com/v1"></div>
+        <div class="field"><label for="a-ai-model">Modèle</label><input type="text" id="a-ai-model" placeholder="gpt-4o-mini"></div>
+      </div>
+      <button class="btn-save" onclick="saveAiProvider()">Enregistrer</button>
+      <div class="status-line" id="status-ai-provider"></div>
+      <div class="secret-row">
+        <input type="password" id="a-ai-key" placeholder="Nouvelle clé API IA" style="flex:1;min-width:220px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;">
+        <button class="btn-save" onclick="saveSecret('aiKey','a-ai-key','status-ai-key')">Enregistrer la clé</button>
+        <button class="btn-clear-secret" onclick="clearSecret('aiKey','status-ai-key')">Effacer</button>
+        <span class="badge-configured" id="badge-aiKey">…</span>
+      </div>
+      <div class="status-line" id="status-ai-key"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Jeton GitHub institutionnel</h2>
+      <p class="hint">Utilisé côté serveur uniquement (jamais envoyé au navigateur) pour la promotion des dépôts validés vers la banque.</p>
+      <div class="secret-row">
+        <input type="password" id="a-gh-token" placeholder="Nouveau jeton GitHub" style="flex:1;min-width:220px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;">
+        <button class="btn-save" onclick="saveSecret('ghToken','a-gh-token','status-gh-token')">Enregistrer le jeton</button>
+        <button class="btn-clear-secret" onclick="clearSecret('ghToken','status-gh-token')">Effacer</button>
+        <span class="badge-configured" id="badge-ghToken">…</span>
+      </div>
+      <div class="status-line" id="status-gh-token"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Mentions légales &amp; RGPD (instance hébergée)</h2>
+      <p class="hint">Affiché dans la modale « Mentions légales » de l'application. Le responsable de traitement est la personne ou l'organisme qui héberge et administre <strong>cette instance</strong> — jamais l'auteur du logiciel Cairn for Stack. Une instance peut proposer plusieurs langues, mais le responsable et l'autorité de contrôle ne changent pas selon la langue affichée : ils doivent être nommés explicitement ci-dessous (champs marqués <strong>*</strong> obligatoires) plutôt que de laisser un texte générique.</p>
+      <div class="admin-row">
+        <div class="field"><label for="a-legal-responsable-nom">Responsable de traitement (nom / organisme) *</label><input type="text" id="a-legal-responsable-nom" required placeholder="Ex : Lycée X, Rectorat de Y, association Z…"></div>
+        <div class="field"><label for="a-legal-responsable-email">E-mail de contact *</label><input type="text" id="a-legal-responsable-email" required placeholder="contact@exemple.org"></div>
+      </div>
+      <div class="admin-row">
+        <div class="field"><label for="a-legal-pays">Pays d'hébergement principal</label><input type="text" id="a-legal-pays" placeholder="Ex : France"></div>
+        <div class="field"><label for="a-legal-autorite-nom">Autorité de contrôle compétente *</label><input type="text" id="a-legal-autorite-nom" required placeholder="Ex : CNIL"></div>
+        <div class="field"><label for="a-legal-autorite-url">URL de l'autorité de contrôle</label><input type="url" id="a-legal-autorite-url" placeholder="https://www.cnil.fr"></div>
+      </div>
+      <button class="btn-save" onclick="saveLegal()">Enregistrer</button>
+      <div class="status-line" id="status-legal"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Comptes &amp; rôles</h2>
+      <table class="accounts-table">
+        <thead><tr><th>Identifiant</th><th>Rôle</th><th>Auto-inscrit</th></tr></thead>
+        <tbody id="accounts-tbody"><tr><td colspan="3">Chargement…</td></tr></tbody>
+      </table>
+      <div class="status-line" id="status-accounts"></div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+function setStatus(id, msg, ok) {
+  var el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'status-line ' + (ok ? 'ok' : 'err');
+}
+
+async function loadConfig() {
+  try {
+    const res = await fetch('/api/admin/config');
+    if (!res.ok) throw new Error((await res.json()).error || 'Erreur de chargement.');
+    const cfg = await res.json();
+    document.getElementById('a-gh-owner').value = cfg.mutualisation.ghOwner || '';
+    document.getElementById('a-gh-repo').value = cfg.mutualisation.ghRepo || '';
+    document.getElementById('a-gh-review-branch').value = cfg.mutualisation.ghReviewBranch || '';
+    document.getElementById('a-gh-review-folder').value = cfg.mutualisation.ghReviewFolder || '';
+    document.getElementById('a-gh-banque-branch').value = cfg.mutualisation.ghBanqueBranch || '';
+    document.getElementById('a-gh-banque-folder').value = cfg.mutualisation.ghBanqueFolder || '';
+    document.getElementById('a-maxima-url').value = cfg.maximaUrl || '';
+    document.getElementById('a-jsmol-url').value = cfg.jsmolUrl || '';
+    document.getElementById('a-ai-baseurl').value = cfg.ai.baseUrl || '';
+    document.getElementById('a-ai-model').value = cfg.ai.model || '';
+    const legal = cfg.legal || {};
+    document.getElementById('a-legal-responsable-nom').value = legal.responsableNom || '';
+    document.getElementById('a-legal-responsable-email').value = legal.responsableEmail || '';
+    document.getElementById('a-legal-pays').value = legal.pays || '';
+    document.getElementById('a-legal-autorite-nom').value = legal.autoriteNom || '';
+    document.getElementById('a-legal-autorite-url').value = legal.autoriteUrl || '';
+    updateBadge('ghToken', cfg.ghTokenConfigured);
+    updateBadge('aiKey', cfg.aiKeyConfigured);
+  } catch (err) {
+    setStatus('status-mutualisation', err.message, false);
+  }
+}
+
+function updateBadge(name, configured) {
+  const el = document.getElementById('badge-' + name);
+  el.textContent = configured ? '✓ Configuré' : 'Non configuré';
+  el.className = 'badge-configured ' + (configured ? 'yes' : 'no');
+}
+
+async function saveMutualisation() {
+  const body = {
+    mutualisation: {
+      ghOwner: document.getElementById('a-gh-owner').value.trim(),
+      ghRepo: document.getElementById('a-gh-repo').value.trim(),
+      ghReviewBranch: document.getElementById('a-gh-review-branch').value.trim(),
+      ghReviewFolder: document.getElementById('a-gh-review-folder').value.trim(),
+      ghBanqueBranch: document.getElementById('a-gh-banque-branch').value.trim(),
+      ghBanqueFolder: document.getElementById('a-gh-banque-folder').value.trim(),
+    },
+  };
+  await postConfig(body, 'status-mutualisation');
+}
+
+async function saveMaximaUrl() {
+  await postConfig({ maximaUrl: document.getElementById('a-maxima-url').value.trim() }, 'status-maxima');
+}
+
+async function saveJsmolUrl() {
+  await postConfig({ jsmolUrl: document.getElementById('a-jsmol-url').value.trim().replace(/\/+$/, '') }, 'status-jsmol');
+}
+
+async function saveAiProvider() {
+  const body = {
+    ai: {
+      baseUrl: document.getElementById('a-ai-baseurl').value.trim(),
+      model: document.getElementById('a-ai-model').value.trim(),
+    },
+  };
+  await postConfig(body, 'status-ai-provider');
+}
+
+async function saveLegal() {
+  const legal = {
+    responsableNom: document.getElementById('a-legal-responsable-nom').value.trim(),
+    responsableEmail: document.getElementById('a-legal-responsable-email').value.trim(),
+    pays: document.getElementById('a-legal-pays').value.trim(),
+    autoriteNom: document.getElementById('a-legal-autorite-nom').value.trim(),
+    autoriteUrl: document.getElementById('a-legal-autorite-url').value.trim(),
+  };
+  // Le responsable de traitement et l'autorité de contrôle sont fixes pour une
+  // instance donnée (indépendants des langues proposées aux utilisateurs) : on
+  // exige qu'ils soient nommés explicitement plutôt que de laisser un texte
+  // générique s'afficher côté client (voir js/app.js renderRgpdLegalInfo).
+  if (!legal.responsableNom || !legal.responsableEmail || !legal.autoriteNom) {
+    setStatus('status-legal', 'Champs obligatoires (*) manquants.', false);
+    return;
+  }
+  await postConfig({ legal: legal }, 'status-legal');
+}
+
+async function postConfig(body, statusId) {
+  try {
+    const res = await fetch('/api/admin/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error((await res.json()).error || 'Échec de l\'enregistrement.');
+    setStatus(statusId, 'Enregistré.', true);
+  } catch (err) {
+    setStatus(statusId, err.message, false);
+  }
+}
+
+async function saveSecret(name, inputId, statusId) {
+  const input = document.getElementById(inputId);
+  const value = input.value.trim();
+  if (!value) { setStatus(statusId, 'Valeur requise.', false); return; }
+  try {
+    const res = await fetch('/api/admin/config/secret/' + name, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Échec de l\'enregistrement.');
+    updateBadge(name, data.configured);
+    input.value = '';
+    setStatus(statusId, 'Enregistré.', true);
+  } catch (err) {
+    setStatus(statusId, err.message, false);
+  }
+}
+
+async function clearSecret(name, statusId) {
+  if (!confirm('Effacer ce secret ? Les fonctionnalités qui en dépendent basculeront sur le palier suivant.')) return;
+  try {
+    const res = await fetch('/api/admin/config/secret/' + name, { method: 'DELETE' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Échec.');
+    updateBadge(name, data.configured);
+    setStatus(statusId, 'Effacé.', true);
+  } catch (err) {
+    setStatus(statusId, err.message, false);
+  }
+}
+
+async function loadAccounts() {
+  const tbody = document.getElementById('accounts-tbody');
+  try {
+    const res = await fetch('/api/admin/accounts');
+    if (!res.ok) throw new Error((await res.json()).error || 'Erreur de chargement.');
+    const { accounts } = await res.json();
+    tbody.innerHTML = '';
+    accounts.forEach(function (a) {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + a.username.replace(/</g, '&lt;') + '</td>' +
+        '<td><select data-username="' + a.username.replace(/"/g, '&quot;') + '" onchange="changeRole(this)">' +
+          '<option value="none"' + (!a.role ? ' selected' : '') + '>Enseignant</option>' +
+          '<option value="admin"' + (a.role === 'admin' ? ' selected' : '') + '>Admin</option>' +
+          '<option value="validateur"' + (a.role === 'validateur' ? ' selected' : '') + '>Validateur</option>' +
+        '</select></td>' +
+        '<td>' + (a.selfRegistered ? 'Oui' : 'Non') + '</td>';
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="3">' + err.message + '</td></tr>';
+  }
+}
+
+async function changeRole(select) {
+  const username = select.dataset.username;
+  const role = select.value;
+  try {
+    const res = await fetch('/api/admin/accounts/' + encodeURIComponent(username) + '/role', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Échec.');
+    setStatus('status-accounts', 'Rôle de "' + username + '" mis à jour.', true);
+  } catch (err) {
+    setStatus('status-accounts', err.message, false);
+  }
+}
+
+loadConfig();
+loadAccounts();
+</script>
+</body>
+</html>

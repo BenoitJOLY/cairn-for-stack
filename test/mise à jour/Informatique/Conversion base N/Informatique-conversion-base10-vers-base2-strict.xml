@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396592  -->
+  <question type="stack">
+    <name>
+      <text>Conversion Base 10 vers Base 2 (Format Strict)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#0c4a6e;border-left:5px solid #0369a1;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Numération — Conversion Binaire</strong>
+        <span style="background:#0369a1;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#0369a1;border:1px solid #0369a1;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">💻 Base 2</span>
+      </div>
+      
+      <p><strong>Consigne :</strong> Convertissez le nombre décimal suivant en base 2 (binaire) :</p>
+      <p style="text-align: center; font-size: 1.5em; font-weight: bold; margin: 15px 0;">
+        \( {@n@} _{10} \) = [[input:ans1]] \( _{2} \)
+      </p>
+      <div style="margin-bottom: 15px;">[[validation:ans1]]</div>
+      
+      <div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin:15px 0;">
+        <strong>Conseils pour la saisie :</strong>
+        <ul style="margin:8px 0 0 20px;line-height:1.7">
+          <li>Saisissez une suite de <code>0</code> et de <code>1</code> (ex: <code>1011</code>).</li>
+          <li><strong>Sans espace</strong>, sans préfixe (pas de <code>0b</code>), et sans zéro inutile au début.</li>
+        </ul>
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponse attendue
+        </div>
+        <div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">
+          <span style="font-weight:bold;color:#0c4a6e;">Conversion :</span>
+          <p>Pour convertir {@n@} en binaire, on effectue des divisions successives par 2.</p>
+          <p>Le résultat se lit en remontant les restes (du dernier au premier).</p>
+          <p>{@n@}<sub>10</sub> = {@ta@}<sub>2</sub></p>
+        </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text></text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[n: rand_with_step(16, 250, 1);
+
+/* Algorithme natif Maxima pour éviter les timeouts */
+ta: block([s:"", q:n],
+    if q=0 then return("0"),
+    while q>0 do (
+        s: sconcat(string(mod(q,2)), s),
+        q: floor(q/2)
+    ),
+    s
+);
+
+ta_rev: sreverse(ta);]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Décimal: {@n@} | Binaire: {@ta@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec format strict STACK</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>string</type>
+      <tans>ta</tans>
+      <boxsize>20</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>1</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse exacte</description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans>ta</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1.0000000</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Correct !</strong> La conversion est bonne.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Zéros inutiles au début</description>
+        <answertest>RegExp</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA["^0[01]+$"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Presque correct.</strong> En notation binaire standard, on ne met pas de zéro au début (sauf si le nombre vaut exactement 0). Enlevez le(s) zéro(s) au début de votre nombre.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Préfixes ou lettres interdits</description>
+        <answertest>RegExp</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA["[a-zA-Z]"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Format incorrect.</strong> Ne mettez pas de préfixe (comme <code>0b</code>) ni de lettre. Tapez uniquement la suite de chiffres.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Espaces détectés</description>
+        <answertest>RegExp</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA["\s"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Format incorrect.</strong> Votre réponse contient des espaces. Tapez la suite de chiffres sans aucun espace.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Restes lus à l'envers</description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans>ta_rev</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-4-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de lecture.</strong> Vous avez lu les restes dans le mauvais sens ! Il faut lire les restes de la <b>dernière</b> division jusqu'à la <b>première</b> (de bas en haut dans votre tableau de divisions).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>5</falsenextnode>
+        <falseanswernote>prt1-4-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>5</name>
+        <description>Recopie du nombre décimal</description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans>string(n)</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-5-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Vous avez recopié le nombre en base 10. La consigne demande de le convertir en base 2 (binaire, avec des 0 et des 1).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>6</falsenextnode>
+        <falseanswernote>prt1-5-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>6</name>
+        <description>Caractères invalides (autre que 0 et 1)</description>
+        <answertest>RegExp</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA["^[01]+$"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-6-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Votre réponse ne contient que des 0 et des 1, ce qui est bien, mais le résultat est faux. Vérifiez vos divisions successives par 2.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-6-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Un nombre binaire ne doit contenir <b>que des 0 et des 1</b>. Vous avez tapé d'autres chiffres.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

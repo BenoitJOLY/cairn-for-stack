@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396133  -->
+  <question type="stack">
+    <name>
+      <text>Q11 - Complexes : Forme exponentielle et puissances</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #4f46e5; border-left: 5px solid #4338ca; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Q11 — Nombres complexes</strong> <span style="background: #4338ca; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span> <span style="background: #ffffff; color: #4338ca; border: 1px solid #4338ca; padding: 2px 9px; border-radius: 20px; font-size: .75rem; font-weight: 600;">#️⃣ Forme exponentielle</span></div>
+<p>Écrire le nombre complexe suivant sous sa forme algébrique \( a + b*i \) : <br><br>\( {@expr@} \)</p>
+<p>[[input:ans1]] [[validation:ans1]]</p>
+<p>[[iframe width="100%" height="160px" scrolling="false"]] [[style]] body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; } .stack-keyboard-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; max-width: 600px; box-sizing: border-box; margin-top: 10px; } .stack-keyboard-title { font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; } .stack-keyboard-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; } .btn-ins { background: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; color: #334155 !important; padding: 6px 12px !important; font-size: 0.9rem !important; font-weight: 600 !important; cursor: pointer !important; transition: all 0.15s ease !important; min-width: 38px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; user-select: none; } .btn-ins:hover { background: #eef2ff !important; border-color: #a5b4fc !important; color: #4f46e5 !important; } .btn-ins:active { background: #e0e7ff !important; } .btn-i { background: #eef2ff !important; border-color: #c7d2fe !important; color: #4338ca !important; font-style: italic; font-weight: 800 !important; } .btn-pi { color: #4f46e5 !important; font-weight: 800 !important; font-style: italic; } .sep { width: 1px; height: 28px; background: #e2e8f0; margin: 0 4px; } [[/style]]</p>
+<div class="stack-keyboard-container">
+<div class="stack-keyboard-title">🧮 Aide à la saisie</div>
+<div class="stack-keyboard-row"><button class="btn-ins btn-i" type="button" data-val="%i">i</button> <button class="btn-ins btn-pi" type="button" data-val="%pi">π</button> <button class="btn-ins" type="button" data-val="sqrt()">√</button>
+<div class="sep"> </div>
+<button class="btn-ins" type="button" data-val="+">+</button> <button class="btn-ins" type="button" data-val="-">-</button> <button class="btn-ins" type="button" data-val="*">×</button>
+<div class="sep"> </div>
+<button class="btn-ins" type="button" data-val="^">^</button> <button class="btn-ins" type="button" data-val="(">(</button> <button class="btn-ins" type="button" data-val=")">)</button></div>
+</div>
+<p>[[script type="module"]] import {stack_js} from '[[cors src="stackjsiframe.js"/]]'; stack_js.request_access_to_input("ans1", true).then(function(input_id) { var stackInput = document.getElementById(input_id); document.querySelectorAll('.btn-ins').forEach(function(btn){ btn.addEventListener('click', function(e){ e.preventDefault(); var val = this.getAttribute('data-val'); var actuel = stackInput.value || ''; var texteAvant = actuel.trimEnd(); var charPrecedent = texteAvant.length &gt; 0 ? texteAvant.slice(-1) : null; var excl = [null, '=', '+', '-', '*', '/', '^', '(']; var estOp = /^[+\-*\/^)]/.test(val); var pref = ''; if (!excl.includes(charPrecedent) &amp;&amp; !estOp &amp;&amp; actuel.length &gt; 0) { pref = '*'; } stackInput.value = actuel + pref + val; stackInput.dispatchEvent(new Event('change')); }); }); }); [[/script]] [[/iframe]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;"><strong>La méthode brute (déconseillée) :</strong> Développer \((1+i)^{10}\) avec le binôme de Newton est un cauchemar.<br><br><strong>La méthode experte (forme exponentielle) :</strong><br>1. On calcule le module : \( |1+i| = \sqrt{1^2 + 1^2} = \sqrt{2} \).<br>2. On calcule l'argument : \( \theta = \frac{\pi}{4} \) car le point \((1,1)\) est sur la première bissectrice.<br>3. On écrit sous forme exponentielle : \( 1+i = \sqrt{2} e^{i\pi/4} \).<br>4. On élève à la puissance 10 (Moivre) :<br>\( (1+i)^{10} = (\sqrt{2})^{10} e^{i \times 10 \times \pi/4} \)<br>\( = 2^5 e^{i \times 5\pi/2} \)<br>\( = 32 e^{i \times 5\pi/2} \)<br>5. On réduit l'angle (en enlevant \(2\pi\)) : \( 5\pi/2 = 2\pi + \pi/2 \).<br>6. On revient en algébrique : \( e^{i\pi/2} = i \).<br><br><strong>Résultat final : \( (1+i)^{10} = 32i \)</strong></div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[ta1: 32*%i; ta_sans_i: 32; ta_signe_faux: -32*%i; ta_module_faux: 1024*%i; texput(expr, "(1+i)^{10}");]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+<li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>Forme algébrique de (1+i)^10 : {@ta1@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:complex</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>ta1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>ta1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-EXP-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Excellent !</strong> Vous avez maîtrisé la forme exponentielle. Le calcul de \((1+i)^{10}\) est instantané avec cette méthode !</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-EXP-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>ta_sans_i</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SANS-I</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #eab308; padding: 10px 14px; background: #fefce8; border-radius: 4px;">⚠️ <strong>Oubli du "i" !</strong> Vous avez parfaitement calculé le module (\(32\)), mais vous avez oublié de convertir l'angle \(5\pi/2\) en nombre complexe. Rappelez-vous que \( e^{i\pi/2} = i \).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-NOT-ERR-SANS-I</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>ta_signe_faux</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGNE</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe !</strong> Le module est correct, mais l'angle est faux. Attention lors de la réduction de l'angle : \(5\pi/2 = 2\pi + \pi/2\). Le point se trouve sur l'axe des ordonnées positif, donc la réponse est \(+32i\) et non \(-32i\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-NOT-ERR-SIGNE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>ta_module_faux</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MODULE</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de module !</strong> Votre calcul d'angle semble bon, mais le module est faux. Vous avez probablement calculé \( |1+i| = 2 \) au lieu de \( |1+i| = \sqrt{1^2+1^2} = \sqrt{2} \).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-OTHER</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> N'essayez pas de développer \((1+i)^{10}\) avec le binôme de Newton ! Passez par la forme exponentielle \( r e^{i \theta} \), élevez le module à la puissance 10, multipliez l'angle par 10, puis convertissez le résultat.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

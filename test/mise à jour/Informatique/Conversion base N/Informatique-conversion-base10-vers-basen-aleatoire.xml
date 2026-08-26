@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396601  -->
+  <question type="stack">
+    <name>
+      <text>Conversion Base 10 vers Base N (Aléatoire)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#7c2d12;border-left:5px solid #ea580c;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Numération — Conversion Base N Aléatoire</strong>
+        <span style="background:#ea580c;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#ea580c;border:1px solid #ea580c;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">🧠 Difficile</span>
+      </div>
+      
+      <p><strong>Consigne :</strong> Convertissez le nombre décimal suivant en base <strong>{@N@}</strong> :</p>
+      <p style="text-align: center; font-size: 1.5em; font-weight: bold; margin: 15px 0;">
+        \( {@n@} _{10} \) = [[input:ans1]] \( _{@N@} \)
+      </p>
+      <div style="margin-bottom: 15px;">[[validation:ans1]]</div>
+      
+      <div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin:15px 0;">
+        <strong>Conseils pour la saisie :</strong>
+        <ul style="margin:8px 0 0 20px;line-height:1.7">
+          <li>Si la base est supérieure à 10, utilisez les lettres majuscules (A=10, B=11, C=12...).</li>
+          <li><strong>Sans espace</strong>, sans préfixe, et sans zéro inutile au début.</li>
+        </ul>
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:#7c2d12; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponse attendue
+        </div>
+        <div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">
+          <span style="font-weight:bold;color:#7c2d12;">Conversion en base {@N@} :</span>
+          <p>On effectue des divisions successives par {@N@}. Le résultat se lit en remontant les restes.</p>
+          <p>{@n@}<sub>10</sub> = {@ta@}<sub>{@N@}</sub></p>
+        </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. Générer toutes les bases de 2 à 16, puis SUPPRIMER la base 10 */
+all_bases: makelist(i, i, 2, 16);
+allowed_bases: delete(10, all_bases);
+N: allowed_bases[rand(length(allowed_bases)) + 1];
+
+/* 2. Générer un nombre décimal adapté (pour avoir 3 "chiffres" dans la base cible) */
+min_n: N^2;
+max_n: N^3 - 1;
+/* On plafonne à 4095 pour éviter des nombres trop grands si N=16 */
+n: rand_with_step(min_n, min(max_n, 4095), 1);
+
+/* 3. Liste des symboles standards jusqu'à la base 16 */
+sym: ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+
+/* 4. Algorithme de conversion ultra-rapide via liste (Zéro timeout) */
+ta: block([q:n, res:[]],
+    if q=0 then return("0"),
+    while q>0 do (
+        res: cons(sym[mod(q, N)+1], res),
+        q: quotient(q, N)
+    ),
+    simplode(res)
+);
+
+/* 5. Inversion de la chaîne pour l'erreur de lecture des restes */
+ta_rev: sreverse(ta);
+
+/* 6. Création DYNAMIQUE et STRICTE de la Regex pour valider les caractères */
+/* Exemple : Si N=12, la regex n'acceptera que 0-9, A, B (et a, b) mais rejettera C-F */
+chars_ok: simplode(makelist(sym[i], i, 1, N));
+valid_regex: sconcat("^[", chars_ok, sdowncase(chars_ok), "]+$");]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Base: {@N@} | Décimal: {@n@} | Résultat: {@ta@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec format strict STACK</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>string</type>
+      <tans>ta</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>1</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse exacte</description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans>ta</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Correct !</strong> La conversion en base {@N@} est parfaite.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Recopie du nombre décimal</description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans>string(n)</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Vous avez recopié le nombre de départ en base 10. La consigne demande de le convertir en <strong>base {@N@}</strong> en faisant des divisions successives par {@N@}.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Restes lus à l'envers</description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans>ta_rev</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Erreur de lecture.</strong> Vous avez lu les restes dans le mauvais sens ! Il faut lire les restes de la <b>dernière</b> division jusqu'à la <b>première</b> (de bas en haut).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Espaces détectés</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA["\s"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Format incorrect.</strong> Votre réponse contient des espaces. Tapez la suite de caractères sans aucun espace.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Zéros inutiles au début</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA["^0[0-9A-Za-z]+"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-4-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:8px 12px;background:#fefce8;border-radius:4px;margin-bottom:10px;">🔶 <strong>Presque correct.</strong> En notation standard, on ne met pas de zéro au début (sauf si le nombre vaut exactement 0). Enlevez le(s) zéro(s) au début.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>5</falsenextnode>
+        <falseanswernote>prt1-4-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>5</name>
+        <description>Préfixes interdits</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans><![CDATA["^(0[xXbB])"]]></tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-5-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Format incorrect.</strong> Ne mettez pas de préfixe (comme <code>0x</code> ou <code>0b</code>). Tapez uniquement la suite de caractères.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>6</falsenextnode>
+        <falseanswernote>prt1-5-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>6</name>
+        <description>Caractères invalides pour la base N</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>valid_regex</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>-</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-6-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Caractères invalides.</strong> Vous travaillez en base {@N@}, vous n'avez pas le droit d'utiliser ces symboles. En base {@N@}, les chiffres autorisés vont de 0 à {@N-1@}.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-6-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Incorrect.</strong> Les caractères utilisés sont autorisés en base {@N@}, mais le résultat du calcul est faux. Vérifiez vos divisions successives par {@N@}.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

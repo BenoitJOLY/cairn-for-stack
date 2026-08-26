@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 397006  -->
+  <question type="stack">
+    <name>
+      <text>chimie_tangentes_spec_final</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#14532d;border-left:5px solid #166534;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — pH-métrie</strong>
+<span style="background:#166534;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+</div>
+
+<p style="margin:10px 0;font-size:.95em;line-height:1.5;">On réalise le dosage d'un acide faible <strong>AH</strong> de concentration <strong>C<sub>1</sub> = 0.1 mol/L</strong> et de volume <strong>V<sub>1</sub> = 20 mL</strong> par une solution d'hydroxyde de sodium de concentration <strong>C<sub>2</sub> = 0.1 mol/L</strong>.</p>
+<p style="margin:10px 0;font-size:.95em;line-height:1.5;">La courbe de dosage pH-métrique est tracée ci-dessous. <em>(On ne connaît pas le pK<sub>a</sub> de cet acide).</em></p>
+<p style="margin:10px 0;font-size:.95em;line-height:1.5;"><strong>Consigne :</strong> Appliquez la <strong>méthode des tangentes</strong>. Déplacez les points <span style="color:#f97316;font-weight:bold;">T<sub>1</sub></span> et <span style="color:#a855f7;font-weight:bold;">T<sub>2</sub></span> à l'endroit où la courbe est la plus incurvée (points d'inflexion de la pente). Le graphique tracera la droite équidistante (en vert). Déplacez la droite rouge à l'abscisse du point d'intersection trouvé, puis placez le curseur rouge à la hauteur de ce point pour lire le volume équivalent.</p>
+
+<p style="margin:6px 0 10px;font-size:.9em;color:#374151;"><strong>Données :</strong> C₁ = 0.1 mol/L, V₁ = 20 mL, C₂ = 0.1 mol/L</p>
+
+<div style="display:none">[[input:ans1]][[validation:ans1]]</div>
+
+[[jsxgraph input-ref-ans1="refSlopes" width="700px" height="500px"]]
+var board = JXG.JSXGraph.initBoard(divid, {
+  boundingbox: [-2, 14.8, 32.5, -0.8],
+  keepaspectratio: false, showCopyright: false, showNavigation: true
+});
+board.create("axis", [[0,0],[1,0]], {
+  name: "V (mL)", withLabel: true,
+  label: {position:"lrt", offset:[-20,15], fontSize:14}
+});
+board.create("axis", [[0,0],[0,1]], {
+  name: "pH", withLabel: true,
+  label: {position:"rt", offset:[10,0], fontSize:14},
+  ticks: {ticksDistance:2, minorTicks:1}
+});
+
+var Ka=1.5849e-5, Kw=1e-14;
+var C1=0.1, V1=20, C2=0.1;
+var LN10 = Math.log(10);
+
+function dA(pH) { return -LN10 * (Math.pow(10, pH - 14) + Math.pow(10, -pH)); }
+function dB(pH) {
+  var h  = Math.pow(10, -pH);
+  var oh = Math.pow(10, pH - 14);
+  var D  = h + Ka;
+  return V1 * LN10 * (C1 * Ka * h / (D * D) + oh + h);
+}
+
+function calcV(pH) {
+  var h = Math.pow(10, -pH), oh = Math.pow(10, pH-14);
+  var D  = h + Ka;
+  var aw = Ka / D;
+  var num = C1 * aw + (oh - h);
+  var den = C2 - (oh - h);
+  var x = V1 * num / den;
+  return (x < 0 || !isFinite(x) || isNaN(x)) ? NaN : x;
+}
+
+var curve = board.create("curve", [
+  function(t) { return calcV(t); },
+  function(t) { return t; },
+  0.3, 12.5
+], {strokeColor:"#2563eb",strokeWidth:3,fixed:true,highlight:false,numberPointsHigh:300});
+
+function coeffs(p) {
+    var v0 = p.X(), pH0 = p.Y();
+    var a = C2 - (Math.pow(10, pH0-14) - Math.pow(10, -pH0));                  
+    var b = v0 * dA(pH0) - dB(pH0);         
+    var c = -(a * v0 + b * pH0);             
+    return [a, b, c];
+}
+
+var p1 = board.create('glider', [parseFloat("{#v_extremum1#}"), parseFloat("{#raw_v1#}"), curve], {
+  size:7, face:'diamond', fillColor:'#f97316', strokeColor:'#c2410c',
+  name:'T1', label:{offset:[-20,-15], fontSize:14, color:'#c2410c', fontweight:'bold'}
+});
+var p2 = board.create('glider', [parseFloat("{#v_extremum2#}"), parseFloat("{#raw_v2#}"), curve], {
+  size:7, face:'diamond', fillColor:'#a855f7', strokeColor:'#7e22ce',
+  name:'T2', label:{offset:[15,15], fontSize:14, color:'#7e22ce', fontweight:'bold'}
+});
+
+var c1 = function(){ return coeffs(p1); };
+var c2 = function(){ return coeffs(p2); };
+
+var t1 = board.create('line', [
+  function(){ return [p1.X(), p1.Y()]; },
+  function(){ var cc = c1(); return [p1.X() - cc[1], p1.Y() + cc[0]]; }
+], {strokeColor:'#f97316', strokeWidth:2.5, fixed:false});
+
+var t2 = board.create('line', [
+  function(){ return [p2.X(), p2.Y()]; },
+  function(){ var cc = c2(); return [p2.X() - cc[1], p2.Y() + cc[0]]; }
+], {strokeColor:'#a855f7', strokeWidth:2.5, fixed:false});
+
+var V0_ref = 10;
+var eqLine = board.create('line', [
+  function() {
+      var v1 = c1(), v2 = c2();
+      var b1 = v1[1], b2 = v2[1];
+      if (Math.abs(b1) < 1e-9 || Math.abs(b2) < 1e-9) return [0,0];
+      var pH1 = -(v1[0] * V0_ref + v1[2]) / b1;
+      var pH2 = -(v2[0] * V0_ref + v2[2]) / b2;
+      return [V0_ref, (pH1 + pH2) / 2];
+  },
+  function() {
+      var v1 = c1(), v2 = c2();
+      var a_eq = (v1[0] + v2[0]) / 2;
+      var b_eq = (v1[1] + v2[1]) / 2;
+      var b1 = v1[1], b2 = v2[1];
+      if (Math.abs(b1) < 1e-9 || Math.abs(b2) < 1e-9) return [1,0];
+      var Y0_ref = (-(v1[0]*V0_ref + v1[2])/b1 + -(v2[0]*V0_ref + v2[2])/b2) / 2;
+      return [V0_ref - b_eq, Y0_ref + a_eq]; 
+  }
+], {strokeColor:'#10b981', strokeWidth:3, fixed:false});
+
+/* Anti-AJAX Reload */
+var inputSlopes = document.getElementById(refSlopes);
+var isFrozen = (inputSlopes && inputSlopes.value !== "" && inputSlopes.value !== "[0.0000, 0.0000]");
+
+function updateSlopes() {
+    if (isFrozen || !inputSlopes) return;
+    var v1 = c1(), v2 = c2();
+    var m1 = (Math.abs(v1[1]) < 1e-9) ? 9999 : -(v1[0] / v1[1]);
+    var m2 = (Math.abs(v2[1]) < 1e-9) ? 9999 : -(v2[0] / v2[1]);
+    if (!isFinite(m1)) m1 = 0;
+    if (!isFinite(m2)) m2 = 0;
+    inputSlopes.value = "[" + m1.toFixed(4) + ", " + m2.toFixed(4) + "]";
+    inputSlopes.dispatchEvent(new Event('change'));
+}
+
+board.addHook(updateSlopes, 'update');
+
+/* Ligne de guidage invisible à Y=7 (au milieu de la zone d'équivalence) */
+var guideLine = board.create('line', [[-2, 7], [32.5, 7]], {
+    visible: false, 
+    straightFirst: true, /* Ligne étendue à l'infini pour le zoom */
+    straightLast: true
+});
+
+/* Point rouge posé sur cette ligne invisible (déplacement horizontal garanti) */
+var cursor = board.create('glider', [25.0, 7, guideLine], {
+  size:8, face:"circle", fillColor:"#ef4444", strokeColor:"#b91c1c",
+  name:"Votre réponse", label:{fontSize:12, color:"#b91c1c", offset:[10,-15]}
+});
+
+/* Ligne rouge verticale qui suit l'abscisse du point */
+var cursorLine = board.create('line', [
+    function(){ return [cursor.X(), -0.5]; },
+    function(){ return [cursor.X(), 14.5]; }
+], {
+    strokeColor:'#ef4444', strokeWidth:2, dash:3, fixed:true,
+    point1: {size:0, visible:false},
+    point2: {size:0, visible:false}
+});
+
+board.create('text',
+  [function(){return cursor.X()+0.8;}, 14.0,
+   function(){return "V="+cursor.X().toFixed(1)+" mL";}],
+  {fixed:false, fontSize:12, color:"#ef4444", highlight:false});
+
+[[/jsxgraph]]
+<div style="margin-top:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+    <label for="ans2" style="font-weight:bold; font-size:0.95em; color:#1e3a5f;">Volume équivalent lu sur le graphique (en mL) :</label>
+    [[input:ans2]] [[validation:ans2]]
+</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);"><div style="font-weight:bold; color:#1e3a5f; margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div><div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;"><span style="font-weight:bold;color:#1e3a5f;">Q1 Méthode :</span> Tangentes aux points d'inflexion de la pente et <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;color:#d946ef;">V_eq = 20.0 mL</code></div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>Ka: 1.5849e-5$ V1: 20$ C1: 0.1$ C2: 0.1$ 
+h(pH) := 10^(-pH)$ oh(pH) := 10^(pH-14)$ 
+A(pH) := C2 - (oh(pH) - h(pH))$ 
+B(pH) := V1 * (C1 * (Ka/(h(pH)+Ka)) + oh(pH) - h(pH))$ 
+dAdpH(pH) := diff(A(pH), pH)$ dBdpH(pH) := diff(B(pH), pH)$ 
+
+/* Calcul des points d'inflexion de la pente de la tangente (Endroits où la courbe est la plus incurvée) */
+m_tang(pH) := -A(pH) / ((B(pH)/A(pH)) * dAdpH(pH) - dBdpH(pH))$ 
+dm_tang(pH) := diff(m_tang(pH), pH)$ 
+raw_v1: find_root(dm_tang, pH, [1, 5])$ 
+raw_v2: find_root(dm_tang, pH, [10, 20])$ 
+v_extremum1: if numberp(raw_v1) then float(B(raw_v1)/A(raw_v1)) else 4.0$ 
+v_extremum2: if numberp(raw_v2) then float(B(raw_v2)/A(raw_v2)) else 28.0$</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>AcideBase Q1 n=1 af-bf methode tangentes</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:acide-base</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>string</type>
+      <tans><![CDATA["0.0000, 0.0000"]]></tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>numerical</type>
+      <tans>20.0</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[parsed: sscanf(ans1, "[%f, %f]")$ 
+m1: if listp(parsed) and length(parsed) = 2 then float(parsed[1]) else 0.0$ 
+m2: if listp(parsed) and length(parsed) = 2 then float(parsed[2]) else 0.0$ 
+is_parallel: is(abs(m1 - m2) < 0.2)$ 
+v_cur: float(ans2)$ 
+is_veq_ok: is(abs(v_cur - 20.0) <= 0.5)$]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification parallélisme des tangentes</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>is_parallel</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty>0</truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty>0.1</falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Tangentes non parallèles.</strong> L'écart entre les pentes est trop grand. Ajustez finement les points T1 et T2 pour qu'elles aient la même pente.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Vérification volume équivalent</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>is_veq_ok</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty>0</truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">✅ <strong>Excellent !</strong> La méthode des tangentes est parfaitement maîtrisée et le volume équivalent est correct.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty>0.1</falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Parallélélisme correct.</strong> Cependant, la valeur du volume équivalent lue est incorrecte. Vérifiez l'abscisse du point d'intersection de la droite verte avec la courbe bleue.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Vérification volume équivalent</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>is_veq_ok</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;"> le volume équivalent est correct mais le travail n'est pas rigoureux</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #f97316;padding:10px 14px;background:#fff7ed;border-radius:4px;margin:4px 0;">⚠️ <strong>Parallélélisme et valeur incorrects.</strong> La méthode des tangentes est à revoir.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

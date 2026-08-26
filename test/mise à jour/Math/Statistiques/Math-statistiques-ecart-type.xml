@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396222  -->
+  <question type="stack">
+    <name>
+      <text>Statistiques : Calcul d'un écart-type</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Statistiques — Écart-type d'une série</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit la série statistique suivante composée de 5 mesures :<br><br></p>
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; font-size: 1.1rem; margin-bottom: 15px;">\( S = \left\{ {@str_L@} \right\} \)</div>
+<p>Calculer l'écart-type de cette série.<br><em>(Arrondir le résultat à \(10^{-2}\) près).</em><br><br></p>
+<div>\(\sigma \approx\) [[input:ans_std]] [[validation:ans_std]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">L'écart-type est la racine carrée de la variance :<br>\(\sigma = \sqrt{V} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (x_i - \bar{x})^2}\)<br><br>1. La moyenne est : \(\bar{x} = {@ta_mean@}\)<br>2. La variance est : \(V \approx {@ta_var@}\)<br>3. L'écart-type est : \(\sigma \approx \sqrt{{@ta_var@}} \approx {@ta_std@}\)</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. Fonctions statistiques maison (sans utiliser load) */
+mean(L) := apply("+", L) / length(L);
+ var(L) := block([m], m: mean(L), mean((L - m)^2));
+ std(L) := sqrt(var(L));
+/* 2. Génération de 5 nombres entiers aléatoires */
+L: [rand(8)+1, rand(8)+1, rand(8)+1, rand(8)+1, rand(8)+1]; 
+/* 3. Affichage de la liste */
+str_L: simplode(L, " ; "); 
+/* 4. Calculs pour la correction */
+ta_mean: round(float(mean(L)) * 100) / 100;
+ ta_var: round(float(var(L)) * 100) / 100;
+ ta_std: 1.0*round(float(std(L)) * 100) / 100;
+/* 5. Les erreurs classiques pour le PRT */
+/* Erreur 1 : A donné la variance au lieu de l'écart-type (oubli de la racine) */
+ta_err_var: ta_var$ /* Erreur 2 : A donné la moyenne */
+ta_err_mean: ta_mean$ /* Erreur 3 : A donné la somme des carrés (oubli division par n et racine) */
+ta_err_somme: round(float(var(L) * 5) * 100) / 100;]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>Série={@str_L@}, Ecart-type={@ta_std@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:stats-std</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_std</name>
+      <type>numerical</type>
+      <tans>ta_std</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification de l'écart-type</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_std</sans>
+        <tans>ta_std</tans>
+        <testoptions>0.015</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> L'écart-type a été correctement calculé en prenant la racine carrée de la variance.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A donné la variance</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_std</sans>
+        <tans>ta_err_var</tans>
+        <testoptions>0.015</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-VAR</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion Variance / Écart-type !</strong> Vous avez calculé la VARIANCE (\(\sigma^2\)). On vous demande l'ÉCART-TYPE (\(\sigma\)), qui est la racine carrée de la variance. N'oubliez pas le symbole \(\sqrt{\dots}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-AUTRE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : A donné la moyenne</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_std</sans>
+        <tans>ta_err_mean</tans>
+        <testoptions>0.015</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MEAN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion !</strong> Vous avez calculé la MOYENNE. On demande l'ÉCART-TYPE, qui mesure la dispersion autour de cette moyenne.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-AUTRE2</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : A donné la somme des carrés</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_std</sans>
+        <tans>ta_err_somme</tans>
+        <testoptions>0.1</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SOMME</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Calcul incomplet !</strong> Vous avez calculé la somme des carrés des écarts, mais il manque la division par l'effectif (\(n=5\)) et la racine carrée pour obtenir l'écart-type.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la formule complète : \(\sigma = \sqrt{\frac{1}{n}\sum(x_i - \bar{x})^2}\).</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

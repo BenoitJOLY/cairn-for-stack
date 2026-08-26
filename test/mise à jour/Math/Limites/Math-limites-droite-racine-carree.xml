@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396384  -->
+  <question type="stack">
+    <name>
+      <text>Limites : Limite à droite en un point (Racine carrée)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Limites de fonctions — À droite en \(a\)</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit \(f\) la fonction définie pour tout réel \(x \geq {@a@}\), \(x \neq {@a@}\), par :</p>
+<div style="text-align: center; font-size: 1.2rem; margin: 25px 0; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+\(f(x) = \frac{{@num@}}{{@den@}}\)
+</div>
+<p> Calculer la limite de la fonction \(f\) à droite en {@a@}.</p>
+<p><em>Si la limite est infinie, on saisira <strong>inf</strong> ou <strong>-inf</strong>.</em></p>
+<div style="margin: 15px 0 10px 0;">\(\lim\limits_{x \to {@a@}^+} f(x) = \) [[input:ans_lim]] [[validation:ans_lim]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+En remplaçant \(x\) par {@a@}, on obtient \(\frac{\sqrt{0}}{0}\), ce qui est une <strong>forme indéterminée</strong>.<br><br>
+<strong>Le point clé ici :</strong><br>
+Puisque l'on calcule la limite <strong>à droite</strong> (\(x \to {@a@}^+\)), on sait que \(x > {@a@}\), donc \(x - {@a@} > 0\).<br>
+Par conséquent, on peut écrire : \(x - {@a@} = \left(\sqrt{x - {@a@}}\right)^2\).<br><br>
+<strong>Levée de l'indétermination :</strong><br>
+Pour tout \(x > {@a@}\) :
+\[
+f(x) = \frac{\sqrt{x - {@a@}}}{x - {@a@}} = \frac{\sqrt{x - {@a@}}}{\left(\sqrt{x - {@a@}}\right)^2} = \frac{1}{\sqrt{x - {@a@}}}
+\]<br>
+<strong>Conclusion :</strong><br>
+Lorsque \(x \to {@a@}^+\), le terme \(x - {@a@}\) tend vers \(0^+\) (zéro par valeurs positives).<br>
+Ainsi, \(\sqrt{x - {@a@}} \to \sqrt{0^+} = 0^+\), et son inverse tend vers \(+\infty\) :
+\[
+\lim\limits_{x \to {@a@}^+} f(x) = +\infty
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. INITIALISATIONS PAR DÉFAUT */
+a: 2$ num: sqrt(x-2)$ den: x-2$ func: num/den$ ans_correct: inf$ txt_lim: "+\infty"$ err_0: 0$ err_sign: -inf$ err_a: 999$ 
+/* 2. GÉNÉRATION ALÉATOIRE */
+r_a: rand(5)$ if r_a = 1 then a: 2$ if r_a = 2 then a: 3$ if r_a = 3 then a: -1$ if r_a = 4 then a: -2$ if r_a = 5 then a: 4$ 
+num: sqrt(x - a)$ den: x - a$ func: num/den$ ans_correct: inf$ txt_lim: "+\infty"$ 
+/* 3. ERREURS CLASSIQUES */
+err_0: 0$ err_sign: -inf$ err_a: a$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>a={@a@}, Limite à droite = +inf</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:limites-point-fini-a-droite</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_lim</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>inf ou -inf</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords>inf</allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Vous avez bien justifié que \(x - {@a@} > 0\) pour simplifier, et trouvé la bonne limite.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A répondu 0</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>err_0</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-0</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Piège de la racine !</strong> Vous avez probablement simplifié \(\frac{\sqrt{x-a}}{x-a}\) par \(\sqrt{x-a}\) au lieu de \(\frac{1}{\sqrt{x-a}}\). Rappelez-vous que \(x-a = (\sqrt{x-a})^2\). Le numérateur est la racine, le dénominateur est le carré !</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-0</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : A répondu -inf</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>err_sign</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe !</strong> Vous avez bien trouvé que la limite est infinie. Cependant, on calcule la limite <strong>à droite</strong> (\(x \to {@a@}^+\)), donc \(x - {@a@}\) tend vers \(0^+\) (zéro positif). Une racine carrée d'un nombre positif tendant vers 0 est positive, son inverse tend donc vers \(+\infty\), et non \(-\infty\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SIGN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : A répondu la valeur de a</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_lim</sans>
+        <tans>err_a</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-A</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Valeur interdite !</strong> Vous avez donné la valeur {@a@}. Cela correspondrait à un remplacement direct dans la fraction non simplifiée, ce qui est mathématiquement interdit (\(\frac{0}{0}\) n'existe pas). Il faut impérativement simplifier l'expression avant de passer à la limite.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Méthode :<br>1. Justifiez que \(x - {@a@} > 0\) car on est à droite de {@a@}.<br>2. Remplacez \(x - {@a@}\) par \((\sqrt{x - {@a@}})^2\) au dénominateur.<br>3. Simplifiez par \(\sqrt{x - {@a@}}\) pour obtenir \(\frac{1}{\sqrt{x - {@a@}}}\).<br>4. Concluez en utilisant le fait que \(x - {@a@} \to 0^+\).</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

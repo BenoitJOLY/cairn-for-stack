@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396071  -->
+  <question type="stack">
+    <name>
+      <text>Exercice_cases a cocher corrigé</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #7c3aed; border-left: 5px solid #4c1d95; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Q1 — Cases à cocher</strong> <span style="background: #4c1d95; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span> <span style="background: #ffffff; color: #4c1d95; border: 1px solid #4c1d95; padding: 2px 9px; border-radius: 20px; font-size: .75rem; font-weight: 600;">☑️ Plusieurs choix possibles</span></div>
+<!-- ENONCE-START -->
+<div>Dans ce type d'exercice l'enseignant a créé manuellement ou grâce à l'IA 10 propositions vraies et 10 propositions fausses. On veut afficher 5 propositions avec un nombre aléatoire de bonne réponses (entre 1 et 4 ici). Le nombre de tirages différents est de 2100 et en tenant compte de l'ordre de présentation des propositions elle est de 5400.</div>
+<div>A chaque fois qu'un élève commence un nouveau test il a des propositions différentes.</div>
+<div> </div>
+<p>Cochez les propositions qui caractérisent la « Guerre froide » entre 1947 et 1991.</p>
+<!-- ENONCE-END -->
+<p>[[input:ans1]] [[validation:ans1]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+<div style="font-weight: bold; color: var(--navy2); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 1.2rem;">🔑</span> Réponses attendues</div>
+<div style="margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dashed #e2e8f0;"><span style="font-weight: bold; color: var(--navy2);">Q1 Cases à cocher</span>
+<p><strong>Les bonnes réponses étaient :</strong> {@textes_vrais1@}</p>
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Q1 : Cases à cocher (1pt) */
+ta1_all:[["1",true,"Le développement d'une confrontation idéologique globale entre les modèles capitaliste et communiste."],["2",true,"La mise en place de réseaux d'alliances militaires permanentes comme l'OTAN ou le pacte de Varsovie."],["3",true,"L'éclatement de conflits armés périphériques indirects menés par des alliés ou pays tiers interposés."],["4",true,"La course technologique aux armements stratégiques fondée sur le concept de dissuasion nucléaire."],["5",true,"L'utilisation massive d'opérations de propagande et de guerre psychologique envers les populations."],["6",true,"La rivalité symbolique pour la conquête de l'espace comme vitrine de la puissance scientifique."],["7",true,"L'émergence d'un mouvement de pays non-alignés refusant d'intégrer la logique bipolaire dominante."],["8",true,"Le déploiement d'actions d'espionnage et d'opérations clandestines par des agences comme la CIA."],["9",true,"La partition géopolitique durable d'États clés en Europe et en Asie selon des critères idéologiques."],["10",true,"L'existence de crises diplomatiques majeures résolues par la négociation directe au bord du gouffre."],["11",false,"L'engagement d'un conflit armé direct et frontal entre les forces militaires des États-Unis et de l'URSS."],["12",false,"L'effondrement économique immédiat de l'Union soviétique dès la fin des opérations de l'année 1947."],["13",false,"La création de la Société des Nations pour servir d'arbitre impartial lors des crises internationales."],["14",false,"L'interdiction absolue de tout échange diplomatique ou ligne de communication entre les deux blocs."],["15",false,"L'unification politique immédiate du continent européen sous la direction exclusive de la France."],["16",false,"Le monopole exclusif des armes nucléaires par le gouvernement américain durant toute la période."],["17",false,"L'effacement total des empires coloniaux européens sous l'action militaire conjointe des deux grands."],["18",false,"La disparition complète de l'économie de marché dans l'ensemble des pays de l'hémisphère Ouest."],["19",false,"La signature d'un traité d'alliance commerciale secrète pour le partage mondial du pétrole."],["20",false,"La dissolution volontaire de l'Organisation du traité de l'Atlantique Nord à la mort de Staline."]];
+listV1:sublist(ta1_all,lambda([ex],second(ex)=true));
+listF1:sublist(ta1_all,lambda([ex],second(ex)=false));
+nbV1:rand(min(length(listV1), 5-1)) + 1;
+nbF1:min(length(listF1),5 - nbV1);
+ta1:random_permutation(append(rand_selection(listV1,nbV1),rand_selection(listF1,nbF1)));
+fb1:[["1","Proposition exacte. La Guerre froide est fondamentalement un affrontement doctrinal total et planétaire entre deux visions irréconciliables de la société, de l'économie et de la politique."],["2","Proposition exacte. Le conflit structure l'espace mondial à travers une logique de blocs rigides, consolidés par des traités d'assistance militaire mutuelle en cas d'agression."],["3","Proposition exacte. Faute de pouvoir s'affronter directement, les deux superpuissances se livrent une guerre par procuration sur des théâtres régionaux comme en Corée ou en Angola."],["4","Proposition exacte. L'accumulation massive d'armes de destruction massive par les deux camps instaure l'équilibre de la terreur, rendant une agression directe suicidaire."],["5","Proposition exacte. Le contrôle de l'information, le cinéma, le sport et l'éducation sont mobilisés par les deux camps comme des armes majeures pour démontrer leur supériorité."],["6","Proposition exacte. Les programmes spatiaux, du premier satellite Spoutnik aux missions lunaires Apollo, servent de substituts pacifiques mais hautement stratégiques à la guerre."],["7","Proposition exacte. À partir de la conférence de Bandung en 1955, les nouveaux États décolonisés tentent de tracer une troisième voie indépendante de Washington et de Moscou."],["8","Proposition exacte. La collecte de renseignements et le sabotage politique secret sont des instruments permanents pour déstabiliser le camp adverse sans déclarer de guerre ouverte."],["9","Proposition exacte. Le conflit fige des frontières idéologiques durables, coupant des nations en deux républiques distinctes, à l'image des exemples de l'Allemagne, de la Corée ou du Vietnam."],["10","Proposition exacte. Des épisodes critiques comme la crise des missiles de Cuba en 1962 poussent les puissances à des compromis directs pour éviter l'apocalypse nucléaire."],["11","Confusion sémantique majeure. Cette proposition contredit la définition même de la Guerre froide. Le risque d'une destruction mutuelle assurée par l'arme atomique a interdit tout affrontement conventionnel ou nucléaire direct entre les deux superpuissances."],["12","Anachronisme temporel. Cette réponse révèle une mauvaise assimilation de la chronologie. L'économie soviétique, bien que fragile au plan structurel, a maintenu sa puissance industrielle et militaire globale durant plusieurs décennies avant d'entrer en crise terminale à la fin des années 1980."],["13","Confusion d'institutions. La Société des Nations est une organisation de l'entre-deux-guerres qui a cessé d'exister après son échec à empêcher la Seconde Guerre mondiale. C'est l'Organisation des Nations Unies, créée en 1945, qui sert de scène diplomatique pendant la Guerre froide."],["14","Erreur d'analyse factuelle. C'est le piège de l'exercice car la rupture semble totale au premier abord. Or, la diplomatie n'a jamais cessé, se renforçant même après la crise de 1962 avec la mise en place du téléphone rouge et les accords de limitation des armements lors de la Détente."],["15","Erreur de géographie politique. L'Europe de la Guerre froide est profondément fracturée en deux par le rideau de fer. La construction européenne ne concerne que l'Europe de l'Ouest, se fait de manière progressive, et n'est pas une hégémonie française mais un projet partenarial."],["16","Méconnaissance de la course aux armements. Si les États-Unis possèdent le monopole de la bombe atomique entre 1945 et 1949, l'URSS réalise son premier essai nucléaire réussi en août 1949, brisant cette exclusivité et initiant la parité stratégique."],["17","Confusion sur les mécanismes de la décolonisation. Si Washington et Moscou ont globalement encouragé la fin des empires coloniaux pour étendre leur propre influence, le processus d'émancipation découle des mouvements nationalistes locaux et s'est étalé de façon complexe sur trois décennies."],["18","Contresens idéologique. Le bloc occidental dirigé par les États-Unis a fait de la défense de l'économie de marché, du capitalisme, de la propriété privée et du libre-échange le fondement économique de son opposition au modèle planifié communiste."],["19","Hypothèse géopolitique infondée. Les relations économiques entre les deux blocs étaient réduites et encadrées par une méfiance stratégique stricte, excluant toute entente secrète de partage des ressources mondiales."],["20","Erreur sur l'évolution des structures de défense. La mort de Joseph Staline en 1953 ouvre une période de relative déstagnation mais ne remet pas en cause les structures militaires. L'OTAN est restée active durant toute la Guerre froide et existe encore aujourd'hui."]];
+/* Feedback si la proposition vraie N'A PAS ÉTÉ cochée */
+fb_oubli1:[
+["1","Omission cruciale. Il est indispensable de cocher cette proposition car elle définit le fondement idéologique qui donne tout son sens à la période."],
+["2","Omission importante. N'oubliez pas que les alliances militaires sont la traduction concrète de la division du monde en deux blocs hostiles."],
+["3","A cocher absolument. C'est le concept central de « guerre par procuration » (proxy war), une caractéristique majeure de la Guerre froide."],
+["4","A retenir. La dissuasion nucléaire (équilibre de la terreur) est le moteur principal qui a empêché le conflit direct."],
+["5","Ne pas oublier. La propagande était une arme de guerre à part entière sur le plan intérieur comme international."],
+["6","Important. La conquête de l'espace n'était pas qu'une compétition scientifique, mais une véritable guerre d'influence."],
+["7","Essentiel. Le tiers-monde et le mouvement non-aligné sont des acteurs clés de cette période, pas de simples spectateurs."],
+["8","A cocher. L'espionnage (CIA, KGB) illustre parfaitement que la Guerre froide était aussi un conflit clandestin permanent."],
+["9","Indispensable. La partition de l'Allemagne ou de la Corée est la conséquence géopolitique la plus visible de la Guerre froide."],
+["10","A cocher. Les crises majeures (comme Cuba) montrent que la guerre froide a été ponctuée de risques d'escalade nucléaire gérés par la diplomatie."],
+["11",""],["12",""],["13",""],["14",""],["15",""],["16",""],["17",""],["18",""],["19",""],["20",""]
+];
+/* Liste HTML des propositions vraies avec puces */
+textes_vrais1: sconcat("<ul style='margin:4px 0 0 0;padding-left:1.4em;'>", simplode(map(lambda([ex], sconcat("<li>", third(ex), "</li>")), sublist(ta1,lambda([ex],second(ex)=true))), ""), "</ul>");]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+<li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>{@map(first,ta1)@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V4 | hestack-types:checkbox</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>checkbox</type>
+      <tans>ta1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[idx1:flatten([ans1]);
+bons1:map(first,sublist(ta1,lambda([ex],second(ex)=true)));
+nv1:cardinality(intersection(setify(idx1),setify(bons1)));
+nf1:cardinality(intersection(setify(idx1),setify(map(first,sublist(ta1,lambda([ex],second(ex)=false))))));
+den1:length(bons1);
+sc1:if den1>0 then max(0,float((nv1-nf1)/den1)) else 0;
+pct1:floor(sc1*100);
+fbl1:makelist(block([id,lab,ok,ft,col],
+  id:idx1[n],
+  lab:assoc(id,map(lambda([x],[x[1],x[3]]),ta1_all)),
+  ok:assoc(id,map(lambda([x],[x[1],x[2]]),ta1_all)),
+  ft:assoc(id,fb1),
+  col:if ok=true then "green" else "red",
+  sconcat("<div style='color:",col,";border-left:4px solid ",col,";padding:7px;margin:3px 0'><b>",lab,"</b><br/>",ft,"</div>")
+),n,1,length(idx1));
+
+/* --- NOUVEAU : Feedback des vraies NON cochées --- */
+manques1:listify(setdifference(setify(bons1), setify(idx1)));
+fbl_oubli1: if length(manques1)>0 then makelist(block([id,lab,ft],
+  id:manques1[n],
+  lab:assoc(id,map(lambda([x],[x[1],x[3]]),ta1_all)),
+  ft:assoc(id,fb_oubli1),
+  sconcat("<div style='color:#92400e;background:#fffbeb;border-left:4px solid #f59e0b;padding:7px;margin:3px 0'><b>⚠️ Oubli : </b>",lab,"<br/>",ft,"</div>")
+),n,1,length(manques1)) else [];]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans1</sans>
+        <tans>ta1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #86efac;"><strong>✅ Score : 100%</strong>[[foreach item="fbl1"]]{@item@}[[/foreach]]</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>sc1</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="padding:12px;background:#fafafa;border-radius:8px;border:1px solid #e2e8f0"-->
+<p><strong>Score : {@pct1@}%</strong>[[foreach item="fbl1"]]{@item@}[[/foreach]][[if test="manques1 # []"]]</p>
+<div style="padding: 12px; background: #fffbeb; border-radius: 8px; border: 1px solid #fde68a; margin-top: 10px;"><strong style="color: #92400e;">⚠️ Propositions vraies que vous avez oubliées :</strong>[[foreach item="fbl_oubli1"]]{@item@}[[/foreach]]</div>
+<p>[[/if]]]]&gt;</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396423  -->
+  <question type="stack">
+    <name>
+      <text>Équations et Inéquations : Résoudre une inéquation |ax+b|</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Algèbre — Inéquation avec valeur absolue</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Résoudre dans \(\mathbb{R}\) l'inéquation suivante :</p>
+<div style="text-align: center; font-size: 1.2rem; margin: 25px 0;">
+    \[ {@eq@} \]
+</div>
+<p>Donner l'ensemble des solutions sous forme d'inégalités combinées.</p>
+<p><em>Par exemple, si la solution est l'union de deux intervalles, on tapera <strong>x <= -2 or x >= 4</strong>. Si c'est un intervalle borné, on tapera <strong>-3 < x and x < 5</strong>.</em></p>
+<div style="margin: 15px 0 10px 0;">Solution :  [[input:ans_ineq]] [[validation:ans_ineq]] </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour résoudre cette inéquation, on utilise la définition de la valeur absolue :<br><br>
+\[ {@eq@} \]<br><br>
+<strong>1. Définition :</strong><br>
+Une valeur absolue représente une distance. 
+<ul style="margin: 5px 0 5px 20px;">
+<li>Si le symbole est \(\ge\) ou \(>\), on cherche les valeurs <strong>éloignées</strong> du centre, cela se traduit par un <strong>"OU"</strong>.</li>
+<li>Si le symbole est \(\le\) ou \(<\), on cherche les valeurs <strong>proches</strong> du centre, cela se traduit par un <strong>"ET"</strong>.</li>
+</ul>
+<strong>2. Résolution des équations sans valeur absolue :</strong><br>
+On pose \(ax + b = c\) et \(ax + b = -c\) pour trouver les bornes.<br>
+\[
+\begin{align*}
+ax + b &= c \iff x = {@x1@} \\
+ax + b &= -c \iff x = {@x2@}
+\end{align*}
+\]
+<div style="margin: 10px 0; padding: 10px; background: #fff1f2; border-radius: 4px; border-left: 3px solid #e11d48;">
+<strong>ATTENTION :</strong> Ici, l'inéquation se traduit par {@methode_txt@}. Il ne faut pas confondre !
+</div>
+La solution est donc :
+\[ {@ans_correct@} \]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. GÉNÉRATION ALÉATOIRE */
+a: rand([1, -1, 2, -2, 3, -3])$ b: rand([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5])$ c: rand([1, 2, 3, 4, 5])$ /* c strictement positif pour éviter les cas triviaux */
+
+/* 2. DÉFINITION DE L'INÉQUATION */
+ineqs: [abs(a*x + b) > c, abs(a*x + b) >= c, abs(a*x + b) < c, abs(a*x + b) <= c]$ eq: rand(ineqs)$ op_ineq: op(eq)$ 
+/* 3. CALCUL DES VALEURS FRONTIÈRES */
+/* On résout ax+b = c et ax+b = -c */
+x1: ev((c - b)/a, simp)$ x2: ev((-c - b)/a, simp)$ 
+/* On ordonne x1 et x2 pour construire proprement la réponse logique */
+if x1 > x2 then (
+    tmp: x1,
+    x1: x2,
+    x2: tmp
+)$ 
+/* 4. CALCUL DE LA RÉPONSE CORRECTE */
+/* Règle : >= ou > donne "OU" (extérieur). <= ou < donne "ET" (intérieur) */
+if op_ineq = ">" or op_ineq = ">=" then (
+    if op_ineq = ">" then ans_correct: x < x1 or x > x2,
+    if op_ineq = ">=" then ans_correct: x <= x1 or x >= x2
+) else (
+    if op_ineq = "<" then ans_correct: x1 < x and x < x2,
+    if op_ineq = "<=" then ans_correct: x1 <= x and x <= x2
+)$ 
+/* 5. ANTICIPATION DES ERREURS POUR LES FEEDBACKS CIBLÉS */
+
+/* err_sign : l'élève a bon les calculs, mais inverse le OU et le ET */
+if op_ineq = ">" or op_ineq = ">=" then (
+    if op_ineq = ">" then err_sign: x1 < x and x < x2,
+    if op_ineq = ">=" then err_sign: x1 <= x and x <= x2
+) else (
+    if op_ineq = "<" then err_sign: x < x1 or x > x2,
+    if op_ineq = "<=" then err_sign: x <= x1 or x >= x2
+)$ 
+/* err_val : l'élève a la bonne structure (OU/ET) mais se trompe dans les équations */
+/* On simule l'erreur classique : erreur de signe sur le 'b' lors du passage de l'autre côté */
+x2_err: ev((c + b)/a, simp)$ /* Au lieu de -c - b, l'élève fait c - (-b) ou c + b */
+/* Remise en ordre pour la construction logique */
+x1_for_err: x1$ if x1_for_err > x2_err then (
+    tmp: x1_for_err,
+    x1_for_err: x2_err,
+    x2_err: tmp
+)$ 
+if op_ineq = ">" or op_ineq = ">=" then (
+    if op_ineq = ">" then err_val: x < x1_for_err or x > x2_err,
+    if op_ineq = ">=" then err_val: x <= x1_for_err or x >= x2_err
+) else (
+    if op_ineq = "<" then err_val: x1_for_err < x and x < x2_err,
+    if op_ineq = "<=" then err_val: x1_for_err <= x and x <= x2_err
+)$ 
+/* 6. TEXTES POUR LA CORRECTION */
+methode_txt: if op_ineq = ">" or op_ineq = ">=" then "l'union de deux intervalles (connecteur logique <strong>OU</strong>)" else "l'intersection de deux intervalles (connecteur logique <strong>ET</strong>)"$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>{@eq@} -> Bornes : {@x1@} et {@x2@} | Solution : {@ans_correct@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | Approche Mathématique Native</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_ineq</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>25</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords>or, and</allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> L'inéquation avec valeur absolue est correctement résolue.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : Confusion OU / ET</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>err_sign</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de connecteur logique !</strong> Vos valeurs frontières sont correctes, mais vous avez confondu le "OU" et le "ET".<br><br>Rappelez-vous :<br>
+- \(|X| \ge c\) signifie qu'on s'éloigne de 0, c'est un <strong>"OU"</strong> (union des intervalles).\<br>
+- \(|X| \le c\) signifie qu'on se rapproche de 0, c'est un <strong>"ET"</strong> (intersection des intervalles).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SIGN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Mauvais calcul des bornes</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>err_val</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-VAL</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de calcul sur les bornes !</strong> La structure de votre inéquation (OU/ET) est bonne, mais les valeurs frontières sont fausses.<br><br>Vérifiez la résolution de vos deux équations sans valeur absolue :<br>
+1. \(ax + b = c\)<br>
+2. \(ax + b = -c\)<br>
+Attention aux erreurs de signes lorsque vous faites passer le \(b\) de l'autre côté du "=" !</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Méthode pour résoudre \(|ax + b| \ge c\) :<br>
+1. Poser les deux équations : \(ax + b = c\) et \(ax + b = -c\).<br>
+2. Résoudre ces deux équations pour trouver les valeurs frontières \(x_1\) et \(x_2\).<br>
+3. <strong>APPLIQUER LA RÈGLE :</strong> 
+   - Si l'inéquation est stricte ou large dans le sens \(\ge\) ou \(>\), la solution est \(x \le x_1\) <strong>OU</strong> \(x \ge x_2\).<br>
+   - Si l'inéquation est stricte ou large dans le sens \(\le\) ou \(<\), la solution est \(x_1 \le x\) <strong>ET</strong> \(x \le x_2\).</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

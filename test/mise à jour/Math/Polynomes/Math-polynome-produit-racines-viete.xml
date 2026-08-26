@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396363  -->
+  <question type="stack">
+    <name>
+      <text>Fonctions : Produit des racines (Relations de Viète)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Fonctions — Second degré</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit la fonction polynôme du second degré définie sur \(\mathbb{R}\) par :</p>
+<div style="text-align: center; font-size: 1.2rem; margin: 25px 0; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+\(P(x) = {@poly@}\)
+</div>
+<p>On admet que le discriminant est strictement positif (\(\Delta > 0\)), le polynôme admet donc deux racines réelles distinctes notées \(x_1\) et \(x_2\).</p>
+<p> Calculer le produit des racines, c'est-à-dire calculer \(x_1 \times x_2\).</p>
+<div style="margin: 15px 0 10px 0;">\(x_1 \times x_2 = \) [[input:ans_prod]] [[validation:ans_prod]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+D'après les relations de Viète (ou formules de Viète), pour un polynôme \(ax^2 + bx + c\) ayant deux racines \(x_1\) et \(x_2\), on a :<br><br>
+\[
+x_1 \times x_2 = \frac{c}{a}
+\]<br>
+<strong>Application numérique :</strong><br>
+Ici, \(a = {@a@}\) et \(c = {@c@}\).<br><br>
+\[
+x_1 \times x_2 = \frac{{@c@}}{{@a@}} = {@ans_correct@}
+\]<br>
+<em>(Remarque : on peut vérifier ce résultat en calculant les racines : \(x_1 = {@r1@}\) et \(x_2 = {@r2@}\), on a bien {@r1@} \times {@r2@} = {@ans_correct@}).</em>
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>/* Fonction utilitaire */
+ri(a,b) := a + rand(b - a + 1) - 1;
+
+/* Génération secrète de deux racines entières distinctes */
+r1: ri(-5, 5);
+r2: ri(-5, 5);
+while r2 = r1 do r2: ri(-5, 5);
+
+/* Génération du coefficient a (non nul) */
+r_a: rand(6);
+if r_a = 1 then a: -3
+else if r_a = 2 then a: -2
+else if r_a = 3 then a: -1
+else if r_a = 4 then a: 1
+else if r_a = 5 then a: 2
+else a: 3;
+
+/* Fabrication du polynôme à l'envers : a(x - r1)(x - r2) */
+b: -a * (r1 + r2);
+c: a * r1 * r2;
+poly: a*x^2 + b*x + c;
+
+/* Réponse attendue */
+ans_correct: r1 * r2;
+
+/* Erreurs classiques */
+/* Erreur 1 : A donné la somme au lieu du produit (-b/a) */
+err_sum: -b / a;
+/* Erreur 2 : A calculé b/a au lieu de c/a */
+err_minus_sum: b / a;
+/* Erreur 3 : A oublié de diviser par a (a juste donné c) */
+err_no_a: c;
+/* Erreur 4 : A mis un signe moins devant c/a */
+err_sign: -c / a;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>P(x)={@poly@}, Produit racines={@ans_correct@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:fonctions-second-degre-produit-racines</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_prod</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>c/a</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Le produit des racines est correct.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : Confusion avec la somme (-b/a)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>err_sum</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SUM</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion Somme / Produit !</strong> Vous avez calculé \(-\frac{b}{a}\), ce qui correspond à la <strong>somme</strong> des racines (\(x_1 + x_2\)). On vous demande le <strong>produit</strong> (\(x_1 \times x_2\)).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SUM</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : A calculé b/a</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>err_minus_sum</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MINUS-SUM</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise formule !</strong> Vous avez calculé \(\frac{b}{a}\). Cela ne correspond ni à la somme ni au produit des racines. Rappel : Produit \(= \frac{c}{a}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-MINUS-SUM</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Oubli de la division par a (a donné c)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>err_no_a</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-NOA</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli du coefficient \(a\) !</strong> Vous avez donné la valeur de \(c\). La formule du produit des racines est un quotient : il faut diviser par le coefficient \(a\) : \(\frac{c}{a}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-NOA</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur : A mis un signe moins (-c/a)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_prod</sans>
+        <tans>err_sign</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe !</strong> Le signe moins se trouve dans la formule de la <strong>somme</strong> (\(-\frac{b}{a}\)). Pour le <strong>produit</strong>, il n'y a pas de signe moins : c'est directement \(\frac{c}{a}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Utilisez les relations de Viète pour éviter de calculer le discriminant :<br>\(x_1 + x_2 = -\frac{b}{a}\)<br>\(x_1 \times x_2 = \frac{c}{a}\)<br><em>(Attention, contrairement à la somme, il n'y a pas de signe "-" pour le produit).</em></div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396879  -->
+  <question type="stack">
+    <name>
+      <text>Exercice_sans_titre_2026_06_30_15h26</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#B686D8;border-left:5px solid #7c3aed;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Relier les éléments</strong>
+    <span style="background:#7c3aed;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 2 pt</span>
+    <span style="background:#ffffff;color:#7c3aed;border:1px solid #7c3aed;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">Appariements</span>
+  </div>
+  <!-- ENONCE-START -->Relis les propositions de la colonne A à ceux de la colonne B quand ils sont liés.<!-- ENONCE-END -->
+<div id="match-container-1" style="width:100%;margin:16px 0;border:1px solid #e9d5ff;border-radius:12px;padding:4px;background:#faf5ff;box-shadow:0 2px 8px rgba(109,40,217,.07);position:relative;">
+ 
+[[jsxgraph input-ref-ans1="refAns1" width="100%" height="372px"]]
+function setRef(ref, value) {
+  var el = document.getElementById(ref);
+  if (el) { el.value = value; el.dispatchEvent(new Event('change')); }
+}
+
+var match_leftData  = {#left#};
+var match_rightData = {#right#};
+var match_selectedLeft = -1;
+var match_connections  = [];
+var match_lines        = [];
+var match_leftAnchors  = [];
+var match_rightAnchors = [];
+
+// Dimensions : on attend que le DOM soit prêt via setTimeout
+var match_board = JXG.JSXGraph.initBoard(divid, {
+    boundingbox: [0, 10, 100, 0],
+    axis: false, grid: false, showNavigation: false, showCopyright: false,
+    keepaspectratio: false
+});
+
+function match_init() {
+    var boardEl = document.getElementById(divid);
+    if (!boardEl || boardEl.offsetWidth < 10) { setTimeout(match_init, 80); return; }
+
+    var W    = 100;
+    var nL   = match_leftData.length;
+    var nR   = match_rightData.length;
+    var maxN = Math.max(nL, nR);
+    var ROW  = 12;
+    var H    = maxN * ROW + 8;
+
+    // Redimensionner le canvas SVG à la taille réelle du div (STACK le garde sinon à ~500px)
+    match_board.resizeContainer(boardEl.offsetWidth, boardEl.offsetHeight);
+    match_board.setBoundingBox([0, H, W, 0], false);
+
+    // unitX = pixels par unité APRÈS resize → cohérent avec le positionnement des éléments
+    var boxPx = Math.floor(43 * match_board.unitX);
+
+    // ── GRILLE : 1% | 43% boîtes gauche | 1% | 10% points | 1% | 43% boîtes droite | 1% ──
+    var xLBox = 1;
+    var xAL   = 45;
+    var xAR   = 55;
+    var xRBox = 56;
+
+    var styleBase = 'border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600;' +
+                    'display:flex;align-items:center;justify-content:center;text-align:center;' +
+                    'cursor:pointer;pointer-events:auto;box-sizing:border-box;' +
+                    'white-space:normal;word-break:break-word;overflow:hidden;' +
+                    'width:' + boxPx + 'px;';
+
+    function styleL(sel, linked) {
+        var bg  = sel ? '#ede9fe' : (linked ? '#f3e8ff' : '#ffffff');
+        var brd = sel ? '#7c3aed' : (linked ? '#a78bfa' : '#c4b5fd');
+        var col = sel ? '#5b21b6' : '#4c1d95';
+        var sh  = sel ? '0 0 0 3px #c4b5fd' : '0 1px 4px rgba(0,0,0,.10)';
+        return styleBase + 'background:' + bg + ';border:2px solid ' + brd + ';color:' + col + ';box-shadow:' + sh + ';';
+    }
+    function styleR(linked) {
+        var bg  = linked ? '#fdf2f8' : '#ffffff';
+        var brd = linked ? '#f0abfc' : '#fca5a5';
+        var col = '#991b1b';
+        return styleBase + 'background:' + bg + ';border:2px solid ' + brd + ';color:' + col + ';box-shadow:0 1px 4px rgba(0,0,0,.10);';
+    }
+
+    function match_updateInput() { setRef(refAns1, JSON.stringify(match_connections)); }
+
+    function match_redraw() {
+        for (var i = 0; i < match_lines.length; i++) match_board.removeObject(match_lines[i]);
+        match_lines = [];
+        for (var i = 0; i < match_connections.length; i++) {
+            var lI = match_leftData.indexOf(match_connections[i][0]);
+            var rI = match_rightData.indexOf(match_connections[i][1]);
+            if (lI !== -1 && rI !== -1) {
+                var li = match_board.create('line',
+                    [match_leftAnchors[lI], match_rightAnchors[rI]],
+                    { straightFirst:false, straightLast:false, strokeWidth:2.5,
+                      strokeColor:'#6d28d9', fixed:true, highlight:false });
+                (function(line, tL, tR) {
+                    line.on('down', function() {
+                        for (var k = 0; k < match_connections.length; k++) {
+                            if (match_connections[k][0]===match_leftData[tL] && match_connections[k][1]===match_rightData[tR]) {
+                                match_connections.splice(k,1);
+                                match_redraw(); match_updateInput(); break;
+                            }
+                        }
+                    });
+                })(li, lI, rI);
+                match_lines.push(li);
+            }
+        }
+        // Rafraîchir styles
+        for (var j = 0; j < match_leftElems.length; j++) {
+            var linked = match_connections.some(function(c){ return c[0]===match_leftData[j]; });
+            match_leftElems[j].setAttribute({ cssStyle: styleL(j===match_selectedLeft, linked) });
+        }
+        for (var j = 0; j < match_rightElems.length; j++) {
+            var linked = match_connections.some(function(c){ return c[1]===match_rightData[j]; });
+            match_rightElems[j].setAttribute({ cssStyle: styleR(linked) });
+        }
+        match_board.update();
+    }
+
+    var match_leftElems  = [];
+    var match_rightElems = [];
+
+    for (var i = 0; i < nL; i++) {
+        var y = H - 6 - i * ROW;
+        var t = match_board.create('text', [xLBox, y, match_leftData[i]], {
+            fontSize:14, anchorX:'left', anchorY:'middle',
+            cssStyle: styleL(false, false),
+            useMathJax:true, fixed:true, highlight:false
+        });
+        var a = match_board.create('point', [xAL, y], {
+            size:5, fillColor:'#a78bfa', strokeColor:'#7c3aed', strokeWidth:2,
+            fixed:true, name:'', showInfobox:false, highlight:false
+        });
+        match_leftAnchors.push(a);
+        match_leftElems.push(t);
+        (function(idx) {
+            var fn = function() { match_selectedLeft = idx; match_redraw(); };
+            t.on('down', fn); a.on('down', fn);
+        })(i);
+    }
+
+    for (var i = 0; i < nR; i++) {
+        var y = H - 6 - i * ROW;
+        var t = match_board.create('text', [xRBox, y, match_rightData[i]], {
+            fontSize:14, anchorX:'left', anchorY:'middle',
+            cssStyle: styleR(false),
+            useMathJax:true, fixed:true, highlight:false
+        });
+        var a = match_board.create('point', [xAR, y], {
+            size:5, fillColor:'#f87171', strokeColor:'#dc2626', strokeWidth:2,
+            fixed:true, name:'', showInfobox:false, highlight:false
+        });
+        match_rightAnchors.push(a);
+        match_rightElems.push(t);
+        (function(idx) {
+            var fn = function() {
+                if (match_selectedLeft === -1) return;
+                var conn = [match_leftData[match_selectedLeft], match_rightData[idx]];
+                if (!match_connections.some(function(c){ return c[0]===conn[0]&&c[1]===conn[1]; })) {
+                    match_connections.push(conn); match_updateInput();
+                }
+                match_selectedLeft = -1; match_redraw();
+            };
+            t.on('down', fn); a.on('down', fn);
+        })(i);
+    }
+
+    // Restaurer état
+    var sv = document.getElementById(refAns1);
+    if (sv && sv.value && sv.value.trim()) {
+        try { var p = JSON.parse(sv.value); if (Array.isArray(p)) match_connections = p; } catch(e){}
+    }
+    match_redraw();
+
+    // Bouton effacer
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.innerHTML = '🗑 Effacer les liaisons';
+    btn.style.cssText = 'margin:10px auto 0;display:block;padding:6px 16px;border:1px solid #c4b5fd;border-radius:8px;background:#faf5ff;color:#6d28d9;font-size:13px;cursor:pointer;font-weight:600;';
+    btn.onmouseenter = function(){ this.style.background='#ede9fe'; };
+    btn.onmouseleave = function(){ this.style.background='#faf5ff'; };
+    btn.onclick = function(){ match_connections=[]; match_selectedLeft=-1; match_redraw(); match_updateInput(); };
+    boardEl.parentNode.insertBefore(btn, boardEl.nextSibling);
+}
+
+setTimeout(match_init, 100);
+[[/jsxgraph]]
+
+<div style="display:none;"> [[input:ans1]] [[validation:ans1]] </div>
+
+</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);"><div style="font-weight:bold; color:var(--navy2); margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div><div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;">
+                <span style="font-weight:bold;color:var(--navy2);">Q1 Relier</span>
+                <span style="color:#64748b;font-size:.85rem;margin-left:6px;">[[jsxgraph width="100%" height="372px"]]
+var sol_leftData  = {#left#};
+var sol_rightData = {#right#};
+var sol_pairs     = {#tans#};
+
+var sol_board = JXG.JSXGraph.initBoard(divid, {
+    boundingbox: [0, 10, 100, 0],
+    axis: false, grid: false, showNavigation: false, showCopyright: false,
+    keepaspectratio: false
+});
+
+function sol_init() {
+    var boardEl = document.getElementById(divid);
+    if (!boardEl || boardEl.offsetWidth < 10) { setTimeout(sol_init, 80); return; }
+
+    var W    = 100;
+    var nL   = sol_leftData.length;
+    var nR   = sol_rightData.length;
+    var maxN = Math.max(nL, nR);
+    var ROW  = 12;
+    var H    = maxN * ROW + 8;
+
+    sol_board.resizeContainer(boardEl.offsetWidth, boardEl.offsetHeight);
+    sol_board.setBoundingBox([0, H, W, 0], false);
+
+    var boxPx = Math.floor(43 * sol_board.unitX);
+    var xLBox = 1;
+    var xAL = 45, xAR = 55;
+    var xRBox = 56;
+
+    var solStyle = 'border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600;' +
+        'display:flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;' +
+        'white-space:normal;word-break:break-word;overflow:hidden;' +
+        'pointer-events:none;background:#f0fdf4;border:2px solid #86efac;color:#166534;' +
+        'box-shadow:0 1px 4px rgba(0,0,0,.08);width:' + boxPx + 'px;';
+
+    var solLeftAnchors = [], solRightAnchors = [];
+
+    for (var i = 0; i < nL; i++) {
+        var y = H - 6 - i * ROW;
+        sol_board.create('text', [xLBox, y, sol_leftData[i]], {
+            fontSize:14, anchorX:'left', anchorY:'middle',
+            cssStyle: solStyle, useMathJax:true, fixed:true, highlight:false
+        });
+        var a = sol_board.create('point', [xAL, y], {
+            size:5, fillColor:'#4ade80', strokeColor:'#16a34a', strokeWidth:2,
+            fixed:true, name:'', showInfobox:false, highlight:false
+        });
+        solLeftAnchors.push(a);
+    }
+
+    for (var i = 0; i < nR; i++) {
+        var y = H - 6 - i * ROW;
+        sol_board.create('text', [xRBox, y, sol_rightData[i]], {
+            fontSize:14, anchorX:'left', anchorY:'middle',
+            cssStyle: solStyle, useMathJax:true, fixed:true, highlight:false
+        });
+        var a = sol_board.create('point', [xAR, y], {
+            size:5, fillColor:'#4ade80', strokeColor:'#16a34a', strokeWidth:2,
+            fixed:true, name:'', showInfobox:false, highlight:false
+        });
+        solRightAnchors.push(a);
+    }
+
+    for (var i = 0; i < sol_pairs.length; i++) {
+        var lI = sol_leftData.indexOf(sol_pairs[i][0]);
+        var rI = sol_rightData.indexOf(sol_pairs[i][1]);
+        if (lI !== -1 && rI !== -1) {
+            sol_board.create('line', [solLeftAnchors[lI], solRightAnchors[rI]], {
+                straightFirst:false, straightLast:false,
+                strokeWidth:2.5, strokeColor:'#16a34a', fixed:true, highlight:false
+            });
+        }
+    }
+    sol_board.update();
+}
+
+setTimeout(sol_init, 100);
+[[/jsxgraph]]</span>
+            </div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>2</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[list_left: ["Spectre continu","Raies d'emission","Spectre d'absorption","Corps incandescent","Gaz basse pression excite","Atmosphere stellaire"]$ list_right: ["Origine de la formation du spectre","Apparence visuelle du spectre"]$ tans: [["Spectre continu", "Apparence visuelle du spectre"],["Raies d'emission", "Apparence visuelle du spectre"],["Spectre d'absorption", "Apparence visuelle du spectre"],["Corps incandescent", "Origine de la formation du spectre"],["Gaz basse pression excite", "Origine de la formation du spectre"],["Atmosphere stellaire", "Origine de la formation du spectre"]]$ left: random_permutation(list_left)$ right: random_permutation(list_right)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]] </li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Match (6/2)</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:match</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>tans</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[rep_etud_set: if listp(ans1) then setify(ans1) else {}$ rep_corr_set: setify(tans)$ bons_elements: intersect(rep_etud_set, rep_corr_set)$ faux_elements: setdifference(rep_etud_set, rep_corr_set)$ nb_bons: length(bons_elements)$ nb_faux: length(faux_elements)$ total: length(rep_corr_set)$ if total > 0 then note_calculee: max(0, (nb_bons - nb_faux) / total) else note_calculee: 0$ faux_list: listify(faux_elements)$ faux_feedback_str: if length(faux_list) = 0 then "Aucune erreur de liaison." else
+    block([txt],
+        txt: "<ul style='margin: 5px 0; padding-left: 20px; color: #c0392b;'>",
+        for i:1 thru length(faux_list) do (
+            txt: sconcat(txt, "<li>", faux_list[i][1], " - ", faux_list[i][2], "</li>")
+        ),
+        sconcat(txt, "</ul>")
+    )$]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>NumAbsolute</answertest>
+        <sans>note_calculee</sans>
+        <tans>1</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="padding:10px; background-color:#d4edda; color:#155724; border-radius:5px;">
+    <strong>Excellent !</strong> Vous avez trouvé les {@nb_bons@} liaisons correctes.
+</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>note_calculee</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="padding:10px; background-color:#fff3cd; color:#856404; border-radius:5px;">
+    <strong>Résultat :</strong> Vous avez trouvé {@nb_bons@} bonne(s) liaison(s) sur {@total@}.<br>
+    <div style="margin-top:10px;">
+        <strong>Vos erreurs (liaisons incorrectes) :</strong><br>
+        {@faux_feedback_str@}
+    </div>
+    <div style="margin-top:10px; font-weight:bold;">
+        Note : {@note_calculee*2@} / 2
+    </div>
+</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

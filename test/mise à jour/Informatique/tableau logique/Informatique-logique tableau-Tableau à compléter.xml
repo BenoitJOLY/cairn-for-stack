@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396685  -->
+  <question type="stack">
+    <name>
+      <text>Logique Propositionnelle - Tableau à compléter</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#1e3a5f;border-left:5px solid #2563eb;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Logique — Table de vérité</strong>
+        <span style="background:#2563eb;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#1e3a5f;border:1px solid #1e3a5f;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📐 Mathématiques</span>
+      </div>
+
+      <p>Complétez la colonne de résultat pour l'expression logique suivante :</p>
+      <div style="text-align:center; font-size:1.3rem; font-weight:bold; margin: 15px 0; padding: 15px; background:#eff6ff; border-radius:8px; border:1px solid #bfdbfe; font-family: serif;">
+        \( {@expr@} \)
+      </div>
+
+      <div style="overflow-x:auto; margin: 20px 0;">
+        <table style="margin: 0 auto; border-collapse: collapse; border: 2px solid #334155; background-color: #ffffff; font-family: monospace; font-size: 1.1rem;">
+          <thead>
+            <tr style="background-color: #f1f5f9;">
+              <th style="border: 1px solid #94a3b8; padding: 10px 25px;">P</th>
+              <th style="border: 1px solid #94a3b8; padding: 10px 25px;">Q</th>
+              <th style="border: 1px solid #94a3b8; padding: 10px 25px; background-color: #fef9c3;">{@expr@}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">0</td>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">0</td>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center; background-color: #fefce8;">[[input:ans0]] [[validation:ans0]]</td>
+            </tr>
+            <tr style="background-color: #f8fafc;">
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">0</td>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">1</td>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center; background-color: #fefce8;">[[input:ans1]] [[validation:ans1]]</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">1</td>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">0</td>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center; background-color: #fefce8;">[[input:ans2]] [[validation:ans2]]</td>
+            </tr>
+            <tr style="background-color: #f8fafc;">
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">1</td>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">1</td>
+              <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center; background-color: #fefce8;">[[input:ans3]] [[validation:ans3]]</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:#0f766e; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponse attendue
+        </div>
+        <div style="overflow-x:auto; margin: 0 auto; width: fit-content;">
+          <table style="margin: 0 auto; border-collapse: collapse; border: 2px solid #334155; background-color: #ffffff; font-family: monospace; font-size: 1.1rem;">
+            <thead>
+              <tr style="background-color: #f1f5f9;">
+                <th style="border: 1px solid #94a3b8; padding: 10px 25px;">P</th>
+                <th style="border: 1px solid #94a3b8; padding: 10px 25px;">Q</th>
+                <th style="border: 1px solid #94a3b8; padding: 10px 25px; background-color: #fef9c3;">{@expr@}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">0</td>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">0</td>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center; background-color: #f0fdf4; font-weight:bold; color:#15803d;">{@v0@}</td>
+              </tr>
+              <tr style="background-color: #f8fafc;">
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">0</td>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">1</td>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center; background-color: #f0fdf4; font-weight:bold; color:#15803d;">{@v1@}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">1</td>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">0</td>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center; background-color: #f0fdf4; font-weight:bold; color:#15803d;">{@v2@}</td>
+              </tr>
+              <tr style="background-color: #f8fafc;">
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">1</td>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center;">1</td>
+                <td style="border: 1px solid #94a3b8; padding: 10px 25px; text-align: center; background-color: #f0fdf4; font-weight:bold; color:#15803d;">{@v3@}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>expr1 : (P or not(Q)) and not(Q and not(P))
+expr2 : not(P implies Q)
+expr3 : not(P and Q)
+expr4 : (P implies Q) and (Q implies P)
+expr5 : not(P) implies Q
+expr6 : not(P or Q)
+liste_expr : [expr1, expr2, expr3, expr4, expr5, expr6]
+idx : rand([1,2,3,4,5,6])
+expr : liste_expr[idx]
+
+T : truth_table(boolean_form(expr))
+Rows : args(T)
+v0 : if last(Rows[2]) then 1 else 0
+v1 : if last(Rows[3]) then 1 else 0
+v2 : if last(Rows[4]) then 1 else 0
+v3 : if last(Rows[5]) then 1 else 0
+ta_ans : [v0, v1, v2, v3]
+
+ta_inverse : [v3, v2, v1, v0]
+ta_negation : [1-v0, 1-v1, 1-v2, 1-v3]</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Expr: {@expr@} | Rep: {@ta_ans@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:logique-prop-tableau</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>symbol</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans0</name>
+      <type>algebraic</type>
+      <tans>v0</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans1</name>
+      <type>algebraic</type>
+      <tans>v1</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans2</name>
+      <type>algebraic</type>
+      <tans>v2</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans3</name>
+      <type>algebraic</type>
+      <tans>v3</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>student_ans : [ans0, ans1, ans2, ans3]</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Tableau correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>student_ans</sans>
+        <tans>ta_ans</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;"><p>✅ <strong>Parfait !</strong> Votre tableau est rempli correctement.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>A calculé la négation de l'expression</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>student_ans</sans>
+        <tans>ta_negation</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Presque ça !</strong> Vos résultats correspondent à l'expression \(\neg({@expr@})\). Vous avez calculé l'inverse de ce qui était demandé.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>A rempli de haut en bas (1,1 vers 0,0)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>student_ans</sans>
+        <tans>ta_inverse</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Attention à l'ordre !</strong> Vous avez rempli le tableau en commençant par P=1, Q=1 (de haut en bas), alors qu'il faut le remplir en commençant par P=0, Q=0 (de bas en haut).</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Tableau incorrect</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;margin:4px 0;"><p>❌ <strong>Incorrect.</strong> Vérifiez pas à pas l'évaluation de chaque opérateur. Rappel : <br>• L'implication \(P \Rightarrow Q\) est fausse <u>uniquement</u> si P est vrai et Q est faux.<br>• Le NON s'applique en priorité.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

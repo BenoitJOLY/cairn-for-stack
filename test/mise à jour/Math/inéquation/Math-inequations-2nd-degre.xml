@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396419  -->
+  <question type="stack">
+    <name>
+      <text>Équations et Inéquations : Résoudre une inéquation du 2nd degré</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Algèbre — Inéquation du second degré</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Résoudre dans \(\mathbb{R}\) l'inéquation suivante :</p>
+<div style="text-align: center; font-size: 1.2rem; margin: 25px 0;">
+    \[ {@eq@} \]
+</div>
+<p>Donner l'ensemble des solutions sous forme d'inégalités combinées.</p>
+<p><em>Par exemple, si la solution est l'union de deux intervalles, on tapera <strong>x < -2 or x > 3</strong>. Si c'est un intervalle borné, on tapera <strong>-1 <= x and x <= 4</strong>.</em></p>
+<div style="margin: 15px 0 10px 0;">Solution : [[input:ans_ineq]] [[validation:ans_ineq]] </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour résoudre cette inéquation, on étudie le signe du trinôme du second degré :<br><br>
+\[ {@eq@} \]<br><br>
+<strong>1. Calcul du discriminant :</strong><br>
+\(\Delta = b^2 - 4ac = ({@b@})^2 - 4 \times ({@a@}) \times ({@c@}) = {@delta@}\)<br><br>
+<strong>2. Racines du trinôme :</strong><br>
+\(x_1 = \frac{-b - \sqrt{\Delta}}{2a} = {@x1@}\) et \(x_2 = \frac{-b + \sqrt{\Delta}}{2a} = {@x2@}\)<br><br>
+<strong>3. Conclusion :</strong><br>
+Comme \(a = {@a@}\) est {@signe_a_txt@}, la parabole est {@forme_txt@}. Le trinôme est donc {@regle_txt@}.
+<div style="margin: 10px 0; padding: 10px; background: #fff1f2; border-radius: 4px; border-left: 3px solid #e11d48;">
+<strong>RÈGLE À RETENIR :</strong> Un trinôme du second degré est toujours du signe de \(a\) (\({@signe_a_txt@}) à l'extérieur des racines, et du signe opposé à l'intérieur.
+</div>
+L'ensemble des solutions est donc :
+\[ {@ans_correct@} \]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. GÉNÉRATION ALÉATOIRE (A l'envers pour garantir de bonnes racines) */
+a: rand([1, -1, 2, -2])$ /* On force deux racines distinctes, une négative et une positive pour l'exhaustivité */
+x1: rand([-5, -4, -3, -2, -1])$ x2: rand([1, 2, 3, 4, 5])$ 
+/* Calcul de b et c à partir de la forme factorisée a(x-x1)(x-x2) = ax^2 - a(x1+x2)x + a(x1*x2) */
+b: -a*(x1 + x2)$ c: a*x1*x2$ 
+/* 2. DÉFINITION DE L'INÉQUATION */
+ineqs: [a*x^2 + b*x + c > 0, a*x^2 + b*x + c >= 0, a*x^2 + b*x + c < 0, a*x^2 + b*x + c <= 0]$ eq: rand(ineqs)$ op_ineq: op(eq)$ 
+/* 3. CALCUL DE LA RÉPONSE CORRECTE */
+/* Règle : a>0 -> positive à l'extérieur. a<0 -> positif à l'intérieur */
+if a > 0 then (
+    if op_ineq = ">" then ans_correct: x < x1 or x > x2,
+    if op_ineq = ">=" then ans_correct: x <= x1 or x >= x2,
+    if op_ineq = "<" then ans_correct: x1 < x and x < x2,
+    if op_ineq = "<=" then ans_correct: x1 <= x and x <= x2
+) else (
+    if op_ineq = ">" then ans_correct: x1 < x and x < x2,
+    if op_ineq = ">=" then ans_correct: x1 <= x and x <= x2,
+    if op_ineq = "<" then ans_correct: x < x1 or x > x2,
+    if op_ineq = "<=" then ans_correct: x <= x1 or x >= x2
+)$ 
+/* 4. ANTICIPATION DES ERREURS POUR LES FEEDBACKS CIBLÉS */
+
+/* err_sign : l'élève inverse la règle du signe (prend l'intérieur au lieu de l'extérieur) */
+if a > 0 then (
+    if op_ineq = ">" then err_sign: x1 < x and x < x2,
+    if op_ineq = ">=" then err_sign: x1 <= x and x <= x2,
+    if op_ineq = "<" then err_sign: x < x1 or x > x2,
+    if op_ineq = "<=" then err_sign: x <= x1 or x >= x2
+) else (
+    if op_ineq = ">" then err_sign: x < x1 or x > x2,
+    if op_ineq = ">=" then err_sign: x <= x1 or x >= x2,
+    if op_ineq = "<" then err_sign: x1 < x and x < x2,
+    if op_ineq = "<=" then err_sign: x1 <= x and x <= x2
+)$ 
+/* err_val : l'élève a bon intérieur/extérieur, mais se trompe de racines (ex: erreur de signe sur c) */
+c_err: -c$ delta_err: b^2 - 4*a*c_err$ x1_err: (-b - sqrt(delta_err))/(2*a)$ x2_err: (-b + sqrt(delta_err))/(2*a)$ /* Remise en ordre au cas où le tri serait inversé */
+if x1_err > x2_err then (
+    tmp: x1_err,
+    x1_err: x2_err,
+    x2_err: tmp
+)$ 
+if a > 0 then (
+    if op_ineq = ">" then err_val: x < x1_err or x > x2_err,
+    if op_ineq = ">=" then err_val: x <= x1_err or x >= x2_err,
+    if op_ineq = "<" then err_val: x1_err < x and x < x2_err,
+    if op_ineq = "<=" then err_val: x1_err <= x and x <= x2_err
+) else (
+    if op_ineq = ">" then err_val: x1_err < x and x < x2_err,
+    if op_ineq = ">=" then err_val: x1_err <= x and x <= x2_err,
+    if op_ineq = "<" then err_val: x < x1_err or x > x2_err,
+    if op_ineq = "<=" then err_val: x <= x1_err or x >= x2_err
+)$ 
+/* 5. TEXTES POUR LA CORRECTION GÉNÉRALE */
+delta: b^2 - 4*a*c$ signe_a_txt: if a > 0 then "positif" else "négatif"$ forme_txt: if a > 0 then "tournée vers le haut (\cup)" else "tournée vers le bas (\cap)"$ regle_txt: if a > 0 then "positif à l'extérieur des racines et négatif à l'intérieur" else "négatif à l'extérieur des racines et positif à l'intérieur"$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>{@eq@} -> Racines : {@x1@} et {@x2@} | Solution : {@ans_correct@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | Approche Mathématique Native</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_ineq</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>25</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords>or, and</allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> L'inéquation du second degré est correctement résolue.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : Mauvaise application de la règle du signe</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>err_sign</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de règle du signe !</strong> Vos racines semblent correctes, mais vous avez inversé "l'intérieur" et "l'extérieur" des racines. Le coefficient \(a = {@a@}\) est {@signe_a_txt@}. Rappelez-vous : <strong>le trinôme est toujours du signe de \(a\) à l'extérieur des racines</strong>, et du signe contraire à \(a\) à l'intérieur.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SIGN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Calcul des racines faux</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ineq</sans>
+        <tans>err_val</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-VAL</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de calcul des racines !</strong> La structure de votre inéquation (intérieur/extérieur) est bonne, mais les valeurs frontières sont fausses. Vérifiez votre calcul du discriminant \(\Delta\) et l'application de la formule \(x = \frac{-b \pm \sqrt{\Delta}}{2a}\). Les bonnes racines étaient \({@x1@}\) et \({@x2@}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Méthode pour résoudre \(ax^2 + bx + c \ge 0\) :<br>
+1. Calculer le discriminant : \(\Delta = b^2 - 4ac\)<br>
+2. Calculer les racines : \(x_1 = \frac{-b - \sqrt{\Delta}}{2a}\) et \(x_2 = \frac{-b + \sqrt{\Delta}}{2a}\)<br>
+3. <strong>APPLIQUER LA RÈGLE :</strong> Le trinôme est du signe de \(a\) à l'extérieur des racines, et du signe opposé à \(a\) à l'intérieur.<br>
+4. Écrire l'ensemble de solutions avec "or" (pour l'union) ou "and" (pour l'intersection).</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

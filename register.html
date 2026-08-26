@@ -1,0 +1,128 @@
+<!--
+  Cairn for Stack — générateur de questions STACK pour Moodle
+  Copyright (C) 2026  Benoit Joly
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscription — Cairn for Stack</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f4f5f7 url("/assets/fond_login.avif") center center / 100% 100% no-repeat;
+  }
+  form {
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    width: min(90vw, 340px);
+  }
+  h1 { font-size: 1.25rem; margin: 0 0 1.25rem; text-align: center; }
+  label { display: block; font-size: 0.85rem; margin: 0.75rem 0 0.25rem; color: #333; }
+  input {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  .hint { font-size: 0.75rem; color: #777; margin-top: 0.25rem; }
+  button {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 6px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.6; cursor: default; }
+  #error {
+    margin-top: 1rem;
+    color: #b91c1c;
+    font-size: 0.85rem;
+    text-align: center;
+    min-height: 1.1em;
+  }
+  .switch { margin-top: 1rem; font-size: 0.85rem; text-align: center; }
+  .switch a { color: #2563eb; }
+  @media (prefers-color-scheme: dark) {
+    body { background-color: #18191c; }
+    form { background: #24262b; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+    h1 { color: #eee; }
+    label { color: #ccc; }
+    input { background: #1a1b1e; border-color: #444; color: #eee; }
+    .hint { color: #999; }
+    .switch { color: #ccc; }
+  }
+</style>
+</head>
+<body>
+<form id="register-form">
+  <h1>Cairn for Stack — Inscription</h1>
+  <label for="username">Identifiant</label>
+  <input type="text" id="username" name="username" autocomplete="username" required autofocus minlength="3">
+  <label for="password">Mot de passe</label>
+  <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
+  <div class="hint">8 caractères minimum.</div>
+  <button type="submit">Créer mon compte</button>
+  <div id="error"></div>
+  <div class="switch">Déjà un compte ? <a href="/login.html">Connecte-toi</a></div>
+</form>
+<script>
+  const form = document.getElementById('register-form');
+  const errorEl = document.getElementById('error');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.textContent = '';
+    const button = form.querySelector('button');
+    button.disabled = true;
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          password: document.getElementById('password').value,
+        }),
+      });
+      if (res.ok) {
+        window.location.href = '/';
+      } else {
+        const data = await res.json().catch(() => ({}));
+        errorEl.textContent = data.error || 'Inscription impossible.';
+        button.disabled = false;
+      }
+    } catch (err) {
+      errorEl.textContent = 'Erreur réseau. Réessaie.';
+      button.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

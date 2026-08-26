@@ -1,0 +1,734 @@
+/*
+ * Cairn for Stack — générateur de questions STACK pour Moodle
+ * Copyright (C) 2026  Benoit Joly
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// ── ATELIER CIRCUITS ÉLECTRIQUES — moteur partagé enseignant/élève/aperçu ──
+//
+// cirEngineRun(cfg) est porté depuis le prototype de référence :
+//   test/mise à jour/Physique-chimie/circuit élec/questions-Atelier_circuits_electriques_v6.xml
+// (construction JSXGraph par glisser/relier + correction par isomorphisme de graphe).
+//
+// cfg = { mode: 'teacher'|'student-preview'|'student', inputNames:{s,c,w,v}, initialStateB64 }
+//   - 'teacher'         : pas de stack_js, pas de bouton Valider ; expose
+//                         window.__cirGetModelState()/__cirSetModelState(b64) au parent.
+//   - 'student-preview' : comme 'student' mais stack_js est un stub local (voir circuit-ui.js).
+//   - 'student'         : flux réel STACK-JS (stack_js.request_access_to_input).
+//
+// Volontairement autonome : cirEngineRun ne référence rien hors de son propre corps
+// (seulement les globales navigateur : document, window, Math, JSON, Promise, btoa/atob,
+// JXG une fois chargé, stack_js pour les modes élève). js/gen-circuit.js injecte
+// cirEngineRun.toString() tel quel dans le XML Moodle exporté : une seule source de
+// vérité, aucune divergence possible entre l'appli et la question générée.
+function cirEngineRun(cfg) {
+  'use strict';
+  var LT = String.fromCharCode(60), GT = String.fromCharCode(62);
+  function detag(str) { return str.split('#LT#').join(LT).split('#GT#').join(GT); }
+
+  // cfg.labels : libellés déjà résolus par I18N côté appelant (js/gen-circuit.js ou
+  // js/circuit-ui.js), car cette fonction est stringifiée telle quelle dans le XML
+  // Moodle exporté et s'exécute alors dans l'iframe élève, hors de l'appli Cairn for Stack
+  // (window.I18N n'y existe pas) — d'où le repli français ci-dessous si absent.
+  var L = cfg.labels || {};
+  function lb(key, def) { if (L[key]) return L[key]; return def; }
+
+  var isValidated = false;
+  var inputAns1 = null, inputAns2 = null, inputAns3 = null, inputAns4 = null;
+
+  function loadJsxGraphThen(cb) {
+    if (window.JXG) { cb(); return; }
+    var linkCss = document.createElement('link');
+    linkCss.rel = 'stylesheet';
+    linkCss.href = cfg.jsxCssUrl || 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.11.1/jsxgraph.css';
+    document.head.appendChild(linkCss);
+    var scriptJsx = document.createElement('script');
+    scriptJsx.src = cfg.jsxJsUrl || 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.11.1/jsxgraphcore.js';
+    scriptJsx.onload = cb;
+    document.head.appendChild(scriptJsx);
+  }
+
+  function initApp() {
+    var board = JXG.JSXGraph.initBoard('board', { boundingbox: [-1, 7.5, 14.5, -1.5], axis: false, grid: false, showNavigation: false, showCopyright: false, keepaspectratio: true, pan: { enabled: false }, zoom: { enabled: false }, title: lb('boardTitle', 'Éditeur de circuit électrique'), description: lb('boardDescription', 'Grille interactive : cliquez sur un composant de la palette pour l\'ajouter, faites-le glisser pour le positionner, puis connectez ses bornes pour construire le circuit.') });
+    function dataUri(svg) { return 'data:image/svg+xml,' + encodeURIComponent(svg); }
+    function term(dx, dy, role, color) { return { dx: dx, dy: dy, role: role, color: color || '#6b7280' }; }
+    function wrapSvg(innerBody, innerH, deg) { var canvas = Math.max(200, innerH); var dy = (canvas - innerH) / 2; var c = canvas / 2; return detag('#LT#svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + canvas + ' ' + canvas + '"#GT##LT#g transform="rotate(' + deg + ' ' + c + ' ' + c + ') translate(0 ' + dy + ')"#GT#') + innerBody + detag('#LT#/g#GT##LT#/svg#GT#'); }
+
+    var battInner = detag('#LT#line x1="0" y1="50" x2="70" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#line x1="75" y1="22" x2="75" y2="78" stroke="#1f2937" stroke-width="8"/#GT##LT#line x1="125" y1="8" x2="125" y2="92" stroke="#1f2937" stroke-width="3"/#GT##LT#line x1="130" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#text x="75" y="16" font-size="20" fill="#2563eb" text-anchor="middle" font-family="Arial" font-weight="bold"#GT#−#LT#/text#GT##LT#text x="125" y="16" font-size="20" fill="#dc2626" text-anchor="middle" font-family="Arial" font-weight="bold"#GT#+#LT#/text#GT#');
+    var resInner = detag('#LT#line x1="0" y1="50" x2="55" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#rect x="55" y="25" width="90" height="50" rx="6" fill="#ecfdf5" stroke="#15803d" stroke-width="3"/#GT##LT#line x1="145" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT#');
+    var switchOpenInner = detag('#LT#line x1="0" y1="50" x2="60" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#circle cx="65" cy="50" r="6" fill="#1f2937"/#GT##LT#line x1="65" y1="50" x2="128" y2="20" stroke="#1f2937" stroke-width="4"/#GT##LT#circle cx="135" cy="50" r="5" fill="#ffffff" stroke="#1f2937" stroke-width="2"/#GT##LT#line x1="135" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT#');
+    var switchClosedInner = detag('#LT#line x1="0" y1="50" x2="60" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#circle cx="65" cy="50" r="6" fill="#15803d"/#GT##LT#line x1="65" y1="50" x2="135" y2="50" stroke="#15803d" stroke-width="4"/#GT##LT#circle cx="135" cy="50" r="5" fill="#15803d" stroke="#15803d" stroke-width="2"/#GT##LT#line x1="135" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT#');
+    var lampOffInner = detag('#LT#line x1="0" y1="100" x2="45" y2="100" stroke="#1f2937" stroke-width="4"/#GT##LT#line x1="155" y1="100" x2="200" y2="100" stroke="#1f2937" stroke-width="4"/#GT##LT#circle cx="100" cy="100" r="52" fill="#fff7d6" stroke="#a16207" stroke-width="3"/#GT##LT#line x1="78" y1="78" x2="122" y2="122" stroke="#a16207" stroke-width="3"/#GT##LT#line x1="78" y1="122" x2="122" y2="78" stroke="#a16207" stroke-width="3"/#GT#');
+    var lampOnInner = detag('#LT#circle cx="100" cy="100" r="85" fill="#fde047" opacity="0.35"/#GT##LT#line x1="0" y1="100" x2="45" y2="100" stroke="#1f2937" stroke-width="4"/#GT##LT#line x1="155" y1="100" x2="200" y2="100" stroke="#1f2937" stroke-width="4"/#GT##LT#circle cx="100" cy="100" r="52" fill="#fde047" stroke="#ca8a04" stroke-width="3"/#GT##LT#line x1="78" y1="78" x2="122" y2="122" stroke="#92400e" stroke-width="3"/#GT##LT#line x1="78" y1="122" x2="122" y2="78" stroke="#92400e" stroke-width="3"/#GT#');
+
+    var capInner = detag('#LT#line x1="0" y1="50" x2="82" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#line x1="82" y1="16" x2="82" y2="84" stroke="#1f2937" stroke-width="7"/#GT##LT#line x1="118" y1="16" x2="118" y2="84" stroke="#1f2937" stroke-width="7"/#GT##LT#line x1="118" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT#');
+    var coilInner = detag('#LT#line x1="0" y1="50" x2="45" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#path d="M45,50 a13,13 0 0 1 26,0 a13,13 0 0 1 26,0 a13,13 0 0 1 26,0 a13,13 0 0 1 26,0" fill="none" stroke="#1f2937" stroke-width="4"/#GT##LT#line x1="149" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT#');
+    var motorInner = detag('#LT#line x1="0" y1="50" x2="52" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#circle cx="100" cy="50" r="46" fill="#eef2ff" stroke="#4338ca" stroke-width="3"/#GT##LT#text x="100" y="66" font-size="46" fill="#4338ca" text-anchor="middle" font-family="Arial" font-weight="bold"#GT#M#LT#/text#GT##LT#line x1="148" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT#');
+    var sw3aInner = detag('#LT#line x1="0" y1="50" x2="58" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#circle cx="63" cy="50" r="6" fill="#15803d"/#GT##LT#line x1="63" y1="50" x2="138" y2="20" stroke="#15803d" stroke-width="4"/#GT##LT#circle cx="143" cy="20" r="5" fill="#15803d" stroke="#15803d" stroke-width="2"/#GT##LT#circle cx="143" cy="80" r="5" fill="#ffffff" stroke="#1f2937" stroke-width="2"/#GT##LT#line x1="143" y1="20" x2="200" y2="20" stroke="#1f2937" stroke-width="4"/#GT##LT#line x1="143" y1="80" x2="200" y2="80" stroke="#1f2937" stroke-width="4"/#GT##LT#text x="188" y="14" font-size="17" fill="#64748b" text-anchor="middle" font-family="Arial"#GT#1#LT#/text#GT##LT#text x="188" y="99" font-size="17" fill="#64748b" text-anchor="middle" font-family="Arial"#GT#2#LT#/text#GT#');
+    var sw3bInner = detag('#LT#line x1="0" y1="50" x2="58" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#circle cx="63" cy="50" r="6" fill="#15803d"/#GT##LT#line x1="63" y1="50" x2="138" y2="80" stroke="#15803d" stroke-width="4"/#GT##LT#circle cx="143" cy="20" r="5" fill="#ffffff" stroke="#1f2937" stroke-width="2"/#GT##LT#circle cx="143" cy="80" r="5" fill="#15803d" stroke="#15803d" stroke-width="2"/#GT##LT#line x1="143" y1="20" x2="200" y2="20" stroke="#1f2937" stroke-width="4"/#GT##LT#line x1="143" y1="80" x2="200" y2="80" stroke="#1f2937" stroke-width="4"/#GT##LT#text x="188" y="14" font-size="17" fill="#64748b" text-anchor="middle" font-family="Arial"#GT#1#LT#/text#GT##LT#text x="188" y="99" font-size="17" fill="#64748b" text-anchor="middle" font-family="Arial"#GT#2#LT#/text#GT#');
+
+    var ledOffInner = detag('#LT#line x1="0" y1="50" x2="62" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#polygon points="62,22 62,78 118,50" fill="#fee2e2" stroke="#b91c1c" stroke-width="3" stroke-linejoin="round"/#GT##LT#line x1="118" y1="20" x2="118" y2="80" stroke="#b91c1c" stroke-width="5"/#GT##LT#line x1="118" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#path d="M128,30 L142,16" stroke="#b91c1c" stroke-width="2.5" fill="none"/#GT##LT#path d="M138,34 L152,20" stroke="#b91c1c" stroke-width="2.5" fill="none"/#GT#');
+    var ledOnInner = detag('#LT#circle cx="90" cy="50" r="72" fill="#fca5a5" opacity="0.35"/#GT##LT#line x1="0" y1="50" x2="62" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#polygon points="62,22 62,78 118,50" fill="#f87171" stroke="#b91c1c" stroke-width="3" stroke-linejoin="round"/#GT##LT#line x1="118" y1="20" x2="118" y2="80" stroke="#b91c1c" stroke-width="5"/#GT##LT#line x1="118" y1="50" x2="200" y2="50" stroke="#1f2937" stroke-width="4"/#GT##LT#path d="M128,30 L146,12" stroke="#dc2626" stroke-width="3" fill="none"/#GT##LT#path d="M140,36 L158,18" stroke="#dc2626" stroke-width="3" fill="none"/#GT#');
+
+    var RECT = { w: 2.2, h: 1.1 }; var SQUARE = { w: 1.7, h: 1.7 }; var TH = 0.33;
+    var CATALOG = [
+      { key: 'gen', label: lb('comp_gen', 'Générateur (pile)'), w: RECT.w, h: RECT.h, innerH: 100, svg: battInner, hasValue: true, unit: 'V', defaultValue: 9, conducts: [], terminals: [term(-RECT.w / 2, 0, 'moins', '#2563eb'), term(RECT.w / 2, 0, 'plus', '#dc2626')] },
+      { key: 'lamp', label: lb('comp_lamp', 'Lampe'), w: SQUARE.w, h: SQUARE.h, innerH: 200, svgOff: lampOffInner, svgOn: lampOnInner, conducts: [[0, 1]], terminals: [term(-SQUARE.w / 2, 0, 'a'), term(SQUARE.w / 2, 0, 'b')] },
+      { key: 'led', label: lb('comp_led', 'LED'), w: RECT.w, h: RECT.h, innerH: 100, svgOff: ledOffInner, svgOn: ledOnInner, polarise: true, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'anode', '#dc2626'), term(RECT.w / 2, 0, 'cathode', '#1f2937')] },
+      { key: 'res', label: lb('comp_res', 'Résistance'), w: RECT.w, h: RECT.h, innerH: 100, svg: resInner, hasValue: true, unit: 'Ω', defaultValue: 220, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
+      { key: 'cap', label: lb('comp_cap', 'Condensateur'), w: RECT.w, h: RECT.h, innerH: 100, svg: capInner, hasValue: true, unit: 'µF', defaultValue: 100, conducts: [], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
+      { key: 'coil', label: lb('comp_coil', 'Bobine'), w: RECT.w, h: RECT.h, innerH: 100, svg: coilInner, hasValue: true, unit: 'mH', defaultValue: 10, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
+      { key: 'motor', label: lb('comp_motor', 'Moteur'), w: RECT.w, h: RECT.h, innerH: 100, svg: motorInner, conducts: [[0, 1]], terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')] },
+      { key: 'switch2', label: lb('comp_switch2', 'Interrupteur (2 pts)'), w: RECT.w, h: RECT.h, innerH: 100, terminals: [term(-RECT.w / 2, 0, 'a'), term(RECT.w / 2, 0, 'b')], states: [{ svg: switchOpenInner, connections: [], label: 'ouvert' }, { svg: switchClosedInner, connections: [[0, 1]], label: 'fermé' }] },
+      { key: 'switch3', label: lb('comp_switch3', 'Interrupteur (3 pts)'), w: RECT.w, h: 1.45, innerH: 100, terminals: [term(-RECT.w / 2, 0, 'c', '#7c3aed'), term(RECT.w / 2, TH, 't1'), term(RECT.w / 2, -TH, 't2')], states: [{ svg: sw3aInner, connections: [[0, 1]], label: 'position 1' }, { svg: sw3bInner, connections: [[0, 2]], label: 'position 2' }] }
+    ];
+    CATALOG.forEach(function (c) { c.boxSize = Math.max(c.w, c.h); });
+    var CATALOG_BY_KEY = {}; CATALOG.forEach(function (c) { CATALOG_BY_KEY[c.key] = c; });
+
+    var instances = [], instCounter = 0, cables = [], pending = null, selectedInst = null, pathPoints = [], pathSegs = [], ANCHOR_HIT = 0.4, CONTACT_DIST = 0.45;
+    var fb = document.getElementById('feedback');
+
+    // Anti-superposition : deux composants ne doivent jamais pouvoir occuper le même
+    // point du board (sinon leurs poignées H coïncident et JSXGraph ne peut plus
+    // départager de façon fiable laquelle des deux recevra le drag). On empêche donc la
+    // collision à la source plutôt que de tenter de départager après coup.
+    function hasOverlapAt(x, y, cat, excludeInst) {
+      return instances.some(function (inst) {
+        if (inst === excludeInst) return false;
+        var otherCat = CATALOG_BY_KEY[inst.key];
+        var minDist = (cat.boxSize + otherCat.boxSize) / 2 + 0.25;
+        return lt(Math.hypot(inst.H.X() - x, inst.H.Y() - y), minDist);
+      });
+    }
+    function findFreeSpawnPos(cat) {
+      var xMin = -0.3, xMax = 13.8, yMax = 6.8, yMin = -0.8;
+      var stepX = cat.boxSize + 0.5, stepY = cat.boxSize + 0.5;
+      for (var y = yMax; ge(y, yMin); y -= stepY) {
+        for (var x = xMin; le(x, xMax); x += stepX) {
+          if (!hasOverlapAt(x, y, cat, null)) return [x, y];
+        }
+      }
+      return [xMin + Math.random() * (xMax - xMin), yMax - Math.random() * (yMax - yMin)];
+    }
+
+    function refreshSelection() {
+      instances.forEach(function (inst) {
+        // fixed doit suivre visible : sinon le point poignée (carré) des instances non
+        // sélectionnées reste draggable bien qu'invisible. Le layer doit aussi monter au-dessus
+        // des autres poignées H (toutes à 10 par défaut) : deux composants superposés ont leurs
+        // poignées au même endroit, et à layer égal c'est le rendu SVG (donc l'ordre du DOM, pas
+        // la sélection applicative) qui décide quel point reçoit le clic — sans ce bump la
+        // poignée sélectionnée peut rester sous celle, non draggable, d'une instance voisine.
+        if (inst.H) inst.H.setAttribute({ visible: inst === selectedInst, fixed: isValidated || inst !== selectedInst, layer: inst === selectedInst ? 11 : 10 });
+      });
+      updateValuePanel();
+      board.update();
+    }
+
+    function updateValuePanel() {
+      var box = document.getElementById('valBox');
+      if (!box) return;
+      var nameEl = document.getElementById('valName'), inp = document.getElementById('valInput');
+      var unitEl = document.getElementById('valUnit'), hintEl = document.getElementById('valHint');
+      if (!selectedInst) {
+        nameEl.textContent = lb('valNoneSelected', 'Aucun composant sélectionné');
+        inp.value = ''; inp.disabled = true; unitEl.textContent = '';
+        hintEl.textContent = lb('valhint', 'Clique sur un composant du schéma pour régler sa valeur.');
+        return;
+      }
+      var cat = CATALOG_BY_KEY[selectedInst.key];
+      nameEl.textContent = cat.label;
+      if (!cat.hasValue) {
+        inp.value = ''; inp.disabled = true; unitEl.textContent = '';
+        hintEl.textContent = lb('valNoAdjustable', 'Ce composant n\'a pas de valeur réglable.');
+        return;
+      }
+      inp.disabled = isValidated;
+      inp.value = selectedInst.value;
+      unitEl.textContent = cat.unit;
+      hintEl.textContent = isValidated ? lb('valLocked', 'Circuit validé : réglage verrouillé.') : lb('valPositive', 'Valeur strictement positive.');
+    }
+    function selectInstance(inst) { selectedInst = inst; refreshSelection(); }
+
+    function refreshAnchor(a) { if (a === pending) a.pt.setAttribute({ strokeColor: '#f59e0b', strokeWidth: 3.5 }); else if (a._connected) a.pt.setAttribute({ strokeColor: '#16a34a', strokeWidth: 3.5 }); else a.pt.setAttribute({ strokeColor: '#1f2937', strokeWidth: 1.4 }); }
+    function rotatedOffset(dx, dy, rot) { switch (((rot % 4) + 4) % 4) { case 0: return [dx, dy]; case 1: return [dy, -dx]; case 2: return [-dx, -dy]; default: return [-dy, dx]; } }
+
+    function updateImage(inst, cat) { var innerBody; if (cat.svgOn) innerBody = inst.lit ? cat.svgOn : cat.svgOff; else if (cat.states) innerBody = cat.states[inst.state].svg; else innerBody = cat.svg; var svgFull = wrapSvg(innerBody, cat.innerH, inst.rot * 90); var bs = cat.boxSize; var newImg = board.create('image', [dataUri(svgFull), [function () { return inst.H.X() - bs / 2; }, function () { return inst.H.Y() - bs / 2; }], [bs, bs]], { fixed: true, highlight: false, layer: 1 }); newImg.on('down', function () { if (isValidated) return; if (scissorsMode) return; if (cat.states) { if (selectedInst === inst) { toggleState(inst, cat); return; } } selectInstance(inst); }); if (inst.img) board.removeObject(inst.img); inst.img = newImg; board.update(); }
+
+    function createInstance(cat, x, y) {
+      if (isValidated) return null;
+      instCounter++; var inst = { id: 'c' + instCounter, key: cat.key, rot: 0, state: 0, lit: false, value: cat.defaultValue, anchors: [], img: null, _lastX: x, _lastY: y }; inst.H = board.create('point', [x, y], { size: 8, face: 'square', fillColor: '#cbd5e1', strokeColor: '#64748b', strokeWidth: 1.5, withLabel: false, showInfobox: false, name: '', layer: 10, visible: false }); inst.H.on('drag', function () { if (isValidated) return; if (hasOverlapAt(inst.H.X(), inst.H.Y(), cat, inst)) { inst.H.setPosition(JXG.COORDS_BY_USER, [inst._lastX, inst._lastY]); } else { inst._lastX = inst.H.X(); inst._lastY = inst.H.Y(); } recompute(); }); updateImage(inst, cat); cat.terminals.forEach(function (t) { var a = { inst: inst, role: t.role, cableCount: 0, _connected: false, pt: board.create('point', [function () { var o = rotatedOffset(t.dx, t.dy, inst.rot); return inst.H.X() + o[0]; }, function () { var o = rotatedOffset(t.dx, t.dy, inst.rot); return inst.H.Y() + o[1]; }], { size: 7, strokeColor: '#1f2937', strokeWidth: 1.4, fillColor: t.color, fixed: true, withLabel: false, showInfobox: false, name: '', layer: 16 }) }; inst.anchors.push(a); a.pt.on('down', function () { onAnchorDown(a); }); }); inst.rotateBtn = board.create('text', [function () { var o = rotatedOffset(-cat.w / 2 - 0.05, cat.h / 2 + 0.35, inst.rot); return inst.H.X() + o[0]; }, function () { var o = rotatedOffset(-cat.w / 2 - 0.05, cat.h / 2 + 0.35, inst.rot); return inst.H.Y() + o[1]; }, '⟳'], { fontSize: 16, color: '#1e40af', fixed: true, anchorX: 'left', layer: 15 }); inst.rotateBtn.on('down', function () { if (isValidated || scissorsMode) return; inst.rot = (inst.rot + 1) % 4; updateImage(inst, cat); recompute(); }); inst.labelTxt = board.create('text', [function () { var o = rotatedOffset(0, -cat.h / 2 - 0.22, inst.rot); return inst.H.X() + o[0]; }, function () { var o = rotatedOffset(0, -cat.h / 2 - 0.22, inst.rot); return inst.H.Y() + o[1]; }, function () { return cat.hasValue ? (cat.label + ' (' + inst.value + ' ' + cat.unit + ') ✎') : cat.label; }], { fontSize: 11, color: '#64748b', fixed: true, anchorX: 'middle', layer: 15 }); inst.labelTxt.on('down', function () { if (isValidated) return; if (scissorsMode) return; selectInstance(inst); }); instances.push(inst); selectInstance(inst); recompute(); return inst;
+    }
+
+    function toggleState(inst, cat) { if (isValidated || scissorsMode) return; inst.state = (inst.state + 1) % cat.states.length; updateImage(inst, cat); recompute(); }
+    function deleteInstance(inst) { if (isValidated) return; cables.slice().forEach(function (c) { if (inst.anchors.indexOf(c.a) !== -1 || inst.anchors.indexOf(c.b) !== -1) removeCable(c); }); if (pending) { if (inst.anchors.indexOf(pending) !== -1) cancelPending(); } (inst.anchors || []).forEach(function (a) { board.removeObject(a.pt); }); if (inst.img) board.removeObject(inst.img); if (inst.rotateBtn) board.removeObject(inst.rotateBtn); if (inst.labelTxt) board.removeObject(inst.labelTxt); if (inst.H) board.removeObject(inst.H); var idx = instances.indexOf(inst); if (idx !== -1) instances.splice(idx, 1); if (selectedInst === inst) selectedInst = null; refreshSelection(); recompute(); }
+    function clearInProgressPath() { pathSegs.forEach(function (s) { board.removeObject(s); }); pathPoints.forEach(function (p) { board.removeObject(p); }); pathSegs = []; pathPoints = []; }
+    function cancelPending() { clearInProgressPath(); if (pending) { var p = pending; pending = null; refreshAnchor(p); } board.update(); }
+    function addWaypoint(x, y) { if (isValidated) return; var wp = board.create('point', [x, y], { size: 5, fillColor: '#0ea5e9', strokeColor: '#0369a1', strokeWidth: 1, withLabel: false, showInfobox: false, name: '' }); var prevPt = pathPoints.length ? pathPoints[pathPoints.length - 1] : pending.pt; var seg = board.create('segment', [prevPt, wp], { strokeColor: '#0ea5e9', strokeWidth: 4, fixed: true, highlight: false, layer: 6 }); pathPoints.push(wp); pathSegs.push(seg); board.update(); }
+    function finalizeCable(destAnchor) { if (isValidated) return; var prevPt = pathPoints.length ? pathPoints[pathPoints.length - 1] : pending.pt; var lastSeg = board.create('segment', [prevPt, destAnchor.pt], { strokeColor: '#0ea5e9', strokeWidth: 4, fixed: true, highlight: false, layer: 6 }); var cableObj = { segs: pathSegs.concat([lastSeg]), waypoints: pathPoints.slice(), a: pending, b: destAnchor }; cables.push(cableObj); pending.cableCount++; destAnchor.cableCount++; pathPoints = []; pathSegs = []; pending = null; recompute(); }
+    function removeCable(cableObj) { var idx = cables.indexOf(cableObj); if (idx === -1) return; cableObj.segs.forEach(function (s) { board.removeObject(s); }); cableObj.waypoints.forEach(function (wp) { board.removeObject(wp); }); cables.splice(idx, 1); cableObj.a.cableCount--; cableObj.b.cableCount--; recompute(); }
+    function onAnchorDown(a) { if (isValidated || scissorsMode) return; if (!pending) { pending = a; refreshAnchor(a); board.update(); return; } if (pending === a) { cancelPending(); return; } finalizeCable(a); }
+    var scissorsMode = false;
+    function cutNearestCable(x, y) { if (isValidated) return false; var best = null, bestDist = 0.3; cables.forEach(function (cab) { var chain = [cab.a.pt].concat(cab.waypoints).concat([cab.b.pt]); for (var i = 0; Math.sign(i - (chain.length - 1)) === -1; i++) { var dx = chain[i + 1].X() - chain[i].X(), dy = chain[i + 1].Y() - chain[i].Y(), lenSq = dx * dx + dy * dy; var t = lenSq === 0 ? 0 : Math.max(0, Math.min(1, ((x - chain[i].X()) * dx + (y - chain[i].Y()) * dy) / lenSq)); var d = Math.hypot(x - (chain[i].X() + t * dx), y - (chain[i].Y() + t * dy)); if (Math.sign(d - bestDist) === -1) { bestDist = d; best = cab; } } }); if (best) { removeCable(best); return true; } return false; }
+
+    document.getElementById('btnScissors').addEventListener('click', function () { if (isValidated) return; scissorsMode = !scissorsMode; document.getElementById('btnScissors').classList.toggle('active', scissorsMode); document.getElementById('board').classList.toggle('cutting', scissorsMode); if (scissorsMode) cancelPending(); });
+    document.getElementById('btnUndo').addEventListener('click', function () { if (isValidated) return; if (pathPoints.length) { board.removeObject(pathSegs.pop()); board.removeObject(pathPoints.pop()); board.update(); } else if (pending) cancelPending(); });
+    document.getElementById('btnReset').addEventListener('click', function () { if (isValidated) return; scissorsMode = false; document.getElementById('btnScissors').classList.remove('active'); document.getElementById('board').classList.remove('cutting'); instances.slice().forEach(function (inst) { try { deleteInstance(inst); } catch (e) { } }); instances = []; cables = []; clearInProgressPath(); pending = null; selectedInst = null; fb.textContent = lb('feedbackPlaceholder', 'Choisis un composant à droite pour commencer.'); fb.style.background = '#f1f5f9'; fb.style.color = '#475569'; fb.style.borderColor = 'var(--line)'; board.update(); });
+
+    board.on('down', function (evt) {
+      var c = board.getUsrCoordsOfMouse(evt);
+      if (scissorsMode) {
+        if (!cutNearestCable(c[0], c[1])) {
+          for (var i = 0; lt(i, instances.length); i++) {
+            var ins = instances[i];
+            var rr = CATALOG_BY_KEY[ins.key].boxSize / 2 * 1.05;
+            if (lt(Math.hypot(c[0] - ins.H.X(), c[1] - ins.H.Y()), rr)) { deleteInstance(ins); break; }
+          }
+        }
+        return;
+      }
+      var nearAnchor = instances.some(function (inst) { return inst.anchors.some(function (a) { return lt(Math.hypot(a.pt.X() - c[0], a.pt.Y() - c[1]), ANCHOR_HIT); }); });
+      var nearBody = instances.some(function (inst) { var r = CATALOG_BY_KEY[inst.key].boxSize / 2 * 1.05; return lt(Math.hypot(c[0] - inst.H.X(), c[1] - inst.H.Y()), r); });
+      if (!pending) {
+        if (!nearBody) { if (!nearAnchor) { if (selectedInst) { selectedInst = null; refreshSelection(); } } }
+        return;
+      }
+      if (!nearAnchor) { if (!nearBody) { addWaypoint(c[0], c[1]); } }
+    });
+
+    // ── Modèle de notation : nœuds calculés depuis les fils/contacts, chaînes
+    // série contractées, puis forme canonique du graphe (copié à l'identique
+    // depuis le prototype — ne pas modifier sans revalider les qtest de référence). ──
+
+    function gradingNets() {
+      var list = [], i, j;
+      instances.forEach(function (inst) { inst.anchors.forEach(function (a) { list.push(a); }); });
+      var n = list.length;
+      var parent = []; for (i = 0; lt(i, n); i++) parent.push(i);
+      function find(k) { while (parent[k] !== k) k = parent[k]; return k; }
+      function union(x, y) { var rx = find(x), ry = find(y); if (rx !== ry) parent[rx] = ry; }
+      for (i = 0; lt(i, n); i++) { for (j = i + 1; lt(j, n); j++) { if (list[i].inst === list[j].inst) continue; if (lt(list[i].pt.Dist(list[j].pt), CONTACT_DIST)) union(i, j); } }
+      cables.forEach(function (c) { var ia = list.indexOf(c.a), ib = list.indexOf(c.b); if (ia !== -1) { if (ib !== -1) { union(ia, ib); } } });
+      var netId = {}, count = 0, netOf = [];
+      for (i = 0; lt(i, n); i++) { var r = find(i); if (!(r in netId)) { netId[r] = count; count++; } netOf.push(netId[r]); }
+      return { list: list, netOf: netOf, count: count };
+    }
+
+    function buildGraph() {
+      var g = gradingNets();
+      var comps = instances.map(function (inst) {
+        return {
+          key: inst.key, terms: inst.anchors.map(function (a) {
+            var ai = g.list.indexOf(a); if (ai === -1) return -1; return g.netOf[ai];
+          })
+        };
+      });
+      return contractGraph(comps, g.count);
+    }
+
+    var POLARITE = false;
+    function lt(a, b) { return Math.sign(a - b) === -1; }
+    function gt(a, b) { return Math.sign(a - b) === 1; }
+    function le(a, b) { return !gt(a, b); }
+    function ge(a, b) { return !lt(a, b); }
+
+    function roleOf(key, idx) {
+      if (key === 'gen') return idx === 0 ? 'moins' : 'plus';
+      if (key === 'led') return idx === 0 ? 'anode' : 'cathode';
+      if (key === 'switch3') return idx === 0 ? 'c' : 't';
+      return 'x';
+    }
+
+    function isDirected(key) { return key === 'led'; }
+
+    function polariteEffective(comps) {
+      if (POLARITE) return true;
+      var i;
+      for (i = 0; lt(i, comps.length); i++) { if (isDirected(comps[i].key)) return true; }
+      return false;
+    }
+
+    function chainable(c, polar) {
+      if (c.terms.length !== 2) return false;
+      if (c.key === 'gen') { if (polar) return false; }
+      return true;
+    }
+
+    function compress(arr) {
+      var uniq = arr.slice().sort().filter(function (v, i, a) { return i === 0 || v !== a[i - 1]; });
+      var map = {};
+      uniq.forEach(function (v, i) { map[v] = 'c' + i; });
+      return arr.map(function (v) { return map[v]; });
+    }
+
+    function contractGraph(comps, netCount) {
+      var i, j;
+      var polar = polariteEffective(comps);
+      function chn(c) { return chainable(c, polar); }
+
+      var inc = []; for (i = 0; lt(i, netCount); i++) inc.push([]);
+      comps.forEach(function (c, ci) {
+        c.terms.forEach(function (nid, ti) { if (nid !== -1) inc[nid].push({ ci: ci, ti: ti }); });
+      });
+
+      function isInternal(nid) {
+        var t = inc[nid];
+        if (t.length !== 2) return false;
+        if (t[0].ci === t[1].ci) return false;
+        if (!chn(comps[t[0].ci])) return false;
+        if (!chn(comps[t[1].ci])) return false;
+        return true;
+      }
+
+      var done = [], chains = [], loops = [];
+      for (i = 0; lt(i, comps.length); i++) done.push(false);
+
+      function reachEnd(ci, ti, seed) {
+        var guard = 0;
+        while (true) {
+          guard++; if (gt(guard, 500)) return null;
+          var nid = comps[ci].terms[ti];
+          if (nid === -1) return { net: -1, ci: ci, ti: ti };
+          if (!isInternal(nid)) return { net: nid, ci: ci, ti: ti };
+          var t = inc[nid];
+          var nxt = (t[0].ci === ci) ? t[1] : t[0];
+          if (nxt.ci === seed) return null;
+          ci = nxt.ci; ti = 1 - nxt.ti;
+        }
+      }
+
+      for (i = 0; lt(i, comps.length); i++) {
+        if (done[i]) continue;
+        if (!chn(comps[i])) continue;
+
+        var endA = reachEnd(i, 0, i);
+
+        if (endA === null) {
+          var lp = [], lf = 0, lr = 0, ci = i, ti = 0, guard = 0;
+          while (true) {
+            guard++; if (gt(guard, 500)) break;
+            done[ci] = true;
+            if (isDirected(comps[ci].key)) { if (ti === 0) lf++; else lr++; }
+            else lp.push(comps[ci].key);
+            var nid = comps[ci].terms[1 - ti];
+            var t = inc[nid];
+            var nxt = (t[0].ci === ci) ? t[1] : t[0];
+            if (nxt.ci === i) break;
+            ci = nxt.ci; ti = nxt.ti;
+          }
+          var lo = Math.min(lf, lr), hi = Math.max(lf, lr);
+          loops.push(lp.sort().join('+') + '/' + lo + ':' + hi);
+          continue;
+        }
+
+        var passives = [], fwd = 0, rev = 0;
+        var cc = endA.ci, ct = endA.ti, endB = -1, g2 = 0;
+        while (true) {
+          g2++; if (gt(g2, 500)) break;
+          done[cc] = true;
+          if (isDirected(comps[cc].key)) { if (ct === 0) fwd++; else rev++; }
+          else passives.push(comps[cc].key);
+          var nid2 = comps[cc].terms[1 - ct];
+          if (nid2 === -1) { endB = -1; break; }
+          if (!isInternal(nid2)) { endB = nid2; break; }
+          var t2 = inc[nid2];
+          var nx2 = (t2[0].ci === cc) ? t2[1] : t2[0];
+          cc = nx2.ci; ct = nx2.ti;
+        }
+
+        var base = passives.sort().join('+');
+        var Lab = base + '/' + fwd + ':' + rev;
+        var Lba = base + '/' + rev + ':' + fwd;
+        if (fwd === rev) chains.push({ label: 'S{' + Lab + '}', a: endA.net, b: endB, dir: false });
+        else if (Lab.localeCompare(Lba) === -1) chains.push({ label: 'D{' + Lab + '}', a: endA.net, b: endB, dir: true });
+        else chains.push({ label: 'D{' + Lba + '}', a: endB, b: endA.net, dir: true });
+      }
+
+      var keep = {};
+      chains.forEach(function (ch) { if (ch.a !== -1) keep[ch.a] = true; if (ch.b !== -1) keep[ch.b] = true; });
+      comps.forEach(function (c) {
+        if (chn(c)) return;
+        c.terms.forEach(function (nid) { if (nid !== -1) keep[nid] = true; });
+      });
+
+      var vlabels = [], netVertex = {};
+      Object.keys(keep).map(Number).sort(function (a, b) { return a - b; }).forEach(function (nid) {
+        netVertex[nid] = vlabels.length; vlabels.push('net');
+      });
+
+      var edges = [];
+      chains.forEach(function (ch) {
+        if (ch.a === -1) return; if (ch.b === -1) return;
+        edges.push({ role: ch.label, u: netVertex[ch.a], v: netVertex[ch.b], dir: ch.dir });
+      });
+      comps.forEach(function (c) {
+        if (chn(c)) return;
+        var cv = vlabels.length; vlabels.push(c.key);
+        c.terms.forEach(function (nid, ti) {
+          if (nid === -1) return;
+          edges.push({ role: roleOf(c.key, ti), u: cv, v: netVertex[nid], dir: false });
+        });
+      });
+      loops.forEach(function (l) { vlabels.push('loop{' + l + '}'); });
+
+      return { n: vlabels.length, labels: vlabels, edges: edges };
+    }
+
+    function canonicalFromGraph(G) {
+      var n = G.n, i, round;
+      if (n === 0) return '';
+
+      var color = G.labels.slice();
+      for (round = 0; lt(round, 4); round++) {
+        var acc = []; for (i = 0; lt(i, n); i++) acc.push([]);
+        G.edges.forEach(function (e) {
+          if (e.dir) { acc[e.u].push(e.role + '-out~' + color[e.v]); acc[e.v].push(e.role + '-in~' + color[e.u]); }
+          else { acc[e.u].push(e.role + '~' + color[e.v]); acc[e.v].push(e.role + '~' + color[e.u]); }
+        });
+        var next = [];
+        for (i = 0; lt(i, n); i++) next.push(color[i] + '{' + acc[i].sort().join(',') + '}');
+        color = compress(next);
+      }
+      var key = [];
+      for (i = 0; lt(i, n); i++) key.push(G.labels[i] + '#' + color[i]);
+
+      var order = []; for (i = 0; lt(i, n); i++) order.push(i);
+      order.sort(function (a, b) { var c = key[a].localeCompare(key[b]); if (c !== 0) return c; return a - b; });
+
+      var groups = [], cur = [order[0]];
+      for (i = 1; lt(i, n); i++) {
+        if (key[order[i]] === key[cur[0]]) cur.push(order[i]);
+        else { groups.push(cur); cur = [order[i]]; }
+      }
+      groups.push(cur);
+
+      var offsets = [], off = 0;
+      groups.forEach(function (g) { offsets.push(off); off += g.length; });
+
+      function sig(perm) {
+        var lab = [];
+        for (var k = 0; lt(k, n); k++) lab[perm[k]] = G.labels[k];
+        var es = G.edges.map(function (e) {
+          var a = perm[e.u], b = perm[e.v];
+          if (e.dir) return e.role + ':' + a + '.' + b;
+          return e.role + ':' + Math.min(a, b) + '.' + Math.max(a, b);
+        }).sort().join('|');
+        return lab.join(',') + '|' + es;
+      }
+
+      var total = 1;
+      groups.forEach(function (g) { var f = 1, k; for (k = 2; !gt(k, g.length); k++) f *= k; total *= f; });
+      if (gt(total, 20000)) {
+        var perm0 = []; order.forEach(function (v, idx) { perm0[v] = idx; });
+        return 'A' + n + '|' + sig(perm0);
+      }
+
+      function permutations(arr) {
+        if (arr.length === 1) return [arr];
+        var out = [];
+        arr.forEach(function (x, idx) {
+          var rest = arr.slice(0, idx).concat(arr.slice(idx + 1));
+          permutations(rest).forEach(function (p) { out.push([x].concat(p)); });
+        });
+        return out;
+      }
+      var perGroup = groups.map(function (g) { return permutations(g); });
+      var best = null;
+      function rec(gi, perm) {
+        if (gi === groups.length) {
+          var s = sig(perm);
+          if (best === null) { best = s; return; }
+          if (s.localeCompare(best) === -1) best = s;
+          return;
+        }
+        perGroup[gi].forEach(function (p) {
+          var p2 = perm.slice();
+          p.forEach(function (v, k) { p2[v] = offsets[gi] + k; });
+          rec(gi + 1, p2);
+        });
+      }
+      rec(0, []);
+      return 'C' + n + '|' + best;
+    }
+    function canonicalSignature() { return canonicalFromGraph(buildGraph()); }
+    function componentsSignature() { return instances.map(function (inst) { return inst.key; }).sort().join(','); }
+
+    function fmtNum(v) {
+      var x = Math.round(v * 1000) / 1000;
+      return String(x);
+    }
+    function valuesSignature() {
+      var out = [];
+      instances.forEach(function (inst) {
+        var cat = CATALOG_BY_KEY[inst.key];
+        if (!cat.hasValue) return;
+        out.push(inst.key + '=' + fmtNum(inst.value));
+      });
+      return out.sort().join(',');
+    }
+
+    // ── Sauvegarde/restauration du schéma (état complet en base64 url-safe) ──
+    function b64encode(s) { return btoa(s).split('+').join('-').split('/').join('_').split('=').join(''); }
+    function b64decode(s) { var t = s.split('-').join('+').split('_').join('/'); while (t.length % 4) t += '='; return atob(t); }
+    function r2(x) { return Math.round(x * 100) / 100; }
+
+    function serializeState() {
+      var comps = instances.map(function (inst) { return { k: inst.key, x: r2(inst.H.X()), y: r2(inst.H.Y()), r: inst.rot, s: inst.state, v: inst.value }; });
+      var wires = cables.map(function (c) {
+        return {
+          a: [instances.indexOf(c.a.inst), c.a.inst.anchors.indexOf(c.a)],
+          b: [instances.indexOf(c.b.inst), c.b.inst.anchors.indexOf(c.b)],
+          p: c.waypoints.map(function (wp) { return [r2(wp.X()), r2(wp.Y())]; })
+        };
+      });
+      return b64encode(JSON.stringify({ c: comps, w: wires, v: isValidated ? 1 : 0 }));
+    }
+
+    function pushState() {
+      if (!inputAns3) return;
+      try { inputAns3.value = serializeState(); inputAns3.dispatchEvent(new Event('change')); } catch (e) { }
+    }
+
+    function restoreState(str) {
+      if (!str) return;
+      var data;
+      try { data = JSON.parse(b64decode(str)); } catch (e) { return; }
+      if (!data) return; if (!data.c) return;
+      var wasValidated = isValidated;
+      isValidated = false;
+      var made = [];
+      data.c.forEach(function (cd) {
+        var cat = CATALOG_BY_KEY[cd.k];
+        if (!cat) { made.push(null); return; }
+        var inst = createInstance(cat, cd.x, cd.y);
+        if (inst) {
+          inst.rot = cd.r || 0;
+          inst.state = cd.s || 0;
+          if (typeof cd.v !== 'undefined') inst.value = cd.v;
+          updateImage(inst, cat);
+        }
+        made.push(inst);
+      });
+      (data.w || []).forEach(function (wd) {
+        var ia = made[wd.a[0]], ib = made[wd.b[0]];
+        if (!ia) return; if (!ib) return;
+        var aA = ia.anchors[wd.a[1]], aB = ib.anchors[wd.b[1]];
+        if (!aA) return; if (!aB) return;
+        pending = aA;
+        (wd.p || []).forEach(function (pt) { addWaypoint(pt[0], pt[1]); });
+        finalizeCable(aB);
+      });
+      isValidated = wasValidated || (data.v === 1);
+      selectedInst = null; refreshSelection();
+      recompute();
+    }
+
+    function conductionPairs(inst) {
+      var cat = CATALOG_BY_KEY[inst.key];
+      if (cat.states) return cat.states[inst.state].connections || [];
+      return cat.conducts || [];
+    }
+
+    function recompute() {
+      var g = gradingNets(), list = g.list, i;
+      var netCount = {};
+      g.netOf.forEach(function (id) { netCount[id] = (netCount[id] || 0) + 1; });
+      list.forEach(function (a, idx) { a._connected = gt(netCount[g.netOf[idx]], 1); refreshAnchor(a); });
+
+      var gens = instances.filter(function (x) { return x.key === 'gen'; });
+      var lamps = instances.filter(function (x) { if (x.key === 'lamp') return true; return x.key === 'led'; });
+      lamps.forEach(function (lampInst) {
+        var lit = false;
+        if (gens.length) {
+          var parent = []; for (var k = 0; lt(k, g.count); k++) parent.push(k);
+          var find = function (z) { while (parent[z] !== z) z = parent[z]; return z; };
+          var union = function (x, y) { var rx = find(x), ry = find(y); if (rx !== ry) parent[rx] = ry; };
+          instances.forEach(function (inst) {
+            if (inst === lampInst) return;
+            if (inst.key === 'gen') return;
+            conductionPairs(inst).forEach(function (pair) {
+              var ia = list.indexOf(inst.anchors[pair[0]]), ib = list.indexOf(inst.anchors[pair[1]]);
+              if (ia !== -1) { if (ib !== -1) { union(g.netOf[ia], g.netOf[ib]); } }
+            });
+          });
+          var la = list.indexOf(lampInst.anchors[0]), lb = list.indexOf(lampInst.anchors[1]);
+          if (la !== -1) {
+            if (lb !== -1) {
+              var A = find(g.netOf[la]), B = find(g.netOf[lb]);
+              var polarise = CATALOG_BY_KEY[lampInst.key].polarise;
+              lit = gens.some(function (gn) {
+                var m = list.indexOf(gn.anchors[0]), q = list.indexOf(gn.anchors[1]);
+                if (m === -1) return false; if (q === -1) return false;
+                var M = find(g.netOf[m]), P = find(g.netOf[q]);
+                if (P === A) { if (M === B) return true; }
+                if (polarise) return false;
+                if (P === B) { if (M === A) return true; }
+                return false;
+              });
+            }
+          }
+        }
+        if (lampInst.lit !== lit) { lampInst.lit = lit; updateImage(lampInst, CATALOG_BY_KEY[lampInst.key]); }
+      });
+      board.update();
+      pushState();
+
+      if (cfg.mode === 'teacher') {
+        if (instances.length) {
+          fb.textContent = lb('statusComponents', '{n} composant(s) placé(s), {m} nœud(s) électrique(s).').split('{n}').join(String(instances.length)).split('{m}').join(String(g.count));
+        } else {
+          fb.textContent = lb('statusEmpty', 'Aucun composant placé — cliquez sur un composant à droite pour commencer.');
+        }
+        fb.style.background = '#f1f5f9'; fb.style.color = '#475569'; fb.style.borderColor = '#e5e7eb';
+      }
+    }
+
+    function syncToStack() {
+      if (isValidated) return;
+      if (instances.length === 0) { fb.textContent = lb('placeAtLeastOne', 'Place au moins un composant avant de valider.'); fb.style.background = '#fee2e2'; fb.style.color = '#991b1b'; fb.style.borderColor = '#dc2626'; return; }
+      isValidated = true;
+      inputAns1.value = canonicalSignature();
+      inputAns2.value = componentsSignature();
+      inputAns4.value = valuesSignature();
+      inputAns1.dispatchEvent(new Event('change'));
+      inputAns2.dispatchEvent(new Event('change'));
+      inputAns4.dispatchEvent(new Event('change'));
+      pushState();
+      lockUI();
+      fb.textContent = lb('validatedClickVerify', 'Circuit validé ! Cliquez maintenant sur le bouton \'Vérifier\' de la page.');
+      fb.style.background = '#dcfce7';
+      fb.style.color = '#15803d';
+      fb.style.borderColor = '#16a34a';
+    }
+
+    function lockUI() {
+      ['btnScissors', 'btnUndo', 'btnReset', 'btnExport'].forEach(function (id) {
+        var b = document.getElementById(id);
+        if (b) { b.disabled = true; b.style.opacity = 0.45; b.style.cursor = 'not-allowed'; }
+      });
+      selectedInst = null; refreshSelection();
+      instances.forEach(function (inst) { if (inst.H) inst.H.setAttribute({ fixed: true }); });
+    }
+
+    // ── Bootstrap terminal : seule partie qui diverge de la référence ──
+    var btnExport = document.getElementById('btnExport');
+    if (cfg.mode === 'teacher') {
+      if (btnExport) btnExport.style.display = 'none';
+      window.__cirGetModelState = function () {
+        if (!instances.length) return null;
+        return { signature: canonicalSignature(), components: componentsSignature(), values: valuesSignature(), state: serializeState() };
+      };
+      window.__cirSetModelState = function (b64) { if (b64) restoreState(b64); };
+      if (cfg.initialStateB64) restoreState(cfg.initialStateB64);
+    } else {
+      if (btnExport) btnExport.addEventListener('click', syncToStack);
+      if (inputAns3) { if (inputAns3.value) restoreState(inputAns3.value); }
+      if (isValidated) {
+        lockUI();
+        fb.textContent = lb('alreadyValidated', 'Circuit déjà validé (verrouillé).');
+        fb.style.background = '#dcfce7'; fb.style.color = '#15803d'; fb.style.borderColor = '#16a34a';
+      }
+    }
+
+    document.getElementById('valInput').addEventListener('input', function () {
+      if (isValidated) return;
+      if (!selectedInst) return;
+      var cat = CATALOG_BY_KEY[selectedInst.key];
+      if (!cat.hasValue) return;
+      var v = parseFloat(String(this.value).replace(',', '.'));
+      if (isNaN(v)) return;
+      if (!gt(v, 0)) return;
+      selectedInst.value = v;
+      board.update();
+      pushState();
+    });
+
+    var paletteEl = document.getElementById('palette');
+    CATALOG.forEach(function (cat) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      var img = document.createElement('img');
+      img.alt = '';
+      var previewInner = cat.svg || cat.svgOff; if (!previewInner) { if (cat.states) { previewInner = cat.states[0].svg; } }
+      img.src = dataUri(wrapSvg(previewInner, cat.innerH, 0));
+      var span = document.createElement('span');
+      span.textContent = cat.label;
+      card.appendChild(img);
+      card.appendChild(span);
+      card.addEventListener('click', function () { var pos = findFreeSpawnPos(cat); createInstance(cat, pos[0], pos[1]); });
+      paletteEl.appendChild(card);
+    });
+  }
+
+  if (cfg.mode === 'teacher') {
+    loadJsxGraphThen(initApp);
+  } else {
+    var jxgReady = false, inputReady = false;
+    function tryInit() { if (jxgReady) { if (inputReady) initApp(); } }
+    Promise.all([
+      stack_js.request_access_to_input(cfg.inputNames.s, true),
+      stack_js.request_access_to_input(cfg.inputNames.c, true),
+      stack_js.request_access_to_input(cfg.inputNames.w, true),
+      stack_js.request_access_to_input(cfg.inputNames.v, true)
+    ]).then(function (ids) {
+      inputAns1 = document.getElementById(ids[0]);
+      inputAns2 = document.getElementById(ids[1]);
+      inputAns3 = document.getElementById(ids[2]);
+      inputAns4 = document.getElementById(ids[3]);
+      inputReady = true;
+      tryInit();
+    });
+    loadJsxGraphThen(function () { jxgReady = true; tryInit(); });
+  }
+}
+
+// Construit l'objet cfg.labels à partir d'un I18N.t() résolu côté appelant (js/gen-circuit.js
+// pour l'export réel, js/circuit-ui.js pour le canvas enseignant/aperçu élève) : source unique
+// des clés attendues par les appels lb(...) dans cirEngineRun ci-dessus, pour éviter toute
+// divergence entre les deux points d'appel.
+function cirBuildLabels(I18N_D) {
+  var t = I18N_D.t.bind(I18N_D);
+  return {
+    boardTitle: t('cir.board_title'),
+    boardDescription: t('cir.board_description'),
+    comp_gen: t('cir.comp_gen'),
+    comp_lamp: t('cir.comp_lamp'),
+    comp_led: t('cir.comp_led'),
+    comp_res: t('cir.comp_res'),
+    comp_cap: t('cir.comp_cap'),
+    comp_coil: t('cir.comp_coil'),
+    comp_motor: t('cir.comp_motor'),
+    comp_switch2: t('cir.comp_switch2'),
+    comp_switch3: t('cir.comp_switch3'),
+    valNoneSelected: t('cir.val_none_selected'),
+    valhint: t('cir.valhint'),
+    valNoAdjustable: t('cir.val_no_adjustable'),
+    valLocked: t('cir.val_locked'),
+    valPositive: t('cir.val_positive'),
+    feedbackPlaceholder: t('cir.feedback_placeholder'),
+    statusComponents: t('cir.status_components'),
+    statusEmpty: t('cir.status_empty'),
+    placeAtLeastOne: t('cir.place_at_least_one'),
+    validatedClickVerify: t('cir.validated_click_verify'),
+    alreadyValidated: t('cir.already_validated')
+  };
+}
+
+// Export CommonJS pour Node (tests + génération XML côté js/gen-circuit.js) : la même
+// fonction est utilisée par le navigateur (via <script src>) et stringifiée pour
+// être injectée telle quelle dans le [[script type="module"]] du XML Moodle exporté.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { cirEngineRun: cirEngineRun, CIR_ENGINE_JS: cirEngineRun.toString(), cirBuildLabels: cirBuildLabels };
+}

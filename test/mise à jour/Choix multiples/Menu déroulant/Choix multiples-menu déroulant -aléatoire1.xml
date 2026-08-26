@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396872  -->
+  <question type="stack">
+    <name>
+      <text>Exercice_sans_titre_2026_06_30_14h44</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#db2877;border-left:5px solid #be185d;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Q1 — Menu déroulant</strong>
+        <span style="background:#be185d;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#be185d;border:1px solid #be185d;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📋 Menu déroulant</span>
+      </div>
+      <!-- ENONCE-START --><p>quelle est la proposition vraie sur le son ?</p><!-- ENONCE-END -->
+      <p>[[input:ans1]] [[validation:ans1]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);"><div style="font-weight:bold; color:var(--navy2); margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:1.2rem;">🔑</span> Réponses attendues</div><div style="margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #e2e8f0;">
+                <span style="font-weight:bold;color:var(--navy2);">Q1 Menu déroulant</span>
+                <span style="color:#64748b;font-size:.85rem;margin-left:6px;"><p><strong>La bonne réponse était :</strong> {@texte_vrai1@}</p><p>{@fb_vrai1@}</p></span>
+            </div></div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Q1 : Menu déroulant (1pt) */
+ta1_all:[["1",true,"Le son est une onde mecanique qui a besoin d'un milieu materiel pour se propager."],["2",true,"La vitesse du son dans l'air est d'environ 340 metres par seconde dans les conditions usuelles."],["3",true,"La frequence d'un son determine sa hauteur, un son aigu ayant une frequence elevee."],["4",true,"L'intensite sonore se mesure en decibels et caracterise le niveau de puissance d'un son."],["5",false,"Le son se propage a la vitesse de la lumiere."],["6",false,"Le son peut se propager dans le vide sideral."],["7",false,"Un son grave possede une frequence tres elevee."],["8",false,"L'amplitude d'un signal sonore est liee a sa duree."],["9",false,"La frequence d'un son s'exprime en metres par seconde."],["10",false,"Le son est une onde electromagnetique."],["11",false,"La vitesse du son est identique quel que soit le milieu de propagation."],["12",false,"L'intensite sonore ne depend pas de la distance a la source."],["13",false,"La periode d'un signal sonore est egale a sa frequence."]]$ fb1:[["1","C'est exact. Contrairement a la lumiere, le son ne peut pas se deplacer dans le vide car il necessite des chocs entre les molecules du milieu."],["2","C'est exact. Cette valeur est la reference standard pour le son se propageant dans l'air a temperature ambiante."],["3","C'est exact. La hauteur du son est directement liee au nombre de vibrations par seconde, mesuree en Hertz."],["4","C'est exact. Le decibel est l'unite logaritmique utilisee pour quantifier le niveau d'intensite acoustique percu par l'oreille."],["5","Cette confusion entre deux phenomenes ondulatoires differents est courante. La lumiere est beaucoup plus rapide que le son."],["6","Il s'agit d'une erreur de comprehension sur la nature du son. Sans milieu materiel, aucune vibration ne peut etre transmise."],["7","C'est l'inverse. Les sons graves correspondent a des basses frequences, alors que les sons aigus correspondent a de hautes frequences."],["8","Confusion entre duree et intensite. L'amplitude de l'onde sonore est en realite reliee au volume ou a la force du son."],["9","Erreur d'unite. Le metre par seconde mesure une vitesse, alors que la frequence se mesure en Hertz."],["10","Erreur sur la nature de l'onde. Le son est une onde mecanique de compression alors que la lumiere est une onde electromagnetique."],["11","Cette affirmation omet que la propagation depend de la densite et de l'elasticite du milieu. Le son voyage plus vite dans l'eau que dans l'air."],["12","Ceci est faux car l'energie sonore se repartit sur une surface croissante avec la distance, ce qui fait diminuer l'intensite."],["13","C'est une inversion mathematique. La periode est l'inverse de la frequence, mesuree en secondes."]]$ pV1:sublist(ta1_all,lambda([ex],second(ex)=true))$ pF1:sublist(ta1_all,lambda([ex],second(ex)=false))$ ta1:random_permutation(append(rand_selection(pV1,1),rand_selection(pF1,4-1)))$ la_vraie1:first(sublist(ta1,lambda([ex],second(ex)=true)))$ texte_vrai1:third(la_vraie1)$ fb_vrai1:assoc(first(la_vraie1),fb1)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@map(first,ta1)@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:dropdown</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>dropdown</type>
+      <tans>ta1</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text>vid1:first(first(sublist(ta1,lambda([ex],second(ex)=true))))$ fbe1:assoc(ans1,fb1)$</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description></description>
+        <answertest>String</answertest>
+        <sans>ans1</sans>
+        <tans>vid1</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;">{@fbe1@}</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fff0f0;border-radius:4px;margin:4px 0;">{@fbe1@}</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396243  -->
+  <question type="stack">
+    <name>
+      <text>Statistiques : Moyenne pondérée (Tableau)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Statistiques — Moyenne pondérée</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Voici les moyennes de 3 classes de Première lors d'un devoir de mathématiques :</p>
+<table style="border-collapse: collapse; margin: 0 auto 15px auto; font-size: 1rem; text-align: center; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+<tbody>
+<tr style="background: #f1f5f9;">
+<th style="border: 1px solid #cbd5e1; padding: 8px;">Classe</th>
+<th style="border: 1px solid #cbd5e1; padding: 8px;">Nombre d'élèves</th>
+<th style="border: 1px solid #cbd5e1; padding: 8px;">Moyenne</th>
+</tr>
+{@table_rows@}
+</tbody>
+</table>
+<p><strong>1.</strong> Calculer la moyenne pondérée de l'ensemble des élèves de Première pour ce devoir.<br><em>(Arrondir le résultat à \(10^{-1}\) près).</em><br><br></p>
+<div>\(\bar{x}_{pond} \approx\) [[input:ans_moy]] [[validation:ans_moy]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">La formule de la moyenne pondérée est :<br>\(\bar{x}_{pond} = \frac{n_1 \times m_1 + n_2 \times m_2 + n_3 \times m_3}{n_1 + n_2 + n_3}\)<br><br>Numérateur : {@N_total@}<br>Dénominateur : {@Somme_pond@}<br><br>\(\bar{x}_{pond} \approx \frac{{@Somme_pond@}}{{@N_total@}} \approx {@ta_moy@}\)</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. Génération des données du tableau */
+L_moy: [1.0*rand(100)/10 + 8,1.0* rand(70)/10 + 11, 1.0*rand(90)/10 + 12];
+L_eff: [rand(15)+20, rand(15)+20, rand(15)+20];
+/* 2. Affichage dynamique du tableau HTML */
+r1: sconcat("<tr><td style='border:1px solid #e2e8f0; padding:8px;'>1ère</td><td style='border:1px solid #e2e8f0; padding:8px;'>", L_eff[1], "</td><td style='border:1px solid #e2e8f0; padding:8px;'>", L_moy[1], "</td></tr>");
+r2: sconcat("<tr><td style='border:1px solid #e2e8f0; padding:8px;'>2ème</td><td style='border:1px solid #e2e8f0; padding:8px;'>", L_eff[2], "</td><td style='border:1px solid #e2e8f0; padding:8px;'>", L_moy[2], "</td></tr>");
+ r3: sconcat("<tr><td style='border:1px solid #e2e8f0; padding:8px;'>3ème</td><td style='border:1px solid #e2e8f0; padding:8px;'>", L_eff[3], "</td><td style='border:1px solid #e2e8f0; padding:8px;'>", L_moy[3], "</td></tr>");
+table_rows: simplode([r1, r2, r3], ""); 
+/* 3. Calculs pour la correction */
+N_total: apply("+", L_eff);
+Somme_pond: L_moy[1]*L_eff[1] + L_moy[2]*L_eff[2] + L_moy[3]*L_eff[3];
+ ta_moy: 1.0* round(float(Somme_pond / N_total)*10)/10; 
+/* 4. Les erreurs classiques pour le PRT */
+/* Erreur 1 : Moyenne simple des moyennes (sans pondérer par les effectifs) */
+ta_err_unweight: round(float(apply("+", L_moy) / 3)*10)/10;
+ /* Erreur 2 : A fait la somme pondérée mais a oublié de diviser par l'effectif total */
+ta_err_sans_div: round(float(Somme_pond)*10)/10;]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>Moyennes={@L_moy@}, Effectifs={@L_eff@}, Moyenne pondérée={@ta_moy@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:stats-weighted-mean</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_moy</name>
+      <type>numerical</type>
+      <tans>ta_moy</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification de la moyenne pondérée</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_moy</sans>
+        <tans>ta_moy</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Vous avez bien pondéré chaque moyenne par son effectif avant de calculer la moyenne globale.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : Moyenne simple des moyennes</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_moy</sans>
+        <tans>ta_err_unweight</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-UNWEIGHT</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli de la pondération !</strong> Vous avez calculé la moyenne SIMPLE des trois moyennes (\(\frac{m_1+m_2+m_3}{3}\)). Il faut pondérer chaque moyenne par le nombre d'élèves de la classe avant de faire la somme, puis diviser par le nombre total d'élèves.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-AUTRE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Somme pondérée non divisée</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_moy</sans>
+        <tans>ta_err_sans_div</tans>
+        <testoptions>0.1</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SANS_DIV</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Presque !</strong> Vous avez bien multiplié chaque moyenne par son effectif et fait la somme. Mais la formule de la moyenne exige de diviser ce résultat par l'effectif total ({@N_total@}).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez strictement la formule : \(\frac{n_1 m_1 + n_2 m_2 + n_3 m_3}{n_1 + n_2 + n_3}\).</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

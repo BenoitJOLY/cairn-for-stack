@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396756  -->
+  <question type="stack">
+    <name>
+      <text>C Logique — Identifier l'expression d'après sa table</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#1e3a5f;border-left:5px solid #2563eb;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Logique — Identifier l'expression</strong>
+        <span style="background:#2563eb;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#1e3a5f;border:1px solid #1e3a5f;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📐 Mathématiques</span>
+      </div>
+
+      <p>Quelle expression logique correspond à la table de vérité suivante ?</p>
+
+      <div style="overflow-x:auto;margin:20px 0;">
+        <table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.1rem;">
+          <thead>
+            <tr style="background:#f1f5f9;">
+              <th style="border:1px solid #94a3b8;padding:10px 30px;">P</th>
+              <th style="border:1px solid #94a3b8;padding:10px 30px;">Q</th>
+              <th style="border:1px solid #94a3b8;padding:10px 30px;background:#fef9c3;">?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;">0</td>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;">0</td>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;font-size:1.2rem;">{@v0@}</td>
+            </tr>
+            <tr style="background:#f8fafc;">
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;">0</td>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;">1</td>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;font-size:1.2rem;">{@v1@}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;">1</td>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;">0</td>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;font-size:1.2rem;">{@v2@}</td>
+            </tr>
+            <tr style="background:#f8fafc;">
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;">1</td>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;">1</td>
+              <td style="border:1px solid #94a3b8;padding:10px 30px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;font-size:1.2rem;">{@v3@}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="text-align:center;margin:20px 0;">
+        <p style="font-size:1.05rem;margin-bottom:8px;"><strong>Expression correspondante :</strong></p>
+        [[input:rep]] [[validation:rep]]
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:var(--navy2); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponse attendue
+        </div>
+        <div style="overflow-x:auto; width:fit-content; margin:0 auto;">
+          <table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.1rem;">
+            <thead>
+              <tr style="background:#f1f5f9;">
+                <th style="border:1px solid #94a3b8;padding:10px 25px;">P</th>
+                <th style="border:1px solid #94a3b8;padding:10px 25px;">Q</th>
+                <th style="border:1px solid #94a3b8;padding:10px 25px;background:#fef9c3;">\({@bonne_expr@}\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;">0</td>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;">0</td>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@v0@}</td>
+              </tr>
+              <tr style="background:#f8fafc;">
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;">0</td>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;">1</td>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@v1@}</td>
+              </tr>
+              <tr>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;">1</td>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;">0</td>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@v2@}</td>
+              </tr>
+              <tr style="background:#f8fafc;">
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;">1</td>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;">1</td>
+                <td style="border:1px solid #94a3b8;padding:10px 25px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@v3@}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.2</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[groupeA_expr : [P and Q, P or Q, not(P and Q), not(P or Q)]$ groupeA_txt : ["P ∧ Q", "P ∨ Q", "¬(P ∧ Q)", "¬(P ∨ Q)"]$ 
+groupeB_expr : [P implies Q, Q implies P, not(P implies Q), P implies not(Q)]$ groupeB_txt : ["P ⇒ Q", "Q ⇒ P", "¬(P ⇒ Q)", "P ⇒ ¬Q"]$ 
+groupeC_expr : [(P implies Q) and (Q implies P), (P or Q) and not(P and Q), P and Q, not(P) and not(Q)]$ groupeC_txt : ["(P ⇒ Q) ∧ (Q ⇒ P)", "(P ∨ Q) ∧ ¬(P ∧ Q)", "P ∧ Q", "¬P ∧ ¬Q"]$ 
+groupeD_expr : [not(P) or Q, not(P) and Q, P or not(Q), not(P) or not(Q)]$ groupeD_txt : ["¬P ∨ Q", "¬P ∧ Q", "P ∨ ¬Q", "¬P ∨ ¬Q"]$ 
+liste_expr : [groupeA_expr, groupeB_expr, groupeC_expr, groupeD_expr]$ liste_txt : [groupeA_txt, groupeB_txt, groupeC_txt, groupeD_txt]$ 
+idx_g : rand(4) + 1$ exprs : liste_expr[idx_g]$ txts : liste_txt[idx_g]$ idx_b : rand(4) + 1$ bonne_expr : exprs[idx_b]$ 
+T1 : truth_table(boolean_form(exprs[1]))$ R1 : args(T1)$ T2 : truth_table(boolean_form(exprs[2]))$ R2 : args(T2)$ T3 : truth_table(boolean_form(exprs[3]))$ R3 : args(T3)$ T4 : truth_table(boolean_form(exprs[4]))$ R4 : args(T4)$ 
+tables_expr : [
+  [if last(R1[2]) then 1 else 0, if last(R1[3]) then 1 else 0, if last(R1[4]) then 1 else 0, if last(R1[5]) then 1 else 0],
+  [if last(R2[2]) then 1 else 0, if last(R2[3]) then 1 else 0, if last(R2[4]) then 1 else 0, if last(R2[5]) then 1 else 0],
+  [if last(R3[2]) then 1 else 0, if last(R3[3]) then 1 else 0, if last(R3[4]) then 1 else 0, if last(R3[5]) then 1 else 0],
+  [if last(R4[2]) then 1 else 0, if last(R4[3]) then 1 else 0, if last(R4[4]) then 1 else 0, if last(R4[5]) then 1 else 0]
+]$ 
+ta_ans : tables_expr[idx_b]$ v0 : ta_ans[1]$ v1 : ta_ans[2]$ v2 : ta_ans[3]$ v3 : ta_ans[4]$ 
+choix1 : [["1", true, txts[1]], ["2", false, txts[2]], ["3", false, txts[3]], ["4", false, txts[4]]]$ choix2 : [["1", false, txts[1]], ["2", true, txts[2]], ["3", false, txts[3]], ["4", false, txts[4]]]$ choix3 : [["1", false, txts[1]], ["2", false, txts[2]], ["3", true, txts[3]], ["4", false, txts[4]]]$ choix4 : [["1", false, txts[1]], ["2", false, txts[2]], ["3", false, txts[3]], ["4", true, txts[4]]]$ 
+choix_brut : if idx_b=1 then choix1 elseif idx_b=2 then choix2 elseif idx_b=3 then choix3 else choix4$ choix : random_permutation(choix_brut)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol><li>[[feedback:prt1]]</li></ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>Table: [{@v0@},{@v1@},{@v2@},{@v3@}] → {@bonne_expr@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:logique-prop-identifier</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>symbol</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>rep</name>
+      <type>dropdown</type>
+      <tans>choix</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text><![CDATA[vraie_id : first(first(sublist(choix, lambda([ex], second(ex)=true))))$ rep_num : if rep="1" then 1 elseif rep="2" then 2 elseif rep="3" then 3 else 4$ v_etu : tables_expr[rep_num]$ v_neg : [1-v0, 1-v1, 1-v2, 1-v3]$ est_negation : is(v_etu = v_neg)$]]></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Bonne expression</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>rep</sans>
+        <tans>vraie_id</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;"><p>✅ <strong>Exact !</strong> Vous avez correctement identifié l'expression logique à partir de sa table de vérité.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>A choisi la négation de l'expression</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>est_negation</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Presque ça !</strong> L'expression que vous avez choisie correspond exactement à l'<strong>inverse</strong> de la table demandée (les 0 et 1 sont permutés). Vérifiez si vous n'avez pas confondu avec la négation de la proposition.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Expression incorrecte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;margin:4px 0;"><p>❌ <strong>Incorrect.</strong> Pour trouver la bonne expression, repérez les lignes où le résultat vaut <strong>1</strong> et déduisez-en le connecteur logique principal :<br>
+        • Si seul (1,1) donne 1 → <em>ET</em><br>
+        • Si seul (0,0) donne 0 → <em>OU</em><br>
+        • Si seul (1,0) donne 0 → <em>IMPLIQUE</em></p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

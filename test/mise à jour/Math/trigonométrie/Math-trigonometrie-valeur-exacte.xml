@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396340  -->
+  <question type="stack">
+    <name>
+      <text>Trigonométrie : Valeur exacte d'un angle classique</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Trigonométrie — Valeurs exactes</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>En utilisant le cercle trigonométrique, déterminer la <strong>valeur exacte</strong> du nombre suivant :</p>
+<div style="text-align: center; font-size: 1.3rem; margin: 25px 0; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+\({@func_disp@}\left( {@angle@} \right)\)
+</div>
+<p><em>Attention : les valeurs approchées (avec des décimales) sont refusées. Saisissez par exemple \(\frac{\sqrt{2}}{2}\) sous la forme <strong>sqrt(2)/2</strong>.</em></p>
+<div style="margin: 15px 0 10px 0;">\({@func_disp@}\left( {@angle@} \right) = \) [[input:ans_trig]] [[validation:ans_trig]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour trouver cette valeur exacte, on suit deux étapes :<br><br>
+<strong>1. On détermine le signe :</strong><br>
+L'angle {@angle@} se trouve dans le {@quadrant@}. D'après les règles de signe en trigonométrie, la fonction {@func_disp@} est donc {@signe_txt@} dans ce quadrant.<br><br>
+<strong>2. On utilise l'angle associé :</strong><br>
+L'angle associé dans le premier quadrant est \({@angle_ref@}\).<br>
+On a donc \(\left| {@func_disp@}\left( {@angle@} \right) \right| = {@func_disp@}\left( {@angle_ref@} \right) = {@val_abs@}\).<br><br>
+<strong>Conclusion :</strong><br>
+En appliquant le signe trouvé à l'étape 1, on obtient :<br>
+\[
+{@func_disp@}\left( {@angle@} \right) = {@ans_correct@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Fonction utilitaire */
+ri(a,b) := a + rand(b - a + 1) - 1;
+
+/* Génération de l'angle (sans utiliser de liste pour éviter les bugs d'index) */
+r_angle: rand(10);
+
+if r_angle = 1 then angle: pi/6
+else if r_angle = 2 then angle: pi/4
+else if r_angle = 3 then angle: pi/3
+else if r_angle = 4 then angle: 2*pi/3
+else if r_angle = 5 then angle: 3*pi/4
+else if r_angle = 6 then angle: 5*pi/6
+else if r_angle = 7 then angle: 7*pi/6
+else if r_angle = 8 then angle: 5*pi/4
+else if r_angle = 9 then angle: 4*pi/3
+else angle: 11*pi/6;
+
+/* Génération de la fonction (séparation stricte calcul / affichage) */
+r_func: rand(3);
+
+if r_func = 1 then (
+    func_calc: sin,
+    func_disp: "\sin"
+) else if r_func = 2 then (
+    func_calc: cos,
+    func_disp: "\cos"
+) else (
+    func_calc: tan,
+    func_disp: "\tan"
+);
+
+/* Réponse attendue */
+ans_correct: func_calc(angle);
+
+/* Valeur absolue pour la correction */
+val_abs: abs(func_calc(angle));
+
+/* Calcul de l'angle de référence et du quadrant (logique entière 100% fiable) */
+k: round(angle / (pi/12));
+k_mod: mod(k, 12);
+if k_mod = 0 then k_mod: 12;
+
+if k_mod <= 3 then quadrant: "premier quadrant"
+else if k_mod <= 6 then quadrant: "deuxième quadrant"
+else if k_mod <= 9 then quadrant: "troisième quadrant"
+else quadrant: "quatrième quadrant";
+
+angle_ref_num: k_mod;
+if angle_ref_num > 6 then angle_ref_num: 12 - angle_ref_num;
+angle_ref: ratsimp(angle_ref_num * pi / 12);
+
+/* Calcul du texte pour le signe */
+if func_calc = cos then (
+    if k_mod <= 3 or k_mod >= 10 then signe_txt: "positive"
+    else signe_txt: "négative"
+)
+else if func_calc = sin then (
+    if k_mod <= 6 then signe_txt: "positive"
+    else signe_txt: "négative"
+)
+else (
+    if k_mod <= 3 or (k_mod >= 7 and k_mod <= 9) then signe_txt: "positive"
+    else signe_txt: "négative"
+);
+
+/* Erreurs classiques */
+/* Erreur 1 : Oubli du signe (répond avec la valeur absolue) */
+err_sign: val_abs;
+
+/* Erreur 2 : Confusion sin/cos ou tan/cotan */
+if func_calc = sin then err_swap: cos(angle)
+else if func_calc = cos then err_swap: sin(angle)
+else err_swap: 1/tan(angle);
+
+/* Erreur 3 : A répondu l'angle de référence au lieu de la valeur trigonométrique */
+err_angle: angle_ref;]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>{@func_disp@}({@angle@}) = {@ans_correct@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:trigonometrie-valeur-exacte</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_trig</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_trig</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> La valeur exacte est correcte.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : Oubli du signe (valeur absolue)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_trig</sans>
+        <tans>err_sign</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SIGN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe !</strong> Votre valeur est correcte en valeur absolue, mais {@angle@} ne se trouve pas dans le premier quadrant. Pensez à regarder le signe de {@func_disp@} dans le {@quadrant@} avant de donner votre réponse.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SIGN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Confusion sin/cos ou tan/cotan</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_trig</sans>
+        <tans>err_swap</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SWAP</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise fonction !</strong> Vous avez donné la valeur de la fonction "inverse" ou associée (cosinus au lieu de sinus, ou cotangente au lieu de tangente). Vérifiez bien l'abscisse (cos) et l'ordonnée (sin) sur le cercle trigonométrique.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SWAP</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : A donné l'angle de référence</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_trig</sans>
+        <tans>err_angle</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-ANGLE</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion Angle / Valeur !</strong> Vous avez recopié l'angle de référence associé ({@angle_ref@}). On vous demande le résultat du calcul de {@func_disp@}, pas l'angle lui-même.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Méthode :<br>1. Placez l'angle sur le cercle trigonométrique.<br>2. Regardez le signe dans le quadrant correspondant.<br>3. Utilisez l'angle associé pour trouver la valeur absolue.<br><em>(Saisissez les racines sous la forme <strong>sqrt(2)</strong> par exemple).</em></div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

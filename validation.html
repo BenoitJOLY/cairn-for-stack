@@ -1,0 +1,200 @@
+<!--
+  Cairn for Stack — générateur de questions STACK pour Moodle
+  Copyright (C) 2026  Benoit Joly
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="assets/icone_18x18.png">
+<title>CAIRN FOR STACK — Validation des dépôts</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/darkmode.css">
+<style>
+  .valid-wrap{max-width:900px;margin:0 auto;}
+  .valid-nav{display:flex;gap:14px;align-items:center;}
+  .valid-nav a{color:#fff;text-decoration:none;}
+  .valid-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .valid-count{font-size:.82rem;color:var(--slate);font-weight:600;}
+  .deposit-list{list-style:none;padding:0;margin:0;}
+  .deposit-list li{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:9px;background:#f8fafc;border-radius:10px;border-left:4px solid var(--navy2);flex-wrap:wrap;}
+  .deposit-info{flex:1;min-width:220px;}
+  .deposit-name{font-weight:700;color:var(--navy);font-size:.9rem;word-break:break-all;}
+  .deposit-pays{font-size:.72rem;background:#e2e8f0;color:var(--navy3);padding:2px 7px;border-radius:9px;display:inline-block;margin-top:5px;}
+  .deposit-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn-mini{padding:7px 13px;border-radius:7px;font-size:.78rem;font-weight:700;white-space:nowrap;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--navy2);text-decoration:none;display:inline-block;}
+  .btn-mini:hover{border-color:var(--navy2);}
+  .btn-valider{border-color:#198754;color:#198754;}
+  .btn-valider:hover{background:#eafaf1;}
+  .btn-rejeter{border-color:#dc2626;color:#dc2626;}
+  .btn-rejeter:hover{background:#fef2f2;}
+  .no-result{text-align:center;color:var(--slate);padding:26px;font-style:italic;border:2px dashed var(--border);border-radius:10px;}
+  #raw-view{white-space:pre-wrap;word-break:break-all;background:#0f172a;color:#e2e8f0;padding:14px;border-radius:8px;font-size:.78rem;max-height:60vh;overflow:auto;}
+</style>
+</head>
+<body>
+<div class="valid-wrap">
+  <header class="app-header" role="banner" style="border-radius:14px 14px 0 0;">
+    <div><h1 style="font-size:1.1rem;margin:0;">✅ Validation des dépôts Cairn for Stack</h1></div>
+    <nav class="valid-nav">
+      <a href="admin.html">Administration</a>
+      <a href="index.html">← Retour au générateur</a>
+    </nav>
+  </header>
+  <main class="card" style="border-radius:0 0 14px 14px;">
+    <p class="hint" style="font-size:.8rem;color:var(--slate);margin:0 0 14px;">
+      Relecture à faire sur un Moodle réel (hors Cairn for Stack). « Valider » déplace le dépôt vers la banque de
+      questions (branche dédiée) ; « Rejeter » le supprime définitivement de la zone de relecture.
+    </p>
+    <div class="valid-toolbar">
+      <span class="valid-count" id="valid-count"></span>
+      <button class="btn-mini" onclick="loadDeposits()">🔄 Actualiser</button>
+    </div>
+    <ul id="deposit-list" class="deposit-list"><li class="no-result">Chargement…</li></ul>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="rawModal" onclick="closeRawModal(event)">
+  <div class="calc-box" style="width:640px;">
+    <h3 id="raw-modal-title">Contenu du dépôt</h3>
+    <pre id="raw-view"></pre>
+    <button class="btn-mini" onclick="closeRawModal()">Fermer</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="confirmModal" onclick="closeConfirmModal(event)">
+  <div class="calc-box">
+    <h3 id="confirm-title">Confirmer</h3>
+    <p id="confirm-body"></p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-mini" id="confirm-btn-ok" onclick="confirmAction()"></button>
+      <button class="btn-mini" onclick="closeConfirmModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/focus-trap.js"></script>
+<script>
+let deposits = [];
+let pendingAction = null; // { path, kind: 'valider'|'rejeter' }
+
+async function loadDeposits() {
+  const list = document.getElementById('deposit-list');
+  list.innerHTML = '<li class="no-result">Chargement…</li>';
+  try {
+    const res = await fetch('/api/validation/deposits');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur de chargement.');
+    deposits = data.deposits;
+    renderDeposits();
+  } catch (err) {
+    list.innerHTML = '<li class="no-result" style="color:#b91c1c;">' + err.message + '</li>';
+  }
+}
+
+function renderDeposits() {
+  const list = document.getElementById('deposit-list');
+  document.getElementById('valid-count').textContent = deposits.length + ' dépôt(s) en attente';
+  if (!deposits.length) {
+    list.innerHTML = '<li class="no-result">Aucun dépôt en attente de validation.</li>';
+    return;
+  }
+  list.innerHTML = '';
+  deposits.forEach(function (d) {
+    const li = document.createElement('li');
+    li.innerHTML =
+      '<div class="deposit-info">' +
+        '<div class="deposit-name">' + d.name.replace(/</g, '&lt;') + '</div>' +
+        '<span class="deposit-pays">' + d.pays.replace(/</g, '&lt;') + '</span>' +
+      '</div>' +
+      '<div class="deposit-actions">' +
+        '<button class="btn-mini" onclick="viewDeposit(' + JSON.stringify(d.path) + ', ' + JSON.stringify(d.name) + ')">👁 Voir</button>' +
+        '<a class="btn-mini" href="/api/validation/deposits/raw?path=' + encodeURIComponent(d.path) + '" download="' + d.name.replace(/"/g,'&quot;') + '">⬇ Télécharger</a>' +
+        '<button class="btn-mini btn-valider" onclick="askConfirm(' + JSON.stringify(d.path) + ', ' + JSON.stringify(d.name) + ', \'valider\')">✅ Valider</button>' +
+        '<button class="btn-mini btn-rejeter" onclick="askConfirm(' + JSON.stringify(d.path) + ', ' + JSON.stringify(d.name) + ', \'rejeter\')">✕ Rejeter</button>' +
+      '</div>';
+    list.appendChild(li);
+  });
+}
+
+async function viewDeposit(path, name) {
+  document.getElementById('raw-modal-title').textContent = name;
+  document.getElementById('raw-view').textContent = 'Chargement…';
+  const modal = document.getElementById('rawModal');
+  modal.style.display = 'flex';
+  FocusTrap.trap(modal, closeRawModal);
+  try {
+    const res = await fetch('/api/validation/deposits/raw?path=' + encodeURIComponent(path));
+    const text = await res.text();
+    if (!res.ok) throw new Error(JSON.parse(text).error || 'Erreur de chargement.');
+    document.getElementById('raw-view').textContent = text;
+  } catch (err) {
+    document.getElementById('raw-view').textContent = 'Erreur : ' + err.message;
+  }
+}
+
+function closeRawModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('rawModal').style.display = 'none';
+  FocusTrap.release();
+}
+
+function askConfirm(path, name, kind) {
+  pendingAction = { path: path, kind: kind };
+  const isValider = kind === 'valider';
+  document.getElementById('confirm-title').textContent = (isValider ? 'Valider' : 'Rejeter') + ' ce dépôt ?';
+  document.getElementById('confirm-body').textContent = isValider
+    ? name + ' sera déplacé vers la banque de questions validées.'
+    : name + ' sera définitivement supprimé de la zone de relecture.';
+  const btn = document.getElementById('confirm-btn-ok');
+  btn.textContent = isValider ? 'Valider' : 'Rejeter';
+  btn.className = 'btn-mini ' + (isValider ? 'btn-valider' : 'btn-rejeter');
+  const modal = document.getElementById('confirmModal');
+  modal.style.display = 'flex';
+  FocusTrap.trap(modal, closeConfirmModal);
+}
+
+function closeConfirmModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('confirmModal').style.display = 'none';
+  FocusTrap.release();
+  pendingAction = null;
+}
+
+async function confirmAction() {
+  if (!pendingAction) return;
+  const { path, kind } = pendingAction;
+  const route = kind === 'valider' ? '/api/validation/deposits/valider' : '/api/validation/deposits/rejeter';
+  closeConfirmModal();
+  try {
+    const res = await fetch(route, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: path }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Échec de l\'opération.');
+    await loadDeposits();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+loadDeposits();
+</script>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cairn for Stack V1 — Guide administrateur</title>
+<style>
+/* ─── Palette ─── */
+:root {
+  --navy:   #1e293b;
+  --blue:   #1d4ed8;
+  --bluel:  #eff6ff;
+  --bluem:  #bfdbfe;
+  --green:  #15803d;
+  --greenl: #f0fdf4;
+  --amber:  #b45309;
+  --amberl: #fffbeb;
+  --red:    #991b1b;
+  --redl:   #fef2f2;
+  --purple: #7c3aed;
+  --purplel:#f5f3ff;
+  --slate:  #475569;
+  --border: #e2e8f0;
+  --bg:     #f8fafc;
+  --sidebar-w: 250px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family: system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:15px; line-height:1.7;
+  color:#1e293b; background:var(--bg);
+}
+
+/* ─── Layout avec sidebar ─── */
+.layout{ display:flex; min-height:100vh; }
+
+/* ─── Sidebar ─── */
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0;
+  background:#fff; border-right:1px solid var(--border);
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  padding:20px 0 40px;
+}
+.sidebar-logo{
+  padding:10px 18px 18px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:12px;
+}
+.sidebar-logo strong{ display:block; font-size:.95rem; color:var(--navy); }
+.sidebar-logo span{ font-size:.75rem; color:var(--slate); }
+.sidebar nav a{
+  display:block; padding:5px 18px;
+  font-size:.82rem; color:var(--slate); text-decoration:none;
+  border-left:3px solid transparent;
+  transition:all .15s;
+}
+.sidebar nav a:hover{ color:var(--blue); background:var(--bluel); border-left-color:var(--bluem); }
+.sidebar nav a.active{ color:var(--blue); font-weight:600; border-left-color:var(--blue); background:var(--bluel); }
+.sidebar-section-label{
+  padding:12px 18px 4px; font-size:.7rem; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; color:#94a3b8;
+}
+.sidebar nav a.sub{ padding-left:30px; font-size:.8rem; }
+
+/* ─── Content ─── */
+.content{ flex:1; min-width:0; padding:40px 48px 100px; max-width:860px; }
+
+/* ─── Header ─── */
+.doc-header{
+  background:linear-gradient(135deg,var(--navy) 0%,#1e40af 100%);
+  color:#fff; padding:36px 32px; border-radius:16px; margin-bottom:40px;
+}
+.doc-header h1{ font-size:1.8rem; margin-bottom:6px; font-weight:800; }
+.doc-header p{ color:#93c5fd; font-size:.97rem; margin-bottom:12px; }
+.header-badges{ display:flex; gap:8px; flex-wrap:wrap; }
+.badge{
+  display:inline-block; padding:3px 12px; border-radius:20px;
+  font-size:.72rem; font-weight:700;
+}
+.badge-navy{ background:#334155; color:#cbd5e1; }
+.badge-blue{ background:#1d4ed8; color:#bfdbfe; }
+.badge-green{ background:#166534; color:#bbf7d0; }
+
+/* ─── Section ─── */
+.section{ margin-bottom:52px; }
+h2.sec-title{
+  font-size:1.25rem; color:var(--navy);
+  border-left:4px solid var(--blue);
+  padding:6px 0 6px 14px; margin-bottom:22px;
+  scroll-margin-top:24px;
+}
+h3{ font-size:1rem; color:var(--navy); margin:24px 0 10px; font-weight:700; }
+h4{ font-size:.9rem; color:var(--slate); margin:16px 0 8px; font-weight:600; }
+p{ margin-bottom:10px; }
+ul,ol{ padding-left:22px; margin-bottom:10px; }
+li{ margin:4px 0; }
+
+/* ─── Steps ─── */
+.steps{ counter-reset:step; display:flex; flex-direction:column; gap:12px; }
+.step{ display:flex; gap:14px; }
+.step::before{
+  counter-increment:step; content:counter(step);
+  flex-shrink:0; width:28px; height:28px;
+  background:var(--blue); color:#fff; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.82rem; font-weight:700; margin-top:3px;
+}
+.step-body{ flex:1; }
+
+/* ─── Boxes ─── */
+.info-box,.tip-box,.warn-box,.err-box,.new-box{
+  padding:12px 16px; border-radius:0 8px 8px 0; margin:14px 0; font-size:.88rem;
+}
+.info-box { background:var(--bluel);  border-left:4px solid var(--blue);  }
+.tip-box  { background:var(--greenl); border-left:4px solid var(--green); }
+.warn-box { background:var(--amberl); border-left:4px solid var(--amber); }
+.err-box  { background:var(--redl);   border-left:4px solid var(--red);   }
+.new-box  { background:var(--purplel);border-left:4px solid var(--purple);}
+.box-title{ font-weight:700; margin-bottom:5px; }
+
+/* ─── Code ─── */
+code{
+  background:#f1f5f9; border:1px solid var(--border);
+  padding:1px 5px; border-radius:4px;
+  font-family:'Courier New',monospace; font-size:.85em;
+}
+pre{
+  background:var(--navy); color:#e2e8f0;
+  padding:14px 18px; border-radius:10px;
+  font-family:'Courier New',monospace; font-size:.83rem;
+  overflow-x:auto; margin:12px 0;
+}
+pre .cm { color:#94a3b8; } /* comment */
+pre .kw { color:#93c5fd; } /* keyword */
+pre .vl { color:#86efac; } /* value */
+pre .fn { color:#fde68a; } /* function */
+
+/* ─── Table ─── */
+table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:.88rem; }
+th{ background:var(--navy); color:#fff; padding:9px 12px; text-align:left; font-size:.83rem; }
+td{ padding:8px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+tr:nth-child(even) td{ background:#f8fafc; }
+
+/* ─── FAQ ─── */
+details{ border:1px solid var(--border); border-radius:8px; margin:8px 0; background:#fff; }
+summary{
+  padding:12px 16px; font-weight:600; cursor:pointer; font-size:.9rem;
+  list-style:none; display:flex; justify-content:space-between; align-items:center;
+}
+summary::-webkit-details-marker{ display:none; }
+summary::after{ content:'›'; font-size:1.1rem; color:var(--slate); transition:transform .2s; }
+details[open] summary::after{ transform:rotate(90deg); }
+.faq-body{ padding:4px 16px 14px; font-size:.9rem; }
+
+/* ─── Rôle badges ─── */
+.role-badge{ display:inline-block; padding:2px 10px; border-radius:12px; font-size:.72rem; font-weight:700; }
+.role-admin{ background:#fce7f3; color:#9d174d; }
+.role-validateur{ background:#dcfce7; color:#166534; }
+.role-enseignant{ background:#e0e7ff; color:#3730a3; }
+
+/* ─── Back to top ─── */
+#back-top{
+  position:fixed; bottom:28px; right:28px;
+  background:var(--blue); color:#fff;
+  width:40px; height:40px; border-radius:50%;
+  border:none; cursor:pointer; font-size:1.1rem;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+  display:none; align-items:center; justify-content:center;
+  z-index:999; transition:opacity .2s;
+}
+#back-top.show{ display:flex; }
+#back-top:hover{ background:#1e40af; }
+
+/* ─── New tag ─── */
+.tag-new{
+  display:inline-block; background:#7c3aed; color:#fff;
+  font-size:.65rem; font-weight:800; padding:1px 6px; border-radius:10px;
+  margin-left:6px; vertical-align:middle; letter-spacing:.04em;
+}
+
+/* ─── Footer ─── */
+.doc-footer{
+  text-align:center; font-size:.82rem; color:var(--slate);
+  border-top:1px solid var(--border); padding-top:20px; margin-top:60px;
+}
+.doc-footer a{ color:var(--blue); }
+
+/* ─── Responsive ─── */
+@media(max-width:900px){
+  .sidebar{ display:none; }
+  .content{ padding:24px 18px 80px; }
+}
+@media print{
+  .sidebar,#back-top{ display:none!important; }
+  .content{ max-width:100%; padding:16px; }
+  .section{ break-inside:avoid; }
+  h2.sec-title{ break-before:page; }
+  h2.sec-title:first-of-type{ break-before:avoid; }
+}
+</style>
+</head>
+<body>
+
+<button id="back-top" title="Retour en haut" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<div class="layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <strong>Cairn for Stack V1</strong>
+    <span>Guide administrateur · v2.1</span>
+  </div>
+  <nav>
+    <div class="sidebar-section-label">Mise en route</div>
+    <a href="#intro">Introduction</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#installation">Installation Docker</a>
+    <a href="#variables-env">Variables d'environnement</a>
+
+    <div class="sidebar-section-label">Comptes & accès</div>
+    <a href="#roles">Rôles disponibles</a>
+    <a href="#creer-comptes">Créer des comptes</a>
+    <a href="#auto-inscription">Auto-inscription & quota</a>
+
+    <div class="sidebar-section-label">Panneau d'administration</div>
+    <a href="#admin-panel">Vue d'ensemble</a>
+    <a href="#mutualisation" class="sub">Zone de mutualisation</a>
+    <a href="#maxima-defaut" class="sub">Serveur Maxima par défaut</a>
+    <a href="#ia-institutionnelle" class="sub">Fournisseur IA institutionnel</a>
+    <a href="#jeton-github" class="sub">Jeton GitHub institutionnel</a>
+    <a href="#mentions-legales" class="sub">Mentions légales & RGPD</a>
+    <a href="#comptes-roles" class="sub">Comptes & rôles</a>
+
+    <div class="sidebar-section-label">Validation</div>
+    <a href="#workflow-validation">Workflow dépôt → validation</a>
+
+    <div class="sidebar-section-label">Exploitation</div>
+    <a href="#securite">Sécurité & secrets</a>
+    <a href="#rgpd">RGPD — droit à l'effacement</a>
+    <a href="#maintenance">Maintenance & mises à jour</a>
+    <a href="#sauvegarde">Sauvegarde des données</a>
+    <a href="#depannage">Dépannage / FAQ</a>
+  </nav>
+</aside>
+
+<!-- ═══ CONTENT ═══ -->
+<main class="content">
+
+<!-- HEADER -->
+<div class="doc-header">
+  <h1>Cairn for Stack V1 — Guide administrateur</h1>
+  <p>Déployer, configurer et exploiter une instance Cairn for Stack auto-hébergée</p>
+  <div class="header-badges">
+    <span class="badge badge-navy">Version 2.1 · 2026</span>
+    <span class="badge badge-blue">Docker · Node.js/Express</span>
+  </div>
+</div>
+
+<!-- ═══ 1. INTRODUCTION ═══ -->
+<div class="section" id="intro">
+  <h2 class="sec-title">1. Introduction</h2>
+
+  <p>Ce guide s'adresse à la personne qui installe, configure et exploite une instance <strong>Cairn for Stack</strong> pour un établissement, une équipe ou un usage personnel hébergé. Il ne couvre pas la création de questions STACK elle-même — voir le <strong>Guide enseignant</strong> pour cet usage.</p>
+
+  <div class="info-box">
+    <div class="box-title">Deux modes de fonctionnement</div>
+    <ul>
+      <li><strong>Mode local (sans serveur)</strong> — ouvrir directement <code>index.html</code> dans un navigateur. Aucune authentification, aucun compte, aucune donnée partagée : chaque enseignant utilise son propre poste et sa propre clé IA/Maxima. Ce guide ne s'applique pas à ce mode.</li>
+      <li><strong>Mode hébergé (serveur Node)</strong> — l'application tourne derrière un serveur Express qui impose une authentification par compte, centralise la configuration (serveur Maxima, IA, dépôt GitHub) et gère les rôles. C'est ce mode que couvre ce guide.</li>
+    </ul>
+  </div>
+
+  <p>En mode hébergé, <strong>toute l'application est servie derrière un login</strong> : aucune page (hormis <code>login.html</code>/<code>register.html</code> et leurs assets) n'est accessible sans session valide.</p>
+</div>
+
+<!-- ═══ 2. ARCHITECTURE ═══ -->
+<div class="section" id="architecture">
+  <h2 class="sec-title">2. Architecture</h2>
+
+  <p>L'instance hébergée repose sur trois briques :</p>
+  <ul>
+    <li><strong>Frontend statique</strong> — HTML/CSS/JS pur (<code>index.html</code>, <code>js/</code>, <code>css/</code>, <code>lang/</code>, <code>lib/</code>), servi par le serveur Node une fois la session authentifiée.</li>
+    <li><strong>Serveur Node/Express</strong> (<code>server/</code>) — authentification par session (cookie <code>httpOnly</code>/<code>secure</code>), routage des pages protégées, endpoint de génération sécurisée <code>POST /api/generate</code>, panneau d'administration, relais vers le moteur Maxima.</li>
+    <li><strong>Conteneur Maxima/Stack-API</strong> — moteur de calcul formel externe (image <code>stackmaths/stackapi</code>), joint via un réseau Docker partagé pour la prévisualisation réelle et le calcul des <code>deployedseed</code>.</li>
+  </ul>
+
+  <div class="info-box">
+    <div class="box-title">Pourquoi un relais côté serveur vers Maxima ?</div>
+    Le navigateur n'appelle jamais directement le conteneur Maxima/Stack-API : la route <code>POST /stack-api/:route</code> (liste blanche : <code>render</code>, <code>grade</code>, <code>validate</code>, <code>diff</code>) sert de proxy interne. Cela évite les blocages CORS liés à un port différent et n'expose pas Stack-API comme proxy ouvert vers le réseau interne.
+  </div>
+
+  <h3>Persistance des données</h3>
+  <p>Toutes les données propres à l'instance (comptes, quotas, configuration, secrets chiffrés) vivent dans <code>server/data/</code> sous forme de fichiers JSON :</p>
+  <table>
+    <tr><th>Fichier</th><th>Contenu</th></tr>
+    <tr><td><code>accounts.json</code></td><td>Comptes (identifiant, hash bcrypt du mot de passe, rôle, indicateur auto-inscrit, clé IA personnelle chiffrée)</td></tr>
+    <tr><td><code>usage.json</code></td><td>Horodatages de génération par compte auto-inscrit, pour le quota hebdomadaire glissant</td></tr>
+    <tr><td><code>instance-config.json</code></td><td>Réglages d'instance (zone de mutualisation, serveur Maxima par défaut, fournisseur IA, mentions légales) et secrets institutionnels chiffrés (jeton GitHub, clé API IA)</td></tr>
+  </table>
+  <p>Ce dossier n'est <strong>jamais commité dans Git</strong> (voir <code>.gitignore</code>) : il contient des identifiants et des secrets propres à chaque déploiement.</p>
+</div>
+
+<!-- ═══ 3. INSTALLATION DOCKER ═══ -->
+<div class="section" id="installation">
+  <h2 class="sec-title">3. Installation Docker</h2>
+
+  <h3>Prérequis</h3>
+  <ul>
+    <li>Docker & Docker Compose (le projet a été conçu et éprouvé pour un auto-hébergement sur NAS Synology, mais fonctionne sur toute machine Docker)</li>
+    <li>Un conteneur Maxima/Stack-API déjà fonctionnel, sur un réseau Docker nommé <code>maxima_default</code> (créé par son propre projet Compose)</li>
+  </ul>
+
+  <h3>Étapes</h3>
+  <div class="steps">
+    <div class="step"><div class="step-body">Cloner le dépôt sur la machine hôte : <code>git clone &lt;url-du-depot&gt; && cd cairn-for-stack</code></div></div>
+    <div class="step"><div class="step-body">Créer un fichier <code>.env</code> à la racine (jamais commité) contenant au minimum <code>SECRETS_KEY</code>, et si souhaité un premier compte admin (voir section suivante).</div></div>
+    <div class="step"><div class="step-body">Vérifier que le réseau <code>maxima_default</code> existe déjà (<code>docker network ls</code>) — <code>docker-compose.yml</code> le rejoint en <code>external: true</code>, il n'est pas recréé.</div></div>
+    <div class="step"><div class="step-body">Construire et démarrer : <code>docker-compose up -d --build</code></div></div>
+    <div class="step"><div class="step-body">Vérifier la santé du conteneur : <code>curl http://localhost:3000/healthz</code> doit répondre <code>ok</code>.</div></div>
+    <div class="step"><div class="step-body">Se connecter sur <code>http://&lt;hôte&gt;:3000/login.html</code> avec le premier compte admin.</div></div>
+  </div>
+
+  <div class="tip-box">
+    <div class="box-title">Mise à jour de code sans reconstruction</div>
+    Le <code>docker-compose.yml</code> monte <code>index.html</code>, <code>depot.html</code>, <code>admin.html</code>, <code>validation.html</code>, <code>login.html</code>, <code>register.html</code> ainsi que <code>js/</code>, <code>css/</code>, <code>lang/</code>, <code>lib/</code>, <code>assets/</code> et <code>server/</code> en volumes depuis l'hôte. Une simple mise à jour de fichier sur l'hôte suffit donc pour la plupart des changements — seul un changement dans <code>server/package.json</code> (nouvelle dépendance) exige un <code>docker-compose up -d --build</code>.
+  </div>
+
+  <h3>Reverse proxy</h3>
+  <p>Si l'instance est exposée derrière un reverse proxy qui termine le HTTPS (par exemple le proxy inversé d'un NAS Synology/DSM), le serveur active <code>app.set('trust proxy', 1)</code> : c'est nécessaire pour que le cookie de session <code>secure</code> se pose correctement malgré une connexion interne en HTTP entre le proxy et le conteneur. Aucune configuration supplémentaire n'est requise côté Cairn for Stack, mais le proxy doit transmettre l'en-tête <code>X-Forwarded-Proto</code>.</p>
+</div>
+
+<!-- ═══ 4. VARIABLES D'ENVIRONNEMENT ═══ -->
+<div class="section" id="variables-env">
+  <h2 class="sec-title">4. Variables d'environnement</h2>
+
+  <table>
+    <tr><th>Variable</th><th>Rôle</th><th>Défaut / obligatoire</th></tr>
+    <tr><td><code>PORT</code></td><td>Port d'écoute du serveur Express</td><td>3000</td></tr>
+    <tr><td><code>SECRETS_KEY</code></td><td>Clé source du chiffrement AES-256-GCM des secrets institutionnels (jeton GitHub, clé API IA)</td><td><strong>Obligatoire</strong> dès qu'un secret est configuré — sinon erreur explicite au moment d'enregistrer</td></tr>
+    <tr><td><code>SESSION_SECRET</code></td><td>Clé de signature des cookies de session</td><td>Généré aléatoirement à chaque démarrage si absent</td></tr>
+    <tr><td><code>ACCOUNT_USERNAME</code></td><td>Identifiant du premier compte, créé automatiquement au démarrage du conteneur</td><td>Optionnel</td></tr>
+    <tr><td><code>ACCOUNT_PASSWORD</code></td><td>Mot de passe du premier compte</td><td>Optionnel</td></tr>
+    <tr><td><code>ACCOUNT_ROLE</code></td><td>Rôle du premier compte (<code>admin</code>, <code>validateur</code>, ou vide)</td><td>Optionnel</td></tr>
+  </table>
+
+  <div class="warn-box">
+    <div class="box-title">SESSION_SECRET non fixé = déconnexion de tous les comptes à chaque redémarrage</div>
+    Si <code>SESSION_SECRET</code> n'est pas défini, le serveur en génère un nouveau à chaque démarrage (<code>crypto.randomBytes</code>) : tous les cookies de session existants deviennent invalides et chaque utilisateur doit se reconnecter. Pour une instance en production, fixez une valeur stable dans <code>.env</code>.
+  </div>
+
+  <div class="err-box">
+    <div class="box-title">SECRETS_KEY : à ne jamais perdre ni changer sans précaution</div>
+    Les secrets institutionnels (jeton GitHub, clé API IA) sont chiffrés au repos avec une clé dérivée de <code>SECRETS_KEY</code>. Si cette variable change ou disparaît, les secrets déjà enregistrés deviennent <strong>indéchiffrables</strong> — il faut alors les ressaisir depuis le panneau d'administration après avoir fixé la nouvelle valeur.
+  </div>
+
+  <p>Exemple de fichier <code>.env</code> minimal pour une première mise en route :</p>
+  <pre><span class="cm"># .env — jamais commité</span>
+SECRETS_KEY=<span class="vl">une-chaine-longue-et-aleatoire</span>
+SESSION_SECRET=<span class="vl">une-autre-chaine-longue-et-aleatoire</span>
+ACCOUNT_USERNAME=<span class="vl">admin</span>
+ACCOUNT_PASSWORD=<span class="vl">mot-de-passe-initial</span>
+ACCOUNT_ROLE=<span class="vl">admin</span></pre>
+</div>
+
+<!-- ═══ 5. RÔLES ═══ -->
+<div class="section" id="roles">
+  <h2 class="sec-title">5. Rôles disponibles</h2>
+
+  <table>
+    <tr><th>Rôle</th><th>Accès</th></tr>
+    <tr><td><span class="role-badge role-enseignant">Enseignant</span> (aucun rôle)</td><td>Générateur de questions, dépôt pour validation (<code>depot.html</code>), génération IA, clé IA personnelle. Pas d'accès à <code>/admin.html</code> ni <code>/validation.html</code>.</td></tr>
+    <tr><td><span class="role-badge role-validateur">validateur</span></td><td>Tout ce que fait un enseignant, plus <code>/validation.html</code> : lister, relire, valider ou rejeter les dépôts en attente dans la zone de mutualisation GitHub.</td></tr>
+    <tr><td><span class="role-badge role-admin">admin</span></td><td>Accès complet, y compris <code>/admin.html</code>. Un admin est un <strong>sur-ensemble</strong> du rôle validateur : il contrôle déjà le jeton GitHub institutionnel utilisé par la promotion, lui refuser l'accès à la file de validation n'apporterait aucune barrière réelle.</td></tr>
+  </table>
+
+  <p>Un compte n'a qu'un seul rôle à la fois (pas de cumul admin+validateur explicite — inutile puisque admin inclut déjà validateur).</p>
+</div>
+
+<!-- ═══ 6. CRÉER DES COMPTES ═══ -->
+<div class="section" id="creer-comptes">
+  <h2 class="sec-title">6. Créer des comptes</h2>
+
+  <p>Cairn for Stack est pensé pour une <strong>liste fermée</strong> de comptes créés par l'administrateur, en complément (optionnel, voir section suivante) d'une auto-inscription publique limitée par quota.</p>
+
+  <h3>Depuis la ligne de commande (SSH dans le conteneur)</h3>
+  <pre>sudo docker exec -it cairn-for-stack node server/create-account.js &lt;identifiant&gt; &lt;mot_de_passe&gt; [admin|validateur]</pre>
+  <p>Le rôle est optionnel : un compte créé sans troisième argument est un enseignant classique.</p>
+
+  <p>Pour changer le rôle d'un compte existant :</p>
+  <pre>sudo docker exec -it cairn-for-stack node server/set-role.js &lt;identifiant&gt; &lt;admin|validateur|none&gt;</pre>
+
+  <h3>Depuis le panneau d'administration</h3>
+  <p>La section <strong>Comptes &amp; rôles</strong> de <code>/admin.html</code> liste tous les comptes existants et permet de changer leur rôle par un simple menu déroulant — aucun accès SSH n'est requis pour cette opération. Voir <a href="#comptes-roles">§8.6</a>.</p>
+
+  <div class="tip-box">
+    <div class="box-title">Premier compte admin au démarrage</div>
+    Renseigner <code>ACCOUNT_USERNAME</code>, <code>ACCOUNT_PASSWORD</code> et <code>ACCOUNT_ROLE=admin</code> dans <code>.env</code> avant le tout premier <code>docker-compose up</code> crée ce compte automatiquement à chaque démarrage du conteneur (l'opération échoue silencieusement — <code>|| true</code> — si le compte existe déjà, ce qui la rend sûre à laisser en place durablement).
+  </div>
+</div>
+
+<!-- ═══ 7. AUTO-INSCRIPTION ═══ -->
+<div class="section" id="auto-inscription">
+  <h2 class="sec-title">7. Auto-inscription &amp; quota</h2>
+
+  <p>En plus des comptes créés par l'administrateur, la page <code>/register.html</code> (endpoint <code>POST /api/register</code>) permet à quiconque connaît l'URL de l'instance de créer son propre compte (identifiant ≥ 3 caractères, mot de passe ≥ 8 caractères). Ces comptes sont marqués <code>selfRegistered</code> et soumis à un <strong>quota hebdomadaire de 5 générations</strong> (fenêtre glissante de 7 jours), contrairement aux comptes créés via <code>create-account.js</code> qui n'ont aucune limite.</p>
+
+  <div class="warn-box">
+    <div class="box-title">Pas de bascule pour désactiver l'auto-inscription</div>
+    Il n'existe actuellement aucun réglage pour fermer <code>/register.html</code> : l'endpoint est toujours actif. Pour une instance strictement fermée, restreignez l'accès réseau à l'URL (pare-feu, VPN, IP autorisées) plutôt que de compter sur une option applicative.
+  </div>
+
+  <p>Le quota peut être identifié dans <code>server/usage.js</code> (<code>WEEKLY_LIMIT = 5</code>) — une modification de cette constante nécessite une reconstruction ou une simple modification de fichier montée en volume, selon la méthode de déploiement.</p>
+</div>
+
+<!-- ═══ 8. PANNEAU D'ADMINISTRATION ═══ -->
+<div class="section" id="admin-panel">
+  <h2 class="sec-title">8. Panneau d'administration</h2>
+  <p>Accessible sur <code>/admin.html</code> pour tout compte de rôle <code>admin</code>. Chaque section se sauvegarde indépendamment via son propre bouton <strong>Enregistrer</strong>.</p>
+
+  <h3 id="mutualisation">8.1 Zone de mutualisation</h3>
+  <p>Dépôt GitHub utilisé par la fonction <strong>« Déposer pour validation »</strong> côté enseignant et par la banque de questions validées :</p>
+  <ul>
+    <li><strong>Propriétaire / dépôt</strong> — <code>owner/repo</code> GitHub cible</li>
+    <li><strong>Branche de dépôt</strong> et <strong>dossier « à valider »</strong> — où atterrissent les dépôts enseignants en attente de relecture</li>
+    <li><strong>Branche banque</strong> et <strong>dossier banque</strong> — où sont déplacées les questions validées</li>
+  </ul>
+  <p>Ces six champs doivent tous être renseignés pour que le workflow de validation (<a href="#workflow-validation">§9</a>) fonctionne : une valeur manquante bloque la promotion avec un message explicite.</p>
+
+  <h3 id="maxima-defaut">8.2 Serveur Maxima / JSmol (défaut d'instance)</h3>
+  <p>URL du serveur Stack-API utilisée comme valeur par défaut quand un enseignant n'a pas configuré son propre serveur dans ses réglages personnels. Utile pour fournir un serveur prêt à l'emploi à toute une équipe sans configuration individuelle.</p>
+
+  <h3 id="ia-institutionnelle">8.3 Fournisseur IA institutionnel</h3>
+  <p>Configuration compatible API OpenAI (chat completions), utilisée par la génération IA <strong>en priorité</strong>, avant la clé personnelle de chaque enseignant :</p>
+  <ul>
+    <li><strong>URL de base de l'API</strong> et <strong>modèle</strong> — champs non secrets, visibles par tout compte connecté</li>
+    <li><strong>Clé API IA</strong> — secret, jamais renvoyé au navigateur une fois enregistré (badge « Configuré »/« Non configuré » uniquement)</li>
+  </ul>
+  <div class="info-box">
+    <div class="box-title">Cascade de résolution</div>
+    <code>server/ai-generate.js</code> résout les identifiants dans cet ordre : clé institutionnelle → clé personnelle du compte → repli vers le flux manuel (copier/coller dans le prompt) si aucune des deux n'est configurée. La génération IA v1 est scopée aux types <strong>RA</strong> (radio/algébrique) et <strong>DD</strong> (drag &amp; drop).
+  </div>
+
+  <h3 id="jeton-github">8.4 Jeton GitHub institutionnel</h3>
+  <p>Jeton personnel GitHub (PAT) utilisé <strong>exclusivement côté serveur</strong>, jamais envoyé au navigateur, pour la promotion des dépôts validés vers la banque (<code>server/gh-validation.js</code>). Doit disposer des droits d'écriture (contents) sur le dépôt de mutualisation configuré en <a href="#mutualisation">§8.1</a>.</p>
+  <p>Distinct du jeton personnel que chaque enseignant peut saisir côté client pour son propre dépôt initial (« Déposer pour validation ») — celui-ci reste inchangé et n'a jamais transité par le panneau admin.</p>
+
+  <h3 id="mentions-legales">8.5 Mentions légales &amp; RGPD (instance hébergée)</h3>
+  <p>Ce bloc alimente la modale « Mentions légales » affichée dans l'application cliente. Trois champs sont <strong>obligatoires</strong> (marqués *) et rejetés côté serveur s'ils sont vides, même en cas d'appel direct à l'API contournant le formulaire :</p>
+  <ul>
+    <li><strong>Responsable de traitement</strong> (nom/organisme) et <strong>e-mail de contact</strong></li>
+    <li><strong>Autorité de contrôle compétente</strong> (nom ; URL optionnelle)</li>
+  </ul>
+  <div class="warn-box">
+    <div class="box-title">Le responsable de traitement, c'est vous — jamais l'auteur du logiciel</div>
+    Cairn for Stack est un logiciel libre (AGPL-3.0) ; l'auteur du code n'est en aucun cas responsable de traitement des données d'une instance qu'il n'héberge pas. La personne ou l'organisme qui déploie et administre <strong>cette instance</strong> est seul responsable de traitement au sens RGPD, et doit renseigner ses propres coordonnées et son autorité de contrôle nationale (CNIL en France — Cairn for Stack étant destiné à des déploiements internationaux, ce champ est libre).
+  </div>
+  <p>Une instance peut proposer plusieurs langues d'interface, mais le responsable et l'autorité de contrôle ne changent pas selon la langue affichée : ils doivent être nommés explicitement plutôt que de laisser un texte générique.</p>
+
+  <h3 id="comptes-roles">8.6 Comptes &amp; rôles</h3>
+  <p>Tableau de tous les comptes existants (identifiant, rôle, statut auto-inscrit). Le rôle se change directement via un menu déroulant par ligne — pas de bouton « Enregistrer » global, chaque changement est appliqué immédiatement.</p>
+</div>
+
+<!-- ═══ 9. WORKFLOW VALIDATION ═══ -->
+<div class="section" id="workflow-validation">
+  <h2 class="sec-title">9. Workflow dépôt → validation</h2>
+
+  <div class="steps">
+    <div class="step"><div class="step-body">Un enseignant dépose une question depuis <code>depot.html</code> : elle atterrit dans le dossier « à valider » (sous-dossier par pays) de la branche de dépôt configurée en <a href="#mutualisation">§8.1</a>, via son propre jeton GitHub personnel côté client.</div></div>
+    <div class="step"><div class="step-body">Un compte <span class="role-badge role-validateur">validateur</span> (ou <span class="role-badge role-admin">admin</span>) ouvre <code>/validation.html</code>, qui liste les dépôts en attente.</div></div>
+    <div class="step"><div class="step-body">La relecture se fait sur un <strong>Moodle réel, hors Cairn for Stack</strong> — il n'existe pas de prévisualisation in-app pour cette étape.</div></div>
+    <div class="step"><div class="step-body"><strong>Valider</strong> déplace le fichier vers la banque (PUT sous le dossier banque puis DELETE de l'original, via le jeton institutionnel côté serveur) ; <strong>Rejeter</strong> le supprime définitivement de la zone de relecture.</div></div>
+  </div>
+
+  <div class="warn-box">
+    <div class="box-title">Un échec partiel de promotion laisse un message explicite</div>
+    Si le PUT vers la banque réussit mais que le DELETE de l'original échoue, le dépôt reste visible en double (dans la banque et dans la zone de relecture) plutôt que de tenter un rollback automatique — un message d'erreur invite à réessayer ou nettoyer manuellement. C'est un choix délibéré : un doublon inoffensif est préférable à une logique de rollback complexe et potentiellement fragile.
+  </div>
+
+  <p>Par sécurité, un validateur ne peut agir que sur des chemins situés sous le dossier de relecture configuré, même via un appel direct à l'API (<code>assertUnderReviewFolder</code> dans <code>server/gh-validation.js</code>).</p>
+</div>
+
+<!-- ═══ 10. SÉCURITÉ ═══ -->
+<div class="section" id="securite">
+  <h2 class="sec-title">10. Sécurité &amp; secrets</h2>
+
+  <h3>Mots de passe et sessions</h3>
+  <ul>
+    <li>Mots de passe hachés avec <strong>bcrypt</strong> (coût 12) — jamais stockés en clair.</li>
+    <li>Sessions par cookie <code>httpOnly</code>, <code>secure</code>, <code>sameSite=lax</code>, durée de vie 30 jours.</li>
+    <li>Le middleware d'authentification protège <strong>toute</strong> la surface applicative (pages et API) hors <code>login.html</code>, <code>register.html</code> et leurs assets.</li>
+  </ul>
+
+  <h3>Secrets institutionnels</h3>
+  <p>Le jeton GitHub et la clé API IA institutionnels sont chiffrés au repos en <strong>AES-256-GCM</strong>, avec une clé dérivée par SHA-256 de la variable d'environnement <code>SECRETS_KEY</code> (voir <a href="#variables-env">§4</a>). Contrat <strong>write-only</strong> respecté à tous les niveaux : l'API et le panneau d'administration ne renvoient jamais un secret en clair, seulement un booléen « configuré / non configuré ».</p>
+
+  <h3>Clé IA personnelle (par enseignant)</h3>
+  <p>Chiffrée avec le même mécanisme, stockée dans l'enregistrement du compte concerné (<code>accounts.json</code>). Un enseignant peut l'effacer lui-même depuis l'application ; un administrateur n'a pas de moyen de la lire, seulement de constater si elle est configurée via l'API interne.</p>
+</div>
+
+<!-- ═══ 11. RGPD ═══ -->
+<div class="section" id="rgpd">
+  <h2 class="sec-title">11. RGPD — droit à l'effacement</h2>
+  <p>Chaque utilisateur dispose d'un <strong>auto-service de suppression de compte</strong>, accessible depuis la modale « Mentions légales » de l'application (<code>POST /api/account/delete</code>). Le mot de passe est redemandé avant l'action, car le cookie de session seul ne suffit pas à confirmer une action destructive.</p>
+  <p>La suppression purge à la fois <code>accounts.json</code> (le compte) et <code>usage.json</code> (l'historique de quota associé), puis détruit la session en cours. Aucune intervention administrateur n'est nécessaire pour honorer une demande de suppression déposée par ce canal.</p>
+</div>
+
+<!-- ═══ 12. MAINTENANCE ═══ -->
+<div class="section" id="maintenance">
+  <h2 class="sec-title">12. Maintenance &amp; mises à jour</h2>
+
+  <table>
+    <tr><th>Type de changement</th><th>Action requise</th></tr>
+    <tr><td>Fichier HTML/CSS/JS front (<code>index.html</code>, <code>js/</code>, <code>css/</code>…)</td><td>Aucune — monté en volume, pris en compte immédiatement (rechargement navigateur)</td></tr>
+    <tr><td>Fichier serveur (<code>server/*.js</code>)</td><td><code>docker-compose restart cairn-for-stack</code></td></tr>
+    <tr><td>Nouvelle dépendance npm (<code>server/package.json</code>)</td><td><code>docker-compose up -d --build</code></td></tr>
+    <tr><td>Changement de <code>Dockerfile</code></td><td><code>docker-compose up -d --build</code></td></tr>
+  </table>
+
+  <p>Surveillance basique : <code>GET /healthz</code> répond <code>ok</code> sans authentification — utilisable par une sonde de supervision externe.</p>
+</div>
+
+<!-- ═══ 13. SAUVEGARDE ═══ -->
+<div class="section" id="sauvegarde">
+  <h2 class="sec-title">13. Sauvegarde des données</h2>
+  <p>Le seul répertoire à sauvegarder pour préserver comptes, quotas et configuration d'instance est <code>server/data/</code> sur l'hôte (monté en volume via <code>./server:/app/server</code>). Une simple copie de ce dossier suffit à restaurer une instance à l'identique sur une nouvelle machine, à condition de conserver la même valeur de <code>SECRETS_KEY</code> — sans quoi les secrets institutionnels chiffrés deviennent illisibles (voir <a href="#variables-env">§4</a>).</p>
+  <div class="tip-box">
+    <div class="box-title">Ce qui n'a pas besoin d'être sauvegardé séparément</div>
+    Le code applicatif (frontend et serveur) vit dans le dépôt Git — seule la donnée d'exploitation propre à l'instance (<code>server/data/</code>) et le fichier <code>.env</code> sont spécifiques au déploiement et absents du contrôle de version.
+  </div>
+</div>
+
+<!-- ═══ 14. DÉPANNAGE ═══ -->
+<div class="section" id="depannage">
+  <h2 class="sec-title">14. Dépannage / FAQ</h2>
+
+  <details>
+    <summary>« SECRETS_KEY manquant » lors de l'enregistrement d'un secret</summary>
+    <div class="faq-body">
+      <p>La variable d'environnement <code>SECRETS_KEY</code> n'est pas définie sur le conteneur. Ajoutez-la dans <code>.env</code> puis redémarrez (<code>docker-compose up -d</code>). Sans elle, aucun secret institutionnel (jeton GitHub, clé API IA) ne peut être chiffré ni déchiffré.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Tous les utilisateurs sont déconnectés après un redémarrage</summary>
+    <div class="faq-body">
+      <p><code>SESSION_SECRET</code> n'est probablement pas fixé : le serveur en régénère un aléatoirement à chaque démarrage, ce qui invalide tous les cookies existants. Fixez une valeur stable dans <code>.env</code> (voir <a href="#variables-env">§4</a>).</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>« stack-api injoignable » lors de la génération ou de l'aperçu</summary>
+    <div class="faq-body">
+      <p>Le conteneur Cairn for Stack n'arrive pas à joindre <code>maxima-stack-api-1</code> sur le réseau Docker <code>maxima_default</code>. Vérifiez que ce conteneur tourne, que le réseau existe (<code>docker network ls</code>) et que le service Cairn for Stack du <code>docker-compose.yml</code> le rejoint bien dans sa section <code>networks</code>.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Un enseignant auto-inscrit ne peut plus générer de questions</summary>
+    <div class="faq-body">
+      <p>Il a probablement atteint le quota hebdomadaire de 5 générations (fenêtre glissante de 7 jours), réservé aux comptes créés via <code>/register.html</code>. Les comptes créés par un administrateur (<code>create-account.js</code>) n'ont pas cette limite — envisagez d'en créer un si l'usage est légitime et récurrent.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>La promotion d'un dépôt vers la banque échoue avec « Zone de mutualisation incomplète »</summary>
+    <div class="faq-body">
+      <p>Un des six champs de la <a href="#mutualisation">zone de mutualisation</a> (propriétaire, dépôt, branches, dossiers) est vide dans le panneau d'administration. Tous sont requis pour que <code>server/gh-validation.js</code> puisse construire les appels à l'API GitHub.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>« Jeton GitHub institutionnel non configuré »</summary>
+    <div class="faq-body">
+      <p>Le jeton utilisé pour la <strong>promotion</strong> des dépôts validés (rôle validateur/admin) est distinct du jeton personnel qu'un enseignant saisit pour son propre dépôt initial. Il se configure exclusivement dans <code>/admin.html</code> → <a href="#jeton-github">Jeton GitHub institutionnel</a>, avec des droits d'écriture sur le dépôt de mutualisation.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Comment retirer les droits admin à un compte ?</summary>
+    <div class="faq-body">
+      <p>Depuis <code>/admin.html</code> → Comptes &amp; rôles, sélectionner « Enseignant » dans le menu déroulant de la ligne concernée, ou en SSH : <code>node server/set-role.js &lt;identifiant&gt; none</code>. Veillez à toujours conserver au moins un compte admin actif.</p>
+    </div>
+  </details>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="doc-footer">
+  <p>Cairn for Stack V1 — Guide administrateur — Version 1.1 — 2026</p>
+  <p style="margin-top:5px;">Contact : <a href="mailto:b_joly@orange.fr">b_joly@orange.fr</a></p>
+</div>
+
+</main><!-- /content -->
+</div><!-- /layout -->
+
+<script>
+/* Sidebar active link au scroll */
+(function(){
+  var links = document.querySelectorAll('.sidebar nav a');
+  var sections = [];
+  links.forEach(function(a){
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if(el) sections.push({el:el, a:a});
+  });
+  function onScroll(){
+    var y = window.scrollY + 100;
+    var active = sections[0];
+    sections.forEach(function(s){ if(s.el.offsetTop <= y) active = s; });
+    links.forEach(function(a){ a.classList.remove('active'); });
+    if(active) active.a.classList.add('active');
+    var btn = document.getElementById('back-top');
+    if(btn) btn.classList.toggle('show', window.scrollY > 300);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+
+</body>
+</html>

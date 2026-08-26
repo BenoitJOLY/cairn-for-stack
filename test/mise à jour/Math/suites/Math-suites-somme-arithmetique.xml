@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396290  -->
+  <question type="stack">
+    <name>
+      <text>Suites : Somme des n premiers termes (Arithmétique)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Suites numériques — Somme arithmétique</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Soit \((U_n)\) une suite arithmétique telle que :</p>
+<div style="display: flex; gap: 30px; justify-content: center; margin: 15px 0; flex-wrap: wrap;">
+<div>\(U_0 = {@U0@}\)</div>
+<div>\(r = {@r@}\)</div>
+</div>
+<p>On souhaite calculer la somme des \(n\) premiers termes : \(S_n = U_0 + U_1 + \dots + U_{n-1}\).</p>
+<p><strong>1.</strong> Exprimer \(S_n\) en fonction de \(n\).</p>
+<div style="margin: 10px 0;">\(S_n = \) [[input:ans_sn]] [[validation:ans_sn]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Pour calculer la somme des \(n\) premiers termes d'une suite arithmétique (de \(U_0\) à \(U_{n-1}\)), on utilise la formule :<br /><br />
+\[
+S_n = n \times \frac{U_0 + U_{n-1}}{2}
+\]<br />
+<strong>1. Calcul du dernier terme de la somme \(U_{n-1}\) :</strong><br />
+\[
+U_{n-1} = U_0 + (n-1) \times r = {@U0@} + (n-1) \times {@r@}
+\]<br />
+<strong>2. Application de la formule :</strong><br />
+\[
+S_n = n \times \frac{{@U0@} + \big({@U0@} + (n-1) \times {@r@}\big)}{2}
+\]
+En simplifiant l'intérieur de la parenthèse :
+\[
+S_n = n \times \frac{2 \times {@U0@} + (n-1) \times {@r@}}{2} = {@ans_correct_simp@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Redéfinitions locales (Pôle 2.9) */
+ri(a,b) := a + rand(b - a + 1)$ rnz(a,b) := block([v], v: ri(a,b), if v=0 then rnz(a,b) else v)$ rnz01(a,b) := block([v], v: ri(a,b), if v=0 or v=1 then rnz01(a,b) else v)$ 
+/* Génération des paramètres */
+U0: rnz(-4, 4)$ r: rnz01(-4, 4)$ 
+/* Expressions des termes */
+Un_1: U0 + (n-1)*r$ Un: U0 + n*r$ 
+/* Réponse attendue */
+ans_correct: n * (U0 + Un_1) / 2$ ans_correct_simp: ev(ans_correct, simp)$ 
+/* Erreurs classiques (Cascade Diagnostique Pôle 4.9) */
+err_un: n * (U0 + Un) / 2$ err_no_half: n * (U0 + Un_1)$ err_no_n: (U0 + Un_1) / 2$ err_geo: U0 * (1 - r^n) / (1 - r)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>U0={@U0@}, r={@r@}, Sn=n*({@U0@}+{@U0@}+(n-1)*{@r@})/2 = {@ans_correct_simp@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:suites-arithmetique-sn</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_sn</name>
+      <type>algebraic</type>
+      <tans>ans_correct</tans>
+      <boxsize>25</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>ans_correct</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> L'expression de la somme est correcte.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A utilisé U_n au lieu de U_{n-1}</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>err_un</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-UN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvais dernier terme !</strong> La somme \(S_n = U_0 + U_1 + \dots + U_{n-1}\) comporte \(n\) termes. Le dernier terme à faire apparaître dans la formule \(\frac{\text{premier} + \text{dernier}}{2}\) est \(U_{n-1}\), et non \(U_n\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-UN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : A oublié de diviser par 2</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>err_no_half</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-NOHALF</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli de la division par 2 !</strong> Vous avez calculé \(n \times (U_0 + U_{n-1})\). La formule de la somme fait la <strong>moyenne</strong> entre le premier et le dernier terme, il faut donc diviser par 2.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-NOHALF</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : A oublié le facteur n</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>err_no_n</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-NON</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli du nombre de termes !</strong> Vous avez calculé la moyenne des premier et dernier termes \(\frac{U_0 + U_{n-1}}{2}\), mais il faut multiplier ce résultat par le <strong>nombre de termes \(n\)</strong>.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-NON</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur : A utilisé la formule d'une suite géométrique</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_sn</sans>
+        <tans>err_geo</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-GEO</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion de suite !</strong> Vous avez utilisé la formule de la somme d'une suite <strong>géométrique</strong> \(U_0 \times \frac{1-q^n}{1-q}\). Ici la suite est <strong>arithmétique</strong>, il faut utiliser \(n \times \frac{U_0 + U_{n-1}}{2}\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la méthode :<br />1. Identifiez le dernier terme : \(U_{n-1} = U_0 + (n-1)r\)<br />2. Appliquez la formule : \(S_n = n \times \frac{U_0 + U_{n-1}}{2}\)<br /><em>(Pensez aux parenthèses si vous développez).</em></div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

@@ -1,0 +1,1247 @@
+﻿/* ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+   HÃSTACK â GÃ©nÃ©rateur InterfÃ©rences-Diffraction (JSXGraph)
+   InspirÃ© des questions STACK Â« dÃ©termination de la longueur d'onde Â».
+   4 montages interactifs :
+     â¢ fente_ecran          fente unique â taches colorÃ©es sur Ã©cran noir
+     â¢ fente_capteur        fente unique â courbe d'intensitÃ© I(y) (sincÂ²)
+     â¢ doublefente_capteur  2 fentes     â courbe enveloppe Ã interfÃ©rences
+     â¢ young                trous de Young â figure 2D (Airy Ã cosÂ²)
+   L'Ã©lÃ¨ve dÃ©place un rÃ©ticule pour mesurer une distance (l ou i),
+   puis dÃ©termine la longueur d'onde Î» du laser (rÃ©ponse avec unitÃ©).
+   ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
+
+/* ââ Lasers disponibles : [Î» (nm), couleur] ââ */
+var DIFF_LASERS = [[405, "blue"], [520, "green"], [532, "green"], [635, "red"], [650, "red"]];
+
+/* ââ Listes de tirage alÃ©atoire ââ */
+var DIFF_A_LIST = [20, 30, 40, 50, 60, 80, 100]; /* largeur de fente a (Âµm)   */
+var DIFF_D_LIST = [1, 1.5, 2, 2.5, 3];           /* distance Ã©cran D (m)      */
+var DIFF_B_LIST = [100, 150, 200, 250, 300];     /* Ã©cartement des trous b (Âµm)*/
+
+/* ââ Texte d'information par montage ââ */
+var DIFF_INFO = {
+  fente_ecran:
+    "ð¥ <strong>Fente simple â Ã©cran.</strong> La figure montre la tache centrale "
+    + "et les taches secondaires colorÃ©es sur fond noir. L'Ã©lÃ¨ve mesure la "
+    + "<strong>largeur l de la tache centrale</strong> avec le rÃ©ticule, puis en "
+    + "dÃ©duit Î» = aÂ·l â (2Â·D).",
+  fente_capteur:
+    "ð <strong>Fente simple â capteur.</strong> La courbe d'intensitÃ© I(y) = sincÂ²(Î²) "
+    + "est relevÃ©e par un capteur. L'Ã©lÃ¨ve repÃ¨re la position du "
+    + "<strong>premier minimum</strong> et en dÃ©duit Î».",
+  doublefente_capteur:
+    "ð <strong>Deux fentes â capteur.</strong> La courbe combine l'enveloppe de "
+    + "diffraction et les franges d'interfÃ©rences. L'Ã©lÃ¨ve mesure "
+    + "<strong>l'interfrange i</strong> et en dÃ©duit Î» = bÂ·i â D.",
+  young:
+    "ðµ <strong>Trous de Young.</strong> Figure 2D (tache d'Airy Ã franges). "
+    + "L'Ã©lÃ¨ve mesure <strong>l'interfrange i</strong> et en dÃ©duit Î» = bÂ·i â D."
+};
+
+/* ââ Templates JSXGraph (placeholders STACK {#a1#} {#D1#} {#b1#} {#lambda#}) ââ */
+var DIFF_TPL = {
+  fente_ecran: `[[jsxgraph width="700px" height="250px"]]
+(function() {
+    // --- VARIABLES STACK ET CONSTANTES ---
+    var a = {#a1#} * 1e-6;           // Largeur de la fente en m (Âµm -> m)
+    var D = {#D1#};                   // Distance fente-Ã©cran en m
+    var lambda = {#lambda#} * 1e-9;   // Longueur d'onde en m (nm -> m)
+
+    // DÃ©termination automatique de la couleur selon la longueur d'onde
+    var lambdaNm = {#lambda#};
+    var couleur;
+    if (lambdaNm < 450) {
+        couleur = "#0000FF"; // Bleu/violet
+    } else if (lambdaNm < 570) {
+        couleur = "#00FF00"; // Vert
+    } else {
+        couleur = "#FF0000"; // Rouge
+    }
+
+    // PARAMÃTRES DE VISUALISATION
+    const MAX_ORDER = 4;              // Nombre de maxima de chaque cÃ´tÃ©
+
+    // Position du premier minimum
+    var y_min = (lambda * D) / a;
+
+    // Plage d'affichage
+    var xMax = y_min * (MAX_ORDER + 1.5);
+
+    // --- FONCTION D'INTENSITÃ ---
+    // I(y) = I_0 * [sin(Î²)/Î²]Â² avec Î² = ÏÂ·aÂ·y/(Î»Â·D)
+    function intensite(y) {
+        var beta = (Math.PI * a * y) / (lambda * D);
+
+        if (Math.abs(beta) < 1e-10) {
+            return 1.0; // Maximum central
+        }
+
+        var sinc = Math.sin(beta) / beta;
+        return sinc * sinc;
+    }
+
+    // Position approximative des maxima secondaires
+    // Maximum d'ordre k Ã  y â (k + 0.5) * y_min pour k â¥ 1
+    function positionMaximum(k) {
+        if (k === 0) return 0;
+        return (k + 0.5) * y_min;
+    }
+
+    // Fonction pour convertir RGB en HEX
+    function rgbToHex(r, g, b) {
+        var toHex = function(c) {
+            var hex = Math.round(c).toString(16);
+            return hex.length === 1 ? "0" + hex : hex;
+        };
+        return "#" + toHex(r) + toHex(g) + toHex(b);
+    }
+
+    // Couleur uniforme pour toutes les taches (depuis variable STACK)
+    function getColor(intensity) {
+        return couleur; // Utilise la couleur dÃ©finie dans les variables de question
+    }
+
+    // --- INITIALISATION DU BOARD ---
+    var board = JXG.JSXGraph.initBoard(divid, {
+        boundingbox: [-xMax, 1.2, xMax, -0.2],
+        axis: false,
+        showNavigation: false,
+        showCopyright: false,
+        keepaspectratio: false,
+        renderer: 'svg',
+        grid: false,
+    });
+
+    // Forcer le fond noir du board
+    document.getElementById(divid).style.backgroundColor = '#000000';
+
+    // Fond noir (polygone de sÃ©curitÃ©)
+    board.create('polygon', [
+        [-xMax, -0.2], [xMax, -0.2], [xMax, 1.2], [-xMax, 1.2]
+    ], {
+        fillColor: '#000000',
+        strokeOpacity: 0,
+        layer: 0,
+        fixed: true,
+        highlight: false,
+        withLines: false,
+        vertices: {visible: false}
+    });
+
+    // --- DESSIN DES TACHES DE DIFFRACTION ---
+    const barHeight = 0.35;
+    const yCenter = 0.5;
+
+    // Largeur de chaque tache : 95% de la distance entre minima
+    var largeurTache = 0.95 * y_min;
+
+    // MAXIMUM CENTRAL (ordre k=0)
+    var I_central = intensite(0);
+    var color_central = getColor(I_central);
+    board.create('polygon', [
+        [-largeurTache, yCenter - barHeight/2],
+        [largeurTache, yCenter - barHeight/2],
+        [largeurTache, yCenter + barHeight/2],
+        [-largeurTache, yCenter + barHeight/2]
+    ], {
+        fillColor: color_central,
+        fillOpacity: 1,
+        strokeColor: '#000000',
+        strokeWidth: 0,
+        layer: 1,
+        fixed: true,
+        highlight: false,
+        withLines: false,
+        vertices: {visible: false}
+    });
+
+    // MAXIMA SECONDAIRES (k=1, 2, 3, ...)
+    for (var k = 1; k <= MAX_ORDER; k++) {
+        var pos_max = positionMaximum(k);
+        var I_k = intensite(pos_max);
+
+        // Ne dessiner que si l'intensitÃ© est significative
+        if (I_k > 0.001) {
+            var color_k = getColor(I_k);
+            var demi_largeur = largeurTache / 2;
+
+            // Tache positive (+k)
+            board.create('polygon', [
+                [pos_max - demi_largeur, yCenter - barHeight/2],
+                [pos_max + demi_largeur, yCenter - barHeight/2],
+                [pos_max + demi_largeur, yCenter + barHeight/2],
+                [pos_max - demi_largeur, yCenter + barHeight/2]
+            ], {
+                fillColor: color_k,
+                fillOpacity: 1,
+                strokeColor: '#000000',
+                strokeWidth: 0,
+                layer: 1,
+                fixed: true,
+                highlight: false,
+                withLines: false,
+                vertices: {visible: false}
+            });
+
+            // Tache nÃ©gative (-k)
+            board.create('polygon', [
+                [-pos_max - demi_largeur, yCenter - barHeight/2],
+                [-pos_max + demi_largeur, yCenter - barHeight/2],
+                [-pos_max + demi_largeur, yCenter + barHeight/2],
+                [-pos_max - demi_largeur, yCenter + barHeight/2]
+            ], {
+                fillColor: color_k,
+                fillOpacity: 1,
+                strokeColor: '#000000',
+                strokeWidth: 0,
+                layer: 1,
+                fixed: true,
+                highlight: false,
+                withLines: false,
+                vertices: {visible: false}
+            });
+        }
+    }
+
+    // --- RÃTICULE MOBILE POUR MESURER ---
+    // Ligne horizontale invisible pour contraindre le mouvement
+    var axeHorizontal = board.create('line', [[0, yCenter], [1, yCenter]], {
+        visible: false,
+        fixed: true
+    });
+
+    // Point mobile sur l'axe horizontal
+    var pointMobile = board.create('glider', [0, yCenter, axeHorizontal], {
+        name: '',
+        size: 4,
+        fillColor: '#FFFFFF',
+        strokeColor: '#FFFFFF',
+        layer: 4,
+        showInfobox: false,
+        fixed: false
+    });
+
+    // Ligne verticale du rÃ©ticule
+    var ligneReticule = board.create('line', [
+        [function() { return pointMobile.X(); }, -0.2],
+        [function() { return pointMobile.X(); }, 1.2]
+    ], {
+        strokeColor: '#FFFFFF',
+        strokeWidth: 1.5,
+        dash: 1,
+        straightFirst: false,
+        straightLast: false,
+        fixed: true,
+        highlight: false,
+        layer: 3
+    });
+
+    // Affichage de la valeur x en millimÃ¨tres
+    var textePosition = board.create('text', [
+        function() { return pointMobile.X(); },
+        1.05,
+        function() {
+            var valeur = pointMobile.X();
+            return 'x = ' + (valeur * 1000).toFixed(2) + ' mm';
+        }
+    ], {
+        fontSize: 14,
+        color: '#FFFFFF',
+        anchorX: 'middle',
+        anchorY: 'bottom',
+        fixed: true,
+        layer: 4,
+        highlight: false,
+        cssStyle: 'background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px;'
+    });
+
+})();
+[[/jsxgraph]]`,
+  fente_capteur: `[[jsxgraph width="700px" height="400px"]]
+(function() {
+    // RÃ©cupÃ©ration des variables Stack
+    var a = {#a1#} * 1e-6;        // Conversion Âµm -> m
+    var D = {#D1#};                // DÃ©jÃ  en m
+    var lambda = {#lambda#} * 1e-9; // Conversion nm -> m
+    var lambdaNm = {#lambda#};   // Garder lambda en nm pour dÃ©terminer la couleur
+
+    // DÃ©terminer la couleur en fonction de lambda
+    var couleur = "red"; // Par dÃ©faut
+    if (lambdaNm < 500) {
+        couleur = "blue";
+    } else if (lambdaNm < 600) {
+        couleur = "green";
+    } else {
+        couleur = "red";
+    }
+
+    console.log("lambda (nm):", lambdaNm, "couleur:", couleur);
+
+    // Initialisation du board
+    var board = JXG.JSXGraph.initBoard(divid, {
+        boundingbox: [-0.05, 1.2, 0.05, -0.2],
+        axis: true,
+        showNavigation: true,
+        showCopyright: false
+    });
+
+    // Configuration des axes
+    board.defaultAxes.x.setAttribute({
+        name: 'Position y (m)',
+        withLabel: true,
+        label: {offset: [0, -20]}
+    });
+
+    board.defaultAxes.y.setAttribute({
+        name: 'IntensitÃ© normalisÃ©e',
+        withLabel: true,
+        label: {offset: [-20, 0]}
+    });
+
+    // Fonction de calcul de l'intensitÃ©
+    function calculateIntensity(y) {
+        var theta = Math.atan(y / D);
+        var beta = (Math.PI * a * Math.sin(theta)) / lambda;
+
+        if (Math.abs(beta) < 0.0001) {
+            return 1.0; // Limite quand beta -> 0
+        }
+
+        var sinc = Math.sin(beta) / beta;
+        return sinc * sinc;
+    }
+
+    // Calcul de la position du premier minimum
+    var firstMinimum = (lambda * D) / a;
+
+    // Ajustement de la fenÃªtre de visualisation
+    var xMax = Math.min(firstMinimum * 3.5, 0.1);
+    board.setBoundingBox([-xMax, 1.2, xMax, -0.2]);
+
+    // TracÃ© de la courbe de diffraction avec la couleur du laser
+    var curve = board.create('functiongraph', [
+        calculateIntensity,
+        -xMax, xMax
+    ], {
+        strokeColor: couleur,
+        strokeWidth: 3,
+        name: 'I(y)'
+    });
+
+
+    // CrÃ©ation d'un rÃ©ticule mobile (point libre)
+    var cursor = board.create('point', [0, 0.5], {
+        name: '',
+        size: 4,
+        fillColor: '#00AA00',
+        strokeColor: '#00AA00',
+        withLabel: false
+    });
+
+    // Affichage de la position Y (en haut Ã  droite)
+    var positionText = board.create('text', [
+        function() { return xMax * 0.5; },
+        1.1,
+        function() {
+            var posX = cursor.coords.usrCoords[1];
+            return 'Position: y = ' + (posX * 1000).toFixed(2) + ' mm';
+        }
+    ], {
+        fontSize: 13,
+        strokeColor: '#006600',
+        highlight: false
+    });
+
+    // Affichage de l'intensitÃ© (en haut Ã  droite)
+    var intensityText = board.create('text', [
+        function() { return xMax * 0.5; },
+        1.0,
+        function() {
+            var posX = cursor.coords.usrCoords[1];
+            return 'IntensitÃ©: I = ' + (calculateIntensity(posX) * 100).toFixed(1) + ' %';
+        }
+    ], {
+        fontSize: 13,
+        strokeColor: '#CC0000',
+        highlight: false
+    });
+
+    // Lignes verticale et horizontale du rÃ©ticule
+    var verticalLine = board.create('line', [
+        [function() { return cursor.X(); }, -0.2],
+        [function() { return cursor.X(); }, 1.2]
+    ], {
+        strokeColor: '#00AA00',
+        strokeWidth: 1,
+        dash: 2,
+        straightFirst: false,
+        straightLast: false,
+        fixed: true,
+        highlight: false
+    });
+
+    var horizontalLine = board.create('line', [
+        [-xMax, function() { return cursor.Y(); }],
+        [xMax, function() { return cursor.Y(); }]
+    ], {
+        strokeColor: '#00AA00',
+        strokeWidth: 1,
+        dash: 2,
+        straightFirst: false,
+        straightLast: false,
+        fixed: true,
+        highlight: false
+    });
+
+    // Point d'intersection avec la courbe
+    var intersect = board.create('point', [
+        function() { return cursor.X(); },
+        function() { return calculateIntensity(cursor.X()); }
+    ], {
+        name: '',
+        size: 3,
+        fillColor: '#FF6600',
+        strokeColor: '#FF6600',
+        fixed: true,
+        highlight: false
+    });
+})();
+[[/jsxgraph]]`,
+  doublefente_capteur: `[[jsxgraph width="700px" height="400px"]]
+(function() {
+    // RÃ©cupÃ©ration des variables Stack
+    var a = {#a1#} * 1e-6;  // Largeur d'une fente en m
+    var b = {#b1#} * 1e-6;  // Distance entre les fentes en m
+    var D = {#D1#};  // Distance Ã  l'Ã©cran en m
+    var lambda = {#lambda#} * 1e-9;  // Longueur d'onde en m
+    var lambdaNm = {#lambda#};  // Lambda en nm pour la couleur
+
+    // DÃ©terminer la couleur en fonction de lambda
+    var couleur = "red";
+    if (lambdaNm < 500) {
+        couleur = "blue";
+    } else if (lambdaNm < 600) {
+        couleur = "green";
+    } else {
+        couleur = "red";
+    }
+
+    // Initialisation du board
+    var board = JXG.JSXGraph.initBoard(divid, {
+        boundingbox: [-0.05, 1.2, 0.05, -0.2],
+        axis: true,
+        showNavigation: true,
+        showCopyright: false
+    });
+
+    // Configuration des axes
+    board.defaultAxes.x.setAttribute({
+        name: 'Position y (m)',
+        withLabel: true,
+        label: {offset: [0, -20]}
+    });
+
+    board.defaultAxes.y.setAttribute({
+        name: 'IntensitÃ© normalisÃ©e',
+        withLabel: true,
+        label: {offset: [-20, 0]}
+    });
+
+    // Fonction de calcul de l'intensitÃ© pour les interfÃ©rences
+    // I(y) = I0 * [sin(Î±)/Î±]Â² * cosÂ²(Î²)
+    // oÃ¹ Î± = Ï*a*sin(Î¸)/Î» (enveloppe de diffraction)
+    // et Î² = Ï*b*sin(Î¸)/Î» (terme d'interfÃ©rences)
+    function calculateIntensity(y) {
+        var theta = Math.atan(y / D);
+        var alpha = (Math.PI * a * Math.sin(theta)) / lambda;
+        var beta = (Math.PI * b * Math.sin(theta)) / lambda;
+
+        // Terme de diffraction (enveloppe)
+        var diffraction = 1.0;
+        if (Math.abs(alpha) > 0.0001) {
+            var sinc = Math.sin(alpha) / alpha;
+            diffraction = sinc * sinc;
+        }
+
+        // Terme d'interfÃ©rences
+        var interference = Math.cos(beta) * Math.cos(beta);
+
+        return diffraction * interference;
+    }
+
+    // Calcul de l'interfrange (distance entre deux franges brillantes)
+    var interfrange = (lambda * D) / b;
+
+    // Calcul de la largeur de l'enveloppe de diffraction
+    var largeurEnveloppe = (lambda * D) / a;
+
+    // Ajustement de la fenÃªtre de visualisation
+    var xMax = Math.min(largeurEnveloppe * 2, 0.1);
+    board.setBoundingBox([-xMax, 1.2, xMax, -0.2]);
+
+    // TracÃ© de la courbe d'interfÃ©rences avec la couleur du laser
+    var curve = board.create('functiongraph', [
+        calculateIntensity,
+        -xMax, xMax
+    ], {
+        strokeColor: couleur,
+        strokeWidth: 3,
+        name: 'I(y)'
+    });
+
+
+
+    // Marquage du maximum central
+    board.create('point', [0, 1], {
+        name: 'Maximum central',
+        size: 3,
+        fillColor: couleur,
+        strokeColor: couleur,
+        fixed: true,
+        label: {offset: [5, 5], fontSize: 11}
+    });
+
+
+    // CrÃ©ation d'un rÃ©ticule mobile (point libre)
+    var cursor = board.create('point', [0, 0.5], {
+        name: '',
+        size: 4,
+        fillColor: '#00AA00',
+        strokeColor: '#00AA00',
+        withLabel: false
+    });
+
+    // Lignes verticale et horizontale du rÃ©ticule
+    var verticalLine = board.create('line', [
+        [function() { return cursor.X(); }, -0.2],
+        [function() { return cursor.X(); }, 1.2]
+    ], {
+        strokeColor: '#00AA00',
+        strokeWidth: 1,
+        dash: 2,
+        straightFirst: false,
+        straightLast: false,
+        fixed: true,
+        highlight: false
+    });
+
+    var horizontalLine = board.create('line', [
+        [-xMax, function() { return cursor.Y(); }],
+        [xMax, function() { return cursor.Y(); }]
+    ], {
+        strokeColor: '#00AA00',
+        strokeWidth: 1,
+        dash: 2,
+        straightFirst: false,
+        straightLast: false,
+        fixed: true,
+        highlight: false
+    });
+
+    // Point d'intersection avec la courbe
+    var intersect = board.create('point', [
+        function() { return cursor.X(); },
+        function() { return calculateIntensity(cursor.X()); }
+    ], {
+        name: '',
+        size: 3,
+        fillColor: '#FF6600',
+        strokeColor: '#FF6600',
+        fixed: true,
+        highlight: false
+    });
+
+    // Affichage de la position Y (en haut Ã  droite)
+    var positionText = board.create('text', [
+        function() { return xMax * 0.4; },
+        1.1,
+        function() {
+            var posX = cursor.coords.usrCoords[1];
+            return 'Position: y = ' + (posX * 1000).toFixed(2) + ' mm';
+        }
+    ], {
+        fontSize: 13,
+        strokeColor: '#006600',
+        highlight: false
+    });
+
+    // Affichage de l'intensitÃ© (en haut Ã  droite)
+    var intensityText = board.create('text', [
+        function() { return xMax * 0.4; },
+        1.0,
+        function() {
+            var posX = cursor.coords.usrCoords[1];
+            return 'IntensitÃ©: I = ' + (calculateIntensity(posX) * 100).toFixed(1) + ' %';
+        }
+    ], {
+        fontSize: 13,
+        strokeColor: '#CC0000',
+        highlight: false
+    });
+
+})();
+[[/jsxgraph]]`,
+  young: `[[jsxgraph width="700px" height="700px"]]
+(function() {
+    // RÃ©cupÃ©ration des variables Stack
+    var a1 = {#a1#};      // DiamÃ¨tre des trous en Âµm
+    var D1 = {#D1#};      // Distance Ã  l'Ã©cran en m
+    var b1 = {#b1#};      // Ãcartement entre les trous en Âµm
+    var lambda = {#lambda#}; // Longueur d'onde en nm
+
+    // Calcul de l'interfrange
+    var i1 = lambda * 1e-9 * D1 / (b1 * 1e-6) * 1e3; // en mm
+
+    // DÃ©terminer la couleur
+    var nomCouleur;
+  if (lambda < 495) nomCouleur = "bleu";
+    else if (lambda < 570) nomCouleur = "vert";
+    else nomCouleur = "rouge";
+
+    // Fonction couleur RGB
+    function getLaserColor(l) {
+        if (l < 490) return [0, 0, 255];
+        if (l < 580) return [0, 255, 0];
+        return [255, 0, 0];
+    }
+
+    var laserRGB = getLaserColor(lambda);
+
+    // Fonction Bessel J1
+    function besselJ1(x) {
+        if (Math.abs(x) < 1e-8) return x / 2;
+        var ax = Math.abs(x), y, ans1, ans2;
+        if (ax < 8.0) {
+            y = x * x;
+            ans1 = x * (72362614232.0 + y * (-7895059235.0 + y * (242396853.1
+                + y * (-2972611.439 + y * (15704.48260 + y * (-30.16036606))))));
+            ans2 = 144725228442.0 + y * (2300535178.0 + y * (18583304.74
+                + y * (99447.43394 + y * (376.9991397 + y * 1.0))));
+            return ans1 / ans2;
+        }
+        var z = 8.0 / ax;
+        y = z * z;
+        var xx = ax - 2.356194491;
+        ans1 = 1.0 + y * (0.183105e-2 + y * (-0.3516396496e-4
+            + y * (0.2457520174e-5 + y * (-0.240337019e-6))));
+        ans2 = 0.04687499995 + y * (-0.2002690873e-3
+            + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6)));
+        var ans = Math.sqrt(0.636619772 / ax) * (Math.cos(xx) * ans1 - z * Math.sin(xx) * ans2);
+        return x < 0.0 ? -ans : ans;
+    }
+
+    // Fonction d'intensitÃ©
+    function intensite(x, y) {
+        var r = Math.sqrt(x * x + y * y);
+        var theta = r * 1e-3 / D1;
+        var beta = Math.PI * a1 * 1e-6 * theta / (lambda * 1e-9);
+        var diffraction = 1;
+        if (Math.abs(beta) > 1e-6) {
+            var bt = 2 * besselJ1(beta) / beta;
+            diffraction = bt * bt;
+        }
+        var alpha = Math.PI * b1 * 1e-6 * x * 1e-3 / (lambda * 1e-9 * D1);
+        var interference = Math.cos(alpha) * Math.cos(alpha);
+        return diffraction * interference;
+    }
+
+    // Initialiser le board JSXGraph
+    var board = JXG.JSXGraph.initBoard(divid, {
+        boundingbox: [-25, 25, 25, -25],
+        axis: false,
+        showNavigation: true,
+        showCopyright: false,
+        keepaspectratio: true
+    });
+
+    // CrÃ©er un canvas dynamique
+    var canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 800;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.zIndex = '1';
+    canvas.style.pointerEvents = 'none';
+
+    var ctx = canvas.getContext('2d');
+
+    // Fonction pour redessiner le canvas
+    function redrawCanvas() {
+        var bb = board.getBoundingBox();
+        var xMin = bb[0];
+        var yMax = bb[1];
+        var xMax = bb[2];
+        var yMin = bb[3];
+
+        var imageData = ctx.createImageData(canvas.width, canvas.height);
+
+        for (var py = 0; py < canvas.height; py++) {
+            for (var px = 0; px < canvas.width; px++) {
+                var x = xMin + (px / canvas.width) * (xMax - xMin);
+                var y = yMax - (py / canvas.height) * (yMax - yMin);
+
+                var I = intensite(x, y);
+                I = Math.pow(I, 0.6);
+                var intensity = Math.min(1, I * 1.5);
+
+                var idx = (py * canvas.width + px) * 4;
+                imageData.data[idx] = Math.floor(laserRGB[0] * intensity);
+                imageData.data[idx + 1] = Math.floor(laserRGB[1] * intensity);
+                imageData.data[idx + 2] = Math.floor(laserRGB[2] * intensity);
+                imageData.data[idx + 3] = 255;
+            }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+    }
+
+    // Dessiner l'image initiale
+    redrawCanvas();
+
+    // InsÃ©rer le canvas
+    var boardDiv = document.getElementById(divid);
+    boardDiv.style.position = 'relative';
+    boardDiv.style.background = '#000';
+
+    var svg = boardDiv.querySelector('svg');
+    if (svg) {
+        svg.style.position = 'relative';
+        svg.style.zIndex = '10';
+        boardDiv.insertBefore(canvas, svg);
+    } else {
+        boardDiv.appendChild(canvas);
+    }
+
+    // Redessiner lors du zoom/pan
+    board.on('boundingbox', function() {
+        redrawCanvas();
+    });
+
+    // Point central
+    var centre = board.create('point', [0, 0], {
+        visible: false,
+        fixed: true
+    });
+
+    // RÃ©ticule mobile
+    var reticule = board.create('point', [5, 5], {
+        name: '',
+        size: 5,
+        fillColor: '#00ff00',
+        strokeColor: '#ffffff',
+        strokeWidth: 2
+    });
+
+    // Ligne pointillÃ©e blanche du centre au rÃ©ticule
+    board.create('segment', [centre, reticule], {
+        strokeColor: '#ffffff',
+        strokeWidth: 2,
+        dash: 2
+    });
+
+
+
+
+    board.create('text', [
+        function() { return 0; },
+        function() { return board.getBoundingBox()[3] + 2; },
+        '0'
+    ], {fontSize: 11, color: '#aaaaaa', fixed: false, anchorX: 'middle'});
+
+    board.create('text', [
+        function() { return board.getBoundingBox()[2] - 2; },
+        function() { return board.getBoundingBox()[3] + 2; },
+        function() { return board.getBoundingBox()[2].toFixed(1) + ' mm'; }
+    ], {fontSize: 11, color: '#aaaaaa', fixed: false});
+
+    board.create('text', [
+        function() { return board.getBoundingBox()[0] + 2; },
+        function() { return board.getBoundingBox()[3] + 2; },
+        function() { return board.getBoundingBox()[0].toFixed(1) + ' mm'; }
+    ], {fontSize: 11, color: '#aaaaaa', fixed: false});
+
+    // Marquer le centre
+    board.create('point', [0, 0], {
+        name: '',
+        size: 4,
+        fillColor: '#ffffff',
+        strokeColor: '#ffffff',
+        fixed: true
+    });
+
+    board.create('text', [0, -1.5, 'Centre'], {
+        fontSize: 11,
+        color: '#ffffff',
+        anchorX: 'middle',
+        anchorY: 'top',
+        fixed: true
+    });
+
+    // Affichage distance
+    board.create('text', [
+        function() { return reticule.X() + 2.5; },
+        function() { return reticule.Y() + 2.5; },
+        function() {
+            var d = Math.sqrt(reticule.X() * reticule.X() + reticule.Y() * reticule.Y());
+            return 'd = ' + d.toFixed(2) + ' mm';
+        }
+    ], {
+        fontSize: 14,
+        color: '#FFFFFF',
+        anchorX: 'left',
+        anchorY: 'bottom',
+        fixed: true
+    });
+
+
+
+})();
+[[/jsxgraph]]`
+};
+
+/* ââ Helpers ââ */
+function _diffNeedsB(m) { return m === "doublefente_capteur" || m === "young"; }
+function _diffIsCurve(m) { return m === "fente_capteur" || m === "doublefente_capteur"; }
+
+function _diffColorHex(lambdaNm) {
+  if (lambdaNm < 500) return "#1d4ed8";
+  if (lambdaNm < 600) return "#16a34a";
+  return "#dc2626";
+}
+
+/* ââ UI : changement de montage ââ */
+function diffMontageChange() {
+  var m = (document.getElementById("diff-montage") || {}).value || "fente_ecran";
+  var info = document.getElementById("diff-info-box");
+  if (info) info.innerHTML = DIFF_INFO[m] || "";
+  var bRow = document.getElementById("diff-row-b");
+  if (bRow) bRow.style.display = _diffNeedsB(m) ? "" : "none";
+  diffUpdatePreview();
+}
+
+/* ââ UI : bascule alÃ©atoire / fixe ââ */
+function diffRandomToggle() {
+  var rnd = document.getElementById("diff-random");
+  var fixed = document.getElementById("diff-fixed-params");
+  if (rnd && fixed) fixed.style.display = rnd.checked ? "none" : "";
+  diffUpdatePreview();
+}
+
+/* ââ Valeurs courantes (selon mode alÃ©atoire / fixe) ââ */
+function _diffCurrentParams() {
+  var m = (document.getElementById("diff-montage") || {}).value || "fente_ecran";
+  var rnd = document.getElementById("diff-random");
+  var isRnd = rnd ? rnd.checked : true;
+  var a = parseFloat((document.getElementById("diff-a") || {}).value) || 50;
+  var D = parseFloat((document.getElementById("diff-d") || {}).value) || 2;
+  var b = parseFloat((document.getElementById("diff-b") || {}).value) || 200;
+  var lambda = parseFloat((document.getElementById("diff-lambda") || {}).value) || 532;
+  /* pour l'aperÃ§u on prend des valeurs reprÃ©sentatives (mÃ©dianes des listes) si alÃ©atoire */
+  if (isRnd) {
+    a = DIFF_A_LIST[Math.floor(DIFF_A_LIST.length / 2)];
+    D = DIFF_D_LIST[Math.floor(DIFF_D_LIST.length / 2)];
+    b = DIFF_B_LIST[Math.floor(DIFF_B_LIST.length / 2)];
+    lambda = 532;
+  }
+  return { m: m, isRnd: isRnd, a: a, D: D, b: b, lambda: lambda };
+}
+
+/* ââ AperÃ§u SVG (rendu pur JS, sans JSXGraph) ââ */
+function _diffBuildSvgPreview(m, a_um, D_m, b_um, lambdaNm) {
+  var col = _diffColorHex(lambdaNm);
+  var W = 420, H = 150;
+  var a = a_um * 1e-6, D = D_m, b = b_um * 1e-6, lam = lambdaNm * 1e-9;
+  var ymin = lam * D / a;            /* 1er minimum (demi-largeur tache centrale) */
+  var inter = b > 0 ? lam * D / b : 0;/* interfrange */
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="max-width:' + W + 'px;background:#0b0b0f;border-radius:6px;">';
+
+  if (_diffIsCurve(m)) {
+    /* courbe d'intensitÃ© */
+    var xMax = (m === "doublefente_capteur") ? Math.min(2 * lam * D / a, 0.1) : Math.min(3.5 * ymin, 0.1);
+    var pts = [], N = 240;
+    for (var i = 0; i <= N; i++) {
+      var y = -xMax + (2 * xMax) * i / N;
+      var theta = Math.atan(y / D);
+      var alpha = Math.PI * a * Math.sin(theta) / lam;
+      var I = 1;
+      if (Math.abs(alpha) > 1e-6) { var s = Math.sin(alpha) / alpha; I = s * s; }
+      if (m === "doublefente_capteur") {
+        var beta = Math.PI * b * Math.sin(theta) / lam;
+        I = I * Math.cos(beta) * Math.cos(beta);
+      }
+      var px = 20 + (W - 30) * (y + xMax) / (2 * xMax);
+      var py = H - 18 - (H - 30) * I;
+      pts.push(px.toFixed(1) + "," + py.toFixed(1));
+    }
+    svg += '<line x1="20" y1="' + (H - 18) + '" x2="' + (W - 8) + '" y2="' + (H - 18) + '" stroke="#444" stroke-width="1"/>';
+    svg += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="' + col + '" stroke-width="2.2"/>';
+    svg += '<text x="' + (W / 2) + '" y="14" fill="#bbb" font-size="11" text-anchor="middle" font-family="sans-serif">IntensitÃ© I(y)</text>';
+  } else if (m === "young") {
+    /* mosaÃ¯que 2D Airy Ã cosÂ² (Ã©chantillonnÃ©e grossiÃ¨rement) */
+    var cols = 56, rows = 18, cw = (W - 16) / cols, rh = (H - 16) / rows;
+    var span = 6 * inter * 1000; /* mm fenÃªtre */
+    function bessRatio(x) { if (Math.abs(x) < 1e-6) return 1; var j = (Math.sin(x) - x * Math.cos(x)) / (x * x); return 2 * j / x; }
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var xx = (c / (cols - 1) - 0.5) * span; /* mm */
+        var yy = (r / (rows - 1) - 0.5) * span * (rh / cw);
+        var rr = Math.sqrt(xx * xx + yy * yy);
+        var th = rr * 1e-3 / D;
+        var beta2 = Math.PI * a * th / lam;
+        var diff = bessRatio(beta2); diff = diff * diff;
+        var alpha2 = Math.PI * b * xx * 1e-3 / (lam * D);
+        var I2 = diff * Math.cos(alpha2) * Math.cos(alpha2);
+        if (I2 > 0.02) {
+          svg += '<rect x="' + (8 + c * cw).toFixed(1) + '" y="' + (8 + r * rh).toFixed(1) + '" width="' + (cw + 0.6).toFixed(1) + '" height="' + (rh + 0.6).toFixed(1) + '" fill="' + col + '" fill-opacity="' + Math.min(1, I2).toFixed(2) + '"/>';
+        }
+      }
+    }
+  } else {
+    /* fente_ecran : taches colorÃ©es */
+    var yc = H / 2, bh = 44;
+    var l0 = 0.92 * ymin;                          /* demi-largeur visuelle */
+    var scale = (W / 2 - 16) / (5 * ymin);
+    function tache(cx, w, op) {
+      svg += '<rect x="' + (cx - w).toFixed(1) + '" y="' + (yc - bh / 2) + '" width="' + (2 * w).toFixed(1) + '" height="' + bh + '" fill="' + col + '" fill-opacity="' + op + '"/>';
+    }
+    tache(W / 2, l0 * scale, 1);                   /* centrale */
+    for (var k = 1; k <= 4; k++) {
+      var pos = (k + 0.5) * ymin * scale;
+      var beta = Math.PI * (k + 0.5);
+      var ik = Math.pow(Math.sin(beta) / beta, 2);
+      if (ik > 0.004) { tache(W / 2 + pos, 0.45 * ymin * scale, Math.max(0.25, ik)); tache(W / 2 - pos, 0.45 * ymin * scale, Math.max(0.25, ik)); }
+    }
+    svg += '<line x1="' + (W / 2) + '" y1="6" x2="' + (W / 2) + '" y2="' + (H - 6) + '" stroke="#fff" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>';
+  }
+  svg += "</svg>";
+
+  var meas = "";
+  if (m === "fente_ecran") meas = "Largeur tache centrale l â <strong>" + (2 * ymin * 1000).toFixed(2) + " mm</strong>";
+  else if (m === "fente_capteur") meas = "Position 1er minimum â <strong>" + (ymin * 1000).toFixed(2) + " mm</strong>";
+  else meas = "Interfrange i â <strong>" + (inter * 1000).toFixed(3) + " mm</strong>";
+  return { svg: svg, meas: meas, ymin: ymin, inter: inter };
+}
+
+/* ââ AperÃ§u dans le panneau ââ */
+function diffUpdatePreview() {
+  var box = document.getElementById("diff-preview");
+  if (!box) return;
+  var p = _diffCurrentParams();
+  var demo = _diffBuildSvgPreview(p.m, p.a, p.D, p.b, p.lambda);
+  var lasersTxt = DIFF_LASERS.map(function (l) { return l[0]; }).join(", ");
+  box.innerHTML =
+    '<div style="margin-bottom:6px;">' + demo.svg + "</div>"
+    + '<div style="font-size:.82rem;color:#334155;">'
+    + (p.isRnd
+      ? "ð² a, D" + (_diffNeedsB(p.m) ? ", b" : "") + ", λ tirÃ©s au hasard — aperÃ§u : "
+      : "ð valeurs fixes : ")
+    + "a=" + p.a + " µm, D=" + p.D + " m" + (_diffNeedsB(p.m) ? ", b=" + p.b + " µm" : "")
+    + ", λ=" + p.lambda + " nm"
+    + (p.isRnd ? "<br>λ tirÃ©e parmi : " + lasersTxt + " nm" : "")
+    + "<br>" + demo.meas + "</div>";
+}
+
+/* ── Générateur ── */
+function genDiffraction(X) {
+  var m = v("diff-montage") || "fente_ecran";
+  var bareme = parseFloat(v("diff-bareme")) || 1;
+  var text = richVal("diff-text");
+  var rnd = document.getElementById("diff-random");
+  var isRnd = rnd ? rnd.checked : true;
+  var aFix = parseFloat(v("diff-a")) || 50;
+  var DFix = parseFloat(v("diff-d")) || 2;
+  var bFix = parseFloat(v("diff-b")) || 200;
+  var lambdaFix = parseFloat(v("diff-lambda")) || 532;
+  var needsB = _diffNeedsB(m);
+  var isSingle = (m === "fente_ecran" || m === "fente_capteur");
+  var nPRT = isSingle ? 8 : 7;
+  var bpp = Math.round(bareme / nPRT * 100) / 100;
+
+  function _lColor(nm) { return nm < 500 ? "blue" : nm < 600 ? "green" : "red"; }
+
+  /* noms de variables STACK suffixés par X pour éviter les conflits multi-questions */
+  var A   = "diffa" + X;    /* largeur fente a (µm) */
+  var uA  = "diffua" + X;   /* incertitude sur a */
+  var D   = "diffD" + X;    /* distance écran D (m) */
+  var uD  = "diffuD" + X;   /* incertitude sur D */
+  var B   = "diffb" + X;    /* écartement fentes b (µm) */
+  var uB  = "diffub" + X;   /* incertitude sur b */
+  var L   = "difflam" + X;  /* longueur d'onde lambda (nm) */
+  var C   = "diffcoul" + X; /* couleur laser */
+  var UL  = "difful" + X;   /* incertitude mesure l ou i (m) */
+  var LW  = "difflw" + X;   /* largeur tache centrale l (mm, unité implicite) */
+  var IF_ = "diffif" + X;   /* interfrange i (mm, unité implicite) */
+  var t   = function(n) { return "difft" + n + "q" + X; }; /* clés de réponse ta1..ta8 */
+
+  /* ── Variables Maxima ── */
+  var vars = "/* Q" + X + " : Diffraction/Interferences - " + m + " (" + bareme + "pt) */\n";
+  vars += A  + ": " + (isRnd ? "rand([20,30,40,50,60,80,100])" : aFix)  + ";  /* largeur fente (µm) */\n";
+  vars += uA + ": float(round(" + A + "*rand(100)/100))/10;\n";
+  vars += D  + ": " + (isRnd ? "rand([1,1.5,2,2.5,3])" : DFix)          + ";  /* distance écran (m) */\n";
+  vars += uD + ": 1E-3*(rand(2)+1)/2;\n";
+  if (needsB) {
+    vars += B  + ": " + (isRnd ? "rand([200,250,300,350,400,450,500])" : bFix) + ";  /* écartement fentes (µm) */\n";
+    vars += uB + ": float(round(" + B + "*rand(100)/100))/10;\n";
+  }
+  if (isRnd) {
+    vars += "difflasers" + X + ": [[405,\"blue\"],[520,\"green\"],[532,\"green\"],[635,\"red\"],[650,\"red\"]];\n";
+    vars += "difflc" + X + ": rand(difflasers" + X + ");\n";
+    vars += L + ": first(difflc" + X + ");  /* lambda (nm) */\n";
+    vars += C + ": second(difflc" + X + ");\n";
+  } else {
+    vars += L + ": " + lambdaFix + ";  /* lambda fixe (nm) */\n";
+    vars += C + ": \"" + _lColor(lambdaFix) + "\";\n";
+  }
+  vars += "nm: 1e-9; mm: 1e-3; m: 1;\n";
+
+  if (isSingle) {
+    /* fente unique : mesure de l (largeur tache centrale) */
+    vars += UL + ": 0.06E-3;  /* incertitude réticule u(l) en m = 0,06 mm */\n";
+    vars += LW + ": float(" + D + "*" + L + "/" + A + ");  /* l théorique (mm) */\n";
+    vars += t(1) + ": [[1,false,\"C'est de la refraction\"],[2,false,\"C'est de la diffusion\"],"
+          + "[3,false,\"C'est le phenomene d'interferences\"],[4,true,\"C'est le phenomene de diffraction\"]];\n";
+    vars += t(2) + ": l/(2*D);\n";  /* tan(theta) = l/(2D) */
+    vars += t(3) + ": float(" + L + "/" + A + "*1E-3);\n";  /* theta = lambda(nm)/a(µm) * 1e-3 (rad) */
+    vars += t(4) + ": " + L + "*nm;\n";  /* lambda en mètres */
+    vars += "difft5i" + X + ": " + L + "*(("+uA+"/"+A+")^2+("+uD+"/"+D+")^2+("+UL+"/"+LW+")^2)^0.5;\n";
+    vars += "difftpk" + X + ": floor(log(abs(difft5i" + X + "))/log(10));\n";
+    vars += "difftkk" + X + ": 10^((2-1)-difftpk" + X + ");\n";
+    vars += t(5) + ": float((round(difft5i" + X + "*difftkk" + X + ")/difftkk" + X + "))*nm;\n";
+    vars += "diffira" + X + ": "+uA+"/"+A+"; diffirD" + X + ": "+uD+"/"+D+"; diffirl" + X + ": "+UL+"/"+LW+";\n";
+    vars += "diffmv" + X + ": max(diffira"+X+",diffirD"+X+",diffirl"+X+");\n";
+    vars += t(6) + ": [[1,is(diffira"+X+"=diffmv"+X+"),\"une fente de meilleure precision (a)\"],"
+          + "[2,is(diffirD"+X+"=diffmv"+X+"),\"une distance D plus precise\"],"
+          + "[3,is(diffirl"+X+"=diffmv"+X+"),\"une mesure l plus precise\"]];\n";
+    vars += "difffb6" + X + ": block([],if is("+t(6)+"[1][2]) then return(\"Incertitude relative sur a la plus elevee : ameliorer la fente.\")"
+          + " else if is("+t(6)+"[2][2]) then return(\"Incertitude relative sur D la plus elevee.\") else"
+          + " return(\"Incertitude relative sur l la plus grande : utiliser un reticule plus precis.\"));\n";
+    vars += t(7) + ": float((" + L + "+" + t(5) + "/nm))*nm;\n";  /* borne sup */
+    vars += t(8) + ": float((" + L + "-" + t(5) + "/nm))*nm;";    /* borne inf */
+  } else {
+    /* double fente / Young : mesure de i (interfrange) */
+    vars += UL + ": (rand(10)+3)/10*1E-3;  /* incertitude mesure i (m) */\n";
+    vars += IF_ + ": float(" + L + "*1E-9*" + D + "/(" + B + "*1E-6)*1E3);  /* interfrange (mm) */\n";
+    vars += t(1) + ": [[1,false,\"C'est de la refraction\"],[2,false,\"C'est de la diffusion\"],"
+          + "[3,true,\"C'est le phenomene d'interferences\"],[4,false,\"C'est le phenomene de diffraction\"]];\n";
+    vars += t(2) + ": " + IF_ + "*mm;\n";         /* interfrange en mètres */
+    vars += t(3) + ": " + L + "*1E-9*m;\n";        /* lambda en mètres */
+    vars += "difft4i" + X + ": " + L + "*(("+UL+"/"+IF_+")^2+("+uD+"/"+D+")^2+("+uB+"/"+B+")^2)^0.5;\n";
+    vars += "difftpk" + X + ": floor(log(abs(difft4i" + X + "))/log(10));\n";
+    vars += "difftkk" + X + ": 10^((2-1)-difftpk" + X + ");\n";
+    vars += t(4) + ": float((round(difft4i" + X + "*difftkk" + X + ")/difftkk" + X + "))*nm;\n";
+    vars += "diffirb" + X + ": "+uB+"/"+B+"; diffirD" + X + ": "+uD+"/"+D+"; diffiri" + X + ": "+UL+"/"+IF_+";\n";
+    vars += "diffmv" + X + ": max(diffirb"+X+",diffirD"+X+",diffiri"+X+");\n";
+    vars += t(5) + ": [[1,is(diffirb"+X+"=diffmv"+X+"),\"un ecartement de fentes de meilleure precision\"],"
+          + "[2,is(diffirD"+X+"=diffmv"+X+"),\"une distance D plus precise\"],"
+          + "[3,is(diffiri"+X+"=diffmv"+X+"),\"une mesure i plus precise\"]];\n";
+    vars += t(6) + ": float((" + L + "+" + t(4) + "/nm))*nm;\n";  /* borne sup */
+    vars += t(7) + ": float((" + L + "-" + t(4) + "/nm))*nm;";    /* borne inf */
+  }
+
+  /* ── JSXGraph (substitution des placeholders) ── */
+  var jsx = DIFF_TPL[m]
+    .replace(/\{#a1#\}/g,    "{#" + A + "#}")
+    .replace(/\{#D1#\}/g,    "{#" + D + "#}")
+    .replace(/\{#b1#\}/g,    "{#" + B + "#}")
+    .replace(/\{#lambda#\}/g, "{#" + L + "#}");
+
+  /* ── Bandeau titre ── */
+  var header = '<div style="background:#4338ca;border-left:5px solid #312e81;border-radius:0 8px 8px 0;'
+    + 'padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+    + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q' + X + ' — Interférences-Diffraction</strong>'
+    + '<span style="background:#312e81;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ ' + bareme + ' pt</span>'
+    + '<span style="background:#fff;color:#312e81;border:1px solid #312e81;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📐 ' + m + '</span>'
+    + "</div>";
+
+  /* ── Paramètres affichés dans l'énoncé ── */
+  var params = '<p>a = ({@' + A + '@} ± {@' + uA + '@}) µm ; D = ({@' + D + '@} ± {@' + uD + '@}) m</p>';
+  if (needsB) params += '<p>b = ({@' + B + '@} ± {@' + uB + '@}) µm</p>';
+
+  /* ── Consigne figure ── */
+  var consigneJsx, consigneMes;
+  if (isSingle) {
+    consigneJsx = m === "fente_ecran"
+      ? "<p>La figure de diffraction est représentée ci-dessus. Utilisez le réticule pour mesurer la largeur l de la tache centrale.</p>"
+      : "<p>La courbe I(y) est représentée ci-dessus. Repérez les deux premiers minima avec le réticule pour mesurer la largeur l de la tache centrale.</p>";
+    consigneMes = "<p>Incertitude sur la mesure au réticule : u(l) = 0,06 mm.</p>";
+  } else {
+    consigneJsx = m === "doublefente_capteur"
+      ? "<p>La figure d'interférences I(y) est représentée ci-dessus. Mesurez l'interfrange i entre deux franges brillantes consécutives.</p>"
+      : "<p>La figure d'interférences 2D est représentée ci-dessus. Mesurez l'interfrange i.</p>";
+    consigneMes = "<p>Incertitude sur la mesure de l'interfrange : u(i) = {@" + UL + "@} m.</p>";
+  }
+
+  /* ── Sous-questions ── */
+  function inp(n) { return "[[input:ans" + n + X + "]] [[validation:ans" + n + X + "]]"; }
+
+  var subQs;
+  if (isSingle) {
+    subQs = "<ol>"
+      + "<li>Quel est le nom du phénomène observé ? " + inp(1) + "</li>"
+      + "<li>Donner l'expression littérale de tan(θ) en fonction de l et D : tan(θ) = " + inp(2) + "</li>"
+      + "<li>Calculer l'angle θ en radian : θ = " + inp(3) + "</li>"
+      + "<li>Calculer λ — indiquer l'unité avec * (ex : 635*nm ou 6.35e-7*m) : λ = " + inp(4) + "</li>"
+      + "<li>Calculer u(λ) avec 2 chiffres significatifs, "
+      + "sachant que u(λ) = λ·√[(u(a)/a)²+(u(D)/D)²+(u(l)/l)²] : u(λ) = " + inp(5) + "</li>"
+      + "<li>Quel est le paramètre le plus important à améliorer ? " + inp(6) + "</li>"
+      + "<li>En déduire un encadrement de λ (avec unités) : "
+      + inp(7) + " &lt; λ &lt; " + inp(8) + "</li>"
+      + "</ol>";
+  } else {
+    subQs = "<ol>"
+      + "<li>Quel est le nom du phénomène observé ? " + inp(1) + "</li>"
+      + "<li>Calculer l'interfrange i (avec unité, ex : 2.5*mm) : i = " + inp(2) + "</li>"
+      + "<li>Sachant que i = λ·D/b, déterminer λ (avec unité, ex : 635*nm) : λ = " + inp(3) + "</li>"
+      + "<li>Calculer u(λ) avec 2 chiffres significatifs, "
+      + "sachant que u(λ) = λ·√[(u(i)/i)²+(u(D)/D)²+(u(b)/b)²] : u(λ) = " + inp(4) + "</li>"
+      + "<li>Quel est le paramètre le plus important à améliorer ? " + inp(5) + "</li>"
+      + "<li>En déduire un encadrement de λ (avec unités) : "
+      + inp(6) + " &lt; λ &lt; " + inp(7) + "</li>"
+      + "</ol>";
+  }
+
+  var textFrag = header
+    + "<!-- ENONCE-START --><div style=\"margin-bottom:14px;\">" + (text || "") + "</div><!-- ENONCE-END -->\n"
+    + params + jsx + "\n"
+    + consigneJsx + consigneMes + "\n"
+    + subQs;
+
+  /* ── Aperçu HéStack (SVG statique) ── */
+  var demo = _diffBuildSvgPreview(m,
+    isRnd ? DIFF_A_LIST[3] : aFix,
+    isRnd ? DIFF_D_LIST[2] : DFix,
+    isRnd ? DIFF_B_LIST[2] : bFix,
+    isRnd ? 532 : lambdaFix);
+  var previewFrag = header
+    + "<!-- ENONCE-START --><div style=\"margin-bottom:10px;\">" + (text || "") + "</div><!-- ENONCE-END -->\n"
+    + '<div style="text-align:center;">' + demo.svg + "</div>"
+    + '<p style="font-size:.85rem;color:#475569;">' + demo.meas + " — " + nPRT + " sous-questions</p>"
+    + params + subQs.replace(/\[\[input:[^\]]+\]\] \[\[validation:[^\]]+\]\]/g, "<em style=\"color:#6b7280;\">[réponse]</em>");
+
+  /* ── Helpers XML ── */
+  function mkInp(n, type, tans) {
+    return "    <input>\n"
+      + "      <name>ans" + n + X + "</name><type>" + type + "</type><tans>" + tans + "</tans>\n"
+      + "      <boxsize>10</boxsize><strictsyntax>1</strictsyntax><insertstars>0</insertstars>\n"
+      + "      <syntaxhint></syntaxhint><syntaxattribute>0</syntaxattribute>\n"
+      + "      <forbidwords></forbidwords><allowwords></allowwords>\n"
+      + "      <forbidfloat>0</forbidfloat><requirelowestterms>0</requirelowestterms>\n"
+      + "      <checkanswertype>0</checkanswertype><mustverify>0</mustverify><showvalidation>1</showvalidation>\n"
+      + "    </input>";
+  }
+
+  function mkPRT(n, val, test, sans, tans, opts, fbT, fbF, feedvars) {
+    return "    <prt>\n"
+      + "      <name>prt" + n + X + "</name>\n"
+      + "      <value>" + val + "</value>\n"
+      + "      <autosimplify>1</autosimplify><feedbackstyle>1</feedbackstyle>\n"
+      + "      <feedbackvariables><text>" + (feedvars || "") + "</text></feedbackvariables>\n"
+      + "      <node>\n"
+      + "        <name>0</name><description></description>\n"
+      + "        <answertest>" + test + "</answertest>\n"
+      + "        <sans>" + sans + "</sans><tans>" + tans + "</tans>\n"
+      + "        <testoptions>" + opts + "</testoptions><quiet>0</quiet>\n"
+      + "        <truescoremode>=</truescoremode><truescore>1</truescore><truepenalty></truepenalty>\n"
+      + "        <truenextnode>-1</truenextnode><trueanswernote>prt" + n + X + "-0-T</trueanswernote>\n"
+      + "        <truefeedback format=\"html\"><text><![CDATA[" + fbT + "]]></text></truefeedback>\n"
+      + "        <falsescoremode>=</falsescoremode><falsescore>0</falsescore><falsepenalty></falsepenalty>\n"
+      + "        <falsenextnode>-1</falsenextnode><falseanswernote>prt" + n + X + "-0-F</falseanswernote>\n"
+      + "        <falsefeedback format=\"html\"><text><![CDATA[" + fbF + "]]></text></falsefeedback>\n"
+      + "      </node>\n"
+      + "    </prt>";
+  }
+
+  var ok  = '<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;">';
+  var ko  = '<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fff0f0;border-radius:4px;">';
+  var end = "</div>";
+
+  var inputXML, prtXML, feedbackRef;
+
+  if (isSingle) {
+    var fv6 = "gl"+X+": mcq_correct("+t(6)+"); rp6"+X+": if("+t(6)+"[ans6"+X+"][1]=gl"+X+"[1]) then 1 else 0;";
+    inputXML = [
+      mkInp(1, "radio",     t(1)),
+      mkInp(2, "algebraic", t(2)),
+      mkInp(3, "numerical", t(3)),
+      mkInp(4, "units",     t(4)),
+      mkInp(5, "units",     t(5)),
+      mkInp(6, "radio",     t(6)),
+      mkInp(7, "units",     t(7)),
+      mkInp(8, "units",     t(8))
+    ].join("\n");
+    prtXML = [
+      mkPRT(1, bpp, "NumRelative", "ans1"+X, "4", "0.01",
+        ok+"✅ C'est bien le phénomène de diffraction."+end,
+        ko+"❌ Il s'agit de la <strong>diffraction</strong> : étalement de la lumière par une fente unique."+end),
+      mkPRT(2, bpp, "AlgEquiv", "ans2"+X, t(2), "",
+        ok+"✅ Expression correcte : tan(θ) = l/(2D)."+end,
+        ko+"❌ Incorrect. On a tan(θ) = l/(2D), avec l la largeur de la tache centrale."+end),
+      mkPRT(3, bpp, "NumRelative", "ans3"+X, t(3), "0.05",
+        ok+"✅ Angle θ correct."+end,
+        ko+"❌ Angle incorrect. θ = λ(nm)/a(µm) × 10⁻³ = {@"+t(3)+"@} rad."+end),
+      mkPRT(4, bpp, "UnitsRelative", "ans4"+X, t(4), "0.05",
+        ok+"✅ Longueur d'onde correcte : λ = {@"+t(4)+"@}."+end,
+        ko+"❌ Valeur ou unité incorrecte. λ = θ × a. Exemple : 635*nm."+end),
+      mkPRT(5, bpp, "UnitsRelative", "ans5"+X, t(5), "0.15",
+        ok+"✅ Incertitude u(λ) correcte."+end,
+        ko+"❌ Incorrect. u(λ) = λ·√[(u(a)/a)²+(u(D)/D)²+(u(l)/l)²] avec u(l) = 0,06 mm."+end),
+      mkPRT(6, bpp, "NumRelative", "rp6"+X, "1", "0.01",
+        ok+"✅ Correct ! {@difffb6"+X+"@}"+end,
+        ko+"❌ Comparez u(a)/a, u(D)/D et u(l)/l : le plus grand rapport indique le paramètre à améliorer."+end,
+        fv6),
+      mkPRT(7, bpp, "UnitsRelative", "ans7"+X, t(7), "0.05",
+        ok+"✅ Borne supérieure λ+u(λ) correcte."+end,
+        ko+"❌ Borne supérieure incorrecte. λ+u(λ) = {@"+t(7)+"@}."+end),
+      mkPRT(8, bpp, "UnitsRelative", "ans8"+X, t(8), "0.05",
+        ok+"✅ Encadrement complet correct : {@"+t(8)+"@} < λ < {@"+t(7)+"@}."+end,
+        ko+"❌ Borne inférieure incorrecte. λ−u(λ) = {@"+t(8)+"@}."+end)
+    ].join("\n\n");
+    feedbackRef = [1,2,3,4,5,6,7,8].map(function(n){ return "[[feedback:prt"+n+X+"]]"; }).join("");
+  } else {
+    var fv5 = "gl"+X+": mcq_correct("+t(5)+"); rp5"+X+": if("+t(5)+"[ans5"+X+"][1]=gl"+X+"[1]) then 1 else 0;";
+    inputXML = [
+      mkInp(1, "radio", t(1)),
+      mkInp(2, "units", t(2)),
+      mkInp(3, "units", t(3)),
+      mkInp(4, "units", t(4)),
+      mkInp(5, "radio", t(5)),
+      mkInp(6, "units", t(6)),
+      mkInp(7, "units", t(7))
+    ].join("\n");
+    prtXML = [
+      mkPRT(1, bpp, "NumRelative", "ans1"+X, "3", "0.01",
+        ok+"✅ C'est bien le phénomène d'interférences."+end,
+        ko+"❌ Il s'agit des <strong>interférences</strong> : superposition de deux ondes cohérentes (fentes de Young)."+end),
+      mkPRT(2, bpp, "UnitsRelative", "ans2"+X, t(2), "0.05",
+        ok+"✅ Interfrange correct : i = {@"+t(2)+"@}."+end,
+        ko+"❌ Interfrange incorrect. i = λ·D/b. N'oubliez pas l'unité (ex : 2.5*mm)."+end),
+      mkPRT(3, bpp, "UnitsRelative", "ans3"+X, t(3), "0.05",
+        ok+"✅ Longueur d'onde correcte : λ = {@"+t(3)+"@}."+end,
+        ko+"❌ Longueur d'onde incorrecte. λ = i·b/D. Unité attendue (ex : 635*nm)."+end),
+      mkPRT(4, bpp, "UnitsRelative", "ans4"+X, t(4), "0.15",
+        ok+"✅ Incertitude u(λ) correcte."+end,
+        ko+"❌ Incorrect. u(λ) = λ·√[(u(i)/i)²+(u(D)/D)²+(u(b)/b)²]."+end),
+      mkPRT(5, bpp, "NumRelative", "rp5"+X, "1", "0.01",
+        ok+"✅ Correct ! Comparez u(i)/i, u(D)/D et u(b)/b."+end,
+        ko+"❌ Comparez les incertitudes relatives pour trouver le paramètre dominant."+end,
+        fv5),
+      mkPRT(6, bpp, "UnitsRelative", "ans6"+X, t(6), "0.05",
+        ok+"✅ Borne supérieure λ+u(λ) correcte."+end,
+        ko+"❌ Borne supérieure incorrecte. λ+u(λ) = {@"+t(6)+"@}."+end),
+      mkPRT(7, bpp, "UnitsRelative", "ans7"+X, t(7), "0.05",
+        ok+"✅ Encadrement complet correct : {@"+t(7)+"@} < λ < {@"+t(6)+"@}."+end,
+        ko+"❌ Borne inférieure incorrecte. λ−u(λ) = {@"+t(7)+"@}."+end)
+    ].join("\n\n");
+    feedbackRef = [1,2,3,4,5,6,7].map(function(n){ return "[[feedback:prt"+n+X+"]]"; }).join("");
+  }
+
+  return {
+    bareme: bareme, vars: vars, qnote: "{@" + L + "@} nm",
+    textFrag: textFrag, previewFrag: previewFrag,
+    inputXML: inputXML, prtXML: prtXML,
+    feedbackRef: feedbackRef
+  };
+}

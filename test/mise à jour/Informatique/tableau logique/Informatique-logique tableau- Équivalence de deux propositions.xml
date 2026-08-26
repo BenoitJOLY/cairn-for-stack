@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396786  -->
+  <question type="stack">
+    <name>
+      <text>E Logique — Équivalence de deux propositions</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#1e3a5f;border-left:5px solid #2563eb;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Logique — Équivalence logique</strong>
+        <span style="background:#2563eb;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#1e3a5f;border:1px solid #1e3a5f;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📐 Mathématiques</span>
+      </div>
+
+      <p>Complétez les deux tables de vérité, puis indiquez si les deux propositions sont <strong>logiquement équivalentes</strong>.</p>
+
+      <div style="display:flex;gap:30px;justify-content:center;flex-wrap:wrap;margin:20px 0;">
+        <div>
+          <div style="text-align:center;font-size:1.15rem;font-weight:bold;margin-bottom:8px;padding:8px;background:#eff6ff;border-radius:6px;border:1px solid #bfdbfe;font-family:serif;">\({@dispA@}\)</div>
+          <table style="border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+            <thead><tr style="background:#f1f5f9;">
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">P</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">Q</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;">Rés.</th>
+            </tr></thead>
+            <tbody>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:a0]] [[validation:a0]]</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:a1]] [[validation:a1]]</td></tr>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:a2]] [[validation:a2]]</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:a3]] [[validation:a3]]</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;align-items:center;font-size:2rem;font-weight:bold;color:#64748b;">⇔ ?</div>
+
+        <div>
+          <div style="text-align:center;font-size:1.15rem;font-weight:bold;margin-bottom:8px;padding:8px;background:#fef3c7;border-radius:6px;border:1px solid #fcd34d;font-family:serif;">\({@dispB@}\)</div>
+          <table style="border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+            <thead><tr style="background:#f1f5f9;">
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">P</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;">Q</th>
+              <th style="border:1px solid #94a3b8;padding:8px 22px;background:#fef9c3;">Rés.</th>
+            </tr></thead>
+            <tbody>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:b0]] [[validation:b0]]</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:b1]] [[validation:b1]]</td></tr>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:b2]] [[validation:b2]]</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 22px;text-align:center;background:#fefce8;">[[input:b3]] [[validation:b3]]</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin:20px 0;">
+        <p style="font-size:1.05rem;margin-bottom:8px;"><strong>Les deux propositions sont-elles logiquement équivalentes ?</strong></p>
+        [[input:equiv]] [[validation:equiv]]
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:var(--navy2); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponse attendue
+        </div>
+        <p style="text-align:center; margin-bottom:15px; font-size:1.05rem;"><strong>{@equiv_txt@}</strong></p>
+        <div style="overflow-x:auto; width:fit-content; margin:0 auto;">
+          <table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+            <thead>
+              <tr style="background:#f1f5f9;">
+                <th style="border:1px solid #94a3b8;padding:8px 18px;">P</th>
+                <th style="border:1px solid #94a3b8;padding:8px 18px;">Q</th>
+                <th style="border:1px solid #94a3b8;padding:8px 18px;background:#dbeafe;">\({@dispA@}\)</th>
+                <th style="border:1px solid #94a3b8;padding:8px 18px;background:#fef3c7;">\({@dispB@}\)</th>
+                <th style="border:1px solid #94a3b8;padding:8px 18px;">Identique ?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">0</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">0</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;{@sA0@}">{@vA0@}</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;{@sB0@}">{@vB0@}</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-size:1.2rem;">{@m0@}</td>
+              </tr>
+              <tr style="background:#f8fafc;">
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">0</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">1</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;{@sA1@}">{@vA1@}</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;{@sB1@}">{@vB1@}</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-size:1.2rem;">{@m1@}</td>
+              </tr>
+              <tr>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">1</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">0</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;{@sA2@}">{@vA2@}</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;{@sB2@}">{@vB2@}</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-size:1.2rem;">{@m2@}</td>
+              </tr>
+              <tr style="background:#f8fafc;">
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">1</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;">1</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;{@sA3@}">{@vA3@}</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-weight:bold;{@sB3@}">{@vB3@}</td>
+                <td style="border:1px solid #94a3b8;padding:8px 18px;text-align:center;font-size:1.2rem;">{@m3@}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[eq1_disp : ["P \\to Q", "\\neg P \\lor Q"]$ eq1_eval : [P implies Q, not(P) or Q]$ 
+eq2_disp : ["\\neg(P \\land Q)", "\\neg P \\lor \\neg Q"]$ eq2_eval : [not(P and Q), not(P) or not(Q)]$ 
+eq3_disp : ["(P \\to Q) \\land (Q \\to P)", "(P \\land Q) \\lor (\\neg P \\land \\neg Q)"]$ eq3_eval : [(P implies Q) and (Q implies P), (P and Q) or (not(P) and not(Q))]$ 
+eq4_disp : ["\\neg(P \\lor Q)", "\\neg P \\land \\neg Q"]$ eq4_eval : [not(P or Q), not(P) and not(Q)]$ 
+neq1_disp : ["P \\land Q", "P \\lor Q"]$ neq1_eval : [P and Q, P or Q]$ 
+neq2_disp : ["P \\to Q", "Q \\to P"]$ neq2_eval : [P implies Q, Q implies P]$ 
+neq3_disp : ["\\neg(P \\land Q)", "P \\land \\neg P"]$ neq3_eval : [not(P and Q), P and not(P)]$ 
+neq4_disp : ["P \\lor \\neg Q", "\\neg P \\lor Q"]$ neq4_eval : [P or not(Q), not(P) or Q]$ 
+liste_eq_disp : [eq1_disp, eq2_disp, eq3_disp, eq4_disp]$ liste_eq_eval : [eq1_eval, eq2_eval, eq3_eval, eq4_eval]$ 
+liste_neq_disp : [neq1_disp, neq2_disp, neq3_disp, neq4_disp]$ liste_neq_eval : [neq1_eval, neq2_eval, neq3_eval, neq4_eval]$ 
+est_equiv : rand(2) = 1$ idx : rand(4) + 1$ 
+if est_equiv then (
+    disp_pair : liste_eq_disp[idx],
+    eval_pair : liste_eq_eval[idx]
+) else (
+    disp_pair : liste_neq_disp[idx],
+    eval_pair : liste_neq_eval[idx]
+)$ 
+dispA : disp_pair[1]$ dispB : disp_pair[2]$ 
+if est_equiv then ta_equiv_id : "1" else ta_equiv_id : "2"$ if est_equiv then equiv_txt : "Oui, les deux propositions sont logiquement équivalentes." else equiv_txt : "Non, les deux propositions ne sont PAS logiquement équivalentes."$ 
+TA : truth_table(eval_pair[1])$ RA : args(TA)$ vA0 : if last(RA[1])=true then 1 else 0$ vA1 : if last(RA[2])=true then 1 else 0$ vA2 : if last(RA[3])=true then 1 else 0$ vA3 : if last(RA[4])=true then 1 else 0$ taA : [vA0, vA1, vA2, vA3]$ 
+TB : truth_table(eval_pair[2])$ RB : args(TB)$ vB0 : if last(RB[1])=true then 1 else 0$ vB1 : if last(RB[2])=true then 1 else 0$ vB2 : if last(RB[3])=true then 1 else 0$ vB3 : if last(RB[4])=true then 1 else 0$ taB : [vB0, vB1, vB2, vB3]$ 
+sA0 : if vA0=1 then "color:#15803d;background:#f0fdf4;" else "color:#dc2626;background:#fef2f2;"$ sA1 : if vA1=1 then "color:#15803d;background:#f0fdf4;" else "color:#dc2626;background:#fef2f2;"$ sA2 : if vA2=1 then "color:#15803d;background:#f0fdf4;" else "color:#dc2626;background:#fef2f2;"$ sA3 : if vA3=1 then "color:#15803d;background:#f0fdf4;" else "color:#dc2626;background:#fef2f2;"$ 
+sB0 : if vB0=1 then "color:#15803d;background:#f0fdf4;" else "color:#dc2626;background:#fef2f2;"$ sB1 : if vB1=1 then "color:#15803d;background:#f0fdf4;" else "color:#dc2626;background:#fef2f2;"$ sB2 : if vB2=1 then "color:#15803d;background:#f0fdf4;" else "color:#dc2626;background:#fef2f2;"$ sB3 : if vB3=1 then "color:#15803d;background:#f0fdf4;" else "color:#dc2626;background:#fef2f2;"$ 
+m0 : if is(vA0 = vB0) then "✅" else "❌"$ m1 : if is(vA1 = vB1) then "✅" else "❌"$ m2 : if is(vA2 = vB2) then "✅" else "❌"$ m3 : if is(vA3 = vB3) then "✅" else "❌"$ 
+choix1 : [["1", true, "Oui, elles sont équivalentes"], ["2", false, "Non, elles ne sont pas équivalentes"]]$ choix2 : [["1", false, "Oui, elles sont équivalentes"], ["2", true, "Non, elles ne sont pas équivalentes"]]$ if est_equiv then choix_brut : choix1 else choix_brut : choix2$ choix : random_permutation(choix_brut)$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol><li>[[feedback:prt1]]</li></ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@dispA@} | {@dispB@} | {@equiv_txt@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:logique-prop-equivalence</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>symbol</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>a0</name>
+      <type>algebraic</type>
+      <tans>vA0</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>a1</name>
+      <type>algebraic</type>
+      <tans>vA1</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>a2</name>
+      <type>algebraic</type>
+      <tans>vA2</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>a3</name>
+      <type>algebraic</type>
+      <tans>vA3</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>b0</name>
+      <type>algebraic</type>
+      <tans>vB0</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>b1</name>
+      <type>algebraic</type>
+      <tans>vB1</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>b2</name>
+      <type>algebraic</type>
+      <tans>vB2</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>b3</name>
+      <type>algebraic</type>
+      <tans>vB3</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>equiv</name>
+      <type>dropdown</type>
+      <tans>choix</tans>
+      <boxsize>5</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>sa : [a0, a1, a2, a3]$ sb : [b0, b1, b2, b3]$ tables_ok : is(sa = taA and sb = taB)$ vraie_id_equiv : first(first(sublist(choix, lambda([ex], second(ex)=true))))$</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification des tables</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>tables_ok</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Tables OK → Vérifie équivalence</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>equiv</sans>
+        <tans>vraie_id_equiv</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;"><p>✅ <strong>Parfait !</strong> Les tables sont correctes et votre conclusion sur l'équivalence est juste. {@equiv_txt@}</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Tables correctes, mais conclusion fausse !</strong> Comparez les deux colonnes de résultat ligne par ligne. Deux propositions sont équivalentes si et seulement si leurs colonnes sont <u>strictement identiques</u>.</p></div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Tables incorrectes</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;margin:4px 0;"><p>❌ <strong>Tables incorrectes.</strong> Recalculez chaque colonne séparément avant de pouvoir conclure à une équivalence.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

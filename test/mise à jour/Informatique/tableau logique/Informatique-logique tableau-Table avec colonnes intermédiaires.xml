@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396740  -->
+  <question type="stack">
+    <name>
+      <text>Logique — Table avec colonnes intermédiaires</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#1e3a5f;border-left:5px solid #2563eb;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:15px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Logique — Colonnes intermédiaires</strong>
+        <span style="background:#2563eb;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+        <span style="background:#ffffff;color:#1e3a5f;border:1px solid #1e3a5f;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📐 Mathématiques</span>
+      </div>
+
+      <p>Complétez le tableau en calculant d'abord les sous-expressions, puis le résultat final :</p>
+      <div style="text-align:center;font-size:1.3rem;font-weight:bold;margin:15px 0;padding:15px;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;font-family:serif;">
+        \( {@expr_fin@} \)
+      </div>
+
+      <div style="overflow-x:auto;margin:20px 0;">
+        <table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+          <thead>
+            <tr style="background:#f1f5f9;">
+              <th style="border:1px solid #94a3b8;padding:8px 20px;">P</th>
+              <th style="border:1px solid #94a3b8;padding:8px 20px;">Q</th>
+              <th style="border:1px solid #94a3b8;padding:8px 20px;background:#dbeafe;">{@se1@}</th>
+              <th style="border:1px solid #94a3b8;padding:8px 20px;background:#dbeafe;">{@se2@}</th>
+              <th style="border:1px solid #94a3b8;padding:8px 20px;background:#fef9c3;">{@expr_fin@}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">0</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">0</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#eff6ff;">[[input:se1_0]] [[validation:se1_0]]</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#eff6ff;">[[input:se2_0]] [[validation:se2_0]]</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#fefce8;">[[input:f_0]] [[validation:f_0]]</td>
+            </tr>
+            <tr style="background:#f8fafc;">
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">0</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">1</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#eff6ff;">[[input:se1_1]] [[validation:se1_1]]</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#eff6ff;">[[input:se2_1]] [[validation:se2_1]]</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#fefce8;">[[input:f_1]] [[validation:f_1]]</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">1</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">0</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#eff6ff;">[[input:se1_2]] [[validation:se1_2]]</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#eff6ff;">[[input:se2_2]] [[validation:se2_2]]</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#fefce8;">[[input:f_2]] [[validation:f_2]]</td>
+            </tr>
+            <tr style="background:#f8fafc;">
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">1</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">1</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#eff6ff;">[[input:se1_3]] [[validation:se1_3]]</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#eff6ff;">[[input:se2_3]] [[validation:se2_3]]</td>
+              <td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#fefce8;">[[input:f_3]] [[validation:f_3]]</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px;padding:15px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
+        <div style="font-weight:bold;color:#0f766e;margin-bottom:15px;">🔑 Réponse attendue</div>
+        <div style="overflow-x:auto;width:fit-content;margin:0 auto;">
+          <table style="margin:0 auto;border-collapse:collapse;border:2px solid #334155;background:#fff;font-family:monospace;font-size:1.05rem;">
+            <thead><tr style="background:#f1f5f9;">
+              <th style="border:1px solid #94a3b8;padding:8px 20px;">P</th>
+              <th style="border:1px solid #94a3b8;padding:8px 20px;">Q</th>
+              <th style="border:1px solid #94a3b8;padding:8px 20px;background:#dbeafe;">{@se1@}</th>
+              <th style="border:1px solid #94a3b8;padding:8px 20px;background:#dbeafe;">{@se2@}</th>
+              <th style="border:1px solid #94a3b8;padding:8px 20px;background:#fef9c3;">{@expr_fin@}</th>
+            </tr></thead>
+            <tbody>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_se1[1]@}</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_se2[1]@}</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_fin[1]@}</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_se1[2]@}</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_se2[2]@}</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_fin[2]@}</td></tr>
+              <tr><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">0</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_se1[3]@}</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_se2[3]@}</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_fin[3]@}</td></tr>
+              <tr style="background:#f8fafc;"><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;">1</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_se1[4]@}</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_se2[4]@}</td><td style="border:1px solid #94a3b8;padding:8px 20px;text-align:center;background:#f0fdf4;font-weight:bold;color:#15803d;">{@ta_fin[4]@}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>/* --- Définition des 5 exercices --- */
+se1_a : P implies Q$ se2_a : Q implies P$ fin_a : (P implies Q) and (Q implies P)$ 
+se1_b : P or Q$ se2_b : not(P and Q)$ fin_b : (P or Q) and not(P and Q)$ 
+se1_c : P and Q$ se2_c : not(P) and not(Q)$ fin_c : (P and Q) or (not(P) and not(Q))$ 
+se1_d : P or not(Q)$ se2_d : not(P) or Q$ fin_d : (P or not(Q)) and (not(P) or Q)$ 
+se1_e : P implies not(Q)$ se2_e : Q implies not(P)$ fin_e : (P implies not(Q)) and (Q implies not(P))$ 
+liste_se1 : [se1_a, se1_b, se1_c, se1_d, se1_e]$ liste_se2 : [se2_a, se2_b, se2_c, se2_d, se2_e]$ liste_fin : [fin_a, fin_b, fin_c, fin_d, fin_e]$ 
+idx : rand(5) + 1$ se1 : liste_se1[idx]$ se2 : liste_se2[idx]$ expr_fin : liste_fin[idx]$ 
+/* --- Tables de vérité --- */
+T1 : truth_table(boolean_form(se1))$ T2 : truth_table(boolean_form(se2))$ Tf : truth_table(boolean_form(expr_fin))$ 
+R1 : args(T1)$ R2 : args(T2)$ Rf : args(Tf)$ 
+ta_se1 : [if last(R1[2]) then 1 else 0, if last(R1[3]) then 1 else 0, if last(R1[4]) then 1 else 0, if last(R1[5]) then 1 else 0]$ ta_se2 : [if last(R2[2]) then 1 else 0, if last(R2[3]) then 1 else 0, if last(R2[4]) then 1 else 0, if last(R2[5]) then 1 else 0]$ ta_fin : [if last(Rf[2]) then 1 else 0, if last(Rf[3]) then 1 else 0, if last(Rf[4]) then 1 else 0, if last(Rf[5]) then 1 else 0]$</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol><li>[[feedback:prt1]]</li></ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@expr_fin@} | SE1:{@ta_se1@} | SE2:{@ta_se2@} | FIN:{@ta_fin@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:logique-prop-intermediaire</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>symbol</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>f_0</name>
+      <type>algebraic</type>
+      <tans>ta_fin[1]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>f_1</name>
+      <type>algebraic</type>
+      <tans>ta_fin[2]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>f_2</name>
+      <type>algebraic</type>
+      <tans>ta_fin[3]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>f_3</name>
+      <type>algebraic</type>
+      <tans>ta_fin[4]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>se1_0</name>
+      <type>algebraic</type>
+      <tans>ta_se1[1]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>se1_1</name>
+      <type>algebraic</type>
+      <tans>ta_se1[2]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>se1_2</name>
+      <type>algebraic</type>
+      <tans>ta_se1[3]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>se1_3</name>
+      <type>algebraic</type>
+      <tans>ta_se1[4]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>se2_0</name>
+      <type>algebraic</type>
+      <tans>ta_se2[1]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>se2_1</name>
+      <type>algebraic</type>
+      <tans>ta_se2[2]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>se2_2</name>
+      <type>algebraic</type>
+      <tans>ta_se2[3]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>se2_3</name>
+      <type>algebraic</type>
+      <tans>ta_se2[4]</tans>
+      <boxsize>3</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>0</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>student_se1 : [se1_0, se1_1, se1_2, se1_3]
+student_se2 : [se2_0, se2_1, se2_2, se2_3]
+student_fin : [f_0, f_1, f_2, f_3]
+all_student : [student_se1, student_se2, student_fin]
+all_ta : [ta_se1, ta_se2, ta_fin]
+inter_student : [student_se1, student_se2]
+inter_ta : [ta_se1, ta_se2]</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Tout correct</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>all_student</sans>
+        <tans>all_ta</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:10px 14px;background:#f0fdf4;border-radius:4px;margin:4px 0;"><p>✅ <strong>Parfait !</strong> Toutes les colonnes sont correctement remplies.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Sous-expressions correctes, finale fausse</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>inter_student</sans>
+        <tans>inter_ta</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Bonne décomposition, mais erreur finale !</strong> Les sous-expressions sont correctes, mais vérifiez l'opérateur principal qui les combine.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Seule la finale est correcte</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>student_fin</sans>
+        <tans>ta_fin</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.3</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #ca8a04;padding:10px 14px;background:#fefce8;border-radius:4px;margin:4px 0;"><p>🔶 <strong>Résultat final correct, mais sous-expressions fausses.</strong> Le résultat est bon, mais vos colonnes intermédiaires contiennent des erreurs. Recalculez-les.</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Tout incorrect</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>true</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>1</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;margin:4px 0;"><p>❌ <strong>Incorrect.</strong> Procédez colonne par colonne, de gauche à droite. Vérifiez chaque opérateur séparément. Rappel : <br>• <code>NOT</code> : inverse les 0 et 1<br>• <code>AND</code> : vaut 1 uniquement si les deux opérandes valent 1<br>• <code>OR</code> : vaut 0 uniquement si les deux opérandes valent 0<br>• <code>IMPLIES</code> : vaut 0 uniquement si gauche=1 et droite=0</p></div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

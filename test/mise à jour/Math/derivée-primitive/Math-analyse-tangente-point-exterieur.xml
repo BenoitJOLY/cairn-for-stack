@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396148  -->
+  <question type="stack">
+    <name>
+      <text>Tangente passant par un point extérieur</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Dérivation — Tangente par un point extérieur</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Dans un repère, on considère la fonction \(f\) définie par \( f(x) = {@f@} \) et sa courbe représentative \(\mathcal{C}_f\).<br><br>Soit le point \(M\left( {@xM@} ; {@yM@} \right)\) qui n'appartient pas à \(\mathcal{C}_f\).<br><br><strong>1.</strong> Déterminer les abscisses des points de \(\mathcal{C}_f\) où la tangente passe par \(M\). On donnera la réponse sous forme d'un ensemble \(\{a ; b\}\) avec \(a &lt; b\).</p>
+<div style="margin-top: 5px; margin-bottom: 15px;">Abscisses = [[input:ans_ab]] [[validation:ans_ab]]</div>
+<p><strong>2.</strong> Donner l'équation de l'une de ces deux tangentes (sous la forme \(y = ...\)).</p>
+<div style="margin-top: 5px;">Tangente : y= [[input:ans_tang]] [[validation:ans_tang]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;"><strong>1. Recherche des abscisses :</strong><br>L'équation générale d'une tangente en \(a\) est \(y = f'(a)(x - a) + f(a)\).<br>Ici, \(f'(x) = 2x\), donc \(y = 2a(x - a) + a^2 + {@k@}\).<br>Elle passe par \(M\left({@xM@} ; {@yM@}\right)\) si :<br>{@yM@} = 2a({@xM@} - a) + a^2 + {@k@}<br>En développant et simplifiant, on obtient une équation du second degré dont les solutions sont \(S = \{{@a@} ; {@b@}\}\).<br><br><strong>2. Équations des tangentes :</strong><br>En {@a@} : {@tg1@}<br>En {@b@} : {@tg2@}</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text>a: rand([-3,-2,-1,1,2,3])$ b: rand([-3,-2,-1,1,2,3])$ while a = b do b: rand([-3,-2,-1,1,2,3])$ k: rand([-2,-1,0,1,2])$ f: x^2 + k$ fp: diff(f, x)$ xM: ratsimp((a+b)/2)$ yM: a*b + k$ ta_sol: {a, b}$ tg1: expand(fp*(x - a) + ev(f, x=a))$ tg2: expand(fp*(x - b) + ev(f, x=b))$ ta_tang: {tg1, tg2}$ err_point: {xM}$</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>f(x)={@f@}, M({@xM@},{@yM@}), Sol={@a@},{@b@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:tangent-external</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_ab</name>
+      <type>algebraic</type>
+      <tans>ta_sol</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>{a, b}</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_tang</name>
+      <type>algebraic</type>
+      <tans>ta_tang</tans>
+      <boxsize>20</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint>...</syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>1</checkanswertype>
+      <mustverify>1</mustverify>
+      <showvalidation>2</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification des abscisses des tangentes</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ab</sans>
+        <tans>ta_sol</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>PRT-AB-OK</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-AB-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Vérification d'une équation de tangente</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_tang</sans>
+        <tans>ta_tang</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-TG-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> Vous avez trouvé les bonnes abscisses et rédigé correctement l'équation d'une tangente.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-TG-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Diagnostic erreur sur les abscisses</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_ab</sans>
+        <tans>err_point</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-XM</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Confusion point / courbe !</strong> Vous avez donné l'abscisse du point M. Le point M n'est pas sur la courbe. Vous devez résoudre l'équation <em>de la tangente</em> passant par M, pas l'équation de la courbe.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Abscisses incorrectes.</strong>Écrivez l'équation générale de la tangente en \(a\) : \(y = f'(a)(x-a) + f(a)\). Remplacez \(x\) et \(y\) par les coordonnées de M pour obtenir une équation d'inconnue \(a\) à résoudre.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Diagnostic erreur sur l'équation</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_tang</sans>
+        <tans>false</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-FORM</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">⚠️ <strong>Formule de tangente incorrecte.</strong> Les abscisses étaient bonnes. N'oubliez pas le terme \((x - a)\) dans la formule : \(y = f'(a)(x-a) + f(a)\). Ne faites pas \(y = f'(a)x + f(a)\) !</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-CALC-TG</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Équation incorrecte.</strong> Les abscisses étaient justes. Vérifiez le calcul de \(f'(a)\), de \(f(a)\), et le développement de l'équation.</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

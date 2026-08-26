@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396474  -->
+  <question type="stack">
+    <name>
+      <text>Parsons SVT - Parcours de l'air et échanges alvéolaires</text>
+    </name>
+    <questiontext format="moodle_auto_format">
+      <text><![CDATA[<div style="background:#14532d;border-left:5px solid #16a34a;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">SVT — Respiration et échanges gazeux</strong>
+        <span style="background:#166534;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 1 pt</span>
+      </div>
+      
+      <p><strong>Consigne :</strong> Reconstituez l'ordre chronologique du parcours de l'air inspiré depuis l'extérieur jusqu'aux échanges au niveau des alvéoles pulmonaires.</p>
+      <p><em>Attention :</em> Des affirmations fausses (distracteurs) ont été mélangées. Ne les utilisez pas !</p>
+      
+[[parsons input="ans1" height="500px"]]
+{# parsons_encode(proof_steps) #}
+[[/parsons ]]
+<p>[[input:ans1]] [[validation:ans1]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="moodle_auto_format">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
+        <div style="font-weight:bold; margin-bottom:10px; color:#166534;">🔑 Correction détaillée</div>
+        <div style="font-size:.9rem;">
+          Voici le parcours correct :
+          <div class="proof">{@proof_display_para(ta, proof_steps)@}</div>
+          <br/>
+          <strong>Rappels de cours :</strong>
+          <ul>
+            <li>L'air est filtré et humidifié dans les <strong>fosses nasales</strong>.</li>
+            <li>Le pharynx est le carrefour entre les voies digestives et respiratoires.</li>
+            <li>Les échanges gazeux se font <strong>par diffusion</strong> : le O2 passe dans le sang car sa concentration est plus faible dans le sang que dans l'alvéole, et inversement pour le CO2.</li>
+          </ul>
+        </div>
+      </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[stack_include_contrib("prooflib.mac");
+
+/* 1. Déclaration des blocs */
+proof_steps: [
+    /* Les bonnes étapes dans l'ordre */
+    ["L1", "L'air pénètre par les fosses nasales où il est filtré, réchauffé et humidifié."],
+    ["L2", "Il passe par le pharynx, puis descend dans la trachée."],
+    ["L3", "La trachée se divise en deux bronches principales qui pénètrent dans les poumons."],
+    ["L4", "Les bronches se ramifications en bronchioles, aboutissant aux alvéoles pulmonaires."],
+    ["L5", "Le dioxygène (O2) diffuse de l'alvéole vers le sang des capillaires sanguins."],
+    ["L6", "Le dioxyde de carbone (CO2) diffuse du sang vers la cavité de l'alvéole pour être expiré."],
+    
+    /* Les distracteurs (erreurs classiques de lycéens) */
+    ["D1", "Le dioxygène passe directement des fosses nasales aux bronches sans passer par la trachée."],
+    ["D2", "Le dioxyde de carbone (CO2) est absorbé par les alvéoles pour être stocké dans les poumons."],
+    ["D3", "L'air arrive dans l'œsophage avant de rejoindre les poumons."]
+];
+
+/* 2. Structure de la bonne réponse */
+ta: proof("L1", "L2", "L3", "L4", "L5", "L6");
+
+/* 3. Mélange aléatoire */
+proof_steps: random_permutation(proof_steps);
+
+/* 4. Préparation de l'évaluation */
+tal: proof_alternatives(ta);
+tas: setify(map(proof_flatten, tal));]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text>[[feedback:prt1]]</text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>{@ map(first, proof_steps) @}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Parson SVT Lycée : Échanges alvéolaires</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="moodle_auto_format">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="moodle_auto_format">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="moodle_auto_format">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans1</name>
+      <type>parsons</type>
+      <tans>[ta, proof_steps]</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text>sa: parsons_decode(ans1);
+check: elementp(sa, tas);</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification du parcours respiratoire</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>check</sans>
+        <tans>true</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #16a34a;padding:10px 14px;background:#f0fdf4;border-radius:4px;">✅ <strong>Excellent !</strong> Vous avez parfaitement reconstitué l'ordre du trajet de l'air et les mécanismes de diffusion.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:10px 14px;background:#fef2f2;border-radius:4px;">❌ <strong>Incorrect.</strong> Vérifiez l'anatomie (attention à ne pas confondre œsophage et trachée) et le sens de diffusion des gaz (du milieu le plus concentré vers le moins concentré).</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <qtest>
+      <testcase>1</testcase>
+      <description>Test case assuming the teacher's input gets full marks.</description>
+      <testinput>
+        <name>ans1</name>
+        <value>apply(parsons_answer,[ta, proof_steps])</value>
+      </testinput>
+      <expected>
+        <name>prt1</name>
+        <expectedscore>1.0000000</expectedscore>
+        <expectedpenalty>0.0000000</expectedpenalty>
+        <expectedanswernote>prt1-1-T</expectedanswernote>
+      </expected>
+    </qtest>
+  </question>
+
+</quiz>

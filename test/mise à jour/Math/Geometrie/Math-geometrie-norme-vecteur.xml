@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396260  -->
+  <question type="stack">
+    <name>
+      <text>Géométrie : Norme d'un vecteur</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Géométrie — Norme de vecteur</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Dans un repère orthonormé \((O; \vec{i}, \vec{j})\), on considère le vecteur :</p>
+<div style="text-align: center; margin: 15px 0; font-size: 1.1rem;">\(\vec{u} \begin{pmatrix} {@x@} \\ {@y@} \end{pmatrix}\)</div>
+<p><strong>1.</strong> Calculer la norme du vecteur \(\vec{u}\).<br>
+<em>(Arrondir le résultat à \(10^{-2}\) près).</em></p>
+<div style="margin: 10px 0;">\(\|\vec{u}\| = \) [[input:ans_norm]] [[validation:ans_norm]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Dans un repère orthonormé, la norme d'un vecteur \(\vec{u}(x ; y)\) correspond à sa "longueur". Elle se calcule avec la formule déduite du théorème de Pythagore :<br><br>
+\[
+\|\vec{u}\| = \sqrt{x^2 + y^2}
+\]<br>
+<strong>Application :</strong><br><br>
+\[
+\|\vec{u}\| = \sqrt{{@x@}^2 + {@y@}^2} = \sqrt{{@x2@} + {@y2@}} = \sqrt{{@somme_carres@}}
+\]
+\[
+\|\vec{u}\| \approx {@norm_arr@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Fonction utilitaire */
+ri(a,b) := a + rand(b - a + 1)$ 
+/* Génération des coordonnées du vecteur */
+x: ri(-5,5)$ y: ri(-5,5)$ 
+/* On s'assure que le vecteur n'est pas nul */
+while x=0 and y=0 do (
+    x: ri(-5,5),
+    y: ri(-5,5)
+)$ 
+/* Calculs intermédiaires */
+x2: x^2$ y2: y^2$ somme_carres: x2 + y2$ 
+/* Norme exacte et arrondie à 10^-2 */
+norm_exact: sqrt(somme_carres)$ norm_arr: 1.00*(round(float(norm_exact)*100)/100)$ 
+/* Erreurs classiques */
+err_no_sqrt: somme_carres$ err_manhattan: abs(x) + abs(y)$ err_soustraction: sqrt(abs(x2 - y2))$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>u({@x@};{@y@}), ||u||={@norm_arr@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:geometry-vector-norm</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_norm</name>
+      <type>numerical</type>
+      <tans>norm_arr</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte (tolérance arrondi)</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_norm</sans>
+        <tans>norm_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> La norme du vecteur est correctement calculée et arrondie.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A oublié la racine carrée</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_norm</sans>
+        <tans>err_no_sqrt</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-NO-SQRT</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli de la racine carrée !</strong> Vous avez calculé \(x^2 + y^2\). D'après le théorème de Pythagore appliqué au vecteur, c'est le <strong>carré</strong> de la norme. Il faut prendre la racine carrée de ce résultat pour obtenir \(\|\vec{u}\|\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-NO-SQRT</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Norme 1 (somme des valeurs absolues)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_norm</sans>
+        <tans>err_manhattan</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MANHATTAN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise formule !</strong> Vous avez additionné les valeurs absolues des coordonnées (\(|x| + |y|\)). Dans un repère <strong>orthonormé</strong>, la norme n'est pas la somme des coordonnées, c'est la racine de la <strong>somme des carrés</strong>.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-MANHATTAN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Soustraction des carrés sous la racine</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_norm</sans>
+        <tans>err_soustraction</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-SOUSTRACTION</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de signe sous le radical !</strong> Vous avez calculé \(\sqrt{|x^2 - y^2|}\). Avec Pythagore, il faut <strong>additionner</strong> les carrés des côtés de l'angle droit, jamais les soustraire.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-SOUSTRACTION</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur générique (Fallback)</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_norm</sans>
+        <tans>norm_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-GENERIC</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la formule du cours issue de Pythagore :<br>\(\|\vec{u}\| = \sqrt{x^2 + y^2}\)</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-FALLBACK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>

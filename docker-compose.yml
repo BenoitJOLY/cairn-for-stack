@@ -1,0 +1,39 @@
+services:
+  cairn-for-stack:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cairn-for-stack
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - ./index.html:/app/index.html
+      - ./depot.html:/app/depot.html
+      - ./admin.html:/app/admin.html
+      - ./validation.html:/app/validation.html
+      - ./login.html:/app/login.html
+      - ./register.html:/app/register.html
+      - ./js:/app/js
+      - ./css:/app/css
+      - ./lang:/app/lang
+      - ./lib:/app/lib
+      - ./assets:/app/assets
+      - ./server:/app/server
+      - /app/server/node_modules
+    environment:
+      - ACCOUNT_USERNAME=${ACCOUNT_USERNAME:-}
+      - ACCOUNT_PASSWORD=${ACCOUNT_PASSWORD:-}
+      - ACCOUNT_ROLE=${ACCOUNT_ROLE:-}
+      - SECRETS_KEY=${SECRETS_KEY:-}
+    restart: unless-stopped
+    networks:
+      - default
+      - maxima_default
+
+# Réseau du projet Docker "maxima" (stack-api / goemaxima), déjà créé par son
+# propre compose.yaml sur le NAS — on le rejoint ici (external: true, donc pas
+# recréé) pour que ce conteneur puisse joindre "maxima-stack-api-1" par son nom
+# sans jamais passer par internet ni par le port 8443 exposé publiquement.
+networks:
+  maxima_default:
+    external: true

@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 350478  -->
+  <question type="stack">
+    <name>
+      <text>chronophotographie d'une voiture</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p></p>
+<p></p>
+<h3>La Chronophotographie</h3>
+<p>La chronophotographie est une technique qui permet de prendre plusieurs photos d'un objet en mouvement à des moments différents, puis de les mettre ensemble pour voir comment l'objet bouge.</p>
+<h3>Exercice : Analyse du Mouvement d'une Voiture</h3>
+<p>Elsa a utilisé cette technique pour prendre des photos d'une petite voiture en mouvement. Elle a pris une photo toutes les 100 millisecondes (ms), ce qui veut dire une photo toutes les 0,1 secondes.</p>
+<p>Après avoir monté les photos, elle a obtenu une image où la voiture se déplace de gauche à droite.</p>
+<p></p>
+<p>[[geogebra height="650px" width="1400px" set="a1,a2,a3,a4" watch="note1,note2,note3,note4"]] params["material_id"]="yntggrcs"; params["showToolBar"]="true"; params["customToolBar"]="0 | 38 | 18 | 5 | 34"; params["enableShiftDragZoom"]="true"; params["errorDialogsActive"]="false"; params["allowStyleBar"]="false"; params["preventFocus"]="false"; params["showZoomButtons"]="true"; params["height"]=650; params["width"]=1400; [[/geogebra]]
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var apresVerif = urlParams.get('feedback') === '1';
+
+    if (!apresVerif) {
+        localStorage.removeItem('geogebra_png_yntggrcs');
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'ggb_png') {
+                localStorage.setItem('geogebra_png_yntggrcs', event.data.png);
+            }
+        });
+
+        var form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                try {
+                    var stackIframe = document.querySelector('iframe#stack-iframe-1');
+                    stackIframe.contentWindow.postMessage({type: 'get_ggb_png'}, '*');
+                } catch(e) {
+                    console.warn("Capture PNG echouee : " + e);
+                }
+            }, true);
+        }
+    } else {
+        setTimeout(function() {
+            var iframes = document.querySelectorAll('iframe');
+            iframes.forEach(function(iframe) {
+                if (iframe.parentElement) {
+                    iframe.parentElement.style.display = 'none';
+                }
+            });
+        }, 1500);
+
+        var png = localStorage.getItem('geogebra_png_yntggrcs');
+        if (png) {
+            var div = document.getElementById('geogebra_snapshot');
+            if (div) {
+                var titre = document.createElement('p');
+                var bold = document.createElement('strong');
+                bold.textContent = 'Votre construction :';
+                titre.appendChild(bold);
+                var img = document.createElement('img');
+                img.src = 'data:image/png;base64,' + png;
+                img.style.maxWidth = '100%';
+                img.style.border = '1px solid #ccc';
+                div.appendChild(titre);
+                div.appendChild(img);
+            }
+        }
+    }
+});
+</script>
+</p>
+<div id="geogebra_snapshot"></div>
+<p></p>
+<div id="geogebra_snapshot"></div>
+<p></p>
+<div id="geogebra_snapshot"></div>
+<p></p>
+<h4>Instructions :</h4>
+<ol>
+<li>
+<p dir="ltr">Avec le vecteur rouge, placez le vecteur déplacement \( \overrightarrow{M_4M_5} \)</p>
+</li>
+<li>
+<p dir="ltr">Avec le vecteur vert, placez le vecteur déplacement \( \overrightarrow{M_0M_1} \)</p>
+</li>
+<li>Avec le vecteur noir, placez le vecteur vitesse \( \overrightarrow{v_2} \) On prendra comme échelle 1cm&lt;=&gt; 5 m/s .</li>
+<li>
+<p dir="ltr">Avec le vecteur bleu,  placez le vecteur vitesse \( \overrightarrow{v_5} \) On prendra comme échelle 1cm&lt;=&gt; 5 m/s .</p>
+</li>
+</ol>
+<p><span class="" style="color: #ef4540;">Pour pouvoir valider il faut que tu ais essayé au moins un des vecteurs. Si tu valide sans le faire ta question sera bloquée.</span></p>
+<p></p>
+<p><span hidden="">[[input:note1]] [[validation:note1]]</span></p>
+<p><span hidden="">[[input:note2]] [[validation:note2]]</span></p>
+<p><span hidden="">[[input:note3]] [[validation:note3]]</span></p>
+<p><span hidden="">[[input:note4]] [[validation:note4]]</span></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;"></p>
+<p><span style="color: #094fc8;"><img class="img-fluid atto_image_button_text-bottom" role="presentation" src="@@PLUGINFILE@@/correction.png" alt="" width="1465" height="207"></span></p>
+<p dir="ltr"></p>
+<p><span style="color: #094fc8;">Le vecteur déplacement \( \overrightarrow{M_4M_5} \) est le vecteur qui relie M<sub>4</sub> à M<sub>5</sub>. Sa direction est de M<sub>4</sub> vers M<sub>5</sub> .</span></p>
+<p><span style="color: #094fc8;">Le vecteur déplacement \( \overrightarrow{M_0M_1} \) est le vecteur qui relie M<sub>0</sub> à M<sub>1</sub>. Sa direction est de M<sub>0</sub> vers M<sub>1</sub> .</span></p>
+<p dir="ltr" style="text-align: left;"><span style="color: #094fc8;">Pour le vecteur vitesse \( \overrightarrow{v_2} \) On mesure la distance M<sub>2</sub>M<sub>3</sub> sur le dessins et on trouve 2.27 cm donc la voiture s'est déplacée de 2.27m en 0.100s. Sa vitesse est donc de \(V= \frac{d}{\Delta t}\) = 22.7 m/s. Comme échelle 1cm&lt;=&gt; 5 m/s le vecteur mesure 22.7/5 = 4.54 cm. Il est tangent à la trajectoire donc il part de M<sub>2</sub> passe par M<sub>3</sub> et mesure 4.54 cm.</span></p>
+<p><span style="color: #094fc8;">Pour le vecteur vitesse \( \overrightarrow{v_6} \) On mesure la distance M6M7 sur le dessins et on trouve 1.49 cm donc la voiture s'est déplacée de 1.49m en 0.100s. Sa vitesse est donc de \(V= \frac{d}{\Delta t}\) = 14.9 m/s. Comme échelle 1cm&lt;=&gt; 5 m/s le vecteur mesure 14.9/5 = 2.98 cm. Il est tangent à la trajectoire donc il part de M<span style="font-size: 12px;">6</span> passe par M7 et mesure 2.98 cm.</span></p>]]></text>
+<file name="correction.png" path="/" encoding="base64">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yisjR448ePBgfHy89AuRUSqVW7duPeCVlIiR7ymEdLL79u1LTk5esmTJ6NGj8/Ly5DVqIL0FarXa870wGAyuExw0aBD9SgAAADyRKwEA1KKoqEij0WRkZKT9KDg42Gg0/v3vf3c4HI8//rhUTaFQrFy5MiQkxLXjU0895W7FQ00NyutV0eAdZXJzc0NCQlzJkaCgoI0bN3rOKhIZGemuLURwcHBNKYy8vLyhQ4c+9dRT+/btGzdunLy4sel0ut27dy9btmzSpEnLly+XF9dM9l7IThAAAACeyJUAAGrhcDh0Ol28h6NHj06cONHf318IUVFRId/hR7KVWVwzd9TUoGflajV4R5mKigrvs6XKJhnx3JTNKRsVFbVnz54PP/wwISGhAT1c6stsNiclJc2YMWPFihVvvfWWvLhmdT8jAAAAkCsBANRCp9NVnULV4XBotVohRGFhoSzuuVmtmhqURapq8I4y/fv3t1qtsg4pDWhHIo2OmT179uLFi8ePH19UVCSvIYQ0021CQsIor2JiYqqeoMRoNCYlJY0fP37kyJGHDx+uaaQPAAAA7h65EgBALebOnVtYWOjZESMnJ6e4uDgyMjIyMnL//v2uuLQKjOem67XnZk0NujZlaQvXZq071kRaMddl+vTpKpUqNzfXFSkoKMjIyHBtWiwW12vZZk3r2kijY1asWLF69epq5xNRKpWbN2+Wz1Byp+zsbNfIIBdpPpQZM2a88MILhw4d8j7SR3amLg04IwAAAJ/V9p133pHHAADw0LNnz8DAwHnz5v3kJz/RaDR6vf6LL7548cUXhRDPPffchg0bjh079rOf/ez7779ft27dm2++aTQaMzIy9u7de/369cDAwKCgoP/6r//avXv3iRMnVCrVwIEDg4ODq22wqKhI2vHKlSvdunULCAjIyMjYvXu3wWDo3LmzTqfzciTV2rlz52effbZ161aj0VhRUfH9999L08126NAhKipq1qxZ3bp1Cw0N/eyzz/bt2/frX/+6tLQ0LS1tz549RqNRoVBERERkZGR8+OGHxcXFCoWiZ8+eX3311bp16woLC8+ePduzZ8+HH35Y9hO7des2bty4Z5555oMPPli6dGm3bt08J3Cpr6KiohkzZuzbt+/tt9/+3e9+VzWN4lLTmRYVFaWlpe3fv//ixYtqtVqj0bz//vvSCSqVyiFDhnz0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</file>
+    </generalfeedback>
+    <defaultgrade>4</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2025102100</text>
+    </stackversion>
+    <questionvariables>
+      <text>a1:0;
+a2:0;
+a3:0;
+a4:0;</text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<p>[[feedback:prt1]][[feedback:prt2]][[feedback:prt3]][[feedback:prt4]]</p>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text><![CDATA[<p><i class="fa fa-check"></i> Réponse correcte, bravo !</p>]]></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text><![CDATA[<p><i class="fa fa-adjust"></i> Réponse partiellement correcte.</p>]]></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text><![CDATA[<p><i class="fa fa-times"></i> Réponse incorrecte.</p>]]></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>note1</name>
+      <type>numerical</type>
+      <tans>100</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>note2</name>
+      <type>numerical</type>
+      <tans>100</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>note3</name>
+      <type>numerical</type>
+      <tans>100</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>note4</name>
+      <type>numerical</type>
+      <tans>100</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>vecteur position M4M5</description>
+        <answertest>NumRelative</answertest>
+        <sans>note1</sans>
+        <tans>100</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous avez trouvé le bon vecteur position  \( \overrightarrow{M_4M_5} \) et vous le maitrisez bien.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>vecteur position M4M5 en cas de plusieurs essais</description>
+        <answertest>GT</answertest>
+        <sans>note1</sans>
+        <tans>0</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous avez trouvé le bon vecteur position \( \overrightarrow{M_4M_5} \) mais il faudra retravailler cette notion car vous avez dû vous y reprendre à plusieurs reprise.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p style="text-align: left;">Vous n'avez pas réussi à tracer le vecteur déplacement \( \overrightarrow{M_4M_5} \). Le vecteur déplacement \( \overrightarrow{M_4M_5} \) est le vecteur qui relie M4 à M5. Sa direction est de M<sub>4</sub> vers M<sub>5</sub> .</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <prt>
+      <name>prt2</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>vecteur position M0M1</description>
+        <answertest>NumRelative</answertest>
+        <sans>note2</sans>
+        <tans>100</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt2-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous avez trouvé le bon vecteur position \( \overrightarrow{M_0 M_1} \) et vous le maitrisez bien.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt2-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>vecteur position M0M1 en cas de plusieurs essais</description>
+        <answertest>GT</answertest>
+        <sans>note2</sans>
+        <tans>0</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt2-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous avez trouvé le bon vecteur position \( \overrightarrow{M_0 M_1} \) mais il faudra retravailler cette notion car vous avez dû vous y reprendre à plusieurs reprise.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt2-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous n'avez pas réussi à tracer le vecteur déplacement \( \overrightarrow{M_0M_1} \). Le vecteur déplacement \( \overrightarrow{M_0M_1} \) est le vecteur qui relie M<sub>0</sub> à M<sub>1</sub>. Sa direction est de M<sub>0</sub> vers M<sub>1</sub> .</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <prt>
+      <name>prt3</name>
+      <value>2.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>note_calculee3: if (not(assigned(note3)) or note3 = NULL or note3 = []) then 0 else note3;</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>tracer du vecteur v2</description>
+        <answertest>NumRelative</answertest>
+        <sans>note_calculee3</sans>
+        <tans>100</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt3-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous avez trouvé le bon vecteur vitesse \( \overrightarrow{v_2} \) et vous le maitrisez bien.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt3-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>vecteur vitesse v2 en cas de plusieurs essais</description>
+        <answertest>GT</answertest>
+        <sans>note_calculee3</sans>
+        <tans>0</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt3-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous avez trouvé le bon vecteur vitesse \( \overrightarrow{v_2} \) mais il faudra retravailler cette notion car vous avez dû vous y reprendre à plusieurs reprise.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt3-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous n'avez pas trouvé le bon vecteur vitesse \( \overrightarrow{v_2} \) . Le vecteur vitesse \( \overrightarrow{v_2} \) On mesure la distance M<sub>2</sub>M<sub>3</sub> sur le dessins et on trouve 2.27 cm donc la voiture s'est déplacée de 2.27m en 0.100s. Sa vitesse est donc de \(V= \frac{d}{\Delta t}\) = 22.7 m/s. Comme échelle 1cm&lt;=&gt; 5 m/s le vecteur mesure 22.7/5 = 4.54 cm. Il est tangent à la trajectoire donc il part de M<sub>2</sub> passe par M<sub>3</sub> et mesure 4.54 cm.</p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <prt>
+      <name>prt4</name>
+      <value>2.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>note_calculee4: if (not(assigned(note4)) or note4 = NULL or note4 = []) then 0 else note4;</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>vecteur vitesse v6</description>
+        <answertest>NumRelative</answertest>
+        <sans>note_calculee4</sans>
+        <tans>100</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt4-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous avez trouvé le bon vecteur vitesse \( \overrightarrow{v_6} \) et vous le maitrisez bien.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>prt4-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>vecteur vitesse v6 en cas de plusieurs essais</description>
+        <answertest>GT</answertest>
+        <sans>note_calculee4</sans>
+        <tans>0</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0.5</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt4-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous avez trouvé le bon vecteur vitesse \( \overrightarrow{v_6} \) mais il faudra retravailler cette notion car vous avez dû vous y reprendre à plusieurs reprise.</p>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt4-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<p dir="ltr" style="text-align: left;">Vous n'avez pas trouvé le bon vecteur vitesse \( \overrightarrow{v_6} \) . </p>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+    <tags>
+      <tag><text>difficulté:moyenne</text>
+</tag>
+      <tag><text>geogebra</text>
+</tag>
+      <tag><text>stack</text>
+</tag>
+      <tag><text>Forces</text>
+</tag>
+      <tag><text>Bloom : Application</text>
+</tag>
+    </tags>
+  </question>
+
+</quiz>

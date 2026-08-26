@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396567  -->
+  <question type="stack">
+    <name>
+      <text>Oscilloscope Clair - Fréquence Aléatoire</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background:#0c4a6e;border-left:5px solid #0369a1;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-weight:800;color:#fff;font-size:.95rem;">Oscilloscope — Période et Fréquence</strong>
+        <span style="background:#0369a1;color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ 2 pts</span>
+        <span style="background:#ffffff;color:#0369a1;border:1px solid #0369a1;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">📏 Grandeur physique</span>
+      </div>
+      <input type="hidden" id="hs_fq" value="{@random_f_val@}">
+      <p><strong>Consigne :</strong> À l'aide des curseurs (boutons <span style="color:#a855f7;font-weight:bold;">■ X</span> et <span style="color:#ef4444;font-weight:bold;">■ Y</span>), mesurez la période \(T\) de la tension sinusoïdale, puis en déduise sa fréquence \(f\).</p>
+      
+[[jsxgraph width="775px" height="550px"]]
+(function(){
+var lSH=[5e-7,0.000001,0.000002,0.000005,0.00001,0.00002,0.00005,0.0001,0.0002,0.0005,0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5];
+var lSV=[0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10];
+var si=7,ti=9,xp=0,yp=0;
+
+/* --- VARIABLES ALÉATOIRES ISSUES DE MAXIMA --- */
+var phase = Math.random() * 2 * Math.PI;
+var fq = parseFloat(window.parent.document.getElementById('hs_fq').value);
+var phase = Math.random() * 2 * Math.PI;
+var um = 3;; 
+board.create('functiongraph', [f]);
+function SV(){return lSV[si];}
+function SH(){return lSH[ti];}
+function fV(v){return v<0.05?(v*1e3).toPrecision(3)+" mV":v+" V";}
+function fT(s){
+  return s<5e-5?(s*1e6).toPrecision(3)+" \u00B5s"
+        :s<0.05?(s*1e3).toPrecision(3)+" ms"
+        :s.toPrecision(3)+" s";
+}
+var bd=JXG.JSXGraph.initBoard(divid,{
+  boundingbox:[-5.4,4.5,5.4,-4.8],
+  axis:false,grid:false,
+  showNavigation:false,showCopyright:false,
+  pan:{enabled:false},zoom:{enabled:false}
+});
+
+/* --- FOND BLANC ET BORDURES GRIS --- */
+bd.create("polygon",[[-5,-4],[5,-4],[5,4],[-5,4]],
+  {fillColor:"#ffffff",fillOpacity:1,strokeWidth:0,
+  fixed:true,layer:0,highlight:false, vertices:{visible:false, fixed:true}, borders:{visible:false}});
+bd.create("segment",[[-5,-4],[5,-4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[5,-4],[5,4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[5,4],[-5,4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+bd.create("segment",[[-5,4],[-5,-4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});
+
+/* --- GRILLES ADAPTÉES POUR FOND CLAIR --- */
+var gs={strokeColor:"#e5e7eb",strokeWidth:0.8,fixed:true,layer:1,highlight:false};
+var gc={strokeColor:"#d1d5db",strokeWidth:1.2,fixed:true,layer:1,highlight:false};
+var ts={strokeColor:"#9ca3af",strokeWidth:0.55,fixed:true,layer:1,highlight:false};
+for(var xi=-4;xi<=4;xi++) bd.create("segment",[[xi,-4],[xi,4]],xi===0?gc:gs);
+for(var yi=-3;yi<=3;yi++) bd.create("segment",[[-5,yi],[5,yi]],yi===0?gc:gs);
+bd.create("segment",[[-5,0],[5,0]],gc);
+bd.create("segment",[[0,-4],[0,4]],gc);
+for(var xt=-5;xt<=5.01;xt+=0.2)
+  if(Math.abs(xt%1)>0.05) bd.create("segment",[[xt,-0.07],[xt,0.07]],ts);
+for(var yt=-4;yt<=4.01;yt+=0.2)
+  if(Math.abs(yt%1)>0.05) bd.create("segment",[[-0.07,yt],[0.07,yt]],ts);
+
+function phi0(){
+  var T=fq>0?1/fq:0;
+  return T>0?Math.PI/2+10*Math.PI*SH()/T:0;
+}
+
+function sinSig(xd){
+  var T=fq>0?1/fq:0,s=SH(),sv=SV();
+  if(T<=0) return 0;
+  var y=um/sv*Math.cos(2*Math.PI*s*(xd-xp)/T-phi0()+phase)+yp;
+  return y>4?4:y<-4?-4:y;
+}
+
+var curve = bd.create("functiongraph",[sinSig,-5,5],
+  {strokeColor:"#2563eb",strokeWidth:3,layer:3,highlight:false,fixed:true});
+
+var lbSH=bd.create("text",[0,-3.75,function(){return fT(SH())+"/div";}],
+  {fixed:true,color:"#1f2937",fontSize:13,anchorX:"middle",layer:4,highlight:false});
+var lbSV=bd.create("text",[-4.7,3.6,function(){return fV(SV())+"/div";}],
+  {fixed:true,color:"#1f2937",fontSize:13,layer:4,highlight:false});
+
+/* --- CURSEURS VIOLETS --- */
+var cA=bd.create("glider",[-2,0,curve],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false});
+var cB=bd.create("glider",[2,0,curve],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false});
+var segPA=bd.create("segment",[function(){return[cA.X(),-4];},function(){return[cA.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});
+var segPB=bd.create("segment",[function(){return[cB.X(),-4];},function(){return[cB.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});
+var txtP=bd.create("text",[0,3.6,function(){
+  var dx=Math.abs(cB.X()-cA.X()),dts=dx*SH();
+  return "\u0394t="+fT(dts);
+}],{fixed:false,color:"#7c3aed",fontSize:14,anchorX:"middle",layer:6,highlight:false, visible:false});
+
+/* --- CURSEURS ROUGES --- */
+var cD=bd.create("glider",[0,1,curve],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false});
+var cE=bd.create("glider",[0,-1,curve],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false});
+var segRD=bd.create("segment",[function(){return[-5,cD.Y()];},function(){return[5,cD.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});
+var segRE=bd.create("segment",[function(){return[-5,cE.Y()];},function(){return[5,cE.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});
+var txtR=bd.create("text",[4.5,3.2,function(){
+  var dy=Math.abs(cD.Y()-cE.Y()),dv=dy*SV();
+  return "\u0394V="+fV(dv);
+}],{fixed:false,color:"#dc2626",fontSize:14,anchorX:"right",layer:6,highlight:false, visible:false});
+
+function toggleGroup(arr) {
+  var isVisible = arr[0].getAttribute('visible');
+  arr.forEach(function(obj) { obj.setAttribute({visible: !isVisible}); });
+}
+var purpleGroup = [cA, cB, segPA, segPB, txtP];
+var redGroup = [cD, cE, segRD, segRE, txtR];
+
+/* ---------------------------------------------------------
+   BARRE DE CONTRÔLE AGRANDIE (Mode Clair)
+   --------------------------------------------------------- */
+var style = document.createElement('style');
+style.textContent = '.osc-btn{background:#ffffff;color:#374151;border:2px solid #6b7280;padding:5px 12px;cursor:pointer;border-radius:4px;font-size:15px;font-family:monospace;font-weight:bold;margin:0 2px;box-shadow: 0 1px 2px rgba(0,0,0,0.05);}.osc-btn:hover{background:#f3f4f6;border-color:#374151;}';
+document.head.appendChild(style);
+
+var ctrl = document.createElement('div');
+ctrl.style.cssText = 'position:absolute; bottom:0; left:0; width:100%; box-sizing:border-box; display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:8px 12px; background:rgba(255,255,255,0.95); border-top:2px solid #4b5563; z-index:100; user-select:none; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);';
+
+function mkL(t,c,w){ var s=document.createElement('span'); s.textContent=t; s.style.cssText='color:'+(c||'#374151')+';font-size:14px;font-family:monospace;font-weight:bold;display:inline-block;'+(w?'min-width:'+w+'px;text-align:center;':''); return s; }
+function mkS(){ var s=document.createElement('span'); s.style.cssText='border-left:1px solid #d1d5db;height:24px;display:inline-block;margin:0 6px;'; return s; }
+function mkB(t,c,fn){ var b=document.createElement('button'); b.className='osc-btn'; b.textContent=t; if(c){b.style.color=c; b.style.borderColor=c;} if(fn) b.addEventListener('click', fn); return b; }
+
+var lblV = mkL('', '#374151', '65px');
+var lblT = mkL('', '#374151', '75px');
+
+ctrl.appendChild(mkL('V/div', '#dc2626', '45px'));
+ctrl.appendChild(mkB('\u25BC', '#dc2626', function(){si=Math.max(0,si-1);bd.update();}));
+ctrl.appendChild(lblV);
+ctrl.appendChild(mkB('\u25B2', '#dc2626', function(){si=Math.min(lSV.length-1,si+1);bd.update();}));
+ctrl.appendChild(mkS());
+
+ctrl.appendChild(mkL('t/div', '#2563eb', '45px'));
+ctrl.appendChild(mkB('\u25C4', '#2563eb', function(){ti=Math.max(0,ti-1);bd.update();}));
+ctrl.appendChild(lblT);
+ctrl.appendChild(mkB('\u25BA', '#2563eb', function(){ti=Math.min(lSH.length-1,ti+1);bd.update();}));
+ctrl.appendChild(mkS());
+
+ctrl.appendChild(mkL('XPOS', '#7c3aed', '50px')); 
+ctrl.appendChild(mkB('\u25C4', '#7c3aed', function(){xp=Math.max(-5,parseFloat((xp-0.5).toFixed(1)));bd.update();}));
+ctrl.appendChild(mkB('\u25BA', '#7c3aed', function(){xp=Math.min(5,parseFloat((xp+0.5).toFixed(1)));bd.update();}));
+ctrl.appendChild(mkS());
+
+ctrl.appendChild(mkL('YPOS', '#d97706', '50px'));
+ctrl.appendChild(mkB('\u25BC', '#d97706', function(){yp=Math.max(-4,parseFloat((yp-0.5).toFixed(1)));bd.update();}));
+ctrl.appendChild(mkB('\u25B2', '#d97706', function(){yp=Math.min(4,parseFloat((yp+0.5).toFixed(1)));bd.update();}));
+ctrl.appendChild(mkS());
+
+ctrl.appendChild(mkB('\u25A0 X', '#7c3aed', function(){ toggleGroup(purpleGroup); }));
+ctrl.appendChild(mkB('\u25A0 Y', '#dc2626', function(){ toggleGroup(redGroup); }));
+
+var boardContainer = document.getElementById(divid);
+boardContainer.style.position = 'relative';
+boardContainer.appendChild(ctrl);
+
+var _ou = bd.update.bind(bd);
+bd.update = function(){
+  _ou();
+  lblV.textContent = fV(SV());
+  lblT.textContent = fT(SH());
+};
+bd.update();
+
+})();
+[[/jsxgraph]]
+
+      <div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin:15px 0;">
+        <strong>Conseils pour la saisie :</strong>
+        <ul style="margin:8px 0 0 20px;line-height:1.7">
+          <li>La virgule se note avec un point (ex : <code>1.32</code>).</li>
+          <li><strong>Lier nombre et unité</strong> : reliez-les par <code>*</code> (ex : <code>10*ms</code>).</li>
+          <li><strong>Unités complexes</strong> : pour s⁻¹, tapez <code>s^(-1)</code> ou <code>1/s</code>.</li>
+          <li><strong>Unités usuelles</strong> : <code>s</code>, <code>ms</code>, <code>us pour µs</code>, <code>Hz</code>, <code>kHz</code>, <code>V</code>.</li>
+        </ul>
+      </div>
+      
+      <p>1. Période \(T\) mesurée : [[input:ans_T]] [[validation:ans_T]]</p>
+      <p>2. Fréquence \(f\) déduite : [[input:ans_f]] [[validation:ans_f]]</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top:20px; padding:15px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold; color:var(--navy2); margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🔑</span> Réponses attendues
+        </div>
+        <div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">
+          <span style="font-weight:bold;color:var(--navy2);">Q1 Période :</span>
+          <p>La période est le temps que met un phénomène cyclique à se reproduire à l'identique, ici avec les curseurs de temps on trouve T= {@1.0*ta_T@}</p>
+        </div>
+        <div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">
+          <span style="font-weight:bold;color:var(--navy2);">Q2 Fréquence :</span>
+           <p>La fréquence est le nombre de fois qu'un phénomène se reproduit par seconde , on le calcul avec la formule  \[ f = \frac{1}{T} \] </p>
+        <p> On a donc \[ f= \frac {1}{ {@1.0*ta_T@}}= {@ta_f@} \]</p>
+        </div>]]></text>
+    </generalfeedback>
+    <defaultgrade>2</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2026010500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* 1. Choix aléatoire d'une fréquence "propre" pour l'oscilloscope */
+liste_fq: [100, 200, 250, 500, 1000, 2000];
+random_f_val: 100;
+
+/* 2. Préparation des unités pour les réponses attendues */
+osc_fq: stackunits(random_f_val, Hz);
+fq_unit : stack_units_units(osc_fq);
+fq_nums : stack_units_nums(osc_fq);
+T_unit : stack_unit_si_to_si_base(1/fq_unit);
+T_nums: 1/fq_nums ;
+T: stackunits(T_nums, T_unit);
+osc_um: 3;
+precision_T:0.05;
+ti: 7; /* Indice temps/div par défaut */
+si: 7; /* Indice volt/div par défaut */
+
+/* 3. Réponses attendues pour le PRT */
+ta_T: T;
+ta_f: osc_fq;]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<ol>
+  <li>[[feedback:prt1]]</li>
+</ol>]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text>f={@random_f_val@} Hz, T={@ta_T@}, f={@ta_f@}</text>
+    </questionnote>
+    <questiondescription format="html">
+      <text>Généré avec HéStack V2 | hestack-types:oscilloscope-units</text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_T</name>
+      <type>units</type>
+      <tans>1.0*ta_T</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <input>
+      <name>ans_f</name>
+      <type>units</type>
+      <tans>ta_f</tans>
+      <boxsize>15</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>1</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>2.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>2</feedbackstyle>
+      <feedbackvariables>
+        <text>/* --- Traitement Période T --- */
+           stud_si_T : stack_unit_si_to_si_base(ans_T);
+           teach_si_T : T_unit;
+           v_pure_e_T : subst(map(lambda([u], u=1), listofvars(stud_si_T)), stud_si_T);
+           v_pure_t_T : subst(map(lambda([u], u=1), listofvars(teach_si_T)), teach_si_T);
+           eleve_unit_T : 2 * stud_si_T / v_pure_e_T;
+           teacher_unit_T : 2 * teach_si_T / v_pure_t_T;
+
+           /* --- Traitement Fréquence f --- */
+           stud_si_f : stack_unit_si_to_si_base(ans_f);
+           teach_si_f : fq_unit;
+           v_pure_e_f : subst(map(lambda([u], u=1), listofvars(stud_si_f)), stud_si_f);
+           v_pure_t_f : subst(map(lambda([u], u=1), listofvars(teach_si_f)), teach_si_f);
+           eleve_unit_f : 2 * stud_si_f / v_pure_e_f;
+           teacher_unit_f : 2 * teach_si_f / v_pure_t_f;</text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Vérification de l'unité  de T</description>
+        <answertest>UnitsAbsolute</answertest>
+        <sans>eleve_unit_T</sans>
+        <tans>teacher_unit_T</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>1</truenextnode>
+        <trueanswernote>prt1-0-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-0-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Période :</strong> Votre période est incorrecte car elle n'a pas la bonne unité. L'unité attendue en base SI était {@teacher_unit_T/2@}).</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Vérification de la valeur  de T (avec conversion unité)</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_T</sans>
+        <tans>ta_T</tans>
+        <testoptions>precision_T</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>2</truenextnode>
+        <trueanswernote>prt1-1-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-bottom:10px;">✅ <strong>Période :</strong> Votre période est correcte</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>prt1-1-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ <strong>Période :</strong>La valeur numérique ou la précision de votre période est incorrecte.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Vérification de l'unité de  f</description>
+        <answertest>UnitsAbsolute</answertest>
+        <sans>eleve_unit_f</sans>
+        <tans>teacher_unit_f</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>3</truenextnode>
+        <trueanswernote>prt1-2-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-2-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;margin-bottom:10px;">❌ L'unité de votre fréquence n'est pas une unité admise. L'unité attendue était I : {@teacher_unit_f/2@}).</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Vérification de la valeur de f (avec conversion unité)</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_f</sans>
+        <tans>ta_f</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0.25</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-3-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #15803d;padding:8px 12px;background:#f0fdf4;border-radius:4px;">✅ <strong>Bravo</strong> Votre fréquence est parfaitement axacte</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-3-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;">❌ La valeur numérique (ou la précision) de votre fréquence est incorrecte vous avez du faire une erreur de calcul.</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>unité de f dans le cas ou T est mauvais</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_f</sans>
+        <tans>ta_f</tans>
+        <testoptions>0</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>5</truenextnode>
+        <trueanswernote>prt1-5-T</trueanswernote>
+        <truefeedback format="html">
+          <text></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-5-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;">❌ Votre unité de fréquence n'est pas en cohérente, elle ne correspond pas à une fréquence</div>]]></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>5</name>
+        <description>La valeur de f est elle cohérente avec celle trouvée pour la période ?</description>
+        <answertest>UnitsRelative</answertest>
+        <sans>ans_f</sans>
+        <tans>1/ans_T</tans>
+        <testoptions>0.05</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>+</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>prt1-6-T</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div
+  style="padding: 12px; background: #F9F2BB; border-radius: 8px; border: 1px solid #EDB465;">
+  🔶 Votre fréquence est cohérente par rapport à votre réponse sur la période mais ce n'était pas la réponse attendue.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>-</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>prt1-6-F</falseanswernote>
+        <falsefeedback format="html">
+          <text><![CDATA[<div style="border-left:4px solid #dc2626;padding:8px 12px;background:#fef2f2;border-radius:4px;">❌ Votre fréquence n'est pas logique par rapport à votre réponse précédente \( f= \frac {1}{T} \)</div>]]></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+
+</quiz>

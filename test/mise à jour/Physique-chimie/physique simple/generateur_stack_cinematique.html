@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Générateur STACK — Cinématique du point</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.0/jsxgraph.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.9.0/jsxgraphcore.js"></script>
+<style>
+  :root{
+    --paper:#f4f1e8; --ink:#1e2a2f; --ink-soft:#54636a; --grid-line:#c9d6d3;
+    --teal:#0f6f66; --teal-dark:#0a4f49; --amber:#c97a1f; --danger:#a8432f;
+    --panel:#ffffff; --border:#d8d2c2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans',sans-serif;
+    background-image:linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:28px 28px; background-attachment:fixed;
+  }
+  header{ padding:26px 32px 16px; border-bottom:2px solid var(--ink); background:var(--paper); }
+  header .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--teal-dark); margin:0 0 6px; }
+  header h1{ margin:0; font-size:24px; font-weight:700; }
+  header p{ margin:8px 0 0; color:var(--ink-soft); font-size:14px; max-width:680px;}
+  .layout{ display:grid; grid-template-columns: 400px 1fr; gap:20px; padding:22px 32px 60px; align-items:start; }
+  @media (max-width: 1020px){ .layout{ grid-template-columns:1fr; } }
+  .panel{ background:var(--panel); border:1.5px solid var(--ink); border-radius:3px;
+    box-shadow:4px 4px 0 rgba(30,42,47,.08); padding:16px 18px 18px; }
+  .panel h2{ font-size:12.5px; text-transform:uppercase; letter-spacing:.08em;
+    font-family:'IBM Plex Mono',monospace; color:var(--teal-dark);
+    margin:0 0 12px; border-bottom:1px dashed var(--border); padding-bottom:7px; }
+  label{ display:block; font-size:11.5px; font-weight:600; margin:9px 0 3px;
+    color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; }
+  input[type=text], input[type=number]{ width:100%; padding:6px 8px; border:1.3px solid var(--border);
+    border-radius:2px; font-family:'IBM Plex Mono',monospace; font-size:13px; background:#fdfcf8; color:var(--ink); }
+  input:focus{ outline:2px solid var(--teal); outline-offset:1px; border-color:var(--teal); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .hint{ font-size:11px; color:var(--ink-soft); margin-top:3px; line-height:1.5;}
+
+  #segList{ margin-top:6px; display:flex; flex-direction:column; gap:8px; }
+  .seg-card{ border:1.3px solid var(--border); border-left:4px solid var(--teal); border-radius:3px;
+    padding:9px 10px; background:#fbfaf5; }
+  .seg-card.arc{ border-left-color:var(--amber); }
+  .seg-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+  .seg-title{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:700; color:var(--ink); }
+  .seg-actions{ display:flex; gap:4px; }
+  .seg-actions button{ border:1px solid var(--ink); background:#fff; border-radius:2px; width:22px; height:22px;
+    font-size:12px; cursor:pointer; line-height:1; }
+  .seg-actions button.remove{ color:var(--danger); border-color:var(--danger); }
+  .add-row{ display:flex; gap:8px; margin-top:10px; }
+  button.addbtn{ flex:1; background:#fff; border:1.5px dashed var(--ink); color:var(--ink);
+    padding:9px 6px; font-weight:700; font-size:12.5px; border-radius:3px; cursor:pointer; }
+  button.addbtn:hover{ background:#eef0e8; }
+
+  .readout{ font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.7;
+    background:#f0ece0; border:1px dashed var(--border); border-radius:3px; padding:9px 11px; margin-top:12px; }
+  .readout b{ color:var(--teal-dark); }
+  .readout.warn{ background:#fbe9e4; border-color:var(--danger); color:var(--danger); }
+
+  .boards{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width: 760px){ .boards{ grid-template-columns:1fr; } }
+  .board-wrap h3{ font-size:12px; font-family:'IBM Plex Mono',monospace; margin:0 0 6px; color:var(--ink-soft);}
+  .jxgbox{ border:1.5px solid var(--ink); border-radius:2px; background:#fff; }
+
+  .export-row{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  button.primary{ background:var(--teal); color:#fff; border:1.5px solid var(--teal-dark);
+    padding:10px 16px; font-weight:700; font-size:13px; border-radius:3px; cursor:pointer; }
+  button.primary:disabled{ background:#9fb3af; border-color:#9fb3af; cursor:not-allowed; }
+  button.primary:not(:disabled):hover{ background:var(--teal-dark); }
+  button.ghost{ background:transparent; border:1.5px solid var(--ink); color:var(--ink);
+    padding:10px 16px; font-weight:600; font-size:12.5px; border-radius:3px; cursor:pointer; }
+  button.ghost:disabled{ opacity:.4; cursor:not-allowed; }
+  textarea{ width:100%; height:200px; margin-top:10px; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; padding:9px; border:1.3px solid var(--border); border-radius:3px; background:#fbfaf5; resize:vertical; }
+  .status{ font-size:12px; font-family:'IBM Plex Mono',monospace; margin-top:8px; color:var(--teal-dark);}
+  .note{ font-size:11.5px; color:var(--ink-soft); margin-top:12px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Générateur — questions STACK / Moodle</p>
+  <h1>Cinématique du point · construis ta propre trajectoire</h1>
+  <p>Enchaîne des segments (ligne, arc de cercle) pour construire la piste — ex. une pente à
+  20° suivie d'un tremplin en arc de cercle. Le point quitte la piste en bout de trajectoire
+  et devient un projectile (seule la pesanteur agit) : c'est cette phase qui sert à mesurer
+  le vecteur variation de vitesse.</p>
+</header>
+
+<div class="layout">
+
+  <!-- ================= FORMULAIRE ================= -->
+  <div class="panel">
+    <h2>1 · Départ</h2>
+    <div class="row3">
+      <div><label>x0 (m)</label><input type="number" id="x0" value="0" step="0.1"></div>
+      <div><label>y0 (m)</label><input type="number" id="y0" value="0" step="0.1"></div>
+      <div><label>angle départ (°)</label><input type="number" id="theta0" value="0" step="1"></div>
+    </div>
+    <label>Vitesse initiale v0 (m/s)</label>
+    <input type="number" id="v0start" value="8" step="0.1">
+    <p class="hint">Angle : 0° = horizontale vers la droite, 90° = verticale vers le haut,
+    -90° = verticale vers le bas.</p>
+
+    <h2 style="margin-top:16px;">2 · Piste (segments chaînés)</h2>
+    <div id="segList"></div>
+    <div class="add-row">
+      <button class="addbtn" id="addLigne">+ Ligne droite</button>
+      <button class="addbtn" id="addArc">+ Arc de cercle</button>
+    </div>
+    <p class="hint">Ligne : longueur + angle absolu (°). Arc : rayon + angle balayé (°),
+    positif = courbe vers le haut, négatif = courbe vers le bas. La piste est supposée sans
+    frottement : la vitesse en sortie est calculée par conservation de l'énergie mécanique.</p>
+
+    <h2 style="margin-top:16px;">3 · Après la piste</h2>
+    <div class="row2">
+      <div><label>g (m/s²)</label><input type="number" id="g" value="9.8" step="0.1"></div>
+      <div><label>Δt (s)</label><input type="number" id="dt" value="0.15" step="0.01"></div>
+    </div>
+
+    <h2 style="margin-top:16px;">4 · Échelle des vecteurs vitesse</h2>
+    <label>Échelle (carreaux par m/s)</label>
+    <input type="number" id="kv" value="0.3" step="0.05" min="0.01">
+    <p class="hint">Utilisée pour dessiner v2 (en M2) et v3 (en M3) directement sur la
+    trajectoire, sans qu'ils ne débordent trop du graphique. N'affecte pas la correction
+    (toujours faite en m/s).</p>
+
+    <label>Nom de la question</label>
+    <input type="text" id="qname" value="Cinematique_trajectoire_composee">
+
+    <div class="readout" id="readout"></div>
+  </div>
+
+  <!-- ================= APERÇU + EXPORT ================= -->
+  <div>
+    <div class="panel">
+      <h2>5 · Aperçu (piste + chronophotographie + construction de Δv)</h2>
+      <div class="boards">
+        <div class="board-wrap">
+          <h3>Trajectoire — v2 en M2, v3 en M3 (attendu)</h3>
+          <div id="board_traj" class="jxgbox" style="width:100%;height:360px;"></div>
+        </div>
+        <div class="board-wrap">
+          <h3>Zone de construction de Δv = v3 − v2 (attendu)</h3>
+          <div id="board_vec" class="jxgbox" style="width:100%;height:360px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:18px;">
+      <h2>6 · Export</h2>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 4px;">
+        Génère le fichier XML (format Moodle/STACK) correspondant à la piste et aux valeurs
+        saisies ci-dessus.
+      </p>
+      <div class="export-row">
+        <button class="primary" id="btnGenerate">Générer le XML</button>
+        <button class="ghost" id="btnDownload" disabled>Télécharger le .xml</button>
+      </div>
+      <div class="status" id="status"></div>
+      <textarea id="xmlOut" readonly placeholder="Le XML généré apparaîtra ici après clic sur « Générer le XML »."></textarea>
+      <p class="note">
+        Hypothèses : piste sans frottement (conservation de l'énergie mécanique le long des
+        segments) ; une fois la piste quittée, seule la pesanteur agit (mouvement à
+        accélération constante). La chronophotographie (5 points M0…M4, pas Δt) est prise
+        pendant cette phase de vol libre, et l'élève construit Δv à partir de M1–M4
+        (v2 = M1M3/2Δt, v3 = M2M4/2Δt). Testez l'import dans un bac à sable Moodle avant
+        déploiement.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===================== MODÈLE DE PISTE ===================== */
+let segments = [
+  {type:'ligne', L:3, theta:20},
+  {type:'arc', R:5, dtheta:30}
+];
+
+function renderSegList(){
+  const wrap = document.getElementById('segList');
+  wrap.innerHTML = '';
+  if(segments.length===0){
+    wrap.innerHTML = '<p class="hint">Aucun segment : le point part directement en vol libre depuis (x0,y0) avec l\'angle et la vitesse de départ.</p>';
+    return;
+  }
+  segments.forEach((seg,i)=>{
+    const card = document.createElement('div');
+    card.className = 'seg-card ' + seg.type;
+    const title = seg.type==='ligne' ? `Segment ${i+1} · Ligne droite` : `Segment ${i+1} · Arc de cercle`;
+    let fields = '';
+    if(seg.type==='ligne'){
+      fields = `
+        <div class="row2">
+          <div><label>longueur (m)</label><input type="number" step="0.1" data-i="${i}" data-f="L" value="${seg.L}"></div>
+          <div><label>angle absolu (°)</label><input type="number" step="1" data-i="${i}" data-f="theta" value="${seg.theta}"></div>
+        </div>`;
+    } else {
+      fields = `
+        <div class="row2">
+          <div><label>rayon (m)</label><input type="number" step="0.1" min="0.1" data-i="${i}" data-f="R" value="${seg.R}"></div>
+          <div><label>angle balayé (°)</label><input type="number" step="1" data-i="${i}" data-f="dtheta" value="${seg.dtheta}"></div>
+        </div>`;
+    }
+    card.innerHTML = `
+      <div class="seg-head">
+        <span class="seg-title">${title}</span>
+        <span class="seg-actions">
+          <button data-act="up" data-i="${i}" title="monter">↑</button>
+          <button data-act="down" data-i="${i}" title="descendre">↓</button>
+          <button data-act="remove" data-i="${i}" class="remove" title="supprimer">×</button>
+        </span>
+      </div>
+      ${fields}`;
+    wrap.appendChild(card);
+  });
+}
+
+document.getElementById('segList').addEventListener('input', (e)=>{
+  const t = e.target;
+  if(t.dataset.i===undefined) return;
+  const i = parseInt(t.dataset.i), f = t.dataset.f;
+  const v = parseFloat(t.value);
+  if(!isNaN(v)) segments[i][f] = v;
+  update();
+});
+
+document.getElementById('segList').addEventListener('click', (e)=>{
+  const t = e.target;
+  if(!t.dataset.act) return;
+  const i = parseInt(t.dataset.i);
+  if(t.dataset.act==='remove'){ segments.splice(i,1); }
+  else if(t.dataset.act==='up' && i>0){ [segments[i-1],segments[i]]=[segments[i],segments[i-1]]; }
+  else if(t.dataset.act==='down' && i<segments.length-1){ [segments[i+1],segments[i]]=[segments[i],segments[i+1]]; }
+  renderSegList();
+  update();
+});
+
+document.getElementById('addLigne').addEventListener('click', ()=>{
+  segments.push({type:'ligne', L:3, theta:0});
+  renderSegList(); update();
+});
+document.getElementById('addArc').addEventListener('click', ()=>{
+  segments.push({type:'arc', R:5, dtheta:30});
+  renderSegList(); update();
+});
+
+/* ===================== PHYSIQUE ===================== */
+function getGlobalParams(){
+  return {
+    x0: parseFloat(document.getElementById('x0').value),
+    y0: parseFloat(document.getElementById('y0').value),
+    theta0: parseFloat(document.getElementById('theta0').value),
+    v0start: parseFloat(document.getElementById('v0start').value),
+    g: parseFloat(document.getElementById('g').value),
+    dt: parseFloat(document.getElementById('dt').value),
+    kv: parseFloat(document.getElementById('kv').value),
+    qname: document.getElementById('qname').value.trim() || 'Cinematique_trajectoire'
+  };
+}
+
+/* construit la piste : renvoie décor (primitives à dessiner), point/angle de sortie,
+   et segGeom (géométrie par abscisse curviligne s, pour simuler le mouvement le long
+   de la piste). */
+function buildChain(gp){
+  let pos = [gp.x0, gp.y0];
+  let theta = gp.theta0; // degrés
+  let sCum = 0;
+  const decor = [];
+  const jointPts = [[...pos]];
+  const segGeom = [];
+  segments.forEach(seg=>{
+    if(seg.type==='ligne'){
+      const rad = seg.theta*Math.PI/180;
+      const p2 = [pos[0]+seg.L*Math.cos(rad), pos[1]+seg.L*Math.sin(rad)];
+      decor.push({type:'line', pts:[[...pos],[...p2]]});
+      segGeom.push({type:'ligne', sStart:sCum, sEnd:sCum+seg.L, theta:seg.theta, start:[...pos]});
+      sCum += seg.L;
+      pos = p2; theta = seg.theta;
+      jointPts.push([...pos]);
+    } else {
+      const s = seg.dtheta>=0 ? 1 : -1;
+      const rad0 = theta*Math.PI/180;
+      const perp = rad0 + s*Math.PI/2;
+      const R = Math.max(0.1, seg.R);
+      const C = [pos[0]+R*Math.cos(perp), pos[1]+R*Math.sin(perp)];
+      const phi0 = rad0 - s*Math.PI/2;
+      const dthetaRad = seg.dtheta*Math.PI/180;
+      const N = 24;
+      const pts = [];
+      for(let k=0;k<=N;k++){
+        const phi = phi0 + dthetaRad*k/N;
+        pts.push([C[0]+R*Math.cos(phi), C[1]+R*Math.sin(phi)]);
+      }
+      decor.push({type:'arc', pts});
+      const arcLen = R*Math.abs(dthetaRad);
+      segGeom.push({type:'arc', sStart:sCum, sEnd:sCum+arcLen, R:R, s_dir:s, phi0:phi0, center:[...C]});
+      sCum += arcLen;
+      pos = pts[pts.length-1];
+      theta = theta + seg.dtheta;
+      jointPts.push([...pos]);
+    }
+  });
+  return {decor, exitPoint:pos, exitAngle:theta, jointPts, h0:gp.y0, segGeom, S_total:sCum};
+}
+
+function angleAtS(segGeom, s){
+  if(segGeom.length===0) return 0;
+  let seg = segGeom[segGeom.length-1];
+  for(const g of segGeom){ if(s <= g.sEnd + 1e-9){ seg = g; break; } }
+  if(seg.type==='ligne') return seg.theta;
+  const phi = seg.phi0 + seg.s_dir*(s-seg.sStart)/seg.R;
+  return (phi + seg.s_dir*Math.PI/2)*180/Math.PI;
+}
+
+function positionAtS(segGeom, s){
+  if(segGeom.length===0) return null;
+  let seg = segGeom[segGeom.length-1];
+  for(const g of segGeom){ if(s <= g.sEnd + 1e-9){ seg = g; break; } }
+  if(seg.type==='ligne'){
+    const rad = seg.theta*Math.PI/180;
+    const ds = s-seg.sStart;
+    return [seg.start[0]+ds*Math.cos(rad), seg.start[1]+ds*Math.sin(rad)];
+  } else {
+    const phi = seg.phi0 + seg.s_dir*(s-seg.sStart)/seg.R;
+    return [seg.center[0]+seg.R*Math.cos(phi), seg.center[1]+seg.R*Math.sin(phi)];
+  }
+}
+
+/* simule le mouvement le long de la piste par intégration numérique (RK4) de
+   ds/dt = v, dv/dt = -g*sin(theta(s)) (conservation de l'énergie mécanique,
+   piste sans frottement). Détecte un rebroussement (énergie insuffisante en un
+   point intermédiaire, pas seulement en sortie de piste). */
+function simulateTrack(segGeom, S_total, v0, g){
+  const trace = [{t:0, s:0, v:v0}];
+  if(S_total<=0) return {trace, tExit:0, ok:true};
+  const dtSim = Math.max(0.0005, Math.min(0.01, S_total/(Math.max(v0,1)*400)));
+  let t=0, s=0, v=v0;
+  const maxSteps = 20000;
+  for(let it=0; it<maxSteps; it++){
+    const f = (ss,vv)=>[vv, -g*Math.sin(angleAtS(segGeom,ss)*Math.PI/180)];
+    const k1=f(s,v);
+    const k2=f(s+dtSim/2*k1[0], v+dtSim/2*k1[1]);
+    const k3=f(s+dtSim/2*k2[0], v+dtSim/2*k2[1]);
+    const k4=f(s+dtSim*k3[0], v+dtSim*k3[1]);
+    const sNew = s + dtSim/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]);
+    const vNew = v + dtSim/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+    if(vNew<=0.001 && sNew<S_total-1e-6){
+      return {trace, tExit:null, ok:false};
+    }
+    if(sNew>=S_total){
+      const frac = (S_total-s)/(sNew-s);
+      const tExit = t + dtSim*frac;
+      trace.push({t:tExit, s:S_total, v:vNew});
+      return {trace, tExit, ok:true};
+    }
+    t += dtSim; s=sNew; v=vNew;
+    trace.push({t,s,v});
+  }
+  return {trace, tExit:null, ok:false};
+}
+
+function sampleTrackPosition(segGeom, trace, t){
+  if(t<=0) return positionAtS(segGeom,0) || [0,0];
+  for(let i=1;i<trace.length;i++){
+    if(trace[i].t>=t){
+      const a=trace[i-1], b=trace[i];
+      const frac = (b.t-a.t)>1e-12 ? (t-a.t)/(b.t-a.t) : 0;
+      const s = a.s + frac*(b.s-a.s);
+      return positionAtS(segGeom, s);
+    }
+  }
+  return positionAtS(segGeom, trace[trace.length-1].s);
+}
+
+function computeAll(){
+  const gp = getGlobalParams();
+  if(Object.values(gp).some(v=>typeof v==='number' && isNaN(v))) return null;
+  const chain = buildChain(gp);
+
+  const sim = simulateTrack(chain.segGeom, chain.S_total, gp.v0start, gp.g);
+  if(!sim.ok){
+    return {gp, chain, energyOk:false, tooManyPoints:false,
+      failReason:'turning', vmax2:1, xmin_t:gp.x0-1, xmax_t:gp.x0+1, ymin_t:-1, ymax_t:gp.y0+1,
+      Mlist:[], kExit:0, v2:[0,0], v3:[0,0], dv:[0,0]};
+  }
+  const tExit = sim.tExit;
+  const dh = gp.y0 - chain.exitPoint[1];
+  const under = gp.v0start*gp.v0start + 2*gp.g*dh;
+  const v_exit = Math.sqrt(Math.max(0,under));
+  const rad = chain.exitAngle*Math.PI/180;
+  const v0x = v_exit*Math.cos(rad), v0y = v_exit*Math.sin(rad);
+  const ax=0, ay=-gp.g;
+
+  /* index du premier échantillon (t = k*dt) déjà en vol libre */
+  let kExit = 0;
+  while(kExit*gp.dt < tExit - 1e-9) kExit++;
+  const Ntotal = kExit+5;
+
+  if(Ntotal > 40){
+    return {gp, chain, energyOk:true, tooManyPoints:true, Ntotal,
+      vmax2:1, xmin_t:gp.x0-1, xmax_t:gp.x0+1, ymin_t:-1, ymax_t:gp.y0+1,
+      Mlist:[], kExit:0, v2:[0,0], v3:[0,0], dv:[0,0]};
+  }
+
+  const Mlist = [];
+  for(let k=0;k<Ntotal;k++){
+    const t = k*gp.dt;
+    if(k < kExit){
+      Mlist.push(sampleTrackPosition(chain.segGeom, sim.trace, t));
+    } else {
+      const tf = t - tExit;
+      Mlist.push([ chain.exitPoint[0]+v0x*tf+0.5*ax*tf*tf, chain.exitPoint[1]+v0y*tf+0.5*ay*tf*tf ]);
+    }
+  }
+  // le point d'indice kExit est exactement la sortie de piste
+  Mlist[kExit] = [...chain.exitPoint];
+
+  const v2=[ (Mlist[kExit+3][0]-Mlist[kExit+1][0])/(2*gp.dt), (Mlist[kExit+3][1]-Mlist[kExit+1][1])/(2*gp.dt) ];
+  const v3=[ (Mlist[kExit+4][0]-Mlist[kExit+2][0])/(2*gp.dt), (Mlist[kExit+4][1]-Mlist[kExit+2][1])/(2*gp.dt) ];
+  const dv=[ v3[0]-v2[0], v3[1]-v2[1] ];
+
+  const arrowTip2 = [Mlist[kExit+2][0]+gp.kv*v2[0], Mlist[kExit+2][1]+gp.kv*v2[1]];
+  const arrowTip3 = [Mlist[kExit+3][0]+gp.kv*v3[0], Mlist[kExit+3][1]+gp.kv*v3[1]];
+
+  const allX = [gp.x0, ...chain.jointPts.map(p=>p[0]), ...Mlist.map(p=>p[0]), arrowTip2[0], arrowTip3[0]];
+  const allY = [gp.y0, 0, ...chain.jointPts.map(p=>p[1]), ...Mlist.map(p=>p[1]), arrowTip2[1], arrowTip3[1]];
+  const xmin_t = Math.floor(Math.min(...allX))-1, xmax_t = Math.ceil(Math.max(...allX))+1;
+  const ymin_t = Math.floor(Math.min(...allY))-1, ymax_t = Math.ceil(Math.max(...allY))+1;
+  const vmax2 = Math.ceil(Math.max(Math.abs(dv[0]),Math.abs(dv[1]),1))+1;
+
+  return {gp, chain, energyOk:true, tooManyPoints:false, tExit, kExit, Ntotal, Mlist,
+    v_exit, v0x, v0y, ax, ay, v2, v3, dv, xmin_t, xmax_t, ymin_t, ymax_t, vmax2};
+}
+
+/* ===================== AFFICHAGE ===================== */
+function drawBoards(d){
+  const trajDiv=document.getElementById('board_traj');
+  const vecDiv=document.getElementById('board_vec');
+  trajDiv.innerHTML=''; vecDiv.innerHTML='';
+
+  const b1 = JXG.JSXGraph.initBoard(trajDiv, {
+    boundingbox:[d.xmin_t,d.ymax_t,d.xmax_t,d.ymin_t], axis:true,
+    showCopyright:false, showNavigation:false, keepAspectRatio:true
+  });
+  d.chain.decor.forEach(prim=>{
+    if(prim.type==='line'){
+      b1.create('segment', prim.pts, {strokeColor:'#8a5a2b', strokeWidth:5, fixed:true});
+    } else {
+      b1.create('curve', [prim.pts.map(p=>p[0]), prim.pts.map(p=>p[1])],
+        {strokeColor:'#8a5a2b', strokeWidth:5, fixed:true});
+    }
+  });
+  if(d.energyOk && !d.tooManyPoints){
+    const Mpts = d.Mlist.map((pt,i)=> b1.create('point', pt, {
+      name:'M'+i, fixed:true, size: i<d.kExit ? 2.5 : 3,
+      color: i<d.kExit ? '#8a5a2b' : '#0033aa',
+      label:{offset:[6,6],fontSize: i<d.kExit ? 10 : 13}
+    }));
+    const kv = d.gp.kv;
+    const i2 = d.kExit+2, i3 = d.kExit+3;
+    const T2 = b1.create('point', [d.Mlist[i2][0]+kv*d.v2[0], d.Mlist[i2][1]+kv*d.v2[1]], {name:'v2', size:3, color:'#c0392b'});
+    b1.create('arrow', [Mpts[i2], T2], {strokeColor:'#c0392b', strokeWidth:2});
+    const T3 = b1.create('point', [d.Mlist[i3][0]+kv*d.v3[0], d.Mlist[i3][1]+kv*d.v3[1]], {name:'v3', size:3, color:'#2980b9'});
+    b1.create('arrow', [Mpts[i3], T3], {strokeColor:'#2980b9', strokeWidth:2});
+  }
+
+  const b2 = JXG.JSXGraph.initBoard(vecDiv, {
+    boundingbox:[-d.vmax2,d.vmax2,d.vmax2,-d.vmax2], axis:true,
+    showCopyright:false, showNavigation:false, keepAspectRatio:true, grid:true
+  });
+  const O=b2.create('point',[0,0],{name:'O',fixed:true,size:2,color:'black'});
+  const Tdv=b2.create('point',[d.dv[0],d.dv[1]],{name:'Δv',size:4,color:'#27ae60'});
+  b2.create('arrow',[O,Tdv],{strokeColor:'#27ae60',strokeWidth:2});
+}
+
+function update(){
+  const d = computeAll();
+  const ro = document.getElementById('readout');
+  const btnGen = document.getElementById('btnGenerate');
+  if(!d){ ro.textContent='Vérifie les valeurs saisies.'; btnGen.disabled=true; return; }
+  drawBoards(d);
+  if(!d.energyOk){
+    ro.className='readout warn';
+    ro.innerHTML = `⚠ Le point rebrousse chemin quelque part sur la piste (énergie
+    insuffisante pour passer un point haut, pas seulement en sortie). Augmente v0, réduis un
+    rayon/une longueur, ou adoucis un angle.`;
+    btnGen.disabled = true;
+  } else if(d.tooManyPoints){
+    ro.className='readout warn';
+    ro.innerHTML = `⚠ La piste est trop longue par rapport à Δt : cela donnerait ${d.Ntotal}
+    points affichés. Augmente Δt, ou raccourcis la piste (moins de segments / segments plus
+    courts).`;
+    btnGen.disabled = true;
+  } else {
+    ro.className='readout';
+    ro.innerHTML =
+      `<b>Points affichés</b> : ${d.Ntotal} (M0…M${d.kExit-1} sur la piste, M${d.kExit}… en vol libre)<br>`+
+      `<b>Sortie de piste</b> (M${d.kExit}) : (${d.chain.exitPoint[0].toFixed(2)} ; ${d.chain.exitPoint[1].toFixed(2)}) m,
+      angle ${d.chain.exitAngle.toFixed(1)}°, v = ${d.v_exit.toFixed(2)} m/s<br>`+
+      `<b>v2</b> (en M${d.kExit+2}) = (${d.v2[0].toFixed(2)} ; ${d.v2[1].toFixed(2)}) m/s<br>`+
+      `<b>v3</b> (en M${d.kExit+3}) = (${d.v3[0].toFixed(2)} ; ${d.v3[1].toFixed(2)}) m/s<br>`+
+      `<b>Δv</b> = (${d.dv[0].toFixed(2)} ; ${d.dv[1].toFixed(2)}) m/s &nbsp;→ norme ${Math.hypot(d.dv[0],d.dv[1]).toFixed(2)} m/s`;
+    btnGen.disabled = false;
+  }
+}
+
+['x0','y0','theta0','v0start','g','dt','kv','qname'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', update);
+});
+
+/* ===================== EXPORT XML ===================== */
+function fmt(n){ return Number(n.toFixed(4)); }
+function xmlEscape(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function buildMaximaVars(d){
+  const MlistStr = '[' + d.Mlist.map(p=>`[${fmt(p[0])},${fmt(p[1])}]`).join(',') + ']';
+  return `g: ${fmt(d.gp.g)}$
+
+dt: ${fmt(d.gp.dt)}$
+kExit: ${d.kExit}$
+Mlist: ${MlistStr}$
+
+v2: [${fmt(d.v2[0])}, ${fmt(d.v2[1])}]$
+v3: [${fmt(d.v3[0])}, ${fmt(d.v3[1])}]$
+dv: [v3[1]-v2[1], v3[2]-v2[2]]$
+
+tol: 0.30$
+
+xmin_t: ${fmt(d.xmin_t)}$
+xmax_t: ${fmt(d.xmax_t)}$
+ymin_t: ${fmt(d.ymin_t)}$
+ymax_t: ${fmt(d.ymax_t)}$
+
+vmax2: ${fmt(d.vmax2)}$
+kv: ${fmt(d.gp.kv)}$`;
+}
+
+/* décor de la piste : coordonnées littérales (pas de randomisation possible sur la piste
+   elle-même dans cette version — seules dt/g restent modifiables a posteriori dans Maxima). */
+function buildDecorJS(d){
+  let js = '';
+  d.chain.decor.forEach(prim=>{
+    if(prim.type==='line'){
+      const [p1,p2]=prim.pts;
+      js += `b1.create('segment', [[${fmt(p1[0])},${fmt(p1[1])}],[${fmt(p2[0])},${fmt(p2[1])}]], {strokeColor:'#8a5a2b', strokeWidth:5, fixed:true});\n`;
+    } else {
+      const xs = prim.pts.map(p=>fmt(p[0])).join(',');
+      const ys = prim.pts.map(p=>fmt(p[1])).join(',');
+      js += `b1.create('curve', [[${xs}],[${ys}]], {strokeColor:'#8a5a2b', strokeWidth:5, fixed:true});\n`;
+    }
+  });
+  return js;
+}
+
+function buildQuestionText(d){
+  const decorJS = buildDecorJS(d);
+  return `
+<p>La figure ci-dessous montre la piste construite pour cet exercice. Le point M est
+photographié à intervalles de temps réguliers \\( \\Delta t = {@dt@}\\ \\text{s} \\), en
+partant de son point de départ M0, y compris pendant qu'il est guidé par la piste. Une fois
+la piste quittée (au point M{@kExit@}), une seule force agit sur lui : son poids.</p>
+
+<p>On admet que la vitesse instantanée en un point M<sub>k</sub> peut être estimée par
+\\( \\vec v_k \\approx \\dfrac{\\overrightarrow{M_{k-1}M_{k+1}}}{2\\,\\Delta t} \\) — valable
+seulement en vol libre (accélération constante), pas pendant que le point est guidé par la
+piste.</p>
+
+<p><b>Étape 1</b> — sur la figure, fais glisser les points colorés pour construire, à
+l'échelle indiquée ({@kv@} carreau(x) pour 1 m/s) :</p>
+<ul>
+<li>le vecteur \\( \\vec v_2 \\) (rouge), <b>à partir de M{@kExit+2@}</b> ;</li>
+<li>le vecteur \\( \\vec v_3 \\) (bleu), <b>à partir de M{@kExit+3@}</b>.</li>
+</ul>
+
+[[jsxgraph width="600" height="440" id="board_traj"]]
+var b1 = JXG.JSXGraph.initBoard('board_traj', {
+  boundingbox: [{@xmin_t@}, {@ymax_t@}, {@xmax_t@}, {@ymin_t@}],
+  axis: true, showCopyright: false, showNavigation: false, keepAspectRatio: true
+});
+b1.create('text', [{@xmin_t@}+0.3, {@ymin_t@}+0.4, 'x (m)'], {fontSize:12});
+b1.create('text', [{@xmin_t@}+0.3, {@ymax_t@}-0.3, 'y (m)'], {fontSize:12});
+
+${decorJS}
+var Mlist = {@Mlist@};
+var kExit = {@kExit@};
+var Mpts = [];
+for (var i=0; i<Mlist.length; i++){
+  Mpts.push(b1.create('point', Mlist[i], {name:'M'+i, fixed:true,
+    size: i<kExit ? 2.5 : 3, color: i<kExit ? '#8a5a2b' : '#0033aa',
+    label:{offset:[6,6], fontSize: i<kExit ? 10 : 13}}));
+}
+
+var kv = {@kv@};
+var i2 = kExit+2, i3 = kExit+3;
+var T2 = b1.create('point', [Mlist[i2][0], Mlist[i2][1]], {name:'v2', size:4, color:'#c0392b',
+  snapToGrid:true, snapSizeX:0.05, snapSizeY:0.05});
+b1.create('arrow', [Mpts[i2], T2], {strokeColor:'#c0392b', strokeWidth:2});
+
+var T3 = b1.create('point', [Mlist[i3][0], Mlist[i3][1]], {name:'v3', size:4, color:'#2980b9',
+  snapToGrid:true, snapSizeX:0.05, snapSizeY:0.05});
+b1.create('arrow', [Mpts[i3], T3], {strokeColor:'#2980b9', strokeWidth:2});
+[[/jsxgraph]]
+
+<p><b>Étape 2</b> — dans le repère ci-dessous (1 carreau = 1 m/s), reporte les vecteurs
+\\( \\vec v_2 \\) et \\( \\vec v_3 \\) que tu viens de construire à partir d'une même origine O,
+puis construis le vecteur variation de vitesse
+\\( \\Delta \\vec v = \\vec v_3 - \\vec v_2 \\) (vert) en faisant glisser sa pointe.</p>
+
+[[jsxgraph width="380" height="380" id="board_dv"]]
+var b2 = JXG.JSXGraph.initBoard('board_dv', {
+  boundingbox: [-{@vmax2@}, {@vmax2@}, {@vmax2@}, -{@vmax2@}],
+  axis: true, showCopyright: false, showNavigation: false, keepAspectRatio: true, grid:true
+});
+var O = b2.create('point', [0, 0], {name:'O', fixed:true, size:2, color:'black'});
+var Tdv = b2.create('point', [0, 0], {name:'\\u0394v', size:4, color:'#27ae60',
+  snapToGrid:true, snapSizeX:0.05, snapSizeY:0.05});
+b2.create('arrow', [O, Tdv], {strokeColor:'#27ae60', strokeWidth:2});
+
+function syncInput(pt, origin, suffix, scale){
+  var dx = ((pt.X()-origin.X())/scale).toFixed(2);
+  var dy = ((pt.Y()-origin.Y())/scale).toFixed(2);
+  var el = document.querySelector('input[id$="' + suffix + '"]');
+  if (el){
+    el.value = '[' + dx + ',' + dy + ']';
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+    el.dispatchEvent(new Event('change', {bubbles:true}));
+  }
+}
+T2.on('up', function(){ syncInput(T2, Mpts[i2], '_ans1', kv); });
+T3.on('up', function(){ syncInput(T3, Mpts[i3], '_ans2', kv); });
+Tdv.on('up', function(){ syncInput(Tdv, O, '_ans3', 1); });
+[[/jsxgraph]]
+
+<div style="display:none">
+[[input:ans1]]
+[[input:ans2]]
+[[input:ans3]]
+</div>
+
+<p>[[validation:ans1]] [[validation:ans2]] [[validation:ans3]]</p>
+`;
+}
+
+function buildXML(d){
+  const vars = buildMaximaVars(d);
+  const qtext = buildQuestionText(d);
+  const qname = xmlEscape(d.gp.qname);
+  const pisteDesc = segments.length===0 ? 'aucune (chute directe)' :
+    segments.map(s=> s.type==='ligne' ? `ligne(${s.L}m,${s.theta}°)` : `arc(R=${s.R}m,${s.dtheta}°)`).join(' -> ');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!--
+  Question STACK générée par le générateur "Cinématique du point — trajectoire composée".
+  Piste : ${pisteDesc}
+  Valeurs fixes (pas de randomisation).
+-->
+<question type="stack">
+  <name>
+    <text>${qname}</text>
+  </name>
+  <questiontext format="html">
+    <text><![CDATA[${qtext}]]></text>
+  </questiontext>
+
+  <generalfeedback format="html">
+    <text><![CDATA[
+<p>Une fois le point lancé, il n'est soumis qu'à son poids : l'accélération est constante,
+verticale, dirigée vers le bas, de valeur g, quelle que soit la forme de la piste parcourue
+avant. On montre que \\( \\Delta \\vec v = \\vec a \\cdot \\Delta t \\), un vecteur
+<b>vertical, dirigé vers le bas, de norme constante</b> — la signature d'un mouvement
+uniformément accéléré.</p>
+]]></text>
+  </generalfeedback>
+
+  <defaultgrade>1.0000000</defaultgrade>
+  <penalty>0.1000000</penalty>
+  <hidden>0</hidden>
+  <idnumber></idnumber>
+
+  <questionvariables>
+    <text><![CDATA[
+${vars}
+]]></text>
+  </questionvariables>
+
+  <specificfeedback format="html">
+    <text><![CDATA[[[feedback:ans1]] [[feedback:ans2]] [[feedback:ans3]]]]></text>
+  </specificfeedback>
+
+  <questionnote format="html">
+    <text><![CDATA[Piste : ${xmlEscape(pisteDesc)}, dt=${fmt(d.gp.dt)} s, v_sortie=${fmt(d.v_exit)} m/s]]></text>
+  </questionnote>
+
+  <questiondescription format="html">
+    <text></text>
+  </questiondescription>
+
+  <input>
+    <name>ans1</name>
+    <type>algebraic</type>
+    <tans>v2</tans>
+    <boxsize>15</boxsize>
+    <strictsyntax>1</strictsyntax>
+    <insertstars>0</insertstars>
+    <syntaxhint></syntaxhint>
+    <forbidwords></forbidwords>
+    <mustverify>1</mustverify>
+    <showvalidation>1</showvalidation>
+    <options></options>
+  </input>
+
+  <input>
+    <name>ans2</name>
+    <type>algebraic</type>
+    <tans>v3</tans>
+    <boxsize>15</boxsize>
+    <strictsyntax>1</strictsyntax>
+    <insertstars>0</insertstars>
+    <syntaxhint></syntaxhint>
+    <forbidwords></forbidwords>
+    <mustverify>1</mustverify>
+    <showvalidation>1</showvalidation>
+    <options></options>
+  </input>
+
+  <input>
+    <name>ans3</name>
+    <type>algebraic</type>
+    <tans>dv</tans>
+    <boxsize>15</boxsize>
+    <strictsyntax>1</strictsyntax>
+    <insertstars>0</insertstars>
+    <syntaxhint></syntaxhint>
+    <forbidwords></forbidwords>
+    <mustverify>1</mustverify>
+    <showvalidation>1</showvalidation>
+    <options></options>
+  </input>
+
+  <prt>
+    <name>prt1</name>
+    <value>0.2500000</value>
+    <autosimplify>1</autosimplify>
+    <feedbackstyle>1</feedbackstyle>
+    <node>
+      <name>0</name>
+      <answertest>NumAbsolute</answertest>
+      <sans>ans1</sans>
+      <tans>v2</tans>
+      <testoptions>tol</testoptions>
+      <quiet>0</quiet>
+      <truescoremode>=</truescoremode>
+      <truescore>1.0000000</truescore>
+      <truepenalty></truepenalty>
+      <truenextnode>-1</truenextnode>
+      <trueanswernote>prt1-0-T</trueanswernote>
+      <truefeedback format="html">
+        <text><![CDATA[<p>Vecteur \\( \\vec v_2 \\) correct.</p>]]></text>
+      </truefeedback>
+      <falsescoremode>=</falsescoremode>
+      <falsescore>0.0000000</falsescore>
+      <falsepenalty></falsepenalty>
+      <falsenextnode>-1</falsenextnode>
+      <falseanswernote>prt1-0-F</falseanswernote>
+      <falsefeedback format="html">
+        <text><![CDATA[<p>Vecteur \\( \\vec v_2 \\) incorrect : reprends
+\\( \\vec v_2 \\approx \\overrightarrow{M_{${d.kExit+1}}M_{${d.kExit+3}}}/(2\\Delta t) \\), à tracer
+<b>à partir de M${d.kExit+2}</b>, à l'échelle indiquée.</p>]]></text>
+      </falsefeedback>
+    </node>
+  </prt>
+
+  <prt>
+    <name>prt2</name>
+    <value>0.2500000</value>
+    <autosimplify>1</autosimplify>
+    <feedbackstyle>1</feedbackstyle>
+    <node>
+      <name>0</name>
+      <answertest>NumAbsolute</answertest>
+      <sans>ans2</sans>
+      <tans>v3</tans>
+      <testoptions>tol</testoptions>
+      <quiet>0</quiet>
+      <truescoremode>=</truescoremode>
+      <truescore>1.0000000</truescore>
+      <truepenalty></truepenalty>
+      <truenextnode>-1</truenextnode>
+      <trueanswernote>prt2-0-T</trueanswernote>
+      <truefeedback format="html">
+        <text><![CDATA[<p>Vecteur \\( \\vec v_3 \\) correct.</p>]]></text>
+      </truefeedback>
+      <falsescoremode>=</falsescoremode>
+      <falsescore>0.0000000</falsescore>
+      <falsepenalty></falsepenalty>
+      <falsenextnode>-1</falsenextnode>
+      <falseanswernote>prt2-0-F</falseanswernote>
+      <falsefeedback format="html">
+        <text><![CDATA[<p>Vecteur \\( \\vec v_3 \\) incorrect : reprends
+\\( \\vec v_3 \\approx \\overrightarrow{M_{${d.kExit+2}}M_{${d.kExit+4}}}/(2\\Delta t) \\), à tracer
+<b>à partir de M${d.kExit+3}</b>, à l'échelle indiquée.</p>]]></text>
+      </falsefeedback>
+    </node>
+  </prt>
+
+  <prt>
+    <name>prt3</name>
+    <value>0.5000000</value>
+    <autosimplify>1</autosimplify>
+    <feedbackstyle>1</feedbackstyle>
+    <node>
+      <name>0</name>
+      <answertest>NumAbsolute</answertest>
+      <sans>ans3</sans>
+      <tans>dv</tans>
+      <testoptions>tol</testoptions>
+      <quiet>0</quiet>
+      <truescoremode>=</truescoremode>
+      <truescore>1.0000000</truescore>
+      <truepenalty></truepenalty>
+      <truenextnode>-1</truenextnode>
+      <trueanswernote>prt3-0-T</trueanswernote>
+      <truefeedback format="html">
+        <text><![CDATA[<p>Vecteur \\( \\Delta \\vec v \\) correct : il est bien vertical, dirigé
+vers le bas, de norme \\( g\\Delta t \\). C'est la preuve que l'accélération est
+constante.</p>]]></text>
+      </truefeedback>
+      <falsescoremode>=</falsescoremode>
+      <falsescore>0.0000000</falsescore>
+      <falsepenalty></falsepenalty>
+      <falsenextnode>-1</falsenextnode>
+      <falseanswernote>prt3-0-F</falseanswernote>
+      <falsefeedback format="html">
+        <text><![CDATA[<p>Vecteur \\( \\Delta \\vec v \\) incorrect : reporte \\( \\vec v_2 \\)
+et \\( \\vec v_3 \\) à partir de la même origine O, puis relie la pointe de
+\\( \\vec v_2 \\) à la pointe de \\( \\vec v_3 \\) : c'est \\( \\Delta \\vec v \\).</p>]]></text>
+      </falsefeedback>
+    </node>
+  </prt>
+
+  <deployedseed></deployedseed>
+  <qtest></qtest>
+
+</question>
+</quiz>`;
+}
+
+let lastXML = '';
+document.getElementById('btnGenerate').addEventListener('click', ()=>{
+  const d = computeAll();
+  if(!d || !d.energyOk || d.tooManyPoints) return;
+  lastXML = buildXML(d);
+  document.getElementById('xmlOut').value = lastXML;
+  document.getElementById('btnDownload').disabled = false;
+  document.getElementById('status').textContent = '✓ XML généré (' + lastXML.length + ' caractères). Vérifie-le puis télécharge-le.';
+});
+
+document.getElementById('btnDownload').addEventListener('click', ()=>{
+  if(!lastXML) return;
+  const gp = getGlobalParams();
+  const blob = new Blob([lastXML], {type:'application/xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (gp.qname || 'question_stack') + '.xml';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  document.getElementById('status').textContent = '✓ Téléchargement lancé : ' + a.download;
+});
+
+renderSegList();
+update();
+</script>
+</body>
+</html>

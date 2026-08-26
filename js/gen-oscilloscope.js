@@ -1,0 +1,863 @@
+/*
+ * Cairn for Stack — générateur de questions STACK pour Moodle
+ * Copyright (C) 2026  Benoit Joly
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/* ══════════════════════════════════════════════════════════════
+   CAIRN FOR STACK — Générateur Oscilloscope (JSXGraph, thème clair)
+   Basé sur les exports Moodle de référence (test/mise à jour/Physique-chimie/Oscilloscope)
+   Écran : 10×8 divisions  x∈[-5,5]  y∈[-4,4] — vrais boutons, curseurs togglables,
+   réponses en 2 champs "units" (grandeur + unité), PRT diagnostique multi-nœuds.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Listes de sensibilités (identiques au GeoGebra d'origine) ── */
+var OSC_SV = [0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10];
+var OSC_SH = [5e-7,1e-6,2e-6,5e-6,1e-5,2e-5,5e-5,
+              1e-4,2e-4,5e-4,1e-3,2e-3,5e-3,
+              1e-2,2e-2,5e-2,0.1,0.2,0.5];
+
+/* ── UI helpers (appelés par le panel) ── */
+function oscModeChange(){
+  var mode = document.getElementById('osc-mode').value;
+  document.getElementById('osc-pf-params').style.display     = (mode==='periode_frequence') ? '' : 'none';
+  document.getElementById('osc-rc-params').style.display     = (mode==='rc_charge'||mode==='rc_decharge') ? '' : 'none';
+  document.getElementById('osc-retard-params').style.display  = (mode==='retard') ? '' : 'none';
+  oscUpdateShSvAuto();
+}
+
+function oscFreqModeChange(){
+  var fm = document.getElementById('osc-freq-mode').value;
+  document.getElementById('osc-freq-fixed-row').style.display = (fm==='fixed') ? '' : 'none';
+  oscUpdateShSvAuto();
+}
+
+function oscAutoToggle(which){
+  var ck  = document.getElementById('osc-'+which+'-auto');
+  var sel = document.getElementById('osc-'+which+'-idx');
+  if(!ck||!sel) return;
+  sel.disabled = ck.checked;
+  if(ck.checked) oscUpdateShSvAuto();
+}
+
+function oscUpdateShSvAuto(){
+  var mode   = document.getElementById('osc-mode').value;
+  var autoSH = document.getElementById('osc-sh-auto') && document.getElementById('osc-sh-auto').checked;
+  var autoSV = document.getElementById('osc-sv-auto') && document.getElementById('osc-sv-auto').checked;
+  if(!autoSH && !autoSV) return;
+
+  var shIdx, svIdx;
+  if(mode==='rc_charge'||mode==='rc_decharge'){
+    var tauBase = parseFloat(document.getElementById('osc-tau-base').value)||1000;
+    var tau_s   = tauBase/1e6;
+    var evBase  = parseFloat(document.getElementById('osc-evolt-base').value)||2000;
+    var ev_v    = evBase/1000;
+    var tgt=tau_s/2; shIdx=12;
+    for(var i=0;i<OSC_SH.length;i++) if(OSC_SH[i]<=tgt) shIdx=i;
+    tgt=ev_v/3; svIdx=7;
+    for(var i=0;i<OSC_SV.length;i++) if(OSC_SV[i]<=tgt) svIdx=i;
+  } else if(mode==='retard'){
+    var fc = parseFloat(document.getElementById('osc-fcarrier').value)||4000000;
+    var T=1/fc, tgt=T/2; shIdx=2;
+    for(var i=0;i<OSC_SH.length;i++) if(OSC_SH[i]<=tgt) shIdx=i;
+    svIdx=6;
+  } else {
+    var fm   = document.getElementById('osc-freq-mode').value;
+    var fHz  = (fm==='alea') ? 500 : (parseFloat(document.getElementById('osc-ffreq').value)||500);
+    var umax = parseFloat(document.getElementById('osc-umax').value)||3;
+    var T=1/fHz, tgt=T/4; shIdx=10;
+    for(var i=0;i<OSC_SH.length;i++) if(OSC_SH[i]<=tgt) shIdx=i;
+    tgt=umax/3; svIdx=7;
+    for(var i=0;i<OSC_SV.length;i++) if(OSC_SV[i]<=tgt) svIdx=i;
+  }
+  if(autoSH){
+    var selSH = document.getElementById('osc-sh-idx');
+    if(selSH) selSH.value = shIdx;
+  }
+  if(autoSV){
+    var selSV = document.getElementById('osc-sv-idx');
+    if(selSV) selSV.value = svIdx;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Fond d'écran clair + grille (identique aux 4 familles de référence)
+   ══════════════════════════════════════════════════════════════ */
+function _oscLightBoardJS(){
+  return 'var bd=JXG.JSXGraph.initBoard(divid,{\n'
+  + '  boundingbox:[-5.4,4.5,5.4,-4.8],\n'
+  + '  axis:false,grid:false,\n'
+  + '  showNavigation:false,showCopyright:false,\n'
+  + '  pan:{enabled:false},zoom:{enabled:false}\n'
+  + '});\n'
+  + 'bd.create("polygon",[[-5,-4],[5,-4],[5,4],[-5,4]],\n'
+  + '  {fillColor:"#ffffff",fillOpacity:1,strokeWidth:0,\n'
+  + '  fixed:true,layer:0,highlight:false, vertices:{visible:false, fixed:true}, borders:{visible:false}});\n'
+  + 'bd.create("segment",[[-5,-4],[5,-4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});\n'
+  + 'bd.create("segment",[[5,-4],[5,4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});\n'
+  + 'bd.create("segment",[[5,4],[-5,4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});\n'
+  + 'bd.create("segment",[[-5,4],[-5,-4]], {strokeColor:"#4b5563",strokeWidth:2,fixed:true,layer:0,highlight:false});\n'
+  + 'var gs={strokeColor:"#e5e7eb",strokeWidth:0.8,fixed:true,layer:1,highlight:false};\n'
+  + 'var gc={strokeColor:"#d1d5db",strokeWidth:1.2,fixed:true,layer:1,highlight:false};\n'
+  + 'var ts={strokeColor:"#9ca3af",strokeWidth:0.55,fixed:true,layer:1,highlight:false};\n'
+  + 'for(var xi=-4;xi<=4;xi++) bd.create("segment",[[xi,-4],[xi,4]],xi===0?gc:gs);\n'
+  + 'for(var yi=-3;yi<=3;yi++) bd.create("segment",[[-5,yi],[5,yi]],yi===0?gc:gs);\n'
+  + 'bd.create("segment",[[-5,0],[5,0]],gc);\n'
+  + 'bd.create("segment",[[0,-4],[0,4]],gc);\n'
+  + 'for(var xt=-5;xt<=5.01;xt+=0.2)\n'
+  + '  if(Math.abs(xt%1)>0.05) bd.create("segment",[[xt,-0.07],[xt,0.07]],ts);\n'
+  + 'for(var yt=-4;yt<=4.01;yt+=0.2)\n'
+  + '  if(Math.abs(yt%1)>0.05) bd.create("segment",[[-0.07,yt],[0.07,yt]],ts);\n';
+}
+
+/* Curseurs violets (X, temps) + rouges (Y, tension) — cachés, togglables via boutons */
+function _oscCursorsJS(){
+  return 'var cA=bd.create("point",[-4.5,0],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["x"]});\n'
+  + 'var cB=bd.create("point",[-4.5,0],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["x"]});\n'
+  + 'var segPA=bd.create("segment",[function(){return[cA.X(),-4];},function(){return[cA.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var segPB=bd.create("segment",[function(){return[cB.X(),-4];},function(){return[cB.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var txtP=bd.create("text",[0,3.6,function(){\n'
+  + '  var dx=Math.abs(cB.X()-cA.X()),dts=dx*SH();\n'
+  + '  return "\\u0394t="+fT(dts);\n'
+  + '}],{fixed:false,color:"#7c3aed",fontSize:14,anchorX:"middle",layer:6,highlight:false, visible:false});\n'
+  + 'var cD=bd.create("point",[0,0],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["y"]});\n'
+  + 'var cE=bd.create("point",[0,0],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["y"]});\n'
+  + 'var segRD=bd.create("segment",[function(){return[-5,cD.Y()];},function(){return[5,cD.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var segRE=bd.create("segment",[function(){return[-5,cE.Y()];},function(){return[5,cE.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var txtR=bd.create("text",[4.5,3.2,function(){\n'
+  + '  var dy=Math.abs(cD.Y()-cE.Y()),dv=dy*SV_R();\n'
+  + '  return "\\u0394V="+fV(dv);\n'
+  + '}],{fixed:false,color:"#dc2626",fontSize:14,anchorX:"right",layer:6,highlight:false, visible:false});\n'
+  + 'function toggleGroup(arr) {\n'
+  + '  var isVisible = arr[0].getAttribute("visible");\n'
+  + '  arr.forEach(function(obj) { obj.setAttribute({visible: !isVisible}); });\n'
+  + '}\n'
+  + 'var purpleGroup = [cA, cB, segPA, segPB, txtP];\n'
+  + 'var redGroup = [cD, cE, segRD, segRE, txtR];\n';
+}
+
+/* Style + fabrique de boutons (identique à la référence) */
+function _oscCtrlStyleJS(){
+  return 'var _oscStyle=document.createElement("style");\n'
+  + '_oscStyle.textContent=\'.osc-btn{background:#ffffff;color:#374151;border:2px solid #6b7280;padding:5px 12px;cursor:pointer;border-radius:4px;font-size:15px;font-family:monospace;font-weight:bold;margin:0 2px;box-shadow: 0 1px 2px rgba(0,0,0,0.05);}.osc-btn:hover{background:#f3f4f6;border-color:#374151;}\';\n'
+  + 'document.head.appendChild(_oscStyle);\n'
+  + 'var ctrl=document.createElement("div");\n'
+  + 'ctrl.style.cssText="position:absolute; bottom:0; left:0; width:100%; box-sizing:border-box; display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:8px 12px; background:rgba(255,255,255,0.95); border-top:2px solid #4b5563; z-index:100; user-select:none; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);";\n'
+  + 'function mkL(t,c,w){ var s=document.createElement("span"); s.textContent=t; s.style.cssText="color:"+(c||"#374151")+";font-size:14px;font-family:monospace;font-weight:bold;display:inline-block;"+(w?"min-width:"+w+"px;text-align:center;":""); return s; }\n'
+  + 'function mkS(){ var s=document.createElement("span"); s.style.cssText="border-left:1px solid #d1d5db;height:24px;display:inline-block;margin:0 6px;"; return s; }\n'
+  + 'function mkB(t,c,fn){ var b=document.createElement("button"); b.className="osc-btn"; b.textContent=t; if(c){b.style.color=c; b.style.borderColor=c;} if(fn) b.addEventListener("click", fn); return b; }\n';
+}
+
+function _oscMountCtrlJS(){
+  return 'var boardContainer=document.getElementById(divid);\n'
+  + 'boardContainer.style.position="relative";\n'
+  + 'boardContainer.appendChild(ctrl);\n';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODE 1 : Période / Fréquence (forme + fréquence paramétrables)
+   cfg : {X, si, ti, um, freqExpr, typeExpr}
+   ══════════════════════════════════════════════════════════════ */
+function buildOscJSXCode_PeriodeFrequence(cfg){
+  var SHL = JSON.stringify(OSC_SH), SVL = JSON.stringify(OSC_SV);
+  return '[[jsxgraph width="775px" height="550px"]]\n'
+  + '(function(){\n'
+  + 'var lSH='+SHL+';\nvar lSV='+SVL+';\n'
+  + 'var si='+cfg.si+',ti='+cfg.ti+',xp=0,yp=0;\n'
+  + 'var fq=parseFloat("'+cfg.freqExpr+'");\n'
+  + 'var um=parseFloat("'+cfg.umExpr+'");\n'
+  + 'var typeCourbe=parseInt("'+cfg.typeExpr+'");\n'
+  + 'function SV(){return lSV[si];}\nfunction SH(){return lSH[ti];}\nfunction SV_R(){return lSV[si];}\n'
+  + 'function fV(v){return v<0.05?(v*1e3).toPrecision(3)+" mV":v+" V";}\n'
+  + 'function fT(s){return s<5e-5?(s*1e6).toPrecision(3)+" \\u00B5s":s<0.05?(s*1e3).toPrecision(3)+" ms":s.toPrecision(3)+" s";}\n'
+  + _oscLightBoardJS()
+  + 'var phase=Math.random()*2*Math.PI;\n'
+  + 'function phi0(){var T=fq>0?1/fq:0;return T>0?Math.PI/2+10*Math.PI*SH()/T:0;}\n'
+  + 'function sinSig(xd){\n'
+  + '  var T=fq>0?1/fq:0,s=SH(),sv=SV();\n  if(T<=0) return 0;\n'
+  + '  var y=um/sv*Math.cos(2*Math.PI*s*(xd-xp)/T-phi0()+phase)+yp;\n'
+  + '  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'function carreSig(xd){\n'
+  + '  var s=SH(),sv=SV(),T=fq>0?1/fq:0;\n  if(T<=0) return yp;\n'
+  + '  var Td=T/s, ph=(((xd-xp)/Td)%1+1)%1;\n'
+  + '  var y=(ph<0.5?um:-um)/sv+yp;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'function triSig(xd){\n'
+  + '  var s=SH(),sv=SV(),T=fq>0?1/fq:0;\n  if(T<=0) return yp;\n'
+  + '  var Td=T/s, ph=(((xd-xp)/Td+0.25)%1+1)%1;\n'
+  + '  var raw=ph<0.5?(-um+4*um*ph):(3*um-4*um*ph);\n'
+  + '  var y=raw/sv+yp;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'function carreRealSig(xd){\n'
+  + '  var s=SH(),sv=SV(),T=fq>0?1/fq:0;\n  if(T<=0) return yp;\n'
+  + '  var Td=T/s, ph=(((xd-xp)/Td)%1+1)%1;\n'
+  + '  var raw=um*Math.tanh(6*Math.sin(2*Math.PI*ph))/Math.tanh(6);\n'
+  + '  var y=raw/sv+yp;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'function triangleRealSig(xd){\n'
+  + '  var s=SH(),sv=SV(),T=fq>0?1/fq:0;\n  if(T<=0) return yp;\n'
+  + '  var Td=T/s, ph=(((xd-xp)/Td+0.25)%1+1)%1;\n'
+  + '  var tri=ph<0.5?(-um+4*um*ph):(3*um-4*um*ph);\n'
+  + '  var raw=um*Math.tanh(2*tri/um)/Math.tanh(2);\n'
+  + '  var y=raw/sv+yp;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'function harmSig(xd){\n'
+  + '  var T=fq>0?1/fq:0,s=SH(),sv=SV();\n  if(T<=0) return 0;\n'
+  + '  var w=2*Math.PI*s*(xd-xp)/T-phi0()+phase;\n'
+  + '  var raw=Math.cos(w)+0.30*Math.cos(3*w+Math.PI/6)+0.15*Math.cos(5*w+Math.PI/3);\n'
+  + '  var y=um*raw/1.45/sv+yp;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'function sawSig(xd){\n'
+  + '  var s=SH(),sv=SV(),T=fq>0?1/fq:0;\n  if(T<=0) return yp;\n'
+  + '  var Td=T/s, ph=(((xd-xp)/Td)%1+1)%1;\n'
+  + '  var raw=-um+2*um*ph;\n'
+  + '  var y=raw/sv+yp;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'var paliersLevels=null;\n'
+  + 'function getPaliersLevels(){\n'
+  + '  if(!paliersLevels){\n'
+  + '    var n=5+Math.floor(Math.random()*4);\n'
+  + '    paliersLevels=[];\n'
+  + '    for(var i=0;i<n;i++) paliersLevels.push(-um+Math.random()*2*um);\n'
+  + '  }\n'
+  + '  return paliersLevels;\n'
+  + '}\n'
+  + 'function paliersSig(xd){\n'
+  + '  var s=SH(),sv=SV(),T=fq>0?1/fq:0;\n  if(T<=0) return yp;\n'
+  + '  var Td=T/s, ph=(((xd-xp)/Td)%1+1)%1;\n'
+  + '  var lv=getPaliersLevels();\n'
+  + '  var idx=Math.min(lv.length-1, Math.floor(ph*lv.length));\n'
+  + '  var y=lv[idx]/sv+yp;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'var sigFunc;\nif(typeCourbe===1) sigFunc=sinSig; else if(typeCourbe===2) sigFunc=carreSig; else if(typeCourbe===3) sigFunc=triSig; else if(typeCourbe===4) sigFunc=carreRealSig; else if(typeCourbe===5) sigFunc=triangleRealSig; else if(typeCourbe===6) sigFunc=harmSig; else if(typeCourbe===7) sigFunc=sawSig; else sigFunc=paliersSig;\n'
+  + 'bd.create("functiongraph",[sigFunc,-5,5],\n'
+  + '  {strokeColor:"#2563eb",strokeWidth:3,layer:3,highlight:false,fixed:true, numberPoints:4000, doAdvancedPlot:false});\n'
+  + 'var lbSH=bd.create("text",[4.9,3.6,function(){return fT(SH())+"/div";}],\n'
+  + '  {fixed:true,color:"#1f2937",fontSize:13,anchorX:"right",layer:4,highlight:false});\n'
+  + 'var lbSV=bd.create("text",[-4.7,3.6,function(){return fV(SV())+"/div";}],\n'
+  + '  {fixed:true,color:"#1f2937",fontSize:13,layer:4,highlight:false});\n'
+  + _oscCursorsJS()
+  + _oscCtrlStyleJS()
+  + 'var lblV=mkL("","#374151","65px"), lblT=mkL("","#374151","75px");\n'
+  + 'ctrl.appendChild(mkL("V/div","#dc2626","45px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25BC","#dc2626",function(){si=Math.max(0,si-1);bd.update();}));\n'
+  + 'ctrl.appendChild(lblV);\n'
+  + 'ctrl.appendChild(mkB("\\u25B2","#dc2626",function(){si=Math.min(lSV.length-1,si+1);bd.update();}));\n'
+  + 'ctrl.appendChild(mkS());\n'
+  + 'ctrl.appendChild(mkL("t/div","#2563eb","45px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25C4","#2563eb",function(){ti=Math.max(0,ti-1);bd.update();}));\n'
+  + 'ctrl.appendChild(lblT);\n'
+  + 'ctrl.appendChild(mkB("\\u25BA","#2563eb",function(){ti=Math.min(lSH.length-1,ti+1);bd.update();}));\n'
+  + 'ctrl.appendChild(mkS());\n'
+  + 'ctrl.appendChild(mkL("XPOS","#7c3aed","50px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25C4","#7c3aed",function(){xp=Math.max(-5,parseFloat((xp-0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkB("\\u25BA","#7c3aed",function(){xp=Math.min(5,parseFloat((xp+0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkS());\n'
+  + 'ctrl.appendChild(mkL("YPOS","#d97706","50px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25BC","#d97706",function(){yp=Math.max(-4,parseFloat((yp-0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkB("\\u25B2","#d97706",function(){yp=Math.min(4,parseFloat((yp+0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkS());\n'
+  + 'ctrl.appendChild(mkB("\\u25A0 X","#7c3aed",function(){ toggleGroup(purpleGroup); }));\n'
+  + 'ctrl.appendChild(mkB("\\u25A0 Y","#dc2626",function(){ toggleGroup(redGroup); }));\n'
+  + _oscMountCtrlJS()
+  + 'var _ou=bd.update.bind(bd);\n'
+  + 'bd.update=function(){_ou();lblV.textContent=fV(SV());lblT.textContent=fT(SH());};\n'
+  + 'bd.update();\n'
+  + '})();\n[[/jsxgraph]]';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODE 2/3 : Charge / Décharge RC
+   cfg : {si, ti, evExpr, tauExpr, decharge:bool}
+   ══════════════════════════════════════════════════════════════ */
+function buildOscJSXCode_RC(cfg){
+  var SHL = JSON.stringify(OSC_SH), SVL = JSON.stringify(OSC_SV);
+  var sigBody = cfg.decharge
+    ? 'var y = t>=0 ? ev/sv*(Math.exp(-t/ta))+yp : ev/sv+yp;'
+    : 'var y = t>=0 ? ev/sv*(1-Math.exp(-t/ta))+yp : 0+yp;';
+  return '[[jsxgraph width="775px" height="550px"]]\n'
+  + '(function(){\n'
+  + 'var lSH='+SHL+';\nvar lSV='+SVL+';\n'
+  + 'var si='+cfg.si+', ti='+cfg.ti+', yp=0, xp=0;\n'
+  + 'var ev=parseFloat("'+cfg.evExpr+'")/1000;\n'
+  + 'var ta=parseFloat("'+cfg.tauExpr+'")/1000000;\n'
+  + 'function SV(){return lSV[si];}\nfunction SH(){return lSH[ti];}\nfunction SV_R(){return lSV[si];}\n'
+  + 'function fV(v){return v<0.05?(v*1e3).toPrecision(3)+" mV":v+" V";}\n'
+  + 'function fT(s){return s<5e-5?(s*1e6).toPrecision(3)+" \\u00B5s":s<0.05?(s*1e3).toPrecision(3)+" ms":s.toPrecision(3)+" s";}\n'
+  + _oscLightBoardJS()
+  + 'function rcSig(xd){var t=(xd+5-xp)*SH(),sv=SV(); '+sigBody+' return y>4?4:y<-4?-4:y;}\n'
+  + 'bd.create("functiongraph",[rcSig,-5,5],{strokeColor:"#2563eb",strokeWidth:3,layer:3,highlight:false,fixed:true, numberPoints:150, doAdvancedPlot:false});\n'
+  + 'var lbSH=bd.create("text",[4.9,3.6,function(){return fT(SH())+"/div";}],{fixed:true,color:"#1f2937",fontSize:13,anchorX:"right",layer:4,highlight:false});\n'
+  + 'var lbSV=bd.create("text",[-4.7,3.6,function(){return fV(SV())+"/div";}],{fixed:true,color:"#1f2937",fontSize:13,layer:4,highlight:false});\n'
+  + 'var cA=bd.create("point",[-4.5,0],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["x"]});\n'
+  + 'var cB=bd.create("point",[-4.5,0],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["x"]});\n'
+  + 'var segPA=bd.create("segment",[function(){return[cA.X(),-4];},function(){return[cA.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var segPB=bd.create("segment",[function(){return[cB.X(),-4];},function(){return[cB.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var txtP=bd.create("text",[0,3.4,function(){var dx=Math.abs(cB.X()-cA.X()),dts=dx*SH(); return "\\u0394t="+fT(dts);}],{fixed:false,color:"#7c3aed",fontSize:14,anchorX:"middle",layer:6,highlight:false, visible:false});\n'
+  + 'var cD=bd.create("point",[0, 0],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["y"]});\n'
+  + 'var cE=bd.create("point",[0, 0],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["y"]});\n'
+  + 'var segRD=bd.create("segment",[function(){return[-5,cD.Y()];},function(){return[5,cD.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var segRE=bd.create("segment",[function(){return[-5,cE.Y()];},function(){return[5,cE.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var txtR=bd.create("text",[4.5,3.2,function(){var dy=Math.abs(cD.Y()-cE.Y()),dv=dy*SV(); return "\\u0394V="+fV(dv);}],{fixed:false,color:"#dc2626",fontSize:14,anchorX:"right",layer:6,highlight:false, visible:false});\n'
+  + 'function toggleGroup(arr) {var isVisible = arr[0].getAttribute("visible"); arr.forEach(function(obj) { obj.setAttribute({visible: !isVisible}); });}\n'
+  + 'var purpleGroup = [cA, cB, segPA, segPB, txtP];\nvar redGroup = [cD, cE, segRD, segRE, txtR];\n'
+  + _oscCtrlStyleJS()
+  + 'var lblV=mkL("","#374151","65px"), lblT=mkL("","#374151","75px");\n'
+  + 'ctrl.appendChild(mkL("V/div","#dc2626","45px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25BC","#dc2626",function(){si=Math.max(0,si-1);bd.update();}));\n'
+  + 'ctrl.appendChild(lblV);\n'
+  + 'ctrl.appendChild(mkB("\\u25B2","#dc2626",function(){si=Math.min(lSV.length-1,si+1);bd.update();}));\n'
+  + 'ctrl.appendChild(mkS());\n'
+  + 'ctrl.appendChild(mkL("t/div","#2563eb","45px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25C4","#2563eb",function(){ti=Math.max(0,ti-1);bd.update();}));\n'
+  + 'ctrl.appendChild(lblT);\n'
+  + 'ctrl.appendChild(mkB("\\u25BA","#2563eb",function(){ti=Math.min(lSH.length-1,ti+1);bd.update();}));\n'
+  + 'ctrl.appendChild(mkL("XPOS","#7c3aed","50px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25C4","#7c3aed",function(){xp=Math.max(-5,parseFloat((xp-0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkB("\\u25BA","#7c3aed",function(){xp=Math.min(5,parseFloat((xp+0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkS());\n'
+  + 'ctrl.appendChild(mkL("YPOS","#d97706","50px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25BC","#d97706",function(){yp=Math.max(-4,parseFloat((yp-0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkB("\\u25B2","#d97706",function(){yp=Math.min(4,parseFloat((yp+0.5).toFixed(1)));bd.update();}));\n'
+  + 'var spacer=document.createElement("div"); spacer.style.cssText="flex-grow:1;"; ctrl.appendChild(spacer);\n'
+  + 'ctrl.appendChild(mkB("\\u25A0 X","#7c3aed",function(){ toggleGroup(purpleGroup); }));\n'
+  + 'ctrl.appendChild(mkB("\\u25A0 Y","#dc2626",function(){ toggleGroup(redGroup); }));\n'
+  + _oscMountCtrlJS()
+  + 'var _ou=bd.update.bind(bd);\nbd.update=function(){ _ou(); lblV.textContent=fV(SV()); lblT.textContent=fT(SH()); };\nbd.update();\n'
+  + '})();\n[[/jsxgraph]]';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODE 4 : Retard ultrasonore (2 voies, salves)
+   cfg : {siA, siB, ti, fcExpr, dtExpr}
+   ══════════════════════════════════════════════════════════════ */
+function buildOscJSXCode_Retard(cfg){
+  var SHL = JSON.stringify(OSC_SH), SVL = JSON.stringify(OSC_SV);
+  return '[[jsxgraph width="775px" height="550px"]]\n'
+  + '(function(){\n'
+  + 'var lSH='+SHL+';\nvar lSV='+SVL+';\n'
+  + 'var siA='+cfg.siA+', siB='+cfg.siB+', ti='+cfg.ti+', xp=0, ypA=0, ypB=0;\n'
+  + 'var fc=parseFloat("'+cfg.fcExpr+'");\n'
+  + 'var dt=parseFloat("'+cfg.dtExpr+'");\n'
+  + 'var a1=0.7, a2=0.2;\n'
+  + 'function SV_A(){return lSV[siA];}\nfunction SV_B(){return lSV[siB];}\nfunction SH(){return lSH[ti];}\n'
+  + 'function fV(v){return v<0.05?(v*1e3).toPrecision(3)+" mV":v+" V";}\n'
+  + 'function fT(s){return s<5e-5?(s*1e6).toPrecision(3)+" \\u00B5s":s<0.05?(s*1e3).toPrecision(3)+" ms":s.toPrecision(3)+" s";}\n'
+  + _oscLightBoardJS()
+  + 'var nc=6;\nvar tBurst=nc/fc;\nvar t0_ch1=-tBurst*0.25;\n'
+  + 'function burst(t){\n'
+  + '  var halfT=tBurst*0.6;\n  if(Math.abs(t)>halfT) return 0;\n'
+  + '  var env=Math.cos(Math.PI*t/halfT);\n  return env*env;\n}\n'
+  + 'function ch1Sig(xd){\n'
+  + '  var s=SH(), sv=SV_A();\n  var t=(xd-xp)*s-t0_ch1;\n'
+  + '  var y=a1*burst(t)*Math.sin(2*Math.PI*fc*t)/sv+ypA;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'function ch2Sig(xd){\n'
+  + '  var s=SH(), sv=SV_B();\n  var t=(xd-xp)*s-t0_ch1-dt;\n'
+  + '  var y=a2*burst(t)*Math.sin(2*Math.PI*fc*t)/sv+ypB;\n  return y>4?4:y<-4?-4:y;\n}\n'
+  + 'bd.create("functiongraph",[ch1Sig,-5,5],{strokeColor:"#2563eb",strokeWidth:2.5,layer:3,highlight:false,fixed:true, numberPoints:8000, doAdvancedPlot:false});\n'
+  + 'bd.create("functiongraph",[ch2Sig,-5,5],{strokeColor:"#dc2626",strokeWidth:2.5,layer:3,highlight:false,fixed:true, numberPoints:8000, doAdvancedPlot:false});\n'
+  + 'var lbSH=bd.create("text",[4.9,3.6,function(){return fT(SH())+"/div";}],{fixed:true,color:"#1f2937",fontSize:13,anchorX:"right",layer:4,highlight:false});\n'
+  + 'var lbSV_A=bd.create("text",[-4.7,3.6,function(){return fV(SV_A())+"/div";}],{fixed:true,color:"#2563eb",fontSize:13,layer:4,highlight:false});\n'
+  + 'var lbSV_B=bd.create("text",[-4.7,3.2,function(){return fV(SV_B())+"/div";}],{fixed:true,color:"#dc2626",fontSize:13,layer:4,highlight:false});\n'
+  + 'var cA=bd.create("point",[-4.5,0],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["x"]});\n'
+  + 'var cB=bd.create("point",[-4.5,0],{size:7,fillColor:"#a855f7",strokeColor:"#a855f7",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["x"]});\n'
+  + 'var segPA=bd.create("segment",[function(){return[cA.X(),-4];},function(){return[cA.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var segPB=bd.create("segment",[function(){return[cB.X(),-4];},function(){return[cB.X(),4];}],{strokeColor:"#a855f7",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var txtP=bd.create("text",[0,3.6,function(){\n'
+  + '  var dx=Math.abs(cB.X()-cA.X()),dts=dx*SH();\n  return "\\u0394t="+fT(dts);\n'
+  + '}],{fixed:false,color:"#7c3aed",fontSize:14,anchorX:"middle",layer:6,highlight:false, visible:false});\n'
+  + 'var cD=bd.create("point",[0,0],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["y"]});\n'
+  + 'var cE=bd.create("point",[0,0],{size:7,fillColor:"#ef4444",strokeColor:"#ef4444",name:"",layer:5,showInfobox:false,label:{visible:false}, visible:false, drag: ["y"]});\n'
+  + 'var segRD=bd.create("segment",[function(){return[-5,cD.Y()];},function(){return[5,cD.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var segRE=bd.create("segment",[function(){return[-5,cE.Y()];},function(){return[5,cE.Y()];}],{strokeColor:"#ef4444",strokeWidth:1.5,dash:3,layer:5,highlight:false, visible:false});\n'
+  + 'var txtR=bd.create("text",[4.5,3.2,function(){\n'
+  + '  var dy=Math.abs(cD.Y()-cE.Y()),dv=dy*SV_A();\n  return "\\u0394V="+fV(dv);\n'
+  + '}],{fixed:false,color:"#dc2626",fontSize:14,anchorX:"right",layer:6,highlight:false, visible:false});\n'
+  + 'function toggleGroup(arr) {\n  var isVisible=arr[0].getAttribute("visible");\n  arr.forEach(function(obj) { obj.setAttribute({visible: !isVisible}); });\n}\n'
+  + 'var purpleGroup=[cA, cB, segPA, segPB, txtP];\nvar redGroup=[cD, cE, segRD, segRE, txtR];\n'
+  + _oscCtrlStyleJS()
+  + 'var lblVA=mkL("","#2563eb","65px");\n'
+  + 'ctrl.appendChild(mkL("V/div A","#2563eb","50px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25BC","#2563eb",function(){siA=Math.max(0,siA-1);bd.update();}));\n'
+  + 'ctrl.appendChild(lblVA);\n'
+  + 'ctrl.appendChild(mkB("\\u25B2","#2563eb",function(){siA=Math.min(lSV.length-1,siA+1);bd.update();}));\n'
+  + 'var lblVB=mkL("","#dc2626","65px");\n'
+  + 'ctrl.appendChild(mkL("V/div B","#dc2626","50px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25BC","#dc2626",function(){siB=Math.max(0,siB-1);bd.update();}));\n'
+  + 'ctrl.appendChild(lblVB);\n'
+  + 'ctrl.appendChild(mkB("\\u25B2","#dc2626",function(){siB=Math.min(lSV.length-1,siB+1);bd.update();}));\n'
+  + 'ctrl.appendChild(mkS());\n'
+  + 'var lblT=mkL("","#374151","75px");\n'
+  + 'ctrl.appendChild(mkL("t/div","#2563eb","45px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25C4","#2563eb",function(){ti=Math.max(0,ti-1);bd.update();}));\n'
+  + 'ctrl.appendChild(lblT);\n'
+  + 'ctrl.appendChild(mkB("\\u25BA","#2563eb",function(){ti=Math.min(lSH.length-1,ti+1);bd.update();}));\n'
+  + 'ctrl.appendChild(mkL("XPOS","#7c3aed","50px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25C4","#7c3aed",function(){xp=Math.max(-5,parseFloat((xp-0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkB("\\u25BA","#7c3aed",function(){xp=Math.min(5,parseFloat((xp+0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkS());\n'
+  + 'ctrl.appendChild(mkL("Y A","#2563eb","35px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25BC","#2563eb",function(){ypA=Math.max(-4,parseFloat((ypA-0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkB("\\u25B2","#2563eb",function(){ypA=Math.min(4,parseFloat((ypA+0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkL("Y B","#dc2626","35px"));\n'
+  + 'ctrl.appendChild(mkB("\\u25BC","#dc2626",function(){ypB=Math.max(-4,parseFloat((ypB-0.5).toFixed(1)));bd.update();}));\n'
+  + 'ctrl.appendChild(mkB("\\u25B2","#dc2626",function(){ypB=Math.min(4,parseFloat((ypB+0.5).toFixed(1)));bd.update();}));\n'
+  + 'var spacer=document.createElement("div"); spacer.style.cssText="flex-grow:1;"; ctrl.appendChild(spacer);\n'
+  + 'ctrl.appendChild(mkB("X","#7c3aed",function(){ toggleGroup(purpleGroup); }));\n'
+  + 'ctrl.appendChild(mkB("V","#b91c1c",function(){ toggleGroup(redGroup); }));\n'
+  + _oscMountCtrlJS()
+  + 'var _ou=bd.update.bind(bd);\n'
+  + 'bd.update=function(){\n  _ou();\n  lblVA.textContent=fV(SV_A());\n  lblVB.textContent=fV(SV_B());\n  lblT.textContent=fT(SH());\n};\n'
+  + 'bd.update();\n'
+  + '})();\n[[/jsxgraph]]';
+}
+
+/* ── Encart de conseils de saisie (units) ── */
+function _oscInputHintsHTML(exList){
+  return '<div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin:15px 0;">'
+    + '<strong>' + I18N.t('osc.hint_title') + '</strong>'
+    + '<ul style="margin:8px 0 0 20px;line-height:1.7">'
+    + '<li>' + I18N.t('osc.hint_virgule') + '</li>'
+    + '<li><strong>' + I18N.t('osc.hint_lier_lbl') + '</strong>' + I18N.t('osc.hint_lier_desc', {exList: exList}) + '</li>'
+    + '<li><strong>' + I18N.t('osc.hint_unites_lbl') + '</strong>' + I18N.t('osc.hint_unites_desc') + '</li>'
+    + '</ul></div>';
+}
+
+/* ── Bandeau titre (identique norme UI Cairn for Stack) ── */
+function _oscHeader(X, bareme, title, tagBg, tagIcon, tagLabel){
+  return '<div style="background:'+tagBg.bg+';border-left:5px solid '+tagBg.accent+';border-radius:0 8px 8px 0;'
+    + 'padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+    + '<strong style="font-weight:800;color:#fff;font-size:.95rem;">Q'+X+' — '+title+'</strong>'
+    + '<span style="background:'+tagBg.accent+';color:#fff;padding:2px 9px;border-radius:20px;font-size:.78rem;font-weight:700;">/ '+bareme+' pt</span>'
+    + '<span style="background:#ffffff;color:'+tagBg.accent+';border:1px solid '+tagBg.accent+';padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;">'+tagIcon+' '+tagLabel+'</span>'
+    + '</div>';
+}
+
+/* ── Nœud PRT canonique (schéma buildPrtXml) ── */
+function _oscNode(name, desc, test, sans, tans, testopt, tScoreMode, tScore, tNext, tNote, tFb, fScoreMode, fScore, fNext, fNote, fFb){
+  return {
+    name: name, description: desc, answertest: test, sans: sans, tans: tans,
+    testoptions: testopt, quiet: '0',
+    truescoremode: tScoreMode, truescore: String(tScore), truepenalty: '', truenextnode: String(tNext),
+    trueanswernote: tNote, truefeedback: tFb,
+    falsescoremode: fScoreMode, falsescore: String(fScore), falsepenalty: '', falsenextnode: String(fNext),
+    falseanswernote: fNote, falsefeedback: fFb
+  };
+}
+/* _oscOk/_oscKo/_oscTrap : le texte reste BRUT (aucun encadre/icone), seulement marque avec sa
+   nature (true/false/partial) via un petit objet {__fbKind, text}. L'encadre colore n'est
+   applique qu'a l'export XML (voir _oscFinalize -> applyFbBox_D), jamais dans les nœuds
+   canoniques exposes a prt-manager.js (js/fb-box.js). */
+function _oscOk(txt){ return { __fbKind: 'true', text: txt }; }
+function _oscKo(txt){ return { __fbKind: 'false', text: txt }; }
+function _oscTrap(txt){ return { __fbKind: 'partial', text: txt }; }
+function _oscFbKindOf(v){ return (v && typeof v === 'object' && v.__fbKind) ? v.__fbKind : null; }
+function _oscFbTextOf(v){ return (v && typeof v === 'object' && v.__fbKind) ? v.text : v; }
+
+/* Structure simplifiée (Autonome/Expert) : 2 nœuds indépendants, un par grandeur,
+   sans décomposition unité/piège. neutral=true (Expert) => feedback d'échec sans indice. */
+function _oscSimplePair(idPrefix, q1, q2, neutral){
+  var neutralFb = _oscKo('<p>' + I18N.t('osc.fb_faux_refaites') + '</p>');
+  var fb1ok   = _oscOk('<strong>'+q1.label+I18N.t('osc.fb_correcte_suffix'));
+  var fb2ok   = _oscOk('<strong>'+q2.label+I18N.t('osc.fb_correcte_suffix'));
+  var fb1fail = neutral ? neutralFb : _oscKo('<strong>'+q1.label+I18N.t('osc.fb_incorrecte_suffix'));
+  var fb2fail = neutral ? neutralFb : _oscKo('<strong>'+q2.label+I18N.t('osc.fb_incorrecte_suffix'));
+  return [
+    _oscNode('0',I18N.t('tpl.osc_desc_verif_prefix')+q1.label,'UnitsRelative',q1.sans,q1.tans,q1.testopt,'+',0.5,1,idPrefix+'-0-T',fb1ok,'-',0,1,idPrefix+'-0-F',fb1fail),
+    _oscNode('1',I18N.t('tpl.osc_desc_verif_prefix')+q2.label,'UnitsRelative',q2.sans,q2.tans,q2.testopt,'+',0.5,-1,idPrefix+'-1-T',fb2ok,'-',0,-1,idPrefix+'-1-F',fb2fail)
+  ];
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GÉNÉRATEUR PRINCIPAL — genOscilloscope(X)
+   ══════════════════════════════════════════════════════════════ */
+function genOscilloscopeParams(){
+  return {
+    mode:    v('osc-mode') || 'periode_frequence',
+    pedMode: v('osc-ped-mode') || 'guide',
+    bareme:  parseFloat(v('osc-bareme')) || 1,
+    text:    richVal('osc-text'),
+    fbGen:   v('osc-fbgen'),
+    shIdx:   parseInt(document.getElementById('osc-sh-idx').value),
+    svIdx:   parseInt(document.getElementById('osc-sv-idx').value),
+    forme:     v('osc-forme') || 'aleatoire',
+    freqMode:  v('osc-freq-mode') || 'fixed',
+    ffreq:     parseFloat(v('osc-ffreq')) || 500,
+    umax:      parseFloat(v('osc-umax'))  || 3,
+    evBase:    parseFloat(v('osc-evolt-base')) || 2000,
+    evRange:   parseFloat(v('osc-evolt-range')) || 1000,
+    tauBase:   parseFloat(v('osc-tau-base')) || 1000,
+    tauRange:  parseFloat(v('osc-tau-range')) || 1000,
+    fCarrier:  parseFloat(v('osc-fcarrier')) || 4000000,
+    fMod:      parseFloat(v('osc-fmod'))     || 2000,
+    dtMin:     parseFloat(v('osc-dt-min'))   || 4,
+    dtMax:     parseFloat(v('osc-dt-max'))   || 8
+  };
+}
+
+async function genOscilloscope(X){
+  var p = genOscilloscopeParams();
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({type: 'oscilloscope', X, params: p})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return data.parts;
+    }
+    if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
+    }
+    console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "oscilloscope", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[cairnforstack] /api/generate injoignable pour "oscilloscope", repli sur le calcul local.', e); }
+  return genOscilloscopeCore(X, p);
+}
+
+function genOscilloscopeCore(X, p, deps){
+  deps = deps || {};
+  var I18N_D = deps.I18N || I18N;
+  var _oscInputHintsHTML_D = deps._oscInputHintsHTML || _oscInputHintsHTML;
+  var _oscSimplePair_D = deps._oscSimplePair || _oscSimplePair;
+
+  var mode = p.mode, pedMode = p.pedMode, bareme = p.bareme, text = p.text, fbGen = p.fbGen, shIdx = p.shIdx, svIdx = p.svIdx;
+
+  var vars='', jsx='', textFrag='', previewFrag='', inputXML='', qnote='', genFb='', canonicalNodes=[], prtValue=bareme;
+
+  if(mode==='periode_frequence'){
+    var forme    = p.forme;
+    var freqMode = p.freqMode;
+    var ffreq    = p.ffreq;
+    var umax     = p.umax;
+
+    var typeExpr, typeTextExpr;
+    if(forme==='sinus'){ typeExpr='1'; }
+    else if(forme==='carre'){ typeExpr='2'; }
+    else if(forme==='triangle'){ typeExpr='3'; }
+    else if(forme==='carre_reel'){ typeExpr='4'; }
+    else if(forme==='triangle_reel'){ typeExpr='5'; }
+    else if(forme==='harmoniques'){ typeExpr='6'; }
+    else if(forme==='dents_scie'){ typeExpr='7'; }
+    else if(forme==='paliers'){ typeExpr='8'; }
+    else { typeExpr='1+rand(8)'; }
+
+    vars = '/* Q'+X+' : Oscilloscope — Période/Fréquence ('+bareme+'pt) */\n'
+      + 'ta'+X+'_type_val: '+typeExpr+';\n'
+      + 'ta'+X+'_type_text: if ta'+X+'_type_val=1 then '+JSON.stringify(I18N_D.t('osc.qnote_type_sinus'))+' else (if ta'+X+'_type_val=2 then '+JSON.stringify(I18N_D.t('osc.qnote_type_carre'))+' else (if ta'+X+'_type_val=3 then '+JSON.stringify(I18N_D.t('osc.qnote_type_triangle'))+' else (if ta'+X+'_type_val=4 then '+JSON.stringify(I18N_D.t('osc.qnote_type_carre_reel'))+' else (if ta'+X+'_type_val=5 then '+JSON.stringify(I18N_D.t('osc.qnote_type_triangle_reel'))+' else (if ta'+X+'_type_val=6 then '+JSON.stringify(I18N_D.t('osc.qnote_type_harmoniques'))+' else (if ta'+X+'_type_val=7 then '+JSON.stringify(I18N_D.t('osc.qnote_type_dents_scie'))+' else '+JSON.stringify(I18N_D.t('osc.qnote_type_paliers'))+'))))));\n'
+      + (freqMode==='alea'
+          ? 'ta'+X+'_liste_fq: [100, 200, 250, 500, 1000, 2000];\nta'+X+'_f: ta'+X+'_liste_fq[rand(length(ta'+X+'_liste_fq))+1];\n'
+          : 'ta'+X+'_f: '+ffreq+';\n')
+      + 'ta'+X+'_um: '+umax+';\n'
+      + 'ta'+X+'_fq: stackunits(ta'+X+'_f, Hz);\n'
+      + 'ta'+X+'_fq_unit: stack_units_units(ta'+X+'_fq);\n'
+      + 'ta'+X+'_fq_nums: stack_units_nums(ta'+X+'_fq);\n'
+      + 'ta'+X+'_T_unit: stack_unit_si_to_si_base(1/ta'+X+'_fq_unit);\n'
+      + 'ta'+X+'_T_nums: 1/ta'+X+'_fq_nums;\n'
+      + 'ta'+X+'_T: stackunits(ta'+X+'_T_nums, ta'+X+'_T_unit);\n'
+      + 'ta'+X+'_precision_T: 0.05;\n';
+
+    jsx = buildOscJSXCode_PeriodeFrequence({
+      si: svIdx, ti: shIdx,
+      freqExpr: '{#ta'+X+'_f#}', umExpr: '{#ta'+X+'_um#}', typeExpr: '{#ta'+X+'_type_val#}'
+    });
+
+    var header = _oscHeader(X, bareme, I18N_D.t('osc.title_periode_frequence'), {bg:'#0c4a6e',accent:'#0369a1'}, '📏', I18N_D.t('osc.subtitle_grandeur_physique'));
+    textFrag = header
+      + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
+      + '<p><strong>' + I18N_D.t('osc.consigne_lbl') + '</strong> ' + I18N_D.t('osc.consigne_periode_frequence', {X: X}) + '</p>'
+      + (text||'') + '</div><!-- ENONCE-END -->\n'
+      + '<div><!--HS-KBD:'+X+'--></div>\n'
+      + _oscInputHintsHTML_D('<code>10*ms</code>')
+      + '<p>' + I18N_D.t('osc.label_periode_mesuree') + '[[input:ans_T'+X+']] [[validation:ans_T'+X+']]</p>\n'
+      + '<p>' + I18N_D.t('osc.label_frequence_deduite') + '[[input:ans_F'+X+']] [[validation:ans_F'+X+']]</p>';
+
+    previewFrag = header
+      + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
+      + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#1e3a5f;font-family:monospace;font-size:.85rem;">'
+      + I18N_D.t('osc.preview_periode_frequence') + forme + I18N_D.t('osc.preview_frequence_sep') + (freqMode==='alea'?I18N_D.t('osc.freq_alea_preview'):ffreq+' Hz')
+      + '</div>';
+
+    inputXML = _oscUnitsInput('ans_T'+X, '1.0*ta'+X+'_T')
+      + '\n' + _oscUnitsInput('ans_F'+X, 'ta'+X+'_fq');
+
+    var fbv = '/* --- Traitement Période T --- */\n'
+      + 'stud_si_T'+X+' : stack_unit_si_to_si_base(ans_T'+X+');\n'
+      + 'teach_si_T'+X+' : ta'+X+'_T_unit;\n'
+      + 'v_pure_e_T'+X+' : subst(map(lambda([u], u=1), listofvars(stud_si_T'+X+')), stud_si_T'+X+');\n'
+      + 'v_pure_t_T'+X+' : subst(map(lambda([u], u=1), listofvars(teach_si_T'+X+')), teach_si_T'+X+');\n'
+      + 'eleve_unit_T'+X+' : 2 * stud_si_T'+X+' / v_pure_e_T'+X+';\n'
+      + 'teacher_unit_T'+X+' : 2 * teach_si_T'+X+' / v_pure_t_T'+X+';\n'
+      + '/* --- Traitement Fréquence f --- */\n'
+      + 'stud_si_F'+X+' : stack_unit_si_to_si_base(ans_F'+X+');\n'
+      + 'teach_si_F'+X+' : ta'+X+'_fq_unit;\n'
+      + 'v_pure_e_F'+X+' : subst(map(lambda([u], u=1), listofvars(stud_si_F'+X+')), stud_si_F'+X+');\n'
+      + 'v_pure_t_F'+X+' : subst(map(lambda([u], u=1), listofvars(teach_si_F'+X+')), teach_si_F'+X+');\n'
+      + 'eleve_unit_F'+X+' : 2 * stud_si_F'+X+' / v_pure_e_F'+X+';\n'
+      + 'teacher_unit_F'+X+' : 2 * teach_si_F'+X+' / v_pure_t_F'+X+';\n';
+
+    if(pedMode==='guide'){
+      canonicalNodes = [
+        _oscNode('0',I18N_D.t('tpl.osc_desc_unite_t'),'UnitsAbsolute','eleve_unit_T'+X,'teacher_unit_T'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_periode_unite_ko',{X:X}))),
+        _oscNode('1',I18N_D.t('tpl.osc_desc_valeur_t'),'UnitsRelative','ans_T'+X,'ta'+X+'_T','ta'+X+'_precision_T','+',0.25,2,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_periode_ok')),'-',0,4,'prt'+X+'-1-F',_oscKo(I18N_D.t('osc.fb_periode_valeur_ko'))),
+        _oscNode('2',I18N_D.t('tpl.osc_desc_unite_f'),'UnitsAbsolute','eleve_unit_F'+X,'teacher_unit_F'+X,'0','+',0.25,3,'prt'+X+'-2-T','','-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_frequence_unite_ko',{X:X}))),
+        _oscNode('3',I18N_D.t('tpl.osc_desc_valeur_f'),'UnitsRelative','ans_F'+X,'ta'+X+'_fq','0.05','+',0.25,-1,'prt'+X+'-3-T',_oscOk(I18N_D.t('osc.fb_frequence_ok')),'-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_frequence_valeur_ko'))),
+        _oscNode('4',I18N_D.t('tpl.osc_desc_unite_f_incoherente'),'UnitsRelative','ans_F'+X,'ta'+X+'_fq','0','+',0,5,'prt'+X+'-4-T','','-',0,-1,'prt'+X+'-4-F',_oscKo(I18N_D.t('osc.fb_frequence_unite_incoherente'))),
+        _oscNode('5',I18N_D.t('tpl.osc_desc_coherence_f'),'UnitsRelative','ans_F'+X,'1/ans_T'+X,'0.05','+',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_frequence_coherente_trap')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N_D.t('osc.fb_frequence_incoherente')))
+      ];
+    } else {
+      canonicalNodes = _oscSimplePair_D('prt'+X,
+        {label:I18N_D.t('osc.label_periode'),   sans:'ans_T'+X, tans:'ta'+X+'_T',  testopt:'ta'+X+'_precision_T'},
+        {label:I18N_D.t('osc.label_frequence'), sans:'ans_F'+X, tans:'ta'+X+'_fq', testopt:'0.05'},
+        pedMode==='expert');
+    }
+
+    qnote = I18N_D.t('osc.qnote_type_label')+': {@ta'+X+'_type_text@} | f={@ta'+X+'_f@} Hz, T={@ta'+X+'_T@}, f={@ta'+X+'_fq@}';
+    genFb = '<div style="font-weight:bold; color:#0c4a6e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
+      + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
+      + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N_D.t('osc.genfb_q1_periode') + '</span> <p>' + I18N_D.t('osc.genfb_periode_explanation', {X: X}) + '</p></div>'
+      + '<div style="margin-bottom:8px;font-size:.9rem;">'
+      + '<span style="font-weight:bold;color:#0c4a6e;">' + I18N_D.t('osc.genfb_q2_frequence') + '</span> <p>' + I18N_D.t('osc.genfb_frequence_explanation') + '</p>'
+      + '<p>' + I18N_D.t('osc.genfb_frequence_calcul', {X: X}) + '</p></div>';
+
+    var prtMeta = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv };
+    return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta, canonicalNodes, genFb, fbGen, jsx, deps);
+  }
+
+  if(mode==='rc_charge' || mode==='rc_decharge'){
+    var decharge = (mode==='rc_decharge');
+    var evBase  = p.evBase;
+    var evRange = p.evRange;
+    var tauBase = p.tauBase;
+    var tauRange= p.tauRange;
+
+    vars = '/* Q'+X+' : Oscilloscope — '+(decharge?'Décharge':'Charge')+' RC ('+bareme+'pt) */\n'
+      + 'ta'+X+'_ev_val: '+evBase+' + rand('+evRange+');\n'
+      + 'ta'+X+'_tau_val: '+tauBase+' + rand('+tauRange+');\n'
+      + 'ta'+X+'_E: stackunits(ta'+X+'_ev_val, mV);\n'
+      + 'ta'+X+'_tau: stackunits(ta'+X+'_tau_val, us);\n'
+      + 'ta'+X+'_tau_unit: stack_units_units(ta'+X+'_tau);\n'
+      + 'ta'+X+'_E_unit: stack_units_units(ta'+X+'_E);\n'
+      + 'ta'+X+'_precision_q: 0.1;\n';
+
+    jsx = buildOscJSXCode_RC({ si: svIdx, ti: shIdx, evExpr:'{#ta'+X+'_ev_val#}', tauExpr:'{#ta'+X+'_tau_val#}', decharge: decharge });
+
+    var titre = decharge ? I18N_D.t('osc.title_rc_decharge') : I18N_D.t('osc.title_rc_charge');
+    var header2 = _oscHeader(X, bareme, titre, {bg:'#0c4a6e',accent:'#0369a1'}, '📏', I18N_D.t('osc.subtitle_grandeur_physique'));
+    var consigneY = decharge
+      ? I18N_D.t('osc.consigne_y_decharge')
+      : I18N_D.t('osc.consigne_y_charge');
+    var consigneTau = decharge
+      ? I18N_D.t('osc.consigne_tau_decharge')
+      : I18N_D.t('osc.consigne_tau_charge');
+
+    textFrag = header2
+      + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
+      + '<p>' + I18N_D.t('osc.rc_intro', {mode: decharge ? I18N_D.t('osc.mot_decharge') : I18N_D.t('osc.mot_charge')}) + '</p>'
+      + '<p><strong>' + I18N_D.t('osc.consigne_lbl') + '</strong><ul><li>'+consigneY+'</li><li>'+consigneTau+'</li></ul></p>'
+      + (text||'') + '</div><!-- ENONCE-END -->\n'
+      + '<div><!--HS-KBD:'+X+'--></div>\n'
+      + _oscInputHintsHTML_D('<code>1500*us</code> ' + I18N_D.t('osc.pour_us'))
+      + '<p>' + I18N_D.t('osc.label_tau_mesuree') + '[[input:ans_tau'+X+']] [[validation:ans_tau'+X+']]</p>\n'
+      + '<p>' + I18N_D.t('osc.label_tension_mesuree', {mode: decharge ? I18N_D.t('osc.mot_initiale') : I18N_D.t('osc.mot_finale')}) + '[[input:ans_E'+X+']] [[validation:ans_E'+X+']]</p>';
+
+    previewFrag = header2
+      + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
+      + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#1e3a5f;font-family:monospace;font-size:.85rem;">'
+      + I18N_D.t('osc.preview_rc', {mode: decharge ? I18N_D.t('osc.mot_decharge') : I18N_D.t('osc.mot_charge')}) + '</div>';
+
+    inputXML = _oscUnitsInput('ans_E'+X, 'ta'+X+'_E') + '\n' + _oscUnitsInput('ans_tau'+X, 'ta'+X+'_tau');
+
+    var fbv2 = 'stud_si_tau'+X+' : stack_unit_si_to_si_base(ans_tau'+X+');\n'
+      + 'teach_si_tau'+X+' : stack_unit_si_to_si_base(ta'+X+'_tau_unit);\n'
+      + 'v_pure_e_tau'+X+' : subst(map(lambda([u], u=1), listofvars(stud_si_tau'+X+')), stud_si_tau'+X+');\n'
+      + 'v_pure_t_tau'+X+' : subst(map(lambda([u], u=1), listofvars(teach_si_tau'+X+')), teach_si_tau'+X+');\n'
+      + 'eleve_unit_tau'+X+' : 2 * stud_si_tau'+X+' / v_pure_e_tau'+X+';\n'
+      + 'teacher_unit_tau'+X+' : 2 * teach_si_tau'+X+' / v_pure_t_tau'+X+';\n'
+      + '/* --- Traitement E --- */\n'
+      + 'stud_si_E'+X+' : stack_unit_si_to_si_base(ans_E'+X+');\n'
+      + 'teach_si_E'+X+' : stack_unit_si_to_si_base(ta'+X+'_E_unit);\n'
+      + 'v_pure_e_E'+X+' : subst(map(lambda([u], u=1), listofvars(stud_si_E'+X+')), stud_si_E'+X+');\n'
+      + 'v_pure_t_E'+X+' : subst(map(lambda([u], u=1), listofvars(teach_si_E'+X+')), teach_si_E'+X+');\n'
+      + 'eleve_unit_E'+X+' : 2 * stud_si_E'+X+' / v_pure_e_E'+X+';\n'
+      + 'teacher_unit_E'+X+' : 2 * teach_si_E'+X+' / v_pure_t_E'+X+';\n';
+
+    if(pedMode==='guide'){
+      canonicalNodes = [
+        _oscNode('0',I18N_D.t('tpl.osc_desc_unite_tau'),'UnitsAbsolute','eleve_unit_tau'+X,'teacher_unit_tau'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_tau_unite_ko',{X:X}))),
+        _oscNode('1',I18N_D.t('tpl.osc_desc_valeur_tau'),'UnitsRelative','ans_tau'+X,'ta'+X+'_tau','ta'+X+'_precision_q','+',0.25,3,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_tau_correcte')),'-',0,2,'prt'+X+'-1-F',''),
+        _oscNode('2',I18N_D.t('tpl.osc_desc_piege_tau_e'),'UnitsRelative','ans_tau'+X,'ta'+X+'_E','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N_D.t('osc.fb_tau_trap_e')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_tau_valeur_ko',{pct: decharge?I18N_D.t('osc.pct_368'):I18N_D.t('osc.pct_632')}))),
+        _oscNode('3',I18N_D.t('tpl.osc_desc_unite_e'),'UnitsAbsolute','eleve_unit_E'+X,'teacher_unit_E'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_tension_unite_ko',{X:X}))),
+        _oscNode('4',I18N_D.t('tpl.osc_desc_valeur_e'),'UnitsRelative','ans_E'+X,'ta'+X+'_E','0.05','+',0.25,-1,'prt'+X+'-4-T',_oscOk(I18N_D.t('osc.fb_tension_correcte')),'-',0,5,'prt'+X+'-4-F',''),
+        _oscNode('5',I18N_D.t('tpl.osc_desc_piege_e_tau'),'UnitsRelative','ans_E'+X,'ta'+X+'_tau','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_tension_trap_tau')),'-',0,-1,'prt'+X+'-5-F',_oscKo(I18N_D.t('osc.fb_tension_valeur_ko')))
+      ];
+    } else {
+      canonicalNodes = _oscSimplePair_D('prt'+X,
+        {label:I18N_D.t('osc.label_constante_temps'), sans:'ans_tau'+X, tans:'ta'+X+'_tau', testopt:'ta'+X+'_precision_q'},
+        {label:I18N_D.t('osc.label_tension'),            sans:'ans_E'+X,   tans:'ta'+X+'_E',   testopt:'0.05'},
+        pedMode==='expert');
+    }
+
+    qnote = 'E={@ta'+X+'_E@} | tau={@ta'+X+'_tau@}';
+    genFb = '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
+      + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
+      + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q1_tau') + '</span> <p>' + I18N_D.t('osc.genfb_tau_explanation', {pct: decharge?I18N_D.t('osc.pct_368'):I18N_D.t('osc.pct_632'), X: X}) + '</p></div>'
+      + '<div style="margin-bottom:8px;font-size:.9rem;">'
+      + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q2_tension', {mode: decharge?I18N_D.t('osc.mot_initiale'):I18N_D.t('osc.mot_finale')}) + '</span> <p>' + I18N_D.t('osc.genfb_tension_explanation', {X: X}) + '</p></div>';
+
+    var prtMeta2 = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv2 };
+    return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta2, canonicalNodes, genFb, fbGen, jsx, deps);
+  }
+
+  /* mode === 'retard' */
+  var fCarrier = p.fCarrier;
+  var fMod     = p.fMod;
+  var dtMin    = p.dtMin;
+  var dtMax    = p.dtMax;
+
+  vars = '/* Q'+X+' : Oscilloscope — Retard ultrasonore ('+bareme+'pt) */\n'
+    + 'ta'+X+'_f_carrier_val: '+fCarrier+';\n'
+    + 'ta'+X+'_f_mod_val: '+fMod+';\n'
+    + 'ta'+X+'_dt_val: rand_with_step('+dtMin+', '+dtMax+', 1) * 0.000001;\n'
+    + 'ta'+X+'_fc: stackunits(ta'+X+'_f_carrier_val, Hz);\n'
+    + 'ta'+X+'_dt: stackunits(ta'+X+'_dt_val, s);\n'
+    + 'ta'+X+'_fm: stackunits(ta'+X+'_f_mod_val, Hz);\n'
+    + 'ta'+X+'_err_periode: stackunits(1/ta'+X+'_f_carrier_val, s);\n'
+    + 'ta'+X+'_err_demi_periode: stackunits(1/(2*ta'+X+'_f_carrier_val), s);\n'
+    + 'ta'+X+'_precision_q: 0.1;\n'
+    + 'ta'+X+'_fc_unit: stack_units_units(ta'+X+'_fc);\n'
+    + 'ta'+X+'_dt_unit: stack_units_units(ta'+X+'_dt);\n';
+
+  jsx = buildOscJSXCode_Retard({ siA: svIdx, siB: Math.min(OSC_SV.length-1, svIdx+1), ti: shIdx, fcExpr:'{#ta'+X+'_f_carrier_val#}', dtExpr:'{#ta'+X+'_dt_val#}' });
+
+  var header3 = _oscHeader(X, bareme, I18N_D.t('osc.title_retard'), {bg:'#0f766e',accent:'#14b8a6'}, '📡', I18N_D.t('osc.subtitle_ondes_mecaniques'));
+  textFrag = header3
+    + '<!-- ENONCE-START --><div style="margin-bottom:14px;">'
+    + '<p><strong>' + I18N_D.t('osc.consigne_lbl') + '</strong> ' + I18N_D.t('osc.retard_intro') + '</p>'
+    + '<p>' + I18N_D.t('osc.retard_determinez') + '</p>'
+    + '<ol style="margin-left:20px;line-height:2;"><li>' + I18N_D.t('osc.retard_li_frequence') + '</li><li>' + I18N_D.t('osc.retard_li_delta_t') + '</li></ol>'
+    + (text||'') + '</div><!-- ENONCE-END -->\n'
+    + '<div><!--HS-KBD:'+X+'--></div>\n'
+    + _oscInputHintsHTML_D('<code>25*us</code> ' + I18N_D.t('osc.pour_us'))
+    + '<p>' + I18N_D.t('osc.label_frequence_ultrasons') + '[[input:ans_fc'+X+']] [[validation:ans_fc'+X+']]</p>\n'
+    + '<p>' + I18N_D.t('osc.label_retard_temporel') + '[[input:ans_dt'+X+']] [[validation:ans_dt'+X+']]</p>';
+
+  previewFrag = header3
+    + '<!-- ENONCE-START --><div style="margin-bottom:10px;">'+(text||'')+'</div><!-- ENONCE-END -->\n'
+    + '<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:20px;text-align:center;color:#0f766e;font-family:monospace;font-size:.85rem;">' + I18N_D.t('osc.preview_retard') + '</div>';
+
+  inputXML = _oscUnitsInput('ans_dt'+X, 'ta'+X+'_dt') + '\n' + _oscUnitsInput('ans_fc'+X, 'ta'+X+'_fc');
+
+  var fbv3 = '/* --- Traitement Fréquence f --- */\n'
+    + 'stud_si_f'+X+' : stack_unit_si_to_si_base(ans_fc'+X+');\n'
+    + 'teach_si_f'+X+' : ta'+X+'_fc_unit;\n'
+    + 'v_pure_e_f'+X+' : subst(map(lambda([u], u=1), listofvars(stud_si_f'+X+')), stud_si_f'+X+');\n'
+    + 'v_pure_t_f'+X+' : subst(map(lambda([u], u=1), listofvars(teach_si_f'+X+')), teach_si_f'+X+');\n'
+    + 'eleve_unit_f'+X+' : 2 * stud_si_f'+X+' / v_pure_e_f'+X+';\n'
+    + 'teacher_unit_f'+X+' : 2 * teach_si_f'+X+' / v_pure_t_f'+X+';\n'
+    + '/* --- Traitement Retard dt --- */\n'
+    + 'stud_si_dt'+X+' : stack_unit_si_to_si_base(ans_dt'+X+');\n'
+    + 'teach_si_dt'+X+' : ta'+X+'_dt_unit;\n'
+    + 'v_pure_e_dt'+X+' : subst(map(lambda([u], u=1), listofvars(stud_si_dt'+X+')), stud_si_dt'+X+');\n'
+    + 'v_pure_t_dt'+X+' : subst(map(lambda([u], u=1), listofvars(teach_si_dt'+X+')), teach_si_dt'+X+');\n'
+    + 'eleve_unit_dt'+X+' : 2 * stud_si_dt'+X+' / v_pure_e_dt'+X+';\n'
+    + 'teacher_unit_dt'+X+' : 2 * teach_si_dt'+X+' / v_pure_t_dt'+X+';\n';
+
+  if(pedMode==='guide'){
+    canonicalNodes = [
+      _oscNode('0',I18N_D.t('tpl.osc_desc_unite_f'),'UnitsAbsolute','eleve_unit_f'+X,'teacher_unit_f'+X,'0','+',0.25,1,'prt'+X+'-0-T','','-',0,-1,'prt'+X+'-0-F',_oscKo(I18N_D.t('osc.fb_freq_unite_ko_retard',{X:X}))),
+      _oscNode('1',I18N_D.t('tpl.osc_desc_valeur_f'),'UnitsRelative','ans_fc'+X,'ta'+X+'_fc','ta'+X+'_precision_q','+',0.75,3,'prt'+X+'-1-T',_oscOk(I18N_D.t('osc.fb_freq_correcte_retard')),'-',0,2,'prt'+X+'-1-F',''),
+      _oscNode('2',I18N_D.t('tpl.osc_desc_piege_freq_salve'),'UnitsRelative','ans_fc'+X,'ta'+X+'_fm','ta'+X+'_precision_q','-',0,-1,'prt'+X+'-2-T',_oscTrap(I18N_D.t('osc.fb_freq_trap_salve')),'-',0,-1,'prt'+X+'-2-F',_oscKo(I18N_D.t('osc.fb_freq_valeur_ko_retard'))),
+      _oscNode('3',I18N_D.t('tpl.osc_desc_unite_retard'),'UnitsAbsolute','eleve_unit_dt'+X,'teacher_unit_dt'+X,'0','+',0.25,4,'prt'+X+'-3-T','','-',0,-1,'prt'+X+'-3-F',_oscKo(I18N_D.t('osc.fb_retard_unite_ko',{X:X}))),
+      _oscNode('4',I18N_D.t('tpl.osc_desc_valeur_retard'),'UnitsRelative','ans_dt'+X,'ta'+X+'_dt','0.05','+',0.75,-1,'prt'+X+'-4-T',_oscOk(I18N_D.t('osc.fb_retard_correct')),'-',0,5,'prt'+X+'-4-F',''),
+      _oscNode('5',I18N_D.t('tpl.osc_desc_piege_retard_periode'),'UnitsRelative','ans_dt'+X,'ta'+X+'_err_periode','0.05','-',0,-1,'prt'+X+'-5-T',_oscTrap(I18N_D.t('osc.fb_retard_trap_periode')),'-',0,6,'prt'+X+'-5-F',''),
+      _oscNode('6',I18N_D.t('tpl.osc_desc_piege_retard_demi_periode'),'UnitsRelative','ans_dt'+X,'ta'+X+'_err_demi_periode','0.05','-',0,-1,'prt'+X+'-6-T',_oscTrap(I18N_D.t('osc.fb_retard_trap_demi_periode')),'-',0,-1,'prt'+X+'-6-F',_oscKo(I18N_D.t('osc.fb_retard_valeur_ko')))
+    ];
+  } else {
+    canonicalNodes = _oscSimplePair_D('prt'+X,
+      {label:I18N_D.t('osc.label_frequence'), sans:'ans_fc'+X, tans:'ta'+X+'_fc', testopt:'ta'+X+'_precision_q'},
+      {label:I18N_D.t('osc.label_retard'),    sans:'ans_dt'+X, tans:'ta'+X+'_dt', testopt:'0.05'},
+      pedMode==='expert');
+  }
+
+  qnote = 'f={@ta'+X+'_f_carrier_val@} Hz | dt={@ta'+X+'_dt@}';
+  genFb = '<div style="font-weight:bold; color:#0f766e; margin-bottom:10px;">' + I18N_D.t('osc.genfb_reponses_attendues') + '</div>'
+    + '<div style="margin-bottom:8px;font-size:.9rem;border-bottom:1px dashed #e2e8f0;padding-bottom:6px;">'
+    + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q1_frequence_retard') + '</span> <p>' + I18N_D.t('osc.genfb_frequence_retard_explanation', {X: X}) + '</p></div>'
+    + '<div style="margin-bottom:8px;font-size:.9rem;">'
+    + '<span style="font-weight:bold;color:#0f766e;">' + I18N_D.t('osc.genfb_q2_retard') + '</span> <p>' + I18N_D.t('osc.genfb_retard_explanation', {X: X}) + '</p></div>';
+
+  var prtMeta3 = { name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables:fbv3 };
+  return _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta3, canonicalNodes, genFb, fbGen, jsx, deps);
+}
+
+function _oscUnitsInput(name, tans){
+  return '    <input>\n'
+    + '      <name>'+name+'</name>\n'
+    + '      <type>units</type>\n'
+    + '      <tans>'+tans+'</tans>\n'
+    + '      <boxsize>15</boxsize>\n'
+    + '      <strictsyntax>1</strictsyntax>\n'
+    + '      <insertstars>0</insertstars>\n'
+    + '      <syntaxhint></syntaxhint>\n'
+    + '      <syntaxattribute>0</syntaxattribute>\n'
+    + '      <forbidwords></forbidwords>\n'
+    + '      <allowwords></allowwords>\n'
+    + '      <forbidfloat>1</forbidfloat>\n'
+    + '      <requirelowestterms>0</requirelowestterms>\n'
+    + '      <checkanswertype>0</checkanswertype>\n'
+    + '      <mustverify>0</mustverify>\n'
+    + '      <showvalidation>0</showvalidation>\n'
+    + '      <options></options>\n'
+    + '    </input>';
+}
+
+function _oscFinalize(X, bareme, vars, qnote, textFrag, previewFrag, inputXML, prtMeta, canonicalNodes, genFb, fbGen, kbdRaw, deps){
+  deps = deps || {};
+  var buildPrtXml_D = deps.buildPrtXml || buildPrtXml;
+  var _mkFbGen_D = deps._mkFbGen || _mkFbGen;
+  var applyFbBox_D = deps.applyFbBox || applyFbBox;
+
+  // canonicalNodes peut porter des feedbacks "marques" (objets {__fbKind, text} produits par
+  // _oscOk/_oscKo/_oscTrap) : plainNodes en extrait le texte brut (expose via prt.nodes pour
+  // prt-manager.js), xmlNodes y applique l'encadre colore correspondant, uniquement pour
+  // l'export prtXML. Voir js/fb-box.js (applyFbBox).
+  var plainNodes = canonicalNodes.map(function(n) {
+    return Object.assign({}, n, {
+      truefeedback: _oscFbTextOf(n.truefeedback),
+      falsefeedback: _oscFbTextOf(n.falsefeedback)
+    });
+  });
+  var xmlNodes = canonicalNodes.map(function(n) {
+    var tKind = _oscFbKindOf(n.truefeedback), fKind = _oscFbKindOf(n.falsefeedback);
+    var tText = _oscFbTextOf(n.truefeedback), fText = _oscFbTextOf(n.falsefeedback);
+    return Object.assign({}, n, {
+      truefeedback: tKind ? applyFbBox_D(tKind, tText) : tText,
+      falsefeedback: fKind ? applyFbBox_D(fKind, fText) : fText
+    });
+  });
+  var prtXML = buildPrtXml_D(prtMeta, xmlNodes);
+  return {
+    bareme: bareme, vars: vars, qnote: qnote, textFrag: textFrag, previewFrag: previewFrag,
+    inputXML: inputXML, prtXML: prtXML,
+    prt: { meta: prtMeta, nodes: plainNodes },
+    generalFeedback: applyFbBox_D('general', _mkFbGen_D(genFb, fbGen)),
+    feedbackRef: '[[feedback:'+prtMeta.name+']]',
+    kbdRaw: kbdRaw
+  };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    genOscilloscope: genOscilloscope,
+    genOscilloscopeCore: genOscilloscopeCore,
+    genOscilloscopeParams: genOscilloscopeParams
+  };
+}
+

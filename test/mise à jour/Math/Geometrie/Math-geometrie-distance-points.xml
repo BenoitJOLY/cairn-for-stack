@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 396254  -->
+  <question type="stack">
+    <name>
+      <text>Géométrie : Distance entre deux points</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<div style="background: #475569; border-left: 5px solid #334155; border-radius: 0 8px 8px 0; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><strong style="font-weight: 800; color: #fff; font-size: .95rem;">Géométrie — Distance</strong> <span style="background: #334155; color: #fff; padding: 2px 9px; border-radius: 20px; font-size: .78rem; font-weight: bold;">/ 1 pt</span></div>
+<p>Dans un repère orthonormé \((O; \vec{i}, \vec{j})\), on considère les points :</p>
+<div style="display: flex; gap: 40px; justify-content: center; margin: 15px 0; flex-wrap: wrap;">
+<div>\(A \left( {@xa@} \; ; \; {@ya@} \right)\)</div>
+<div>\(B \left( {@xb@} \; ; \; {@yb@} \right)\)</div>
+</div>
+<p><strong>1.</strong> Calculer la longueur du segment \([AB]\).<br>
+<em>(Arrondir le résultat à \(10^{-2}\) près).</em></p>
+<div style="margin: 10px 0;">\(AB = \) [[input:ans_dist]] [[validation:ans_dist]]</div>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<div style="margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+<div style="font-weight: bold; margin-bottom: 10px;">🔑 Correction détaillée</div>
+<div style="font-size: .9rem;">
+Dans un repère orthonormé, la formule de la distance entre deux points est :<br><br>
+\[
+AB = \sqrt{(x_B - x_A)^2 + (y_B - y_A)^2}
+\]<br>
+<strong>Application :</strong><br><br>
+\[
+AB = \sqrt{({@xb@} - ({@xa@}))^2 + ({@yb@} - ({@ya@}))^2}
+\]
+\[
+AB = \sqrt{{@dx@}^2 + {@dy@}^2} = \sqrt{{@dx2@} + {@dy2@}} = \sqrt{{@somme_carres@}}
+\]
+\[
+AB \approx {@dist_arr@}
+\]
+</div>
+</div>]]></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <stackversion>
+      <text>2024092500</text>
+    </stackversion>
+    <questionvariables>
+      <text><![CDATA[/* Fonction utilitaire */
+ri(a,b) := a + rand(b - a + 1)$ 
+/* Génération des coordonnées */
+xa: ri(-5,5)$ ya: ri(-5,5)$ xb: ri(-5,5)$ yb: ri(-5,5)$ 
+/* On s'assure que A et B ne sont pas confondus */
+while xa=xb and ya=yb do (
+    xb: ri(-5,5),
+    yb: ri(-5,5)
+)$ 
+/* Calculs intermédiaires */
+dx: xb - xa$ dy: yb - ya$ dx2: dx^2$ dy2: dy^2$ somme_carres: dx2 + dy2$ 
+/* Distance exacte et arrondie à 10^-2 */
+dist_exact: sqrt(somme_carres)$ dist_arr: 1.0* round(float(dist_exact)*100)/100$ 
+/* Erreurs classiques */
+err_no_sqrt: somme_carres$ err_manhattan: abs(dx) + abs(dy)$ err_dist_origine: abs(sqrt(xb^2+yb^2) - sqrt(xa^2+ya^2))$]]></text>
+    </questionvariables>
+    <specificfeedback format="html">
+      <text><![CDATA[<div>[[feedback:prt1]]</div> ]]></text>
+    </specificfeedback>
+    <questionnote format="html">
+      <text><![CDATA[<p>A({@xa@};{@ya@}), B({@xb@};{@yb@}), AB={@dist_arr@}</p>]]></text>
+    </questionnote>
+    <questiondescription format="html">
+      <text><![CDATA[<p>Généré avec HéStack V2 | hestack-types:geometry-distance-points</p>]]></text>
+    </questiondescription>
+    <questionsimplify>1</questionsimplify>
+    <assumepositive>0</assumepositive>
+    <assumereal>0</assumereal>
+    <prtcorrect format="html">
+      <text></text>
+    </prtcorrect>
+    <prtpartiallycorrect format="html">
+      <text></text>
+    </prtpartiallycorrect>
+    <prtincorrect format="html">
+      <text></text>
+    </prtincorrect>
+    <decimals>.</decimals>
+    <scientificnotation>*10</scientificnotation>
+    <multiplicationsign>dot</multiplicationsign>
+    <sqrtsign>1</sqrtsign>
+    <complexno>i</complexno>
+    <inversetrig>cos-1</inversetrig>
+    <logicsymbol>lang</logicsymbol>
+    <matrixparens>[</matrixparens>
+    <isbroken>0</isbroken>
+    <variantsselectionseed></variantsselectionseed>
+    <input>
+      <name>ans_dist</name>
+      <type>numerical</type>
+      <tans>dist_arr</tans>
+      <boxsize>10</boxsize>
+      <strictsyntax>1</strictsyntax>
+      <insertstars>0</insertstars>
+      <syntaxhint></syntaxhint>
+      <syntaxattribute>0</syntaxattribute>
+      <forbidwords></forbidwords>
+      <allowwords></allowwords>
+      <forbidfloat>0</forbidfloat>
+      <requirelowestterms>0</requirelowestterms>
+      <checkanswertype>0</checkanswertype>
+      <mustverify>0</mustverify>
+      <showvalidation>0</showvalidation>
+      <options></options>
+    </input>
+    <prt>
+      <name>prt1</name>
+      <value>1.0000000</value>
+      <autosimplify>1</autosimplify>
+      <feedbackstyle>1</feedbackstyle>
+      <feedbackvariables>
+        <text></text>
+      </feedbackvariables>
+      <node>
+        <name>0</name>
+        <description>Réponse correcte (tolérance arrondi)</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_dist</sans>
+        <tans>dist_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>1</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-OK</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #15803d; padding: 10px 14px; background: #f0fdf4; border-radius: 4px;">✅ <strong>Parfait !</strong> La distance est correctement calculée et arrondie.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>1</falsenextnode>
+        <falseanswernote>PRT-NOK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>1</name>
+        <description>Erreur : A oublié la racine carrée</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_dist</sans>
+        <tans>err_no_sqrt</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-NO-SQRT</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Oubli de la racine carrée !</strong> Vous avez calculé \((x_B-x_A)^2 + (y_B-y_A)^2\). D'après le théorème de Pythagore, il faut prendre la <strong>racine carrée</strong> de cette somme pour obtenir la distance.</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>2</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-NO-SQRT</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>2</name>
+        <description>Erreur : Distance de Manhattan (somme des écarts)</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_dist</sans>
+        <tans>err_manhattan</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-MANHATTAN</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Mauvaise formule !</strong> Vous avez additionné les différences (\(|x_B-x_A| + |y_B-y_A|\)). Ce n'est pas une distance en géométrie euclidienne. Il faut appliquer le <strong>théorème de Pythagore</strong> (addition des <strong>carrés</strong> puis racine).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>3</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-MANHATTAN</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>3</name>
+        <description>Erreur : Soustraction des distances à l'origine</description>
+        <answertest>AlgEquiv</answertest>
+        <sans>ans_dist</sans>
+        <tans>err_dist_origine</tans>
+        <testoptions></testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-ORIGINE</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #f97316; padding: 10px 14px; background: #fff7ed; border-radius: 4px;">🚨 <strong>Erreur de méthode !</strong> Vous avez soustrait les distances des points à l'origine (\(OA - OB\)). Cela ne donne pas la distance \(AB\) (sauf si les points sont alignés avec l'origine). Il faut utiliser la formule avec les coordonnées de \(A\) et \(B\).</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>4</falsenextnode>
+        <falseanswernote>PRT-ERR-NOT-ORIGINE</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+      <node>
+        <name>4</name>
+        <description>Erreur générique (Fallback)</description>
+        <answertest>NumAbsolute</answertest>
+        <sans>ans_dist</sans>
+        <tans>dist_arr</tans>
+        <testoptions>0.005</testoptions>
+        <quiet>0</quiet>
+        <truescoremode>=</truescoremode>
+        <truescore>0</truescore>
+        <truepenalty></truepenalty>
+        <truenextnode>-1</truenextnode>
+        <trueanswernote>PRT-ERR-GENERIC</trueanswernote>
+        <truefeedback format="html">
+          <text><![CDATA[<div style="border-left: 4px solid #dc2626; padding: 10px 14px; background: #fff0f0; border-radius: 4px;">❌ <strong>Incorrect.</strong> Appliquez la formule du cours :<br>\(AB = \sqrt{(x_B - x_A)^2 + (y_B - y_A)^2}\)</div>]]></text>
+        </truefeedback>
+        <falsescoremode>=</falsescoremode>
+        <falsescore>0</falsescore>
+        <falsepenalty></falsepenalty>
+        <falsenextnode>-1</falsenextnode>
+        <falseanswernote>PRT-ERR-FALLBACK</falseanswernote>
+        <falsefeedback format="html">
+          <text></text>
+        </falsefeedback>
+      </node>
+    </prt>
+  </question>
+</quiz>
