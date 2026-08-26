@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   STACKFORGE — HULP-INHOUD: NEDERLANDS
+   CAIRN FOR STACK — HULP-INHOUD: NEDERLANDS
    Alleen gegevens (geen logica). Om een hulptaal toe te voegen,
    kopieer dit bestand (bijv. help.en.js), vertaal de teksten
    en sluit af met: window.HELP_LANG.en = HELP_CONTENT;
@@ -607,7 +607,7 @@ const HELP_CONTENT = {
     title: '<svg class="hs-ico"><use href="#ico-type-jxgdrop"></use></svg> Slepen en Neerzetten JSXGraph — Hulp',
     body:
       _hSection('Waarvoor dient het?',
-        '<p>De student <b>sleept labels (opties) naar een afbeelding</b> om deze te deponeren in gedefinieerde zones (gelegend diagram, kaart, experimentele opstelling…). Stackforge genereert automatisch de responsieve JSXGraph-code en de correctie.</p>') +
+        '<p>De student <b>sleept labels (opties) naar een afbeelding</b> om deze te deponeren in gedefinieerde zones (gelegend diagram, kaart, experimentele opstelling…). Cairn for Stack genereert automatisch de responsieve JSXGraph-code en de correctie.</p>') +
       _hSection('Hoe in te vullen', _hList([
         '<b>Achtergrondafbeelding</b>: laad een afbeelding (PNG/JPG) — deze dient als visueel draagvlak voor zones en opties.',
         '<b>Opties</b>: klik op <b>＋ Optie toevoegen</b> voor elk label dat de student kan deponeren.',

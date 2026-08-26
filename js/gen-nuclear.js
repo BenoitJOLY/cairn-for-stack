@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 // ── NUCLEAR REACTION GENERATOR (Réaction Nucléaire) ─────────────
 
 // ══════════════════════════════════════════════════════
-//  STACKFORGE FORM PANEL — INTERACTIONS ÉDITEUR
+//  CAIRN FOR STACK FORM PANEL — INTERACTIONS ÉDITEUR
 // ══════════════════════════════════════════════════════
 
 // Verrouille la zone de saisie de la réaction (éditeur + barre d'outils) tant que
@@ -97,7 +97,7 @@ function nucRenderPreview() {
 }
 
 // ══════════════════════════════════════════════════════
-//  PARSING CÔTÉ STACKFORGE (pour générer ta3 / ta4)
+//  PARSING CÔTÉ CAIRN FOR STACK (pour générer ta3 / ta4)
 // ══════════════════════════════════════════════════════
 
 // Clés = ce que les boutons insèrent (espaces tailing strippés)
@@ -457,8 +457,8 @@ async function genNuclear(X) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
     }
-    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "nuclear", repli sur le calcul local (session expirée ?).');
-  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "nuclear", repli sur le calcul local.', e); }
+    console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "nuclear", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[cairnforstack] /api/generate injoignable pour "nuclear", repli sur le calcul local.', e); }
   return genNuclearCore(X, p);
 }
 
@@ -529,7 +529,7 @@ ${jsxOpen}
     [[input:ans${X}p]] [[validation:ans${X}p]]
 </div>`;
 
-  // ── previewFrag (dans Stackforge) ────────────────────
+  // ── previewFrag (dans Cairn for Stack) ────────────────────
   const previewFrag =
 `<div style="background:#EAB308;border-left:5px solid #676863;border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
   <strong style="font-weight:800;color:#3a3a37;font-size:.95rem;">Q${X} — ${I18N_D.t('tpl.nuc_title')}</strong>

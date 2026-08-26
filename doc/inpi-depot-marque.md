@@ -1,4 +1,4 @@
-# Dépôt de marque "StackForge" — dossier de préparation INPI
+# Dépôt de marque "Cairn for Stack" — dossier de préparation INPI
 
 À utiliser comme base pour le dépôt en ligne sur https://www.inpi.fr
 (rubrique "Déposer une marque"). Ce document prépare le contenu ;
@@ -6,13 +6,14 @@ le dépôt lui-même (identité, paiement) doit être fait par toi.
 
 ## 1. Signe à déposer
 
-- **Dénomination verbale** : StackForge
+- **Dénomination verbale** : Cairn for Stack
 - Variante à envisager en dépôt complémentaire si tu as un logo :
   marque semi-figurative (texte + logo), protection plus large mais
   aussi plus coûteuse (dépôt séparé).
 - Vérifier avant dépôt : recherche d'antériorité gratuite sur la base
-  INPI (https://data.inpi.fr/marques) pour "StackForge" et variantes
-  proches ("StackForge", "Stack Forge").
+  INPI (https://data.inpi.fr/marques) pour "Cairn for Stack" et
+  variantes proches ("Cairn for Stack", "CairnForStack", "Cairn-for-Stack",
+  "Cairn Stack").
 
 ## 2. Classes de produits/services (classification de Nice)
 
@@ -32,7 +33,7 @@ envisages une offre commerciale hébergée à l'avenir.)
 
 ## 3. Description du logiciel (pour le formulaire)
 
-> StackForge est un logiciel de création de questions pédagogiques
+> Cairn for Stack est un logiciel de création de questions pédagogiques
 > interactives pour la plateforme Moodle, utilisant le système
 > d'évaluation STACK (System for Teaching and Assessment using a
 > Computer algebra Kernel). Il permet aux enseignants de générer des

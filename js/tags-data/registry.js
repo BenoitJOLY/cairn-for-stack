@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 // séparé (js/tags-data/<code>.js) qui s'enregistre via registerCountryTags().
 // Voir js/tags-data/_modele.js pour créer un nouveau pays.
 var TAGS_COUNTRIES = {};
-var STACKFORGE_PAYS_KEY = 'stackforge_pays';
+var CAIRN_FOR_STACK_PAYS_KEY = 'cairnforstack_pays';
 
 function registerCountryTags(code, label, tree) {
   TAGS_COUNTRIES[code] = { label: label, tree: tree };
@@ -33,16 +33,20 @@ function currentPays() {
   if (window.I18N && typeof I18N.getLang === 'function' && TAGS_COUNTRIES[I18N.getLang()]) {
     return I18N.getLang();
   }
-  try { return localStorage.getItem(STACKFORGE_PAYS_KEY) || 'fr'; } catch (e) { return 'fr'; }
+  try { return localStorage.getItem(CAIRN_FOR_STACK_PAYS_KEY) || 'fr'; } catch (e) { return 'fr'; }
 }
 
 // tagsArbre reste la variable globale lue par tmInitMat()/tmSelectMat() etc.
 // dans js/app.js — applyPays() la fait simplement pointer vers l'arbre du
 // pays choisi, sans toucher au reste de la logique des tags.
+//
+// Si l'admin a configuré un "Fichier de tags" (admin.html → tagsUrl), une fois
+// chargé par fetchCustomTagsTree() dans js/app.js, window._customTagsTree
+// prend le pas sur l'arbre intégré, quel que soit le pays/la langue actifs.
 function applyPays(code) {
   var entry = TAGS_COUNTRIES[code] || TAGS_COUNTRIES['fr'] || { tree: {} };
-  window.tagsArbre = entry.tree;
-  try { localStorage.setItem(STACKFORGE_PAYS_KEY, code); } catch (e) {}
+  window.tagsArbre = window._customTagsTree || entry.tree;
+  try { localStorage.setItem(CAIRN_FOR_STACK_PAYS_KEY, code); } catch (e) {}
   if (typeof tmInitMat === 'function' && document.getElementById('tagModal') &&
       document.getElementById('tagModal').style.display !== 'none') {
     tmInitMat();

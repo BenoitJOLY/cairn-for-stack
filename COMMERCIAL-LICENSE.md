@@ -1,27 +1,27 @@
-# StackForge — Licence double (dual licensing)
+# Cairn for Stack — Licence double (dual licensing)
 
-StackForge est publié sous licence libre **[GNU AGPL-3.0](LICENSE.md)**.
+Cairn for Stack est publié sous licence libre **[GNU AGPL-3.0](LICENSE.md)**.
 
 ## Ce que l'AGPL-3.0 vous permet gratuitement
 
-Vous pouvez utiliser, copier, modifier et redistribuer StackForge librement —
+Vous pouvez utiliser, copier, modifier et redistribuer Cairn for Stack librement —
 y compris à des fins commerciales — à une condition : si vous exploitez une
-version modifiée de StackForge sur un serveur accessible au public (y compris
+version modifiée de Cairn for Stack sur un serveur accessible au public (y compris
 en tant que service payant / SaaS), vous devez rendre le code source
 correspondant de cette version disponible à vos utilisateurs, sous la même
 licence.
 
 C'est cette obligation de transparence qui protège le travail de l'auteur :
 personne ne peut construire un produit fermé et payant sur la base de
-StackForge sans reverser ses propres modifications à la communauté.
+Cairn for Stack sans reverser ses propres modifications à la communauté.
 
 ## Licence commerciale (sans les obligations AGPL)
 
 Si votre organisation souhaite :
 
-- intégrer StackForge (ou du code dérivé) dans un produit ou service **sans**
+- intégrer Cairn for Stack (ou du code dérivé) dans un produit ou service **sans**
   publier le code source de vos modifications, ou
-- distribuer StackForge dans un produit propriétaire fermé,
+- distribuer Cairn for Stack dans un produit propriétaire fermé,
 
 une licence commerciale distincte, sans les obligations de copyleft de
 l'AGPL, peut être négociée directement avec l'auteur.

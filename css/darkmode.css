@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   StackForge V4 — darkmode.css
+   Cairn for Stack V1 — darkmode.css
    options.js applique  data-theme="dark"  sur <html> quand
    l'utilisateur choisit le thème sombre.
    Tous les sélecteurs s'appuient sur [data-theme="dark"] — pas de

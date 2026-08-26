@@ -1,5 +1,5 @@
 <!--
-  StackForge — générateur de questions STACK pour Moodle
+  Cairn for Stack — générateur de questions STACK pour Moodle
   Copyright (C) 2026  Benoit Joly
 
   This program is free software: you can redistribute it and/or modify
@@ -21,15 +21,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="assets/icone_18x18.png">
-  <title>STACKFORGE </title>
+  <title>CAIRN FOR STACK </title>
   <link rel="stylesheet" href="lib/katex/katex.min.css">
   <link rel="stylesheet" href="lib/jsxgraph/jsxgraph.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/assistant.css">
   <link rel="stylesheet" href="css/darkmode.css">
 </head>
-<body><!-- STACKFORGE — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
-<!-- STACKFORGE — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
+<body><!-- CAIRN FOR STACK — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
+<!-- CAIRN FOR STACK — jeu d'icônes (sprite SVG). Recolorable via currentColor. -->
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><defs>
 <symbol id="ico-action-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line>
       <line x1="6" y1="6" x2="18" y2="18"></line></symbol>
@@ -750,9 +750,9 @@ fill="currentColor" stroke="none">
 
 <header class="v4-header app-header" role="banner">
   <div class="v4-header-left">
-    <img src="assets/icone_48x48.png" class="v4-logo-img" alt="StackForge" width="48" height="48">
+    <img src="assets/icone_48x48.png" class="v4-logo-img" alt="Cairn for Stack" width="48" height="48">
     <div class="v4-brand">
-      <h1 class="v4-app-name">StackForge</h1>
+      <h1 class="v4-app-name">Cairn for Stack</h1>
       <span class="v4-app-sub" data-i18n="app.subtitle">Générez le savoir, certifiez la réponse.</span>
     </div>
     <input type="text" id="quiz-name" class="v4-quiz-input" value="Exercice sans titre" aria-label="Nom de l exercice" data-i18n-aria="header.exercise_name_aria" data-i18n-val="header.exercise_name_default">
@@ -916,7 +916,7 @@ fill="currentColor" stroke="none">
         <div class="mtab" onclick="tab('jd','fb-gen',this);if(typeof jdRefreshPreview==='function')jdRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
       </div>
       <div class="mpane on" id="jd-cfg">
-      <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-info"></use></svg> <span data-i18n="jd.info_box">Définissez une image de fond, placez des zones de dépôt et listez les propositions. Stackforge génère automatiquement le code JSXGraph responsive et la correction automatique.</span></div>
+      <div class="info-box"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-info"></use></svg> <span data-i18n="jd.info_box">Définissez une image de fond, placez des zones de dépôt et listez les propositions. Cairn for Stack génère automatiquement le code JSXGraph responsive et la correction automatique.</span></div>
 
       <!-- Énoncé -->
       <div class="field">
@@ -8232,18 +8232,18 @@ fill="currentColor" stroke="none">
 <div id="copyModal" class="modal-backdrop" onclick="closeCopyModal(event)" style="z-index:2000;">
   <div class="calc-box" style="width:1040px;max-width:97vw;" onclick="event.stopPropagation()">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid var(--border);">
-    <img src="assets\stackforge.png" alt="Stackforge" style="height:34px;width:auto;border-radius:8px;flex-shrink:0;">
+    <img src="assets\cairn-for-stack.png" alt="Cairn for Stack" style="height:34px;width:auto;border-radius:8px;flex-shrink:0;">
     <h2 style="display:flex;align-items:center;gap:8px;font-size:.98rem;margin:0;"><svg class="hs-ico"><use href="#ico-footer-legal"></use></svg> <span data-i18n="modal.mentions_legales_amp_droits">Mentions légales &amp; Droits d'utilisation</span></h2>
   </div>
     <div style="font-size:.82rem;color:var(--navy2);line-height:1.42;">
-      <p data-i18n-html="copy.intro"><strong>Stackforge</strong> est un outil open-source conçu pour faciliter la création de questions STACK pour la plateforme Moodle.</p>
+      <p data-i18n-html="copy.intro"><strong>Cairn for Stack</strong> est un outil open-source conçu pour faciliter la création de questions STACK pour la plateforme Moodle.</p>
       <p style="margin-top:4px;" data-i18n-html="copy.auteur"><strong>Auteur :</strong> Benoit Joly — 2026</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;">
         <div class="modal-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:9px 10px;">
           <p style="font-weight:700;color:#15803d;margin-bottom:4px;" data-i18n="copy.licence_titre">📄 Licence d'utilisation</p>
           <p data-i18n-html="copy.licence_body">Distribué sous licence <strong>GNU AGPLv3</strong>. Utilisation, modification et redistribution libres, y compris à titre commercial.<br>
           Si vous exploitez une version modifiée sur un serveur accessible à des utilisateurs, l'AGPL vous oblige à leur fournir le code source correspondant.<br>
-          Code source et texte complet de la licence : <a href="https://github.com/BenoitJOLY/stackforge" target="_blank" rel="noopener noreferrer">github.com/BenoitJOLY/stackforge</a>.</p>
+          Code source et texte complet de la licence : <a href="https://github.com/BenoitJOLY/cairn-for-stack" target="_blank" rel="noopener noreferrer">github.com/BenoitJOLY/cairn-for-stack</a>.</p>
         </div>
         <div class="modal-section" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:9px 10px;">
           <p style="font-weight:700;color:#1d4ed8;margin-bottom:4px;" data-i18n="copy.rgpd_titre">🔒 RGPD &amp; Données personnelles</p>
@@ -8260,7 +8260,7 @@ fill="currentColor" stroke="none">
           </div>
         </div>
       </div>
-      <p style="font-size:.75rem;color:var(--slate);margin-top:4px;" data-i18n="copy.footer_note">Les questions générées appartiennent à leurs auteurs. Stackforge n'est qu'un outil de mise en forme.</p>
+      <p style="font-size:.75rem;color:var(--slate);margin-top:4px;" data-i18n="copy.footer_note">Les questions générées appartiennent à leurs auteurs. Cairn for Stack n'est qu'un outil de mise en forme.</p>
     </div>
     <div style="margin-top:10px;">
       <button style="background:var(--navy);color:white;width:100%;padding:9px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.88rem;" onclick="document.getElementById('copyModal').style.display='none'" data-i18n="btn.fermer">Fermer</button>
@@ -8294,7 +8294,7 @@ fill="currentColor" stroke="none">
 <!-- ══════════════════════════════════════════════════ -->
 <div id="contactModal" class="modal-backdrop" onclick="closeContactModal(event)" style="z-index:2000;">
   <div class="calc-box" style="width:480px;max-width:95vw;" onclick="event.stopPropagation()">
-    <img src="assets\icone_48x48.png" alt="Stackforge" style="display:block;margin:0 auto 16px;height:60px;width:auto;border-radius:10px;">
+    <img src="assets\icone_48x48.png" alt="Cairn for Stack" style="display:block;margin:0 auto 16px;height:60px;width:auto;border-radius:10px;">
     <h2 style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);font-size:1rem;"><svg class="hs-ico"><use href="#ico-footer-contact"></use></svg> <span data-i18n="modal.contact_amp_support">Contact &amp; Support</span></h2>
     <div style="font-size:.85rem;color:var(--navy2);line-height:1.7;">
       <div class="contact-author-box" style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;">
@@ -8309,7 +8309,7 @@ fill="currentColor" stroke="none">
       </div>
       <div class="modal-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;">
         <p style="font-weight:700;color:#15803d;margin-bottom:4px;"><svg class="hs-ico" aria-hidden="true"><use href="#ico-status-info"></use></svg> <span data-i18n="contact.sugg_titre">Suggestions &amp; améliorations</span></p>
-        <p style="color:#166534;font-size:.82rem;" data-i18n="contact.sugg_body">Toute idée pour enrichir Stackforge est la bienvenue. N'hésitez pas à écrire !</p>
+        <p style="color:#166534;font-size:.82rem;" data-i18n="contact.sugg_body">Toute idée pour enrichir Cairn for Stack est la bienvenue. N'hésitez pas à écrire !</p>
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:18px;">
@@ -8503,15 +8503,15 @@ fill="currentColor" stroke="none">
 <!-- ══════════════════════════════════════════════════ -->
 <footer class="app-footer" role="contentinfo">
   <div class="footer-content">
-    <p id="footer-version" style="font-size:.7rem;color:var(--footer-muted);">Version 2.1.0 — Juin 2026</p>
+    <p id="footer-version" style="font-size:.7rem;color:var(--footer-muted);">Version 1.1 — Juillet 2026</p>
     <nav class="footer-links">
       <a href="javascript:void(0)" onclick="openCopyModal()"><svg class="hs-ico"><use href="#ico-footer-legal"></use></svg> <span data-i18n="footer.legal">Mentions légales &amp; Droits d'utilisation</span></a>
       <span class="sep">|</span>
       <a href="javascript:void(0)" onclick="openContactModal()"><svg class="hs-ico"><use href="#ico-footer-contact"></use></svg> <span data-i18n="footer.contact">Contact &amp; Support</span></a>
       <span class="sep">|</span>
-      <a href="https://github.com/BenoitJOLY/stackforge" target="_blank" rel="noopener noreferrer"><svg class="hs-ico"><use href="#ico-footer-docs"></use></svg> <span data-i18n="footer.docs">Documentation</span></a>
+      <a href="https://github.com/BenoitJOLY/cairn-for-stack" target="_blank" rel="noopener noreferrer"><svg class="hs-ico"><use href="#ico-footer-docs"></use></svg> <span data-i18n="footer.docs">Documentation</span></a>
       <span class="sep">|</span>
-      <a href="https://github.com/BenoitJOLY/stackforge" target="_blank" rel="noopener noreferrer"><svg class="hs-ico"><use href="#ico-footer-docs"></use></svg> <span data-i18n="footer.code_source">Code source</span></a>
+      <a href="https://github.com/BenoitJOLY/cairn-for-stack" target="_blank" rel="noopener noreferrer"><svg class="hs-ico"><use href="#ico-footer-docs"></use></svg> <span data-i18n="footer.code_source">Code source</span></a>
     </nav>
     <p style="font-size:.7rem;color:var(--footer-muted);" data-i18n="footer.privacy">🔒 Usage local : aucune donnée collectée · Version hébergée : voir mentions légales</p>
   </div>
@@ -8728,7 +8728,7 @@ fill="currentColor" stroke="none">
 window.__hsKnownLangs = ["fr","en","de","es","nl"];
 window.__hsActiveLang = (function(){
   var saved = "fr";
-  try { var s = localStorage.getItem("stackforge_lang"); if (s && window.__hsKnownLangs.indexOf(s) !== -1) saved = s; } catch(e){}
+  try { var s = localStorage.getItem("cairnforstack_lang"); if (s && window.__hsKnownLangs.indexOf(s) !== -1) saved = s; } catch(e){}
   return saved;
 })();
 window.__hsDeferredLangs = [];
@@ -8933,7 +8933,7 @@ window.__hsLoadLangSet("lang/", true);
      onclick="if(event.target.id==='projectsModal')closeProjectsModal()">
   <div class="proj-modal">
     <div class="proj-modal-head">
-      <span><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-projects"></use></svg> <h2 data-i18n="proj.title" style="margin:0;font:inherit;display:inline;">Projets StackForge</h2></span>
+      <span><svg class="hs-ico" aria-hidden="true"><use href="#ico-file-projects"></use></svg> <h2 data-i18n="proj.title" style="margin:0;font:inherit;display:inline;">Projets Cairn for Stack</h2></span>
       <button class="proj-close-btn" onclick="closeProjectsModal()" title="Fermer" data-i18n-title="btn.fermer">✕</button>
     </div>
 
@@ -8953,15 +8953,15 @@ window.__hsLoadLangSet("lang/", true);
 
     <!-- Export / Import fichier -->
     <div class="proj-file-zone">
-      <div class="proj-section-title" data-i18n="proj.file_title">Fichier .stackforge (portable)</div>
+      <div class="proj-section-title" data-i18n="proj.file_title">Fichier .cairnforstack (portable)</div>
       <div class="proj-file-row">
         <button class="proj-btn proj-btn-export" onclick="projExport()" data-i18n="proj.export_btn">📤 Exporter le projet actuel</button>
         <label class="proj-btn proj-btn-import">
-          <span data-i18n="proj.import_btn">📥 Importer un .stackforge</span>
-          <input type="file" accept=".stackforge,.json" style="display:none" onchange="projImport(this)">
+          <span data-i18n="proj.import_btn">📥 Importer un .cairnforstack</span>
+          <input type="file" accept=".cairnforstack,.json" style="display:none" onchange="projImport(this)">
         </label>
       </div>
-      <div class="proj-file-hint" data-i18n="proj.file_hint">Le fichier .stackforge contient tout votre exercice (questions, variables, PRTs). Il peut être partagé entre ordinateurs.</div>
+      <div class="proj-file-hint" data-i18n="proj.file_hint">Le fichier .cairnforstack contient tout votre exercice (questions, variables, PRTs). Il peut être partagé entre ordinateurs.</div>
     </div>
   </div>
 </div>

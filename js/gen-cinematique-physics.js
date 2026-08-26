@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ══════════════════════════════════════════════════════════════
-   STACKFORGE — Cinématique du point : moteur physique pur.
+   CAIRN FOR STACK — Cinématique du point : moteur physique pur.
    L'enseignant digitalise lui-même les points M0, M1, M2… (clic sur
    un fond libre ou une image importée dans l'atelier, voir
    js/cinematique-ui.js) — ce fichier ne simule plus rien, il se

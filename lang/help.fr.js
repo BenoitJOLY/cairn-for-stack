@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   STACKFORGE — CONTENU D'AIDE : FRANÇAIS
+   CAIRN FOR STACK — CONTENU D'AIDE : FRANÇAIS
    Données seulement (aucune logique). Pour ajouter une langue d'aide,
    copier ce fichier (ex. help.en.js), traduire les textes, et terminer
    par : window.HELP_LANG.en = HELP_CONTENT;
@@ -607,7 +607,7 @@ const HELP_CONTENT = {
     title: '<svg class="hs-ico"><use href="#ico-type-jxgdrop"></use></svg> Glisser-Déposer JSXGraph — Aide',
     body:
       _hSection('À quoi ça sert',
-        '<p>L\'élève <b>glisse des étiquettes (propositions) sur une image</b> pour les déposer dans des zones définies (schéma légendé, carte, montage expérimental…). Stackforge génère automatiquement le code JSXGraph responsive et la correction.</p>') +
+        '<p>L\'élève <b>glisse des étiquettes (propositions) sur une image</b> pour les déposer dans des zones définies (schéma légendé, carte, montage expérimental…). Cairn for Stack génère automatiquement le code JSXGraph responsive et la correction.</p>') +
       _hSection('Comment remplir', _hList([
         '<b>Image de fond</b> : chargez une image (PNG/JPG) — elle sert de support visuel aux zones et propositions.',
         '<b>Propositions</b> : cliquez <b>＋ Ajouter une proposition</b> pour chaque étiquette que l\'élève pourra déposer.',

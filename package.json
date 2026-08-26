@@ -1,7 +1,7 @@
 {
-  "name": "stackforge",
+  "name": "cairn-for-stack",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Générateur de questions STACK/Moodle — app statique (aucun build requis).",
   "scripts": {
     "test": "node --test test/unit/**/*.test.js",

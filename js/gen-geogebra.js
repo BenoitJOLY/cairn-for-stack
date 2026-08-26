@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -88,7 +88,7 @@ function ggbBuildFilterTag(X, st) {
 
 /* ── Assemble le bloc HTML/JS d'intégration de l'applet GeoGebra ─────
    Réservé à l'aperçu live du panneau de configuration (iframe scriptée
-   propre à StackForge) : le filtre [[geogebra]] est traité côté serveur
+   propre à Cairn for Stack) : le filtre [[geogebra]] est traité côté serveur
    Moodle et ne peut pas être prévisualisé tel quel hors Moodle, donc
    l'aperçu continue de piloter l'API GeoGebra via deployggb.js. */
 function ggbBuildEmbedHtml(X, st, opts) {
@@ -254,8 +254,8 @@ async function genGeoGebra(qid) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
     }
-    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "geogebra", repli sur le calcul local (session expirée ?).');
-  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "geogebra", repli sur le calcul local.', e); }
+    console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "geogebra", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[cairnforstack] /api/generate injoignable pour "geogebra", repli sur le calcul local.', e); }
   return genGeoGebraCore(qid, p);
 }
 

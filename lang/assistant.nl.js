@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════════════
-   STACKFORGE — Inhoud van de ASSISTENT-MODUS (Nederlands)
+   CAIRN FOR STACK — Inhoud van de ASSISTENT-MODUS (Nederlands)
    Opgeslagen in window.ASSIST_LANG.nl ; gelezen door assistant.js afhankelijk van de taal.
    Om een taal toe te voegen: kopieer dit bestand, vertaal de waarden,
    en sla op in window.ASSIST_LANG.<code>.
@@ -98,7 +98,7 @@
         "Klik op « <strong>📋 Prompt kopiëren</strong> ».",
         "Plak het in een <strong>AI</strong> (ChatGPT, Claude, Gemini…) en start de generatie.",
         "Haal het <strong>resultaat</strong> op dat door de AI is geproduceerd (in JSON-formaat).",
-        "Keer terug naar Stackforge en <strong>importeer het</strong> via de knop « 📥 JSON » van het formulier."
+        "Keer terug naar Cairn for Stack en <strong>importeer het</strong> via de knop « 📥 JSON » van het formulier."
       ],
       note: "⚠️ <strong>Verwar dit niet met de studentweergave.</strong> " +
         "Deze twee velden beschrijven wat <strong>de AI moet produceren</strong> (de bank), niet wat de student zal zien:" +
@@ -134,7 +134,7 @@
     /* ── Gedetailleerde begeleiding van stap 3, veld voor veld, per type ── */
     STEP3: {
       checkbox: {
-        intro: "Meerkeuze met meerdere antwoorden: Stackforge trekt willekeurig goede/slechte opties bij elke poging.",
+        intro: "Meerkeuze met meerdere antwoorden: Cairn for Stack trekt willekeurig goede/slechte opties bij elke poging.",
         fields: [
           "<strong>Opdracht</strong> — klik op « ✏️ Editor » om de vraag te schrijven (tekst, formule, afbeelding).",
           "<strong>Beoordelingsschema</strong> (gele banner bovenaan) — toegekende punten.",
@@ -167,7 +167,7 @@
         ]
       },
       algebraic: {
-        intro: "De student voert een wiskundige expressie in; Stackforge controleert de algebraïsche equivalentie.",
+        intro: "De student voert een wiskundige expressie in; Cairn for Stack controleert de algebraïsche equivalentie.",
         fields: [
           "<strong>Opdracht</strong> — via « ✏️ Editor ».",
           "<strong>Variabelen</strong> — lijst ze op (bijv.: x, y, z).",
@@ -188,7 +188,7 @@
         ]
       },
       units: {
-        intro: "Antwoord = een numerieke waarde EN een eenheid (Stackforge controleert beide).",
+        intro: "Antwoord = een numerieke waarde EN een eenheid (Cairn for Stack controleert beide).",
         fields: [
           "<strong>Opdracht</strong> — via « ✏️ Editor ».",
           "<strong>Verwachte numerieke waarde</strong>.",
@@ -222,7 +222,7 @@
         fields: [
           "<strong>Beoordelingsschema</strong> en <strong>aantal te gebruiken woorden</strong>.",
           "<strong>Woorden + definities</strong> — voeg elke regel toe (« + Woord toevoegen »).",
-          "<strong>Grid genereren</strong> — Stackforge berekent de indeling."
+          "<strong>Grid genereren</strong> — Cairn for Stack berekent de indeling."
         ],
         tip: "« 🤖 AI-Prompt » maakt met één klik een lijst woorden/definities over een thema aan."
       },

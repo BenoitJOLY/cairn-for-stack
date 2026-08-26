@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 
 /*
  * ═══════════════════════════════════════════════════════════════════
- *  StackForge V4 — style.css
+ *  Cairn for Stack V1 — style.css
  *  TABLE DES MATIÈRES
  * ───────────────────────────────────────────────────────────────────
  *  1. Variables CSS & reset global
@@ -1709,7 +1709,7 @@ html[data-theme="dark"] .ic-seq-order-row-sel{border-color:#f59e0b;background:#3
 html[data-theme="dark"] .ic-seq-order-label{color:#5eead4;}
 
 /* ═══════════════════════════════════════════════════════════════
-   STACKFORGE V4 — Styles spécifiques (cumulatif)
+   CAIRN FOR STACK V4 — Styles spécifiques (cumulatif)
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Variables V4 ── */

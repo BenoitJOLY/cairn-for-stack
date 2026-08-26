@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// projects.js — Gestionnaire de projets StackForge
-// Slots nommés localStorage + export/import .stackforge
+// projects.js — Gestionnaire de projets Cairn for Stack
+// Slots nommés localStorage + export/import .cairnforstack
 
 var _PROJ_KEY = 'v4_projects';
 var _PROJ_MAX = 10;
@@ -121,7 +121,7 @@ function projRename(id){
   renderProjectsList();
 }
 
-/* ── Export .stackforge ────────────────────────────────────────────── */
+/* ── Export .cairnforstack ────────────────────────────────────────────── */
 function projExport(){
   var data = _projCapture();
   var quizName = data.quizName || 'projet';
@@ -129,13 +129,13 @@ function projExport(){
   var blob = new Blob([payload],{type:'application/json'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = quizName.replace(/[^a-zA-Z0-9_\-À-ž]/g,'_')+'.stackforge';
+  a.download = quizName.replace(/[^a-zA-Z0-9_\-À-ž]/g,'_')+'.cairnforstack';
   a.click();
   URL.revokeObjectURL(a.href);
   toast(I18N.t('proj.msg_exported', {name: a.download}));
 }
 
-/* ── Import .stackforge ────────────────────────────────────────────── */
+/* ── Import .cairnforstack ────────────────────────────────────────────── */
 function projImport(input){
   var file = input.files[0]; if(!file) return;
   var reader = new FileReader();

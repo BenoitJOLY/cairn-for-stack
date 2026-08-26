@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* STACKFORGE - Generateur Interferences-Diffraction (JSXGraph)
+/* CAIRN FOR STACK - Generateur Interferences-Diffraction (JSXGraph)
    3 types de mesure : fente_simple, fente_double, young
    2 modes par type : ecran (mesure directe sur la figure), capteur (figure + courbe I(distance))
    La figure de diffraction/interferences est toujours affichee, quel que soit le mode. */
@@ -1081,9 +1081,9 @@ async function genDiffraction(X) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
     }
-    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "diffraction", repli sur le calcul local (session expirée ?).');
+    console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "diffraction", repli sur le calcul local (session expirée ?).');
   } catch (e) {
-    console.warn('[stackforge] /api/generate injoignable pour "diffraction", repli sur le calcul local.', e);
+    console.warn('[cairnforstack] /api/generate injoignable pour "diffraction", repli sur le calcul local.', e);
   }
   return genDiffractionCore(X, p);
 }

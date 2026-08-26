@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 // ══════════════════════════════════════════════════
-//  SCORM 1.2 — Stackforge Générateur
+//  SCORM 1.2 — Cairn for Stack Générateur
 //  Complété = au moins 1 XML téléchargé
 // ══════════════════════════════════════════════════
 var SCORM_API = null;

@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,11 +30,15 @@ const DEFAULTS = {
   },
   maximaUrl: '',
   jsmolUrl: '',
+  // URL optionnelle d'un JSON personnalisé d'arborescence de tags (voir
+  // js/tags-data/_modele.js pour le format attendu). Vide = l'appli garde
+  // l'arborescence codée en dur de js/tags-data/<langue>.js.
+  tagsUrl: '',
   ai: { baseUrl: '', model: '' },
   // Affiché dans la modale "Mentions légales" (RGPD) côté client. Le responsable
   // de traitement est qui héberge/administre CETTE instance, jamais l'auteur du
-  // logiciel StackForge — chaque exploitant renseigne ses propres coordonnées et
-  // son autorité de contrôle nationale (CNIL en France, mais StackForge est
+  // logiciel Cairn for Stack — chaque exploitant renseigne ses propres coordonnées et
+  // son autorité de contrôle nationale (CNIL en France, mais Cairn for Stack est
   // destiné à des déploiements internationaux).
   legal: {
     responsableNom: '', responsableEmail: '', pays: '',
@@ -50,6 +54,7 @@ function load() {
     mutualisation: Object.assign({}, DEFAULTS.mutualisation, raw.mutualisation),
     maximaUrl: raw.maximaUrl || '',
     jsmolUrl: raw.jsmolUrl || '',
+    tagsUrl: raw.tagsUrl || '',
     ai: Object.assign({}, DEFAULTS.ai, raw.ai),
     legal: Object.assign({}, DEFAULTS.legal, raw.legal),
     secrets: Object.assign({}, DEFAULTS.secrets, raw.secrets),
@@ -69,6 +74,7 @@ function getPublicConfig() {
     mutualisation: cfg.mutualisation,
     maximaUrl: cfg.maximaUrl,
     jsmolUrl: cfg.jsmolUrl,
+    tagsUrl: cfg.tagsUrl,
     ai: cfg.ai,
     legal: cfg.legal,
     ghTokenConfigured: !!cfg.secrets.ghInstitutionalToken,
@@ -100,6 +106,12 @@ function setJsmolUrl(url) {
   save(cfg);
 }
 
+function setTagsUrl(url) {
+  const cfg = load();
+  cfg.tagsUrl = String(url || '').trim();
+  save(cfg);
+}
+
 function setAiProviderConfig(fields) {
   const cfg = load();
   cfg.ai = Object.assign({}, cfg.ai, fields);
@@ -128,6 +140,6 @@ function getSecret(name) {
 }
 
 module.exports = {
-  getPublicConfig, setMutualisationConfig, setMaximaUrl, setJsmolUrl, setAiProviderConfig, setLegalConfig,
+  getPublicConfig, setMutualisationConfig, setMaximaUrl, setJsmolUrl, setTagsUrl, setAiProviderConfig, setLegalConfig,
   setSecret, clearSecret, getSecret,
 };

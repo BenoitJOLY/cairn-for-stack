@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   STACKFORGE — HILFEINHALTE: DEUTSCH
+   CAIRN FOR STACK — HILFEINHALTE: DEUTSCH
    Nur Daten (keine Logik). Um eine Hilfssprache hinzuzufügen,
    kopieren Sie diese Datei (z.B. help.en.js), übersetzen Sie die Texte
    und beenden Sie mit: window.HELP_LANG.en = HELP_CONTENT;
@@ -607,7 +607,7 @@ const HELP_CONTENT = {
     title: '<svg class="hs-ico"><use href="#ico-type-jxgdrop"></use></svg> JSXGraph Drag & Drop — Hilfe',
     body:
       _hSection('Wofür ist das?',
-        '<p>Der Schüler <b>zieht Beschriftungen (Optionen) auf ein Bild</b>, um sie in definierten Zonen abzulegen (beschriftetes Diagramm, Karte, experimenteller Aufbau…). Stackforge generiert automatisch den responsiven JSXGraph-Code und die Korrektur.</p>') +
+        '<p>Der Schüler <b>zieht Beschriftungen (Optionen) auf ein Bild</b>, um sie in definierten Zonen abzulegen (beschriftetes Diagramm, Karte, experimenteller Aufbau…). Cairn for Stack generiert automatisch den responsiven JSXGraph-Code und die Korrektur.</p>') +
       _hSection('Wie wird es ausgefüllt?', _hList([
         '<b>Hintergrundbild</b>: laden Sie ein Bild (PNG/JPG) hoch — es dient als visuelle Unterlage für Zonen und Optionen.',
         '<b>Optionen</b>: klicken Sie auf <b>＋ Option hinzufügen</b> für jedes Label, das der Schüler ablegen kann.',

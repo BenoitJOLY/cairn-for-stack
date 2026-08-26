@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   STACKFORGE — CONTENIDO DE AYUDA: ESPAÑOL
+   CAIRN FOR STACK — CONTENIDO DE AYUDA: ESPAÑOL
    Solo datos (sin lógica). Para añadir un idioma de ayuda,
    copie este archivo (ej. help.en.js), traduzca los textos
    y termine con: window.HELP_LANG.en = HELP_CONTENT;
@@ -607,7 +607,7 @@ const HELP_CONTENT = {
     title: '<svg class="hs-ico"><use href="#ico-type-jxgdrop"></use></svg> Arrastrar y Soltar JSXGraph — Ayuda',
     body:
       _hSection('¿Para qué sirve?',
-        '<p>El estudiante <b>arrastra etiquetas (propuestas) sobre una imagen</b> para depositarlas en zonas definidas (diagrama legendado, mapa, montaje experimental…). Stackforge genera automáticamente el código JSXGraph responsive y la corrección.</p>') +
+        '<p>El estudiante <b>arrastra etiquetas (propuestas) sobre una imagen</b> para depositarlas en zonas definidas (diagrama legendado, mapa, montaje experimental…). Cairn for Stack genera automáticamente el código JSXGraph responsive y la corrección.</p>') +
       _hSection('Cómo llenarlo', _hList([
         '<b>Imagen de fondo</b>: cargue una imagen (PNG/JPG) — sirve de soporte visual para las zonas y propuestas.',
         '<b>Propuestas</b>: haga clic en <b>＋ Añadir una propuesta</b> para cada etiqueta que el estudiante podrá depositar.',

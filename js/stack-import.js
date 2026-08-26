@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,9 +37,9 @@ function handleStackImportFile(input) {
 
 function _processStackXml(xmlText, fileName) {
 
-  /* ── Détection signature StackForge round-trip ─────────────────────
+  /* ── Détection signature Cairn for Stack round-trip ─────────────────────
      Depuis 2026-07-04 (v2) : état stocké en base64 dans un commentaire XML
-     <!-- stackforge::v1::... -->, jamais dans un champ de question. Un
+     <!-- cairnforstack::v1::... -->, jamais dans un champ de question. Un
      commentaire n'est rendu nulle part (ni élève, ni enseignant), donc
      c'est le seul emplacement réellement sûr — deux tentatives précédentes
      (span caché dans <questiontext>, texte brut dans <questiondescription>)
@@ -48,23 +48,23 @@ function _processStackXml(xmlText, fileName) {
      Anciens formats conservés comme fallbacks pour réimporter d'anciens
      exports : texte plat dans <questiondescription>, span dans
      <questiontext>, <idnumber>. */
-  var _sigMatch = xmlText.match(/<!--\s*stackforge::v1::([A-Za-z0-9+/=\s]+?)\s*-->/);
+  var _sigMatch = xmlText.match(/<!--\s*cairnforstack::v1::([A-Za-z0-9+/=\s]+?)\s*-->/);
   var _sigIsB64 = !!_sigMatch;
   if(!_sigMatch){
     /* Fallback texte plat dans <questiondescription> */
-    _sigMatch = xmlText.match(/stackforge::v1::([\s\S]*?)<\/text>/);
+    _sigMatch = xmlText.match(/cairnforstack::v1::([\s\S]*?)<\/text>/);
   }
   if(!_sigMatch){
     /* Fallback : span caché dans questiontext */
-    _sigMatch = xmlText.match(/stackforge::v1::([\s\S]*?)<\/span>/);
+    _sigMatch = xmlText.match(/cairnforstack::v1::([\s\S]*?)<\/span>/);
   }
   if(!_sigMatch){
     /* Fallback ancien format : <idnumber> CDATA */
-    _sigMatch = xmlText.match(/<idnumber[^>]*>\s*<!\[CDATA\[stackforge::v1::([\s\S]*?)\]\]>\s*<\/idnumber>/);
+    _sigMatch = xmlText.match(/<idnumber[^>]*>\s*<!\[CDATA\[cairnforstack::v1::([\s\S]*?)\]\]>\s*<\/idnumber>/);
   }
   if(!_sigMatch){
     /* Fallback très ancien : <idnumber> sans CDATA */
-    _sigMatch = xmlText.match(/<idnumber[^>]*>stackforge::v1::([\s\S]*?)<\/idnumber>/);
+    _sigMatch = xmlText.match(/<idnumber[^>]*>cairnforstack::v1::([\s\S]*?)<\/idnumber>/);
   }
   if(_sigMatch){
     try{
@@ -81,7 +81,7 @@ function _processStackXml(xmlText, fileName) {
       if(state.html!==undefined && state.questions!==undefined){
         var quizName = state.quizName || fileName.replace(/\.xml$/i,'');
         var qCount   = Object.keys(state.questions||{}).length;
-        if(!confirm('Ce fichier XML a été créé avec StackForge.\n\n'
+        if(!confirm('Ce fichier XML a été créé avec Cairn for Stack.\n\n'
           + '📦 Projet : « '+quizName+' » ('+qCount+' question'+(qCount>1?'s':'')+')\n\n'
           + 'Restaurer le projet complet avec tous ses modules ?\n'
           + '(Annuler = importer comme question STACK brute)')){
@@ -109,14 +109,14 @@ function _processStackXml(xmlText, fileName) {
           }
           if(typeof renumberChips==='function') renumberChips();
           if(typeof saveEditorState==='function') saveEditorState();
-          toast('✅ Projet StackForge restauré : « '+quizName+' » — '+qCount+' module'+(qCount>1?'s':'')+'.');
+          toast('✅ Projet Cairn for Stack restauré : « '+quizName+' » — '+qCount+' module'+(qCount>1?'s':'')+'.');
           return;
         }
       }
     }catch(e){
       /* JSON invalide → import brut */
-      console.warn('[StackForge] Signature détectée mais JSON invalide :', e.message);
-      toast('⚠️ Signature StackForge détectée mais JSON corrompu — import en mode expert. Détail : ' + e.message);
+      console.warn('[Cairn for Stack] Signature détectée mais JSON invalide :', e.message);
+      toast('⚠️ Signature Cairn for Stack détectée mais JSON corrompu — import en mode expert. Détail : ' + e.message);
     }
   }
 
@@ -135,10 +135,10 @@ function _processStackXml(xmlText, fileName) {
   var qtextEl = qEl.querySelector(':scope > questiontext > text');
   var qtext = qtextEl ? qtextEl.textContent.trim() : '';
 
-  // Lire les types StackForge depuis <questiondescription> si présent
+  // Lire les types Cairn for Stack depuis <questiondescription> si présent
   var _descEl = qEl.querySelector(':scope > questiondescription > text');
   var _descText = _descEl ? _descEl.textContent.trim() : '';
-  var _hsTypesMatch = _descText.match(/stackforge-types:([a-zA-Z0-9_,\-]+)/);
+  var _hsTypesMatch = _descText.match(/cairnforstack-types:([a-zA-Z0-9_,\-]+)/);
   var _hsChipTypes = _hsTypesMatch ? _hsTypesMatch[1].split(',').filter(Boolean) : [];
 
   // Extract PRT blocks directly from the raw XML string (preserves CDATA)

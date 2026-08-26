@@ -46,7 +46,7 @@ Si la chaîne ressemble à du code — un identifiant suivi de parenthèses puis
 
 **Solution systématique** : ne jamais passer une chaîne littérale à `create("text",...)`. Toujours passer une **fonction** : `function(){return "V(KMnO₄) (mL)";}`. Une fonction n'est jamais parsée par JessieCode, sa valeur de retour est utilisée directement comme texte.
 
-*(Découvert le 2026-07-20/21 en auditant `gen-redox.js` de StackForge — voir PLAN.md #38. Reproduit et confirmé via un harnais Node+jsdom exécutant la vraie bibliothèque JSXGraph vendée, pas une supposition.)*
+*(Découvert le 2026-07-20/21 en auditant `gen-redox.js` de Cairn for Stack — voir PLAN.md #38. Reproduit et confirmé via un harnais Node+jsdom exécutant la vraie bibliothèque JSXGraph vendée, pas une supposition.)*
 
 ## 7. Lier un point à un `<input>` STACK (`bind_point`) depuis un iframe sandboxé
 

@@ -1,4 +1,4 @@
-# SUIVI ANTI-RÉGRESSION — StackForge V4
+# SUIVI ANTI-RÉGRESSION — Cairn for Stack V1
 # Mise à jour : 2026-07-06
 # LIRE AVANT TOUTE MODIFICATION
 

@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@
    GeoGebra, seul le bouton "Vérifier" de STACK donne un retour noté. */
 /* Chaque coefficient est décrit par des bornes/pas par défaut (pas une
    expression Maxima) : l'enseignant choisit "valeur fixe" ou "min/max/pas"
-   dans le panneau, StackForge construit l'expression rand() correspondante
+   dans le panneau, Cairn for Stack construit l'expression rand() correspondante
    lui-même (voir ggbCoeffExpr). unitSuffix est ajouté tel quel après le
    nombre tiré (utile pour exprimer un angle en multiples de π/4 par ex.). */
 var GGB_MODELS = {

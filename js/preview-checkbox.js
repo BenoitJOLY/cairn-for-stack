@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -380,7 +380,7 @@ function renderPreviewHTML_checkbox(state) {
   function _cbRealDrawnOptionTexts(renderRes, qid) {
     var ir = renderRes && renderRes.questioninputs && renderRes.questioninputs['ans' + qid];
     var options = ir && ir.configuration && ir.configuration.options;
-    console.log('[stackforge][debug checkbox real-preview] ir.configuration =', ir && ir.configuration, '| options =', options);
+    console.log('[cairnforstack][debug checkbox real-preview] ir.configuration =', ir && ir.configuration, '| options =', options);
     if (!options) return null;
     var keys = Object.keys(options).map(function (k) { return parseInt(k, 10); }).sort(function (a, b) { return a - b; });
     var texts = keys.map(function (k) { return options[k]; });

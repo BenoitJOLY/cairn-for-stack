@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════════════
-   STACKFORGE — Contenu du MODE ASSISTANT (Français)
+   CAIRN FOR STACK — Contenu du MODE ASSISTANT (Français)
    Enregistré dans window.ASSIST_LANG.fr ; lu par assistant.js selon la langue.
    Pour ajouter une langue : copier ce fichier, traduire les valeurs,
    et enregistrer dans window.ASSIST_LANG.<code>.
@@ -98,7 +98,7 @@
         "Cliquez sur « <strong>📋 Copier le prompt</strong> ».",
         "Collez-le dans une <strong>IA</strong> (ChatGPT, Claude, Gemini…) et lancez la génération.",
         "Récupérez le <strong>résultat</strong> produit par l'IA (au format JSON).",
-        "Revenez dans Stackforge et <strong>importez-le</strong> via le bouton « 📥 JSON » du formulaire."
+        "Revenez dans Cairn for Stack et <strong>importez-le</strong> via le bouton « 📥 JSON » du formulaire."
       ],
       note: "⚠️ <strong>Ne confondez pas avec l'affichage élève.</strong> " +
         "Ces deux champs décrivent ce que <strong>l'IA doit produire</strong> (le vivier), pas ce que verra l'élève :" +
@@ -134,7 +134,7 @@
     /* ── Guidage détaillé de l'étape 3, champ par champ, par type ── */
     STEP3: {
       checkbox: {
-        intro: "QCM à choix multiples : Stackforge tire au sort les bonnes/mauvaises propositions à chaque tentative.",
+        intro: "QCM à choix multiples : Cairn for Stack tire au sort les bonnes/mauvaises propositions à chaque tentative.",
         fields: [
           "<strong>Énoncé</strong> — cliquez sur « ✏️ Éditeur » pour rédiger la question (texte, formule, image).",
           "<strong>Barème</strong> (bandeau jaune en haut) — points attribués.",
@@ -167,7 +167,7 @@
         ]
       },
       algebraic: {
-        intro: "L'élève saisit une expression mathématique ; Stackforge vérifie l'équivalence algébrique.",
+        intro: "L'élève saisit une expression mathématique ; Cairn for Stack vérifie l'équivalence algébrique.",
         fields: [
           "<strong>Énoncé</strong> — via « ✏️ Éditeur ».",
           "<strong>Variables</strong> — listez celles utilisées (ex : x, y, z).",
@@ -188,7 +188,7 @@
         ]
       },
       units: {
-        intro: "Réponse = une valeur numérique ET une unité (Stackforge vérifie les deux).",
+        intro: "Réponse = une valeur numérique ET une unité (Cairn for Stack vérifie les deux).",
         fields: [
           "<strong>Énoncé</strong> — via « ✏️ Éditeur ».",
           "<strong>Valeur numérique</strong> attendue.",
@@ -222,7 +222,7 @@
         fields: [
           "<strong>Barème</strong> et <strong>nombre de mots</strong> à utiliser.",
           "<strong>Mots + définitions</strong> — ajoutez chaque ligne (« + Ajouter un mot »).",
-          "<strong>Générer la grille</strong> — Stackforge calcule la disposition."
+          "<strong>Générer la grille</strong> — Cairn for Stack calcule la disposition."
         ],
         tip: "« 🤖 Prompt IA » fabrique une liste mots/définitions sur un thème en un clic."
       },

@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ function cirEngineRun(cfg) {
 
   // cfg.labels : libellés déjà résolus par I18N côté appelant (js/gen-circuit.js ou
   // js/circuit-ui.js), car cette fonction est stringifiée telle quelle dans le XML
-  // Moodle exporté et s'exécute alors dans l'iframe élève, hors de l'appli StackForge
+  // Moodle exporté et s'exécute alors dans l'iframe élève, hors de l'appli Cairn for Stack
   // (window.I18N n'y existe pas) — d'où le repli français ci-dessous si absent.
   var L = cfg.labels || {};
   function lb(key, def) { if (L[key]) return L[key]; return def; }

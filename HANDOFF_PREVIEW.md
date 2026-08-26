@@ -1,12 +1,12 @@
 # Prompt de reprise — Prévisualisation élève (session suivante)
 
-Colle ce prompt tel quel dans une nouvelle conversation Claude Code, dans le dossier `c:\Users\phy_j\Downloads\stackforgeV4`.
+Colle ce prompt tel quel dans une nouvelle conversation Claude Code, dans le dossier `c:\Users\phy_j\Downloads\cairnforstackV4`.
 
 ---
 
 ## Contexte
 
-StackForge V4 a un système de prévisualisation élève en iframe sandboxée (JSON state → `renderPreviewHTML_<type>(state)` dans `js/preview.js` → `mountPreviewIframe()`), déjà en place et VALIDÉ pour : `vf`, `checkbox` (`cb`), `radio` (`ra`), `dropdown` (`dd`).
+Cairn for Stack V1 a un système de prévisualisation élève en iframe sandboxée (JSON state → `renderPreviewHTML_<type>(state)` dans `js/preview.js` → `mountPreviewIframe()`), déjà en place et VALIDÉ pour : `vf`, `checkbox` (`cb`), `radio` (`ra`), `dropdown` (`dd`).
 
 Cette session en a ajouté 5 de plus (`algebraic`, `numerical`, `units`, `string`, `match`) mais le travail est **incomplet et a été fait trop vite** : il manque la largeur de modale uniforme, et la méthode utilisée risquait de zapper des onglets "Feedback général" sur les types suivants. Ne pas répéter cette erreur.
 

@@ -1,11 +1,11 @@
 services:
-  stackforge:
+  cairn-for-stack:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: stackforge
+    container_name: cairn-for-stack
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:3000"
     volumes:
       - ./index.html:/app/index.html
       - ./depot.html:/app/depot.html

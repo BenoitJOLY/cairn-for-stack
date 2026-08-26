@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 const crypto = require('crypto');
 
 // Secrets institutionnels/personnels (jeton GitHub, clé API IA) sont les
-// premiers secrets réversibles stockés par StackForge — jusqu'ici seuls des
+// premiers secrets réversibles stockés par Cairn for Stack — jusqu'ici seuls des
 // hachages bcrypt irréversibles (mots de passe) touchaient le disque. Chiffrés
 // avec une clé dérivée de SECRETS_KEY (variable d'env, même esprit que
 // SESSION_SECRET dans server.js) plutôt que stockés en clair dans

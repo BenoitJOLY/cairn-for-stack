@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   STACKFORGE — MODE ASSISTANT (autonome)
+   CAIRN FOR STACK — MODE ASSISTANT (autonome)
    Lit l'état global (currentType, questions, editingId, nameLocked) ;
    ne modifie aucun fichier existant.
    À charger EN DERNIER, après app.js :
@@ -26,9 +26,9 @@
 (function () {
   "use strict";
 
-  var STORE_KEY = "stackforge_assistant";
-  var STORE_W   = "stackforge_assistant_w";
-  var STORE_H   = "stackforge_assistant_h";
+  var STORE_KEY = "cairnforstack_assistant";
+  var STORE_W   = "cairnforstack_assistant_w";
+  var STORE_H   = "cairnforstack_assistant_h";
   var DEFAULT_NAME = "Exercice sans titre";
   var DIM_SELECTOR =
     ".quiz-name-bar, .q-list-box, .type-grid, .form-panel, .action-bar";

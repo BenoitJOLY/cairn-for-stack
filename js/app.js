@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -279,11 +279,11 @@ function buildXML() {
     generalFeedbackContent = generalFeedbackContent.split(markerFb).join(q.kbdRawFbGen);
   });
 
-  /* ── Signature StackForge pour round-trip ─────────────────────────
+  /* ── Signature Cairn for Stack pour round-trip ─────────────────────────
      stack-import.js lit le fichier XML comme du texte brut (FileReader),
      jamais via un champ Moodle — la signature n'a donc pas besoin de vivre
      dans un champ de question. Elle est stockée dans un commentaire XML
-     <!-- stackforge::v1::... -->, jamais rendu ni affiché nulle part (ni côté
+     <!-- cairnforstack::v1::... -->, jamais rendu ni affiché nulle part (ni côté
      élève, ni côté enseignant dans la banque de questions). Le JSON est
      encodé en base64 pour éviter tout souci d'échappement XML et la
      séquence interdite "--" dans un commentaire.
@@ -317,7 +317,7 @@ function buildXML() {
   var xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
     + '<quiz>\n'
     + '  <question type="stack">\n'
-    + '    <name><text>' + qName + '</text></name>\n'
+    + '    <name><text>' + _escHtml(qName) + '</text></name>\n'
     + '    <questiontext format="html">\n'
     + '      <text><![CDATA[' + allTexts + ']]></text>\n'
     + '    </questiontext>\n'
@@ -336,12 +336,12 @@ function buildXML() {
     + '      <text><![CDATA[' + allFB + ']]></text>\n'
     + '    </specificfeedback>\n'
     + '    <questionnote format="html">\n'
-    + '      <text>' + allQnote + '</text>\n'
+    + '      <text><![CDATA[' + allQnote + ']]></text>\n'
     + '    </questionnote>\n'
     + '    <questiondescription format="html">\n'
-    + '      <text>Généré avec StackForge V2 | stackforge-types:' + hsTypes + '</text>\n'
+    + '      <text>Généré avec Cairn for Stack V1 | cairnforstack-types:' + hsTypes + '</text>\n'
     + '    </questiondescription>\n'
-    + '    <!-- stackforge::v1::' + _hsState + ' -->\n'
+    + '    <!-- cairnforstack::v1::' + _hsState + ' -->\n'
     + '    <questionsimplify>1</questionsimplify>\n'
     + '    <assumepositive>0</assumepositive>\n'
     + '    <assumereal>0</assumereal>\n'
@@ -688,11 +688,31 @@ async function fetchInstanceConfig() {
     window._instanceJsmolUrl = cfg.jsmolUrl || '';
     window._instanceLegal = cfg.legal || {};
     renderRgpdLegalInfo();
+    if (cfg.tagsUrl) fetchCustomTagsTree(cfg.tagsUrl);
   } catch (e) {
     console.error('fetchInstanceConfig:', e);
   }
 }
 fetchInstanceConfig();
+
+// Charge l'arborescence de tags personnalisée configurée par l'admin (voir
+// js/tags-data/_modele.js pour le format JSON attendu : { Matiere: { Niveau:
+// { SousMatiere: [Chapitre, ...] } } }). En cas d'échec (réseau, JSON
+// invalide), on garde silencieusement l'arbre intégré (js/tags-data/<langue>.js).
+async function fetchCustomTagsTree(url) {
+  try {
+    var res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var tree = await res.json();
+    if (!tree || typeof tree !== 'object') throw new Error('format inattendu');
+    window._customTagsTree = tree;
+    if (typeof applyPays === 'function' && typeof currentPays === 'function') {
+      applyPays(currentPays());
+    }
+  } catch (e) {
+    console.error('fetchCustomTagsTree:', e);
+  }
+}
 
 function _escHtml(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -700,7 +720,7 @@ function _escHtml(s) {
 
 // Modale "Mentions légales" (index.html, #copy-rgpd-body) : le responsable de
 // traitement et l'autorité de contrôle dépendent de QUI héberge cette instance
-// (admin.html, section RGPD), jamais de l'auteur du logiciel StackForge — voir
+// (admin.html, section RGPD), jamais de l'auteur du logiciel Cairn for Stack — voir
 // PLAN.md. Sans configuration admin (mode local/hors-serveur, ou instance pas
 // encore paramétrée), on retombe sur un texte générique plutôt que d'inventer
 // un responsable ou une autorité de contrôle par défaut.
@@ -733,10 +753,10 @@ if (document.readyState === 'loading') {
 }
 
 function ghGetToken() {
-  var t = localStorage.getItem('stackforge_gh_token');
+  var t = localStorage.getItem('cairnforstack_gh_token');
   if (!t) {
     t = prompt('Jeton GitHub (fine-grained, accès en écriture limité à ce dépôt) — sera mémorisé dans ce navigateur pour les prochains dépôts :');
-    if (t && t.trim()) localStorage.setItem('stackforge_gh_token', t.trim());
+    if (t && t.trim()) localStorage.setItem('cairnforstack_gh_token', t.trim());
   }
   return t ? t.trim() : null;
 }

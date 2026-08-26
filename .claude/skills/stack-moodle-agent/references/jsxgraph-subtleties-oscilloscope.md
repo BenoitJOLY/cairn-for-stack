@@ -56,7 +56,7 @@ Les ENT (ex Elea) suppriment silencieusement boutons/id placés dans le texte no
 
 ---
 
-# Manifeste StackForge : Oscilloscope JSXGraph (Cheat Sheet)
+# Manifeste Cairn for Stack : Oscilloscope JSXGraph (Cheat Sheet)
 
 À utiliser dès que la question porte sur un oscilloscope / signal électrique / RC.
 

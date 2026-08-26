@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   STACKFORGE — RELANCE D'AJOUT
+   CAIRN FOR STACK — RELANCE D'AJOUT
    Transforme le toast « ✅ Qn (...) — Xpt ajoutée ! » en une relance
    factuelle-encourageante qui invite à enchaîner. Drop-in, bilingue.
    Charger APRÈS i18n-walk.js (et après app.js) :

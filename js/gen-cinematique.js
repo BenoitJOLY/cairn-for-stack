@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ══════════════════════════════════════════════════════════════
-   STACKFORGE — Générateur Cinématique du point (vecteur vitesse,
+   CAIRN FOR STACK — Générateur Cinématique du point (vecteur vitesse,
    relation de Chasles), JSXGraph. Assemble gen-cinematique-physics.js
    (moteur RK4) et gen-cinematique-jsx.js (builders JSXGraph Phase1/
    Phase2) en un type de question complet, suivant le pattern
@@ -119,8 +119,8 @@ async function genCinematique(X){
       const data = await res.json().catch(() => ({}));
       throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
     }
-    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "cinematique", repli sur le calcul local.');
-  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "cinematique", repli sur le calcul local.', e); }
+    console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "cinematique", repli sur le calcul local.');
+  } catch(e) { console.warn('[cairnforstack] /api/generate injoignable pour "cinematique", repli sur le calcul local.', e); }
   return genCinematiqueCore(X, p);
 }
 

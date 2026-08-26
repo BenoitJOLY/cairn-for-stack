@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -98,7 +98,7 @@ function insertDeployedSeeds(xml, seeds) {
 
 // Assemble une SEULE question STACK autonome (mêmes champs par défaut que
 // buildXML() dans js/app.js, réduits à une question, sans tags ni signature
-// stackforge) — utilisée pour l'aperçu réel isolé d'un chip (voir
+// cairnforstack) — utilisée pour l'aperçu réel isolé d'un chip (voir
 // preview-checkbox.js), jamais pour l'export final (buildXML() reste le seul
 // chemin d'export, inchangé). Gabarit vérifié par appel réel à /render le
 // 2026-07-27 (HTTP 200, forme confirmée par test-render-shape.js).

@@ -1,5 +1,5 @@
 Structure du dossier
-Le numéro de série du volume est 000000F2 2404:746E
+Le numï¿½ro de sï¿½rie du volume est 000000F2 2404:746E
 C:.
 |   .gitignore
 |   arborescence du projet.py
@@ -19,7 +19,7 @@ C:.
 |   LICENSE.md
 |   package.json
 |   PLAN.md
-|   recupérer_tags.py
+|   recupï¿½rer_tags.py
 |   ROADMAP_INSTITUTIONNALISATION.md
 |   structure.txt
 |   SUIVI.md
@@ -53,7 +53,7 @@ C:.
 |       icone_18x18.png
 |       icone_48x48.png
 |       icons.svg
-|       stackforge.png
+|       cairnforstack.png
 |       topologique.png
 |       
 +---chimie-svg
@@ -77,8 +77,8 @@ C:.
 |       bouchon.svg
 |       bouchon2.svg
 |       bouchon_troue.svg
-|       bouchon_troué.svg
-|       bouchon_troué2.svg
+|       bouchon_trouï¿½.svg
+|       bouchon_trouï¿½2.svg
 |       buchner.svg
 |       burette remplie.svg
 |       Burette.svg
@@ -103,11 +103,11 @@ C:.
 |       erlen_bouchon.svg
 |       fiole_a_vide.svg
 |       fiole_bouchon.svg
-|       fiole_jaugée.svg
+|       fiole_jaugï¿½e.svg
 |       pince_3_doigts.svg
 |       pipette.svg
 |       pipette_gradue.svg
-|       pipette_jaugée.svg
+|       pipette_jaugï¿½e.svg
 |       pissette.svg
 |       plaque_test.svg
 |       poire_aspi.svg
@@ -116,7 +116,7 @@ C:.
 |       refrigerant_boule.svg
 |       refrigerant_droit.svg
 |       serringue.svg
-|       sonde_thermomètre.svg
+|       sonde_thermomï¿½tre.svg
 |       spatule.svg
 |       support_ballon.svg
 |       thermometre-numerique.svg
@@ -609,9 +609,9 @@ C:.
 |   |   index.json
 |   |   regression.html
 |   |   rvb_ref_trunc.txt
-|   |   SPÉCIFICATION TECHNIQUE UNIQUE.txt
+|   |   SPï¿½CIFICATION TECHNIQUE UNIQUE.txt
 |   |   taxonomy.js
-|   |   voir en dépot.html
+|   |   voir en dï¿½pot.html
 |   |   
 |   +---comment_faire
 |   |       comment faire un parson.txt
@@ -627,13 +627,13 @@ C:.
 |   |       Sans nom 7.odt
 |   |       Sans nom 8.odt
 |   |       
-|   +---mise à jour
+|   +---mise ï¿½ jour
 |   |   +---Choix multiples
-|   |   |   +---cases à cocher
+|   |   |   +---cases ï¿½ cocher
 |   |   |   |       Choix multiples-cases-cocher-1.xml
 |   |   |   |       
-|   |   |   +---Menu déroulant
-|   |   |   |       Choix multiples-menu déroulant -aléatoire1.xml
+|   |   |   +---Menu dï¿½roulant
+|   |   |   |       Choix multiples-menu dï¿½roulant -alï¿½atoire1.xml
 |   |   |   |       
 |   |   |   +---radio
 |   |   |   |       Choix multiples-radio-1.xml
@@ -651,13 +651,13 @@ C:.
 |   |   |   |       Informatique-conversion-basen-vers-base10-aleatoire.xml
 |   |   |   |       
 |   |   |   \---tableau logique
-|   |   |           Informatique-logique tableau- Identifier lexpression daprès sa table.xml
-|   |   |           Informatique-logique tableau- Table de vérité à 3 variables.xml
-|   |   |           Informatique-logique tableau- Équivalence de deux propositions.xml
-|   |   |           Informatique-logique tableau-Déduire des cases manquantes.xml
-|   |   |           Informatique-logique tableau-Logique Propositionnelle - Tableau à compléter.xml
-|   |   |           Informatique-logique tableau-Table avec colonnes intermédiaires.xml
-|   |   |           Informatique-logique tableau-Tableau à compléter.xml
+|   |   |           Informatique-logique tableau- Identifier lexpression daprï¿½s sa table.xml
+|   |   |           Informatique-logique tableau- Table de vï¿½ritï¿½ ï¿½ 3 variables.xml
+|   |   |           Informatique-logique tableau- ï¿½quivalence de deux propositions.xml
+|   |   |           Informatique-logique tableau-Dï¿½duire des cases manquantes.xml
+|   |   |           Informatique-logique tableau-Logique Propositionnelle - Tableau ï¿½ complï¿½ter.xml
+|   |   |           Informatique-logique tableau-Table avec colonnes intermï¿½diaires.xml
+|   |   |           Informatique-logique tableau-Tableau ï¿½ complï¿½ter.xml
 |   |   |           
 |   |   +---Interactif visuel
 |   |   |   +---Glisser deposer
@@ -665,12 +665,12 @@ C:.
 |   |   |   |       questions-parcours-69b486eebfaad-Exercice_sans_titre_2026_07_02_17h34-20260702-2200.xml
 |   |   |   |       
 |   |   |   +---image-clic
-|   |   |   |       questions-parcours-69b486eebfaad-JSXGraph 3 Carrés Séquentiels-20260707-1627.xml
+|   |   |   |       questions-parcours-69b486eebfaad-JSXGraph 3 Carrï¿½s Sï¿½quentiels-20260707-1627.xml
 |   |   |   |       
 |   |   |   +---mesure doc
 |   |   |   |       questions-parcours-69552c495bebf-longueur dondes de raies-20260710-0919.xml
 |   |   |   |       
-|   |   |   \---sélection sur image
+|   |   |   \---sï¿½lection sur image
 |   |   |           questions-parcours-69552c495bebf-longueur dondes de raies-20260702-1716.xml
 |   |   |           
 |   |   +---Math
@@ -689,7 +689,7 @@ C:.
 |   |   |   |       Math-complexes-module-argument.xml
 |   |   |   |       Math-complexes-parties-reelle-imaginaire.xml
 |   |   |   |       
-|   |   |   +---derivée-primitive
+|   |   |   +---derivï¿½e-primitive
 |   |   |   |       Math-analyse-aire-courbes.xml
 |   |   |   |       Math-analyse-convexite-tangente-exponentielle.xml
 |   |   |   |       Math-analyse-derivee-piege-produit-exponentielle.xml
@@ -699,7 +699,7 @@ C:.
 |   |   |   |       Math-analyse-tangente-point-exterieur.xml
 |   |   |   |       
 |   |   |   +---geogebra
-|   |   |   |   |   créée dans stackforge.xml
+|   |   |   |   |   crï¿½ï¿½e dans cairnforstack.xml
 |   |   |   |   |   fonctionnelle.xml
 |   |   |   |   |   Geogebra.svg
 |   |   |   |   |   tracer courbe.ggb
@@ -718,7 +718,7 @@ C:.
 |   |   |   |       Math-geometrie-ordonnee-origine-droite.xml
 |   |   |   |       Math-geometrie-pente-droite.xml
 |   |   |   |       
-|   |   |   +---inéquation
+|   |   |   +---inï¿½quation
 |   |   |   |       Math-inequations-1er-degre.xml
 |   |   |   |       Math-inequations-2nd-degre.xml
 |   |   |   |       Math-inequations-absolu-ax-b.xml
@@ -738,7 +738,7 @@ C:.
 |   |   |   |       Math-matrices-trace-3x3.xml
 |   |   |   |       Math-matrices-transposee-3x3.xml
 |   |   |   |       
-|   |   |   +---numérique
+|   |   |   +---numï¿½rique
 |   |   |   |       Math-numerique-clavier.xml
 |   |   |   |       
 |   |   |   +---Polynomes
@@ -750,7 +750,7 @@ C:.
 |   |   |   |       Math-polynome-racines-2nd-degre.xml
 |   |   |   |       Math-polynome-somme-racines-viete.xml
 |   |   |   |       
-|   |   |   +---Probabilités
+|   |   |   +---Probabilitï¿½s
 |   |   |   |       Math-probabilites-combinatoire-coefficient.xml
 |   |   |   |       Math-probabilites-conditionnelle-arbre.xml
 |   |   |   |       Math-probabilites-esperance-binomiale.xml
@@ -758,7 +758,7 @@ C:.
 |   |   |   |       Math-probabilites-union.xml
 |   |   |   |       Math-probabilites-variance-binomiale.xml
 |   |   |   |       
-|   |   |   +---raisonnement par équivalence
+|   |   |   +---raisonnement par ï¿½quivalence
 |   |   |   |       equivalence_reasoning_x_moins_1_cube.xml
 |   |   |   |       
 |   |   |   +---Statistiques
@@ -779,7 +779,7 @@ C:.
 |   |   |   |       Math-suites-terme-general-arithmetique.xml
 |   |   |   |       Math-suites-terme-general-geometrique.xml
 |   |   |   |       
-|   |   |   \---trigonométrie
+|   |   |   \---trigonomï¿½trie
 |   |   |           Math-trigonometrie-simplifier.xml
 |   |   |           Math-trigonometrie-valeur-exacte.xml
 |   |   |           
@@ -788,8 +788,8 @@ C:.
 |   |   |   |       Organisation-classement-moyenne.xml
 |   |   |   |       Organisation-classement-parcours-air.xml
 |   |   |   |       
-|   |   |   +---Mots croisés
-|   |   |   |       Organisation-mots croisés-1.xml
+|   |   |   +---Mots croisï¿½s
+|   |   |   |       Organisation-mots croisï¿½s-1.xml
 |   |   |   |       
 |   |   |   \---Relier
 |   |   |           Organisation-relier-1.xml
@@ -797,13 +797,13 @@ C:.
 |   |   +---Physique-chimie
 |   |   |   +---APN
 |   |   |   |       1298736.svg
-|   |   |   |       APN-diaph de prise de vue iso changé-.xml
-|   |   |   |       APN-diaph de prise de vue iso et vitesse changés-.xml
-|   |   |   |       APN-diaph de prise de vue vitesse changée.xml
-|   |   |   |       APN-iso de prise de vue diaph et vitesse changés .xml
-|   |   |   |       APN-Vitesse de prise de vue diaph changé-.xml
-|   |   |   |       APN-Vitesse de prise de vue diaph et iso changés-.xml
-|   |   |   |       APN-Vitesse de prise de vue iso changé.xml
+|   |   |   |       APN-diaph de prise de vue iso changï¿½-.xml
+|   |   |   |       APN-diaph de prise de vue iso et vitesse changï¿½s-.xml
+|   |   |   |       APN-diaph de prise de vue vitesse changï¿½e.xml
+|   |   |   |       APN-iso de prise de vue diaph et vitesse changï¿½s .xml
+|   |   |   |       APN-Vitesse de prise de vue diaph changï¿½-.xml
+|   |   |   |       APN-Vitesse de prise de vue diaph et iso changï¿½s-.xml
+|   |   |   |       APN-Vitesse de prise de vue iso changï¿½.xml
 |   |   |   |       
 |   |   |   +---chimie topologique
 |   |   |   |       questions-parcours-69b486eebfaad-Rentrez_le_nom_de_votre_exercice-20260701-1527.xml
@@ -817,27 +817,27 @@ C:.
 |   |   |   +---equation chimique
 |   |   |   |       questions-parcours-69b486eebfaad-Rentrez_le_nom_de_votre_exercice-20260701-1530.xml
 |   |   |   |       
-|   |   |   +---Interférences Diffraction
-|   |   |   |       questions-parcours-696671a935ea8-Diffraction par 2 fentes avec capteur détermination de la largeur et de lécartement-20260702-0002.xml
-|   |   |   |       questions-parcours-696671a935ea8-Diffraction par trous de young détermination de la longueur donde-20260702-0002.xml
-|   |   |   |       questions-parcours-696671a935ea8-Diffraction par un trou avec écran détermination de la longueur donde-20260702-0002.xml
-|   |   |   |       questions-parcours-696671a935ea8-Diffraction par une fente avec capteur détermination longueur donde-20260702-0002.xml
-|   |   |   |       questions-parcours-696671a935ea8-Diffraction par une fente avec écran détermination longueur donde-20260702-0002.xml
+|   |   |   +---Interfï¿½rences Diffraction
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par 2 fentes avec capteur dï¿½termination de la largeur et de lï¿½cartement-20260702-0002.xml
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par trous de young dï¿½termination de la longueur donde-20260702-0002.xml
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par un trou avec ï¿½cran dï¿½termination de la longueur donde-20260702-0002.xml
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par une fente avec capteur dï¿½termination longueur donde-20260702-0002.xml
+|   |   |   |       questions-parcours-696671a935ea8-Diffraction par une fente avec ï¿½cran dï¿½termination longueur donde-20260702-0002.xml
 |   |   |   |       
 |   |   |   +---lentille
 |   |   |   |       miroir-plan.xml
-|   |   |   |       questions-kjkj-Lentille convergente — AB entre -infini et F (image réelle)-20260717-1700.xml
-|   |   |   |       questions-kjkj-Lentille convergente — AB entre F et O (image virtuelle)-20260717-1711.xml
-|   |   |   |       questions-kjkj-Lentille divergente — image virtuelle-20260717-1731.xml
-|   |   |   |       questions-kjkj-Lunette de Galilée — construction complète (objectif + oculaire)-20260718-0924.xml
-|   |   |   |       questions-kjkj-Miroir concave — AB entre F et S (image virtuelle)-20260717-1546.xml
-|   |   |   |       questions-kjkj-Miroir concave —AB entre -inf et F(image réelle)-20260717-1517.xml
-|   |   |   |       questions-kjkj-Miroir convexe — image virtuelle-20260717-1642.xml
-|   |   |   |       questions-kjkj-Télescope de Newton — construction complète (miroir primaire + miroir secondaire + oculaire)-20260718-1125.xml
-|   |   |   |       questions-kjkj-Télescope de Newton — construction complète (miroir primaire + miroir secondaire + oculaire)-20260718-1413.xml
+|   |   |   |       questions-kjkj-Lentille convergente ï¿½ AB entre -infini et F (image rï¿½elle)-20260717-1700.xml
+|   |   |   |       questions-kjkj-Lentille convergente ï¿½ AB entre F et O (image virtuelle)-20260717-1711.xml
+|   |   |   |       questions-kjkj-Lentille divergente ï¿½ image virtuelle-20260717-1731.xml
+|   |   |   |       questions-kjkj-Lunette de Galilï¿½e ï¿½ construction complï¿½te (objectif + oculaire)-20260718-0924.xml
+|   |   |   |       questions-kjkj-Miroir concave ï¿½ AB entre F et S (image virtuelle)-20260717-1546.xml
+|   |   |   |       questions-kjkj-Miroir concave ï¿½AB entre -inf et F(image rï¿½elle)-20260717-1517.xml
+|   |   |   |       questions-kjkj-Miroir convexe ï¿½ image virtuelle-20260717-1642.xml
+|   |   |   |       questions-kjkj-Tï¿½lescope de Newton ï¿½ construction complï¿½te (miroir primaire + miroir secondaire + oculaire)-20260718-1125.xml
+|   |   |   |       questions-kjkj-Tï¿½lescope de Newton ï¿½ construction complï¿½te (miroir primaire + miroir secondaire + oculaire)-20260718-1413.xml
 |   |   |   |       
-|   |   |   +---nucléaire
-|   |   |   |       Nucléaire-fission de l uranium 235.xml
+|   |   |   +---nuclï¿½aire
+|   |   |   |       Nuclï¿½aire-fission de l uranium 235.xml
 |   |   |   |       
 |   |   |   +---Oscilloscope
 |   |   |   |       Physique-oscilloscope-charge-rc.xml
@@ -849,11 +849,11 @@ C:.
 |   |   |   |       Physique-oscilloscope-decharge-rc.xml
 |   |   |   |       Physique-oscilloscope-retard-ultrasonore.xml
 |   |   |   |       
-|   |   |   +---pH-métrie — Titrage
-|   |   |   |       pH-métrie — Titrage-colorimétrie.xml
-|   |   |   |       pH-métrie — Titrage-methode_tangentes.xml
+|   |   |   +---pH-mï¿½trie ï¿½ Titrage
+|   |   |   |       pH-mï¿½trie ï¿½ Titrage-colorimï¿½trie.xml
+|   |   |   |       pH-mï¿½trie ï¿½ Titrage-methode_tangentes.xml
 |   |   |   |       
-|   |   |   +---polarimétrie
+|   |   |   +---polarimï¿½trie
 |   |   |   |       polarimetrie.svg
 |   |   |   |       
 |   |   |   +---RVB
@@ -864,16 +864,16 @@ C:.
 |   |   |   |       questions-kjkj-avancement-20260719-1616.xml
 |   |   |   |       table-svgrepo-com(1).svg
 |   |   |   |       
-|   |   |   \---unités
-|   |   |           Unités-conversion d unités- autogénérées-.xml
-|   |   |           Unités-noter une valeur.xml
+|   |   |   \---unitï¿½s
+|   |   |           Unitï¿½s-conversion d unitï¿½s- autogï¿½nï¿½rï¿½es-.xml
+|   |   |           Unitï¿½s-noter une valeur.xml
 |   |   |           
-|   |   \---Réponse textuelle
-|   |           export_stackforge.xml
+|   |   \---Rï¿½ponse textuelle
+|   |           export_cairnforstack.xml
 |   |           fonctionne.xml
-|   |           Réponse textuelle-string-levenshtein-multiple.xml
-|   |           Réponse textuelle-string-levenshtein.xml
-|   |           Réponse textuelle-string-synonymes.xml
+|   |           Rï¿½ponse textuelle-string-levenshtein-multiple.xml
+|   |           Rï¿½ponse textuelle-string-levenshtein.xml
+|   |           Rï¿½ponse textuelle-string-synonymes.xml
 |   |           valide_mais_pas_correction.xml
 |   |           
 |   +---moodle-qtype_stack-master
@@ -1643,20 +1643,20 @@ C:.
 |   |   |   |       
 |   |   |   \---stacklibrary
 |   |   |       \---HELM
-|   |   |           +---Course_quiz_10_4-de-moivre’s-theorem
-|   |   |           |   |   10_4-de-moivre’s-theorem_quiz.json
+|   |   |           +---Course_quiz_10_4-de-moivreï¿½s-theorem
+|   |   |           |   |   10_4-de-moivreï¿½s-theorem_quiz.json
 |   |   |           |   |   
 |   |   |           |   \---top
 |   |   |           |       \---Default-for-10-4
-|   |   |           |               10-4-1-1-De-Moivre’s-theorem.xml
+|   |   |           |               10-4-1-1-De-Moivreï¿½s-theorem.xml
 |   |   |           |               10-4-2-1-Finding-the-roots-of-complex-numbers.xml
 |   |   |           |               10-4-2-2-Root-finding.xml
 |   |   |           |               10-4-2-3-Roots-of-a-complex-number.xml
 |   |   |           |               10-4-3-1-Complex-roots-of-a-simple-quartic.xml
 |   |   |           |               gitsync_category.xml
 |   |   |           |               
-|   |   |           +---Course_quiz_12_3-the-newton–raphson-method
-|   |   |           |   |   12_3-the-newton–raphson-method_quiz.json
+|   |   |           +---Course_quiz_12_3-the-newtonï¿½raphson-method
+|   |   |           |   |   12_3-the-newtonï¿½raphson-method_quiz.json
 |   |   |           |   |   
 |   |   |           |   \---top
 |   |   |           |       \---Default-for-12-3
@@ -1673,25 +1673,25 @@ C:.
 |   |   |           +---Course_quiz_23_6-the-complex-form
 |   |   |           |   \---top
 |   |   |           |       \---Default-for-23-6
-|   |   |           |               23-6-4-1-Parseval’s-theorem.xml
-|   |   |           |               23-6-4-2-Parseval’s-theorem-in-FS-coeffs.xml
-|   |   |           |               23-6-4-3-Parseval’s-theorem-example.xml
+|   |   |           |               23-6-4-1-Parsevalï¿½s-theorem.xml
+|   |   |           |               23-6-4-2-Parsevalï¿½s-theorem-in-FS-coeffs.xml
+|   |   |           |               23-6-4-3-Parsevalï¿½s-theorem-example.xml
 |   |   |           |               
 |   |   |           +---Course_quiz_25_2-applications-of-pdes
 |   |   |           |   \---top
 |   |   |           |       \---Default-for-25-2
-|   |   |           |               25-2-4-Laplace’s-equation.xml
+|   |   |           |               25-2-4-Laplaceï¿½s-equation.xml
 |   |   |           |               
 |   |   |           +---Course_quiz_29_3-integral-vector-theorems
 |   |   |           |   \---top
 |   |   |           |       \---Default-for-29-3
-|   |   |           |               29-3-2-1-Gauss’-Theorem.xml
-|   |   |           |               29-3-2-2-Gauss’-theorem-engineering-examples.xml
-|   |   |           |               29-3-3-1-Green’s-Identities-(3D).xml
-|   |   |           |               29-3-3-2-Green’s-Theorem-in-the-Plane.xml
+|   |   |           |               29-3-2-1-Gaussï¿½-Theorem.xml
+|   |   |           |               29-3-2-2-Gaussï¿½-theorem-engineering-examples.xml
+|   |   |           |               29-3-3-1-Greenï¿½s-Identities-(3D).xml
+|   |   |           |               29-3-3-2-Greenï¿½s-Theorem-in-the-Plane.xml
 |   |   |           |               
-|   |   |           +---Course_quiz_35_4-total-probability-and-bayes’-theorem
-|   |   |           |   |   35_4-total-probability-and-bayes’-theorem_quiz.json
+|   |   |           +---Course_quiz_35_4-total-probability-and-bayesï¿½-theorem
+|   |   |           |   |   35_4-total-probability-and-bayesï¿½-theorem_quiz.json
 |   |   |           |   |   
 |   |   |           |   \---top
 |   |   |           |       \---Default-for-35-4
@@ -1713,9 +1713,9 @@ C:.
 |   |   |           +---Course_quiz_43_2-correlation
 |   |   |           |   \---top
 |   |   |           |       \---Default-for-43-2
-|   |   |           |               43-2-04-Significance-of-Pearson’s-r.xml
-|   |   |           |               43-2-07-Spearman’s-coefficient-of-correlation.xml
-|   |   |           |               43-2-08-The-calculation-of-Spearman’s-R.xml
+|   |   |           |               43-2-04-Significance-of-Pearsonï¿½s-r.xml
+|   |   |           |               43-2-07-Spearmanï¿½s-coefficient-of-correlation.xml
+|   |   |           |               43-2-08-The-calculation-of-Spearmanï¿½s-R.xml
 |   |   |           |               
 |   |   |           +---Course_quiz_6_4-the-logarithmic-function
 |   |   |           |   \---top

@@ -1,4 +1,4 @@
-# Architecture applicative "StackForge" (générateur no-code de questions STACK)
+# Architecture applicative "Cairn for Stack" (générateur no-code de questions STACK)
 
 À utiliser quand la demande porte sur la RECONSTRUCTION ou l'ÉVOLUTION de l'application JS de génération de questions (pas sur une question isolée). Contexte : l'ancienne version a échoué à cause de fichiers monolithiques de 2000-5000 lignes mélangeant HTML, Maxima et génération XML.
 

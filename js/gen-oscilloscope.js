@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ══════════════════════════════════════════════════════════════
-   STACKFORGE — Générateur Oscilloscope (JSXGraph, thème clair)
+   CAIRN FOR STACK — Générateur Oscilloscope (JSXGraph, thème clair)
    Basé sur les exports Moodle de référence (test/mise à jour/Physique-chimie/Oscilloscope)
    Écran : 10×8 divisions  x∈[-5,5]  y∈[-4,4] — vrais boutons, curseurs togglables,
    réponses en 2 champs "units" (grandeur + unité), PRT diagnostique multi-nœuds.
@@ -428,7 +428,7 @@ function _oscInputHintsHTML(exList){
     + '</ul></div>';
 }
 
-/* ── Bandeau titre (identique norme UI StackForge) ── */
+/* ── Bandeau titre (identique norme UI Cairn for Stack) ── */
 function _oscHeader(X, bareme, title, tagBg, tagIcon, tagLabel){
   return '<div style="background:'+tagBg.bg+';border-left:5px solid '+tagBg.accent+';border-radius:0 8px 8px 0;'
     + 'padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
@@ -516,8 +516,8 @@ async function genOscilloscope(X){
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
     }
-    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "oscilloscope", repli sur le calcul local (session expirée ?).');
-  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "oscilloscope", repli sur le calcul local.', e); }
+    console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "oscilloscope", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[cairnforstack] /api/generate injoignable pour "oscilloscope", repli sur le calcul local.', e); }
   return genOscilloscopeCore(X, p);
 }
 

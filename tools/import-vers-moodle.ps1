@@ -1,4 +1,4 @@
-﻿# StackForge — générateur de questions STACK pour Moodle
+﻿# Cairn for Stack — générateur de questions STACK pour Moodle
 # Copyright (C) 2026  Benoit Joly
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ $dialog.Filter = "Fichiers XML (*.xml)|*.xml"
 $dialog.InitialDirectory = [Environment]::GetFolderPath('MyDocuments')
 $downloads = Join-Path $env:USERPROFILE 'Downloads'
 if (Test-Path $downloads) { $dialog.InitialDirectory = $downloads }
-$dialog.Title = "Choisis le fichier XML exporté par StackForge"
+$dialog.Title = "Choisis le fichier XML exporté par Cairn for Stack"
 
 if ($dialog.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) {
   Write-Host "Aucun fichier choisi, on arrête là."

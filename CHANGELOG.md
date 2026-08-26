@@ -1,6 +1,6 @@
-# CHANGELOG — StackForge V4
+# CHANGELOG — Cairn for Stack V1
 
-## [4.1.0] — 2026-06-20
+## [1.1.0] — 2026-06-20
 
 ### Ajouté
 - Versioning sémantique : fichier `VERSION`, affichage dans header et footer
@@ -12,7 +12,7 @@
 
 ---
 
-## [4.0.0] — 2026-04-01
+## [1.0.0] — 2026-04-01
 
 ### Première version publique
 - Générateur de questions Moodle/STACK standalone (HTML + JS, sans serveur)

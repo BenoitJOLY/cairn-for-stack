@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ══════════════════════════════════════════════════════════════
-   STACKFORGE — Cinématique du point : builders JSXGraph (Phase 1 et
+   CAIRN FOR STACK — Cinématique du point : builders JSXGraph (Phase 1 et
    Phase 2), suivant le pattern "buildOscJSXCode_*(cfg)" de
    gen-oscilloscope.js : la MÊME fonction sert à générer le JS de
    l'export XML (cfg porte des placeholders STACK {#var#}) et celui

@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ══════════════════════════════════════════════════════════════
-   STACKFORGE — Aperçu live du type "cinematique". Suit le pattern
+   CAIRN FOR STACK — Aperçu live du type "cinematique". Suit le pattern
    oscilloscope/jxgdrop (js/preview.js:952-1069, js/preview-jxgdrop.js) :
    les MÊMES fonctions buildCinJSX_Phase1/Phase2 (js/gen-cinematique-jsx.js)
    servent à l'export XML et à l'aperçu local, avec des valeurs

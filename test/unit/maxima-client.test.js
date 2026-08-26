@@ -67,10 +67,10 @@ test('buildStandaloneQuestionXML : valeurs STACK par défaut correctes (decimals
     assert.match(xml, /<questionsimplify>1<\/questionsimplify>/);
 });
 
-test('buildStandaloneQuestionXML : aucun tag ni signature stackforge (aperçu jetable, jamais exporté)', () => {
+test('buildStandaloneQuestionXML : aucun tag ni signature cairnforstack (aperçu jetable, jamais exporté)', () => {
     const xml = buildStandaloneQuestionXML(baseParts());
     assert.ok(!xml.includes('<tags>'));
-    assert.ok(!/stackforge/i.test(xml));
+    assert.ok(!/cairnforstack/i.test(xml));
 });
 
 test('insertDeployedSeeds : insère un <deployedseed> juste après le dernier </prt>', () => {

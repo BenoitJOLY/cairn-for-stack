@@ -1,4 +1,4 @@
-﻿# StackForge — générateur de questions STACK pour Moodle
+﻿# Cairn for Stack — générateur de questions STACK pour Moodle
 # Copyright (C) 2026  Benoit Joly
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 
 <#
 .SYNOPSIS
-  Importe automatiquement un fichier XML StackForge dans un Moodle local, en
+  Importe automatiquement un fichier XML Cairn for Stack dans un Moodle local, en
   rejouant les mêmes requêtes HTTP qu'un import manuel (login -> upload dans
   la zone de brouillon -> soumission du formulaire d'import), puis ouvre la
   page de résultat Moodle dans le navigateur par défaut pour lecture normale.
@@ -27,7 +27,7 @@
   d'habitude.
 
 .PARAMETER XmlPath
-  Chemin du fichier .xml exporté par StackForge à importer.
+  Chemin du fichier .xml exporté par Cairn for Stack à importer.
 
 .PARAMETER ConfigPath
   Chemin du fichier de config (identifiants + paramètres Moodle). Par défaut
@@ -35,7 +35,7 @@
   .example fourni, à copier et remplir toi-même — jamais commité).
 
 .EXAMPLE
-  ./tools/moodle-import-test.ps1 -XmlPath "C:\Users\...\export_stackforge.xml"
+  ./tools/moodle-import-test.ps1 -XmlPath "C:\Users\...\export_cairnforstack.xml"
 #>
 param(
   [Parameter(Mandatory=$true)][string]$XmlPath,
@@ -160,7 +160,7 @@ $resultResp = Invoke-WebRequest -Uri "$MoodleBaseUrl/question/bank/importquestio
   -Method Post -Body $importBody -WebSession $moodleSession -UseBasicParsing
 
 # ── 5) Sauvegarde + ouverture du résultat réel Moodle ───────────────────
-$outDir = Join-Path $env:TEMP "stackforge-moodle-import"
+$outDir = Join-Path $env:TEMP "cairnforstack-moodle-import"
 if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Path $outDir | Out-Null }
 $outFile = Join-Path $outDir ("resultat-{0:yyyyMMdd-HHmmss}.html" -f (Get-Date))
 

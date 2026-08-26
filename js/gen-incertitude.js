@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -70,8 +70,8 @@ async function genIncertitude(X) {
     });
     if (res.ok) { const data = await res.json(); if (data && data.ok) return data.parts; }
     if (res.status === 429) { const data = await res.json().catch(() => ({})); throw new Error(data.error || I18N.t('msg.err_quota_hebdo')); }
-    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "incertitude", repli sur le calcul local.');
-  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "incertitude", repli sur le calcul local.', e); }
+    console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "incertitude", repli sur le calcul local.');
+  } catch(e) { console.warn('[cairnforstack] /api/generate injoignable pour "incertitude", repli sur le calcul local.', e); }
   return genIncertitudeCore(X, p);
 }
 

@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -222,7 +222,7 @@ function renderPreviewHTML_radio(state) {
   function _raRealDrawnIds(renderRes, qid) {
     var ir = renderRes && renderRes.questioninputs && renderRes.questioninputs['ans' + qid];
     var options = ir && ir.configuration && ir.configuration.options;
-    console.log('[stackforge][debug radio real-preview] ir.configuration =', ir && ir.configuration, '| options =', options);
+    console.log('[cairnforstack][debug radio real-preview] ir.configuration =', ir && ir.configuration, '| options =', options);
     if (!options) return null;
     var ids = Object.keys(options).map(function (id) { return parseInt(id, 10); });
     return ids.length ? ids : null;

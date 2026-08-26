@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>StackForge — Tests de non-régression</title>
+  <title>Cairn for Stack — Tests de non-régression</title>
   <style>
     body { font-family: system-ui, sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; }
     header { background: #1e293b; color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
@@ -45,7 +45,7 @@
 
 <header>
   <div>
-    <h1>StackForge — Tests de non-régression</h1>
+    <h1>Cairn for Stack — Tests de non-régression</h1>
     <div class="ver">Comparez le XML généré par les générateurs à une référence sauvegardée</div>
   </div>
 </header>
@@ -256,7 +256,7 @@ function serialize(result) {
   }, null, 2);
 }
 
-const STORAGE_KEY = 'stackforge_regression_refs_v2';
+const STORAGE_KEY = 'cairnforstack_regression_refs_v2';
 
 function loadRefs() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }

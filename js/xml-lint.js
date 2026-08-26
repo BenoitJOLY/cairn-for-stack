@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@
 function lintExportedXML(xml) {
   var warnings = [];
 
-  // 1) I18N n'existe que dans le contexte navigateur de StackForge (voir js/i18n.js).
+  // 1) I18N n'existe que dans le contexte navigateur de Cairn for Stack (voir js/i18n.js).
   //    S'il apparaît littéralement dans le XML exporté, ce JS s'exécutera un jour
   //    dans le sandbox Moodle/JSXGraph où I18N est undefined → plantage silencieux.
   //    (cause exacte du Problème connu #36, bug 4 : I18N.t(...) laissé hors ${...}.)

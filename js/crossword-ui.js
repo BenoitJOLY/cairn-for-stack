@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -107,7 +107,7 @@ function generateCWGrid() {
 function exportCWJSON() {
     const words = getCWTableWords();
     if (words.length === 0) return toast(I18N.t('msg.aucun_mot_a_exporter'));
-    // On utilise la fonction dlJSON déjà présente dans STACKFORGE
+    // On utilise la fonction dlJSON déjà présente dans CAIRN FOR STACK
     dlJSON(words, "crossword_words.json");
 }
 

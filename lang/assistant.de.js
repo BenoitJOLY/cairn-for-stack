@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════════════
-   STACKFORGE — Inhalt des ASSISTENT-MODUS (Deutsch)
+   CAIRN FOR STACK — Inhalt des ASSISTENT-MODUS (Deutsch)
    Gespeichert in window.ASSIST_LANG.de ; gelesen von assistant.js je nach Sprache.
    Um eine Sprache hinzuzufügen: Diese Datei kopieren, die Werte übersetzen
    und in window.ASSIST_LANG.<code> speichern.
@@ -98,7 +98,7 @@
         "Klicken Sie auf „<strong>📋 Prompt kopieren</strong>“.",
         "Fügen Sie ihn in eine <strong>KI</strong> (ChatGPT, Claude, Gemini…) ein und starten Sie die Generierung.",
         "Holen Sie das von der <strong>KI erzeugte Ergebnis</strong> ab (im JSON-Format).",
-        "Kehren Sie zu Stackforge zurück und <strong>importieren Sie es</strong> über die Schaltfläche „📥 JSON“ des Formulars."
+        "Kehren Sie zu Cairn for Stack zurück und <strong>importieren Sie es</strong> über die Schaltfläche „📥 JSON“ des Formulars."
       ],
       note: "⚠️ <strong>Verwechseln Sie dies nicht mit der Schüleransicht.</strong> " +
         "Diese beiden Felder beschreiben, was <strong>die KI produzieren</strong> soll (der Pool), nicht was der Schüler sehen wird:" +
@@ -134,7 +134,7 @@
     /* ── Detaillierte Anleitung für Schritt 3, Feld für Feld, nach Typ ── */
     STEP3: {
       checkbox: {
-        intro: "Multiple-Choice mit Mehrfachantworten: Stackforge zieht bei jedem Versuch zufällig gute/schlechte Optionen.",
+        intro: "Multiple-Choice mit Mehrfachantworten: Cairn for Stack zieht bei jedem Versuch zufällig gute/schlechte Optionen.",
         fields: [
           "<strong>Aufgabenstellung</strong> — klicken Sie auf „✏️ Editor“, um die Frage zu verfassen (Text, Formel, Bild).",
           "<strong>Bewertungsschema</strong> (gelbes Banner oben) — vergebene Punkte.",
@@ -167,7 +167,7 @@
         ]
       },
       algebraic: {
-        intro: "Der Schüler gibt einen mathematischen Ausdruck ein; Stackforge prüft die algebraische Äquivalenz.",
+        intro: "Der Schüler gibt einen mathematischen Ausdruck ein; Cairn for Stack prüft die algebraische Äquivalenz.",
         fields: [
           "<strong>Aufgabenstellung</strong> — über „✏️ Editor“.",
           "<strong>Variablen</strong> — listen Sie diese auf (z. B.: x, y, z).",
@@ -188,7 +188,7 @@
         ]
       },
       units: {
-        intro: "Antwort = ein numerischer Wert UND eine Einheit (Stackforge prüft beides).",
+        intro: "Antwort = ein numerischer Wert UND eine Einheit (Cairn for Stack prüft beides).",
         fields: [
           "<strong>Aufgabenstellung</strong> — über „✏️ Editor“.",
           "<strong>Erwarteter numerischer Wert</strong>.",
@@ -222,7 +222,7 @@
         fields: [
           "<strong>Bewertungsschema</strong> und <strong>Anzahl der zu verwendenden Wörter</strong>.",
           "<strong>Wörter + Definitionen</strong> — fügen Sie jede Zeile hinzu („+ Wort hinzufügen“).",
-          "<strong>Raster generieren</strong> — Stackforge berechnet die Anordnung."
+          "<strong>Raster generieren</strong> — Cairn for Stack berechnet die Anordnung."
         ],
         tip: "„🤖 KI-Prompt“ erstellt mit einem Klick eine Wort-/Definitionsliste zu einem Thema."
       },

@@ -1,4 +1,4 @@
-# StackForge V4 — Feuille de route : Institutionnalisation
+# Cairn for Stack V1 — Feuille de route : Institutionnalisation
 
 > Document de suivi à utiliser en début de session Claude Code.
 > Cocher chaque item au fur et à mesure de l'avancement.
@@ -14,7 +14,7 @@
   - Restant : chimie topo, DOI, ordonnancement (à valider plus tard)
 
 - [x] **Versioning sémantique**
-  - `VERSION` → `4.1.0`
+  - `VERSION` → `1.1.0`
   - Version affichée dans le header (badge gris) et le footer (`id="footer-version"`)
   - `js/version.js` — source unique runtime
   - `CHANGELOG.md` créé
@@ -48,7 +48,7 @@ Obligatoire pour les établissements publics français.
 - [x] **Labels formulaires** — `a11y-init.js` étendu (4 étapes) + `aria-label` HTML direct
   - 38 champs sans label identifiés et corrigés (matrices, modales, IA docs, textareas éditeur riche)
   - File inputs cachés labellisés ; textareas `display:none` couverts par Step 1 étendu et Step 4 catch-all
-- [x] **Test avec lecteur d'écran NVDA + Firefox** — structure valide (Insert+F7 : h1 StackForge, h2 Mode assistant, navigation cohérente)
+- [x] **Test avec lecteur d'écran NVDA + Firefox** — structure valide (Insert+F7 : h1 Cairn for Stack, h2 Mode assistant, navigation cohérente)
 - [x] **Audit Lighthouse accessibilité : 97%** (objectif ≥ 90 atteint)
   - Touch targets : header V4 → 60px, boutons/input → min-height 48px
   - Footer links → min-height 24px avec padding
@@ -154,10 +154,10 @@ Issues identifiées lors du développement V4 :
 
 | Élément | Valeur |
 |---|---|
-| Projet | StackForge V4 |
-| Répertoire local | `c:\Users\phy_j\Downloads\stackforgeV4` |
+| Projet | Cairn for Stack V1 |
+| Répertoire local | `c:\Users\phy_j\Downloads\cairnforstackV4` |
 | Contact développeur | b_joly@orange.fr |
-| Dépôt GitHub | https://github.com/BenoitJOLY/stackforge |
+| Dépôt GitHub | https://github.com/BenoitJOLY/cairn-for-stack |
 | Documentation STACK | https://docs.stack-assessment.org |
 
 ---

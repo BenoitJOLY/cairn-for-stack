@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ══════════════════════════════════════════════════════════════
-   STACKFORGE — Cinématique du point : atelier de digitalisation.
+   CAIRN FOR STACK — Cinématique du point : atelier de digitalisation.
    L'enseignant pointe lui-même les positions M0, M1, M2… (chronopho-
    tographie), sur un fond neutre OU sur une image importée servant
    uniquement de guide visuel transitoire — voir js/gen-image-mesure.js

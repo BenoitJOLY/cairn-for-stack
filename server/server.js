@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -130,7 +130,7 @@ const instanceConfig = require('./instance-config');
 // par défaut (js/maxima-client.js) — voir plan §6/§7.
 app.get('/api/config/public', (req, res) => {
   const cfg = instanceConfig.getPublicConfig();
-  res.json({ mutualisation: cfg.mutualisation, maximaUrl: cfg.maximaUrl, jsmolUrl: cfg.jsmolUrl, legal: cfg.legal });
+  res.json({ mutualisation: cfg.mutualisation, maximaUrl: cfg.maximaUrl, jsmolUrl: cfg.jsmolUrl, tagsUrl: cfg.tagsUrl, legal: cfg.legal });
 });
 
 app.get('/api/admin/config', requireRole('admin'), (req, res) => {
@@ -138,7 +138,7 @@ app.get('/api/admin/config', requireRole('admin'), (req, res) => {
 });
 
 app.post('/api/admin/config', requireRole('admin'), (req, res) => {
-  const { mutualisation, maximaUrl, jsmolUrl, ai, legal } = req.body || {};
+  const { mutualisation, maximaUrl, jsmolUrl, tagsUrl, ai, legal } = req.body || {};
   if (mutualisation && typeof mutualisation === 'object') {
     instanceConfig.setMutualisationConfig(mutualisation);
   }
@@ -147,6 +147,9 @@ app.post('/api/admin/config', requireRole('admin'), (req, res) => {
   }
   if (typeof jsmolUrl === 'string') {
     instanceConfig.setJsmolUrl(jsmolUrl);
+  }
+  if (typeof tagsUrl === 'string') {
+    instanceConfig.setTagsUrl(tagsUrl);
   }
   if (ai && typeof ai === 'object') {
     instanceConfig.setAiProviderConfig(ai);
@@ -212,7 +215,7 @@ app.post('/api/admin/accounts/:username/role', requireRole('admin'), (req, res) 
 
 app.get('/admin.html', requireRole('admin'), (req, res) => res.sendFile(path.join(ROOT, 'admin.html')));
 
-// Workflow validateur — relecture faite sur un Moodle réel, hors StackForge
+// Workflow validateur — relecture faite sur un Moodle réel, hors Cairn for Stack
 // (pas de prévisualisation in-app pour le moment) ; la promotion utilise le
 // jeton institutionnel exclusivement côté serveur (server/gh-validation.js).
 const ghValidation = require('./gh-validation');
@@ -388,5 +391,5 @@ for (const file of PUBLIC_FILES) {
 app.get('/', (req, res) => res.sendFile(path.join(ROOT, 'index.html')));
 
 app.listen(PORT, () => {
-  console.log(`StackForge server listening on port ${PORT}`);
+  console.log(`Cairn for Stack server listening on port ${PORT}`);
 });

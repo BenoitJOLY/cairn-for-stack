@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   STACKFORGE — LANGUE DE RÉFÉRENCE : FRANÇAIS
+   CAIRN FOR STACK — LANGUE DE RÉFÉRENCE : FRANÇAIS
    Fichier de langue : aucune logique, uniquement des clés → textes.
    Pour ajouter une langue : copier ce fichier, renommer le code et
    traduire les VALEURS (ne jamais changer les clés).
@@ -1041,7 +1041,7 @@ I18N.add("nl", {
   "jd.instruction_lbl":     "Stelling",
   "jd.bareme_lbl":          "Schaal:",
   "jd.zones_visible_lbl":   "Zichtbare stortzones",
-  "jd.info_box":            "Stel een achtergrondafbeelding in, plaats neerzetzones en vermeld suggesties. Stackforge genereert automatisch responsieve JSXGraph-code en automatische correctie.",
+  "jd.info_box":            "Stel een achtergrondafbeelding in, plaats neerzetzones en vermeld suggesties. Cairn for Stack genereert automatisch responsieve JSXGraph-code en automatische correctie.",
   "jd.zones_lbl":           "Afleverzones:",
   "jd.zone_num_lbl":        "Gebied",
   "jd.centre_x":            "Centrum",
@@ -2907,7 +2907,7 @@ I18N.add("nl", {
   "exp.sauvegarde_json_lbl":     "De vraag opslaan (JSON)",
   "exp.exporter_json_btn":       "💾Exporteren naar JSON",
   "exp.importer_json_btn":       "📂 Importeer JSON",
-  "exp.sauvegarde_json_hint":    "Volledige opslag van de vraag (variabelen, verklaring, invoer, PRT\'s) onafhankelijk van de StackForge-quiz.",
+  "exp.sauvegarde_json_hint":    "Volledige opslag van de vraag (variabelen, verklaring, invoer, PRT\'s) onafhankelijk van de Cairn for Stack-quiz.",
   "exp.valeurs_simulees_lbl":    "Gesimuleerde waarden:",
   "exp.nouvelles_valeurs_title": "Genereer willekeurige waarden opnieuw",
   "exp.nouvelles_valeurs_btn":   "🔀 Nieuwe waarden",
@@ -3297,7 +3297,7 @@ I18N.add("nl", {
   "opt.err_sa_positive":           "De afstand SA moet positief zijn (object voor de spiegel).",
   "opt.err_sa_eq_f":               "SA = f: het object is scherp → beeld op oneindig (niet representatief).",
   "opt.err_sa_eq_2f":              "SA = 2f: het object bevindt zich precies in het krommingsmiddelpunt C - de naar C gerichte straal is in dit specifieke geval niet gedefinieerd.",
-  "opt.err_scenario_a_venir": "Dit scenario is nog niet geïmplementeerd in deze versie van StackForge.",
+  "opt.err_scenario_a_venir": "Dit scenario is nog niet geïmplementeerd in deze versie van Cairn for Stack.",
   "opt.hint_rayons_1": "🔵 Straal 1 (blauw): opkomende straal die door O gaat.",
   "opt.hint_rayons_2": "🟢 Straal 2 (groen): opkomende straal die door F\' gaat.",
   "opt.hint_rayons_3": "🟠 Straal 3 (oranje): opkomende straal evenwijdig aan de as.",
@@ -3708,16 +3708,16 @@ I18N.add("nl", {
   "rtb.geo3d_label":            "Geo 3D",
   "rtb.video_prompt":           "Video-URL (videoportaal, YouTube, Vimeo of .mp4):",
 
-  "proj.title":                 "StackForge-projecten",
+  "proj.title":                 "Cairn for Stack-projecten",
   "proj.save_current":          "Huidig project opslaan",
   "proj.save_name_ph":          "Projectnaam…",
   "proj.save_btn":              "💾 Opslaan",
   "proj.saved_title":           "Opgeslagen projecten",
-  "proj.file_title":            "Draagbaar .stackforge-bestand",
+  "proj.file_title":            "Draagbaar .cairnforstack-bestand",
   "proj.export_btn":            "📤 Huidig project exporteren",
-  "proj.import_btn":            "📥 Een .stackforge-bestand importeren",
-  "proj.file_hint":             "Het .stackforge-bestand bevat uw volledige oefening (vragen, variabelen, PRT's). Het kan tussen computers worden gedeeld.",
-  "proj.msg_storage_full":      "❌ Onvoldoende localStorage-ruimte. Exporteer een project als .stackforge om ruimte vrij te maken.",
+  "proj.import_btn":            "📥 Een .cairnforstack-bestand importeren",
+  "proj.file_hint":             "Het .cairnforstack-bestand bevat uw volledige oefening (vragen, variabelen, PRT's). Het kan tussen computers worden gedeeld.",
+  "proj.msg_storage_full":      "❌ Onvoldoende localStorage-ruimte. Exporteer een project als .cairnforstack om ruimte vrij te maken.",
   "proj.msg_name_required":     "❌ Geef dit project een naam.",
   "proj.msg_saved":             "💾 Project “{name}” opgeslagen.",
   "proj.msg_not_found":         "❌ Project niet gevonden.",
@@ -3727,7 +3727,7 @@ I18N.add("nl", {
   "proj.msg_deleted":           "🗑️ Project verwijderd.",
   "proj.rename_prompt":         "Nieuwe naam:",
   "proj.msg_exported":          "💾 Geëxporteerd: {name}",
-  "proj.msg_import_invalid":    "Ongeldig .stackforge-formaat.",
+  "proj.msg_import_invalid":    "Ongeldig .cairnforstack-formaat.",
   "proj.confirm_import":        "“{name}” importeren? Niet-opgeslagen werk gaat verloren.",
   "proj.msg_imported":          "✅ Project geïmporteerd: {name}",
   "proj.msg_import_error":      "❌ Importfout: {msg}",
@@ -4258,22 +4258,22 @@ I18N.add("nl", {
   "modal.pb_bloom_synthese":         "Synthese",
   "modal.pb_bloom_evaluation":       "Evaluatie",
 
-  "copy.intro":                      "<strong>Stackforge</strong> is een opensource-tool die het maken van STACK-vragen voor het Moodle-platform vergemakkelijkt.",
+  "copy.intro":                      "<strong>Cairn for Stack</strong> is een opensource-tool die het maken van STACK-vragen voor het Moodle-platform vergemakkelijkt.",
   "copy.auteur":                     "<strong>Auteur:</strong> Benoit Joly — 2026",
   "copy.licence_titre":              "📄 Gebruikslicentie",
-  "copy.licence_body":               "Uitgebracht onder de <strong>GNU AGPLv3</strong>-licentie. Vrij gebruik, wijziging en herverspreiding, ook voor commerciële doeleinden.<br>Als u een gewijzigde versie op een voor gebruikers toegankelijke server draait, verplicht de AGPL u om hen de bijbehorende broncode te verstrekken.<br>Broncode en volledige licentietekst: <a href=\"https://github.com/BenoitJOLY/stackforge\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/stackforge</a>.",
+  "copy.licence_body":               "Uitgebracht onder de <strong>GNU AGPLv3</strong>-licentie. Vrij gebruik, wijziging en herverspreiding, ook voor commerciële doeleinden.<br>Als u een gewijzigde versie op een voor gebruikers toegankelijke server draait, verplicht de AGPL u om hen de bijbehorende broncode te verstrekken.<br>Broncode en volledige licentietekst: <a href=\"https://github.com/BenoitJOLY/cairn-for-stack\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/cairn-for-stack</a>.",
   "copy.rgpd_titre":                 "🔒 AVG & Persoonsgegevens",
-  "copy.rgpd_body":                  "Bij <strong>lokaal gebruik in uw browser</strong> stuurt deze tool geen gegevens naar een server.<br>Bij de <strong>gehoste versie</strong> (toegang via account) worden verwerkt: uw gebruikersnaam en een niet-omkeerbare hash van uw wachtwoord, een sessiecookie die strikt noodzakelijk is voor het inloggen (geen tracking- of advertentiecookies), en tijdstempels van uw generaties om het wekelijkse quotum toe te passen.<br><strong>Doel:</strong> toegang tot de dienst beheren en misbruik voorkomen. <strong>Bewaartermijn:</strong> zolang het account bestaat.<br><strong>Verwerkingsverantwoordelijke:</strong> {responsable} — de organisatie of persoon die deze instantie host en beheert, niet de auteur van de StackForge-software.<br><strong>Uw rechten</strong> (inzage, rectificatie, verwijdering): per e-mail aan de bovengenoemde verwerkingsverantwoordelijke, of hieronder rechtstreeks als u bent ingelogd. U kunt ook een klacht indienen bij {autorite}.",
+  "copy.rgpd_body":                  "Bij <strong>lokaal gebruik in uw browser</strong> stuurt deze tool geen gegevens naar een server.<br>Bij de <strong>gehoste versie</strong> (toegang via account) worden verwerkt: uw gebruikersnaam en een niet-omkeerbare hash van uw wachtwoord, een sessiecookie die strikt noodzakelijk is voor het inloggen (geen tracking- of advertentiecookies), en tijdstempels van uw generaties om het wekelijkse quotum toe te passen.<br><strong>Doel:</strong> toegang tot de dienst beheren en misbruik voorkomen. <strong>Bewaartermijn:</strong> zolang het account bestaat.<br><strong>Verwerkingsverantwoordelijke:</strong> {responsable} — de organisatie of persoon die deze instantie host en beheert, niet de auteur van de Cairn for Stack-software.<br><strong>Uw rechten</strong> (inzage, rectificatie, verwijdering): per e-mail aan de bovengenoemde verwerkingsverantwoordelijke, of hieronder rechtstreeks als u bent ingelogd. U kunt ook een klacht indienen bij {autorite}.",
   "copy.rgpd_responsable_fallback":  "de beheerder van deze instantie (zie de contactpagina van de server)",
   "copy.rgpd_autorite_fallback":     "uw nationale gegevensbeschermingsautoriteit (in Frankrijk: de <a href=\"https://www.cnil.fr\" target=\"_blank\" rel=\"noopener\">CNIL</a>)",
   "copy.compte_titre":               "👤 Uw rechten met betrekking tot uw account",
   "copy.compte_body":                "Als u bent ingelogd op de gehoste versie, kunt u uitloggen of uw account en alle bijbehorende gegevens (gebruikersnaam, wachtwoord, gebruiksgeschiedenis) definitief verwijderen.",
-  "copy.footer_note":                "De gegenereerde vragen behoren toe aan hun auteurs. Stackforge is slechts een opmaaktool.",
+  "copy.footer_note":                "De gegenereerde vragen behoren toe aan hun auteurs. Cairn for Stack is slechts een opmaaktool.",
 
   "contact.bug_titre":               "🐛 Een bug melden",
   "contact.bug_body":                "Vermeld bij elk probleem: het vraagtype, de gebruikte browser en de stappen om het probleem te reproduceren.",
   "contact.sugg_titre":              "Suggesties en verbeteringen",
-  "contact.sugg_body":               "Elk idee om Stackforge te verbeteren is welkom. Aarzel niet om te schrijven!",
+  "contact.sugg_body":               "Elk idee om Cairn for Stack te verbeteren is welkom. Aarzel niet om te schrijven!",
 
   "modal.pb_question_ex_ph":         "Bijv.: Welke van de volgende beweringen over de wetten van Newton is waar?",
   "modal.pb_libre_ph":               "of vrij invoeren…",

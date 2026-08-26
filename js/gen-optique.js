@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -300,9 +300,9 @@ async function genRvbCmj(X) {
             const data = await res.json().catch(() => ({}));
             throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
         }
-        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "rvbcmj", repli sur le calcul local (session expirée ?).');
+        console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "rvbcmj", repli sur le calcul local (session expirée ?).');
     } catch (e) {
-        console.warn('[stackforge] /api/generate injoignable pour "rvbcmj", repli sur le calcul local.', e);
+        console.warn('[cairnforstack] /api/generate injoignable pour "rvbcmj", repli sur le calcul local.', e);
     }
     return genRvbCmjCore(X, p);
 }
@@ -621,9 +621,9 @@ async function genOptique(X) {
             const data = await res.json().catch(() => ({}));
             throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
         }
-        console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "optique", repli sur le calcul local (session expirée ?).');
+        console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "optique", repli sur le calcul local (session expirée ?).');
     } catch (e) {
-        console.warn('[stackforge] /api/generate injoignable pour "optique", repli sur le calcul local.', e);
+        console.warn('[cairnforstack] /api/generate injoignable pour "optique", repli sur le calcul local.', e);
     }
     return genOptiqueCore(X, p);
 }

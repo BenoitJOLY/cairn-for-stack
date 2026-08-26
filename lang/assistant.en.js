@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════════════
-   STACKFORGE — ASSISTANT MODE content (English)
+   CAIRN FOR STACK — ASSISTANT MODE content (English)
    Registered in window.ASSIST_LANG.en ; read by assistant.js per language.
    ════════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -96,7 +96,7 @@
         "Click « <strong>📋 Copy the prompt</strong> ».",
         "Paste it into an <strong>AI</strong> (ChatGPT, Claude, Gemini…) and run the generation.",
         "Collect the <strong>result</strong> produced by the AI (in JSON format).",
-        "Come back to Stackforge and <strong>import it</strong> via the « 📥 JSON » button of the form."
+        "Come back to Cairn for Stack and <strong>import it</strong> via the « 📥 JSON » button of the form."
       ],
       note: "⚠️ <strong>Do not confuse this with the student display.</strong> " +
         "These two fields describe what <strong>the AI must produce</strong> (the pool), not what the student will see:" +
@@ -132,7 +132,7 @@
     /* ── Detailed step-3 guidance, field by field, per type ── */
     STEP3: {
       checkbox: {
-        intro: "Multiple-choice question: Stackforge randomly draws the correct/incorrect options on each attempt.",
+        intro: "Multiple-choice question: Cairn for Stack randomly draws the correct/incorrect options on each attempt.",
         fields: [
           "<strong>Question text</strong> — click « ✏️ Editor » to write the question (text, formula, image).",
           "<strong>Marking</strong> (yellow banner at the top) — points awarded.",
@@ -165,7 +165,7 @@
         ]
       },
       algebraic: {
-        intro: "The student enters a mathematical expression; Stackforge checks algebraic equivalence.",
+        intro: "The student enters a mathematical expression; Cairn for Stack checks algebraic equivalence.",
         fields: [
           "<strong>Question text</strong> — via « ✏️ Editor ».",
           "<strong>Variables</strong> — list the ones used (e.g. x, y, z).",
@@ -186,7 +186,7 @@
         ]
       },
       units: {
-        intro: "Answer = a numerical value AND a unit (Stackforge checks both).",
+        intro: "Answer = a numerical value AND a unit (Cairn for Stack checks both).",
         fields: [
           "<strong>Question text</strong> — via « ✏️ Editor ».",
           "<strong>Numerical value</strong> expected.",
@@ -220,7 +220,7 @@
         fields: [
           "<strong>Marking</strong> and <strong>number of words</strong> to use.",
           "<strong>Words + clues</strong> — add each line (« + Add a word »).",
-          "<strong>Generate the grid</strong> — Stackforge computes the layout."
+          "<strong>Generate the grid</strong> — Cairn for Stack computes the layout."
         ],
         tip: "« 🤖 AI Prompt » builds a word/clue list on a topic in one click."
       },

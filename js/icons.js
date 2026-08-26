@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════════════
-   STACKFORGE — Aide à l'insertion d'icônes SVG (sprite)
+   CAIRN FOR STACK — Aide à l'insertion d'icônes SVG (sprite)
    Prérequis : le sprite (icons.svg) doit être inliné en haut du <body>
    (les <use href="#id"> ne fonctionnent de façon fiable en file:// que si
    le sprite est dans la même page).

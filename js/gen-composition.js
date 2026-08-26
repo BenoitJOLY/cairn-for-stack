@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -70,7 +70,7 @@ function renderComposition() {
           <strong style="color:#991b1b;font-size:.9rem;">Doit être seule dans l'exercice</strong>
           <p style="margin:5px 0 0 0;font-size:.8rem;color:#7f1d1d;line-height:1.5;">
             STACK ne permet pas de mélanger, dans une même question, un input à correction manuelle et un input à correction automatique.
-            Cette Composition Libre ne peut donc pas être combinée avec un autre type de question dans le même exercice : StackForge bloque l'ajout d'une autre question si une Composition Libre est présente (et inversement).
+            Cette Composition Libre ne peut donc pas être combinée avec un autre type de question dans le même exercice : Cairn for Stack bloque l'ajout d'une autre question si une Composition Libre est présente (et inversement).
           </p>
         </div>
       </div>
@@ -422,8 +422,8 @@ async function genComposition(X) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || I18N.t('msg.err_quota_hebdo'));
     }
-    console.warn('[stackforge] /api/generate a répondu ' + res.status + ' pour "composition", repli sur le calcul local (session expirée ?).');
-  } catch(e) { console.warn('[stackforge] /api/generate injoignable pour "composition", repli sur le calcul local.', e); }
+    console.warn('[cairnforstack] /api/generate a répondu ' + res.status + ' pour "composition", repli sur le calcul local (session expirée ?).');
+  } catch(e) { console.warn('[cairnforstack] /api/generate injoignable pour "composition", repli sur le calcul local.', e); }
   return genCompositionCore(X, p);
 }
 
@@ -467,7 +467,7 @@ function genCompositionCore(X, p, deps) {
     '  [[input:ans' + X + '_html]] [[validation:ans' + X + '_html]]\n' +
     '</div>';
 
-  // ── previewFrag : prévisualisation StackForge — Q{X} Rédaction + énoncé seul, sans JSXGraph ──
+  // ── previewFrag : prévisualisation Cairn for Stack — Q{X} Rédaction + énoncé seul, sans JSXGraph ──
   var previewFrag =
     HDR +
     '<div style="margin-bottom:10px;">' + text + '</div>' +
@@ -486,7 +486,7 @@ function genCompositionCore(X, p, deps) {
   // dès qu'un input manualgraded est détecté, avant toute évaluation de PRT).
   // On le garde volontairement — nœud "toujours vrai" indépendant de toute saisie —
   // uniquement pour (a) donner une cible valide à [[feedback:prt]] dans le XML et
-  // (b) permettre au panneau de test interne de StackForge (js/verif.js) d'afficher
+  // (b) permettre au panneau de test interne de Cairn for Stack (js/verif.js) d'afficher
   // le bandeau « correction manuelle ». Il n'a aucun effet sur la note réelle.
   var inputXML =
     '    <input>\n' +

@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const STACKFORGE_VERSION = '1.0';
-const STACKFORGE_VERSION_DATE = 'Juillet 2026';
+const CAIRN_FOR_STACK_VERSION = '1.1';
+const CAIRN_FOR_STACK_VERSION_DATE = 'Juillet 2026';
 
 document.addEventListener('DOMContentLoaded', () => {
   const semver = document.getElementById('app-semver');
-  if (semver) semver.textContent = STACKFORGE_VERSION;
+  if (semver) semver.textContent = CAIRN_FOR_STACK_VERSION;
 
   const footerVer = document.getElementById('footer-version');
-  if (footerVer) footerVer.textContent = `Version ${STACKFORGE_VERSION} — ${STACKFORGE_VERSION_DATE}`;
+  if (footerVer) footerVer.textContent = `Version ${CAIRN_FOR_STACK_VERSION} — ${CAIRN_FOR_STACK_VERSION_DATE}`;
 });

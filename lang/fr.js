@@ -1,5 +1,5 @@
 /*
- * StackForge — générateur de questions STACK pour Moodle
+ * Cairn for Stack — générateur de questions STACK pour Moodle
  * Copyright (C) 2026  Benoit Joly
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 /* ════════════════════════════════════════════════════════════════
-   STACKFORGE — LANGUE DE RÉFÉRENCE : FRANÇAIS
+   CAIRN FOR STACK — LANGUE DE RÉFÉRENCE : FRANÇAIS
    Fichier de langue : aucune logique, uniquement des clés → textes.
    Pour ajouter une langue : copier ce fichier, renommer le code et
    traduire les VALEURS (ne jamais changer les clés).
@@ -1041,7 +1041,7 @@ I18N.add("fr", {
   "jd.instruction_lbl":     "Énoncé",
   "jd.bareme_lbl":          "Barème :",
   "jd.zones_visible_lbl":   "Zones de dépôts visibles",
-  "jd.info_box":            "Définissez une image de fond, placez des zones de dépôt et listez les propositions. Stackforge génère automatiquement le code JSXGraph responsive et la correction automatique.",
+  "jd.info_box":            "Définissez une image de fond, placez des zones de dépôt et listez les propositions. Cairn for Stack génère automatiquement le code JSXGraph responsive et la correction automatique.",
   "jd.zones_lbl":           "Zones de dépôt :",
   "jd.zone_num_lbl":        "Zone",
   "jd.centre_x":            "Centre X",
@@ -2906,7 +2906,7 @@ I18N.add("fr", {
   "exp.sauvegarde_json_lbl":     "Sauvegarde de la question (JSON)",
   "exp.exporter_json_btn":       "💾 Exporter en JSON",
   "exp.importer_json_btn":       "📂 Importer un JSON",
-  "exp.sauvegarde_json_hint":    "Sauvegarde complète de la question (variables, énoncé, inputs, PRTs) indépendante du quiz StackForge.",
+  "exp.sauvegarde_json_hint":    "Sauvegarde complète de la question (variables, énoncé, inputs, PRTs) indépendante du quiz Cairn for Stack.",
   "exp.valeurs_simulees_lbl":    "Valeurs simulées :",
   "exp.nouvelles_valeurs_title": "Regénérer des valeurs aléatoires",
   "exp.nouvelles_valeurs_btn":   "🔀 Nouvelles valeurs",
@@ -3296,7 +3296,7 @@ I18N.add("fr", {
   "opt.err_sa_positive":           "La distance SA doit être positive (objet devant le miroir).",
   "opt.err_sa_eq_f":               "SA = f : l'objet est au foyer → image à l'infini (non représentable).",
   "opt.err_sa_eq_2f":              "SA = 2f : l'objet est exactement au centre de courbure C — le rayon dirigé vers C est indéfini dans ce cas particulier.",
-  "opt.err_scenario_a_venir": "Ce scénario n’est pas encore implémenté dans cette version de StackForge.",
+  "opt.err_scenario_a_venir": "Ce scénario n’est pas encore implémenté dans cette version de Cairn for Stack.",
   "opt.hint_rayons_1": "🔵 Rayon 1 (bleu) : rayon émergent passant par O. ",
   "opt.hint_rayons_2": "🟢 Rayon 2 (vert) : rayon émergent passant par F'. ",
   "opt.hint_rayons_3": "🟠 Rayon 3 (orange) : rayon émergent parallèle à l'axe.",
@@ -3707,16 +3707,16 @@ I18N.add("fr", {
   "rtb.geo3d_label":            "Géo 3D",
   "rtb.video_prompt":           "URL de la vidéo (Portail tube, YouTube, Vimeo ou .mp4) :",
 
-  "proj.title":                 "Projets StackForge",
+  "proj.title":                 "Projets Cairn for Stack",
   "proj.save_current":          "Sauvegarder le projet courant",
   "proj.save_name_ph":          "Nom du projet…",
   "proj.save_btn":              "💾 Sauvegarder",
   "proj.saved_title":           "Projets sauvegardés",
-  "proj.file_title":            "Fichier .stackforge (portable)",
+  "proj.file_title":            "Fichier .cairnforstack (portable)",
   "proj.export_btn":            "📤 Exporter le projet actuel",
-  "proj.import_btn":            "📥 Importer un .stackforge",
-  "proj.file_hint":             "Le fichier .stackforge contient tout votre exercice (questions, variables, PRTs). Il peut être partagé entre ordinateurs.",
-  "proj.msg_storage_full":      "❌ Espace localStorage insuffisant. Exportez un projet en .stackforge pour libérer de la place.",
+  "proj.import_btn":            "📥 Importer un .cairnforstack",
+  "proj.file_hint":             "Le fichier .cairnforstack contient tout votre exercice (questions, variables, PRTs). Il peut être partagé entre ordinateurs.",
+  "proj.msg_storage_full":      "❌ Espace localStorage insuffisant. Exportez un projet en .cairnforstack pour libérer de la place.",
   "proj.msg_name_required":     "❌ Donnez un nom à ce projet.",
   "proj.msg_saved":             "💾 Projet « {name} » sauvegardé.",
   "proj.msg_not_found":         "❌ Projet introuvable.",
@@ -3726,7 +3726,7 @@ I18N.add("fr", {
   "proj.msg_deleted":           "🗑️ Projet supprimé.",
   "proj.rename_prompt":         "Nouveau nom :",
   "proj.msg_exported":          "💾 Exporté : {name}",
-  "proj.msg_import_invalid":    "Format .stackforge invalide.",
+  "proj.msg_import_invalid":    "Format .cairnforstack invalide.",
   "proj.confirm_import":        "Importer « {name} » ? Le travail non sauvegardé sera perdu.",
   "proj.msg_imported":          "✅ Projet importé : {name}",
   "proj.msg_import_error":      "❌ Erreur import : {msg}",
@@ -4258,22 +4258,22 @@ I18N.add("fr", {
   "modal.pb_bloom_synthese":         "Synthèse",
   "modal.pb_bloom_evaluation":       "Évaluation",
 
-  "copy.intro":                      "<strong>Stackforge</strong> est un outil open-source conçu pour faciliter la création de questions STACK pour la plateforme Moodle.",
+  "copy.intro":                      "<strong>Cairn for Stack</strong> est un outil open-source conçu pour faciliter la création de questions STACK pour la plateforme Moodle.",
   "copy.auteur":                     "<strong>Auteur :</strong> Benoit Joly — 2026",
   "copy.licence_titre":              "📄 Licence d'utilisation",
-  "copy.licence_body":               "Distribué sous licence <strong>GNU AGPLv3</strong>. Utilisation, modification et redistribution libres, y compris à titre commercial.<br>Si vous exploitez une version modifiée sur un serveur accessible à des utilisateurs, l'AGPL vous oblige à leur fournir le code source correspondant.<br>Code source et texte complet de la licence : <a href=\"https://github.com/BenoitJOLY/stackforge\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/stackforge</a>.",
+  "copy.licence_body":               "Distribué sous licence <strong>GNU AGPLv3</strong>. Utilisation, modification et redistribution libres, y compris à titre commercial.<br>Si vous exploitez une version modifiée sur un serveur accessible à des utilisateurs, l'AGPL vous oblige à leur fournir le code source correspondant.<br>Code source et texte complet de la licence : <a href=\"https://github.com/BenoitJOLY/cairn-for-stack\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/BenoitJOLY/cairn-for-stack</a>.",
   "copy.rgpd_titre":                 "🔒 RGPD & Données personnelles",
-  "copy.rgpd_body":                  "Utilisé <strong>en local dans votre navigateur</strong>, cet outil n'envoie aucune donnée à un serveur.<br>Sur la <strong>version hébergée</strong> (accès par compte), sont traités : votre identifiant et un hachage non réversible de votre mot de passe, un cookie de session strictement nécessaire à la connexion (aucun cookie de suivi ni publicitaire), et l'horodatage de vos générations pour appliquer le quota hebdomadaire.<br><strong>Finalité :</strong> gérer l'accès au service et prévenir les abus. <strong>Durée de conservation :</strong> tant que le compte existe.<br><strong>Responsable de traitement :</strong> {responsable} — c'est l'organisme ou la personne qui héberge et administre cette instance, pas l'auteur du logiciel StackForge.<br><strong>Vos droits</strong> (accès, rectification, effacement) : par e-mail auprès du responsable ci-dessus, ou directement ci-dessous si vous êtes connecté·e. Vous pouvez aussi déposer une réclamation auprès de {autorite}.",
+  "copy.rgpd_body":                  "Utilisé <strong>en local dans votre navigateur</strong>, cet outil n'envoie aucune donnée à un serveur.<br>Sur la <strong>version hébergée</strong> (accès par compte), sont traités : votre identifiant et un hachage non réversible de votre mot de passe, un cookie de session strictement nécessaire à la connexion (aucun cookie de suivi ni publicitaire), et l'horodatage de vos générations pour appliquer le quota hebdomadaire.<br><strong>Finalité :</strong> gérer l'accès au service et prévenir les abus. <strong>Durée de conservation :</strong> tant que le compte existe.<br><strong>Responsable de traitement :</strong> {responsable} — c'est l'organisme ou la personne qui héberge et administre cette instance, pas l'auteur du logiciel Cairn for Stack.<br><strong>Vos droits</strong> (accès, rectification, effacement) : par e-mail auprès du responsable ci-dessus, ou directement ci-dessous si vous êtes connecté·e. Vous pouvez aussi déposer une réclamation auprès de {autorite}.",
   "copy.rgpd_responsable_fallback":  "l'administrateur de cette instance (voir la page de contact du serveur)",
   "copy.rgpd_autorite_fallback":     "votre autorité nationale de protection des données (en France : la <a href=\"https://www.cnil.fr\" target=\"_blank\" rel=\"noopener\">CNIL</a>)",
   "copy.compte_titre":               "👤 Vos droits sur votre compte",
   "copy.compte_body":                "Si vous êtes connecté·e sur la version hébergée, vous pouvez vous déconnecter ou supprimer définitivement votre compte et toutes les données associées (identifiant, mot de passe, historique d'usage).",
-  "copy.footer_note":                "Les questions générées appartiennent à leurs auteurs. Stackforge n'est qu'un outil de mise en forme.",
+  "copy.footer_note":                "Les questions générées appartiennent à leurs auteurs. Cairn for Stack n'est qu'un outil de mise en forme.",
 
   "contact.bug_titre":               "🐛 Signaler un bug",
   "contact.bug_body":                "Pour tout dysfonctionnement, merci de préciser : le type de question, le navigateur utilisé, et les étapes pour reproduire le problème.",
   "contact.sugg_titre":              "Suggestions & améliorations",
-  "contact.sugg_body":               "Toute idée pour enrichir Stackforge est la bienvenue. N'hésitez pas à écrire !",
+  "contact.sugg_body":               "Toute idée pour enrichir Cairn for Stack est la bienvenue. N'hésitez pas à écrire !",
 
   "modal.pb_question_ex_ph":         "Ex : Parmi les propositions suivantes, laquelle est vraie concernant les lois de Newton ?",
   "modal.pb_libre_ph":               "ou saisir librement…",
