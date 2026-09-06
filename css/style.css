@@ -1398,7 +1398,8 @@ html[data-theme="dark"] .sv-tbl-del-col,html[data-theme="dark"] .sv-tbl-del-row{
 html[data-theme="dark"] .sp-empty{color:#fcd34d;opacity:.6;}
 
 /* ── JSXGRAPH ASSISTANT ───────────────────────────────────────── */
-#jsxgraphModal{z-index:1150;}
+/* Doit rester au-dessus des éditeurs qui peuvent l'ouvrir (richModal:9500, linkModal:9600, latexModal:9700) */
+#jsxgraphModal{z-index:9800;}
 .jxg-modal-box{width:min(720px,96vw);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25);margin:auto;}
 html[data-theme="dark"] .jxg-modal-box{background:#1e293b;}
 .jxg-info{font-size:.8rem;color:var(--slate);background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:8px 12px;margin:0;}
@@ -1450,6 +1451,8 @@ html[data-theme="dark"] .geo3d-shape-btn{background:#1e293b;border-color:#334155
 html[data-theme="dark"] .geo3d-shape-btn.geo3d-sel{background:#7c3aed;color:#fff;}
 
 /* ── GEO2D MODAL ──────────────────────────────────────────────── */
+/* Doit rester au-dessus des éditeurs qui peuvent l'ouvrir (richModal:9500, linkModal:9600, latexModal:9700) */
+#geo2dModal,#geo3dModal{z-index:9800;}
 .geo2d-modal-box{width:min(820px,96vw);max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:18px 20px;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25);margin:auto;}
 html[data-theme="dark"] .geo2d-modal-box{background:#1e293b;}
 .geo2d-shape-grid{display:flex;flex-wrap:wrap;gap:6px;}
