@@ -768,6 +768,189 @@ const HELP_CONTENT = {
         'Les trois sous-questions (q, p, hétérozygotes) sont toujours présentes, sans étape désactivable : le scénario n\'a de sens pédagogique qu\'avec les trois réponses.',
         'Un piège classique est diagnostiqué automatiquement sur la sous-question des hétérozygotes : si l\'élève répond avec la fréquence des individus au phénotype <b>dominant</b> (1−q²) au lieu de la fréquence des <b>hétérozygotes</b> seuls (2pq), un feedback ciblé le lui signale.'
       ])) + _HELP_COMMON
+  },
+
+  // ───────────────────────────────────────── CROISEMENTS MONO/DIHYBRIDISME (SVT)
+  croisements: {
+    title: '<svg class="hs-ico"><use href="#ico-type-croisements"></use></svg> Croisements — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>À partir d\'un croisement portant sur <b>deux gènes indépendants</b> — un gène <b>autosomal</b> classique et un gène <b>lié au chromosome X</b> — l\'élève calcule la probabilité du phénotype récessif pour chaque gène séparément, puis la probabilité combinée (les deux gènes étant indépendants, les probabilités se multiplient).</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Espèce</b> : habille l\'énoncé (ex. « la drosophile »).',
+        '<b>Gène autosomal</b> : caractère, lettre de l\'allèle dominant, et noms des phénotypes dominant/récessif (ex. « la forme des ailes », V, « ailes normales », « ailes vestigiales »).',
+        '<b>Gène lié au chromosome X</b> : mêmes réglages pour le second gène (ex. « la couleur des yeux », W, « yeux normaux », « yeux blancs »).',
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour « Hardy-Weinberg », les deux types de croisement par gène sont tirés par un tirage aléatoire natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Les trois sous-questions (probabilité autosomale, probabilité liée à l\'X, probabilité totale) sont toujours présentes, sans étape désactivable.',
+        'Un piège classique est diagnostiqué automatiquement sur la sous-question du gène lié à l\'X : si l\'élève multiplie naïvement P(mâle)=1/2 par le ratio autosomal 1/4 au lieu de relire l\'échiquier de croisement du gène lié à l\'X (le sexe et le phénotype ne sont pas indépendants pour un gène lié à l\'X), un feedback ciblé le lui signale.'
+      ])) + _HELP_COMMON
+  },
+
+  distancegenetique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-distancegenetique"></use></svg> Distance génétique — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>À partir des effectifs phénotypiques observés sur la descendance d\'un test-cross entre deux gènes liés, l\'élève calcule d\'abord le <b>taux de recombinaison</b> (rapport effectifs recombinants / effectif total), puis la <b>distance génétique</b> correspondante en centiMorgans (cM).</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Effectifs totaux possibles</b> : liste de nombres entiers séparés par des virgules, l\'un d\'eux est tiré au hasard à chaque tentative.',
+        '<b>Pourcentages de recombinaison possibles</b> : liste de nombres séparés par des virgules, l\'un d\'eux est tiré au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour « Hardy-Weinberg » et « Croisements », l\'effectif total et le taux de recombinaison sont tirés par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Les deux sous-questions (taux de recombinaison, distance en cM) sont toujours présentes, sans étape désactivable.',
+        'Un piège classique est diagnostiqué automatiquement sur la sous-question de distance : si l\'élève redonne le taux de recombinaison sans le multiplier par 100 (oubli de conversion en cM), un feedback ciblé le signale.'
+      ])) + _HELP_COMMON
+  },
+
+  horlogemoleculaire: {
+    title: '<svg class="hs-ico"><use href="#ico-type-horlogemoleculaire"></use></svg> Horloge moléculaire — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>À partir du nombre de nucléotides différents entre une séquence homologue comparée chez deux espèces et du taux de mutation neutre estimé pour ce gène, l\'élève établit d\'abord l\'<b>expression littérale</b> de la date de divergence <i>T</i>, puis calcule sa <b>valeur numérique</b>.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Longueurs de séquence possibles</b> : liste de nombres entiers séparés par des virgules, l\'une d\'elles est tirée au hasard à chaque tentative.',
+        '<b>Taux de mutation possibles</b> : liste de nombres séparés par des virgules, l\'un d\'eux est tiré au hasard à chaque tentative.',
+        '<b>Pourcentages de divergence possibles</b> : liste de nombres séparés par des virgules, l\'un d\'eux est tiré au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, toutes les grandeurs (longueur, taux, nombre de différences) sont tirées par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Les deux sous-questions (formule littérale, valeur numérique de T) sont toujours présentes, sans étape désactivable.',
+        'Un piège classique est diagnostiqué automatiquement sur les deux sous-questions : si l\'élève oublie le facteur 2 (les mutations s\'accumulent indépendamment dans les deux lignées depuis la divergence), un feedback ciblé le lui signale, aussi bien sur la formule que sur la valeur numérique.'
+      ])) + _HELP_COMMON
+  },
+  radiochronologie: {
+    title: '<svg class="hs-ico"><use href="#ico-type-radiochronologie"></use></svg> Radiochronologie — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>À partir de la proportion restante <i>Nfrac</i> de l\'isotope radioactif parent dans un échantillon de roche et de la constante de désintégration de cet isotope, l\'élève établit d\'abord l\'<b>expression littérale</b> de l\'âge <i>T</i> de la roche, puis calcule sa <b>valeur numérique</b>.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Proportions Nfrac possibles</b> : liste de fractions (syntaxe Maxima, ex : 1/2) séparées par des virgules, l\'une d\'elles est tirée au hasard à chaque tentative.',
+        '<b>Coefficients lam_a possibles</b> : liste de nombres entiers séparés par des virgules, l\'un d\'eux est tiré au hasard à chaque tentative.',
+        '<b>Exposants lam_b possibles</b> : liste de nombres entiers séparés par des virgules, l\'un d\'eux est tiré au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, toutes les grandeurs (Nfrac, lam_a, lam_b) sont tirées par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Les deux sous-questions (formule littérale, valeur numérique de T) sont toujours présentes, sans étape désactivable.',
+        'Un piège classique est diagnostiqué automatiquement sur les deux sous-questions : si l\'élève oublie le signe moins devant le logarithme (Nfrac < 1, donc ln(Nfrac) est négatif), un feedback ciblé le lui signale, aussi bien sur la formule que sur la valeur numérique.'
+      ])) + _HELP_COMMON
+  },
+  ondesismique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-ondesismique"></use></svg> Ondes sismiques — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>À partir d\'une distance épicentrale <i>d</i> et des vitesses de propagation des ondes P et S (<i>v_P</i>, <i>v_S</i>), l\'élève calcule le <b>délai</b> Δt entre l\'arrivée de l\'onde P et celle de l\'onde S à une station sismique.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Distances épicentrales d possibles</b> : liste de nombres séparés par des virgules, l\'une d\'elles est tirée au hasard à chaque tentative.',
+        '<b>Vitesses d\'onde P possibles</b> : liste de nombres séparés par des virgules, l\'une d\'elles est tirée au hasard à chaque tentative.',
+        '<b>Vitesses d\'onde S possibles</b> : liste de nombres séparés par des virgules, l\'une d\'elles est tirée au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, toutes les grandeurs (d, v_P, v_S) sont tirées par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Contrairement aux autres types SVT de ce générateur, il n\'y a qu\'une seule sous-question (pas de split formule littérale / valeur numérique).',
+        'Un piège classique est diagnostiqué automatiquement : si l\'élève inverse l\'ordre de la soustraction (d/v_P - d/v_S au lieu de d/v_S - d/v_P), un feedback ciblé lui rappelle que l\'onde P arrive toujours en premier car elle est plus rapide.'
+      ])) + _HELP_COMMON
+  },
+
+  malthus: {
+    title: '<svg class="hs-ico"><use href="#ico-type-malthus"></use></svg> Malthus — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>À partir d\'une population initiale <i>N₀</i>, d\'un facteur multiplicatif par période <i>q</i> et d\'une durée <i>t</i> (nombre de périodes écoulées), l\'élève calcule la <b>population finale</b> selon le modèle de croissance exponentielle \\( N_t = N_0 \\times q^t \\).</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Populations initiales N₀ possibles</b> : liste de nombres entiers séparés par des virgules, l\'une d\'elles est tirée au hasard à chaque tentative.',
+        '<b>Facteurs multiplicatifs q possibles</b> : liste de nombres séparés par des virgules, l\'un d\'eux est tiré au hasard à chaque tentative.',
+        '<b>Durées t possibles</b> : liste de nombres entiers séparés par des virgules, l\'une d\'elles est tirée au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, toutes les grandeurs (N₀, q, t) sont tirées par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Comme pour les ondes sismiques, il n\'y a qu\'une seule sous-question (pas de split formule littérale / valeur numérique).',
+        'Contrairement à l\'énoncé traditionnel (« la population double/triple toutes les heures »), la formulation générée reste générique (« multiplié par q ») afin que le facteur q reste réellement configurable au-delà de 2 ou 3.',
+        'Un piège classique est diagnostiqué automatiquement : si l\'élève utilise t-1 périodes au lieu de t (erreur d\'une période), un feedback ciblé le lui signale.'
+      ])) + _HELP_COMMON
+  },
+  regle10: {
+    title: '<svg class="hs-ico"><use href="#ico-type-regle10"></use></svg> Règle du 10% — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>À partir d\'une biomasse initiale <i>B₀</i> (niveau trophique 1), l\'élève applique la <b>règle du 10%</b> (\\( B_n = B_0 \\times 0.1^n \\), avec <i>n</i> le nombre de transferts entre niveaux trophiques) pour a) calculer la biomasse atteinte à un niveau trophique donné, puis b) déterminer le nombre maximal de niveaux trophiques supplémentaires que peut supporter un besoin alimentaire donné.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Biomasses initiales b0 possibles</b> : liste de nombres séparés par des virgules, l\'une d\'elles est tirée au hasard à chaque tentative.',
+        '<b>Niveaux trophiques possibles (question a)</b> : liste de nombres entiers séparés par des virgules, l\'un d\'eux est tiré au hasard à chaque tentative.',
+        '<b>Exposants k et facteurs m possibles (question b)</b> : déterminent le besoin alimentaire testé \\( B_{besoin} = B_0 \\times m / 10^k \\) ; une valeur de chaque liste est tirée au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, toutes les grandeurs (b0, n, k, m) sont tirées par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Contrairement aux autres types SVT (radiochronologie, horloge moléculaire, ondes sismiques, Malthus), ce type ne diagnostique PAS de piège classique par cascade de nœuds PRT : chaque sous-question (a et b) reste un unique nœud, l\'élève reçoit un feedback correct/incorrect direct sans diagnostic pédagogique ciblé — ce choix reproduit fidèlement la structure du gabarit hand-XML de référence.',
+        'La question b) se résout par un logarithme : \\( n_{max} = \\lfloor \\log(B_{besoin}/B_0)/\\log(0.1) \\rfloor \\) — le résultat est arrondi par défaut (floor).'
+      ])) + _HELP_COMMON
+  },
+  chi2: {
+    title: '<svg class="hs-ico"><use href="#ico-type-chi2"></use></svg> Test du χ² — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>Test d\'adéquation du χ² (Khi-carré) en écologie : l\'élève compare les effectifs <b>observés</b> de 4 espèces à leurs effectifs <b>théoriques</b> (répartition attendue 40% / 30% / 20% / 10%) pour calculer la statistique \\( \\chi^2 = \\sum \\dfrac{(O-T)^2}{T} \\).</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Effectifs totaux possibles</b> : liste de nombres séparés par des virgules (nombre d\'individus échantillonnés), l\'un d\'eux est tiré au hasard à chaque tentative.',
+        '<b>Écarts possibles (espèces A/B)</b> et <b>Écarts possibles (espèces C/D)</b> : déterminent l\'écart entre effectif observé et effectif théorique pour chaque paire d\'espèces ; une valeur de chaque liste est tirée au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, toutes les grandeurs (effectif total, écarts) sont tirées par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Une seule sous-question (calcul du χ²), avec un diagnostic PRT en cascade (2 nœuds) qui détecte l\'erreur classique consistant à diviser par l\'effectif <b>observé</b> O au lieu de l\'effectif <b>théorique</b> T dans chaque terme de la somme.',
+        'La répartition théorique (40%/30%/20%/10% sur les 4 espèces) est fixe — invariant du scénario pédagogique — seuls l\'effectif total et les écarts observés-théoriques sont configurables.'
+      ])) + _HELP_COMMON
+  },
+  debit: {
+    title: '<svg class="hs-ico"><use href="#ico-type-debit"></use></svg> Débit cardiaque — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>Calcul du débit cardiaque \\( Q = FC \\times VES \\) (fréquence cardiaque × volume d\'éjection systolique), avec conversion d\'unité obligatoire du volume d\'éjection systolique (donné en mL) vers des litres par minute pour le résultat.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Fréquences cardiaques possibles</b> et <b>Volumes d\'éjection systolique possibles (mL)</b> : listes de nombres séparés par des virgules ; une valeur de chaque liste est tirée au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, FC et VES sont tirés par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Une seule sous-question, avec un diagnostic PRT en cascade (2 nœuds) qui détecte l\'erreur classique consistant à oublier la conversion mL → L (résultat 1000 fois trop grand) : contrairement aux autres types SVT, ce nœud diagnostic accorde un <b>crédit partiel de 0,5</b> plutôt qu\'un score de 0, car l\'erreur de calcul elle-même est correcte, seule l\'unité est fautive.'
+      ])) + _HELP_COMMON
+  },
+  nernst: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nernst"></use></svg> Potentiel de Nernst — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>Calcul du potentiel de repos d\'un neurone via l\'équation de Nernst simplifiée pour l\'ion potassium K<sup>+</sup> : \\( E_K = 60 \\times \\log_{10}\\!\\left(\\dfrac{[K^+]_{ext}}{[K^+]_{int}}\\right) \\) (en mV), à partir des concentrations extra- et intracellulaires.</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Concentrations extracellulaires possibles</b> et <b>Concentrations intracellulaires possibles</b> : listes de nombres séparés par des virgules ; une valeur de chaque liste est tirée au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, les concentrations sont tirées par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Une seule sous-question, avec un diagnostic PRT en cascade (2 nœuds) qui détecte l\'erreur classique consistant à inverser les concentrations extra- et intracellulaires dans le rapport (le potentiel obtenu devient positif au lieu de négatif).',
+        'Le potassium étant bien plus concentré à l\'intérieur de la cellule, un potentiel de repos correctement calculé est toujours négatif — c\'est l\'invariant physiologique que le diagnostic met en évidence.'
+      ])) + _HELP_COMMON
+  },
+  dilutions: {
+    title: '<svg class="hs-ico"><use href="#ico-type-dilutions"></use></svg> Dilutions en série — Aide',
+    body:
+      _hSection('À quoi ça sert',
+        '<p>Titrage en immunologie : calcul du facteur de dilution du sérum dans le tube n°<i>n</i> d\'une série de dilutions successives au 1/10 (chaque tube reçoit un dixième de la concentration du précédent), soit \\( 1/10^n \\).</p>') +
+      _hSection('Comment remplir', _hList([
+        '<b>Énoncé / consigne</b> : texte optionnel ajouté avant la question générée.',
+        '<b>Numéros de tube possibles</b> : liste de nombres entiers séparés par des virgules ; un est tiré au hasard à chaque tentative.'
+      ])) +
+      _hSection('Astuces / pièges', _hList([
+        'Comme pour les autres types SVT, le numéro de tube est tiré par un tirage natif Maxima (pas un tirage JS avant export) : l\'aperçu simulé ne peut pas afficher de valeur numérique tant que l\'aperçu réel (bouton 👁️) n\'a pas été demandé — c\'est normal.',
+        'Une seule sous-question, avec un diagnostic PRT en cascade (2 nœuds) qui détecte l\'erreur classique consistant à <b>additionner</b> les facteurs de dilution (\\( 1/(10n) \\)) au lieu de les <b>multiplier</b> (\\( 1/10^n \\)).'
+      ])) + _HELP_COMMON
   }
 };
 

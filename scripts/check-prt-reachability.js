@@ -27,7 +27,7 @@ const path = require('path');
 
 const { computePrtReachability, isPrtFeedbackReachable, findDanglingNodeRefs } = require(path.join('..', 'js', 'prt-reachability.js'));
 const { buildPrtXml } = require(path.join('..', 'js', 'prt-manager.js'));
-const { applyFbBox, inferFbKind } = require(path.join('..', 'js', 'fb-box.js'));
+const { applyFbBox, inferFbKind, stripLeadingFbIcon } = require(path.join('..', 'js', 'fb-box.js'));
 const { _mkFbGen, _mkInput } = require(path.join('..', 'js', 'gen-math-shared.js'));
 const { wrapFb, algPrtNodeCanonical } = require(path.join('..', 'js', 'generators.js'));
 const { buildKbdStackHTML } = require(path.join('..', 'js', 'keyboard.js'));
@@ -38,6 +38,24 @@ const { _incStepDefs } = require(path.join('..', 'js', 'gen-incertitude-steps.js
 const { _incStudentFactor, _incStudentConfidence, _incStudentDf } = require(path.join('..', 'js', 'gen-incertitude-student.js'));
 const { _zsVars } = require(path.join('..', 'js', 'gen-zscore-calc.js'));
 const { _hwVars } = require(path.join('..', 'js', 'gen-hardyweinberg-calc.js'));
+const { _crVars } = require(path.join('..', 'js', 'gen-croisements-calc.js'));
+const { _dgVars } = require(path.join('..', 'js', 'gen-distancegenetique-calc.js'));
+const { _hmVars } = require(path.join('..', 'js', 'gen-horlogemoleculaire-calc.js'));
+const { _rcVars } = require(path.join('..', 'js', 'gen-radiochronologie-calc.js'));
+const { _sisVars } = require(path.join('..', 'js', 'gen-ondesismique-calc.js'));
+const { _sisSeismogramJSX, _sisComputeGraphBounds } = require(path.join('..', 'js', 'gen-ondesismique-jsx.js'));
+const { _malVars } = require(path.join('..', 'js', 'gen-malthus-calc.js'));
+const { _regVars } = require(path.join('..', 'js', 'gen-regle10-calc.js'));
+const { _chiVars } = require(path.join('..', 'js', 'gen-chi2-calc.js'));
+const { _debVars } = require(path.join('..', 'js', 'gen-debit-calc.js'));
+const { _nstVars } = require(path.join('..', 'js', 'gen-nernst-calc.js'));
+const { _dilVars } = require(path.join('..', 'js', 'gen-dilutions-calc.js'));
+const { _fltVars } = require(path.join('..', 'js', 'gen-ieee754-calc.js'));
+const { _cpaVars } = require(path.join('..', 'js', 'gen-complexite-calc.js'));
+const { _arbVars } = require(path.join('..', 'js', 'gen-arbrebinaire-calc.js'));
+const { _bpuVars } = require(path.join('..', 'js', 'gen-bilanpuissance-calc.js'));
+const { _thvVars } = require(path.join('..', 'js', 'gen-thevenin-calc.js'));
+const { _pmoVars } = require(path.join('..', 'js', 'gen-premierordre-calc.js'));
 
 const I18N_STUB = { t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key };
 
@@ -69,6 +87,25 @@ global._incStudentConfidence = _incStudentConfidence;
 global._incStudentDf = _incStudentDf;
 global._zsVars = _zsVars;
 global._hwVars = _hwVars;
+global._crVars = _crVars;
+global._dgVars = _dgVars;
+global._hmVars = _hmVars;
+global._rcVars = _rcVars;
+global._sisVars = _sisVars;
+global._sisSeismogramJSX = _sisSeismogramJSX;
+global._sisComputeGraphBounds = _sisComputeGraphBounds;
+global._malVars = _malVars;
+global._regVars = _regVars;
+global._chiVars = _chiVars;
+global._debVars = _debVars;
+global._nstVars = _nstVars;
+global._dilVars = _dilVars;
+global._fltVars = _fltVars;
+global._cpaVars = _cpaVars;
+global._arbVars = _arbVars;
+global._bpuVars = _bpuVars;
+global._thvVars = _thvVars;
+global._pmoVars = _pmoVars;
 
 const BASE_DEPS = { I18N: I18N_STUB, buildPrtXml: buildPrtXml, applyFbBox: applyFbBox, _mkFbGen: _mkFbGen, _mkInput: _mkInput };
 
@@ -78,7 +115,8 @@ const BASE_DEPS = { I18N: I18N_STUB, buildPrtXml: buildPrtXml, applyFbBox: apply
 const RICH_DEPS = Object.assign({}, BASE_DEPS, {
     wrapFb: wrapFb, algPrtNodeCanonical: algPrtNodeCanonical, inferFbKind: inferFbKind,
     buildKbdStackHTML: buildKbdStackHTML, htmlEsc: htmlEsc, rawEsc: rawEsc,
-    escapeMaximaString: escapeMaximaString, jxgDropChunkedJsString: jxgDropChunkedJsString
+    escapeMaximaString: escapeMaximaString, jxgDropChunkedJsString: jxgDropChunkedJsString,
+    stripLeadingFbIcon: stripLeadingFbIcon
 });
 
 function baseGeoParams(scenario, dimSel) {
@@ -137,7 +175,7 @@ const TARGETS = [
         }))
     },
     {
-        label: 'Nucléaire', module: '../js/gen-nuclear.js', coreFn: 'genNuclearCore', deps: BASE_DEPS,
+        label: 'Nucléaire', module: '../js/gen-nuclear.js', coreFn: 'genNuclearCore', deps: RICH_DEPS,
         scenarios: [{ label: 'default', params: { bareme: 1, text: '<p>Complétez la réaction.</p>', rawEq: '{}^{14}_{6}C -> {}^{14}_{7}N + \\beta-', fbGenRaw: '' } }]
     },
     {
@@ -452,6 +490,205 @@ const TARGETS = [
                 bareme: 3,
                 context: { espece: 'souris', phenoDom: 'pelage gris', phenoRec: 'pelage blanc', intro: '' },
                 grandeurs: { qList: '1/10,2/10,3/10,4/10,6/10,7/10,8/10,9/10' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Croisements mono/dihybridisme', module: '../js/gen-croisements.js', coreFn: 'genCroisementsCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 3,
+                context: { espece: 'la drosophile (Drosophila melanogaster)', autoTrait: 'la forme des ailes', sexTrait: 'la couleur des yeux', intro: '' },
+                grandeurs: {
+                    autoDomName: 'ailes normales', autoDomLetter: 'V', autoRecName: 'ailes vestigiales',
+                    sexDomName: 'yeux normaux', sexDomLetter: 'W', sexRecName: 'yeux blancs'
+                },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Distance génétique (test-cross)', module: '../js/gen-distancegenetique.js', coreFn: 'genDistanceGenetiqueCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 2,
+                context: { intro: '' },
+                grandeurs: { nList: '1000,2000', rpctList: '4,6,8,10,12,14,16,18,20,22,24' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Horloge moléculaire (phylogénie)', module: '../js/gen-horlogemoleculaire.js', coreFn: 'genHorlogeMoleculaireCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 2,
+                context: { intro: '' },
+                grandeurs: { seqList: '1000,2000,5000', tauxList: '1,2,4,5,8', dpctList: '1,2,3,4,5,6,8,10' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Radiochronologie (datation absolue)', module: '../js/gen-radiochronologie.js', coreFn: 'genRadiochronologieCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 2,
+                context: { intro: '' },
+                grandeurs: { fracList: '1/2,1/4,1/8,1/16,3/5,7/10,4/5', lamaList: '1,2,5,8', lambList: '4,5,6' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Ondes sismiques (délai P/S + vitesse-onde)', module: '../js/gen-ondesismique.js', coreFn: 'genOndeSismiqueCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'delai-ps', params: {
+                bareme: 1,
+                scenario: 'delai-ps',
+                context: { intro: '' },
+                grandeurs: { dList: '80,120,150,200,240,300', vpList: '6,7,8', vsList: '3,7/2,4,9/2' },
+                fbGen: ''
+            }
+        }, {
+            label: 'vitesse-onde', params: {
+                bareme: 2,
+                scenario: 'vitesse-onde',
+                context: { intro: '' },
+                grandeurs: { dList2: '210,340,411,480,560,620,710', arrList: '40,60,80,100,120,140,160,180' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Malthus (croissance exponentielle)', module: '../js/gen-malthus.js', coreFn: 'genMalthusCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { n0List: '200,500,1000,2000', qList: '2,3', tList: '10,12,15,18,20' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Règle du 10% (pyramides de biomasse)', module: '../js/gen-regle10.js', coreFn: 'genRegle10Core', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 2,
+                context: { intro: '' },
+                grandeurs: { b0List: '5000,10000,20000,50000', nPartAList: '2,3,4', kList: '1,2,3', mList: '1/5,3/10,2/5,1/2,3/5,7/10,4/5,9/10,1' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Test du χ² (Khi-carré) en écologie', module: '../js/gen-chi2.js', coreFn: 'genChi2Core', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { nList: '100,200', dList: '2,4,6,8', eList: '1,2,3' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Débit cardiaque (conversion mL vers L)', module: '../js/gen-debit.js', coreFn: 'genDebitCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { fcList: '60,65,70,72,75,80', vesList: '60,65,70,75,80,90' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Potentiel de repos (équation de Nernst)', module: '../js/gen-nernst.js', coreFn: 'genNernstCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { kextList: '3,4,5,6', kintList: '120,130,140,150,155' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Titrage et dilutions en série', module: '../js/gen-dilutions.js', coreFn: 'genDilutionsCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { ntubeList: '2,3,4,5,6' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Norme IEEE 754 (mantisse binaire)', module: '../js/gen-ieee754.js', coreFn: 'genIeee754Core', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { xList: '1/10,3/10,1/5,7/10,9/10,3/5', nBits: '8' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Complexité algorithmique (dichotomie)', module: '../js/gen-complexite.js', coreFn: 'genComplexiteCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { nList: '8,16,32,64,128,256,512,1024' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Dénombrement sur les arbres binaires', module: '../js/gen-arbrebinaire.js', coreFn: 'genArbrebinaireCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { hList: '2,3,4,5,6' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Bilan de puissance et rendement global', module: '../js/gen-bilanpuissance.js', coreFn: 'genBilanpuissanceCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { mList: '500,600,800,1000,1200', vList: '1,3/2,2,5/2,3', etaRedList: '9/10,17/20,4/5,7/8', etaMotList: '9/10,17/20,4/5,7/8' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Kirchhoff / Thévenin (résistance équivalente, courant)', module: '../js/gen-thevenin.js', coreFn: 'genTheveninCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { eList: '6,9,12,15,24', r1List: '10,20,30,40,100', r2List: '10,20,30,40,100', r3List: '10,20,50,100' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Système du premier ordre (erreur statique)', module: '../js/gen-premierordre.js', coreFn: 'genPremierordreCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { kList: '2,3,4,5,3/2,5/2', e0List: '1,2,5,10' },
                 fbGen: ''
             }
         }]

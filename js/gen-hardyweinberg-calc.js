@@ -17,12 +17,12 @@
  */
 
 // ── GÉNÉRATEUR "Hardy-Weinberg" (SVT, génétique des populations) — helper Maxima pur ──
-// PREMIER type de l'app à tirer la valeur aléatoire côté Maxima (random() natif dans
+// PREMIER type de l'app à tirer la valeur aléatoire côté Maxima (rand() natif dans
 // questionvariables), et non côté JS avant export : le prof configure une LISTE de
 // fréquences possibles pour l'allèle récessif q, Maxima tire dedans à chaque tentative/
 // élève — une seule question STACK couvre alors toutes les variantes (cf. décision
 // utilisateur, voir svt-01-hardy-weinberg.xml, gabarit hand-XML déjà validé sur Moodle).
-// L'export générique (js/app.js) détecte déjà tout seul le motif random(...) dans les
+// L'export générique (js/app.js) détecte déjà tout seul le motif rand(...) dans les
 // variables combinées et déploie les seeds nécessaires (generateDeployedSeeds /
 // insertDeployedSeeds) : aucune brique supplémentaire à ajouter ici.
 // Noms de variables au format q${X}_nom (convention partagée par TOUS les types de
@@ -36,7 +36,7 @@ function _hwVars(X, p) {
   if (raw.length < 2) throw new Error('Hardy-Weinberg : indiquez au moins deux valeurs possibles pour q (fréquence de l’allèle récessif), séparées par des virgules.');
   return `/* Q${X} Hardy-Weinberg - équilibre génétique (tirage natif Maxima) */
 q${X}_hwlistq: [${raw.join(',')}]$
-q${X}_hwq: q${X}_hwlistq[1+random(length(q${X}_hwlistq))]$
+q${X}_hwq: rand(q${X}_hwlistq)$
 q${X}_hwq2: q${X}_hwq^2$
 q${X}_hwq2pct: q${X}_hwq2*100$
 q${X}_hwp: 1-q${X}_hwq$

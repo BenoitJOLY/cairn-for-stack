@@ -747,6 +747,188 @@ const HELP_CONTENT = {
         'De drie subvragen (q, p, heterozygoten) zijn altijd aanwezig, geen enkele stap is uitschakelbaar: het scenario heeft pedagogisch alleen zin met alle drie de antwoorden.',
         'Een klassieke fout wordt automatisch gediagnosticeerd bij de subvraag over heterozygoten: als de leerling antwoordt met de frequentie van individuen met <b>dominant</b> fenotype (1−q²) in plaats van de frequentie van <b>heterozygoten</b> alleen (2pq), wijst een gerichte feedback hierop.'
       ])) + _HELP_COMMON
+  },
+
+  croisements: {
+    title: '<svg class="hs-ico"><use href="#ico-type-croisements"></use></svg> Kruisingen — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Bij een kruising met <b>twee onafhankelijke genen</b> — een klassiek <b>autosomaal</b> gen en een <b>X-gebonden</b> gen — berekent de leerling de kans op het recessieve fenotype voor elk gen apart, en vervolgens de gecombineerde kans (aangezien de twee genen onafhankelijk zijn, worden de kansen vermenigvuldigd).</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Soort</b>: kleedt de opgave aan (bv. "de fruitvlieg").',
+        '<b>Autosomaal gen</b>: kenmerk, letter van het dominante allel, en namen van het dominante/recessieve fenotype (bv. "de vorm van de vleugels", V, "normale vleugels", "vestigiale vleugels").',
+        '<b>X-gebonden gen</b>: dezelfde instellingen voor het tweede gen (bv. "de oogkleur", W, "normale ogen", "witte ogen").',
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij "Hardy-Weinberg" worden de twee kruisingstypen per gen getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'De drie subvragen (autosomale kans, X-gebonden kans, totale kans) zijn altijd aanwezig, geen enkele stap is uitschakelbaar.',
+        'Een klassieke fout wordt automatisch gediagnosticeerd bij de subvraag over het X-gebonden gen: als de leerling naïef P(man)=1/2 vermenigvuldigt met de autosomale verhouding 1/4 in plaats van rechtstreeks het kruisingsschema van het X-gebonden gen af te lezen (geslacht en fenotype zijn niet onafhankelijk voor een X-gebonden gen), wijst een gerichte feedback hierop.'
+      ])) + _HELP_COMMON
+  },
+
+  distancegenetique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-distancegenetique"></use></svg> Genetische afstand — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Op basis van de fenotype-aantallen die zijn waargenomen bij de nakomelingen van een test-cross tussen twee gekoppelde genen, berekent de leerling eerst het <b>recombinatiepercentage</b> (recombinant aantal / totaal aantal), en vervolgens de bijbehorende <b>genetische afstand</b> in centiMorgan (cM).</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke totale aantallen nakomelingen</b>: door komma\'s gescheiden lijst van gehele getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke recombinatiepercentages</b>: door komma\'s gescheiden lijst van getallen; bij elke poging wordt er willekeurig één getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij "Hardy-Weinberg" en "Kruisingen" worden het totale aantal nakomelingen en het recombinatiepercentage getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'Beide subvragen (recombinatiepercentage, afstand in cM) zijn altijd aanwezig, geen enkele stap is uitschakelbaar.',
+        'Een klassieke fout wordt automatisch gediagnosticeerd bij de subvraag over de afstand: als de leerling het recombinatiepercentage teruggeeft zonder het met 100 te vermenigvuldigen (vergeten om te rekenen naar cM), wijst een gerichte feedback hierop.'
+      ])) + _HELP_COMMON
+  },
+
+  horlogemoleculaire: {
+    title: '<svg class="hs-ico"><use href="#ico-type-horlogemoleculaire"></use></svg> Moleculaire klok — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Op basis van het aantal verschillende nucleotiden tussen een homologe sequentie die tussen twee soorten wordt vergeleken en de geschatte neutrale mutatiesnelheid van dat gen, stelt de leerling eerst de <b>letterlijke uitdrukking</b> van de divergentiedatum <i>T</i> op, en berekent vervolgens de <b>numerieke waarde</b> ervan.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke sequentielengtes</b>: door komma\'s gescheiden lijst van gehele getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke mutatiesnelheden</b>: door komma\'s gescheiden lijst van getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke divergentiepercentages</b>: door komma\'s gescheiden lijst van getallen; bij elke poging wordt er willekeurig één getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types worden alle grootheden (lengte, snelheid, aantal verschillen) getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'Beide subvragen (letterlijke formule, numerieke waarde van T) zijn altijd aanwezig, geen enkele stap is uitschakelbaar.',
+        'Een klassieke fout wordt automatisch gediagnosticeerd bij beide subvragen: als de leerling de factor 2 vergeet (de mutaties accumuleren onafhankelijk in de twee lijnen sinds de divergentie), wijst een gerichte feedback hierop, zowel bij de formule als bij de numerieke waarde.'
+      ])) + _HELP_COMMON
+  },
+  radiochronologie: {
+    title: '<svg class="hs-ico"><use href="#ico-type-radiochronologie"></use></svg> Radiochronologie — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Op basis van de resterende fractie <i>Nfrac</i> van het radioactieve moederisotoop in een gesteentemonster en de vervalconstante van dat isotoop, stelt de leerling eerst de <b>letterlijke uitdrukking</b> van de ouderdom <i>T</i> van het gesteente op, en berekent vervolgens de <b>numerieke waarde</b> ervan.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke Nfrac-waarden</b>: door komma\'s gescheiden lijst van breuken (Maxima-syntax, bv. 1/2); bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke coëfficiënten lam_a</b>: door komma\'s gescheiden lijst van gehele getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke exponenten lam_b</b>: door komma\'s gescheiden lijst van gehele getallen; bij elke poging wordt er willekeurig één getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types worden alle grootheden (Nfrac, lam_a, lam_b) getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'Beide subvragen (letterlijke formule, numerieke waarde van T) zijn altijd aanwezig, geen enkele stap is uitschakelbaar.',
+        'Een klassieke fout wordt automatisch gediagnosticeerd bij beide subvragen: als de leerling het minteken vóór de natuurlijke logaritme vergeet (Nfrac < 1, dus ln(Nfrac) is negatief), wijst een gerichte feedback hierop, zowel bij de formule als bij de numerieke waarde.'
+      ])) + _HELP_COMMON
+  },
+  ondesismique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-ondesismique"></use></svg> Seismische golven — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Op basis van een epicentrale afstand <i>d</i> en de voortplantingssnelheden van de P- en S-golven (<i>v_P</i>, <i>v_S</i>) berekent de leerling de <b>vertraging</b> Δt tussen de aankomst van de P-golf en de aankomst van de S-golf bij een seismisch station.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke epicentrale afstanden d</b>: door komma\'s gescheiden lijst van getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke P-golfsnelheden</b>: door komma\'s gescheiden lijst van getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke S-golfsnelheden</b>: door komma\'s gescheiden lijst van getallen; bij elke poging wordt er willekeurig één getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types worden alle grootheden (d, v_P, v_S) getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'In tegenstelling tot de andere SVT-types van deze generator is er slechts één subvraag (geen opsplitsing letterlijke formule / numerieke waarde).',
+        'Een klassieke fout wordt automatisch gediagnosticeerd: als de leerling de volgorde van de aftrekking omdraait (d/v_P - d/v_S in plaats van d/v_S - d/v_P), wijst een gerichte feedback erop dat de P-golf altijd het eerst aankomt omdat hij sneller is.'
+      ])) + _HELP_COMMON
+  },
+
+  malthus: {
+    title: '<svg class="hs-ico"><use href="#ico-type-malthus"></use></svg> Malthus — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Op basis van een beginpopulatie <i>N₀</i>, een vermenigvuldigingsfactor per periode <i>q</i> en een duur <i>t</i> (aantal verstreken periodes) berekent de leerling de <b>eindpopulatie</b> volgens het exponentiële groeimodel \\( N_t = N_0 \\times q^t \\).</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke beginpopulaties N₀</b>: door komma\'s gescheiden lijst van gehele getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke vermenigvuldigingsfactoren q</b>: door komma\'s gescheiden lijst van getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke duren t</b>: door komma\'s gescheiden lijst van gehele getallen; bij elke poging wordt er willekeurig één getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types worden alle grootheden (N₀, q, t) getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'Net als bij seismische golven is er slechts één subvraag (geen opsplitsing letterlijke formule / numerieke waarde).',
+        'In tegenstelling tot de traditionele formulering ("de populatie verdubbelt/verdrievoudigt elk uur") blijft de gegenereerde tekst generiek ("vermenigvuldigd met q"), zodat de factor q ook buiten 2 of 3 echt configureerbaar blijft.',
+        'Een klassieke fout wordt automatisch gediagnosticeerd: als de leerling t-1 periodes gebruikt in plaats van t (een fout van één periode), wijst een gerichte feedback hierop.'
+      ])) + _HELP_COMMON
+  },
+  regle10: {
+    title: '<svg class="hs-ico"><use href="#ico-type-regle10"></use></svg> 10%-regel — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Op basis van een beginbiomassa <i>B₀</i> (trofisch niveau 1) past de leerling de <b>10%-regel</b> toe (\\( B_n = B_0 \\times 0.1^n \\), waarbij <i>n</i> het aantal overgangen tussen trofische niveaus is) om a) de biomassa op een bepaald trofisch niveau te berekenen en vervolgens b) het maximale aantal extra trofische niveaus te bepalen dat een gegeven voedselbehoefte kan ondersteunen.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke beginbiomassa\'s b0</b>: door komma\'s gescheiden lijst van getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke trofische niveaus (vraag a)</b>: door komma\'s gescheiden lijst van gehele getallen; bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke exponenten k en factoren m (vraag b)</b>: bepalen de geteste voedselbehoefte \\( B_{nodig} = B_0 \\times m / 10^k \\); bij elke poging wordt uit elke lijst willekeurig één waarde getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types worden alle grootheden (b0, n, k, m) getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'In tegenstelling tot de andere SVT-types (radiochronologie, moleculaire klok, seismische golven, Malthus) wordt bij dit type GEEN klassieke fout gediagnosticeerd via een PRT-knooppuntcascade: elke subvraag (a en b) blijft één enkel knooppunt, de leerling krijgt directe correct/incorrect-feedback zonder gerichte pedagogische diagnose — dit geeft de structuur van de handgeschreven referentie-XML-sjabloon getrouw weer.',
+        'Vraag b) wordt opgelost met een logaritme: \\( n_{max} = \\lfloor \\log(B_{nodig}/B_0)/\\log(0.1) \\rfloor \\) — het resultaat wordt standaard naar beneden afgerond (floor).'
+      ])) + _HELP_COMMON
+  },
+  chi2: {
+    title: '<svg class="hs-ico"><use href="#ico-type-chi2"></use></svg> χ²-toets — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>χ²-goodness-of-fit-toets (Chi-kwadraat) in de ecologie: de leerling vergelijkt de <b>waargenomen</b> aantallen van 4 soorten met hun <b>theoretische</b> aantallen (verwachte verdeling 40% / 30% / 20% / 10%) om de statistiek \\( \\chi^2 = \\sum \\dfrac{(O-T)^2}{T} \\) te berekenen.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke totale steekproefgroottes</b>: door komma\'s gescheiden lijst van getallen (aantal bemonsterde individuen); bij elke poging wordt er willekeurig één getrokken.',
+        '<b>Mogelijke afwijkingen (soorten A/B)</b> en <b>Mogelijke afwijkingen (soorten C/D)</b>: bepalen het verschil tussen waargenomen en theoretisch aantal voor elk soortenpaar; bij elke poging wordt uit elke lijst willekeurig één waarde getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types worden alle grootheden (totale steekproefgrootte, afwijkingen) getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'Eén enkele subvraag (χ²-berekening), met een PRT-diagnosecascade van 2 knooppunten die de klassieke fout opspoort om in elke term van de som door het <b>waargenomen</b> aantal O te delen in plaats van door het <b>theoretische</b> aantal T.',
+        'De theoretische verdeling (40%/30%/20%/10% over de 4 soorten) ligt vast — een pedagogische scenario-invariant — alleen de totale steekproefgrootte en de waargenomen-theoretische afwijkingen zijn configureerbaar.'
+      ])) + _HELP_COMMON
+  },
+  debit: {
+    title: '<svg class="hs-ico"><use href="#ico-type-debit"></use></svg> Hartminuutvolume — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Berekening van het hartminuutvolume \\( Q = HF \\times SV \\) (hartfrequentie × slagvolume), met een verplichte eenheidsomrekening van het slagvolume (gegeven in mL) naar liter per minuut voor het resultaat.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke hartfrequenties</b> en <b>Mogelijke slagvolumes (mL)</b>: door komma\'s gescheiden lijsten van getallen; bij elke poging wordt uit elke lijst willekeurig één waarde getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types worden HF en SV getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'Eén enkele subvraag, met een PRT-diagnosecascade van 2 knooppunten die de klassieke fout opspoort om de omrekening mL → L te vergeten (resultaat 1000 keer te groot): in tegenstelling tot de andere SVT-types kent dit diagnoseknooppunt <b>gedeeltelijke score van 0,5</b> toe in plaats van een score van 0, aangezien de berekening zelf correct is — alleen de eenheid is fout.'
+      ])) + _HELP_COMMON
+  },
+  nernst: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nernst"></use></svg> Nernst-potentiaal — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Berekent het rustpotentiaal van een neuron met de vereenvoudigde Nernst-vergelijking voor het kaliumion K<sup>+</sup>: \\( E_K = 60 \\times \\log_{10}\\!\\left(\\dfrac{[K^+]_{ext}}{[K^+]_{int}}\\right) \\) (in mV), op basis van de extra- en intracellulaire concentraties.</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke extracellulaire concentraties</b> en <b>Mogelijke intracellulaire concentraties</b>: door komma\'s gescheiden lijsten van getallen; bij elke poging wordt uit elke lijst willekeurig één waarde getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types worden de concentraties getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'Eén enkele subvraag, met een PRT-diagnosecascade van 2 knooppunten die de klassieke fout opspoort om de extra- en intracellulaire concentraties in de verhouding om te wisselen (het resulterende potentiaal wordt positief in plaats van negatief).',
+        'Aangezien kalium veel geconcentreerder is binnen de cel, is een correct berekend rustpotentiaal altijd negatief — dit is de fysiologische invariant die de diagnose benadrukt.'
+      ])) + _HELP_COMMON
+  },
+  dilutions: {
+    title: '<svg class="hs-ico"><use href="#ico-type-dilutions"></use></svg> Verdunningsreeks — Hulp',
+    body:
+      _hSection('Waarvoor dient dit?',
+        '<p>Titratie in de immunologie: berekent de verdunningsfactor van een serum in buisje n°<i>n</i> van een reeks opeenvolgende 1/10-verdunningen (elk buisje ontvangt een tiende van de concentratie van het vorige buisje), dat is \\( 1/10^n \\).</p>') +
+      _hSection('Hoe in te vullen', _hList([
+        '<b>Opgave / instructie</b>: optionele tekst die vóór de gegenereerde vraag wordt toegevoegd.',
+        '<b>Mogelijke buisnummers</b>: door komma\'s gescheiden lijst van gehele getallen; bij elke poging wordt er willekeurig één getrokken.'
+      ])) +
+      _hSection('Tips / valkuilen', _hList([
+        'Net als bij de andere SVT-types wordt het buisnummer getrokken met een native Maxima-trekking (geen JS-trekking vóór export): het gesimuleerde voorbeeld kan geen numerieke waarde tonen totdat het echte voorbeeld (knop 👁️) is opgevraagd — dit is normaal.',
+        'Eén enkele subvraag, met een PRT-diagnosecascade van 2 knooppunten die de klassieke fout opspoort om de verdunningsfactoren <b>op te tellen</b> (\\( 1/(10n) \\)) in plaats van ze te <b>vermenigvuldigen</b> (\\( 1/10^n \\)).'
+      ])) + _HELP_COMMON
   }
 };
 

@@ -62,7 +62,7 @@ function assertBalancedTags(xml, label) {
 test("_hwVars : émet le tirage natif Maxima et les grandeurs dérivées à partir de la liste q", () => {
     const q = genHardyWeinbergCore(1, baseParams(), DEPS);
     assert.match(q.vars, /q1_hwlistq: \[1\/10,2\/10,3\/10,4\/10,6\/10,7\/10,8\/10,9\/10\]\$/);
-    assert.match(q.vars, /q1_hwq: q1_hwlistq\[1\+random\(length\(q1_hwlistq\)\)\]\$/);
+    assert.match(q.vars, /q1_hwq: rand\(q1_hwlistq\)\$/);
     assert.match(q.vars, /q1_hwq2: q1_hwq\^2\$/);
     assert.match(q.vars, /q1_hwq2pct: q1_hwq2\*100\$/);
     assert.match(q.vars, /q1_hwp: 1-q1_hwq\$/);

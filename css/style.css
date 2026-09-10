@@ -3171,7 +3171,24 @@ html[data-theme="dark"] .hs-preview-panel {
 #q-config-modal:has(#fp-zscore[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-avancement[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-cinematique[style*="display: block"]) .q-config-modal-box,
-#q-config-modal:has(#fp-hardyweinberg[style*="display: block"]) .q-config-modal-box {
+#q-config-modal:has(#fp-hardyweinberg[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-croisements[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-distancegenetique[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-horlogemoleculaire[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-radiochronologie[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-ondesismique[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-malthus[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-regle10[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-chi2[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-debit[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-nernst[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-dilutions[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-ieee754[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-complexite[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-arbrebinaire[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-bilanpuissance[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-thevenin[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-premierordre[style*="display: block"]) .q-config-modal-box {
   width: min(1200px, 96vw);
 }
 @media (max-width: 1000px) {
@@ -3186,7 +3203,7 @@ html[data-theme="dark"] .hs-preview-panel {
   #fp-rvbcmj[style*="display: block"], #fp-imgclick[style*="display: block"], #fp-jxgdrop[style*="display: block"], #fp-ord[style*="display: block"],
   #fp-chemical[style*="display: block"], #fp-chemical_topo[style*="display: block"], #fp-nuclear[style*="display: block"], #fp-composition[style*="display: block"],
   #fp-crossword[style*="display: block"], #fp-doi[style*="display: block"], #fp-image-mesure[style*="display: block"], #fp-apn[style*="display: block"],
-  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"], #fp-avancement[style*="display: block"], #fp-cinematique[style*="display: block"], #fp-hardyweinberg[style*="display: block"] { display: block !important; }
+  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"], #fp-avancement[style*="display: block"], #fp-cinematique[style*="display: block"], #fp-hardyweinberg[style*="display: block"], #fp-croisements[style*="display: block"], #fp-distancegenetique[style*="display: block"], #fp-horlogemoleculaire[style*="display: block"], #fp-radiochronologie[style*="display: block"], #fp-ondesismique[style*="display: block"], #fp-malthus[style*="display: block"], #fp-regle10[style*="display: block"], #fp-chi2[style*="display: block"], #fp-debit[style*="display: block"], #fp-nernst[style*="display: block"], #fp-dilutions[style*="display: block"], #fp-ieee754[style*="display: block"], #fp-complexite[style*="display: block"], #fp-arbrebinaire[style*="display: block"], #fp-bilanpuissance[style*="display: block"], #fp-thevenin[style*="display: block"], #fp-premierordre[style*="display: block"] { display: block !important; }
   .hs-split-row { display: block; }
   .hs-split-left, .hs-preview-panel { max-width: none; }
   .hs-preview-panel { margin-top: 15px; border-top: 1px dashed #ccc; }

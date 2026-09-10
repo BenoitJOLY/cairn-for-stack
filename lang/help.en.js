@@ -739,6 +739,188 @@ const HELP_CONTENT = {
         'All three sub-questions (q, p, heterozygotes) are always present, with no toggleable step: the scenario only makes pedagogical sense with all three answers.',
         'A classic mistake is automatically diagnosed on the heterozygote sub-question: if the student answers with the frequency of <b>dominant</b>-phenotype individuals (1−q²) instead of the <b>heterozygotes</b> alone (2pq), a targeted feedback points it out.'
       ])) + _HELP_COMMON
+  },
+
+  croisements: {
+    title: '<svg class="hs-ico"><use href="#ico-type-croisements"></use></svg> Crosses — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Given a cross involving <b>two independent genes</b> — a classic <b>autosomal</b> gene and an <b>X-linked</b> gene — the student computes the probability of the recessive phenotype for each gene separately, then the combined probability (since the two genes are independent, the probabilities multiply).</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Species</b>: dresses up the statement (e.g. "the fruit fly").',
+        '<b>Autosomal gene</b>: trait, dominant allele letter, and dominant/recessive phenotype names (e.g. "wing shape", V, "normal wings", "vestigial wings").',
+        '<b>X-linked gene</b>: same settings for the second gene (e.g. "eye colour", W, "normal eyes", "white eyes").',
+        '<b>Statement / instructions</b>: optional text added before the generated question.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with "Hardy-Weinberg", the two cross types per gene are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'All three sub-questions (autosomal probability, X-linked probability, total probability) are always present, with no toggleable step.',
+        'A classic mistake is automatically diagnosed on the X-linked sub-question: if the student naively multiplies P(male)=1/2 by the autosomal ratio 1/4 instead of reading the X-linked cross grid directly (sex and phenotype are not independent for an X-linked gene), a targeted feedback points it out.'
+      ])) + _HELP_COMMON
+  },
+
+  distancegenetique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-distancegenetique"></use></svg> Genetic distance — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Given the phenotype counts observed in the offspring of a test-cross between two linked genes, the student first computes the <b>recombination rate</b> (recombinant count / total count), then the corresponding <b>genetic distance</b> in centiMorgans (cM).</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible total offspring counts</b>: comma-separated list of whole numbers; one is drawn at random on every attempt.',
+        '<b>Possible recombination percentages</b>: comma-separated list of numbers; one is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with "Hardy-Weinberg" and "Crosses", the total offspring count and the recombination rate are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'Both sub-questions (recombination rate, distance in cM) are always present, with no toggleable step.',
+        'A classic mistake is automatically diagnosed on the distance sub-question: if the student gives back the recombination rate without multiplying by 100 (forgetting the cM conversion), a targeted feedback points it out.'
+      ])) + _HELP_COMMON
+  },
+
+  horlogemoleculaire: {
+    title: '<svg class="hs-ico"><use href="#ico-type-horlogemoleculaire"></use></svg> Molecular clock — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Given the number of different nucleotides between a homologous sequence compared across two species and the estimated neutral mutation rate for that gene, the student first establishes the <b>literal expression</b> of the divergence date <i>T</i>, then computes its <b>numerical value</b>.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible sequence lengths</b>: comma-separated list of whole numbers; one is drawn at random on every attempt.',
+        '<b>Possible mutation rates</b>: comma-separated list of numbers; one is drawn at random on every attempt.',
+        '<b>Possible divergence percentages</b>: comma-separated list of numbers; one is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, all quantities (length, rate, number of differences) are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'Both sub-questions (literal formula, numerical value of T) are always present, with no toggleable step.',
+        'A classic mistake is automatically diagnosed on both sub-questions: if the student forgets the factor 2 (mutations accumulate independently in both lineages since divergence), a targeted feedback points it out, both on the formula and on the numerical value.'
+      ])) + _HELP_COMMON
+  },
+  radiochronologie: {
+    title: '<svg class="hs-ico"><use href="#ico-type-radiochronologie"></use></svg> Radiochronology — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Given the remaining proportion <i>Nfrac</i> of the parent radioactive isotope in a rock sample and that isotope\'s decay constant, the student first establishes the <b>literal expression</b> of the rock\'s age <i>T</i>, then computes its <b>numerical value</b>.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible Nfrac proportions</b>: comma-separated list of fractions (Maxima syntax, e.g. 1/2); one is drawn at random on every attempt.',
+        '<b>Possible lam_a coefficients</b>: comma-separated list of whole numbers; one is drawn at random on every attempt.',
+        '<b>Possible lam_b exponents</b>: comma-separated list of whole numbers; one is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, all quantities (Nfrac, lam_a, lam_b) are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'Both sub-questions (literal formula, numerical value of T) are always present, with no toggleable step.',
+        'A classic mistake is automatically diagnosed on both sub-questions: if the student forgets the minus sign in front of the natural logarithm (Nfrac < 1, so ln(Nfrac) is negative), a targeted feedback points it out, both on the formula and on the numerical value.'
+      ])) + _HELP_COMMON
+  },
+  ondesismique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-ondesismique"></use></svg> Seismic waves — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Given an epicentral distance <i>d</i> and the propagation speeds of the P and S waves (<i>v_P</i>, <i>v_S</i>), the student computes the <b>delay</b> Δt between the arrival of the P wave and the arrival of the S wave at a seismic station.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible epicentral distances d</b>: comma-separated list of numbers; one is drawn at random on every attempt.',
+        '<b>Possible P-wave speeds</b>: comma-separated list of numbers; one is drawn at random on every attempt.',
+        '<b>Possible S-wave speeds</b>: comma-separated list of numbers; one is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, all quantities (d, v_P, v_S) are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'Unlike the other SVT types in this generator, there is only a single sub-question (no literal-formula / numerical-value split).',
+        'A classic mistake is automatically diagnosed: if the student reverses the order of the subtraction (d/v_P - d/v_S instead of d/v_S - d/v_P), a targeted feedback reminds them that the P wave always arrives first because it is faster.'
+      ])) + _HELP_COMMON
+  },
+
+  malthus: {
+    title: '<svg class="hs-ico"><use href="#ico-type-malthus"></use></svg> Malthus — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Given an initial population <i>N₀</i>, a per-period multiplicative factor <i>q</i> and a duration <i>t</i> (number of elapsed periods), the student computes the <b>final population</b> using the exponential growth model \\( N_t = N_0 \\times q^t \\).</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible initial populations N₀</b>: comma-separated list of integers; one is drawn at random on every attempt.',
+        '<b>Possible multiplicative factors q</b>: comma-separated list of numbers; one is drawn at random on every attempt.',
+        '<b>Possible durations t</b>: comma-separated list of integers; one is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, all quantities (N₀, q, t) are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'Like seismic waves, there is only a single sub-question (no literal-formula / numerical-value split).',
+        'Unlike the traditional wording ("the population doubles/triples every hour"), the generated statement stays generic ("multiplied by q") so the q factor remains genuinely configurable beyond 2 or 3.',
+        'A classic mistake is automatically diagnosed: if the student uses t-1 periods instead of t (an off-by-one error), a targeted feedback points it out.'
+      ])) + _HELP_COMMON
+  },
+  regle10: {
+    title: '<svg class="hs-ico"><use href="#ico-type-regle10"></use></svg> Rule of 10% — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Given an initial biomass <i>B₀</i> (trophic level 1), the student applies the <b>rule of 10%</b> (\\( B_n = B_0 \\times 0.1^n \\), where <i>n</i> is the number of transfers between trophic levels) to a) compute the biomass reached at a given trophic level, then b) determine the maximum number of additional trophic levels a given food requirement can support.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible initial biomasses b0</b>: comma-separated list of numbers; one is drawn at random on every attempt.',
+        '<b>Possible trophic levels (question a)</b>: comma-separated list of integers; one is drawn at random on every attempt.',
+        '<b>Possible exponents k and factors m (question b)</b>: determine the tested food requirement \\( B_{need} = B_0 \\times m / 10^k \\); one value from each list is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, all quantities (b0, n, k, m) are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'Unlike the other SVT types (radiochronology, molecular clock, seismic waves, Malthus), this type does NOT diagnose a classic mistake via a PRT node cascade: each sub-question (a and b) stays a single node, giving the student direct correct/incorrect feedback without a targeted pedagogical diagnosis — this faithfully reproduces the structure of the reference hand-written XML template.',
+        'Question b) is solved using a logarithm: \\( n_{max} = \\lfloor \\log(B_{need}/B_0)/\\log(0.1) \\rfloor \\) — the result is rounded down (floor) by default.'
+      ])) + _HELP_COMMON
+  },
+  chi2: {
+    title: '<svg class="hs-ico"><use href="#ico-type-chi2"></use></svg> Chi-squared test — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Chi-squared (χ²) goodness-of-fit test in ecology: the student compares the <b>observed</b> counts of 4 species to their <b>theoretical</b> counts (expected distribution 40% / 30% / 20% / 10%) to compute the statistic \\( \\chi^2 = \\sum \\dfrac{(O-T)^2}{T} \\).</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible total sample sizes</b>: comma-separated list of numbers (number of sampled individuals); one is drawn at random on every attempt.',
+        '<b>Possible deviations (species A/B)</b> and <b>Possible deviations (species C/D)</b>: determine the gap between observed and theoretical counts for each species pair; one value from each list is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, all quantities (total sample size, deviations) are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'A single sub-question (χ² computation), with a 2-node PRT diagnostic cascade that catches the classic mistake of dividing by the <b>observed</b> count O instead of the <b>theoretical</b> count T in each term of the sum.',
+        'The theoretical distribution (40%/30%/20%/10% across the 4 species) is fixed — a pedagogical scenario invariant — only the total sample size and the observed-theoretical deviations are configurable.'
+      ])) + _HELP_COMMON
+  },
+  debit: {
+    title: '<svg class="hs-ico"><use href="#ico-type-debit"></use></svg> Cardiac output — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Cardiac output calculation \\( Q = HR \\times SV \\) (heart rate × stroke volume), with a mandatory unit conversion of the stroke volume (given in mL) to liters per minute for the result.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible heart rates</b> and <b>Possible stroke volumes (mL)</b>: comma-separated lists of numbers; one value from each list is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, HR and SV are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'A single sub-question, with a 2-node PRT diagnostic cascade that catches the classic mistake of forgetting the mL → L conversion (result 1000 times too large): unlike the other SVT types, this diagnostic node grants <b>partial credit of 0.5</b> rather than a score of 0, since the calculation itself is correct — only the unit is wrong.'
+      ])) + _HELP_COMMON
+  },
+  nernst: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nernst"></use></svg> Nernst potential — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Computes a neuron\'s resting potential using the simplified Nernst equation for the potassium ion K<sup>+</sup>: \\( E_K = 60 \\times \\log_{10}\\!\\left(\\dfrac{[K^+]_{ext}}{[K^+]_{int}}\\right) \\) (in mV), from the extra- and intracellular concentrations.</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible extracellular concentrations</b> and <b>Possible intracellular concentrations</b>: comma-separated lists of numbers; one value from each list is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, the concentrations are drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'A single sub-question, with a 2-node PRT diagnostic cascade that catches the classic mistake of swapping the extra- and intracellular concentrations in the ratio (the resulting potential becomes positive instead of negative).',
+        'Since potassium is far more concentrated inside the cell, a correctly computed resting potential is always negative — this is the physiological invariant the diagnostic highlights.'
+      ])) + _HELP_COMMON
+  },
+  dilutions: {
+    title: '<svg class="hs-ico"><use href="#ico-type-dilutions"></use></svg> Serial dilutions — Help',
+    body:
+      _hSection('What it is for',
+        '<p>Immunology titration: computes the dilution factor of a serum in tube n°<i>n</i> of a series of successive 1/10 dilutions (each tube receives a tenth of the previous tube\'s concentration), i.e. \\( 1/10^n \\).</p>') +
+      _hSection('How to fill', _hList([
+        '<b>Statement / instructions</b>: optional text added before the generated question.',
+        '<b>Possible tube numbers</b>: comma-separated list of whole numbers; one is drawn at random on every attempt.'
+      ])) +
+      _hSection('Tips / pitfalls', _hList([
+        'As with the other SVT types, the tube number is drawn by a native Maxima random draw (not a JS draw before export): the simulated preview cannot show a numeric value until the real preview (👁️ button) is requested — this is expected.',
+        'A single sub-question, with a 2-node PRT diagnostic cascade that catches the classic mistake of <b>adding</b> the dilution factors (\\( 1/(10n) \\)) instead of <b>multiplying</b> them (\\( 1/10^n \\)).'
+      ])) + _HELP_COMMON
   }
 };
 

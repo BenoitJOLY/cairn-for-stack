@@ -1,7 +1,7 @@
-Audit PRT — 2026-08-09T07:38:39.038Z
+Audit PRT — 2026-09-10T06:28:12.328Z
 0 référence(s) de nœud orpheline(s) détectée(s) (import Moodle cassé)
 1 branche(s) morte(s)/inatteignable(s) détectée(s)
-60 branche(s) non terminale(s) avec feedback mort détectée(s), 14 scénario(s) en erreur
+60 branche(s) non terminale(s) avec feedback mort détectée(s)
 
 === Références de nœud orphelines (truenextnode/falsenextnode sans nœud <name> correspondant) ===
 
@@ -9,24 +9,10 @@ Audit PRT — 2026-08-09T07:38:39.038Z
 
 === Branches inatteignables (test dupliqué par un ancêtre) ===
 
-[ERREUR] Nucléaire / default : génération impossible (escapeMaximaString is not defined)
 [Nombres complexes / forme-alg] nœud 2, branche true inatteignable
   test dupliqué : AlgEquiv(ans1X, qX_ta)
   feedback concerné : tpl.cpx_fbdef_formealg_ok2_def
 
-[ERREUR] Numérique / default : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / libre : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / libre (avec erreur classique) : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / developpement : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / developpement (avec erreur classique) : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / factorisation : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / factorisation (avec erreur classique) : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / fraction : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / fraction (avec erreur classique) : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / expert : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Algébrique / expert (avec erreur classique) : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Chaîne de caractères / default : génération impossible (stripLeadingFbIcon is not defined)
-[ERREUR] Chaîne de caractères / levenshtein : génération impossible (stripLeadingFbIcon is not defined)
 === Branches non terminales avec feedback (jamais affiché) ===
 
 [Acide-Base / tangentes] nœud 0, branche false non terminale (→ nœud 2) mais porte un feedback (jamais affiché à l'élève)

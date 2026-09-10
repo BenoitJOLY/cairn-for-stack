@@ -747,6 +747,188 @@ const HELP_CONTENT = {
         'Alle drei Teilfragen (q, p, Heterozygote) sind immer vorhanden, kein Schritt ist abschaltbar: das Szenario ergibt pädagogisch nur mit allen drei Antworten Sinn.',
         'Ein klassischer Fehler wird bei der Heterozygoten-Teilfrage automatisch erkannt: Antwortet der Schüler mit der Häufigkeit der Individuen mit <b>dominantem</b> Phänotyp (1−q²) statt mit der Häufigkeit der <b>Heterozygoten</b> allein (2pq), weist ein gezieltes Feedback darauf hin.'
       ])) + _HELP_COMMON
+  },
+
+  croisements: {
+    title: '<svg class="hs-ico"><use href="#ico-type-croisements"></use></svg> Kreuzungen — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Bei einer Kreuzung mit <b>zwei unabhängigen Genen</b> — einem klassischen <b>autosomalen</b> Gen und einem <b>X-gekoppelten</b> Gen — berechnet der Schüler die Wahrscheinlichkeit des rezessiven Phänotyps für jedes Gen einzeln, dann die kombinierte Wahrscheinlichkeit (da beide Gene unabhängig sind, werden die Wahrscheinlichkeiten multipliziert).</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Art</b>: gestaltet die Aufgabenstellung (z. B. „die Fruchtfliege").',
+        '<b>Autosomales Gen</b>: Merkmal, Buchstabe des dominanten Allels sowie Namen des dominanten/rezessiven Phänotyps (z. B. „die Flügelform", V, „normale Flügel", „verkümmerte Flügel").',
+        '<b>X-gekoppeltes Gen</b>: gleiche Einstellungen für das zweite Gen (z. B. „die Augenfarbe", W, „normale Augen", „weiße Augen").',
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei „Hardy-Weinberg" werden die beiden Kreuzungstypen pro Gen durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Alle drei Teilfragen (autosomale Wahrscheinlichkeit, X-gekoppelte Wahrscheinlichkeit, Gesamtwahrscheinlichkeit) sind immer vorhanden, kein Schritt ist abschaltbar.',
+        'Ein klassischer Fehler wird bei der X-gekoppelten Teilfrage automatisch erkannt: Multipliziert der Schüler naiv P(männlich)=1/2 mit dem autosomalen Verhältnis 1/4, statt direkt das Kreuzungsschema des X-gekoppelten Gens abzulesen (Geschlecht und Phänotyp sind bei einem X-gekoppelten Gen nicht unabhängig), weist ein gezieltes Feedback darauf hin.'
+      ])) + _HELP_COMMON
+  },
+
+  distancegenetique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-distancegenetique"></use></svg> Genetischer Abstand — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Anhand der bei den Nachkommen eines Test-Cross zwischen zwei gekoppelten Genen beobachteten Phänotyp-Häufigkeiten berechnet der Schüler zunächst die <b>Rekombinationsrate</b> (rekombinante Häufigkeit / Gesamthäufigkeit), dann den entsprechenden <b>genetischen Abstand</b> in centiMorgan (cM).</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche Gesamtzahlen der Nachkommen</b>: durch Kommas getrennte Liste ganzer Zahlen; bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche Rekombinationsprozentsätze</b>: durch Kommas getrennte Zahlenliste; bei jedem Versuch wird einer zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei „Hardy-Weinberg" und „Kreuzungen" werden die Gesamtzahl der Nachkommen und die Rekombinationsrate durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Beide Teilfragen (Rekombinationsrate, Abstand in cM) sind immer vorhanden, kein Schritt ist abschaltbar.',
+        'Ein klassischer Fehler wird bei der Abstands-Teilfrage automatisch erkannt: Gibt der Schüler die Rekombinationsrate zurück, ohne sie mit 100 zu multiplizieren (vergessene Umrechnung in cM), weist ein gezieltes Feedback darauf hin.'
+      ])) + _HELP_COMMON
+  },
+
+  horlogemoleculaire: {
+    title: '<svg class="hs-ico"><use href="#ico-type-horlogemoleculaire"></use></svg> Molekulare Uhr — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Anhand der Anzahl unterschiedlicher Nukleotide zwischen einer bei zwei Arten verglichenen homologen Sequenz und der geschätzten neutralen Mutationsrate dieses Gens stellt der Schüler zunächst den <b>literalen Ausdruck</b> des Divergenzdatums <i>T</i> auf und berechnet dann dessen <b>Zahlenwert</b>.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche Sequenzlängen</b>: durch Kommas getrennte Liste ganzer Zahlen; bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche Mutationsraten</b>: durch Kommas getrennte Zahlenliste; bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche Divergenzprozentsätze</b>: durch Kommas getrennte Zahlenliste; bei jedem Versuch wird einer zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen werden alle Größen (Länge, Rate, Anzahl der Unterschiede) durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Beide Teilfragen (literale Formel, Zahlenwert von T) sind immer vorhanden, kein Schritt ist abschaltbar.',
+        'Ein klassischer Fehler wird bei beiden Teilfragen automatisch erkannt: Vergisst der Schüler den Faktor 2 (die Mutationen akkumulieren sich unabhängig in beiden Linien seit der Divergenz), weist ein gezieltes Feedback darauf hin, sowohl bei der Formel als auch beim Zahlenwert.'
+      ])) + _HELP_COMMON
+  },
+  radiochronologie: {
+    title: '<svg class="hs-ico"><use href="#ico-type-radiochronologie"></use></svg> Radiochronologie — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Anhand des verbleibenden Anteils <i>Nfrac</i> des radioaktiven Mutterisotops in einer Gesteinsprobe und der Zerfallskonstante dieses Isotops stellt der Schüler zunächst den <b>literalen Ausdruck</b> des Alters <i>T</i> des Gesteins auf und berechnet dann dessen <b>Zahlenwert</b>.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche Nfrac-Werte</b>: durch Kommas getrennte Liste von Brüchen (Maxima-Syntax, z. B. 1/2); bei jedem Versuch wird einer zufällig gezogen.',
+        '<b>Mögliche Koeffizienten lam_a</b>: durch Kommas getrennte Liste ganzer Zahlen; bei jedem Versuch wird einer zufällig gezogen.',
+        '<b>Mögliche Exponenten lam_b</b>: durch Kommas getrennte Liste ganzer Zahlen; bei jedem Versuch wird einer zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen werden alle Größen (Nfrac, lam_a, lam_b) durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Beide Teilfragen (literale Formel, Zahlenwert von T) sind immer vorhanden, kein Schritt ist abschaltbar.',
+        'Ein klassischer Fehler wird bei beiden Teilfragen automatisch erkannt: Vergisst der Schüler das Minuszeichen vor dem natürlichen Logarithmus (Nfrac < 1, also ist ln(Nfrac) negativ), weist ein gezieltes Feedback darauf hin, sowohl bei der Formel als auch beim Zahlenwert.'
+      ])) + _HELP_COMMON
+  },
+  ondesismique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-ondesismique"></use></svg> Seismische Wellen — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Anhand einer epizentralen Entfernung <i>d</i> und der Ausbreitungsgeschwindigkeiten der P- und S-Wellen (<i>v_P</i>, <i>v_S</i>) berechnet der Schüler die <b>Laufzeitdifferenz</b> Δt zwischen der Ankunft der P-Welle und der Ankunft der S-Welle an einer seismischen Station.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche epizentrale Entfernungen d</b>: durch Kommas getrennte Liste von Zahlen; bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche P-Wellen-Geschwindigkeiten</b>: durch Kommas getrennte Liste von Zahlen; bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche S-Wellen-Geschwindigkeiten</b>: durch Kommas getrennte Liste von Zahlen; bei jedem Versuch wird eine zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen werden alle Größen (d, v_P, v_S) durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Anders als bei den übrigen SVT-Typen dieses Generators gibt es nur eine einzige Teilfrage (keine Aufteilung in literale Formel / Zahlenwert).',
+        'Ein klassischer Fehler wird automatisch erkannt: Vertauscht der Schüler die Reihenfolge der Subtraktion (d/v_P - d/v_S statt d/v_S - d/v_P), erinnert ein gezieltes Feedback daran, dass die P-Welle wegen ihrer höheren Geschwindigkeit immer zuerst ankommt.'
+      ])) + _HELP_COMMON
+  },
+
+  malthus: {
+    title: '<svg class="hs-ico"><use href="#ico-type-malthus"></use></svg> Malthus — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Anhand einer Anfangspopulation <i>N₀</i>, eines Vervielfachungsfaktors pro Periode <i>q</i> und einer Dauer <i>t</i> (Anzahl verstrichener Perioden) berechnet der Schüler die <b>Endpopulation</b> nach dem exponentiellen Wachstumsmodell \\( N_t = N_0 \\times q^t \\).</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche Anfangspopulationen N₀</b>: durch Kommas getrennte Liste ganzer Zahlen; bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche Vervielfachungsfaktoren q</b>: durch Kommas getrennte Liste von Zahlen; bei jedem Versuch wird einer zufällig gezogen.',
+        '<b>Mögliche Dauern t</b>: durch Kommas getrennte Liste ganzer Zahlen; bei jedem Versuch wird eine zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen werden alle Größen (N₀, q, t) durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Wie bei den seismischen Wellen gibt es nur eine einzige Teilfrage (keine Aufteilung in literale Formel / Zahlenwert).',
+        'Anders als die traditionelle Formulierung („die Population verdoppelt/verdreifacht sich stündlich“) bleibt der generierte Text allgemein gehalten („mit q multipliziert“), damit der Faktor q auch über 2 oder 3 hinaus wirklich konfigurierbar bleibt.',
+        'Ein klassischer Fehler wird automatisch erkannt: Verwendet der Schüler t-1 Perioden statt t (ein Ein-Perioden-Fehler), weist ein gezieltes Feedback darauf hin.'
+      ])) + _HELP_COMMON
+  },
+  regle10: {
+    title: '<svg class="hs-ico"><use href="#ico-type-regle10"></use></svg> 10%-Regel — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Ausgehend von einer Anfangsbiomasse <i>B₀</i> (trophische Ebene 1) wendet der Schüler die <b>10%-Regel</b> an (\\( B_n = B_0 \\times 0.1^n \\), wobei <i>n</i> die Anzahl der Übergänge zwischen trophischen Ebenen ist), um a) die auf einer bestimmten trophischen Ebene erreichte Biomasse zu berechnen und b) die maximale Anzahl zusätzlicher trophischer Ebenen zu bestimmen, die ein gegebener Nahrungsbedarf unterstützen kann.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche Anfangsbiomassen b0</b>: durch Kommas getrennte Liste von Zahlen; bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche trophische Ebenen (Frage a)</b>: durch Kommas getrennte Liste ganzer Zahlen; bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche Exponenten k und Faktoren m (Frage b)</b>: bestimmen den getesteten Nahrungsbedarf \\( B_{bedarf} = B_0 \\times m / 10^k \\); bei jedem Versuch wird aus jeder Liste ein Wert zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen werden alle Größen (b0, n, k, m) durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Anders als bei den anderen SVT-Typen (Radiochronologie, molekulare Uhr, seismische Wellen, Malthus) wird bei diesem Typ KEIN klassischer Fehler über eine PRT-Knotenkaskade diagnostiziert: jede Teilfrage (a und b) bleibt ein einziger Knoten, der Schüler erhält direktes Richtig/Falsch-Feedback ohne gezielte pädagogische Diagnose — dies gibt die Struktur der handgeschriebenen Referenz-XML-Vorlage originalgetreu wieder.',
+        'Frage b) wird mithilfe eines Logarithmus gelöst: \\( n_{max} = \\lfloor \\log(B_{bedarf}/B_0)/\\log(0.1) \\rfloor \\) — das Ergebnis wird standardmäßig abgerundet (floor).'
+      ])) + _HELP_COMMON
+  },
+  chi2: {
+    title: '<svg class="hs-ico"><use href="#ico-type-chi2"></use></svg> χ²-Test — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>χ²-Anpassungstest (Chi-Quadrat) in der Ökologie: der Schüler vergleicht die <b>beobachteten</b> Anzahlen von 4 Arten mit ihren <b>theoretischen</b> Anzahlen (erwartete Verteilung 40% / 30% / 20% / 10%), um die Statistik \\( \\chi^2 = \\sum \\dfrac{(O-T)^2}{T} \\) zu berechnen.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche Gesamtstichprobengrößen</b>: durch Kommas getrennte Liste von Zahlen (Anzahl der beprobten Individuen); bei jedem Versuch wird eine zufällig gezogen.',
+        '<b>Mögliche Abweichungen (Arten A/B)</b> und <b>Mögliche Abweichungen (Arten C/D)</b>: bestimmen den Unterschied zwischen beobachteter und theoretischer Anzahl für jedes Artenpaar; bei jedem Versuch wird aus jeder Liste ein Wert zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen werden alle Größen (Gesamtstichprobengröße, Abweichungen) durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Eine einzige Teilfrage (χ²-Berechnung) mit einer PRT-Diagnosekaskade aus 2 Knoten, die den klassischen Fehler erkennt, in jedem Summenglied durch die <b>beobachtete</b> Anzahl O statt durch die <b>theoretische</b> Anzahl T zu teilen.',
+        'Die theoretische Verteilung (40%/30%/20%/10% auf die 4 Arten) ist fest vorgegeben — eine pädagogische Szenario-Invariante — nur die Gesamtstichprobengröße und die beobachtet-theoretisch-Abweichungen sind konfigurierbar.'
+      ])) + _HELP_COMMON
+  },
+  debit: {
+    title: '<svg class="hs-ico"><use href="#ico-type-debit"></use></svg> Herzzeitvolumen — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Berechnung des Herzzeitvolumens \\( Q = HF \\times SV \\) (Herzfrequenz × Schlagvolumen), mit einer obligatorischen Einheitenumrechnung des Schlagvolumens (in mL angegeben) in Liter pro Minute für das Ergebnis.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche Herzfrequenzen</b> und <b>Mögliche Schlagvolumina (mL)</b>: durch Kommas getrennte Zahlenlisten; bei jedem Versuch wird aus jeder Liste ein Wert zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen werden HF und SV durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Eine einzige Teilfrage mit einer PRT-Diagnosekaskade aus 2 Knoten, die den klassischen Fehler erkennt, die Umrechnung mL → L zu vergessen (Ergebnis 1000-mal zu groß): anders als bei den anderen SVT-Typen vergibt dieser Diagnoseknoten eine <b>Teilpunktzahl von 0,5</b> statt einer Bewertung von 0, da die Berechnung selbst korrekt ist — nur die Einheit ist falsch.'
+      ])) + _HELP_COMMON
+  },
+  nernst: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nernst"></use></svg> Nernst-Potenzial — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Berechnet das Ruhepotenzial eines Neurons mithilfe der vereinfachten Nernst-Gleichung für das Kaliumion K<sup>+</sup>: \\( E_K = 60 \\times \\log_{10}\\!\\left(\\dfrac{[K^+]_{ext}}{[K^+]_{int}}\\right) \\) (in mV), ausgehend von den extra- und intrazellulären Konzentrationen.</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche extrazelluläre Konzentrationen</b> und <b>Mögliche intrazelluläre Konzentrationen</b>: durch Kommas getrennte Zahlenlisten; bei jedem Versuch wird aus jeder Liste ein Wert zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen werden die Konzentrationen durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Eine einzige Teilfrage mit einer PRT-Diagnosekaskade aus 2 Knoten, die den klassischen Fehler erkennt, die extra- und intrazellulären Konzentrationen im Verhältnis zu vertauschen (das resultierende Potenzial wird positiv statt negativ).',
+        'Da Kalium innerhalb der Zelle weitaus konzentrierter ist, ist ein korrekt berechnetes Ruhepotenzial stets negativ — das ist die physiologische Invariante, die die Diagnose hervorhebt.'
+      ])) + _HELP_COMMON
+  },
+  dilutions: {
+    title: '<svg class="hs-ico"><use href="#ico-type-dilutions"></use></svg> Verdünnungsreihe — Hilfe',
+    body:
+      _hSection('Wofür ist das?',
+        '<p>Titration in der Immunologie: berechnet den Verdünnungsfaktor eines Serums in Röhrchen n°<i>n</i> einer Reihe aufeinanderfolgender 1/10-Verdünnungen (jedes Röhrchen erhält ein Zehntel der Konzentration des vorherigen Röhrchens), also \\( 1/10^n \\).</p>') +
+      _hSection('Wie wird es ausgefüllt?', _hList([
+        '<b>Aufgabenstellung / Anweisung</b>: optionaler Text, der vor der generierten Frage eingefügt wird.',
+        '<b>Mögliche Röhrchennummern</b>: durch Kommas getrennte Liste ganzer Zahlen; bei jedem Versuch wird eine zufällig gezogen.'
+      ])) +
+      _hSection('Tipps / Fallstricke', _hList([
+        'Wie bei den anderen SVT-Typen wird die Röhrchennummer durch einen nativen Maxima-Zufallszug gezogen (kein JS-Zug vor dem Export): die simulierte Vorschau kann keinen Zahlenwert anzeigen, bevor nicht die echte Vorschau (Schaltfläche 👁️) angefordert wurde — das ist normal.',
+        'Eine einzige Teilfrage mit einer PRT-Diagnosekaskade aus 2 Knoten, die den klassischen Fehler erkennt, die Verdünnungsfaktoren zu <b>addieren</b> (\\( 1/(10n) \\)) statt sie zu <b>multiplizieren</b> (\\( 1/10^n \\)).'
+      ])) + _HELP_COMMON
   }
 };
 

@@ -747,6 +747,188 @@ const HELP_CONTENT = {
         'Las tres subpreguntas (q, p, heterocigotos) siempre están presentes, sin ningún paso desactivable: el escenario solo tiene sentido pedagógico con las tres respuestas.',
         'Un error clásico se diagnostica automáticamente en la subpregunta de heterocigotos: si el estudiante responde con la frecuencia de individuos de fenotipo <b>dominante</b> (1−q²) en lugar de la frecuencia de <b>heterocigotos</b> solos (2pq), un feedback específico se lo señala.'
       ])) + _HELP_COMMON
+  },
+
+  croisements: {
+    title: '<svg class="hs-ico"><use href="#ico-type-croisements"></use></svg> Cruces — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>A partir de un cruce con <b>dos genes independientes</b> — un gen <b>autosómico</b> clásico y un gen <b>ligado al cromosoma X</b> — el estudiante calcula la probabilidad del fenotipo recesivo para cada gen por separado, y luego la probabilidad combinada (al ser independientes, las probabilidades se multiplican).</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Especie</b>: viste el enunciado (ej. «la mosca de la fruta»).',
+        '<b>Gen autosómico</b>: carácter, letra del alelo dominante, y nombres de los fenotipos dominante/recesivo (ej. «la forma de las alas», V, «alas normales», «alas vestigiales»).',
+        '<b>Gen ligado al cromosoma X</b>: mismos ajustes para el segundo gen (ej. «el color de los ojos», W, «ojos normales», «ojos blancos»).',
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en «Hardy-Weinberg», los dos tipos de cruce por gen se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Las tres subpreguntas (probabilidad autosómica, probabilidad ligada al X, probabilidad total) siempre están presentes, sin ningún paso desactivable.',
+        'Un error clásico se diagnostica automáticamente en la subpregunta del gen ligado al X: si el estudiante multiplica ingenuamente P(macho)=1/2 por el ratio autosómico 1/4 en lugar de leer directamente el tablero de cruce del gen ligado al X (el sexo y el fenotipo no son independientes para un gen ligado al X), un feedback específico se lo señala.'
+      ])) + _HELP_COMMON
+  },
+
+  distancegenetique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-distancegenetique"></use></svg> Distancia genética — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>A partir de los efectivos fenotípicos observados en la descendencia de un test-cross entre dos genes ligados, el estudiante calcula primero la <b>tasa de recombinación</b> (efectivos recombinantes / efectivo total), y luego la <b>distancia genética</b> correspondiente en centiMorgans (cM).</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Efectivos totales posibles</b>: lista de números enteros separados por comas; uno se sortea al azar en cada intento.',
+        '<b>Porcentajes de recombinación posibles</b>: lista de números separados por comas; uno se sortea al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en «Hardy-Weinberg» y «Cruces», el efectivo total y la tasa de recombinación se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Las dos subpreguntas (tasa de recombinación, distancia en cM) siempre están presentes, sin ningún paso desactivable.',
+        'Un error clásico se diagnostica automáticamente en la subpregunta de la distancia: si el estudiante da la tasa de recombinación sin multiplicarla por 100 (olvido de la conversión a cM), un feedback específico se lo señala.'
+      ])) + _HELP_COMMON
+  },
+
+  horlogemoleculaire: {
+    title: '<svg class="hs-ico"><use href="#ico-type-horlogemoleculaire"></use></svg> Reloj molecular — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>A partir del número de nucleótidos diferentes entre una secuencia homóloga comparada entre dos especies y de la tasa de mutación neutra estimada para ese gen, el estudiante establece primero la <b>expresión literal</b> de la fecha de divergencia <i>T</i>, y luego calcula su <b>valor numérico</b>.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Longitudes de secuencia posibles</b>: lista de números enteros separados por comas; una se sortea al azar en cada intento.',
+        '<b>Tasas de mutación posibles</b>: lista de números separados por comas; una se sortea al azar en cada intento.',
+        '<b>Porcentajes de divergencia posibles</b>: lista de números separados por comas; uno se sortea al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, todas las magnitudes (longitud, tasa, número de diferencias) se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Las dos subpreguntas (fórmula literal, valor numérico de T) siempre están presentes, sin ningún paso desactivable.',
+        'Un error clásico se diagnostica automáticamente en ambas subpreguntas: si el estudiante olvida el factor 2 (las mutaciones se acumulan independientemente en las dos líneas desde la divergencia), un feedback específico se lo señala, tanto en la fórmula como en el valor numérico.'
+      ])) + _HELP_COMMON
+  },
+  radiochronologie: {
+    title: '<svg class="hs-ico"><use href="#ico-type-radiochronologie"></use></svg> Radiocronología — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>A partir de la proporción restante <i>Nfrac</i> del isótopo radiactivo padre en una muestra de roca y de la constante de desintegración de ese isótopo, el estudiante establece primero la <b>expresión literal</b> de la edad <i>T</i> de la roca, y luego calcula su <b>valor numérico</b>.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Proporciones Nfrac posibles</b>: lista de fracciones separadas por comas (sintaxis Maxima, ej.: 1/2); una se sortea al azar en cada intento.',
+        '<b>Coeficientes lam_a posibles</b>: lista de números enteros separados por comas; uno se sortea al azar en cada intento.',
+        '<b>Exponentes lam_b posibles</b>: lista de números enteros separados por comas; uno se sortea al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, todas las magnitudes (Nfrac, lam_a, lam_b) se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Las dos subpreguntas (fórmula literal, valor numérico de T) siempre están presentes, sin ningún paso desactivable.',
+        'Un error clásico se diagnostica automáticamente en ambas subpreguntas: si el estudiante olvida el signo menos delante del logaritmo neperiano (Nfrac < 1, por lo que ln(Nfrac) es negativo), un feedback específico se lo señala, tanto en la fórmula como en el valor numérico.'
+      ])) + _HELP_COMMON
+  },
+  ondesismique: {
+    title: '<svg class="hs-ico"><use href="#ico-type-ondesismique"></use></svg> Ondas sísmicas — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>A partir de una distancia epicentral <i>d</i> y de las velocidades de propagación de las ondas P y S (<i>v_P</i>, <i>v_S</i>), el estudiante calcula el <b>retardo</b> Δt entre la llegada de la onda P y la llegada de la onda S a una estación sísmica.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Distancias epicentrales d posibles</b>: lista de números separados por comas; una se sortea al azar en cada intento.',
+        '<b>Velocidades de onda P posibles</b>: lista de números separados por comas; una se sortea al azar en cada intento.',
+        '<b>Velocidades de onda S posibles</b>: lista de números separados por comas; una se sortea al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, todas las magnitudes (d, v_P, v_S) se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'A diferencia de los demás tipos SVT de este generador, solo hay una única subpregunta (sin división fórmula literal / valor numérico).',
+        'Un error clásico se diagnostica automáticamente: si el estudiante invierte el orden de la resta (d/v_P - d/v_S en lugar de d/v_S - d/v_P), un feedback específico le recuerda que la onda P siempre llega primero por ser más rápida.'
+      ])) + _HELP_COMMON
+  },
+
+  malthus: {
+    title: '<svg class="hs-ico"><use href="#ico-type-malthus"></use></svg> Malthus — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>A partir de una población inicial <i>N₀</i>, un factor multiplicativo por periodo <i>q</i> y una duración <i>t</i> (número de periodos transcurridos), el estudiante calcula la <b>población final</b> según el modelo de crecimiento exponencial \\( N_t = N_0 \\times q^t \\).</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Poblaciones iniciales N₀ posibles</b>: lista de números enteros separados por comas; una se sortea al azar en cada intento.',
+        '<b>Factores multiplicativos q posibles</b>: lista de números separados por comas; uno se sortea al azar en cada intento.',
+        '<b>Duraciones t posibles</b>: lista de números enteros separados por comas; una se sortea al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, todas las magnitudes (N₀, q, t) se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Como en las ondas sísmicas, solo hay una única subpregunta (sin división fórmula literal / valor numérico).',
+        'A diferencia del enunciado tradicional («la población se duplica/triplica cada hora»), el enunciado generado se mantiene genérico («multiplicada por q») para que el factor q siga siendo realmente configurable más allá de 2 o 3.',
+        'Un error clásico se diagnostica automáticamente: si el estudiante usa t-1 periodos en lugar de t (un error de un periodo), un feedback específico se lo señala.'
+      ])) + _HELP_COMMON
+  },
+  regle10: {
+    title: '<svg class="hs-ico"><use href="#ico-type-regle10"></use></svg> Regla del 10% — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>A partir de una biomasa inicial <i>B₀</i> (nivel trófico 1), el estudiante aplica la <b>regla del 10%</b> (\\( B_n = B_0 \\times 0.1^n \\), donde <i>n</i> es el número de transferencias entre niveles tróficos) para a) calcular la biomasa alcanzada en un nivel trófico dado, y luego b) determinar el número máximo de niveles tróficos adicionales que puede soportar una necesidad alimentaria dada.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Biomasas iniciales b0 posibles</b>: lista de números separados por comas; una se sortea al azar en cada intento.',
+        '<b>Niveles tróficos posibles (pregunta a)</b>: lista de números enteros separados por comas; uno se sortea al azar en cada intento.',
+        '<b>Exponentes k y factores m posibles (pregunta b)</b>: determinan la necesidad alimentaria probada \\( B_{necesaria} = B_0 \\times m / 10^k \\); se sortea un valor de cada lista al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, todas las magnitudes (b0, n, k, m) se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'A diferencia de los demás tipos SVT (radiocronología, reloj molecular, ondas sísmicas, Malthus), este tipo NO diagnostica un error clásico mediante una cascada de nodos PRT: cada subpregunta (a y b) sigue siendo un único nodo, el estudiante recibe un feedback correcto/incorrecto directo sin diagnóstico pedagógico específico — esto reproduce fielmente la estructura de la plantilla XML de referencia escrita a mano.',
+        'La pregunta b) se resuelve mediante un logaritmo: \\( n_{max} = \\lfloor \\log(B_{necesaria}/B_0)/\\log(0.1) \\rfloor \\) — el resultado se redondea hacia abajo (floor) por defecto.'
+      ])) + _HELP_COMMON
+  },
+  chi2: {
+    title: '<svg class="hs-ico"><use href="#ico-type-chi2"></use></svg> Prueba χ² — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>Prueba de bondad de ajuste χ² (Ji-cuadrado) en ecología: el estudiante compara los efectivos <b>observados</b> de 4 especies con sus efectivos <b>teóricos</b> (distribución esperada 40% / 30% / 20% / 10%) para calcular el estadístico \\( \\chi^2 = \\sum \\dfrac{(O-T)^2}{T} \\).</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Tamaños de muestra totales posibles</b>: lista de números separados por comas (número de individuos muestreados); uno se sortea al azar en cada intento.',
+        '<b>Desviaciones posibles (especies A/B)</b> y <b>Desviaciones posibles (especies C/D)</b>: determinan la diferencia entre efectivo observado y teórico para cada par de especies; se sortea un valor de cada lista al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, todas las magnitudes (tamaño total de muestra, desviaciones) se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Una única subpregunta (cálculo del χ²), con una cascada de diagnóstico PRT de 2 nodos que detecta el error clásico de dividir por el efectivo <b>observado</b> O en lugar del efectivo <b>teórico</b> T en cada término de la suma.',
+        'La distribución teórica (40%/30%/20%/10% en las 4 especies) es fija — un invariante del escenario pedagógico — solo el tamaño total de la muestra y las desviaciones observado-teórico son configurables.'
+      ])) + _HELP_COMMON
+  },
+  debit: {
+    title: '<svg class="hs-ico"><use href="#ico-type-debit"></use></svg> Gasto cardíaco — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>Cálculo del gasto cardíaco \\( Q = FC \\times VS \\) (frecuencia cardíaca × volumen sistólico), con una conversión de unidad obligatoria del volumen sistólico (dado en mL) a litros por minuto para el resultado.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Frecuencias cardíacas posibles</b> y <b>Volúmenes sistólicos posibles (mL)</b>: listas de números separados por comas; se sortea un valor de cada lista al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, FC y VS se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Una única subpregunta, con una cascada de diagnóstico PRT de 2 nodos que detecta el error clásico de olvidar la conversión mL → L (resultado 1000 veces demasiado grande): a diferencia de los demás tipos SVT, este nodo diagnóstico otorga <b>crédito parcial de 0,5</b> en lugar de una puntuación de 0, ya que el cálculo en sí es correcto — solo la unidad es incorrecta.'
+      ])) + _HELP_COMMON
+  },
+  nernst: {
+    title: '<svg class="hs-ico"><use href="#ico-type-nernst"></use></svg> Potencial de Nernst — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>Calcula el potencial de reposo de una neurona mediante la ecuación de Nernst simplificada para el ion potasio K<sup>+</sup>: \\( E_K = 60 \\times \\log_{10}\\!\\left(\\dfrac{[K^+]_{ext}}{[K^+]_{int}}\\right) \\) (en mV), a partir de las concentraciones extra- e intracelulares.</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Concentraciones extracelulares posibles</b> y <b>Concentraciones intracelulares posibles</b>: listas de números separados por comas; se sortea un valor de cada lista al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, las concentraciones se sortean con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Una única subpregunta, con una cascada de diagnóstico PRT de 2 nodos que detecta el error clásico de invertir las concentraciones extra- e intracelulares en el cociente (el potencial obtenido se vuelve positivo en lugar de negativo).',
+        'Como el potasio está mucho más concentrado dentro de la célula, un potencial de reposo bien calculado es siempre negativo — este es el invariante fisiológico que el diagnóstico pone de relieve.'
+      ])) + _HELP_COMMON
+  },
+  dilutions: {
+    title: '<svg class="hs-ico"><use href="#ico-type-dilutions"></use></svg> Diluciones en serie — Ayuda',
+    body:
+      _hSection('¿Para qué sirve?',
+        '<p>Titulación en inmunología: calcula el factor de dilución del suero en el tubo n°<i>n</i> de una serie de diluciones sucesivas al 1/10 (cada tubo recibe una décima parte de la concentración del tubo anterior), es decir \\( 1/10^n \\).</p>') +
+      _hSection('Cómo llenarlo', _hList([
+        '<b>Enunciado / consigna</b>: texto opcional añadido antes de la pregunta generada.',
+        '<b>Números de tubo posibles</b>: lista de números enteros separados por comas; uno se sortea al azar en cada intento.'
+      ])) +
+      _hSection('Trucos / trampas', _hList([
+        'Como en los demás tipos SVT, el número de tubo se sortea con un sorteo nativo de Maxima (no un sorteo JS antes de exportar): la vista previa simulada no puede mostrar un valor numérico hasta que se solicite la vista previa real (botón 👁️) — esto es normal.',
+        'Una única subpregunta, con una cascada de diagnóstico PRT de 2 nodos que detecta el error clásico de <b>sumar</b> los factores de dilución (\\( 1/(10n) \\)) en lugar de <b>multiplicarlos</b> (\\( 1/10^n \\)).'
+      ])) + _HELP_COMMON
   }
 };
 

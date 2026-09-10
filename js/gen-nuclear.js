@@ -753,7 +753,25 @@ fb_asterisk${X}: sconcat(
    "<h4 style='margin-top:0;color:#d35400;'>${fbTAsteriskTitle}</h4>",
    "<span style='color:#e67e22;'>${fbTAsteriskText}</span>",
    "</div>"
-);`;
+);
+
+/* 5. RÉSUMÉ CONSOLIDÉ : un feedback unique regroupant uniquement les diagnostics
+   d'une erreur réellement commise. Les feedbacks individuels ci-dessus ne sont
+   attachés à aucune branche non terminale de la PRT (cf. audit check-prt-reachability :
+   un feedback posé sur une branche qui continue vers un autre nœud n'est jamais
+   montré à l'élève, seul le nœud terminal atteint compte) — ils ne sont utilisés
+   qu'ici, en entrée du résumé, et affichés uniquement au nœud terminal réel. */
+err_reactants${X}: if setify(map(lambda([x], rest(x)), tmp_r${X})) # setify(map(lambda([x], rest(x)), nuc${X}_rea)) then true else false;
+err_products${X}: if setify(map(lambda([x], rest(x)), tmp_p${X})) # setify(map(lambda([x], rest(x)), nuc${X}_pro)) then true else false;
+err_coeffs_reactants${X}: if setify(tmp_r${X}) # setify(nuc${X}_rea) then true else false;
+err_coeffs_products${X}: if setify(tmp_p${X}) # setify(nuc${X}_pro) then true else false;
+fb_summary_parts${X}: [];
+if err_reactants${X} then fb_summary_parts${X}: endcons(fb_error_reactants${X}, fb_summary_parts${X});
+if err_products${X} then fb_summary_parts${X}: endcons(fb_error_products${X}, fb_summary_parts${X});
+if err_coeffs_reactants${X} then fb_summary_parts${X}: endcons(fb_reactants_coeffs${X}, fb_summary_parts${X});
+if err_coeffs_products${X} then fb_summary_parts${X}: endcons(fb_products_coeffs${X}, fb_summary_parts${X});
+if asterisk_missing${X} then fb_summary_parts${X}: endcons(fb_asterisk${X}, fb_summary_parts${X});
+fb_summary${X}: if fb_summary_parts${X} = [] then fb_success${X} else simplode(fb_summary_parts${X}, "");`;
 
   // ── PRT (7 nœuds, calqués sur la référence) ────
   const mkCanonNode=(n,desc,sans,tans,ts,tn,fs,fn,tfb,ffb,tm,fm)=>({
@@ -768,25 +786,25 @@ fb_asterisk${X}: sconcat(
   const canonicalNodes=[
     mkCanonNode(0,I18N_D.t('tpl.nuc_desc_reactifs'),
       `setify(map(lambda([x], rest(x)), ans${X}r))`, `setify(map(lambda([x], rest(x)), nuc${X}_rea))`,
-      0.3,1,0,1, '', `{@fb_error_reactants${X}@}`, '+', '='),
+      0.3,1,0,1, '', '', '+', '='),
     mkCanonNode(1,I18N_D.t('tpl.nuc_desc_produits'),
       `setify(map(lambda([x], rest(x)), ans${X}p))`, `setify(map(lambda([x], rest(x)), nuc${X}_pro))`,
-      0.3,2,0,2, '', `{@fb_error_products${X}@}`),
+      0.3,2,0,2, '', ''),
     mkCanonNode(2,I18N_D.t('tpl.nuc_desc_especes_ko'),
       `verif_especes${X}`, 'true',
       0,3,0,-1, '', ''),
     mkCanonNode(3,I18N_D.t('tpl.nuc_desc_coefs_reactifs'),
       `setify(ans${X}r)`, `setify(nuc${X}_rea)`,
-      0.2,4,0,4, '', `{@fb_reactants_coeffs${X}@}`),
+      0.2,4,0,4, '', ''),
     mkCanonNode(4,I18N_D.t('tpl.nuc_desc_coefs_produits'),
       `setify(ans${X}p)`, `setify(nuc${X}_pro)`,
-      0.2,5,0,-1, '', `{@fb_products_coeffs${X}@}`),
+      0.2,5,0,-1, '', `{@fb_summary${X}@}`),
     mkCanonNode(5,I18N_D.t('tpl.nuc_desc_etats_excites'),
       `asterisk_missing${X}`, 'false',
-      0,6,0.2,6, '', `{@fb_asterisk${X}@}`),
+      0,6,0.2,6, '', ''),
     mkCanonNode(6,I18N_D.t('tpl.nuc_desc_tout_bon'),
       `verif_total${X}`, 'true',
-      0,-1,0,-1, `{@fb_success${X}@}`, '')
+      0,-1,0,-1, `{@fb_success${X}@}`, `{@fb_summary${X}@}`)
   ];
   const prtMeta = { name:`prt${X}`, value:String(bareme), autosimplify:'1', feedbackstyle:'2', feedbackvariables: fbVars };
   const prtXML = buildPrtXml_D(prtMeta, canonicalNodes);
@@ -811,8 +829,12 @@ fb_asterisk${X}: sconcat(
   const diagNodes = [];
   canonicalNodes.forEach((n, i) => {
     const isFirst = i === 0, isLast = i === canonicalNodes.length - 1;
-    if (!isFirst && n.truefeedback) diagNodes.push({ desc: n.description + I18N_D.t('common.diag_success_suffix'), fb: diagPreviewText[i + 't'] || n.truefeedback });
-    if (!isLast && n.falsefeedback) diagNodes.push({ desc: n.description + I18N_D.t('common.diag_failure_suffix'), fb: diagPreviewText[i + 'f'] || n.falsefeedback });
+    // diagPreviewText[key] fait foi même quand n.*feedback est vide côté XML (nœuds 0/1/3/5 :
+    // la branche false continue vers un autre nœud, donc leur feedback réel a été déplacé dans
+    // fb_summary${X} porté par le vrai nœud terminal — cf. résumé consolidé ci-dessus) : cet
+    // aperçu pédagogique de l'onglet Config reste donc inchangé pour l'enseignant.
+    if (!isFirst && (n.truefeedback || diagPreviewText[i + 't'])) diagNodes.push({ desc: n.description + I18N_D.t('common.diag_success_suffix'), fb: diagPreviewText[i + 't'] || n.truefeedback });
+    if (!isLast && (n.falsefeedback || diagPreviewText[i + 'f'])) diagNodes.push({ desc: n.description + I18N_D.t('common.diag_failure_suffix'), fb: diagPreviewText[i + 'f'] || n.falsefeedback });
   });
 
   // Encart "réponse attendue" injecté directement dans generalFeedback — sans lui,

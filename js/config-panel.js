@@ -123,7 +123,24 @@ async function _generateAndStoreQuestion(qid, type) {
     'zscore': W.genZscore,
     'avancement': W.genAvancement,
     'cinematique': W.genCinematique,
-    'hardyweinberg': W.genHardyWeinberg
+    'hardyweinberg': W.genHardyWeinberg,
+    'croisements': W.genCroisements,
+    'distancegenetique': W.genDistanceGenetique,
+    'horlogemoleculaire': W.genHorlogeMoleculaire,
+    'radiochronologie': W.genRadiochronologie,
+    'ondesismique': W.genOndeSismique,
+    'malthus': W.genMalthus,
+    'regle10': W.genRegle10,
+    'chi2': W.genChi2,
+    'debit': W.genDebit,
+    'nernst': W.genNernst,
+    'dilutions': W.genDilutions,
+    'ieee754': W.genIeee754,
+    'complexite': W.genComplexite,
+    'arbrebinaire': W.genArbrebinaire,
+    'bilanpuissance': W.genBilanpuissance,
+    'thevenin': W.genThevenin,
+    'premierordre': W.genPremierordre
   };
 
   var gen = genMap[type];

@@ -256,7 +256,24 @@ const TYPE_ICON_MAP = {
   'zscore':'zscore',
   'avancement':'avancement',
   'cinematique':'cinematique',
-  'hardyweinberg':'hardyweinberg'
+  'hardyweinberg':'hardyweinberg',
+  'croisements':'croisements',
+  'distancegenetique':'distancegenetique',
+  'horlogemoleculaire':'horlogemoleculaire',
+  'radiochronologie':'radiochronologie',
+  'ondesismique':'ondesismique',
+  'malthus':'malthus',
+  'regle10':'regle10',
+  'chi2':'chi2',
+  'debit':'debit',
+  'nernst':'nernst',
+  'dilutions':'dilutions',
+  'ieee754':'ieee754',
+  'complexite':'complexite',
+  'arbrebinaire':'arbrebinaire',
+  'bilanpuissance':'bilanpuissance',
+  'thevenin':'thevenin',
+  'premierordre':'premierordre'
 };
 
 function initEditor() {
