@@ -481,6 +481,7 @@ fill="currentColor" stroke="none">
 </path>
         </g>
     </g></symbol>
+<symbol id="ico-type-imgslideshow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="11" rx="1"/><circle cx="6" cy="8" r="1" fill="currentColor" stroke="none"/><path d="M2 13 L7 9 L10 11 L16 6"/><circle cx="18" cy="18" r="4.5"/><path d="M18 15.5 V18 L19.7 19.2"/></symbol>
 <symbol id="ico-type-ord" viewBox="0 0 16 16" fill="currentColor"><path d="m1.75 11 6.25 3.25 6.25-3.25m-12.5-3 6.25 3.25 6.25-3.25m-6.25-6.25-6.25 3.25 6.25 3.25 6.25-3.25z"/></symbol>
 <symbol id="ico-type-geogebra" viewBox="0 0 28 28"><path fill="none" stroke="#666" stroke-width="2.2" d="m15.3,4.7a11.4,9.1-26 1,0 1,0z"/><g stroke-linecap="round"><path stroke="#000" stroke-width="6" d="m13.2,4.9h0M3.8,11.8h0M7.2,22.9h0M20.1,21.2h0M24.4,10.1h0"/><path stroke="#99F" stroke-width="4.3" d="m13.2,4.9h0M3.8,11.8h0M7.2,22.9h0M20.1,21.2h0M24.4,10.1h0"/></g></symbol>
 <symbol id="ico-type-physique" viewBox="0 0 511.999 511.999" fill="currentColor"><g>
@@ -534,6 +535,10 @@ fill="currentColor" stroke="none">
 <symbol id="ico-type-bilanpuissance" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 16 0"/><path d="M12 12l4-5"/><circle cx="12" cy="12" r="1"/></symbol>
 <symbol id="ico-type-thevenin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4"/><rect x="6" y="9" width="6" height="6"/><path d="M12 12h2"/><circle cx="17" cy="12" r="3"/><path d="M20 12h2"/></symbol>
 <symbol id="ico-type-premierordre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18c4 0 4-12 8-12s4 12 8 12"/><path d="M3 18h18" stroke-dasharray="1 3"/></symbol>
+<symbol id="ico-type-tauxvariation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+<symbol id="ico-type-elasticite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M6 8l-4 4 4 4"/><path d="M18 8l4 4-4 4"/></symbol>
+<symbol id="ico-type-multiplicateur" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+<symbol id="ico-type-fisher" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0z"/><path d="M19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
 <symbol id="ico-action-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle>
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line></symbol>
 <symbol id="ico-action-cancel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle>
@@ -1422,6 +1427,88 @@ fill="currentColor" stroke="none">
   <div class="field hs-preview-panel" id="ic-preview-panel">
     <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
     <div id="ic-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+  </div>
+    </div>
+  </div>
+
+  <!-- Diaporama chronométré -->
+  <div class="form-panel" id="fp-imgslideshow">
+    <div class="form-panel-head" style="background:#115e59;">
+      <svg class="hs-ico"><use href="#ico-type-imgslideshow"></use></svg>
+      <span data-i18n="type.imgslideshow">Diaporama chronométré</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="imsl-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="imsl-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('imsl','cfg',this);if(typeof imslRefreshPreview==='function')imslRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('imsl','fb-gen',this);if(typeof imslRefreshPreview==='function')imslRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="imsl-cfg">
+      <div class="info-box" style="border-color:#0d9488;background:#f0fdfa;color:#0f766e;">
+        <span data-i18n="imsl.info">Une série d'images défile automatiquement ; l'élève doit choisir la bonne proposition avant la fin du temps imparti.</span>
+      </div>
+      <div class="field">
+        <label><span data-i18n="imsl.text_lbl">Instruction</span></label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-imsl-text" data-ph="Ex : Identifiez la roche présentée…" data-i18n-dataph="imsl.text_ph" onclick="openRich('imsl-text')"></div>
+        <textarea id="imsl-text" style="display:none"></textarea>
+      </div>
+
+      <div class="field">
+        <label data-i18n="imsl.gallery_lbl">Images du diaporama (ordre = ordre de défilement) :</label>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <label class="jd-upload-btn">
+            <svg class="hs-ico" aria-hidden="true"><use href="#ico-file-open"></use></svg> <span data-i18n="imsl.gallery_upload_btn">Ajouter des images…</span>
+            <input type="file" id="imsl-gallery-file" accept="image/*" multiple style="display:none" onchange="imslHandleImageUpload(this)">
+          </label>
+        </div>
+        <div id="imsl-gallery-list" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="g2" style="margin-top:10px;">
+        <div class="field">
+          <label><span data-i18n="imsl.interval_lbl">Intervalle entre les images (secondes)</span></label>
+          <input type="number" id="imsl-interval" value="2" min="0.5" step="0.5" style="width:100px;">
+        </div>
+        <div class="field">
+          <label><span data-i18n="imsl.timelimit_lbl">Temps total pour répondre (secondes)</span></label>
+          <input type="number" id="imsl-timelimit" value="15" min="1" step="1" style="width:100px;">
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:10px;">
+        <label data-i18n="imsl.props_lbl">Propositions (cochez la bonne réponse) :</label>
+        <div id="imsl-props-items"></div>
+        <button type="button" class="jd-tool" style="margin-top:6px;" onclick="addImslPropRow('', false)"><span data-i18n="imsl.add_prop_btn">+ Ajouter une proposition</span></button>
+      </div>
+
+      <div class="g2" style="margin-top:10px;">
+        <div class="field">
+          <label>✅ <span data-i18n="imsl.fb_ok_lbl">Message si bonne réponse (opt.)</span></label>
+          <input type="text" id="imsl-fb-ok" placeholder="">
+        </div>
+        <div class="field">
+          <label>❌ <span data-i18n="imsl.fb_wrong_lbl">Message si mauvaise réponse ou temps écoulé (opt.)</span></label>
+          <input type="text" id="imsl-fb-wrong" placeholder="">
+        </div>
+      </div>
+      </div>
+      <div class="mpane" id="imsl-fb-gen">
+        <p style="font-size:.85rem;color:#6b7280;" data-i18n="imsl.fbgen_auto_note">La correction de la proposition choisie est automatique. Ce champ permet d'ajouter un commentaire pédagogique complémentaire, affiché en plus de la solution attendue.</p>
+        <div class="field">
+          <label><span data-i18n="common.fbgen_extra_label">Feedback général complémentaire (opt.)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-imsl-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('imsl-fbgen')"></div>
+          <textarea id="imsl-fbgen" style="display:none"></textarea>
+        </div>
+        <p style="font-size:.85rem;color:#6b7280;" data-i18n="common.fbgen_addon_note">Ce texte s'ajoutera à la solution générée automatiquement dans le feedback général Moodle.</p>
+      </div>
+
+    </div>
+    </div>
+  <div class="field hs-preview-panel" id="imsl-preview-panel">
+    <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div id="imsl-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
   </div>
     </div>
   </div>
@@ -7328,6 +7415,284 @@ fill="currentColor" stroke="none">
     </div>
   </div>
 
+  <div class="form-panel" id="fp-tauxvariation" style="display:none">
+    <div class="form-panel-head" style="background:#155e75;color:#fff;">
+      <svg class="hs-ico" style="color:#fff;"><use href="#ico-type-tauxvariation"></use></svg>
+      <span data-i18n="tva.title">Taux de variation, coefficient multiplicateur et indice</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="tva-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="tva-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('tva','cfg',this);if(typeof tvaRefreshPreview==='function')tvaRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('tva','fb-gen',this);if(typeof tvaRefreshPreview==='function')tvaRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="tva-cfg">
+      <div class="info-box" style="border-color:#155e75;background:#cffafe;color:#083344;" data-i18n="tva.info_box">
+        Une valeur initiale V0 et une valeur finale V1 sont tirées aléatoirement (côté Maxima, à chaque tentative) dans les listes indiquées ci-dessous — une seule question STACK couvre ainsi toutes les variantes.
+      </div>
+
+      <div class="field">
+        <label data-i18n="tva.intro_lbl">Énoncé / consigne (optionnel, ajouté avant la question)</label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-tva-intro" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('tva-intro')"
+             style="min-height:50px;border-color:#155e75;background:#cffafe;"></div>
+        <textarea id="tva-intro" style="display:none"></textarea>
+      </div>
+
+      <!-- Valeurs initiales V0 possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#155e75;" data-i18n="tva.v0list_title">Valeurs initiales V0 possibles</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="tva.v0list_hint">Liste de valeurs séparées par des virgules ; une est tirée au hasard à chaque tentative.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="tva-v0list" value="80,100,120,150,200" style="font-family:monospace;">
+      </div>
+
+      <!-- Valeurs finales V1 possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#155e75;" data-i18n="tva.v1list_title">Valeurs finales V1 possibles</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="tva.v1list_hint">Liste de valeurs séparées par des virgules ; choisies pour ne jamais coïncider avec les valeurs initiales.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="tva-v1list" value="88,115,138,165,220" style="font-family:monospace;">
+      </div>
+
+      </div>
+      <div class="mpane" id="tva-fb-gen">
+        <p class="hint" data-i18n="tva.fbgen_auto_desc">La correction (taux de variation, coefficient multiplicateur, indice) est générée automatiquement.</p>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-tva-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('tva-fbgen')"></div>
+          <textarea id="tva-fbgen" style="display:none"></textarea></div>
+        <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
+      </div>
+    </div>
+    </div>
+  <div class="field hs-preview-panel" id="tva-preview-panel">
+    <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="tva-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="tvaRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="tva-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="tvaShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="tva-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
+    <div id="tva-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+  </div>
+    </div>
+  </div>
+
+  <div class="form-panel" id="fp-elasticite" style="display:none">
+    <div class="form-panel-head" style="background:#a21caf;color:#fff;">
+      <svg class="hs-ico" style="color:#fff;"><use href="#ico-type-elasticite"></use></svg>
+      <span data-i18n="ela.title">Élasticité-prix de la demande</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="ela-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="ela-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('ela','cfg',this);if(typeof elaRefreshPreview==='function')elaRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('ela','fb-gen',this);if(typeof elaRefreshPreview==='function')elaRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="ela-cfg">
+      <div class="info-box" style="border-color:#a21caf;background:#fae8ff;color:#701a75;" data-i18n="ela.info_box">
+        Un prix et une quantité demandée, avant et après variation, sont tirés aléatoirement (côté Maxima, à chaque tentative) dans les listes indiquées ci-dessous — une seule question STACK couvre ainsi toutes les variantes.
+      </div>
+
+      <div class="field">
+        <label data-i18n="ela.intro_lbl">Énoncé / consigne (optionnel, ajouté avant la question)</label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-ela-intro" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('ela-intro')"
+             style="min-height:50px;border-color:#a21caf;background:#fae8ff;"></div>
+        <textarea id="ela-intro" style="display:none"></textarea>
+      </div>
+
+      <!-- Prix initiaux P0 possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#a21caf;" data-i18n="ela.p0list_title">Prix initiaux P0 possibles</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="ela.p0list_hint">Liste de valeurs séparées par des virgules ; une est tirée au hasard à chaque tentative.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="ela-p0list" value="10,20,50,100" style="font-family:monospace;">
+      </div>
+
+      <!-- Prix finaux P1 possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#a21caf;" data-i18n="ela.p1list_title">Prix finaux P1 possibles</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="ela.p1list_hint">Liste de valeurs séparées par des virgules ; choisies pour ne jamais coïncider avec les prix initiaux.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="ela-p1list" value="12,25,55,110" style="font-family:monospace;">
+      </div>
+
+      <!-- Quantités initiales Q0 possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#a21caf;" data-i18n="ela.q0list_title">Quantités initiales Q0 possibles</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="ela.q0list_hint">Liste de valeurs séparées par des virgules ; une est tirée au hasard à chaque tentative.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="ela-q0list" value="1000,2000,500,800" style="font-family:monospace;">
+      </div>
+
+      <!-- Quantités finales Q1 possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#a21caf;" data-i18n="ela.q1list_title">Quantités finales Q1 possibles</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="ela.q1list_hint">Liste de valeurs séparées par des virgules ; choisies pour ne jamais coïncider avec les quantités initiales.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="ela-q1list" value="900,1600,420,680" style="font-family:monospace;">
+      </div>
+
+      </div>
+      <div class="mpane" id="ela-fb-gen">
+        <p class="hint" data-i18n="ela.fbgen_auto_desc">La correction (élasticité-prix de la demande) est générée automatiquement.</p>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-ela-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('ela-fbgen')"></div>
+          <textarea id="ela-fbgen" style="display:none"></textarea></div>
+        <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
+      </div>
+    </div>
+    </div>
+  <div class="field hs-preview-panel" id="ela-preview-panel">
+    <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="ela-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="elaRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="ela-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="elaShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="ela-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
+    <div id="ela-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+  </div>
+    </div>
+  </div>
+
+  <div class="form-panel" id="fp-multiplicateur" style="display:none">
+    <div class="form-panel-head" style="background:#3f6212;color:#fff;">
+      <svg class="hs-ico" style="color:#fff;"><use href="#ico-type-multiplicateur"></use></svg>
+      <span data-i18n="mul.title">Multiplicateur keynésien</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="mul-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="mul-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('mul','cfg',this);if(typeof mulRefreshPreview==='function')mulRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('mul','fb-gen',this);if(typeof mulRefreshPreview==='function')mulRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="mul-cfg">
+      <div class="info-box" style="border-color:#3f6212;background:#ecfccb;color:#14532d;" data-i18n="mul.info_box">
+        Une propension marginale à consommer c et une variation initiale de dépense ΔI0 sont tirées aléatoirement (côté Maxima, à chaque tentative) dans les listes indiquées ci-dessous — une seule question STACK couvre ainsi toutes les variantes.
+      </div>
+
+      <div class="field">
+        <label data-i18n="mul.intro_lbl">Énoncé / consigne (optionnel, ajouté avant la question)</label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-mul-intro" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('mul-intro')"
+             style="min-height:50px;border-color:#3f6212;background:#ecfccb;"></div>
+        <textarea id="mul-intro" style="display:none"></textarea>
+      </div>
+
+      <!-- Propensions marginales à consommer c possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#3f6212;" data-i18n="mul.clist_title">Propensions marginales à consommer c possibles</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="mul.clist_hint">Liste de fractions exactes entre 0 et 1 séparées par des virgules (ex: 3/4).</div>
+      </div>
+      <div class="field">
+        <input type="text" id="mul-clist" value="3/4,4/5,7/10,2/3,3/5" style="font-family:monospace;">
+      </div>
+
+      <!-- Variations initiales ΔI0 possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#3f6212;" data-i18n="mul.dilist_title">Variations initiales de dépense ΔI0 possibles</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="mul.dilist_hint">Liste de valeurs séparées par des virgules ; une est tirée au hasard à chaque tentative.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="mul-dilist" value="10,20,50,100" style="font-family:monospace;">
+      </div>
+
+      </div>
+      <div class="mpane" id="mul-fb-gen">
+        <p class="hint" data-i18n="mul.fbgen_auto_desc">La correction (effet multiplicateur sur le revenu) est générée automatiquement.</p>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-mul-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('mul-fbgen')"></div>
+          <textarea id="mul-fbgen" style="display:none"></textarea></div>
+        <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
+      </div>
+    </div>
+    </div>
+  <div class="field hs-preview-panel" id="mul-preview-panel">
+    <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="mul-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="mulRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="mul-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="mulShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="mul-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
+    <div id="mul-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+  </div>
+    </div>
+  </div>
+
+  <div class="form-panel" id="fp-fisher" style="display:none">
+    <div class="form-panel-head" style="background:#92400e;color:#fff;">
+      <svg class="hs-ico" style="color:#fff;"><use href="#ico-type-fisher"></use></svg>
+      <span data-i18n="fis.title">Relation de Fisher (croissance nominale et réelle)</span>
+    </div>
+    <div class="bareme-row"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-grading"></use></svg> <span data-i18n="common.bareme_label">Barème</span> : <input type="number" id="fis-bareme" value="1" min="0.25" step="0.25"> <span data-i18n="common.bareme_pt">pt</span></div>
+    <div class="hs-split-row" id="fis-split-row">
+    <div class="hs-split-left">
+    <div class="form-panel-body">
+      <div class="mtabs">
+        <div class="mtab on" onclick="tab('fis','cfg',this);if(typeof fisRefreshPreview==='function')fisRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-config"></use></svg> <span data-i18n="common.tab_config">Config</span></div>
+        <div class="mtab" onclick="tab('fis','fb-gen',this);if(typeof fisRefreshPreview==='function')fisRefreshPreview()"><svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-context"></use></svg> <span data-i18n="common.tab_fbgen">Feedback général</span></div>
+      </div>
+      <div class="mpane on" id="fis-cfg">
+      <div class="info-box" style="border-color:#92400e;background:#fef3c7;color:#451a03;" data-i18n="fis.info_box">
+        Un taux de croissance réelle gr et un taux d'inflation π sont tirés aléatoirement (côté Maxima, à chaque tentative) dans les listes indiquées ci-dessous — une seule question STACK couvre ainsi toutes les variantes.
+      </div>
+
+      <div class="field">
+        <label data-i18n="fis.intro_lbl">Énoncé / consigne (optionnel, ajouté avant la question)</label>
+        <div class="rich-preview" tabindex="0" role="button" id="prev-fis-intro" data-ph="Cliquez sur ✏️ pour rédiger l'énoncé…" data-i18n-dataph="common.click_write_statement" onclick="openRich('fis-intro')"
+             style="min-height:50px;border-color:#92400e;background:#fef3c7;"></div>
+        <textarea id="fis-intro" style="display:none"></textarea>
+      </div>
+
+      <!-- Taux de croissance réelle gr possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#92400e;" data-i18n="fis.grlist_title">Taux de croissance réelle gr possibles (%)</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="fis.grlist_hint">Liste de valeurs (fractions exactes acceptées) séparées par des virgules.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="fis-grlist" value="1,3/2,2,5/2,3,7/2" style="font-family:monospace;">
+      </div>
+
+      <!-- Taux d'inflation π possibles -->
+      <div class="field" style="border-top:1px dashed #cbd5e1;padding-top:10px;margin-top:10px;">
+        <label style="font-weight:800;color:#92400e;" data-i18n="fis.pilist_title">Taux d'inflation π possibles (%)</label>
+        <div style="font-size:.78rem;color:#6b7280;margin-top:3px;" data-i18n="fis.pilist_hint">Liste de valeurs (fractions exactes acceptées) séparées par des virgules.</div>
+      </div>
+      <div class="field">
+        <input type="text" id="fis-pilist" value="1,3/2,2,5/2,3,7/2" style="font-family:monospace;">
+      </div>
+
+      </div>
+      <div class="mpane" id="fis-fb-gen">
+        <p class="hint" data-i18n="fis.fbgen_auto_desc">La correction (relation de Fisher) est générée automatiquement.</p>
+        <div class="field"><label><span data-i18n="common.fbgen_additionnel_label">Feedback général additionnel</span> <span class="fb-note-hint" data-i18n="ineq.fbgen_extra_note">(optionnel, ajouté à la suite de la correction auto)</span></label>
+          <div class="rich-preview" tabindex="0" role="button" id="prev-fis-fbgen" data-ph="Cliquez sur Éditeur..." data-i18n-dataph="common.click_editor_dots" onclick="openRich('fis-fbgen')"></div>
+          <textarea id="fis-fbgen" style="display:none"></textarea></div>
+        <p class="hint" data-i18n="common.fbgen_note_simple">Ce feedback est toujours affiché après validation, quel que soit le résultat.</p>
+      </div>
+    </div>
+    </div>
+  <div class="field hs-preview-panel" id="fis-preview-panel">
+    <label data-i18n="common.preview_student_label">Aperçu élève (nouveau moteur, lecture seule)</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <button type="button" id="fis-reroll-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="fisRerollPreviewSeed()" data-i18n="common.preview_reroll_btn">🎲 Nouveau tirage</button>
+      <button type="button" id="fis-show-real-preview-btn" style="display:none;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:var(--navy);cursor:pointer;font-size:.85rem;" onclick="fisShowRealPreview()" data-i18n="common.preview_show_real_btn">👁️ Aperçu réel</button>
+      <span id="fis-real-preview-status" style="font-size:.82rem;color:#64748b;"></span>
+    </div>
+    <div id="fis-preview-container" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;"></div>
+  </div>
+    </div>
+  </div>
+
   <!-- ══════════════════════════════════════════════════ -->
   <!-- QUESTION EXPERT (STACK complet)                  -->
   <!-- ══════════════════════════════════════════════════ -->
@@ -10041,6 +10406,7 @@ window.__hsLoadLangSet("lang/", true);
 <script src="js/gen-ord.js"></script>
 <script src="js/gen-vf.js"></script>
 <script src="js/gen-imgclick.js"></script>
+<script src="js/gen-imgslideshow.js"></script>
 <script src="js/gen-optique.js"></script>
 <script src="js/gen-acidebase.js"></script>
 <script src="js/gen-redox.js"></script>
@@ -10119,6 +10485,14 @@ window.__hsLoadLangSet("lang/", true);
 <script src="js/gen-thevenin.js"></script>
 <script src="js/gen-premierordre-calc.js"></script>
 <script src="js/gen-premierordre.js"></script>
+<script src="js/gen-tauxvariation-calc.js"></script>
+<script src="js/gen-tauxvariation.js"></script>
+<script src="js/gen-elasticite-calc.js"></script>
+<script src="js/gen-elasticite.js"></script>
+<script src="js/gen-multiplicateur-calc.js"></script>
+<script src="js/gen-multiplicateur.js"></script>
+<script src="js/gen-fisher-calc.js"></script>
+<script src="js/gen-fisher.js"></script>
 
 <!-- V4 nouveaux modules -->
 <script src="js/editor.js"></script>
@@ -10144,6 +10518,7 @@ window.__hsLoadLangSet("lang/", true);
 <script src="js/config-panel-geometrie.js"></script>
 <script src="js/config-panel-image-mesure.js"></script>
 <script src="js/config-panel-imgclick.js"></script>
+<script src="js/config-panel-imgslideshow.js"></script>
 <script src="js/config-panel-incertitude.js"></script>
 <script src="js/config-panel-inequation.js"></script>
 <script src="js/config-panel-jxgdrop.js"></script>
@@ -10190,6 +10565,10 @@ window.__hsLoadLangSet("lang/", true);
 <script src="js/config-panel-bilanpuissance.js"></script>
 <script src="js/config-panel-thevenin.js"></script>
 <script src="js/config-panel-premierordre.js"></script>
+<script src="js/config-panel-tauxvariation.js"></script>
+<script src="js/config-panel-elasticite.js"></script>
+<script src="js/config-panel-multiplicateur.js"></script>
+<script src="js/config-panel-fisher.js"></script>
 <script src="js/xml-lint.js"></script>
 <script src="js/app.js"></script>
 
@@ -10199,6 +10578,7 @@ window.__hsLoadLangSet("lang/", true);
 <script src="js/ddmarker-assist.js"></script>
 <script src="js/jxgdrop-ui.js"></script>
 <script src="js/imgclick-ui.js"></script>
+<script src="js/imgslideshow-ui.js"></script>
 <script src="js/optique-ui.js"></script>
 <script src="js/acide-base-ui.js"></script>
 <script src="js/redox-ui.js"></script>
@@ -10338,6 +10718,7 @@ window.__hsLoadLangSet("lang/", true);
 <script src="js/preview-geometrie.js"></script>
 <script src="js/preview-image-mesure.js"></script>
 <script src="js/preview-imgclick.js"></script>
+<script src="js/preview-imgslideshow.js"></script>
 <script src="js/preview-incertitude.js"></script>
 <script src="js/preview-inequation.js"></script>
 <script src="js/preview-jxgdrop.js"></script>
@@ -10377,6 +10758,10 @@ window.__hsLoadLangSet("lang/", true);
 <script src="js/preview-bilanpuissance.js"></script>
 <script src="js/preview-thevenin.js"></script>
 <script src="js/preview-premierordre.js"></script>
+<script src="js/preview-tauxvariation.js"></script>
+<script src="js/preview-elasticite.js"></script>
+<script src="js/preview-multiplicateur.js"></script>
+<script src="js/preview-fisher.js"></script>
 <script>
 window.addEventListener("load", function(){
   var run = function(){

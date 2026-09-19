@@ -140,7 +140,12 @@ async function _generateAndStoreQuestion(qid, type) {
     'arbrebinaire': W.genArbrebinaire,
     'bilanpuissance': W.genBilanpuissance,
     'thevenin': W.genThevenin,
-    'premierordre': W.genPremierordre
+    'premierordre': W.genPremierordre,
+    'tauxvariation': W.genTauxvariation,
+    'elasticite': W.genElasticite,
+    'multiplicateur': W.genMultiplicateur,
+    'fisher': W.genFisher,
+    'imgslideshow': W.genImgSlideshow
   };
 
   var gen = genMap[type];

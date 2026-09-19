@@ -1692,6 +1692,13 @@ html[data-theme="dark"] .vf-row-fbs{border-color:#334155;}
 html[data-theme="dark"] .ord-row{background:#1e1127;border-color:#9d174d;}
 html[data-theme="dark"] .ord-item-text{background:#0f172a;border-color:#4c1d95;color:#e2e8f0;}
 .ord-clone-label{display:flex;align-items:flex-start;gap:8px;margin-top:10px;cursor:pointer;font-size:.93rem;}
+.imsl-gallery-row{background:#f0fdfa;border-color:#0d9488;}
+.imsl-gallery-thumb{width:44px;height:32px;object-fit:cover;border-radius:4px;border:1px solid #0d9488;flex-shrink:0;}
+.imsl-gallery-name{flex:1;font-size:.88rem;color:#0f766e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.imsl-prop-row{background:#f0fdfa;border-color:#0d9488;}
+.imsl-prop-correct{flex-shrink:0;width:18px;height:18px;accent-color:#0d9488;cursor:pointer;}
+html[data-theme="dark"] .imsl-gallery-row,html[data-theme="dark"] .imsl-prop-row{background:#042f2e;border-color:#0d9488;}
+html[data-theme="dark"] .imsl-gallery-name{color:#5eead4;}
 .ord-clone-label input[type="checkbox"]{margin-top:2px;accent-color:#be185d;}
 .ord-clone-label .hint{display:block;font-size:.82rem;color:#6b7280;margin-top:2px;}
 /* ── Image cliquable ────────────────────────────────────────────── */
@@ -3188,7 +3195,12 @@ html[data-theme="dark"] .hs-preview-panel {
 #q-config-modal:has(#fp-arbrebinaire[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-bilanpuissance[style*="display: block"]) .q-config-modal-box,
 #q-config-modal:has(#fp-thevenin[style*="display: block"]) .q-config-modal-box,
-#q-config-modal:has(#fp-premierordre[style*="display: block"]) .q-config-modal-box {
+#q-config-modal:has(#fp-premierordre[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-tauxvariation[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-elasticite[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-multiplicateur[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-fisher[style*="display: block"]) .q-config-modal-box,
+#q-config-modal:has(#fp-imgslideshow[style*="display: block"]) .q-config-modal-box {
   width: min(1200px, 96vw);
 }
 @media (max-width: 1000px) {
@@ -3203,7 +3215,7 @@ html[data-theme="dark"] .hs-preview-panel {
   #fp-rvbcmj[style*="display: block"], #fp-imgclick[style*="display: block"], #fp-jxgdrop[style*="display: block"], #fp-ord[style*="display: block"],
   #fp-chemical[style*="display: block"], #fp-chemical_topo[style*="display: block"], #fp-nuclear[style*="display: block"], #fp-composition[style*="display: block"],
   #fp-crossword[style*="display: block"], #fp-doi[style*="display: block"], #fp-image-mesure[style*="display: block"], #fp-apn[style*="display: block"],
-  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"], #fp-avancement[style*="display: block"], #fp-cinematique[style*="display: block"], #fp-hardyweinberg[style*="display: block"], #fp-croisements[style*="display: block"], #fp-distancegenetique[style*="display: block"], #fp-horlogemoleculaire[style*="display: block"], #fp-radiochronologie[style*="display: block"], #fp-ondesismique[style*="display: block"], #fp-malthus[style*="display: block"], #fp-regle10[style*="display: block"], #fp-chi2[style*="display: block"], #fp-debit[style*="display: block"], #fp-nernst[style*="display: block"], #fp-dilutions[style*="display: block"], #fp-ieee754[style*="display: block"], #fp-complexite[style*="display: block"], #fp-arbrebinaire[style*="display: block"], #fp-bilanpuissance[style*="display: block"], #fp-thevenin[style*="display: block"], #fp-premierordre[style*="display: block"] { display: block !important; }
+  #fp-equivalence[style*="display: block"], #fp-geogebra[style*="display: block"], #fp-nomenclature[style*="display: block"], #fp-incertitude[style*="display: block"], #fp-zscore[style*="display: block"], #fp-avancement[style*="display: block"], #fp-cinematique[style*="display: block"], #fp-hardyweinberg[style*="display: block"], #fp-croisements[style*="display: block"], #fp-distancegenetique[style*="display: block"], #fp-horlogemoleculaire[style*="display: block"], #fp-radiochronologie[style*="display: block"], #fp-ondesismique[style*="display: block"], #fp-malthus[style*="display: block"], #fp-regle10[style*="display: block"], #fp-chi2[style*="display: block"], #fp-debit[style*="display: block"], #fp-nernst[style*="display: block"], #fp-dilutions[style*="display: block"], #fp-ieee754[style*="display: block"], #fp-complexite[style*="display: block"], #fp-arbrebinaire[style*="display: block"], #fp-bilanpuissance[style*="display: block"], #fp-thevenin[style*="display: block"], #fp-premierordre[style*="display: block"], #fp-tauxvariation[style*="display: block"], #fp-elasticite[style*="display: block"], #fp-multiplicateur[style*="display: block"], #fp-fisher[style*="display: block"], #fp-imgslideshow[style*="display: block"] { display: block !important; }
   .hs-split-row { display: block; }
   .hs-split-left, .hs-preview-panel { max-width: none; }
   .hs-preview-panel { margin-top: 15px; border-top: 1px dashed #ccc; }

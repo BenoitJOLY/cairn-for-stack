@@ -247,7 +247,7 @@ const TYPE_ICON_MAP = {
   string:'string', match:'match', crossword:'crossword', doi:'doi',
   chemical:'chemistry', chemical_topo:'chemical_topo', nuclear:'nuclear',
   composition:'composition', jxgdrop:'jxgdrop', vf:'vf', ord:'ord',
-  imgclick:'imgclick', rvbcmj:'rvbcmj', optique:'optique', 'acide-base':'acide-base', 'redox':'redox', 'basen':'basen', 'circuit':'circuit', 'logique':'logique', 'complexe':'complexe', 'calcul':'calcul', 'statistiques':'statistiques', 'matrices':'matrices', 'geometrie':'geometrie', 'suites':'suites', 'probabilites':'probabilites', 'trigonometrie':'trigonometrie', 'polynomes':'polynomes', 'limites':'limites', 'physique':'physique', 'oscilloscope':'oscilloscope', 'inequation':'inequation', 'diffraction':'diffraction', 'image-mesure':'image-mesure', 'equivalence':'equivalence',
+  imgclick:'imgclick', imgslideshow:'imgslideshow', rvbcmj:'rvbcmj', optique:'optique', 'acide-base':'acide-base', 'redox':'redox', 'basen':'basen', 'circuit':'circuit', 'logique':'logique', 'complexe':'complexe', 'calcul':'calcul', 'statistiques':'statistiques', 'matrices':'matrices', 'geometrie':'geometrie', 'suites':'suites', 'probabilites':'probabilites', 'trigonometrie':'trigonometrie', 'polynomes':'polynomes', 'limites':'limites', 'physique':'physique', 'oscilloscope':'oscilloscope', 'inequation':'inequation', 'diffraction':'diffraction', 'image-mesure':'image-mesure', 'equivalence':'equivalence',
   'stack-raw':'stack-import',
   'expert':'expert',
   'geogebra':'geogebra',
@@ -273,7 +273,11 @@ const TYPE_ICON_MAP = {
   'arbrebinaire':'arbrebinaire',
   'bilanpuissance':'bilanpuissance',
   'thevenin':'thevenin',
-  'premierordre':'premierordre'
+  'premierordre':'premierordre',
+  'tauxvariation':'tauxvariation',
+  'elasticite':'elasticite',
+  'multiplicateur':'multiplicateur',
+  'fisher':'fisher'
 };
 
 function initEditor() {

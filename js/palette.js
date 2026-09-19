@@ -37,6 +37,7 @@ var PALETTE_TYPES = [
   {type:'composition',   label:'Composition'},
   {type:'jxgdrop',       label:'Glisser-Déposer'},
   {type:'imgclick',      label:'Sélection image'},
+  {type:'imgslideshow',  label:'Diaporama chronométré'},
   {type:'geogebra',      label:'GeoGebra'},
   {type:'rvbcmj',        label:'RVB / CMJN'},
   {type:'optique',       label:'Optique géométrique'},
@@ -85,6 +86,10 @@ var PALETTE_TYPES = [
   {type:'bilanpuissance', label:'Bilan de puissance et rendement global'},
   {type:'thevenin', label:'Kirchhoff / Thévenin (résistance équivalente, courant)'},
   {type:'premierordre', label:'Système du premier ordre (erreur statique)'},
+  {type:'tauxvariation', label:'Taux de variation, coefficient multiplicateur et indice'},
+  {type:'elasticite', label:'Élasticité-prix de la demande'},
+  {type:'multiplicateur', label:'Multiplicateur keynésien'},
+  {type:'fisher', label:'Relation de Fisher (croissance nominale et réelle)'},
   {type:'expert',       label:'Question Expert STACK'}
 ];
 
@@ -98,7 +103,8 @@ var PALETTE_CATEGORIES = [
   {id:'info',        label:'Informatique',           types:['basen','logique','ieee754','complexite','arbrebinaire']},
   {id:'textuelle',   label:'Réponse textuelle',      types:['string','composition']},
   {id:'organisation',label:'Organisation',           types:['match','crossword','ord']},
-  {id:'interactif',  label:'Interactif / Visuel',   types:['jxgdrop','imgclick','image-mesure']},
+  {id:'interactif',  label:'Interactif / Visuel',   types:['jxgdrop','imgclick','imgslideshow','image-mesure']},
+  {id:'economie',    label:'Économie',              types:['tauxvariation','elasticite','multiplicateur','fisher']},
   {id:'expert',      label:'Mode Expert STACK',     types:['expert']}
 ];
 
