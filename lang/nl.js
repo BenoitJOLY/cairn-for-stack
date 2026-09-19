@@ -1110,6 +1110,8 @@ I18N.add("nl", {
   "ggb.err_no_material":    "Voer de hardware-ID van GeoGebra in.",
   "ggb.err_no_outputs":     "Voeg ten minste één uitvoerobject toe.",
   "ggb.err_bad_name":       "Ongeldige GeoGebra-objectnaam: {name}",
+  "ggb.warn_missing_prefix": "⚠ GeoGebra-object(en) niet gevonden in deze constructie: ",
+  "ggb.warn_missing_suffix": ". Controleer de exacte spelling (inclusief hoofdlettergebruik) in het .ggb-bestand.",
 
   /* ── vf — Vrai / Faux ── */
   "type.vf":            "Waar / niet waar",

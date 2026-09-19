@@ -136,6 +136,31 @@ function ggbBuildEmbedHtml(X, st, opts) {
     return "try{api.registerObjectUpdateListener('" + o.ggbName.replace(/'/g, "\\'") + "', ggb" + X + "_sync);}catch(e){}";
   }).join('\n      ');
 
+  /* Bug fréquent (rapporté par un relecteur externe) : le nom d'un objet
+     GeoGebra déclaré côté enseignant (set=/watch=) ne correspond à AUCUN
+     objet réel de la construction .ggb (faute de frappe, casse différente,
+     objet renommé). Le filtre Moodle [[geogebra]] échoue alors en silence :
+     l'entrée n'est jamais injectée / la sortie n'est jamais lue, sans
+     aucune erreur visible pour l'élève ni l'enseignant. On détecte ça ici,
+     dans l'aperçu live (seul endroit où l'API GeoGebra réelle est
+     disponible côté navigateur), pour prévenir l'enseignant AVANT l'export,
+     plutôt que de laisser le bug se découvrir silencieusement sur Moodle. */
+  var declaredNames = inputs.map(function (r) { return r.ggbName; })
+    .concat(outputs.map(function (o) { return o.ggbName; }));
+  var missingCheckLines = declaredNames.length
+    ? "try{\n"
+      + "        var _hsDeclared=" + JSON.stringify(declaredNames) + ";\n"
+      + "        var _hsMissing=_hsDeclared.filter(function(n){try{return !api.exists(n);}catch(e){return false;}});\n"
+      + "        if(_hsMissing.length){\n"
+      + "          var _hsWarn=document.createElement('div');\n"
+      + "          _hsWarn.style.cssText='background:#fef2f2;border-left:4px solid #dc2626;color:#7f1d1d;padding:8px 12px;margin-bottom:8px;border-radius:4px;font-size:.85rem;';\n"
+      + "          _hsWarn.textContent=" + JSON.stringify(I18N.t('ggb.warn_missing_prefix')) + "+_hsMissing.join(', ')+" + JSON.stringify(I18N.t('ggb.warn_missing_suffix')) + ";\n"
+      + "          var _hsC=document.getElementById('" + containerId + "');\n"
+      + "          if(_hsC&&_hsC.parentNode)_hsC.parentNode.insertBefore(_hsWarn,_hsC);\n"
+      + "        }\n"
+      + "      }catch(e){}"
+    : '';
+
   var loaderGuard = "if(typeof GGBApplet==='undefined'){var s=document.createElement('script');"
     + "s.src='https://www.geogebra.org/apps/deployggb.js';s.onload=ggb" + X + "_start;document.head.appendChild(s);}"
     + "else{ggb" + X + "_start();}";
@@ -154,6 +179,7 @@ function ggbBuildEmbedHtml(X, st, opts) {
     + "      " + (setValueLines || '') + "\n"
     + "      " + (listenerLines || '') + "\n"
     + "      ggb" + X + "_sync();\n"
+    + "      " + (missingCheckLines || '') + "\n"
     + "    }\n"
     + "  };\n"
     + "  var app=new GGBApplet(params,true);\n"

@@ -1108,6 +1108,8 @@ I18N.add("en", {
   "ggb.err_no_material":    "Please enter the GeoGebra material ID.",
   "ggb.err_no_outputs":     "Add at least one output object.",
   "ggb.err_bad_name":       "Invalid GeoGebra object name: {name}",
+  "ggb.warn_missing_prefix": "⚠ GeoGebra object(s) not found in this construction: ",
+  "ggb.warn_missing_suffix": ". Check the exact spelling (including case) in the .ggb file.",
 
   /* ── vf — True / False ── */
   "type.vf":            "True / False",

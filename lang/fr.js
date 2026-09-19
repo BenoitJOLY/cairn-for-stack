@@ -1110,6 +1110,8 @@ I18N.add("fr", {
   "ggb.err_no_material":    "Renseignez l'ID du matériel GeoGebra.",
   "ggb.err_no_outputs":     "Ajoutez au moins un objet de sortie.",
   "ggb.err_bad_name":       "Nom d'objet GeoGebra invalide : {name}",
+  "ggb.warn_missing_prefix": "⚠ Objet(s) GeoGebra introuvable(s) dans cette construction : ",
+  "ggb.warn_missing_suffix": ". Vérifiez l'orthographe exacte (y compris la casse) dans le fichier .ggb.",
 
   /* ── vf — Vrai / Faux ── */
   "type.vf":            "Vrai / Faux",

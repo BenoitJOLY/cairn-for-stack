@@ -309,14 +309,15 @@ details[open] summary::after{ transform:rotate(90deg); }
   <h3>Prérequis</h3>
   <ul>
     <li>Docker & Docker Compose (le projet a été conçu et éprouvé pour un auto-hébergement sur NAS Synology, mais fonctionne sur toute machine Docker)</li>
-    <li>Un conteneur Maxima/Stack-API déjà fonctionnel, sur un réseau Docker nommé <code>maxima_default</code> (créé par son propre projet Compose)</li>
+    <li>Un conteneur Maxima/Stack-API déjà fonctionnel, sur un réseau Docker créé par son propre projet Compose (nom par défaut attendu : <code>maxima_default</code>, mais configurable — voir ci-dessous)</li>
   </ul>
 
   <h3>Étapes</h3>
   <div class="steps">
     <div class="step"><div class="step-body">Cloner le dépôt sur la machine hôte : <code>git clone &lt;url-du-depot&gt; && cd cairn-for-stack</code></div></div>
-    <div class="step"><div class="step-body">Créer un fichier <code>.env</code> à la racine (jamais commité) contenant au minimum <code>SECRETS_KEY</code>, et si souhaité un premier compte admin (voir section suivante).</div></div>
-    <div class="step"><div class="step-body">Vérifier que le réseau <code>maxima_default</code> existe déjà (<code>docker network ls</code>) — <code>docker-compose.yml</code> le rejoint en <code>external: true</code>, il n'est pas recréé.</div></div>
+    <div class="step"><div class="step-body">Créer un fichier <code>.env</code> à la racine (jamais commité) contenant au minimum <code>SECRETS_KEY</code>, et si souhaité un premier compte admin (voir section suivante). Si votre projet Maxima/Stack-API externe ne s'appelle pas « maxima », ajoutez aussi <code>MAXIMA_NETWORK_NAME</code> (voir <a href="#variables-env">§4</a>).</div></div>
+    <div class="step"><div class="step-body">Vérifier que le réseau externe ciblé (<code>maxima_default</code> par défaut, ou la valeur de <code>MAXIMA_NETWORK_NAME</code>) existe déjà (<code>docker network ls</code>) — <code>docker-compose.yml</code> le rejoint en <code>external: true</code>, il n'est pas recréé.</div></div>
+    <div class="step"><div class="step-body">Si le service Stack-API de ce réseau porte un nom différent de <code>maxima-stack-api-1</code>, renseignez le bon nom d'hôte après le premier démarrage, dans <strong>Administration → Serveur Maxima / JSmol → URL interne stack-api (réseau Docker)</strong>.</div></div>
     <div class="step"><div class="step-body">Construire et démarrer : <code>docker-compose up -d --build</code></div></div>
     <div class="step"><div class="step-body">Vérifier la santé du conteneur : <code>curl http://localhost:3000/healthz</code> doit répondre <code>ok</code>.</div></div>
     <div class="step"><div class="step-body">Se connecter sur <code>http://&lt;hôte&gt;:3000/login.html</code> avec le premier compte admin.</div></div>
@@ -343,7 +344,9 @@ details[open] summary::after{ transform:rotate(90deg); }
     <tr><td><code>ACCOUNT_USERNAME</code></td><td>Identifiant du premier compte, créé automatiquement au démarrage du conteneur</td><td>Optionnel</td></tr>
     <tr><td><code>ACCOUNT_PASSWORD</code></td><td>Mot de passe du premier compte</td><td>Optionnel</td></tr>
     <tr><td><code>ACCOUNT_ROLE</code></td><td>Rôle du premier compte (<code>admin</code>, <code>validateur</code>, ou vide)</td><td>Optionnel</td></tr>
+    <tr><td><code>MAXIMA_NETWORK_NAME</code></td><td>Nom du réseau Docker externe (<code>docker-compose.yml</code>) à rejoindre pour atteindre le conteneur Stack-API</td><td><code>maxima_default</code> (nom généré par un projet Compose externe nommé « maxima ») — à changer si le vôtre porte un autre nom de projet</td></tr>
   </table>
+  <p class="hint" style="font-size:.85rem;color:#666;">Distinguer <code>MAXIMA_NETWORK_NAME</code> (quel réseau Docker rejoindre — ici, redémarrage du conteneur requis) du réglage « URL interne stack-api » du panneau Administration (quel nom d'hôte appeler <em>dans</em> ce réseau — modifiable à chaud, sans redémarrage). Les deux corrigent le même symptôme (« stack-api injoignable ») selon que c'est le nom du réseau ou celui du service qui diffère de la convention par défaut.</p>
 
   <div class="warn-box">
     <div class="box-title">SESSION_SECRET non fixé = déconnexion de tous les comptes à chaque redémarrage</div>
@@ -552,7 +555,12 @@ ACCOUNT_ROLE=<span class="vl">admin</span></pre>
   <details>
     <summary>« stack-api injoignable » lors de la génération ou de l'aperçu</summary>
     <div class="faq-body">
-      <p>Le conteneur Cairn for Stack n'arrive pas à joindre <code>maxima-stack-api-1</code> sur le réseau Docker <code>maxima_default</code>. Vérifiez que ce conteneur tourne, que le réseau existe (<code>docker network ls</code>) et que le service Cairn for Stack du <code>docker-compose.yml</code> le rejoint bien dans sa section <code>networks</code>.</p>
+      <p>Le conteneur Cairn for Stack n'arrive pas à joindre le conteneur Stack-API sur le réseau Docker externe. Deux réglages distincts peuvent en être la cause, selon ce qui diffère de la convention par défaut (projet Compose externe nommé « maxima », service nommé « stack-api ») :</p>
+      <ul>
+        <li><strong>Nom du réseau différent</strong> (ex. votre projet Maxima s'appelle autrement que « maxima ») : fixez <code>MAXIMA_NETWORK_NAME</code> dans <code>.env</code> (voir <a href="#variables-env">§4</a>) puis redémarrez le conteneur (<code>docker-compose up -d</code>) pour qu'il rejoigne le bon réseau.</li>
+        <li><strong>Nom du conteneur/service différent</strong> (le réseau est le bon, mais le nom d'hôte à l'intérieur ne l'est pas) : renseignez-le dans <strong>Administration → Serveur Maxima / JSmol → URL interne stack-api (réseau Docker)</strong> — effet immédiat, pas de redémarrage nécessaire.</li>
+      </ul>
+      <p>Vérifiez aussi que le conteneur Stack-API tourne bien et que le réseau existe (<code>docker network ls</code>).</p>
     </div>
   </details>
 

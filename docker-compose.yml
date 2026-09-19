@@ -28,12 +28,18 @@ services:
     restart: unless-stopped
     networks:
       - default
-      - maxima_default
+      - maxima_net
 
-# Réseau du projet Docker "maxima" (stack-api / goemaxima), déjà créé par son
-# propre compose.yaml sur le NAS — on le rejoint ici (external: true, donc pas
-# recréé) pour que ce conteneur puisse joindre "maxima-stack-api-1" par son nom
-# sans jamais passer par internet ni par le port 8443 exposé publiquement.
+# Réseau du projet Docker Maxima/Stack-API (goemaxima), déjà créé par son propre
+# compose.yaml — on le rejoint ici (external: true, donc pas recréé) pour que ce
+# conteneur puisse joindre stack-api par son nom sans jamais passer par internet
+# ni par un port exposé publiquement. Le nom réel du réseau dépend du nom du
+# projet Compose externe ("maxima_default" par défaut, pour un projet nommé
+# "maxima") : si le vôtre porte un autre nom, fixez MAXIMA_NETWORK_NAME dans
+# .env plutôt que d'éditer ce fichier (voir doc/guide-administrateur.html §4).
+# Le nom d'hôte du service stack-api à l'intérieur de ce réseau, lui, se règle
+# dans le panneau Administration de l'application (pas ici).
 networks:
-  maxima_default:
+  maxima_net:
     external: true
+    name: ${MAXIMA_NETWORK_NAME:-maxima_default}
