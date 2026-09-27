@@ -56,6 +56,10 @@ const { _arbVars } = require(path.join('..', 'js', 'gen-arbrebinaire-calc.js'));
 const { _bpuVars } = require(path.join('..', 'js', 'gen-bilanpuissance-calc.js'));
 const { _thvVars } = require(path.join('..', 'js', 'gen-thevenin-calc.js'));
 const { _pmoVars } = require(path.join('..', 'js', 'gen-premierordre-calc.js'));
+const { _tvaVars } = require(path.join('..', 'js', 'gen-tauxvariation-calc.js'));
+const { _elaVars } = require(path.join('..', 'js', 'gen-elasticite-calc.js'));
+const { _mulVars } = require(path.join('..', 'js', 'gen-multiplicateur-calc.js'));
+const { _fisVars } = require(path.join('..', 'js', 'gen-fisher-calc.js'));
 
 const I18N_STUB = { t: (key, vars) => vars ? key + ':' + JSON.stringify(vars) : key };
 
@@ -106,6 +110,10 @@ global._arbVars = _arbVars;
 global._bpuVars = _bpuVars;
 global._thvVars = _thvVars;
 global._pmoVars = _pmoVars;
+global._tvaVars = _tvaVars;
+global._elaVars = _elaVars;
+global._mulVars = _mulVars;
+global._fisVars = _fisVars;
 
 const BASE_DEPS = { I18N: I18N_STUB, buildPrtXml: buildPrtXml, applyFbBox: applyFbBox, _mkFbGen: _mkFbGen, _mkInput: _mkInput };
 
@@ -690,6 +698,68 @@ const TARGETS = [
                 context: { intro: '' },
                 grandeurs: { kList: '2,3,4,5,3/2,5/2', e0List: '1,2,5,10' },
                 fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Taux de variation, coefficient multiplicateur et indice', module: '../js/gen-tauxvariation.js', coreFn: 'genTauxvariationCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { v0List: '80,100,120,150,200', v1List: '88,115,138,165,220' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Élasticité-prix de la demande', module: '../js/gen-elasticite.js', coreFn: 'genElasticiteCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { p0List: '10,20,50,100', p1List: '12,25,55,110', q0List: '1000,2000,500,800', q1List: '900,1600,420,680' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Multiplicateur keynésien', module: '../js/gen-multiplicateur.js', coreFn: 'genMultiplicateurCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { cList: '3/4,4/5,7/10,2/3,3/5', diList: '10,20,50,100' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Relation de Fisher (croissance nominale et réelle)', module: '../js/gen-fisher.js', coreFn: 'genFisherCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1,
+                context: { intro: '' },
+                grandeurs: { grList: '1,3/2,2,5/2,3,7/2', piList: '1,3/2,2,5/2,3,7/2' },
+                fbGen: ''
+            }
+        }]
+    },
+    {
+        label: 'Diaporama chronométré', module: '../js/gen-imgslideshow.js', coreFn: 'genImgSlideshowCore', deps: RICH_DEPS,
+        scenarios: [{
+            label: 'default', params: {
+                bareme: 1, text: '', fbOkTxt: '', fbWrTxt: '', fbGen: '',
+                interval: 2, timeLimit: 15,
+                images: [
+                    { data: 'AAA', w: 400, h: 300 },
+                    { data: 'BBB', w: 400, h: 300 }
+                ],
+                props: [
+                    { id: 'p0', text: 'Réponse A' },
+                    { id: 'p1', text: 'Réponse B' }
+                ],
+                correctPropId: 'p0'
             }
         }]
     }
