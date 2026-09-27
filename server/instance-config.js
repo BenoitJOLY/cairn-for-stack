@@ -29,6 +29,13 @@ const DEFAULTS = {
     ghBanqueFolder: '', ghBanqueBranch: '',
   },
   maximaUrl: '',
+  // Hôte interne (réseau Docker) du relais /stack-api/:route de server.js —
+  // distinct de maximaUrl (URL publique appelée par le navigateur). Valeur
+  // par défaut = nom de conteneur historique de l'auteur (docker-compose.yml,
+  // projet Compose externe "maxima", service "stack-api") ; à changer si le
+  // projet Maxima/Stack-API de l'instance porte un autre nom (bug rapporté :
+  // "maxima-stack-api-1 injoignable" quand ce n'est pas le cas).
+  stackApiInternalUrl: 'http://maxima-stack-api-1/',
   jsmolUrl: '',
   // URL optionnelle d'un JSON personnalisé d'arborescence de tags (voir
   // js/tags-data/_modele.js pour le format attendu). Vide = l'appli garde
@@ -53,6 +60,7 @@ function load() {
   return {
     mutualisation: Object.assign({}, DEFAULTS.mutualisation, raw.mutualisation),
     maximaUrl: raw.maximaUrl || '',
+    stackApiInternalUrl: raw.stackApiInternalUrl || DEFAULTS.stackApiInternalUrl,
     jsmolUrl: raw.jsmolUrl || '',
     tagsUrl: raw.tagsUrl || '',
     ai: Object.assign({}, DEFAULTS.ai, raw.ai),
@@ -73,6 +81,7 @@ function getPublicConfig() {
   return {
     mutualisation: cfg.mutualisation,
     maximaUrl: cfg.maximaUrl,
+    stackApiInternalUrl: cfg.stackApiInternalUrl,
     jsmolUrl: cfg.jsmolUrl,
     tagsUrl: cfg.tagsUrl,
     ai: cfg.ai,
@@ -97,6 +106,13 @@ function setLegalConfig(fields) {
 function setMaximaUrl(url) {
   const cfg = load();
   cfg.maximaUrl = String(url || '').trim();
+  save(cfg);
+}
+
+function setStackApiInternalUrl(url) {
+  const cfg = load();
+  const trimmed = String(url || '').trim();
+  cfg.stackApiInternalUrl = trimmed || DEFAULTS.stackApiInternalUrl;
   save(cfg);
 }
 
@@ -140,6 +156,6 @@ function getSecret(name) {
 }
 
 module.exports = {
-  getPublicConfig, setMutualisationConfig, setMaximaUrl, setJsmolUrl, setTagsUrl, setAiProviderConfig, setLegalConfig,
+  getPublicConfig, setMutualisationConfig, setMaximaUrl, setStackApiInternalUrl, setJsmolUrl, setTagsUrl, setAiProviderConfig, setLegalConfig,
   setSecret, clearSecret, getSecret,
 };

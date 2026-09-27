@@ -45,7 +45,11 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,
+      // 'auto' regarde req.secure à chaque requête (via 'trust proxy' ci-
+      // dessus) : cookie sans flag Secure en HTTP local (dev), avec en HTTPS
+      // (déploiement) — un seul réglage qui marche dans les deux cas, plutôt
+      // que 'true' en dur qui casse la connexion tant qu'on n'est pas en HTTPS.
+      secure: 'auto',
       sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     },
@@ -138,12 +142,15 @@ app.get('/api/admin/config', requireRole('admin'), (req, res) => {
 });
 
 app.post('/api/admin/config', requireRole('admin'), (req, res) => {
-  const { mutualisation, maximaUrl, jsmolUrl, tagsUrl, ai, legal } = req.body || {};
+  const { mutualisation, maximaUrl, stackApiInternalUrl, jsmolUrl, tagsUrl, ai, legal } = req.body || {};
   if (mutualisation && typeof mutualisation === 'object') {
     instanceConfig.setMutualisationConfig(mutualisation);
   }
   if (typeof maximaUrl === 'string') {
     instanceConfig.setMaximaUrl(maximaUrl);
+  }
+  if (typeof stackApiInternalUrl === 'string') {
+    instanceConfig.setStackApiInternalUrl(stackApiInternalUrl);
   }
   if (typeof jsmolUrl === 'string') {
     instanceConfig.setJsmolUrl(jsmolUrl);
@@ -350,12 +357,16 @@ app.get('/api/account/ai-key', (req, res) => {
   res.json({ configured: hasAiKey(req.session.username) });
 });
 
-// Relais interne vers stack-api (conteneur "maxima-stack-api-1", réseau Docker
-// partagé "maxima_default", port interne 80 — voir docker-compose.yml). Le
-// navigateur n'appelle jamais bjoly.synology.me:8443 directement : ça évite le
-// blocage CORS (origine différente à cause du port) puisque tout transite par
-// la même origine que le reste de l'appli. Liste blanche de routes pour ne pas
-// exposer stack-api comme proxy ouvert vers le réseau interne.
+// Relais interne vers stack-api (conteneur du projet Compose Maxima externe,
+// réseau Docker partagé "maxima_default", port interne 80 — voir
+// docker-compose.yml). Le navigateur n'appelle jamais bjoly.synology.me:8443
+// directement : ça évite le blocage CORS (origine différente à cause du port)
+// puisque tout transite par la même origine que le reste de l'appli. Liste
+// blanche de routes pour ne pas exposer stack-api comme proxy ouvert vers le
+// réseau interne. L'hôte cible est configurable (panneau admin, "URL interne
+// stack-api") car il dépend du nommage du projet Compose Maxima de chaque
+// instance — un nom de service différent de "stack-api" cassait silencieusement
+// ce relais avant l'ajout de ce réglage (bug rapporté par un relecteur externe).
 const STACK_API_ROUTES = new Set(['render', 'grade', 'validate', 'diff']);
 
 app.post('/stack-api/:route', async (req, res) => {
@@ -363,7 +374,8 @@ app.post('/stack-api/:route', async (req, res) => {
     return res.status(404).json({ error: 'Route stack-api inconnue.' });
   }
   try {
-    const upstream = await fetch(`http://maxima-stack-api-1/${req.params.route}`, {
+    const base = instanceConfig.getPublicConfig().stackApiInternalUrl.replace(/\/+$/, '');
+    const upstream = await fetch(`${base}/${req.params.route}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body || {}),
