@@ -274,6 +274,7 @@ kbd{
     <a href="#image" class="sub">Clic sur image</a>
     <a href="#chimie" class="sub">Chimie</a>
     <a href="#specialises" class="sub">Modules spécialisés</a>
+    <a href="#geogebra" class="sub">GeoGebra</a>
 
     <div class="sidebar-section-label">Avancé</div>
     <a href="#variables">Variables partagées</a>
@@ -513,7 +514,7 @@ kbd{
     </div>
     <div class="type-card">
       <div class="type-card-head"><span class="type-cat cat-math">Maths</span><span class="type-name">GeoGebra</span></div>
-      <div class="type-desc">Intègre une applet GeoGebra existante (identifiant de matériel) avec entrées/sorties et coefficients paramétrables aléatoirement.</div>
+      <div class="type-desc">Intègre une applet GeoGebra existante (identifiant de matériel) avec entrées/sorties et coefficients paramétrables aléatoirement. Modèles de courbes prêts à l'emploi ; le mode Expert nécessite de construire sa propre activité sur geogebra.org.</div>
     </div>
   </div>
 
@@ -781,6 +782,37 @@ kbd{
       <tr><td><strong>RVB/CMJN</strong></td><td>Identifier une couleur visible à travers des filtres colorés (synthèse additive et soustractive).</td></tr>
     </tbody>
   </table>
+</div>
+
+<div class="section" id="geogebra">
+  <h3>6.12 GeoGebra</h3>
+  <p>Deux façons d'utiliser ce type, selon le champ <strong>Modèle</strong> :</p>
+  <table>
+    <thead><tr><th>Modèle</th><th>Ce que vous faites</th><th>Construction GeoGebra</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Tracé de courbe</strong> (degré 2/3, trigonométrique, exponentielle)</td><td>Choisissez juste les bornes/pas de chaque coefficient (a, h, k…).</td><td>Déjà fournie par Cairn for Stack — rien à construire.</td></tr>
+      <tr><td><strong>Expert</strong></td><td>Déclarez vous-même les objets d'entrée et de sortie.</td><td><strong>À construire et publier vous-même sur geogebra.org.</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn-box">
+    <div class="box-title">Le mode Expert reste un mode expert</div>
+    En mode Expert, Cairn for Stack ne dessine rien et ne devine rien : vu la diversité des constructions possibles (fonctions, géométrie, solides, statistiques, physique…), seul <strong>GeoGebra Classic</strong> peut créer la figure. Le rôle de l'application se limite à faire circuler des valeurs entre les variables Maxima de la question STACK et les objets nommés de <em>votre</em> construction. Il faut donc savoir construire et publier une activité sur <a href="https://www.geogebra.org/classic" target="_blank" rel="noopener">geogebra.org/classic</a> avant de vous lancer — ce guide ne remplace pas cet apprentissage.
+  </div>
+
+  <h4 style="margin:14px 0 6px;">Mode Expert — pas à pas</h4>
+  <div class="steps">
+    <div class="step"><div class="step-body"><strong>Sur geogebra.org</strong>, construisez votre figure. Donnez un nom explicite à chaque objet que vous comptez piloter depuis Maxima (ex. un nombre ou curseur nommé <code>a</code> pour un coefficient aléatoire) et à chaque objet que l'élève doit faire aboutir et que vous voulez lire (ex. un point nommé <code>racine1</code>).</div></div>
+    <div class="step"><div class="step-body">Publiez l'activité (<strong>Fichier → Partager → Publier</strong>). L'URL obtenue est du type <code>geogebra.org/m/XXXXXXXX</code> : <code>XXXXXXXX</code> est l'<strong>ID du matériel</strong>.</div></div>
+    <div class="step"><div class="step-body">Dans Cairn for Stack, type <strong>GeoGebra</strong>, modèle <strong>Expert</strong>, collez cet ID dans <strong>ID du matériel</strong>.</div></div>
+    <div class="step"><div class="step-body"><strong>Objets d'entrée</strong> (une ligne par paramètre à injecter) : <em>Objet</em> = nom exact dans votre construction GeoGebra, <em>Valeur</em> = l'expression Maxima qui calcule sa valeur (ex. <code>ta1</code>). Ils sont poussés dans l'applet à chaque tentative, avant que l'élève ne la manipule.</div></div>
+    <div class="step"><div class="step-body"><strong>Objets de sortie</strong> (une ligne par grandeur à noter) : <em>Objet</em> = nom exact dans GeoGebra, <em>Type</em> (numérique / booléen / texte), <em>Valeur</em> = la réponse attendue pour la comparaison STACK, et la tolérance si numérique. Ils sont relus dans l'applet au moment de la validation.</div></div>
+    <div class="step"><div class="step-body">Utilisez l'<strong>aperçu</strong> pour vérifier que l'applet se charge et que chaque objet déclaré existe bien dans la construction — un avertissement s'affiche sinon, avec le nom de l'objet introuvable.</div></div>
+  </div>
+  <div class="tip-box">
+    <div class="box-title">Nom d'objet erroné : le piège le plus fréquent</div>
+    Un objet renommé ou supprimé côté GeoGebra après coup, ou une simple faute de frappe (majuscule, accent), suffit à casser le lien : STACK ne verra jamais l'erreur, seul l'avertissement de l'aperçu la révèle. Vérifiez toujours l'aperçu après une modification de la construction .ggb.
+  </div>
 </div>
 
 <!-- ═══ VARIABLES ═══ -->

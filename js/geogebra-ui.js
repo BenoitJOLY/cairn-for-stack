@@ -295,6 +295,8 @@ function ggbUpdateModelUI() {
   if (inLbl) inLbl.textContent = isExpert ? I18N.t('ggb.inputs_lbl') : I18N.t('ggb.coeffs_lbl');
   var outField = document.getElementById('ggb-outputs-field');
   if (outField) outField.style.display = isExpert ? '' : 'none';
+  var infoExpert = document.getElementById('ggb-info-box-expert');
+  if (infoExpert) infoExpert.style.display = isExpert ? '' : 'none';
 }
 
 function ggbReset() {
@@ -343,11 +345,17 @@ function ggbRenderInputs() {
   var rows = st.inputs || [];
   c.innerHTML = rows.map(function (r, i) {
     return '<div class="ggb-row">'
+      + '<div class="ggb-field">'
+      + '<span class="ggb-field-lbl">' + I18N.t('ggb.field_obj_lbl') + '</span>'
       + '<input class="hs-input ggb-mono" placeholder="' + I18N.t('ggb.ph_ggb_obj') + '" value="' + attrEsc(r.ggbName || '') + '" '
       + 'onchange="ggbUpdateInput(' + i + ',\'ggbName\',this.value)">'
+      + '</div>'
       + '<span class="ggb-arrow">←</span>'
+      + '<div class="ggb-field">'
+      + '<span class="ggb-field-lbl">' + I18N.t('ggb.field_val_lbl') + '</span>'
       + '<input class="hs-input ggb-mono" placeholder="' + I18N.t('ggb.ph_maxima_expr') + '" value="' + attrEsc(r.expr || '') + '" '
       + 'onchange="ggbUpdateInput(' + i + ',\'expr\',this.value)">'
+      + '</div>'
       + '<button type="button" class="ggb-row-del" onclick="ggbRemoveInput(' + i + ')" title="' + I18N.t('common.supprimer') + '">✕</button>'
       + '</div>';
   }).join('') || '<div class="ggb-empty">' + I18N.t('ggb.no_inputs') + '</div>';
@@ -375,11 +383,17 @@ function ggbRenderOutputs() {
       return '<option value="' + x + '"' + (t === x ? ' selected' : '') + '>' + I18N.t('ggb.type_' + x) + '</option>';
     }).join('');
     return '<div class="ggb-row ggb-row-out">'
+      + '<div class="ggb-field">'
+      + '<span class="ggb-field-lbl">' + I18N.t('ggb.field_obj_lbl') + '</span>'
       + '<input class="hs-input ggb-mono" placeholder="' + I18N.t('ggb.ph_ggb_obj') + '" value="' + attrEsc(r.ggbName || '') + '" '
       + 'onchange="ggbUpdateOutput(' + i + ',\'ggbName\',this.value)">'
+      + '</div>'
       + '<select class="hs-input" aria-label="Type de la variable de sortie" onchange="ggbUpdateOutput(' + i + ',\'type\',this.value)">' + typeOpts + '</select>'
+      + '<div class="ggb-field">'
+      + '<span class="ggb-field-lbl">' + I18N.t('ggb.field_val_lbl') + '</span>'
       + '<input class="hs-input ggb-mono" placeholder="' + I18N.t('ggb.ph_tans') + '" value="' + attrEsc(r.tans || '') + '" '
       + 'onchange="ggbUpdateOutput(' + i + ',\'tans\',this.value)">'
+      + '</div>'
       + (t === 'numerical'
         ? '<input type="number" step="any" min="0" class="hs-input ggb-tol" placeholder="±" value="' + attrEsc(r.tol || '0.01') + '" '
           + 'onchange="ggbUpdateOutput(' + i + ',\'tol\',this.value)">'

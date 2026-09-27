@@ -3244,3 +3244,28 @@ html[data-theme="dark"] .hs-preview-panel {
 .ggb-coeff-fields input.ggb-coeff-val { flex:0 0 90px; text-align:center; }
 html[data-theme="dark"] .ggb-coeff-name { color:#cbd5e1; }
 html[data-theme="dark"] .ggb-coeff-row { background:rgba(255,255,255,.03); }
+
+/* ── Entrées / sorties GeoGebra (chaque ligne = une case nom+valeur) ── */
+.ggb-row {
+  display:flex; align-items:flex-end; gap:8px; padding:8px; margin-bottom:6px;
+  background:var(--panel-2, rgba(0,0,0,.02)); border:1px solid var(--border); border-radius:8px;
+  flex-wrap:wrap;
+}
+.ggb-row-out { border-color:#38761d; background:rgba(56,118,29,.05); }
+.ggb-field { display:flex; flex-direction:column; gap:3px; flex:1 1 0; min-width:110px; }
+.ggb-field-lbl { font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.02em; color:#6b7280; }
+.ggb-row .ggb-mono { width:100%; }
+.ggb-row select.hs-input { flex:1 1 0; min-width:130px; }
+.ggb-arrow { flex:0 0 auto; align-self:center; color:#38761d; font-weight:700; padding-bottom:6px; }
+.ggb-row-del {
+  flex:0 0 auto; align-self:center; border:none; background:transparent; color:#9ca3af; cursor:pointer;
+  font-size:.95rem; line-height:1; padding:4px 6px; border-radius:4px;
+}
+.ggb-row-del:hover { background:rgba(220,38,38,.1); color:#dc2626; }
+.ggb-tol { flex:0 0 70px; align-self:center; text-align:center; }
+.ggb-tol-spacer { flex:0 0 70px; }
+.ggb-empty { padding:10px; font-size:.85rem; color:#6b7280; font-style:italic; }
+html[data-theme="dark"] .ggb-row { background:rgba(255,255,255,.03); }
+html[data-theme="dark"] .ggb-row-out { background:rgba(56,118,29,.1); border-color:#4d7c33; }
+html[data-theme="dark"] .ggb-field-lbl { color:#94a3b8; }
+html[data-theme="dark"] .ggb-empty { color:#94a3b8; }
