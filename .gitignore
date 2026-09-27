@@ -11,3 +11,7 @@ server/data/
 # Identifiant/mot de passe du premier compte (création automatique au
 # démarrage du conteneur, voir server/entrypoint.sh) — jamais commité
 .env
+
+# Sorties personnelles de l'outil standalone Cairn XML (scripts/build-
+# question-server.js) — questions générées par un enseignant, pas du code
+questions/

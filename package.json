@@ -5,7 +5,8 @@
   "description": "Générateur de questions STACK/Moodle — app statique (aucun build requis).",
   "scripts": {
     "test": "node --test test/unit/**/*.test.js",
-    "check-prt": "node scripts/check-prt-reachability.js"
+    "check-prt": "node scripts/check-prt-reachability.js",
+    "build-question": "node scripts/build-question-xml.js"
   },
   "engines": {
     "node": ">=18"

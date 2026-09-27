@@ -1,0 +1,51 @@
+{
+  "lang": "fr",
+  "quizName": "Test especes chimiques",
+  "penalty": 0.1,
+  "feedbackStyle": "compact",
+  "tags": {
+    "matiere": "Chimie",
+    "niveau": "2nde",
+    "sousMatiere": "Chimie",
+    "chapitre": "Molecules",
+    "bloom": ["Memoriser"],
+    "difficulte": "Simple",
+    "outils": [],
+    "divers": []
+  },
+  "questions": [
+    {
+      "type": "checkbox",
+      "params": {
+        "bareme": 1,
+        "text": "<p>Cochez les affirmations vraies à propos de la molécule d'eau H2O.</p>",
+        "Xe": "3", "mXb": "fixe", "Xb": "2",
+        "props": [
+          { "bool": "true", "text": "Elle contient deux atomes d'hydrogène.", "fb": "Exact, H2O = 2 H + 1 O.", "fb2": "" },
+          { "bool": "false", "text": "Elle contient deux atomes d'oxygène.", "fb": "Non, un seul atome d'oxygène.", "fb2": "" },
+          { "bool": "true", "text": "C'est une molécule polaire.", "fb": "Exact, la géométrie coudée rend la molécule polaire.", "fb2": "" }
+        ],
+        "showOubli": false,
+        "cbFbGen": "",
+        "cbFbGenShowFb": false
+      }
+    },
+    {
+      "type": "string",
+      "params": {
+        "bareme": 1,
+        "text": "<p>Quel est le nom de la molécule de formule H2O ?</p>",
+        "ansPlain": "eau",
+        "size": 20,
+        "test": "AlgEquiv",
+        "fbc": "<p>✅ <strong>Bravo, c'est bien de l'eau.</strong></p>",
+        "fbe": "<p>❌ Non, ce n'est pas la bonne réponse.</p>",
+        "fbGen": "",
+        "solH": "",
+        "paletteHtml": "",
+        "levenOn": false,
+        "altsArr": []
+      }
+    }
+  ]
+}
