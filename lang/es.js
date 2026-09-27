@@ -3651,7 +3651,7 @@ I18N.add("es", {
   "palette.cat.physique":      "Física",
   "palette.cat.chimie":        "Química",
   "palette.cat.sciences":      "Ciencias (General)",
-  "palette.cat.svt":           "Biología",
+  "palette.cat.biologie":      "Biología",
   "palette.cat.info":          "Informática",
   "palette.cat.textuelle":     "Respuesta literal",
   "palette.cat.organisation":  "Organización",

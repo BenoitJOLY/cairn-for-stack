@@ -3651,7 +3651,7 @@ I18N.add("nl", {
   "palette.cat.physique":      "Natuurkunde",
   "palette.cat.chimie":        "Scheikunde",
   "palette.cat.sciences":      "Wetenschappen (Algemeen)",
-  "palette.cat.svt":           "Biologie",
+  "palette.cat.biologie":      "Biologie",
   "palette.cat.info":          "Computerwetenschappen",
   "palette.cat.textuelle":     "Tekst antwoord",
   "palette.cat.organisation":  "Organisatie",

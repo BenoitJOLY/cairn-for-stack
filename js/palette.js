@@ -99,7 +99,7 @@ var PALETTE_CATEGORIES = [
   {id:'physique',    label:'Physique',               types:['doi','nuclear','optique','circuit','physique','oscilloscope','diffraction','rvbcmj','apn','cinematique','bilanpuissance','thevenin','premierordre']},
   {id:'chimie',      label:'Chimie',                 types:['chemical','chemical_topo','acide-base','redox','nomenclature','avancement']},
   {id:'sciences',    label:'Sciences (Général)',     types:['units','incertitude','zscore']},
-  {id:'svt',         label:'SVT',                    types:['hardyweinberg','croisements','distancegenetique','horlogemoleculaire','radiochronologie','ondesismique','malthus','regle10','chi2','debit','nernst','dilutions']},
+  {id:'biologie',    label:'Biologie',               types:['hardyweinberg','croisements','distancegenetique','horlogemoleculaire','radiochronologie','ondesismique','malthus','regle10','chi2','debit','nernst','dilutions']},
   {id:'info',        label:'Informatique',           types:['basen','logique','ieee754','complexite','arbrebinaire']},
   {id:'textuelle',   label:'Réponse textuelle',      types:['string','composition']},
   {id:'organisation',label:'Organisation',           types:['match','crossword','ord']},

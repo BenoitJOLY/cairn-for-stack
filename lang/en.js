@@ -3647,7 +3647,7 @@ I18N.add("en", {
   "palette.cat.physique":      "Physics",
   "palette.cat.chimie":        "Chemistry",
   "palette.cat.sciences":      "Science (General)",
-  "palette.cat.svt":           "Biology",
+  "palette.cat.biologie":      "Biology",
   "palette.cat.info":          "Computer science",
   "palette.cat.textuelle":     "Text answer",
   "palette.cat.organisation":  "Organisation",

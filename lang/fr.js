@@ -3650,7 +3650,7 @@ I18N.add("fr", {
   "palette.cat.physique":      "Physique",
   "palette.cat.chimie":        "Chimie",
   "palette.cat.sciences":      "Sciences (Général)",
-  "palette.cat.svt":           "SVT",
+  "palette.cat.biologie":      "Biologie",
   "palette.cat.info":          "Informatique",
   "palette.cat.textuelle":     "Réponse textuelle",
   "palette.cat.organisation":  "Organisation",
