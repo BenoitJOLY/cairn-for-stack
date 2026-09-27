@@ -10,7 +10,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 
-const { genNomenclatureCore, NOM_DONNES, _nomFamilies } = require(path.join('..', '..', 'js', 'gen-nomenclature.js'));
+const { genNomenclatureCore, NOM_DONNES, _nomFamilies, _nomDecompose } = require(path.join('..', '..', 'js', 'gen-nomenclature.js'));
 const { buildPrtXml } = require(path.join('..', '..', 'js', 'prt-manager.js'));
 const { applyFbBox } = require(path.join('..', '..', 'js', 'fb-box.js'));
 
@@ -55,6 +55,38 @@ test('_nomFamilies() renvoie une liste triée sans doublons', () => {
     assert.deepEqual(fams, sorted);
 });
 
+test('_nomFamilies() couvre les 9 familles du lycée (dont Alcynes et Amines)', () => {
+    assert.deepEqual(_nomFamilies(), [
+        'Acides carboxyliques', 'Alcanes', 'Alcools', 'Alcynes', 'Alcènes',
+        'Aldéhydes', 'Amines', 'Cétones', 'Esters'
+    ].sort((a, b) => a.localeCompare(b, 'fr')));
+});
+
+// Régression : chaque entrée de NOM_DONNES doit rester décomposable par _nomDecompose
+// (sert de garde-fou contre une coquille dans un nom IUPAC ajouté au pool, qui romprait
+// silencieusement crit_longueur/subs/numero/ordre côté mode Aléatoire).
+test('toutes les entrées de NOM_DONNES se décomposent correctement (aucune coquille de nom IUPAC)', () => {
+    NOM_DONNES.forEach((m) => {
+        const d = _nomDecompose(m[1]);
+        assert.ok(d.ok, `"${m[1]}" (${m[0]}) ne se décompose pas`);
+        assert.equal(d.famille, m[0], `"${m[1]}" décomposé en famille "${d.famille}" au lieu de "${m[0]}"`);
+    });
+});
+
+// ── Nouvelles familles Alcynes / Amines (décomposition JS) ─────────────────
+test('_nomDecompose : Alcynes (bare, locant, substitué)', () => {
+    assert.deepEqual(_nomDecompose('Éthyne'), { ok: true, famille: 'Alcynes', longueur: 2, iscyclo: false, subs: [], locprinc: false, alkyle: null });
+    assert.deepEqual(_nomDecompose('But-2-yne'), { ok: true, famille: 'Alcynes', longueur: 4, iscyclo: false, subs: [], locprinc: 2, alkyle: null });
+    assert.deepEqual(_nomDecompose('3-Méthylbut-1-yne'), { ok: true, famille: 'Alcynes', longueur: 4, iscyclo: false, subs: [[3, 'méthyl']], locprinc: 1, alkyle: null });
+});
+
+test('_nomDecompose : Amines (bare, locant, cyclo, substituée)', () => {
+    assert.deepEqual(_nomDecompose('Méthanamine'), { ok: true, famille: 'Amines', longueur: 1, iscyclo: false, subs: [], locprinc: false, alkyle: null });
+    assert.deepEqual(_nomDecompose('Propan-2-amine'), { ok: true, famille: 'Amines', longueur: 3, iscyclo: false, subs: [], locprinc: 2, alkyle: null });
+    assert.deepEqual(_nomDecompose('Cyclohexanamine'), { ok: true, famille: 'Amines', longueur: 6, iscyclo: true, subs: [], locprinc: false, alkyle: null });
+    assert.deepEqual(_nomDecompose('2-Méthylpropan-1-amine'), { ok: true, famille: 'Amines', longueur: 3, iscyclo: false, subs: [[2, 'méthyl']], locprinc: 1, alkyle: null });
+});
+
 // ── Mode Fixe (molécule imposée, RegExp tolérant) ──────────────────────────
 function fixeParams(overrides) {
     return Object.assign({
@@ -73,10 +105,10 @@ test('mode fixe : vars contient smiles_dessin/nom_attendu/famille_attendue suffi
     assert.match(q.vars, /famille_attendue3 : "Alcanes"\$/);
 });
 
-// Famille hors périmètre du décomposeur (7 familles supportées, cf. _nomDecompose) :
+// Famille hors périmètre du décomposeur (9 familles supportées, cf. _nomDecompose) :
 // sert à couvrir le repli sur l'ancien nœud RegExp tolérant unique.
 function fixeParamsFallback(overrides) {
-    return fixeParams(Object.assign({ fixeFamille: 'Amines', fixeNom: 'Butan-1-amine', fixeSmiles: 'CCCCN' }, overrides || {}));
+    return fixeParams(Object.assign({ fixeFamille: 'Amides', fixeNom: 'Éthanamide', fixeSmiles: 'CC(=O)N' }, overrides || {}));
 }
 
 test('mode fixe : nom non décomposable -> repli, regexify_nom construit un pattern tolérant tirets/espaces/casse', () => {

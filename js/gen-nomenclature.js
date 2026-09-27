@@ -23,7 +23,7 @@
 // Toutes les variables Maxima sont suffixées par ${X} (Loi 2 : pas de variable
 // partagée entre chips d'une même question combinée).
 
-// Pool de molécules pour le mode Aléatoire (98 entrées, identique à la variable
+// Pool de molécules pour le mode Aléatoire (121 entrées, identique à la variable
 // Maxima "donnes" du gabarit Type 1). Sert aussi côté JS à peupler le menu
 // déroulant "Famille" du panneau de config.
 const NOM_DONNES = [
@@ -124,7 +124,30 @@ const NOM_DONNES = [
 ["Esters", "2-Méthylbutanoate de méthyle", "CC(C)CC(=O)OC"],
 ["Esters", "3-Méthylbutanoate d'éthyle", "CCC(C)C(=O)OCC"],
 ["Esters", "2,2-Diméthylpropanoate de méthyle", "CC(C)(C)C(=O)OC"],
-["Esters", "2,2-Diméthylpropanoate d'éthyle", "CC(C)(C)C(=O)OCC"]
+["Esters", "2,2-Diméthylpropanoate d'éthyle", "CC(C)(C)C(=O)OCC"],
+["Alcynes", "Éthyne", "C#C"],
+["Alcynes", "Propyne", "CC#C"],
+["Alcynes", "But-1-yne", "CCC#C"],
+["Alcynes", "But-2-yne", "CC#CC"],
+["Alcynes", "Pent-1-yne", "CCCC#C"],
+["Alcynes", "Pent-2-yne", "CCC#CC"],
+["Alcynes", "Hex-1-yne", "CCCCC#C"],
+["Alcynes", "Hex-2-yne", "CCCC#CC"],
+["Alcynes", "Hex-3-yne", "CCC#CCC"],
+["Alcynes", "3-Méthylbut-1-yne", "C#CC(C)C"],
+["Alcynes", "4-Méthylpent-2-yne", "CC#CC(C)C"],
+["Amines", "Méthanamine", "CN"],
+["Amines", "Éthanamine", "CCN"],
+["Amines", "Propan-1-amine", "CCCN"],
+["Amines", "Butan-1-amine", "CCCCN"],
+["Amines", "Pentan-1-amine", "CCCCCN"],
+["Amines", "Hexan-1-amine", "CCCCCCN"],
+["Amines", "Propan-2-amine", "CC(N)C"],
+["Amines", "Butan-2-amine", "CC(N)CC"],
+["Amines", "2-Méthylpropan-1-amine", "CC(C)CN"],
+["Amines", "2-Méthylpropan-2-amine", "CC(C)(C)N"],
+["Amines", "Cyclopentanamine", "C1CCC(N)C1"],
+["Amines", "Cyclohexanamine", "C1CCCC(N)C1"]
 ];
 
 function _nomFamilies() {
@@ -141,9 +164,9 @@ function _nomFamilies() {
 // SOUMIS par l'étudiant est décomposé par l'équivalent Maxima nom_analyse${X}
 // au moment de la correction (aucune exécution Maxima locale possible pour le
 // vérifier — cf. test/unit/gen-nomenclature.test.js qui valide au moins cette
-// version JS sur les 98 entrées réelles de NOM_DONNES + des cas Fixe types).
+// version JS sur les 121 entrées réelles de NOM_DONNES + des cas Fixe types).
 // Périmètre couvert : chaînes/cycles simples, substituants méthyl/éthyl/
-// propyl/butyl (mono ou multi via di-/tri-/tétra-), 7 familles y compris le
+// propyl/butyl (mono ou multi via di-/tri-/tétra-), 9 familles y compris le
 // cas particulier des acides carboxyliques cycliques ("...carboxylique" et
 // non "...oïque") et des esters ("<acide>oate de/d'<alkyle>").
 const NOM_ROOTS_D = [
@@ -192,13 +215,19 @@ function _nomTryCore(str) {
   if (tail === 'anal') return { famille: 'Aldéhydes', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: false };
   if (tail === 'anol') return { famille: 'Alcools', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: false };
   if (tail === 'anone') return { famille: 'Cétones', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: false };
+  if (tail === 'anamine') return { famille: 'Amines', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: false };
   mm = tail.match(/^an-(\d+)-ol$/);
   if (mm && !iscyclo) return { famille: 'Alcools', longueur: n, iscyclo: false, subs: subs, locprinc: parseInt(mm[1], 10) };
   mm = tail.match(/^an-(\d+)-one$/);
   if (mm && !iscyclo) return { famille: 'Cétones', longueur: n, iscyclo: false, subs: subs, locprinc: parseInt(mm[1], 10) };
+  mm = tail.match(/^an-(\d+)-amine$/);
+  if (mm && !iscyclo) return { famille: 'Amines', longueur: n, iscyclo: false, subs: subs, locprinc: parseInt(mm[1], 10) };
   mm = tail.match(/^-(\d+)-ène$/);
   if (mm) return { famille: 'Alcènes', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: parseInt(mm[1], 10) };
   if (tail === 'ène') return { famille: 'Alcènes', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: false };
+  mm = tail.match(/^-(\d+)-yne$/);
+  if (mm) return { famille: 'Alcynes', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: parseInt(mm[1], 10) };
+  if (tail === 'yne') return { famille: 'Alcynes', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: false };
   if (tail === 'anoïque') return { famille: 'Acides carboxyliques', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: false };
   if (tail === 'anecarboxylique' && iscyclo) return { famille: 'Acides carboxyliques', longueur: n, iscyclo: true, subs: subs, locprinc: false };
   if (tail === 'anoate') return { famille: 'Esters', longueur: n, iscyclo: iscyclo, subs: subs, locprinc: false };
@@ -206,7 +235,7 @@ function _nomTryCore(str) {
 }
 
 // Groupe alkyle d'un ester ("méthyle", "éthyle", ...) : racine simple sans
-// substituants (hors périmètre des 7 familles/98 entrées de la base).
+// substituants (hors périmètre des 9 familles/121 entrées de la base).
 function _nomTryAlkyle(str) {
   const rm = _nomMatchRoot(str);
   if (rm && rm.tail === 'yle') return rm.n;
@@ -244,7 +273,7 @@ function _nomDecompose(rawName) {
   return fail;
 }
 
-// Décomposition (_nomDecompose) précalculée pour les 98 entrées de NOM_DONNES, dans le même ordre.
+// Décomposition (_nomDecompose) précalculée pour les 121 entrées de NOM_DONNES, dans le même ordre.
 let _nomDonnesDecompCache = null;
 function _nomDonnesDecomp() {
   if (!_nomDonnesDecompCache) {
@@ -465,13 +494,19 @@ nom_trycore${X}(s) := block([iscyclo, s1, peel, subs, rest, rm, n, tail],
   if tail = "anal" then return([true, "Aldéhydes", n, iscyclo, subs, false]),
   if tail = "anol" then return([true, "Alcools", n, iscyclo, subs, false]),
   if tail = "anone" then return([true, "Cétones", n, iscyclo, subs, false]),
+  if tail = "anamine" then return([true, "Amines", n, iscyclo, subs, false]),
   if not iscyclo and nom_starts${X}(tail, "an-") and nom_endswith${X}(tail, "-ol") then
     return([true, "Alcools", n, false, subs, nom_readint${X}(tail,4)[1]]),
   if not iscyclo and nom_starts${X}(tail, "an-") and nom_endswith${X}(tail, "-one") then
     return([true, "Cétones", n, false, subs, nom_readint${X}(tail,4)[1]]),
+  if not iscyclo and nom_starts${X}(tail, "an-") and nom_endswith${X}(tail, "-amine") then
+    return([true, "Amines", n, false, subs, nom_readint${X}(tail,4)[1]]),
   if tail = "ène" then return([true, "Alcènes", n, iscyclo, subs, false]),
   if nom_starts${X}(tail, "-") and nom_endswith${X}(tail, "-ène") then
     return([true, "Alcènes", n, iscyclo, subs, nom_readint${X}(tail,2)[1]]),
+  if tail = "yne" then return([true, "Alcynes", n, iscyclo, subs, false]),
+  if nom_starts${X}(tail, "-") and nom_endswith${X}(tail, "-yne") then
+    return([true, "Alcynes", n, iscyclo, subs, nom_readint${X}(tail,2)[1]]),
   if tail = "anoïque" then return([true, "Acides carboxyliques", n, iscyclo, subs, false]),
   if tail = "anecarboxylique" and iscyclo then return([true, "Acides carboxyliques", n, true, subs, false]),
   if tail = "anoate" then return([true, "Esters", n, iscyclo, subs, false]),
