@@ -15,3 +15,12 @@ server/data/
 # Sorties personnelles de l'outil standalone Cairn XML (scripts/build-
 # question-server.js) — questions générées par un enseignant, pas du code
 questions/
+
+# Notes de travail privées (suivi, journal, audits) — gardées en local seulement
+PLAN.md
+JOURNAL.md
+SUIVI.md
+HANDOFF_PREVIEW.md
+bugPRT.txt
+structure.txt
+svt.txt
