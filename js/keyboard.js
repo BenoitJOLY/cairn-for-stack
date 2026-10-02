@@ -20,11 +20,52 @@
 let kbdCurrentType = null;
 let kbdTargetField = null;
 
-// Generate the STACK-ready keyboard HTML using the STACK-JS iframe API
-function buildKbdStackHTML(X){
+// Lettres grecques en syntaxe Maxima (mêmes lettres que la palette LaTeX de
+// l'éditeur riche, mais on insère « alpha » et non « \alpha »). π est absent :
+// il est déjà dans les opérateurs sous la forme %pi. Tous ces noms sont
+// autorisés comme variables élève dans stack/cas/security-map.json.
+const KBD_GREEK = [
+  {v:'alpha',d:'α'},{v:'beta',d:'β'},{v:'gamma',d:'γ'},{v:'delta',d:'δ'},
+  {v:'Delta',d:'Δ'},{v:'epsilon',d:'ε'},{v:'theta',d:'θ'},{v:'lambda',d:'λ'},
+  {v:'mu',d:'μ'},{v:'rho',d:'ρ'},{v:'sigma',d:'σ'},{v:'Sigma',d:'Σ'},
+  {v:'tau',d:'τ'},{v:'phi',d:'φ'},{v:'omega',d:'ω'},{v:'Omega',d:'Ω'},
+];
+
+// Groupes de touches du clavier élève (valeur Maxima insérée, libellé affiché).
+const KBD_OPS = [
+  {v:'+',d:'+'},{v:'-',d:'&#8722;'},{v:'/',d:'&#247;'},{v:'*',d:'&#215;'},{v:'%pi',d:'&#960;'},
+  {v:'^2',d:'x&#178;'},{v:'^',d:'x&#8319;'},{v:'*10^',d:'&#215;10&#8319;'},{v:'(',d:'('},{v:')',d:')'},
+];
+const KBD_FN = [
+  {v:'sqrt()',d:'&#8730;'},{v:'abs()',d:'|x|'},{v:'exp()',d:'e&#739;'},{v:'ln()',d:'ln'},{v:'log_10()',d:'log'},
+  {v:'sin()',d:'sin'},{v:'cos()',d:'cos'},{v:'tan()',d:'tan'},{v:'asin()',d:'Asin'},{v:'acos()',d:'Acos'},{v:'atan()',d:'Atan'},
+];
+
+// Groupes retenus : opts.groups = {ops, fn, greek} (choix de l'enseignant,
+// questions algébriques). Sans opts.groups : opérateurs + fonctions (num/units).
+function kbdResolveGroups(opts){
+  const g=opts&&opts.groups;
+  if(!g) return {ops:true, fn:true, greek:!!(opts&&opts.greek)};
+  return {ops:!!g.ops, fn:!!g.fn, greek:!!g.greek};
+}
+
+// Generate the STACK-ready keyboard HTML using the STACK-JS iframe API.
+function buildKbdStackHTML(X, opts){
   const ansRef='ans'+X;
+  const groups=kbdResolveGroups(opts);
+  const defs=[
+    groups.ops   && {label:I18N.t('kbd.grp_operators'), keys:KBD_OPS, h:85},
+    groups.fn    && {label:I18N.t('kbd.grp_functions'), keys:KBD_FN, h:85},
+    groups.greek && {label:I18N.t('modal.latex_grecques'), keys:KBD_GREEK, h:120},
+  ].filter(Boolean);
+  const rowsHTML=defs.map(d=>`
+  <div class="stack-row-label">${d.label}</div>
+  <div class="stack-keyboard-row">
+${d.keys.map(k=>`    <button class="btn-ins" type="button" data-val="${k.v}">${k.d}</button>`).join('\n')}
+  </div>`).join('');
+  const height=60+defs.reduce((t,d)=>t+d.h,0);
   return `<p>[[input:ans${X}]] [[validation:ans${X}]]</p>
-[[iframe width="100%" height="230px" scrolling="false"]]
+[[iframe width="100%" height="${height}px" scrolling="false"]]
 [[style]]
   body{margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;}
   .stack-keyboard-container{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;max-width:600px;box-sizing:border-box;margin-top:10px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);}
@@ -38,34 +79,7 @@ function buildKbdStackHTML(X){
   .stack-row-label:first-of-type{margin-top:0;}
 [[/style]]
 <div class="stack-keyboard-container">
-  <div class="stack-keyboard-title">\u2328\ufe0f ${I18N.t('tpl.kbd_aide_saisie')}</div>
-  <div class="stack-row-label">${I18N.t('kbd.grp_operators')}</div>
-  <div class="stack-keyboard-row">
-    <button class="btn-ins" type="button" data-val="+">+</button>
-    <button class="btn-ins" type="button" data-val="-">&#8722;</button>
-    <button class="btn-ins" type="button" data-val="/">&#247;</button>
-    <button class="btn-ins" type="button" data-val="*">&#215;</button>
-    <button class="btn-ins" type="button" data-val="%pi">&#960;</button>
-    <button class="btn-ins" type="button" data-val="^2">x&#178;</button>
-    <button class="btn-ins" type="button" data-val="^">x&#8319;</button>
-    <button class="btn-ins" type="button" data-val="*10^">&#215;10&#8319;</button>
-    <button class="btn-ins" type="button" data-val="(">(</button>
-    <button class="btn-ins" type="button" data-val=")">)</button>
-  </div>
-  <div class="stack-row-label">${I18N.t('kbd.grp_functions')}</div>
-  <div class="stack-keyboard-row">
-    <button class="btn-ins" type="button" data-val="sqrt()">&#8730;</button>
-    <button class="btn-ins" type="button" data-val="abs()">|x|</button>
-    <button class="btn-ins" type="button" data-val="exp()">e&#739;</button>
-    <button class="btn-ins" type="button" data-val="ln()">ln</button>
-    <button class="btn-ins" type="button" data-val="log_10()">log</button>
-    <button class="btn-ins" type="button" data-val="sin()">sin</button>
-    <button class="btn-ins" type="button" data-val="cos()">cos</button>
-    <button class="btn-ins" type="button" data-val="tan()">tan</button>
-    <button class="btn-ins" type="button" data-val="asin()">Asin</button>
-    <button class="btn-ins" type="button" data-val="acos()">Acos</button>
-    <button class="btn-ins" type="button" data-val="atan()">Atan</button>
-  </div>
+  <div class="stack-keyboard-title">\u2328\ufe0f ${I18N.t('tpl.kbd_aide_saisie')}</div>${rowsHTML}
 </div>
 [[script type="module"]]
 import {stack_js} from '[[cors src="stackjsiframe.js"/]]';
@@ -98,9 +112,9 @@ stack_js.request_access_to_input("${ansRef}", true).then(function(input_id) {
 // est du pseudo-XML STACK interprété côté Moodle, pas du HTML valide dans
 // notre propre iframe de prévisualisation. Les boutons restent inertes ici
 // (pas de script rejoué), ce qui suffit pour un aperçu visuel fidèle.
-function buildKbdPreviewHTML(){
+function buildKbdPreviewHTML(opts){
   try {
-    var full = buildKbdStackHTML('1');
+    var full = buildKbdStackHTML('1', opts);
     var styleMatch = full.match(/\[\[style\]\]([\s\S]*?)\[\[\/style\]\]/);
     var startIdx = full.indexOf('<div class="stack-keyboard-container">');
     var endIdx = full.indexOf('[[script');
@@ -112,7 +126,7 @@ function buildKbdPreviewHTML(){
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { buildKbdStackHTML: buildKbdStackHTML, buildKbdPreviewHTML: buildKbdPreviewHTML };
+  module.exports = { buildKbdStackHTML: buildKbdStackHTML, buildKbdPreviewHTML: buildKbdPreviewHTML, maximaToLatex: maximaToLatex, KBD_GREEK: KBD_GREEK, addVarToList: addVarToList, formatVarsHelp: formatVarsHelp };
 }
 
 function openKbdModal(type,fieldId){
@@ -122,6 +136,9 @@ function openKbdModal(type,fieldId){
   document.getElementById('kbd-head-bar').style.background = colors[type]||'var(--navy)';
   document.querySelector('#kbd-head-bar h3').innerHTML = '<svg class="hs-ico"><use href="#ico-tool-keyboard"></use></svg> '+I18N.t('tpl.kbd_aide_saisie')+' — '+(labels[type]||'');
   document.getElementById('kbd-btn-confirm').style.background = colors[type]||'var(--navy)';
+  // Lettres grecques : réservées aux expressions algébriques
+  const greekWrap = document.getElementById('kbd-greek-wrap');
+  if(greekWrap) greekWrap.style.display = type==='alg' ? '' : 'none';
 
   // Sync "aide" checkbox with per-type state (hidden when the type has no student-facing field)
   const aideMap = {alg:'alg-h-kbd', num:'num-h-kbd', un:'un-h-kbd'};
@@ -154,7 +171,7 @@ function confirmKbdModal(){
   const srcCb = document.getElementById(aideMap[kbdCurrentType]);
   if(srcCb){
     srcCb.checked = document.getElementById('kbd-aide-check').checked;
-    if(kbdCurrentType==='alg') updateAlgPreview();
+    if(kbdCurrentType==='alg'){ algSyncKbdGroups(); updateAlgPreview(); }
     else if(kbdCurrentType==='num') updateNumPreview();
     else if(kbdCurrentType==='un') updateUnPreview();
   }
@@ -204,6 +221,10 @@ function maximaToLatex(expr){
   // 3. %pi → \pi
   s = s.replace(/%pi/g, '\\pi');
   s = s.replace(/%e\b/g, 'e');
+  // 3b. Lettres grecques Maxima (alpha, Delta…) → \alpha, \Delta, avec indice
+  //     comme l'affiche STACK : rho_0 / rho0 → \rho_{0}, rho_eau → \rho_{eau}
+  s = s.replace(/(?<![A-Za-z_\\])(alpha|beta|gamma|Gamma|delta|Delta|epsilon|zeta|eta|theta|Theta|lambda|Lambda|mu|nu|xi|Xi|rho|sigma|Sigma|tau|upsilon|phi|Phi|chi|psi|Psi|omega|Omega)(?:_?(\d+)|_([A-Za-z0-9]+))?(?![A-Za-z0-9_])/g,
+    function(_, g, num, sub){ const idx = num || sub; return '\\' + g + (idx ? '_{' + idx + '}' : ''); });
 
   // 4. a*10^b → a \times 10^{b}
   s = s.replace(/([^*\s]+)\s*\*\s*10\^\s*(-?\d+)/g, '$1 \\times 10^{$2}');
@@ -342,11 +363,75 @@ function updateKbdPreview(){
   }
 }
 
+const GREEK_CHARS = {
+  alpha:'α',beta:'β',gamma:'γ',Gamma:'Γ',delta:'δ',Delta:'Δ',epsilon:'ε',zeta:'ζ',eta:'η',
+  theta:'θ',Theta:'Θ',iota:'ι',kappa:'κ',lambda:'λ',Lambda:'Λ',mu:'μ',nu:'ν',xi:'ξ',Xi:'Ξ',
+  rho:'ρ',sigma:'σ',Sigma:'Σ',tau:'τ',upsilon:'υ',phi:'φ',Phi:'Φ',chi:'χ',psi:'ψ',Psi:'Ψ',
+  omega:'ω',Omega:'Ω',
+};
+
+// Liste de variables pour l'aide élève : x → x ; rho → ρ (rho) ; rho_0 → ρ₀ (rho_0).
+// Le nom Maxima reste affiché, c'est ce que l'élève doit taper.
+function formatVarsHelp(list){
+  return (list||'').split(',').map(function(s){return s.trim();}).filter(Boolean).map(function(name){
+    const m=name.match(/^([A-Za-z]+?)(?:_?(\d+)|_([A-Za-z0-9]+))?$/);
+    const ch=m&&GREEK_CHARS[m[1]];
+    const code='<code>'+htmlEscVar(name)+'</code>';
+    if(!ch) return code;
+    const idx=m[2]||m[3];
+    return '<strong>'+ch+(idx?'<sub>'+htmlEscVar(idx)+'</sub>':'')+'</strong> ('+code+')';
+  }).join(', ');
+}
+function htmlEscVar(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Groupes du clavier élève choisis par l'enseignant (type algébrique)
+function algKbdGroups(){
+  const g={ops:false, fn:false, greek:false};
+  document.querySelectorAll('.alg-kbd-grp').forEach(function(cb){ if(cb.checked) g[cb.value]=true; });
+  return g;
+}
+function algSyncKbdGroups(){
+  const row=document.getElementById('alg-kbd-groups');
+  const cb=document.getElementById('alg-h-kbd');
+  if(row&&cb) row.style.display=cb.checked?'':'none';
+}
+
+// Ajoute un nom de variable à une liste « x, y » (séparateur virgule, sans doublon).
+function addVarToList(list, name){
+  const vars=(list||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+  if(vars.indexOf(name)===-1) vars.push(name);
+  return vars.join(', ');
+}
+
+// Rangée grecque repliable sous un champ « Variables » (.kbd-vars-greek[data-target])
+function toggleVarsGreek(btn, rowId){
+  const row=document.getElementById(rowId);
+  if(!row) return;
+  const open=row.style.display==='none';
+  row.style.display=open?'':'none';
+  btn.setAttribute('aria-expanded', open?'true':'false');
+}
+
 // Hook keyboard buttons inside the modal to the test input
 // (garde 'typeof document' : ce fichier est aussi require() côté serveur
 // pour buildKbdStackHTML, seule fonction pure exposée — voir server/generate.js)
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded',function(){
+    const greekGrp=document.getElementById('kbd-grp-greek');
+    if(greekGrp){
+      greekGrp.innerHTML=KBD_GREEK.map(function(g){return '<button class="btn-kbd" data-val="'+g.v+'">'+g.d+'</button>';}).join('');
+    }
+    document.querySelectorAll('.kbd-vars-greek').forEach(function(row){
+      row.innerHTML=KBD_GREEK.map(function(g){return '<button type="button" class="btn-kbd" title="'+g.v+'" data-val="'+g.v+'">'+g.d+'</button>';}).join('');
+      row.addEventListener('click',function(e){
+        const btn=e.target.closest('.btn-kbd');
+        const input=document.getElementById(row.dataset.target);
+        if(!btn||!input) return;
+        e.preventDefault();
+        input.value=addVarToList(input.value, btn.dataset.val);
+        input.dispatchEvent(new Event('input',{bubbles:true}));
+      });
+    });
     document.querySelectorAll('#kbdModal .btn-kbd').forEach(function(btn){
       btn.addEventListener('click',function(e){
         e.preventDefault();
@@ -376,7 +461,7 @@ if (typeof document !== 'undefined') {
 //  HELP
 // ══════════════════════════════════════════════════════
 function buildHelpHTML(selector,extra){const cbs=document.querySelectorAll(selector);let items=[];cbs.forEach(c=>{if(c.checked&&c.dataset.html)items.push(`<li>${c.dataset.html}</li>`);});if(extra)items.push(`<li>${extra}</li>`);if(!items.length)return '';return `<div style="background:#f8f9fa;border:1px solid #dee2e6;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>${I18N.t('help.conseils_saisie')}</strong><ul style="margin:8px 0 0 20px;line-height:1.7">${items.join('')}</ul></div>`;}
-function buildAlgHelp(){const sv=document.getElementById('alg-h-vars').checked;const vars=v('alg-vars');return buildHelpHTML('.alg-h',sv&&vars?I18N.t('alg.help_html_vars_utiliser',{vars:vars}):null);}
+function buildAlgHelp(){const sv=document.getElementById('alg-h-vars').checked;const vars=v('alg-vars');return buildHelpHTML('.alg-h',sv&&vars?I18N.t('alg.help_html_vars_utiliser',{vars:formatVarsHelp(vars)}):null);}
 function algRenderFbDetail() {
     var container = document.getElementById('alg-fb-detail');
     if (!container || container.dataset.built || typeof ALG_FB_DEFS === 'undefined') return;
@@ -481,7 +566,6 @@ function validateCurrentType(){
   let ok=true;
   if(currentType==='algebraic'){
     if(markErr('alg-formula','err-alg-formula',!v('alg-formula').trim()))ok=false;
-    if(markErr('alg-expr-display','err-alg-expr-display',!v('alg-expr-display').trim()))ok=false;
     if(markSyntaxErr('alg-formula','err-alg-formula-syntax'))ok=false;
     if(markSyntaxErr('alg-expr-display','err-alg-expr-display-syntax'))ok=false;
     if(markSyntaxErr('alg-error','err-alg-error-syntax'))ok=false;

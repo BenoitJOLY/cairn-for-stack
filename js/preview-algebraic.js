@@ -76,7 +76,11 @@ function renderPreviewHTML_algebraic(state) {
   let aideHTML = '';
   try { if (aideOn && typeof buildAlgHelp === 'function') aideHTML = buildAlgHelp(); } catch (e) {}
   let kbdOn = false;
-  try { kbdOn = aideOn && !!document.getElementById('alg-h-kbd')?.checked; } catch (e) {}
+  let kbdGroups = null;
+  try {
+    kbdGroups = (typeof algKbdGroups === 'function') ? algKbdGroups() : null;
+    kbdOn = aideOn && !!document.getElementById('alg-h-kbd')?.checked && (!kbdGroups || kbdGroups.ops || kbdGroups.fn || kbdGroups.greek);
+  } catch (e) {}
 
   let focusFbGen = false;
   try { focusFbGen = document.querySelector('#fp-algebraic .mpane.on') && document.querySelector('#fp-algebraic .mpane.on').id === 'alg-fb-gen'; } catch (e) {}
@@ -132,7 +136,7 @@ function renderPreviewHTML_algebraic(state) {
   <div class="hs-main-block">
     <div class="hs-preview-text" data-alg-field="text">${text}</div>
     ${exprDisplayHTML ? `<div class="hs-preview-text" data-alg-field="expr-display" style="font-weight:600;">${exprDisplayHTML}</div>` : ''}
-    <div data-alg-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? (typeof buildKbdPreviewHTML === 'function' ? buildKbdPreviewHTML() : `<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ ${I18N.t('common.preview_kbd_note')}</div>`) : ''}</div>
+    <div data-alg-field="help">${aideHTML ? `<div class="hs-alg-help">${aideHTML}</div>` : ''}${kbdOn ? (typeof buildKbdPreviewHTML === 'function' ? buildKbdPreviewHTML(kbdGroups ? {groups:kbdGroups} : undefined) : `<div class="hs-alg-help" style="color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;">⌨️ ${I18N.t('common.preview_kbd_note')}</div>`) : ''}</div>
     <input class="hs-alg-input" type="text" disabled placeholder="${I18N.t('common.preview_student_placeholder')}">
     <button class="hs-validate-btn" disabled>${I18N.t('common.preview_validate_btn')}</button>
 

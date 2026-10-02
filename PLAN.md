@@ -857,6 +857,12 @@ Idées exprimées par l'utilisateur, non commencées, pas encore de XML de réf�
 
 - **Polarimétrie** — dosage/mesure par polarimétrie (pouvoir rotatoire, loi de Biot, concentration).
 
+## Backlog — pistes à travailler (améliorations de types existants)
+
+Idées validées par l'utilisateur comme « à garder pour plus tard », non commencées :
+
+- **Algébrique : diagnostic PRT terme par terme** (relevé 2026-10-03). Le diagnostic actuel (`_algDiagPrt` dans `js/gen-algebraic.js` : signe, facteur numérique, rapport inversé, ×v au lieu de ÷v et inversement) compare l'expression **entière** à la réponse attendue. Il fonctionne quel que soit le nombre de variables (ex. P = nRT/V → `n*R*T*V` détecté), mais **ne reconnaît pas une erreur localisée dans un seul terme d'une somme** (ex. Bernoulli : oubli du ½ sur ½ρv², signe de `(h₁−h₂)` inversé, terme ρgh oublié, `ρ*g/h` au lieu de `ρ*g*h`) ni deux erreurs combinées → l'élève reçoit alors le feedback générique. Piste : développer `ta` en liste de termes (`args(expand(ta))`) et analyser `d = ratsimp(ans−ta)` : `d = −tᵢ` → terme oublié ; `d = −2·tᵢ` → erreur de signe sur ce terme ; `d/tᵢ` numérique → coefficient faux sur ce terme ; `d = tᵢ·(v²−1)` ou `tᵢ·(1/v²−1)` → ×/÷ confondus dans ce terme. 3-4 nœuds PRT de plus, une seule erreur à la fois. Rappel : le champ « erreur classique » (modes développement/expert) couvre déjà une erreur spécifique saisie par l'enseignant.
+
 ## Backlog — avant publication (liste établie 2026-08-04)
 
 Demandé par l'utilisateur ("dans les choses qui restent à faire") + points relevés en réponse à "vois-tu autre chose avant de publier mon programme ?" :

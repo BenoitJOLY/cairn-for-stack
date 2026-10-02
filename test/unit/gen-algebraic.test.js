@@ -39,7 +39,7 @@ function baseParams(overrides) {
         exprDisplay: '(x+1)^2', errorExpr: '',
         fbc: 'Bravo', fbe: 'Perdu',
         sol: '',
-        aide: '', useKbd: false,
+        aide: '', useKbd: false, algDiag: false,
         formVars: ['x'], poolVars: [],
         algFb: {
             developpement: { partial: 'Développement incomplet', errsigne: 'Erreur de signe' },
@@ -118,4 +118,64 @@ test('le XML (prtXML, inputXML) est bien formé pour chaque mode', () => {
         assertBalancedTags(q.prtXML, `prtXML[${mode}]`);
         assertBalancedTags(q.inputXML, `inputXML[${mode}]`);
     });
+});
+
+// ── Diagnostic des erreurs courantes (ex. ρ = m/V : m*V, V/m, -m/V, 2*m/V) ──
+const DIAG_NOTES = ['PRT-DIAG-SIGNE', 'PRT-DIAG-COEFF', 'PRT-DIAG-INVERSE', 'PRT-DIAG-MUL-AU-LIEU-DIV', 'PRT-DIAG-DIV-AU-LIEU-MUL'];
+
+test('diagnostic : 5 nœuds greffés sur la branche fausse du mode libre', () => {
+    const q = genAlgebraicCore(1, baseParams({ algDiag: true, formula: 'm/V', exprDisplay: '', formVars: ['m', 'V'] }), DEPS);
+    const n = q.prt.nodes;
+    assert.equal(n.length, 6);
+    assert.equal(n[0].falsenextnode, '1');
+    assert.equal(n[0].falsefeedback, '');
+    assert.deepEqual(n.slice(1).map(x => x.trueanswernote), DIAG_NOTES);
+    n.slice(1).forEach((x, i) => {
+        assert.equal(x.truescore, '0');
+        assert.equal(x.truenextnode, '-1');
+        assert.equal(x.falsenextnode, i === 4 ? '-1' : String(i + 2));
+    });
+    assert.equal(n[5].falseanswernote, 'PRT-WRONG');
+    assert.match(n[5].falsefeedback, /Perdu/, 'le feedback générique reste en dernier recours');
+});
+
+test('diagnostic : variables de feedback (rapport, ×v², ÷v²) et tests associés', () => {
+    const q = genAlgebraicCore(1, baseParams({ algDiag: true, formula: 'm/V', formVars: ['m', 'V'] }), DEPS);
+    const fv = q.prt.meta.feedbackvariables;
+    assert.match(fv, /dgr1:.*ratsimp\(ans1\/ta1\)/);
+    assert.match(fv, /dgmul1:.*ans1-ta1\*dgv\^2/);
+    assert.match(fv, /dgdiv1:.*ans1-ta1\/dgv\^2/);
+    assert.match(q.prtXML, /<feedbackvariables>[\s\S]*dgmul1/);
+    const n = q.prt.nodes;
+    assert.equal(n[1].tans, '-ta1');
+    assert.equal(n[3].sans, 'ans1*ta1');
+    assert.equal(n[4].sans, 'emptyp(dgmul1)');
+    assert.equal(n[4].tans, 'false');
+});
+
+test('diagnostic : greffé après le nœud « erreur classique » en développement', () => {
+    const q = genAlgebraicCore(1, baseParams({ algDiag: true, mode: 'developpement', errorExpr: '-x^2+2*x+1' }), DEPS);
+    const n = q.prt.nodes;
+    assert.equal(n.length, 8);
+    assert.equal(n[0].falsenextnode, '2');
+    assert.equal(n[2].falsenextnode, '3');
+    assert.equal(n[3].trueanswernote, 'PRT-DIAG-SIGNE');
+});
+
+test('diagnostic : chaque mode reste bien formé et toujours atteignable', () => {
+    ['libre', 'developpement', 'factorisation', 'fraction', 'expert'].forEach(mode => {
+        const q = genAlgebraicCore(1, baseParams({ algDiag: true, mode }), DEPS);
+        assertBalancedTags(q.prtXML, `prtXML[${mode}]`);
+        const names = new Set(q.prt.nodes.map(x => x.name));
+        q.prt.nodes.forEach(x => {
+            [x.truenextnode, x.falsenextnode].forEach(nx => assert.ok(nx === '-1' || names.has(nx), `${mode}: ${nx}`));
+        });
+        assert.ok(q.prt.nodes.some(x => x.trueanswernote === 'PRT-DIAG-MUL-AU-LIEU-DIV'), mode);
+    });
+});
+
+test('diagnostic : désactivable (algDiag:false)', () => {
+    const q = genAlgebraicCore(1, baseParams({ algDiag: false }), DEPS);
+    assert.equal(q.prt.nodes.length, 1);
+    assert.equal(q.prt.meta.feedbackvariables, '');
 });

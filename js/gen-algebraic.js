@@ -34,6 +34,8 @@ function _algBuildParams(){
     sol: richVal('alg-sol'),
     aide: (document.getElementById('alg-aide-on')?.checked||false) ? buildAlgHelp() : '',
     useKbd: (document.getElementById('alg-aide-on')?.checked||false) && document.getElementById('alg-h-kbd').checked,
+    kbdGroups: algKbdGroups(),
+    algDiag: document.getElementById('alg-diag')?.checked!==false,
     formVars, poolVars,
     algFb: {
       developpement: { partial: _algFb('developpement','partial'), errsigne: _algFb('developpement','errsigne') },
@@ -47,7 +49,6 @@ function _algBuildParams(){
 async function genAlgebraic(X){
   const p=_algBuildParams();
   if(!p.formula)throw new Error(I18N.t('msg.err_formule_vide', {n: X}));
-  if(!p.exprDisplay)throw new Error(I18N.t('msg.err_expr_display_vide', {n: X}));
   if(typeof algSyntaxIssues==='function'){
     [[I18N.t('msg.alg_label_reponse_attendue'),p.formula],[I18N.t('msg.alg_label_expr_affichee'),p.exprDisplay],[I18N.t('msg.alg_label_erreur_classique'),p.errorExpr]].forEach(function(pair){
       const issues=algSyntaxIssues(pair[1]);
@@ -89,8 +90,11 @@ function genAlgebraicCore(X, p, deps){
 
   const bareme=p.bareme, text=p.text, formula=p.formula, mode=p.mode;
   const exprDisplay=p.exprDisplay, errorExpr=p.errorExpr;
-  const fbc=p.fbc, fbe=p.fbe, sol=p.sol, aide=p.aide, useKbd=p.useKbd;
-  const kbdHtml=useKbd?(deps.buildKbdStackHTML || buildKbdStackHTML)(X):'';
+  const fbc=p.fbc, fbe=p.fbe, sol=p.sol, aide=p.aide;
+  // Groupes du clavier choisis par l'enseignant ; aucun groupe coché = pas de clavier
+  const kbdGroups=p.kbdGroups||{ops:true, fn:true, greek:false};
+  const useKbd=p.useKbd && (kbdGroups.ops||kbdGroups.fn||kbdGroups.greek);
+  const kbdHtml=useKbd?(deps.buildKbdStackHTML || buildKbdStackHTML)(X,{groups:kbdGroups}):'';
   const allowWords=[...new Set([...p.formVars,...p.poolVars])].join(',');
   const mainVar=p.formVars[0]||'x';
   // Maxima variables block
@@ -148,7 +152,19 @@ function genAlgebraicCore(X, p, deps){
     if(hasError)canonicalNodes.push(algPrtNodeCanonical_D(X,2,'AlgEquiv',_a,_e,'', -1,0.5, -1,0, fbErrSigne,fbKO,
       'PRT-BUG-ERR-FOUND','PRT-WRONG-TOTAL',I18N_D.t('alg.node_err_signe')));
   }
-  const prtMeta={name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:''};
+  // Diagnostic des erreurs courantes : greffé sur la branche « faux » terminale
+  // (celle qui donnait le feedback générique fbKO), qui passe au dernier nœud.
+  let feedbackvariables='';
+  if(p.algDiag!==false){
+    const wrongIdx=((mode==='developpement'||mode==='expert')&&hasError)?2:0;
+    const diag=_algDiagPrt(X, canonicalNodes.length, fbKO, I18N_D, algPrtNodeCanonical_D);
+    const w=canonicalNodes[wrongIdx];
+    w.falsenextnode=String(canonicalNodes.length);
+    w.falsefeedback='';
+    canonicalNodes=canonicalNodes.concat(diag.nodes);
+    feedbackvariables=diag.feedbackvariables;
+  }
+  const prtMeta={name:'prt'+X, value:String(bareme), autosimplify:'1', feedbackstyle:'1', feedbackvariables:feedbackvariables};
   // stripLeadingFbIcon : fbc/fbe retombent par défaut sur FB_JUSTE_DEFAULT()/
   // FB_FAUX_DEFAULT() (js/data.js), déjà préfixés de leur propre icône —
   // sans ce retrait, applyFbBox_D en ajoute une seconde (icône doublée).
@@ -202,8 +218,39 @@ function genAlgebraicCore(X, p, deps){
     solution:sol};
 }
 
+/* Nœuds PRT de diagnostic, enchaînés à partir de l'index `start`. Chaque nœud
+   reconnaît une erreur typique et explique sa nature (score 0) ; sinon on passe
+   au suivant, et le dernier retombe sur le feedback générique `finalFb`.
+   Exemple ta = m/V : -m/V (signe), 2*m/V (coefficient), V/m (rapport inversé),
+   m*V (multiplié par V au lieu de diviser). Les comparaisons passent par
+   ratsimp(a-b)=0 et listofvars(), sans dépendre de la forme interne de
+   l'expression (op(m/V) vaut "/" et non "*" en Maxima). */
+function _algDiagPrt(X, start, finalFb, I18N_D, mkNode){
+  const a='ans'+X, t='ta'+X;
+  const fv=[
+    `dgr${X}:if is(ratsimp(${t})=0) or is(ratsimp(${a})=0) then 0 else ratsimp(${a}/${t});`,
+    `dgk${X}:numberp(dgr${X}) and is(dgr${X}#0) and is(dgr${X}#1) and is(dgr${X}#-1);`,
+    `dgmul${X}:delete(0,makelist(if is(ratsimp(${a}-${t}*dgv^2)=0) then dgv else 0,dgv,listofvars(${t})));`,
+    `dgdiv${X}:delete(0,makelist(if is(ratsimp(${a}-${t}/dgv^2)=0) then dgv else 0,dgv,listofvars(${t})));`,
+  ].join('\n');
+  const steps=[
+    ['AlgEquiv', a, '-'+t, 'PRT-DIAG-SIGNE', 'alg.diag_signe', 'alg.diag_node_signe'],
+    ['AlgEquiv', `dgk${X}`, 'true', 'PRT-DIAG-COEFF', 'alg.diag_coeff', 'alg.diag_node_coeff'],
+    ['AlgEquiv', `${a}*${t}`, '1', 'PRT-DIAG-INVERSE', 'alg.diag_inverse', 'alg.diag_node_inverse'],
+    ['AlgEquiv', `emptyp(dgmul${X})`, 'false', 'PRT-DIAG-MUL-AU-LIEU-DIV', 'alg.diag_mul', 'alg.diag_node_mul'],
+    ['AlgEquiv', `emptyp(dgdiv${X})`, 'false', 'PRT-DIAG-DIV-AU-LIEU-MUL', 'alg.diag_div', 'alg.diag_node_div'],
+  ];
+  const nodes=steps.map(function(s, i){
+    const n=start+i, last=i===steps.length-1;
+    const fb=I18N_D.t(s[4], {X: X});
+    return mkNode(X, n, s[0], s[1], s[2], '', -1, 0, last?-1:n+1, 0, fb, last?finalFb:'',
+      s[3], last?'PRT-WRONG':s[3]+'-NON', I18N_D.t(s[5]));
+  });
+  return {nodes: nodes, feedbackvariables: fv};
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { genAlgebraic: genAlgebraic, genAlgebraicCore: genAlgebraicCore };
+    module.exports = { genAlgebraic: genAlgebraic, genAlgebraicCore: genAlgebraicCore, _algDiagPrt: _algDiagPrt };
 }
 
 

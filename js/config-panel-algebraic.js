@@ -27,6 +27,9 @@ function captureState_algebraic() {
       s.aideOn=document.getElementById('alg-aide-on')?.checked||false;
       s.helpCbs=[...document.querySelectorAll('.alg-h')].map(function(c){return c.checked;});
       s.helpVars=document.getElementById('alg-h-vars').checked;
+      s.helpKbd=!!document.getElementById('alg-h-kbd')?.checked;
+      s.kbdGroups=(typeof algKbdGroups==='function')?algKbdGroups():null;
+      s.algDiag=document.getElementById('alg-diag')?.checked!==false;
       s.fbDetail={};
       if (typeof ALG_FB_DEFS !== 'undefined') { Object.keys(ALG_FB_DEFS).forEach(function(mode){ ALG_FB_DEFS[mode].forEach(function(item){ s.fbDetail[_algFbId(mode,item.key)] = richVal(_algFbId(mode,item.key)); }); }); }
   return s;
@@ -44,6 +47,11 @@ function restoreState_algebraic(s) {
       var algCbs=document.querySelectorAll('.alg-h');
       (s.helpCbs||[]).forEach(function(cv,i){if(algCbs[i])algCbs[i].checked=cv;});
       document.getElementById('alg-h-vars').checked=!!s.helpVars;
+      if(s.helpKbd!==undefined&&document.getElementById('alg-h-kbd'))document.getElementById('alg-h-kbd').checked=!!s.helpKbd;
+      var kg=s.kbdGroups||{ops:true,fn:true,greek:false};
+      document.querySelectorAll('.alg-kbd-grp').forEach(function(cb){cb.checked=!!kg[cb.value];});
+      if(typeof algSyncKbdGroups==='function')algSyncKbdGroups();
+      if(document.getElementById('alg-diag'))document.getElementById('alg-diag').checked=s.algDiag!==false;
       if(typeof updateAlgPreview==='function')updateAlgPreview();
       if(typeof markErr==='function')markErr('alg-formula','err-alg-formula',false);
 }

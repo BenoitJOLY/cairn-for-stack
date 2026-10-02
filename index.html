@@ -4549,13 +4549,13 @@ fill="currentColor" stroke="none">
           </select>
         </div>
         <div class="field">
-          <label><span data-i18n="alg.expr_display_lbl">Expression à afficher dans l'énoncé</span> <span class="hs-c-danger">*</span> <button class="btn-kbd-open" onclick="openKbdModal('alg','alg-expr-display')"><svg class="hs-ico"><use href="#ico-tool-keyboard"></use></svg> <span data-i18n="common.aide_saisie_btn">Aide à la saisie</span></button></label>
+          <label><span data-i18n="alg.expr_display_lbl">Expression à afficher dans l'énoncé</span> <button class="btn-kbd-open" onclick="openKbdModal('alg','alg-expr-display')"><svg class="hs-ico"><use href="#ico-tool-keyboard"></use></svg> <span data-i18n="common.aide_saisie_btn">Aide à la saisie</span></button></label>
           <input type="text" id="alg-expr-display" placeholder="ex: (2*x+3)^2 - 25" data-i18n-ph="alg.expr_display_ph" oninput="algCheckSyntax();updateAlgPreview()">
-          <span class="field-err" id="err-alg-expr-display" style="display:none" data-i18n="common.champ_obligatoire">⚠️ Champ obligatoire</span>
           <span class="field-err" id="err-alg-expr-display-syntax" style="display:none"></span>
         </div>
         <div class="g2">
-          <div class="field"><label data-i18n="field.variables_ex_z_x">Variables (ex:z, x, y)</label><input type="text" id="alg-vars" value="x, y" oninput="updateAlgPreview()"></div>
+          <div class="field"><label><span data-i18n="field.variables_ex_z_x">Variables (ex:z, x, y)</span> <button type="button" class="btn-kbd-open" aria-controls="alg-vars-greek" aria-expanded="false" onclick="toggleVarsGreek(this,'alg-vars-greek')">αβ <span data-i18n="modal.latex_grecques">Lettres grecques</span></button></label><input type="text" id="alg-vars" value="x, y" oninput="updateAlgPreview()">
+            <div class="kbd-grp kbd-vars-greek" id="alg-vars-greek" data-target="alg-vars" style="display:none;margin-top:6px;"></div></div>
           <div class="field">
             <label><span data-i18n="alg.answer_lbl">Réponse attendue</span> <span class="hs-c-danger">*</span> <button class="btn-kbd-open" onclick="openKbdModal('alg')"><svg class="hs-ico"><use href="#ico-tool-keyboard"></use></svg> <span data-i18n="common.aide_saisie_btn">Aide à la saisie</span></button></label>
             <input type="text" id="alg-formula" placeholder="ex: 4*(x-1)*(x+4)" data-i18n-ph="alg.formula_ph" oninput="algCheckSyntax();updateAlgPreview()">
@@ -4582,7 +4582,13 @@ fill="currentColor" stroke="none">
               <label class="help-item"><input type="checkbox" class="alg-h" data-i18n-datahtml="help.parentheses_priorite" data-html="Attention aux parenthèses&nbsp;: les règles de priorité sont respectées." onchange="updateAlgPreview()" checked> <span data-i18n="alg.help_parentheses">Parenthèses et priorités</span></label>
               <label class="help-item"><input type="checkbox" class="alg-h" data-i18n-datahtml="alg.help_html_xy" data-html="<strong>Syndrome du <code>xy</code></strong>&nbsp;: pour 2x, écrivez <code>2*x</code> et non <code>2x</code> — sinon le programme cherche une variable nommée <em>2x</em>." onchange="updateAlgPreview()"> <span data-i18n="alg.help_xy">Syndrome du xy</span></label>
               <label class="help-item hs-colspan2"><input type="checkbox" id="alg-h-vars" onchange="updateAlgPreview()" checked> <span data-i18n="alg.help_rappel_vars">Rappeler les variables définies</span></label>
-              <label class="help-item" style="grid-column:span 2;background:#f0f9ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 10px;margin-top:2px;color:#1d4ed8;"><input type="checkbox" id="alg-h-kbd" onchange="updateAlgPreview()"> <svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-keyboard"></use></svg> <span data-i18n="alg.help_clavier">Inclure le clavier virtuel de saisie dans la question</span></label>
+              <label class="help-item" style="grid-column:span 2;background:#f0f9ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 10px;margin-top:2px;color:#1d4ed8;"><input type="checkbox" id="alg-h-kbd" onchange="algSyncKbdGroups();updateAlgPreview()"> <svg class="hs-ico" aria-hidden="true"><use href="#ico-tool-keyboard"></use></svg> <span data-i18n="alg.help_clavier">Inclure le clavier virtuel de saisie dans la question</span></label>
+              <div id="alg-kbd-groups" class="hs-colspan2" style="display:none;padding:6px 10px;border:1px dashed #bfdbfe;border-radius:6px;font-size:.8rem;color:#1d4ed8;">
+                <span style="font-weight:700;margin-right:6px;" data-i18n="alg.kbd_groups_lbl">Outils du clavier :</span>
+                <label style="margin-right:10px;white-space:nowrap;"><input type="checkbox" class="alg-kbd-grp" value="ops" checked onchange="updateAlgPreview()"> <span data-i18n="kbd.grp_operators">Opérateurs &amp; constantes</span></label>
+                <label style="margin-right:10px;white-space:nowrap;"><input type="checkbox" class="alg-kbd-grp" value="fn" checked onchange="updateAlgPreview()"> <span data-i18n="kbd.grp_functions">Fonctions usuelles</span></label>
+                <label style="white-space:nowrap;"><input type="checkbox" class="alg-kbd-grp" value="greek" onchange="updateAlgPreview()"> <span data-i18n="modal.latex_grecques">Lettres grecques</span></label>
+              </div>
             </div>
           </div>
         </div>
@@ -4592,6 +4598,7 @@ fill="currentColor" stroke="none">
         <div class="field"><label><span data-i18n="alg.fbe_lbl">Feedback si FAUX</span></label>
           <div class="rich-preview hs-minh42" tabindex="0" role="button" id="prev-alg-fbe" data-ph="(défaut auto si vide)" data-i18n-dataph="common.default_auto_ph" onclick="openRich('alg-fbe')"></div>
           <textarea id="alg-fbe" style="display:none"></textarea></div>
+        <div class="field"><label style="font-weight:400;cursor:pointer;"><input type="checkbox" id="alg-diag" checked onchange="updateAlgPreview()"> <span data-i18n="alg.diag_lbl">Diagnostic automatique des erreurs courantes (signe, coefficient, rapport inversé, multiplication/division)</span></label></div>
 
         <!-- ── FEEDBACKS DÉTAILLÉS PAR CAS (selon le type d'exercice) ──
              Édition déportée dans l'aperçu de droite (norme UI : feedback + description du nœud PRT),
@@ -7941,6 +7948,10 @@ fill="currentColor" stroke="none">
         <button class="btn-kbd" data-val="acos()">arccos</button>
         <button class="btn-kbd" data-val="atan()">arctan</button>
       </div>
+      <div id="kbd-greek-wrap">
+        <div class="kbd-grp-label" style="margin-top:4px;" data-i18n="modal.latex_grecques">Lettres grecques</div>
+        <div class="kbd-grp" id="kbd-grp-greek"></div>
+      </div>
     </div>
 
     <!-- Test zone -->
@@ -8159,11 +8170,22 @@ fill="currentColor" stroke="none">
     <div class="sym-group"><div class="sym-group-label" data-i18n="modal.latex_grecques">Lettres grecques</div><div class="sym-btns">
       <span class="sym" onclick="aSym('\\alpha ')">α</span><span class="sym" onclick="aSym('\\beta ')">β</span>
       <span class="sym" onclick="aSym('\\gamma ')">γ</span><span class="sym" onclick="aSym('\\delta ')">δ</span>
-      <span class="sym" onclick="aSym('\\Delta ')">Δ</span><span class="sym" onclick="aSym('\\epsilon ')">ε</span>
+      <span class="sym" onclick="aSym('\\epsilon ')">ε</span><span class="sym" onclick="aSym('\\varepsilon ')">ɛ</span>
+      <span class="sym" onclick="aSym('\\zeta ')">ζ</span><span class="sym" onclick="aSym('\\eta ')">η</span>
+      <span class="sym" onclick="aSym('\\theta ')">θ</span><span class="sym" onclick="aSym('\\vartheta ')">ϑ</span>
+      <span class="sym" onclick="aSym('\\iota ')">ι</span><span class="sym" onclick="aSym('\\kappa ')">κ</span>
       <span class="sym" onclick="aSym('\\lambda ')">λ</span><span class="sym" onclick="aSym('\\mu ')">μ</span>
-      <span class="sym" onclick="aSym('\\pi ')">π</span><span class="sym" onclick="aSym('\\sigma ')">σ</span>
-      <span class="sym" onclick="aSym('\\theta ')">θ</span><span class="sym" onclick="aSym('\\omega ')">ω</span>
-      <span class="sym" onclick="aSym('\\phi ')">φ</span><span class="sym" onclick="aSym('\\tau ')">τ</span>
+      <span class="sym" onclick="aSym('\\nu ')">ν</span><span class="sym" onclick="aSym('\\xi ')">ξ</span>
+      <span class="sym" onclick="aSym('\\pi ')">π</span><span class="sym" onclick="aSym('\\rho ')">ρ</span>
+      <span class="sym" onclick="aSym('\\sigma ')">σ</span><span class="sym" onclick="aSym('\\tau ')">τ</span>
+      <span class="sym" onclick="aSym('\\upsilon ')">υ</span><span class="sym" onclick="aSym('\\phi ')">φ</span>
+      <span class="sym" onclick="aSym('\\varphi ')">ϕ</span><span class="sym" onclick="aSym('\\chi ')">χ</span>
+      <span class="sym" onclick="aSym('\\psi ')">ψ</span><span class="sym" onclick="aSym('\\omega ')">ω</span>
+      <span class="sym" onclick="aSym('\\Gamma ')">Γ</span><span class="sym" onclick="aSym('\\Delta ')">Δ</span>
+      <span class="sym" onclick="aSym('\\Theta ')">Θ</span><span class="sym" onclick="aSym('\\Lambda ')">Λ</span>
+      <span class="sym" onclick="aSym('\\Xi ')">Ξ</span><span class="sym" onclick="aSym('\\Pi ')">Π</span>
+      <span class="sym" onclick="aSym('\\Sigma ')">Σ</span><span class="sym" onclick="aSym('\\Phi ')">Φ</span>
+      <span class="sym" onclick="aSym('\\Psi ')">Ψ</span><span class="sym" onclick="aSym('\\Omega ')">Ω</span>
     </div></div>
     <div class="sym-group"><div class="sym-group-label" data-i18n="modal.latex_vecteurs">Vecteurs &amp; géométrie</div><div class="sym-btns">
       <span class="sym" onclick="iSym('\\vec{AB}','\\vec{','}')">AB⃗</span>
